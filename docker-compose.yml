@@ -1,0 +1,123 @@
+# ~/projects/zenfleet/docker-compose.yml
+
+#version: '3.8'
+
+networks:
+  zenfleet_network:
+    driver: bridge
+
+volumes:
+  zenfleet_postgres_data:
+    driver: local
+  zenfleet_redis_data:
+    driver: local
+
+services:
+  # Service PHP (Application Laravel)
+  php:
+    build:
+      context: ./docker/php
+      args:
+        USER_ID: ${UID:-1000}
+        GROUP_ID: ${GID:-1000}
+    container_name: zenfleet_php
+    restart: unless-stopped
+    volumes:
+      - ./:/var/www/html # Monte le code source de l'application
+      # Le volume php_socket est utilisé pour la communication entre Nginx et PHP-FPM
+      # mais nous utilisons le réseau Docker, donc ce n'est pas strictement nécessaire ici.
+      # Le nommage php:9000 dans Nginx gère cela.
+    networks:
+      - zenfleet_network
+    depends_on:
+      - database
+      - redis
+    environment:
+      # Ces variables seront utilisées par Laravel pour se connecter à la BDD
+      DB_CONNECTION: pgsql
+      DB_HOST: database # Nom du service de la base de données
+      DB_PORT: 5432
+      DB_DATABASE: ${DB_DATABASE:-zenfleet_db}
+      DB_USERNAME: ${DB_USERNAME:-zenfleet_user}
+      DB_PASSWORD: ${DB_PASSWORD:-zenfleet_pass}
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      # D'autres variables d'environnement pour Laravel peuvent être ajoutées ici
+      # APP_KEY: (sera généré par artisan)
+      # APP_ENV: local
+      # APP_DEBUG: true
+
+  # Service Nginx (Serveur Web)
+  nginx:
+    build:
+      context: ./docker/nginx
+    container_name: zenfleet_nginx
+    restart: unless-stopped
+    ports:
+      - "${FORWARD_NGINX_HTTP_PORT:-80}:80"
+      - "${FORWARD_NGINX_HTTPS_PORT:-443}:443" # Si vous configurez SSL
+    volumes:
+      - ./:/var/www/html # Accès aux fichiers statiques et au code source
+      - ./docker/nginx/zenfleet.conf:/etc/nginx/conf.d/zenfleet.conf:ro # Assure que la config est bien celle du host
+      # Volume pour les logs Nginx (optionnel, peut être utile pour le débogage)
+      # - ./docker/nginx/logs:/var/log/nginx
+    networks:
+      - zenfleet_network
+    depends_on:
+      - php # Nginx a besoin que PHP-FPM soit prêt
+
+  # Service Node.js (pour la compilation des assets frontend)
+  node:
+    build:
+      context: ./docker/node
+      args:
+        USER_ID: ${UID:-1000}
+        GROUP_ID: ${GID:-1000}
+    container_name: zenfleet_node
+    volumes:
+      - ./:/var/www/html # Monte le code source pour la compilation des assets
+      - /var/www/html/node_modules # Volume anonyme pour node_modules
+    # Le CMD par défaut du Dockerfile node est `tail -f /dev/null`
+    # Pour le développement avec hot-reloading (ex: Vite), on pourrait surcharger ici:
+    # command: sh -c "yarn install && yarn dev"
+    networks:
+      - zenfleet_network
+    tty: true # Garde le conteneur en vie pour les commandes interactives
+
+  # Service PostgreSQL (Base de données)
+  database:
+    image: postgres:15-alpine # Image officielle PostgreSQL
+    container_name: zenfleet_database
+    restart: unless-stopped
+    ports:
+      - "${FORWARD_DB_PORT:-5432}:5432" # Expose le port pour accès externe (ex: pgAdmin)
+    environment:
+      POSTGRES_DB: ${DB_DATABASE:-zenfleet_db}
+      POSTGRES_USER: ${DB_USERNAME:-zenfleet_user}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-zenfleet_pass}
+    volumes:
+      - zenfleet_postgres_data:/var/lib/postgresql/data # Persiste les données
+    networks:
+      - zenfleet_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME:-zenfleet_user} -d ${DB_DATABASE:-zenfleet_db}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Service Redis (Cache, Queues)
+  redis:
+    image: redis:7-alpine # Image officielle Redis
+    container_name: zenfleet_redis
+    restart: unless-stopped
+    ports:
+      - "${FORWARD_REDIS_PORT:-6379}:6379" # Expose le port pour accès externe si besoin
+    volumes:
+      - zenfleet_redis_data:/data # Persiste les données Redis
+    networks:
+      - zenfleet_network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
