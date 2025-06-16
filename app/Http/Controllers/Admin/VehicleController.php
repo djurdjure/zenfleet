@@ -8,14 +8,22 @@ use App\Models\TransmissionType;
 use App\Models\Vehicle;
 use App\Models\VehicleStatus;
 use App\Models\VehicleType;
-use Carbon\Carbon; // <--- L'INSTRUCTION CAPITALE QUI MANQUAIT
+use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 use League\Csv\Reader;
 use League\Csv\Statement;
+// On importe nos nouvelles Form Requests
+use App\Http\Requests\Admin\Vehicle\StoreVehicleRequest;
+use App\Http\Requests\Admin\Vehicle\UpdateVehicleRequest;
+
+
+
+
 
 class VehicleController extends Controller
 {
@@ -59,56 +67,38 @@ class VehicleController extends Controller
         ]);
     }
 
-    /**
-     * Affiche le formulaire pour créer un nouveau véhicule.
+
+        /**
+     * Affiche le formulaire de création.
      */
     public function create(): View
     {
         $this->authorize('create vehicles');
-
         $vehicleTypes = VehicleType::orderBy('name')->get();
         $fuelTypes = FuelType::orderBy('name')->get();
         $transmissionTypes = TransmissionType::orderBy('name')->get();
         $vehicleStatuses = VehicleStatus::orderBy('name')->get();
-
-        return view('admin.vehicles.create', compact(
-            'vehicleTypes', 'fuelTypes', 'transmissionTypes', 'vehicleStatuses'
-        ));
+        return view('admin.vehicles.create', compact('vehicleTypes', 'fuelTypes', 'transmissionTypes', 'vehicleStatuses'));
     }
 
-    /**
-     * Stocke un nouveau véhicule dans la base de données.
+
+     /**
+     * Enregistre un nouveau véhicule.
      */
-    public function store(Request $request): RedirectResponse
+    public function store(StoreVehicleRequest $request): RedirectResponse
     {
         $this->authorize('create vehicles');
+        $validatedData = $request->validated();
 
-        $validatedData = $request->validate([
-            'registration_plate' => ['required', 'string', 'max:50', 'unique:vehicles,registration_plate'],
-            'vin' => ['nullable', 'string', 'size:17', 'unique:vehicles,vin'],
-            'brand' => ['required', 'string', 'max:100'],
-            'model' => ['required', 'string', 'max:100'],
-            'color' => ['nullable', 'string', 'max:50'],
-            'vehicle_type_id' => ['required', 'exists:vehicle_types,id'],
-            'fuel_type_id' => ['required', 'exists:fuel_types,id'],
-            'transmission_type_id' => ['required', 'exists:transmission_types,id'],
-            'status_id' => ['required', 'exists:vehicle_statuses,id'],
-            'manufacturing_year' => ['nullable', 'integer', 'digits:4', 'min:1950', 'max:'.(date('Y') + 1)],
-            'acquisition_date' => ['nullable', 'date'],
-            'purchase_price' => ['nullable', 'numeric', 'min:0'],
-            'current_value' => ['nullable', 'numeric', 'min:0'],
-            'initial_mileage' => ['nullable', 'integer', 'min:0'],
-            'engine_displacement_cc' => ['nullable', 'integer', 'min:0'],
-            'power_hp' => ['nullable', 'integer', 'min:0'],
-            'seats' => ['nullable', 'integer', 'min:1'],
-            'notes' => ['nullable', 'string'],
-        ]);
-
-        $validatedData['current_mileage'] = $validatedData['initial_mileage'] ?? 0;
+        if ($request->hasFile('photo')) {
+            $validatedData['photo_path'] = $request->file('photo')->store('vehicles/photos', 'public');
+        }
+        $validatedData['current_mileage'] = $validatedData['initial_mileage'];
+        
         Vehicle::create($validatedData);
-
-        return redirect()->route('admin.vehicles.index')->with('success', 'Le nouveau véhicule a été ajouté avec succès.');
+        return redirect()->route('admin.vehicles.index')->with('success', 'Nouveau véhicule ajouté avec succès.');
     }
+
 
     /**
      * Affiche une ressource spécifique.
@@ -119,70 +109,43 @@ class VehicleController extends Controller
         return redirect()->route('admin.vehicles.edit', $vehicle);
     }
 
-    /**
-     * Affiche le formulaire pour modifier un véhicule existant.
+        /**
+     * Affiche le formulaire de modification.
      */
     public function edit(Vehicle $vehicle): View
     {
         $this->authorize('edit vehicles');
-
-         // On pré-charge les relations nécessaires pour la vue
-      //  $vehicle->load(['maintenancePlans.maintenanceType', 'maintenancePlans.recurrenceUnit']);
-    
-
-
         $vehicleTypes = VehicleType::orderBy('name')->get();
         $fuelTypes = FuelType::orderBy('name')->get();
         $transmissionTypes = TransmissionType::orderBy('name')->get();
         $vehicleStatuses = VehicleStatus::orderBy('name')->get();
-
-        return view('admin.vehicles.edit', compact(
-            'vehicle', 'vehicleTypes', 'fuelTypes', 'transmissionTypes', 'vehicleStatuses'
-        ));
-
-       // desactivé pour annuler la modale d'ajout d'un plan de maintenance
-       // return view('admin.vehicles.edit', compact(
-       // 'vehicle', 'vehicleTypes', 'fuelTypes', 'transmissionTypes', 'vehicleStatuses'
-       //      ));
-        
-
+        return view('admin.vehicles.edit', compact('vehicle', 'vehicleTypes', 'fuelTypes', 'transmissionTypes', 'vehicleStatuses'));
     }
 
+
     /**
-     * Met à jour un véhicule dans la base de données.
+     * Met à jour un véhicule existant en utilisant une Form Request.
      */
-    public function update(Request $request, Vehicle $vehicle): RedirectResponse
+    public function update(UpdateVehicleRequest $request, Vehicle $vehicle): RedirectResponse
     {
-        $this->authorize('edit vehicles');
-
-        $validatedData = $request->validate([
-            'registration_plate' => ['required', 'string', 'max:50', Rule::unique('vehicles')->ignore($vehicle->id)],
-            'vin' => ['nullable', 'string', 'size:17', Rule::unique('vehicles')->ignore($vehicle->id)],
-            'brand' => ['required', 'string', 'max:100'],
-            'model' => ['required', 'string', 'max:100'],
-            'color' => ['nullable', 'string', 'max:50'],
-            'vehicle_type_id' => ['required', 'exists:vehicle_types,id'],
-            'fuel_type_id' => ['required', 'exists:fuel_types,id'],
-            'transmission_type_id' => ['required', 'exists:transmission_types,id'],
-            'status_id' => ['required', 'exists:vehicle_statuses,id'],
-            'manufacturing_year' => ['nullable', 'integer', 'digits:4', 'min:1950', 'max:'.(date('Y') + 1)],
-            'current_mileage' => ['nullable', 'integer', 'min:0', 'gte:'.$vehicle->initial_mileage],
-            'acquisition_date' => ['nullable', 'date'],
-            'purchase_price' => ['nullable', 'numeric', 'min:0'],
-            'current_value' => ['nullable', 'numeric', 'min:0'],
-            'engine_displacement_cc' => ['nullable', 'integer', 'min:0'],
-            'power_hp' => ['nullable', 'integer', 'min:0'],
-            'seats' => ['nullable', 'integer', 'min:1'],
-            'notes' => ['nullable', 'string'],
-        ]);
-
+        $validatedData = $request->validated();
+        if ($request->hasFile('photo')) {
+            if ($vehicle->photo_path) {
+                Storage::disk('public')->delete($vehicle->photo_path);
+            }
+            $validatedData['photo_path'] = $request->file('photo')->store('vehicles/photos', 'public');
+        }
         $vehicle->update($validatedData);
-
         return redirect()->route('admin.vehicles.index')->with('success', 'Les informations du véhicule ont été mises à jour.');
     }
 
+
+
   //////////////////////////// ARCHIVER SUPPRIMER ET RESTAURER
 
+     /**
+     * Archive un véhicule.
+     */
     public function destroy(Vehicle $vehicle): RedirectResponse
     {
         $this->authorize('delete vehicles');
@@ -190,7 +153,9 @@ class VehicleController extends Controller
         return redirect()->route('admin.vehicles.index')->with('success', "Le véhicule {$vehicle->registration_plate} a été archivé.");
     }
 
-    // --- NOUVELLES MÉTHODES ---
+    /**
+     * Restaure un véhicule archivé.
+     */
     public function restore($vehicleId): RedirectResponse
     {
         $this->authorize('restore vehicles');
@@ -199,20 +164,23 @@ class VehicleController extends Controller
         return redirect()->route('admin.vehicles.index', ['view_deleted' => 'true'])->with('success', "Le véhicule {$vehicle->registration_plate} a été restauré.");
     }
 
+    /**
+     * Supprime définitivement un véhicule.
+     */
     public function forceDelete($vehicleId): RedirectResponse
     {
         $this->authorize('force delete vehicles');
         $vehicle = Vehicle::onlyTrashed()->findOrFail($vehicleId);
-        if ($vehicle->photo_path) { // Assumant qu'on ajoutera une photo plus tard
+        if ($vehicle->photo_path) {
             Storage::disk('public')->delete($vehicle->photo_path);
         }
         $vehicle->forceDelete();
         return redirect()->route('admin.vehicles.index', ['view_deleted' => 'true'])->with('success', 'Le véhicule a été supprimé définitivement.');
     }
 
+    //////////////////////////  FIN DES METHODES DE SUPPRIMER RESTAURER
 
-  //////////////////////////// FIN DES METHODES ARCHIVER SUPPR RESTAU
-
+    
     /**
      * Affiche le formulaire pour l'importation de véhicules via un fichier CSV.
      */
@@ -263,7 +231,7 @@ class VehicleController extends Controller
 
         $path = $request->file('csv_file')->getRealPath();
         $csv = Reader::createFromPath($path, 'r');
-        $headerFromFile = array_map(fn($h) => trim(preg_replace('/^\x{FEFF}/u', '', $h)), $csv->fetchOne());
+        $headerFromFile = array_map(fn($h) => trim(preg_replace('/^\\x{FEFF}/u', '', $h)), $csv->fetchOne());
         $csv->setHeaderOffset(0);
         $records = Statement::create()->process($csv, $headerFromFile);
 
@@ -348,7 +316,7 @@ class VehicleController extends Controller
         $dataToValidate['vehicle_type_id'] = $vehicleTypes[strtolower($data['vehicle_type_name'] ?? '')] ?? null;
         $dataToValidate['fuel_type_id'] = $fuelTypes[strtolower($data['fuel_type_name'] ?? '')] ?? null;
         $dataToValidate['transmission_type_id'] = $transmissionTypes[strtolower($data['transmission_type_name'] ?? '')] ?? null;
-        $dataToValidate['status_id'] = $vehicleStatuses[strtolower($data['status_name'] ?? '')] ?? null;
+        $dataToValidate['status_id'] = $vehicleStatuses[strtolower($data['status_type_name'] ?? '')] ?? null; // Corrected from status_name to status_type_name
 
         // Assurer que les champs numériques vides deviennent 0 pour la validation/création
         $dataToValidate['initial_mileage'] = $data['initial_mileage'] ?? 0;
@@ -356,30 +324,44 @@ class VehicleController extends Controller
         return $dataToValidate;
     }
 
-    /**
-     * Retourne les règles de validation pour un véhicule.
+     /**
+     * Centralise les règles de validation pour les véhicules.
      */
-    private function getValidationRules(): array
+    private function getValidationRules(?int $vehicleId = null): array
     {
-        return [
-            'registration_plate' => ['required', 'string', 'max:50', Rule::unique('vehicles')],
+        $rules = [
+            'registration_plate' => ['required', 'string', 'max:50', Rule::unique('vehicles')->ignore($vehicleId)->whereNull('deleted_at')],
+            'vin' => ['nullable', 'string', 'size:17', Rule::unique('vehicles')->ignore($vehicleId)->whereNull('deleted_at')],
             'brand' => ['required', 'string', 'max:100'],
             'model' => ['required', 'string', 'max:100'],
+            'color' => ['nullable', 'string', 'max:50'],
             'vehicle_type_id' => ['required', 'exists:vehicle_types,id'],
             'fuel_type_id' => ['required', 'exists:fuel_types,id'],
             'transmission_type_id' => ['required', 'exists:transmission_types,id'],
             'status_id' => ['required', 'exists:vehicle_statuses,id'],
-            'vin' => ['nullable', 'string', 'size:17', Rule::unique('vehicles')->whereNull('deleted_at')],
-            'initial_mileage' => ['required', 'integer', 'min:0'],
-            'acquisition_date' => ['nullable', 'date_format:Y-m-d'],
-            'color' => ['nullable', 'string', 'max:50'],
             'manufacturing_year' => ['nullable', 'integer', 'digits:4'],
+            'acquisition_date' => ['nullable', 'date'],
             'purchase_price' => ['nullable', 'numeric', 'min:0'],
             'current_value' => ['nullable', 'numeric', 'min:0'],
             'engine_displacement_cc' => ['nullable', 'integer', 'min:0'],
             'power_hp' => ['nullable', 'integer', 'min:0'],
             'seats' => ['nullable', 'integer', 'min:1'],
             'notes' => ['nullable', 'string'],
+            'photo' => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif', 'max:2048'],
         ];
+
+        if ($vehicleId) {
+            // Règle pour la mise à jour
+            $vehicle = Vehicle::find($vehicleId);
+            $rules['current_mileage'] = ['required', 'integer', 'min:0', 'gte:' . ($vehicle->current_mileage ?? 0)];
+        } else {
+            // Règles pour la création
+            $rules['initial_mileage'] = ['required', 'integer', 'min:0'];
+            $rules['current_mileage'] = ['required', 'integer', 'min:0', 'gte:initial_mileage'];
+        }
+
+        return $rules;
     }
 }
+
+
