@@ -94,7 +94,7 @@ class VehicleController extends Controller
             $validatedData['photo_path'] = $request->file('photo')->store('vehicles/photos', 'public');
         }
         $validatedData['current_mileage'] = $validatedData['initial_mileage'];
-        
+
         Vehicle::create($validatedData);
         return redirect()->route('admin.vehicles.index')->with('success', 'Nouveau véhicule ajouté avec succès.');
     }
@@ -180,7 +180,7 @@ class VehicleController extends Controller
 
     //////////////////////////  FIN DES METHODES DE SUPPRIMER RESTAURER
 
-    
+
     /**
      * Affiche le formulaire pour l'importation de véhicules via un fichier CSV.
      */
@@ -268,7 +268,7 @@ class VehicleController extends Controller
                 $errorRows[] = ['row_number' => $rowNumber, 'errors' => $validator->errors()->all(), 'data' => $record];
             } else {
                 $validatedData = $validator->validated();
-                $validatedData['current_mileage'] = $validatedData['initial_mileage'] ?? 0;
+                $validatedData["current_mileage"] = $validatedData["initial_mileage"] ?? 0;
 
                 Vehicle::create($validatedData);
                 $successCount++;
@@ -316,7 +316,7 @@ class VehicleController extends Controller
         $dataToValidate['vehicle_type_id'] = $vehicleTypes[strtolower($data['vehicle_type_name'] ?? '')] ?? null;
         $dataToValidate['fuel_type_id'] = $fuelTypes[strtolower($data['fuel_type_name'] ?? '')] ?? null;
         $dataToValidate['transmission_type_id'] = $transmissionTypes[strtolower($data['transmission_type_name'] ?? '')] ?? null;
-        $dataToValidate['status_id'] = $vehicleStatuses[strtolower($data['status_type_name'] ?? '')] ?? null; // Corrected from status_name to status_type_name
+        $dataToValidate['status_id'] = $vehicleStatuses[strtolower($data['status_name'] ?? '')] ?? null;
 
         // Assurer que les champs numériques vides deviennent 0 pour la validation/création
         $dataToValidate['initial_mileage'] = $data['initial_mileage'] ?? 0;
@@ -356,8 +356,8 @@ class VehicleController extends Controller
             $rules['current_mileage'] = ['required', 'integer', 'min:0', 'gte:' . ($vehicle->current_mileage ?? 0)];
         } else {
             // Règles pour la création
-            $rules['initial_mileage'] = ['required', 'integer', 'min:0'];
-            $rules['current_mileage'] = ['required', 'integer', 'min:0', 'gte:initial_mileage'];
+            $rules["initial_mileage"] = ["nullable", "integer", "min:0"];
+            $rules["current_mileage"] = ["nullable", "integer", "min:0"];
         }
 
         return $rules;

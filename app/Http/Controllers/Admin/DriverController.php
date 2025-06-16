@@ -11,18 +11,24 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 use Illuminate\View\View;
+use App\Http\Requests\Admin\Driver\StoreDriverRequest; // <-- AJOUT
+use App\Http\Requests\Admin\Driver\UpdateDriverRequest; // <-- AJOUT
 
 class DriverController extends Controller
 {
-    /**
-     * Affiche la liste des chauffeurs avec une recherche insensible à la casse.
-     */
+    // ... (index et create sont déjà corrects) ...
+    ////////_____OK
     public function index(Request $request): View
     {
         $this->authorize('view drivers');
 
         $perPage = $request->query('per_page', 15);
         $query = Driver::query()->with(['driverStatus', 'user']);
+
+        // AJOUT : Logique pour voir les archives
+        if ($request->query('view_deleted')) {
+            $query->onlyTrashed();
+        }
 
         // Filtre par Statut
         if ($request->filled('status_id')) {
@@ -47,29 +53,22 @@ class DriverController extends Controller
         return view('admin.drivers.index', [
             'drivers' => $drivers,
             'driverStatuses' => $driverStatuses,
-            'filters' => $request->only(['search', 'status_id', 'per_page']),
+            'filters' => $request->only(['search', 'status_id', 'per_page', 'view_deleted']),
         ]);
     }
 
-    public function create(): View
-    {
-        $this->authorize('create drivers');
-        $linkableUsers = User::whereDoesntHave('driver')->orderBy('name')->get();
-        $driverStatuses = DriverStatus::orderBy('name')->get();
-        return view('admin.drivers.create', compact('linkableUsers', 'driverStatuses'));
-    }
 
-    public function store(Request $request): RedirectResponse
+
+    public function store(StoreDriverRequest $request): RedirectResponse
     {
-        $this->authorize('create drivers');
-        $validatedData = $request->validate($this->getValidationRules());
+        $validatedData = $request->validated();
         if ($request->hasFile('photo')) {
             $validatedData['photo_path'] = $request->file('photo')->store('drivers/photos', 'public');
         }
         Driver::create($validatedData);
         return redirect()->route('admin.drivers.index')->with('success', 'Nouveau chauffeur ajouté avec succès.');
     }
-
+    ////////____OK
     public function edit(Driver $driver): View
     {
         $this->authorize('edit drivers');
@@ -78,10 +77,9 @@ class DriverController extends Controller
         return view('admin.drivers.edit', compact('driver', 'linkableUsers', 'driverStatuses'));
     }
 
-    public function update(Request $request, Driver $driver): RedirectResponse
+    public function update(UpdateDriverRequest $request, Driver $driver): RedirectResponse
     {
-        $this->authorize('edit drivers');
-        $validatedData = $request->validate($this->getValidationRules($driver->id));
+        $validatedData = $request->validated();
         if ($request->hasFile('photo')) {
             if ($driver->photo_path) {
                 Storage::disk('public')->delete($driver->photo_path);
@@ -92,6 +90,21 @@ class DriverController extends Controller
         return redirect()->route('admin.drivers.index')->with('success', "Le chauffeur {$driver->first_name} {$driver->last_name} a été mis à jour.");
     }
 
+    // ... (destroy, restore, forceDelete sont déjà corrects) ...
+
+      /**
+     * Affiche la liste des chauffeurs avec une recherche insensible à la casse.
+     */
+
+    public function create(): View
+    {
+        $this->authorize('create drivers');
+        $linkableUsers = User::whereDoesntHave('driver')->orderBy('name')->get();
+        $driverStatuses = DriverStatus::orderBy('name')->get();
+        return view('admin.drivers.create', compact('linkableUsers', 'driverStatuses'));
+    }
+
+
     public function destroy(Driver $driver): RedirectResponse
     {
         $this->authorize('delete drivers');
@@ -99,7 +112,7 @@ class DriverController extends Controller
         return redirect()->route('admin.drivers.index')->with('success', "Le chauffeur {$driver->first_name} a été archivé.");
     }
 
-    public function restore($driverId): RedirectResponse
+     public function restore($driverId): RedirectResponse
     {
         $this->authorize('restore drivers');
         $driver = Driver::onlyTrashed()->findOrFail($driverId);
@@ -142,4 +155,10 @@ class DriverController extends Controller
             'personal_email' => ['nullable', 'email', 'max:255'],
         ];
     }
+
+
+
+
+
 }
+
