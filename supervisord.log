@@ -994,3 +994,115 @@
 2025-06-16 20:30:39,381 INFO success: laravel-worker_00 entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
 2025-06-16 20:30:39,384 INFO spawned: 'laravel-worker_01' with pid 237
 2025-06-16 20:30:41,338 INFO success: laravel-worker_01 entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-16 22:06:16,126 INFO exited: laravel-worker_00 (exit status 0; expected)
+2025-06-16 22:06:16,500 INFO spawned: 'laravel-worker_00' with pid 241
+2025-06-16 22:06:16,501 INFO exited: laravel-worker_01 (exit status 0; expected)
+2025-06-16 22:06:17,504 INFO success: laravel-worker_00 entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-16 22:06:17,508 INFO spawned: 'laravel-worker_01' with pid 245
+2025-06-16 22:06:18,511 INFO success: laravel-worker_01 entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-16 23:23:02,791 INFO exited: laravel-worker_00 (exit status 0; expected)
+2025-06-16 23:23:03,664 INFO spawned: 'laravel-worker_00' with pid 249
+2025-06-16 23:23:03,664 INFO exited: laravel-worker_01 (exit status 0; expected)
+2025-06-16 23:23:04,679 INFO success: laravel-worker_00 entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-16 23:23:04,683 INFO spawned: 'laravel-worker_01' with pid 253
+2025-06-16 23:23:05,690 INFO success: laravel-worker_01 entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-17 00:44:22,400 INFO exited: laravel-worker_00 (exit status 0; expected)
+2025-06-17 00:44:22,793 INFO spawned: 'laravel-worker_00' with pid 257
+2025-06-17 00:44:22,795 INFO exited: laravel-worker_01 (exit status 0; expected)
+2025-06-17 00:44:23,798 INFO success: laravel-worker_00 entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-17 00:44:23,801 INFO spawned: 'laravel-worker_01' with pid 261
+2025-06-17 00:44:24,805 INFO success: laravel-worker_01 entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-17 01:46:55,251 INFO exited: laravel-worker_00 (exit status 0; expected)
+2025-06-17 01:46:56,205 INFO spawned: 'laravel-worker_00' with pid 265
+2025-06-17 01:46:56,206 INFO exited: laravel-worker_01 (exit status 0; expected)
+2025-06-17 01:46:57,228 INFO success: laravel-worker_00 entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-17 01:46:57,232 INFO spawned: 'laravel-worker_01' with pid 269
+2025-06-17 01:46:58,254 INFO success: laravel-worker_01 entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-17 09:11:50,529 INFO exited: laravel-worker_00 (exit status 0; expected)
+2025-06-17 09:11:51,536 INFO spawned: 'laravel-worker_00' with pid 273
+2025-06-17 09:11:52,543 INFO success: laravel-worker_00 entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-17 09:11:53,510 INFO exited: laravel-worker_01 (exit status 0; expected)
+2025-06-17 09:11:54,560 INFO spawned: 'laravel-worker_01' with pid 277
+2025-06-17 09:11:55,563 INFO success: laravel-worker_01 entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-17 10:06:40,671 INFO exited: laravel-worker_00 (exit status 0; expected)
+2025-06-17 10:06:41,696 INFO spawned: 'laravel-worker_00' with pid 281
+2025-06-17 10:06:42,751 INFO success: laravel-worker_00 entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-17 10:06:44,970 INFO exited: laravel-worker_01 (exit status 0; expected)
+2025-06-17 10:06:45,983 INFO spawned: 'laravel-worker_01' with pid 285
+2025-06-17 10:06:47,044 INFO success: laravel-worker_01 entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-17 11:01:16,994 INFO exited: laravel-worker_00 (exit status 0; expected)
+2025-06-17 11:01:18,011 INFO spawned: 'laravel-worker_00' with pid 289
+2025-06-17 11:01:19,018 INFO success: laravel-worker_00 entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-17 11:01:19,761 INFO exited: laravel-worker_01 (exit status 0; expected)
+2025-06-17 11:01:20,811 INFO spawned: 'laravel-worker_01' with pid 293
+2025-06-17 11:01:21,817 INFO success: laravel-worker_01 entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-17 11:55:53,000 INFO exited: laravel-worker_00 (exit status 0; expected)
+2025-06-17 11:55:54,020 INFO spawned: 'laravel-worker_00' with pid 297
+2025-06-17 11:55:55,034 INFO success: laravel-worker_00 entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-17 11:55:56,305 INFO exited: laravel-worker_01 (exit status 0; expected)
+2025-06-17 11:55:57,359 INFO spawned: 'laravel-worker_01' with pid 301
+2025-06-17 11:55:58,364 INFO success: laravel-worker_01 entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-17 15:20:50,181 INFO exited: laravel-worker_00 (exit status 0; expected)
+2025-06-17 15:20:51,194 INFO spawned: 'laravel-worker_00' with pid 305
+2025-06-17 15:20:52,195 INFO success: laravel-worker_00 entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-17 15:20:54,141 INFO exited: laravel-worker_01 (exit status 0; expected)
+2025-06-17 15:20:55,145 INFO spawned: 'laravel-worker_01' with pid 309
+2025-06-17 15:20:56,147 INFO success: laravel-worker_01 entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-17 17:07:21,871 INFO exited: laravel-worker_00 (exit status 0; expected)
+2025-06-17 17:07:22,884 INFO spawned: 'laravel-worker_00' with pid 313
+2025-06-17 17:07:23,887 INFO success: laravel-worker_00 entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-17 17:07:24,824 INFO exited: laravel-worker_01 (exit status 0; expected)
+2025-06-17 17:07:25,828 INFO spawned: 'laravel-worker_01' with pid 317
+2025-06-17 17:07:26,830 INFO success: laravel-worker_01 entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-17 18:07:56,074 INFO exited: laravel-worker_00 (exit status 0; expected)
+2025-06-17 18:07:57,080 INFO spawned: 'laravel-worker_00' with pid 321
+2025-06-17 18:07:58,083 INFO success: laravel-worker_00 entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-17 18:07:58,538 INFO exited: laravel-worker_01 (exit status 0; expected)
+2025-06-17 18:07:59,541 INFO spawned: 'laravel-worker_01' with pid 325
+2025-06-17 18:08:00,543 INFO success: laravel-worker_01 entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-17 19:15:32,270 INFO exited: laravel-worker_00 (exit status 0; expected)
+2025-06-17 19:15:32,943 INFO spawned: 'laravel-worker_00' with pid 329
+2025-06-17 19:15:33,945 INFO success: laravel-worker_00 entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-17 19:15:34,751 INFO exited: laravel-worker_01 (exit status 0; expected)
+2025-06-17 19:15:35,755 INFO spawned: 'laravel-worker_01' with pid 333
+2025-06-17 19:15:36,757 INFO success: laravel-worker_01 entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-17 19:30:48,170 WARN received SIGQUIT indicating exit request
+2025-06-17 19:30:48,177 INFO waiting for php-fpm, laravel-worker_00, laravel-worker_01 to die
+2025-06-17 19:30:48,195 INFO stopped: laravel-worker_00 (exit status 0)
+2025-06-17 19:30:48,195 INFO stopped: laravel-worker_01 (exit status 0)
+2025-06-17 19:30:48,227 INFO stopped: php-fpm (exit status 0)
+2025-06-17 22:25:58,888 INFO Set uid to user 1000 succeeded
+2025-06-17 22:25:58,893 INFO supervisord started with pid 1
+2025-06-17 22:25:59,899 INFO spawned: 'php-fpm' with pid 7
+2025-06-17 22:25:59,912 INFO spawned: 'laravel-worker_00' with pid 8
+2025-06-17 22:25:59,915 INFO spawned: 'laravel-worker_01' with pid 9
+2025-06-17 22:26:01,071 INFO success: php-fpm entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-17 22:26:01,072 INFO success: laravel-worker_00 entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-17 22:26:01,072 INFO success: laravel-worker_01 entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-17 23:26:01,081 INFO exited: laravel-worker_00 (exit status 0; expected)
+2025-06-17 23:26:01,083 INFO exited: laravel-worker_01 (exit status 0; expected)
+2025-06-17 23:26:02,096 INFO spawned: 'laravel-worker_00' with pid 60
+2025-06-17 23:26:02,099 INFO spawned: 'laravel-worker_01' with pid 61
+2025-06-17 23:26:03,100 INFO success: laravel-worker_00 entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-17 23:26:03,101 INFO success: laravel-worker_01 entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-18 00:12:12,542 INFO reaped unknown pid 134 (exit status 0)
+2025-06-18 00:19:20,130 INFO reaped unknown pid 147 (exit status 0)
+2025-06-18 00:26:03,286 INFO exited: laravel-worker_00 (exit status 0; expected)
+2025-06-18 00:26:03,287 INFO exited: laravel-worker_01 (exit status 0; expected)
+2025-06-18 00:26:04,294 INFO spawned: 'laravel-worker_00' with pid 150
+2025-06-18 00:26:04,296 INFO spawned: 'laravel-worker_01' with pid 151
+2025-06-18 00:26:05,300 INFO success: laravel-worker_00 entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-18 00:26:05,300 INFO success: laravel-worker_01 entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-18 00:28:46,521 INFO reaped unknown pid 168 (exit status 0)
+2025-06-18 01:26:12,078 INFO exited: laravel-worker_00 (exit status 0; expected)
+2025-06-18 01:26:12,115 INFO spawned: 'laravel-worker_00' with pid 199
+2025-06-18 01:26:12,117 INFO exited: laravel-worker_01 (exit status 0; expected)
+2025-06-18 01:26:13,119 INFO success: laravel-worker_00 entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-18 01:26:13,125 INFO spawned: 'laravel-worker_01' with pid 203
+2025-06-18 01:26:14,127 INFO success: laravel-worker_01 entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-18 02:26:12,886 INFO exited: laravel-worker_00 (exit status 0; expected)
+2025-06-18 02:26:13,900 INFO spawned: 'laravel-worker_00' with pid 214
+2025-06-18 02:26:13,922 INFO exited: laravel-worker_01 (exit status 0; expected)
+2025-06-18 02:26:14,924 INFO success: laravel-worker_00 entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-18 02:26:14,929 INFO spawned: 'laravel-worker_01' with pid 218
+2025-06-18 02:26:15,932 INFO success: laravel-worker_01 entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)

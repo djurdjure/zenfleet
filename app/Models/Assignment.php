@@ -58,4 +58,10 @@ class Assignment extends Model
     {
         return $this->belongsTo(User::class, 'created_by_user_id');
     }
+
+    // Pour la fiche remise
+    public function handoverForm(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(\App\Models\Handover\VehicleHandoverForm::class, 'assignment_id');
+    }
 }

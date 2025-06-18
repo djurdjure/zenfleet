@@ -10,6 +10,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\Maintenance\DashboardController as MaintenanceDashboardController;
 use App\Http\Controllers\Admin\Maintenance\MaintenancePlanController;
 use App\Http\Controllers\Admin\Maintenance\MaintenanceLogController;
+use App\Http\Controllers\Admin\Handover\VehicleHandoverController;
+
 
 
 
@@ -70,6 +72,15 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     // -- Gestion des ASSIGNMENTS --
     Route::patch('/assignments/{assignment}/end', [AssignmentController::class, 'end'])->name('assignments.end');
     Route::resource('assignments', AssignmentController::class);
+     // --- GESTION DES FICHES DE REMISE ---
+    //Route::resource('handovers/vehicles', VehicleHandoverController::class)->names('handovers.vehicles');
+    //Route::get('/assignments/{assignment}/handovers/create', [VehicleHandoverController::class, 'create'])->name('handovers.vehicles.create');
+    //Route::resource('handovers/vehicles', VehicleHandoverController::class, ['except' => ['create']])->names('handovers.vehicles');
+
+    // La route de création attend l'ID de l'affectation dans l'URL
+    Route::get('/assignments/{assignment}/handovers/create', [VehicleHandoverController::class, 'create'])->name('handovers.vehicles.create');
+    Route::resource('handovers/vehicles', VehicleHandoverController::class)->except(['create']);
+
 
     // --- GESTION DE LA MAINTENANCE ---
     Route::get('/maintenance', [MaintenanceDashboardController::class, 'index'])->name('maintenance.dashboard');

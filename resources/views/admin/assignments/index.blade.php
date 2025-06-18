@@ -141,11 +141,28 @@
                                         </td>
                                         <td class="px-6 py-3 whitespace-nowrap text-right text-sm font-medium">
                                     <div class="flex items-center justify-end space-x-2">
+
+                                        {{-- Bouton pour la Fiche de Remise --}}
+                                        @can('create assignments')
+                                            @if($assignment->handoverForm)
+                                                <a href="{{ route('admin.handovers.vehicles.show', $assignment->handoverForm) }}" title="Voir la Fiche de Remise" class="p-2 rounded-full text-violet-600 bg-violet-100 hover:bg-violet-200">
+                                                    <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                                                </a>
+                                            @else
+                                                {{-- CORRECTION : Le lien pointe maintenant vers la bonne route avec le bon paramètre --}}
+                                                <a href="{{ route('admin.handovers.vehicles.create', ['assignment' => $assignment->id]) }}" title="Créer Fiche de Remise" class="p-2 rounded-full text-gray-400 hover:bg-blue-100 hover:text-blue-600">
+                                                    <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                                                </a>
+                                            @endif
+                                        @endcan
+                                        
                                         @can('edit assignments')
                                             <a href="{{ route('admin.assignments.edit', $assignment) }}" title="Modifier les notes" class="p-2 rounded-full text-gray-400 hover:bg-violet-100 hover:text-violet-600">
                                                 <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.536L16.732 3.732z" /></svg>
                                             </a>
                                         @endcan
+
+
 
                                         @if(is_null($assignment->end_datetime))
                                             @can('end assignments')
