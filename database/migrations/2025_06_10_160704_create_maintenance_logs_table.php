@@ -25,6 +25,7 @@ return new class extends Migration
     // $table->foreignId('supplier_id')->nullable()->constrained('suppliers');
     $table->text('details')->nullable();
     $table->string('performed_by')->nullable();
+    $table->softDeletes();
     $table->timestamps();
 });
     

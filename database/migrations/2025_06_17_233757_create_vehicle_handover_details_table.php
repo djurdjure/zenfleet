@@ -11,16 +11,16 @@ return new class extends Migration
      */
     public function up(): void
     {
-    Schema::create('vehicle_handover_details', function (Blueprint $table) {
-    $table->id();
-    $table->foreignId('handover_form_id')->constrained('vehicle_handover_forms')->onDelete('cascade');
-    $table->string('category');
-    $table->string('item');
-    $table->enum('status', ['Bon', 'Moyen', 'Mauvais', 'N/A']);
-    $table->timestamps();
-    });
-    
-    
+        Schema::create('vehicle_handover_details', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('handover_form_id')->constrained('vehicle_handover_forms')->onDelete('cascade');
+            $table->string('category');
+            $table->string('item');
+            //$table->enum('status', ['Bon', 'Moyen', 'Mauvais', 'N/A']);
+            $table->enum('status', ['Bon', 'Moyen', 'Mauvais', 'N/A', 'Oui', 'Non']);
+        
+            $table->timestamps();
+        }); // <-- LE POINT-VIRGULE MANQUANT EST AJOUTÉ ICI
     }
 
     /**

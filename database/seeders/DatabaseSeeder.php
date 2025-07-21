@@ -3,62 +3,59 @@
 namespace Database\Seeders;
 
 use App\Models\User;
-// use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use App\Models\Organization;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Str;
 
 class DatabaseSeeder extends Seeder
 {
-    /**
-     * Seed the application's database.
-     */
     public function run(): void
     {
-        // La méthode call() exécute les seeders dans l'ordre spécifié.
         $this->call([
-            // Seeders pour la gestion des utilisateurs et des accès
-            RoleSeeder::class,
             PermissionSeeder::class,
             ValidationLevelSeeder::class,
-	    \Database\Seeders\Maintenance\MaintenanceDataSeeder::class,
-
-
-            // --- AJOUT IMPORTANT ---
-            // Appel de notre nouveau seeder maître pour les données des véhicules
             VehicleDataSeeder::class,
-            // ---------------------
+            DriverStatusSeeder::class,
+            Maintenance\MaintenanceDataSeeder::class,
+        ]);
 
-            // Ajoutez d'autres seeders maîtres ici au fur et à mesure des modules
-	    DriverStatusSeeder::class, // <--- AJOUTEZ CETTE LIGNE    
-	
-   	    	
-	
-	
-	]);
+        $zenfleetOrganization = Organization::firstOrCreate(
+            ['name' => 'ZENFLEET Platform'],
+            ['uuid' => (string) Str::uuid()]
+        );
 
-        // Création de l'utilisateur Admin par défaut et assignation de son rôle.
-        // Cette partie reste la même et doit être exécutée après la création des rôles.
-        $adminUser = User::firstOrCreate(
-            ['email' => 'admin@zenfleet.com'], // Critère de recherche pour éviter les doublons
-            [ // Valeurs à utiliser si l'utilisateur est créé pour la première fois
-                'first_name' => 'Admin',
-                'last_name' => 'ZenFleet',
-                'phone' => '0000000000',
-                'password' => bcrypt('password'), // Rappel : à changer pour un mot de passe sécurisé
+        // --- Création de l'utilisateur SUPER ADMIN ---
+        $superAdminUser = User::firstOrCreate(
+            ['email' => 'admin@zenfleet.com'],
+            [
+                'first_name' => 'Super',
+                'last_name' => 'Admin',
+                'password' => bcrypt('password'),
+                'organization_id' => $zenfleetOrganization->id,
                 'email_verified_at' => now(),
             ]
         );
 
-        // S'assure que l'utilisateur Admin a bien le rôle 'Admin'
-        if ($adminUser->wasRecentlyCreated || !$adminUser->hasRole('Admin')) {
-             $adminRole = \Spatie\Permission\Models\Role::where('name', 'Admin')->first();
-             if ($adminRole) {
-                 $adminUser->assignRole($adminRole);
-                 $this->command->info('Admin user created/updated and assigned Admin role.');
-             } else {
-                 $this->command->error('Admin role not found. Could not assign role to admin user.');
-             }
-        } else {
-            $this->command->info('Admin user already exists and has Admin role.');
+        // CORRECTION : On assigne le bon rôle
+        $superAdminUser->syncRoles(['Super Admin']);
+        $this->command->info('Super Admin user created and assigned.');
+
+        // --- Création de données de test pour une organisation cliente ---
+        if (app()->environment('local', 'development')) {
+            $clientOrganization = Organization::factory()->create(['name' => 'Client de Démo Inc.']);
+            if ($clientOrganization) {
+                $clientAdmin = User::factory()->create([
+                    'first_name' => 'Admin',
+                    'last_name' => 'Client',
+                    'email' => 'client.admin@exemple.com',
+                    'organization_id' => $clientOrganization->id,
+                ]);
+                $clientAdmin->assignRole('Admin');
+
+                \App\Models\Driver::factory()->count(5)->create(['organization_id' => $clientOrganization->id]);
+                \App\Models\Vehicle::factory()->count(10)->create(['organization_id' => $clientOrganization->id]);
+                $this->command->info('Demo organization with data created.');
+            }
         }
     }
 }

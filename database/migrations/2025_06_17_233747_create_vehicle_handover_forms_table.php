@@ -22,9 +22,9 @@ return new class extends Migration
     $table->text('additional_observations')->nullable();
     $table->string('signed_form_path', 512)->nullable();
     $table->boolean('is_latest_version')->default(true);
-    $table->timestamps();
     $table->softDeletes();
-	
+    $table->timestamps();
+    	
     });
     
     }

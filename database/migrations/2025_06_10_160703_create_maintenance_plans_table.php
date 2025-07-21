@@ -21,6 +21,7 @@ return new class extends Migration
     $table->date('next_due_date')->nullable();
     $table->bigInteger('next_due_mileage')->nullable();
     $table->text('notes')->nullable();
+    $table->softDeletes();
     $table->timestamps();
 });
     

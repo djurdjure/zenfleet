@@ -1,23 +1,18 @@
 <?php
-
 namespace App\Models;
-
+use App\Models\Concerns\BelongsToOrganization;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
-
 class Driver extends Model
 {
-    use HasFactory, SoftDeletes;
-
+    use HasFactory, SoftDeletes, BelongsToOrganization;
     protected $fillable = [
-        'user_id', 'employee_number', 'first_name', 'last_name', 'photo_path',
-        'birth_date', 'blood_type', 'address', 'personal_phone', 'personal_email',
-        'license_number', 'license_category', 'license_issue_date', 'license_authority', 'license_expiry_date',
-        'recruitment_date', 'contract_end_date', 'status_id',
-        'emergency_contact_name', 'emergency_contact_phone',
+        'user_id', 'employee_number', 'first_name', 'last_name', 'photo_path', 'birth_date', 
+        'blood_type', 'address', 'personal_phone', 'personal_email', 'license_number', 
+        'license_category', 'license_issue_date', 'license_authority', 'license_expiry_date', 
+        'recruitment_date', 'contract_end_date', 'status_id', 'emergency_contact_name', 
+        'emergency_contact_phone', 'organization_id',
     ];
 
     protected $casts = [

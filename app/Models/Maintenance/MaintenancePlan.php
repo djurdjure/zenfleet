@@ -2,14 +2,16 @@
 
 namespace App\Models\Maintenance;
 
+use App\Models\Concerns\BelongsToOrganization;
 use App\Models\Vehicle;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class MaintenancePlan extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes, BelongsToOrganization;
 
     /**
      * Les attributs qui peuvent être assignés en masse.
@@ -24,6 +26,7 @@ class MaintenancePlan extends Model
         'next_due_date',
         'next_due_mileage',
         'notes',
+        'organization_id',
     ];
 
     /**

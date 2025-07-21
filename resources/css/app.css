@@ -3,3 +3,41 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+
+
+/* STYLES SPÉCIFIQUES POUR L'IMPRESSION DE LA FICHE DE REMISE */
+@media print {
+    /* Cache tous les éléments de l'interface par défaut */
+    body * {
+        visibility: hidden;
+    }
+    
+    /* Ne rend visible que la zone d'impression et son contenu */
+    #print-area, #print-area * {
+        visibility: visible;
+    }
+
+    /* Positionne la zone d'impression en haut de la page */
+    #print-area {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        box-shadow: none !important;
+        border: none !important;
+    }
+
+    /* Cache spécifiquement les éléments non désirés comme les boutons */
+    .print\:hidden {
+        display: none !important;
+    }
+
+    /* Optimisation de la police pour le format A4 */
+    body, #print-area {
+        font-size: 10pt;
+        background-color: white !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+}

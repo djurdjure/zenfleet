@@ -41,6 +41,16 @@
                                 <x-input-label for="phone" :value="__('Téléphone (optionnel)')" />
                                 <x-text-input id="phone" class="block mt-1 w-full" type="text" name="phone" :value="old('phone')" />
                             </div>
+                            <div class="md:col-span-2">
+                                <label for="organization_id" class="block font-medium text-sm text-gray-700">Organisation <span class="text-red-500">*</span></label>
+                                <select name="organization_id" id="organization_id" class="mt-1 block w-full ..." required>
+                                    <option value="">Sélectionnez une organisation</option>
+                                    @foreach($organizations as $org)
+                                        <option value="{{ $org->id }}" @selected(old('organization_id') == $org->id)>{{ $org->name }}</option>
+                                    @endforeach
+                                </select>
+                                <x-input-error :messages="$errors->get('organization_id')" class="mt-2" />
+                            </div>
                             <div>
                                 <x-input-label for="password" :value="__('Mot de passe')" />
                                 <x-text-input id="password" class="block mt-1 w-full" type="password" name="password" required />

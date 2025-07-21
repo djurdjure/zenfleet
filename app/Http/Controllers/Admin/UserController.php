@@ -2,125 +2,110 @@
 
 namespace App\Http\Controllers\Admin;
 
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Validation\Rules;
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Models\Organization;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rules;
 use Illuminate\View\View;
 use Spatie\Permission\Models\Role;
 
 class UserController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index(): View
     {
-        // Optimisation : On charge la relation 'roles' pour éviter N+1 requêtes dans la vue
-        $users = User::with('roles')->orderBy('id', 'desc')->paginate(15);
-
+        $this->authorize('view users');
+        $users = User::with(['roles', 'organization'])->orderBy('id', 'desc')->paginate(15);
         return view('admin.users.index', compact('users'));
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(User $user): View
-    {
-        // Récupérer tous les rôles pour les afficher dans le formulaire
-        $roles = Role::all();
-        
-        return view('admin.users.edit', compact('user', 'roles'));
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-     // app/Http/Controllers/Admin/UserController.php -> méthode update
-
-   // app/Http/Controllers/Admin/UserController.php -> méthode update
-
-      public function update(Request $request, User $user): RedirectResponse
-	{
-    	// 1. Valider que les données entrantes sont bien des IDs de rôles valides
-   	 $validated = $request->validate([
-        	'roles' => 'sometimes|array',
-        	'roles.*' => 'exists:roles,id',
-    	]);
-
-    	// 2. Récupérer le tableau d'IDs de rôles depuis la requête validée
-    	$roleIds = $validated['roles'] ?? [];
-
-    	// 3. Trouver les objets Role correspondant à ces IDs
-    	$roles = Role::whereIn('id', $roleIds)->get();
-
-    	// 4. Synchroniser les rôles en utilisant la collection d'objets Role.
-    	// C'est la méthode la plus robuste et la plus claire.
-    	$user->syncRoles($roles);
-
-    	return redirect()->route('admin.users.index')
-        ->with('success', 'Les rôles de l\'utilisateur ont été mis à jour avec succès.');
-	} 
-    
-    //////////////////////// 
-    // Les autres méthodes (create, store, etc.) peuvent rester vides pour l'instant
-	    /**
-     * Affiche le formulaire pour créer un nouvel utilisateur.
-     */
     public function create(): View
     {
-        $roles = Role::all(); // Récupère tous les rôles pour les assigner à la création
-        return view('admin.users.create', compact('roles'));
+        $this->authorize('create users');
+        $roles = Role::all();
+        $organizations = Organization::withoutGlobalScope('organization')->orderBy('name')->get();
+        return view('admin.users.create', compact('roles', 'organizations'));
     }
 
-    /**
-     * Stocke un nouvel utilisateur dans la base de données.
-     */
     public function store(Request $request): RedirectResponse
     {
-        $request->validate([
+        $this->authorize('create users');
+        $validated = $request->validate([
             'first_name' => ['required', 'string', 'max:255'],
             'last_name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
-            'phone' => ['nullable', 'string', 'max:50', 'unique:'.User::class],
+            'email' => ['required', 'string', 'email', 'max:255', 'unique:'.User::class],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
+            'organization_id' => ['required', 'exists:organizations,id'],
             'roles' => 'sometimes|array',
-            'roles.*' => 'exists:roles,id',
+            'roles.*' => 'exists:roles,id', // Valide que les IDs existent
         ]);
 
-        // Le champ 'name' sera automatiquement rempli par l'UserObserver
         $user = User::create([
-            'first_name' => $request->first_name,
-            'last_name' => $request->last_name,
-            'email' => $request->email,
-            'phone' => $request->phone,
-            'password' => Hash::make($request->password),
+            'first_name' => $validated['first_name'],
+            'last_name' => $validated['last_name'],
+            'email' => $validated['email'],
+            'password' => Hash::make($validated['password']),
+            'organization_id' => $validated['organization_id'],
         ]);
 
-        // Assigner les rôles sélectionnés
-        $roleIds = $request->input('roles', []);
-        $roles = Role::whereIn('id', $roleIds)->get();
-        $user->syncRoles($roles);
-
-        return redirect()->route('admin.users.index')->with('success', 'Nouvel utilisateur créé avec succès.');
-    }
-
-      /**
-     * Supprime un utilisateur de la base de données.
-     */
-    public function destroy(User $user): RedirectResponse
-    {
-        // Sécurité : Empêcher un utilisateur de se supprimer lui-même
-        if ($user->id === Auth::id()) {
-            return redirect()->route('admin.users.index')->with('error', 'Vous ne pouvez pas supprimer votre propre compte administrateur.');
+        // CORRECTION : On récupère les modèles de Rôle avant de synchroniser
+        if (!empty($validated['roles'])) {
+            $rolesToSync = Role::whereIn('id', $validated['roles'])->get();
+            $user->syncRoles($rolesToSync);
         }
 
-        $userName = $user->name;
-        $user->delete();
+        return redirect()->route('admin.users.index')->with('success', 'Utilisateur créé avec succès.');
+    }
 
-        return redirect()->route('admin.users.index')->with('success', "L'utilisateur '{$userName}' a été supprimé avec succès.");
+    public function edit(User $user): View
+    {
+        $this->authorize('edit users');
+        $roles = Role::all();
+        $organizations = Organization::withoutGlobalScope('organization')->orderBy('name')->get();
+        return view('admin.users.edit', compact('user', 'roles', 'organizations'));
+    }
+
+    public function update(Request $request, User $user): RedirectResponse
+    {
+        $this->authorize('edit users');
+        $validated = $request->validate([
+            'first_name' => ['required', 'string', 'max:255'],
+            'last_name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email,'.$user->id],
+            'organization_id' => ['required', 'exists:organizations,id'],
+            'roles' => 'sometimes|array',
+            'roles.*' => 'exists:roles,id',
+            'password' => ['nullable', 'confirmed', Rules\Password::defaults()],
+        ]);
+
+        $userData = [
+            'first_name' => $validated['first_name'],
+            'last_name' => $validated['last_name'],
+            'email' => $validated['email'],
+            'organization_id' => $validated['organization_id'],
+        ];
+        if (!empty($validated['password'])) {
+            $userData['password'] = Hash::make($validated['password']);
+        }
+
+        $user->update($userData);
+
+        // CORRECTION : On récupère les modèles de Rôle avant de synchroniser
+        $rolesToSync = Role::whereIn('id', $validated['roles'] ?? [])->get();
+        $user->syncRoles($rolesToSync);
+
+        return redirect()->route('admin.users.index')->with('success', 'Utilisateur mis à jour avec succès.');
+    }
+
+    public function destroy(User $user): RedirectResponse
+    {
+        $this->authorize('delete users');
+        if (auth()->id() == $user->id) {
+            return back()->with('error', 'Vous ne pouvez pas supprimer votre propre compte.');
+        }
+        $user->delete();
+        return redirect()->route('admin.users.index')->with('success', 'Utilisateur supprimé avec succès.');
     }
 }

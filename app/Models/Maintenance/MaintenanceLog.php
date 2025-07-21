@@ -2,6 +2,7 @@
 
 namespace App\Models\Maintenance;
 
+use App\Models\Concerns\BelongsToOrganization;
 use App\Models\Vehicle;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -9,7 +10,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class MaintenanceLog extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes, BelongsToOrganization;
 
     /**
      * Les attributs qui peuvent être assignés en masse.
@@ -26,6 +27,7 @@ class MaintenanceLog extends Model
         'cost',
         'details',
         'performed_by',
+        'organization_id',
     ];
 
     /**

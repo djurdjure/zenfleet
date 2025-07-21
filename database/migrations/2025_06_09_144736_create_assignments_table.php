@@ -22,6 +22,7 @@ return new class extends Migration
             $table->text('reason')->nullable();
             $table->text('notes')->nullable();
             $table->foreignId('created_by_user_id')->nullable()->constrained('users')->onDelete('set null');
+            $table->softDeletes();
             $table->timestamps();
         });
     }
