@@ -1,0 +1,104 @@
+# ~/projects/zenfleet/docker/node/Dockerfile
+# Version corrigée pour fonctionner avec le contexte à la racine du projet
+
+FROM node:20-bullseye
+ARG USER_ID
+ARG GROUP_ID
+
+# Étape 1 : Installer les dépendances système nécessaires
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    gosu \
+    ca-certificates \
+    fonts-liberation \
+    libnss3 \
+    libatk-bridge2.0-0 \
+    libgtk-3-0 \
+    libasound2 \
+    libxshmfence1 \
+    netcat-openbsd \
+    curl \
+    # Dépendances supplémentaires pour Puppeteer 24.x
+    libxss1 \
+    libgconf-2-4 \
+    libxtst6 \
+    libxrandr2 \
+    libasound2 \
+    libpangocairo-1.0-0 \
+    libatk1.0-0 \
+    libcairo-gobject2 \
+    libgtk-3-0 \
+    libgdk-pixbuf2.0-0 \
+    && rm -rf /var/lib/apt/lists/*
+
+# Étape 2 : Création robuste de l'utilisateur et du groupe
+RUN export TARGET_USER=zenfleet_user && \
+    export TARGET_GROUP=zenfleet_user && \
+    export TARGET_UID=${USER_ID:-1000} && \
+    export TARGET_GID=${GROUP_ID:-1000} && \
+    if getent group $TARGET_GID >/dev/null; then \
+        EXISTING_GROUP_NAME=$(getent group $TARGET_GID | cut -d: -f1); \
+        if [ "$EXISTING_GROUP_NAME" != "$TARGET_GROUP" ]; then \
+            groupmod -n $TARGET_GROUP $EXISTING_GROUP_NAME; \
+        fi; \
+    else \
+        groupadd -g $TARGET_GID $TARGET_GROUP; \
+    fi && \
+    if getent passwd $TARGET_UID >/dev/null; then \
+        EXISTING_USER_NAME=$(getent passwd $TARGET_UID | cut -d: -f1); \
+        usermod -l $TARGET_USER -g $TARGET_GROUP $EXISTING_USER_NAME; \
+    else \
+        useradd -u $TARGET_UID -g $TARGET_GROUP -m -s /bin/bash $TARGET_USER; \
+    fi
+
+# Étape 3 : Définir le répertoire de travail
+WORKDIR /var/www/html
+
+# Étape 4 : Copier le package.json depuis la racine du projet
+# Maintenant que le contexte est à la racine, package.json est accessible
+COPY package.json package-lock.json* ./
+
+# Étape 5 : Installer les dépendances Node.js
+# Utiliser npm ci pour une installation plus rapide et déterministe si package-lock.json existe
+RUN if [ -f package-lock.json ]; then \
+        npm ci --only=production; \
+    else \
+        npm install --only=production; \
+    fi
+
+# Étape 6 : Installer Chrome via Puppeteer 24.x
+# La nouvelle version de Puppeteer gère mieux l'installation de Chrome
+RUN npx puppeteer browsers install chrome --path /home/zenfleet_user/.cache/puppeteer
+
+# Étape 7 : Copier le code de l'application
+# Copier tous les fichiers du projet (contexte à la racine)
+COPY . .
+
+# Étape 8 : Créer les répertoires nécessaires avec les bonnes permissions
+RUN mkdir -p /home/zenfleet_user/.cache/puppeteer && \
+    mkdir -p /var/www/html/storage/logs && \
+    chown -R zenfleet_user:zenfleet_user /home/zenfleet_user/.cache && \
+    chmod 755 /home/zenfleet_user/.cache && \
+    chown -R zenfleet_user:zenfleet_user /var/www/html
+
+# Étape 9 : Configurer l'entrypoint
+COPY ./docker/node/entrypoint.sh /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
+
+# Étape 10 : Variables d'environnement pour Puppeteer 24.x
+ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
+ENV PUPPETEER_CACHE_DIR=/home/zenfleet_user/.cache/puppeteer
+ENV NODE_ENV=production
+
+# Étape 11 : Exposer le port
+EXPOSE 3000
+
+# Étape 12 : Healthcheck adapté pour Express 5.x
+HEALTHCHECK --interval=15s --timeout=10s --start-period=45s --retries=5 \
+    #CMD curl -f http://localhost:3000/health || exit 1
+    CMD curl -f --max-time 5 http://localhost:3000/health || exit 1
+
+# Étape 13 : Définir l'entrypoint et la commande
+# IMPORTANT: Ne pas définir USER ici pour permettre à l'entrypoint de fonctionner
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
+CMD ["node", "server.js"]
+

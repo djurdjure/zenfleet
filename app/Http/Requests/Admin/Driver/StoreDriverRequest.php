@@ -29,6 +29,7 @@ class StoreDriverRequest extends FormRequest
             'address' => ['nullable', 'string', 'max:1000'],
             'blood_type' => ['nullable', 'string', 'max:10'],
             'photo' => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif', 'max:2048'],
+            'personal_email' => ['nullable', 'string', 'email', 'max:255'],
 
             // Étape 2
             'employee_number' => ['nullable', 'string', 'max:100', Rule::unique('drivers')->whereNull('deleted_at')],

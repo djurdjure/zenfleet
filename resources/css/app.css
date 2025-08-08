@@ -5,6 +5,10 @@
 @tailwind utilities;
 
 
+/* TEST DE RECHARGEMENT À CHAUD */
+body {
+    background-color: red !important;
+}
 
 /* STYLES SPÉCIFIQUES POUR L'IMPRESSION DE LA FICHE DE REMISE */
 @media print {
@@ -12,6 +16,8 @@
     body * {
         visibility: hidden;
     }
+
+    
     
     /* Ne rend visible que la zone d'impression et son contenu */
     #print-area, #print-area * {

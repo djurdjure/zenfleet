@@ -1,0 +1,58 @@
+tree -I 'node_modules|vendor|storage|bootstrap/cache|public/build' > zenfleet_arborescence_$(date +%Y-%m-%d).txt
+
+
+
+docker compose exec -T database sh -c 'PGPASSWORD=${POSTGRES_PASSWORD} pg_dump -U "${POSTGRES_USER}" -d "${POSTGRES_DB}" --schema-only' > zenfleet_db_schema_$(date +%Y-%m-%d).sql
+
+
+
+une description ultra détaillée de l'environnement, des standards, de la structure des fichiers et de la base de données du projet ZENFLEET.
+
+1. Environnement de Développement et Standards
+Notre environnement est standardisé et conteneurisé pour garantir une reproductibilité parfaite.
+
+1.1 Stack Technologique :
+| Composant | Technologie/Version | Rôle |
+| :--- | :--- | :--- |
+| Serveur Web | Nginx 1.25-alpine | Point d'entrée HTTP. |
+| Backend | PHP 8.2-fpm-alpine | Moteur de l'application Laravel. |
+| Framework | Laravel 10.x | Cœur de l'application. |
+| Base de Données| PostgreSQL 15-alpine | Stockage des données. |
+| Cache & Jobs | Redis alpine | Gestion du cache et des files d'attente. |
+| Frontend | Node.js 20-bullseye | Compilation des assets et serveur Vite. |
+| CSS | Tailwind CSS | Framework de design. |
+| JavaScript| Alpine.js | Interactivité de l'interface. |
+| Icônes | blade-ui-kit/blade-icons | Gestion centralisée des icônes SVG. |
+
+1.2 Outils et Commandes Standards :
+Il est impératif d'utiliser les mêmes outils et commandes pour garantir la cohérence.
+
+Gestion des Dépendances Backend (PHP) :
+
+Outil : Composer
+
+Exécution : docker compose exec -u zenfleet_user php composer <commande>
+
+Exemple : docker compose exec -u zenfleet_user php composer require nouvelle/librairie
+
+Gestion des Dépendances Frontend (JavaScript) :
+
+Outil : Yarn (et non npm).
+
+Raison : Nous utilisons Yarn pour sa gestion stricte et reproductible des versions de paquets via le fichier yarn.lock, ce qui élimine les conflits.
+
+Exécution : docker compose exec -u zenfleet_user node yarn <commande>
+
+Exemples :
+
+Installer les dépendances : docker compose exec -u zenfleet_user node yarn install
+
+Lancer le serveur de dev : docker compose exec -u zenfleet_user node yarn dev
+
+Compiler pour la prod : docker compose exec -u zenfleet_user node yarn build
+
+Commandes Laravel (Artisan) :
+
+Exécution : docker compose exec -u zenfleet_user php php artisan <commande>
+
+Exemple (migration) : docker compose exec -u zenfleet_user php php artisan migrate

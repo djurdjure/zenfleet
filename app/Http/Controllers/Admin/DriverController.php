@@ -11,13 +11,19 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 use Illuminate\View\View;
-use App\Http\Requests\Admin\Driver\StoreDriverRequest; // <-- AJOUT
-use App\Http\Requests\Admin\Driver\UpdateDriverRequest; // <-- AJOUT
+use App\Http\Requests\Admin\Driver\StoreDriverRequest;
+use App\Http\Requests\Admin\Driver\UpdateDriverRequest;
+use Illuminate\Support\Facades\Validator;
+use League\Csv\Reader;
+use League\Csv\Statement;
+use League\Csv\Writer;
+use Illuminate\Database\QueryException;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 
 class DriverController extends Controller
 {
-    // ... (index et create sont déjà corrects) ...
-    ////////_____OK
+    // Méthodes existantes inchangées (index, create, store, edit, update, destroy, restore, forceDelete)
     public function index(Request $request): View
     {
         $this->authorize('view drivers');
@@ -57,8 +63,6 @@ class DriverController extends Controller
         ]);
     }
 
-
-
     public function store(StoreDriverRequest $request): RedirectResponse
     {
         $validatedData = $request->validated();
@@ -68,7 +72,7 @@ class DriverController extends Controller
         Driver::create($validatedData);
         return redirect()->route('admin.drivers.index')->with('success', 'Nouveau chauffeur ajouté avec succès.');
     }
-    ////////____OK
+
     public function edit(Driver $driver): View
     {
         $this->authorize('edit drivers');
@@ -87,14 +91,16 @@ class DriverController extends Controller
             $validatedData['photo_path'] = $request->file('photo')->store('drivers/photos', 'public');
         }
         $driver->update($validatedData);
-        return redirect()->route('admin.drivers.index')->with('success', "Le chauffeur {$driver->first_name} {$driver->last_name} a été mis à jour.");
+
+        // CORRECTION : Nouveau format de message flash
+        $flash = [
+            'type' => 'success',
+            'message' => 'Mise à jour réussie',
+            'description' => "Les informations du chauffeur {$driver->first_name} {$driver->last_name} ont été mises à jour."
+        ];
+
+        return redirect()->route('admin.drivers.index')->with('flash', $flash);
     }
-
-    // ... (destroy, restore, forceDelete sont déjà corrects) ...
-
-      /**
-     * Affiche la liste des chauffeurs avec une recherche insensible à la casse.
-     */
 
     public function create(): View
     {
@@ -104,20 +110,35 @@ class DriverController extends Controller
         return view('admin.drivers.create', compact('linkableUsers', 'driverStatuses'));
     }
 
-
     public function destroy(Driver $driver): RedirectResponse
     {
         $this->authorize('delete drivers');
         $driver->delete();
-        return redirect()->route('admin.drivers.index')->with('success', "Le chauffeur {$driver->first_name} a été archivé.");
+
+        // CORRECTION : Nouveau format de message flash
+        $flash = [
+            'type' => 'warning',
+            'message' => 'Archivage Effectué',
+            'description' => "Le chauffeur {$driver->first_name} {$driver->last_name} a été archivé."
+        ];
+
+        return redirect()->route('admin.drivers.index')->with('flash', $flash);
     }
 
-     public function restore($driverId): RedirectResponse
+    public function restore($driverId): RedirectResponse
     {
         $this->authorize('restore drivers');
         $driver = Driver::onlyTrashed()->findOrFail($driverId);
         $driver->restore();
-        return redirect()->route('admin.drivers.index', ['view_deleted' => 'true'])->with('success', "Le chauffeur {$driver->first_name} a été restauré.");
+
+        // CORRECTION : Nouveau format de message flash
+        $flash = [
+            'type' => 'success',
+            'message' => 'Restauration Réussie',
+            'description' => "Le chauffeur {$driver->first_name} {$driver->last_name} a été restauré."
+        ];
+
+        return redirect()->route('admin.drivers.index', ['view_deleted' => 'true'])->with('flash', $flash);
     }
 
     public function forceDelete($driverId): RedirectResponse
@@ -131,34 +152,454 @@ class DriverController extends Controller
         return redirect()->route('admin.drivers.index', ['view_deleted' => 'true'])->with('success', 'Le chauffeur a été supprimé définitivement.');
     }
 
-    private function getValidationRules(?int $driverId = null): array
+    /**
+     * Affiche le formulaire d'importation de chauffeurs.
+     */
+    public function showImportForm(): View
     {
-        return [
-            'first_name' => ['required', 'string', 'max:255'],
-            'last_name' => ['required', 'string', 'max:255'],
-            'employee_number' => ['nullable', 'string', 'max:100', Rule::unique('drivers')->ignore($driverId)->whereNull('deleted_at')],
-            'user_id' => ['nullable', 'sometimes', 'exists:users,id', Rule::unique('drivers')->ignore($driverId)->whereNull('deleted_at')],
-            'status_id' => ['required', 'exists:driver_statuses,id'],
-            'birth_date' => ['nullable', 'date'],
-            'personal_phone' => ['nullable', 'string', 'max:50'],
-            'address' => ['nullable', 'string', 'max:1000'],
-            'license_number' => ['nullable', 'string', 'max:100'],
-            'license_category' => ['nullable', 'string', 'max:50'],
-            'license_issue_date' => ['nullable', 'date'],
-            'license_authority' => ['nullable', 'string', 'max:255'],
-            'recruitment_date' => ['nullable', 'date'],
-            'contract_end_date' => ['nullable', 'date', 'after_or_equal:recruitment_date'],
-            'emergency_contact_name' => ['nullable', 'string', 'max:255'],
-            'emergency_contact_phone' => ['nullable', 'string', 'max:50'],
-            'photo' => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif', 'max:2048'],
-            'blood_type' => ['nullable', 'string', 'max:10'],
-            'personal_email' => ['nullable', 'email', 'max:255'],
-        ];
+        $this->authorize('create drivers');
+        return view('admin.drivers.import');
     }
 
+    /**
+     * Télécharge le fichier modèle CSV complet pour l'importation.
+     */
+    public function downloadTemplate()
+    {
+        $this->authorize('create drivers');
 
+        $csv = Writer::createFromString('');
+        $csv->setOutputBOM(Writer::BOM_UTF8); // Ajoute le BOM UTF-8 pour garantir la compatibilité
 
+        // En-têtes complets en français
+        $headers = [
+            'nom', 'prenom', 'date_naissance', 'statut', 'matricule', 
+            'telephone', 'email_personnel', 'adresse', 'numero_permis', 
+            'categorie_permis', 'date_delivrance_permis', 'autorite_delivrance', 
+            'date_recrutement', 'date_fin_contrat', 'contact_urgence_nom', 
+            'contact_urgence_telephone', 'groupe_sanguin'
+        ];
 
+        // Ligne d'exemple
+        $example = [
+            'Merzouki', 'Saïd', '1985-04-12', 'Disponible', 'DIF-2022-00123', 
+            '0671020304', 'smerzouki@email.com', '123 Rue de la Paix, 16018 Alger', 'P-987654', 
+            'B,C', '2016-08-20', 'Daïra El Biar', 
+            '2020-01-15', '2025-11-14', 'Merzouki Ali', 
+            '0565040302', 'O+'
+        ];
 
+        $csv->insertOne($headers);
+        $csv->insertOne($example);
+
+        return response($csv->toString(), 200, [
+            'Content-Type' => 'text/csv; charset=UTF-8',
+            'Content-Disposition' => 'attachment; filename="template_import_chauffeurs.csv"',
+        ]);
+    }
+
+    /**
+     * Traite l'importation du fichier CSV.
+     * Version améliorée avec détection d'encodage et gestion robuste des erreurs.
+     * Correction du bug avec ResultSet::rewind()
+     */
+    public function handleImport(Request $request): RedirectResponse
+    {
+        $this->authorize('create drivers');
+        
+        $request->validate([
+            'csv_file' => 'required|file|mimes:csv,txt',
+            'encoding' => 'nullable|string|in:auto,utf8,iso,windows'
+        ]);
+        
+        $file = $request->file('csv_file');
+        $filePath = $file->getPathname();
+        
+        // Détection et conversion d'encodage
+        try {
+            $encoding = $request->input('encoding', 'auto');
+            $fileContent = file_get_contents($filePath);
+            
+            // Détection automatique de l'encodage si demandé
+            if ($encoding === 'auto') {
+                $encoding = $this->detectEncoding($fileContent);
+            }
+            
+            // Conversion vers UTF-8 si nécessaire
+            if ($encoding !== 'utf8') {
+                $fileContent = $this->convertToUtf8($fileContent, $encoding);
+                // Écrire le contenu converti dans un fichier temporaire
+                $tempFile = tempnam(sys_get_temp_dir(), 'csv_import_');
+                file_put_contents($tempFile, $fileContent);
+                $filePath = $tempFile;
+            }
+            
+            // Création du lecteur CSV avec le fichier converti
+            $csv = Reader::createFromPath($filePath, 'r');
+            $csv->setHeaderOffset(0);
+            
+            // Traitement des enregistrements
+            $records = Statement::create()->process($csv);
+            
+            $successCount = 0;
+            $errorRows = [];
+            $importId = Str::uuid()->toString(); // Identifiant unique pour cette importation
+            
+            $statuses = DriverStatus::pluck('id', 'name');
+            $defaultStatusId = $statuses->get('Disponible');
+            
+            // Journalisation du début de l'importation
+            Log::info("Début de l'importation CSV des chauffeurs", [
+                'import_id' => $importId,
+                'file' => $file->getClientOriginalName(),
+                'encoding' => $encoding,
+                'records_count' => iterator_count($records),
+            ]);
+            
+            // CORRECTION: Ne pas utiliser rewind() sur ResultSet
+            // Convertir le ResultSet en tableau pour pouvoir l'itérer à nouveau
+            $recordsArray = iterator_to_array($records);
+            
+            foreach ($recordsArray as $offset => $record) {
+                try {
+                    // Nettoyage préventif des données
+                    $record = $this->sanitizeRecord($record);
+                    
+                    // Préparation des données pour validation
+                    $data = $this->prepareDataForValidation($record);
+                    
+                    // Validation des données
+                    $validator = Validator::make($data, $this->getValidationRules());
+                    
+                    if ($validator->fails()) {
+                        $errorRows[] = [
+                            'line' => $offset + 2,
+                            'errors' => $validator->errors()->all(),
+                            'data' => $record,
+                            'raw' => json_encode($record, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES)
+                        ];
+                        continue;
+                    }
+                    
+                    $validatedData = $validator->validated();
+                    
+                    // Gestion du statut
+                    $statusName = $validatedData['statut'] ?? null;
+                    $statusId = $statuses->get($statusName, $defaultStatusId);
+                    
+                    unset($validatedData['statut']);
+                    $validatedData['status_id'] = $statusId;
+                    
+                    // Création du chauffeur
+                    $driver = Driver::create($validatedData);
+                    $successCount++;
+                    
+                    // Journalisation du succès
+                    Log::debug("Chauffeur importé avec succès", [
+                        'import_id' => $importId,
+                        'line' => $offset + 2,
+                        'driver_id' => $driver->id,
+                        'name' => "{$driver->first_name} {$driver->last_name}"
+                    ]);
+                    
+                } catch (QueryException $e) {
+                    // Gestion des erreurs de base de données
+                    $errorMessage = $this->formatDatabaseError($e);
+                    $errorRows[] = [
+                        'line' => $offset + 2,
+                        'errors' => [$errorMessage],
+                        'data' => $record,
+                        'raw' => json_encode($record, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES)
+                    ];
+                    
+                    // Journalisation de l'erreur
+                    Log::error("Erreur d'importation (Base de données)", [
+                        'import_id' => $importId,
+                        'line' => $offset + 2,
+                        'error' => $e->getMessage(),
+                        'data' => json_encode($record, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES)
+                    ]);
+                    
+                } catch (\Exception $e) {
+                    // Gestion des autres erreurs
+                    $errorRows[] = [
+                        'line' => $offset + 2,
+                        'errors' => ["Erreur inattendue: {$e->getMessage()}"],
+                        'data' => $record,
+                        'raw' => json_encode($record, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES)
+                    ];
+                    
+                    // Journalisation de l'erreur
+                    Log::error("Erreur d'importation (Générale)", [
+                        'import_id' => $importId,
+                        'line' => $offset + 2,
+                        'error' => $e->getMessage(),
+                        'data' => json_encode($record, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES)
+                    ]);
+                }
+            }
+            
+            // Journalisation de la fin de l'importation
+            Log::info("Fin de l'importation CSV des chauffeurs", [
+                'import_id' => $importId,
+                'success_count' => $successCount,
+                'error_count' => count($errorRows)
+            ]);
+            
+            // Nettoyage du fichier temporaire si créé
+            if (isset($tempFile) && file_exists($tempFile)) {
+                unlink($tempFile);
+            }
+            
+            // Redirection vers la page de résultats
+            return redirect()->route('admin.drivers.import.results')
+                ->with('successCount', $successCount)
+                ->with('errorRows', $errorRows)
+                ->with('importId', $importId)
+                ->with('fileName', $file->getClientOriginalName())
+                ->with('encoding', $encoding);
+                
+        } catch (\Exception $e) {
+            // Gestion des erreurs critiques (ex: problème de lecture du fichier)
+            Log::critical("Erreur critique lors de l'importation CSV", [
+                'error' => $e->getMessage(),
+                'file' => $file->getClientOriginalName()
+            ]);
+            
+            return redirect()->route('admin.drivers.import.show')
+                ->with('error', "Une erreur est survenue lors de la lecture du fichier CSV: {$e->getMessage()}")
+                ->withInput();
+        }
+    }
+    
+    /**
+     * Affiche les résultats de l'importation.
+     */
+    public function showImportResults(): View
+    {
+        $this->authorize('create drivers');
+        
+        $successCount = session('successCount', 0);
+        $errorRows = session('errorRows', []);
+        $importId = session('importId', null);
+        $fileName = session('fileName', 'Fichier CSV');
+        $encoding = session('encoding', 'utf8');
+        
+        return view('admin.drivers.import-results', compact(
+            'successCount', 
+            'errorRows', 
+            'importId', 
+            'fileName', 
+            'encoding'
+        ));
+    }
+    
+    /**
+     * Détecte l'encodage d'un contenu de fichier.
+     */
+    private function detectEncoding(string $content): string
+    {
+        // Liste des encodages à tester dans l'ordre de priorité
+        $encodings = ['UTF-8', 'ISO-8859-1', 'Windows-1252'];
+        
+        foreach ($encodings as $encoding) {
+            $sample = mb_convert_encoding($content, 'UTF-8', $encoding);
+            
+            // Si la conversion ne génère pas de caractères invalides, c'est probablement le bon encodage
+            if (!preg_match('/\p{Cc}(?!\n|\t|\r)/u', $sample)) {
+                switch ($encoding) {
+                    case 'UTF-8': return 'utf8';
+                    case 'ISO-8859-1': return 'iso';
+                    case 'Windows-1252': return 'windows';
+                }
+            }
+        }
+        
+        // Par défaut, on suppose Windows-1252 (encodage courant pour les CSV générés par Excel)
+        return 'windows';
+    }
+    
+    /**
+     * Convertit un contenu vers UTF-8 depuis un encodage spécifié.
+     */
+    private function convertToUtf8(string $content, string $fromEncoding): string
+    {
+        $sourceEncoding = match($fromEncoding) {
+            'iso' => 'ISO-8859-1',
+            'windows' => 'Windows-1252',
+            default => 'UTF-8'
+        };
+        
+        return mb_convert_encoding($content, 'UTF-8', $sourceEncoding);
+    }
+    
+    /**
+     * Nettoie les données d'un enregistrement CSV.
+     */
+    private function sanitizeRecord(array $record): array
+    {
+        $sanitized = [];
+        
+        foreach ($record as $key => $value) {
+            // Nettoyage des clés
+            $cleanKey = trim($key);
+            
+            // Nettoyage des valeurs
+            if (is_string($value)) {
+                // Suppression des caractères invisibles et normalisation des espaces
+                $cleanValue = trim(preg_replace('/\s+/', ' ', $value));
+                
+                // Conversion des chaînes vides en NULL
+                $sanitized[$cleanKey] = $cleanValue === '' ? null : $cleanValue;
+            } else {
+                $sanitized[$cleanKey] = $value;
+            }
+        }
+        
+        return $sanitized;
+    }
+    
+    /**
+     * Prépare les données pour la validation.
+     */
+    private function prepareDataForValidation(array $record): array
+    {
+        $map = [
+            'nom' => 'last_name', 
+            'prenom' => 'first_name', 
+            'date_naissance' => 'birth_date',
+            'statut' => 'statut', 
+            'matricule' => 'employee_number', 
+            'telephone' => 'personal_phone',
+            'email_personnel' => 'personal_email', 
+            'adresse' => 'address', 
+            'numero_permis' => 'license_number',
+            'categorie_permis' => 'license_category', 
+            'date_delivrance_permis' => 'license_issue_date',
+            'autorite_delivrance' => 'license_authority', 
+            'date_recrutement' => 'recruitment_date',
+            'date_fin_contrat' => 'contract_end_date', 
+            'contact_urgence_nom' => 'emergency_contact_name',
+            'contact_urgence_telephone' => 'emergency_contact_phone', 
+            'groupe_sanguin' => 'blood_type',
+        ];
+        
+        $dataToValidate = [];
+        
+        foreach ($map as $csvHeader => $dbField) {
+            if (array_key_exists($csvHeader, $record)) {
+                $value = $record[$csvHeader];
+                
+                // Traitement spécifique pour les dates
+                if (in_array($dbField, ['birth_date', 'license_issue_date', 'recruitment_date', 'contract_end_date']) && $value) {
+                    $value = $this->formatDate($value);
+                }
+                
+                $dataToValidate[$dbField] = $value;
+            }
+        }
+        
+        return $dataToValidate;
+    }
+    
+    /**
+     * Formate une date en format YYYY-MM-DD.
+     */
+    private function formatDate($dateString)
+    {
+        if (!$dateString) return null;
+        
+        // Si la date est déjà au format YYYY-MM-DD
+        if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $dateString)) {
+            return $dateString;
+        }
+        
+        // Essayer de parser différents formats de date
+        $formats = [
+            'd/m/Y', // 31/12/2023
+            'd-m-Y', // 31-12-2023
+            'd.m.Y', // 31.12.2023
+            'Y/m/d', // 2023/12/31
+            'Y-m-d', // 2023-12-31
+            'Y.m.d', // 2023.12.31
+            'd/m/y', // 31/12/23
+            'd-m-y', // 31-12-23
+            'd.m.y'  // 31.12.23
+        ];
+        
+        foreach ($formats as $format) {
+            $date = \DateTime::createFromFormat($format, $dateString);
+            if ($date !== false) {
+                return $date->format('Y-m-d');
+            }
+        }
+        
+        // Si aucun format ne correspond, retourner la chaîne originale
+        return $dateString;
+    }
+    
+    /**
+     * Formate une erreur de base de données de manière conviviale.
+     */
+    private function formatDatabaseError(QueryException $e): string
+    {
+        $errorCode = $e->getCode();
+        $errorMessage = $e->getMessage();
+        
+        // Erreurs de contrainte d'unicité
+        if (strpos($errorMessage, 'unique constraint') !== false || $errorCode == 23505) {
+            if (strpos($errorMessage, 'employee_number') !== false) {
+                return "Le matricule existe déjà dans la base de données.";
+            }
+            if (strpos($errorMessage, 'personal_email') !== false) {
+                return "L'adresse email existe déjà dans la base de données.";
+            }
+            if (strpos($errorMessage, 'license_number') !== false) {
+                return "Le numéro de permis existe déjà dans la base de données.";
+            }
+            return "Une valeur unique existe déjà dans la base de données.";
+        }
+        
+        // Erreurs de contrainte de clé étrangère
+        if (strpos($errorMessage, 'foreign key constraint') !== false || $errorCode == 23503) {
+            return "Référence à une valeur qui n'existe pas dans la base de données.";
+        }
+        
+        // Erreurs de type de données
+        if (strpos($errorMessage, 'invalid input syntax') !== false || $errorCode == 22007) {
+            if (strpos($errorMessage, 'date/time') !== false) {
+                return "Format de date invalide. Utilisez le format AAAA-MM-JJ.";
+            }
+            return "Format de données invalide.";
+        }
+        
+        // Erreur par défaut
+        return "Erreur de base de données: " . $e->getMessage();
+    }
+    
+    /**
+     * Règles de validation pour l'importation de chauffeurs.
+     */
+    private function getValidationRules(): array
+    {
+        return [
+            'last_name' => ['required', 'string', 'max:255'],
+            'first_name' => ['required', 'string', 'max:255'],
+            'birth_date' => ['required', 'date_format:Y-m-d'],
+            'statut' => ['nullable', 'string'],
+            'employee_number' => ['nullable', 'string', 'max:100', 'unique:drivers,employee_number,NULL,id,deleted_at,NULL'],
+            'personal_phone' => ['nullable', 'string', 'max:50'],
+            'personal_email' => ['nullable', 'email', 'max:255', 'unique:drivers,personal_email,NULL,id,deleted_at,NULL'],
+            'address' => ['nullable', 'string', 'max:1000'],
+            'license_number' => ['nullable', 'string', 'max:100', 'unique:drivers,license_number,NULL,id,deleted_at,NULL'],
+            'license_category' => ['nullable', 'string', 'max:50'],
+            'license_issue_date' => ['nullable', 'date_format:Y-m-d'],
+            'license_authority' => ['nullable', 'string', 'max:255'],
+            'recruitment_date' => ['nullable', 'date_format:Y-m-d'],
+            'contract_end_date' => ['nullable', 'date_format:Y-m-d', 'after_or_equal:recruitment_date'],
+            'emergency_contact_name' => ['nullable', 'string', 'max:255'],
+            'emergency_contact_phone' => ['nullable', 'string', 'max:50'],
+            'blood_type' => ['nullable', 'string', 'max:10'],
+        ];
+    }
 }
-

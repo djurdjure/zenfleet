@@ -30,5 +30,11 @@ return [
         'secret' => env('AWS_SECRET_ACCESS_KEY'),
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
+    'pdf' => [
+        'url' => env('PDF_SERVICE_URL', 'http://pdf-service:3000/generate-pdf'),
+        'health_url' => env('PDF_SERVICE_HEALTH_URL', 'http://pdf-service:3000/health'),
+        'timeout' => env('PDF_SERVICE_TIMEOUT', 120),
+        'retries' => env('PDF_SERVICE_RETRIES', 3),
+    ],
 
 ];

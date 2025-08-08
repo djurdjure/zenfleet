@@ -3,237 +3,295 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\Vehicle\StoreVehicleRequest;
+use App\Http\Requests\Admin\UpdateVehicleRequest;
 use App\Models\FuelType;
 use App\Models\TransmissionType;
 use App\Models\Vehicle;
 use App\Models\VehicleStatus;
 use App\Models\VehicleType;
-use Carbon\Carbon;
+use App\Services\ImportExportService;
+use App\Services\VehicleService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Validation\Rule;
+use Illuminate\Support\Str;
 use Illuminate\View\View;
 use League\Csv\Reader;
 use League\Csv\Statement;
-// On importe nos nouvelles Form Requests
-use App\Http\Requests\Admin\Vehicle\StoreVehicleRequest;
-use App\Http\Requests\Admin\Vehicle\UpdateVehicleRequest;
-
-
-
+use League\Csv\Writer;
 
 
 class VehicleController extends Controller
 {
+    protected $vehicleService;
+    protected $importExportService;
+
     /**
-     * Affiche la liste des véhicules.
+     * Constructeur avec injection des services
      */
-    public function index(Request $request): View
+    public function __construct(VehicleService $vehicleService, ImportExportService $importExportService)
     {
+        $this->vehicleService = $vehicleService;
+        $this->importExportService = $importExportService;
+    }
+
+    /**
+     * Affiche la liste des véhicules
+     */
+    public function index(Request $request)
+    {
+        // Utilisation de la permission spécifique 'view vehicles' comme dans DriverController
         $this->authorize('view vehicles');
-        $perPage = $request->query('per_page', 15);
-        $query = Vehicle::query()->with(['vehicleType', 'vehicleStatus']);
 
-        // AJOUT : Logique pour voir les archives
-        if ($request->query('view_deleted')) {
-            $query->onlyTrashed();
-        }
+        $filters = $request->only(['search', 'status_id', 'view_deleted']);
+        $vehicles = $this->vehicleService->getFilteredVehicles($filters);
 
-        if ($request->filled('status_id')) {
-            $query->where('status_id', $request->status_id);
-        }
+        // Correction: Passer la variable sous le nom attendu par la vue
+        $vehicleStatuses = VehicleStatus::all();
 
-        if ($request->filled('search')) {
-            $searchTerm = strtolower($request->search);
-            $query->where(function ($q) use ($searchTerm) {
-                $q->whereRaw('LOWER(registration_plate) LIKE ?', ['%' . $searchTerm . '%'])
-                ->orWhereRaw('LOWER(brand) LIKE ?', ['%' . $searchTerm . '%'])
-                ->orWhereRaw('LOWER(model) LIKE ?', ['%' . $searchTerm . '%'])
-                ->orWhereHas('vehicleType', function ($subQuery) use ($searchTerm) {
-                    $subQuery->whereRaw('LOWER(name) LIKE ?', ['%' . $searchTerm . '%']);
-                });
-            });
-        }
-
-        $vehicles = $query->orderBy('id', 'desc')->paginate($perPage)->withQueryString();
-        $vehicleStatuses = VehicleStatus::orderBy('name')->get();
-
-        return view('admin.vehicles.index', [
-            'vehicles' => $vehicles,
-            'vehicleStatuses' => $vehicleStatuses,
-            'filters' => $request->only(['search', 'status_id', 'per_page', 'view_deleted']),
-        ]);
+        return view('admin.vehicles.index', compact('vehicles', 'vehicleStatuses', 'filters'));
     }
-
-
-        /**
-     * Affiche le formulaire de création.
-     */
-    public function create(): View
-    {
-        $this->authorize('create vehicles');
-        $vehicleTypes = VehicleType::orderBy('name')->get();
-        $fuelTypes = FuelType::orderBy('name')->get();
-        $transmissionTypes = TransmissionType::orderBy('name')->get();
-        $vehicleStatuses = VehicleStatus::orderBy('name')->get();
-        return view('admin.vehicles.create', compact('vehicleTypes', 'fuelTypes', 'transmissionTypes', 'vehicleStatuses'));
-    }
-
-
-     /**
-     * Enregistre un nouveau véhicule.
-     */
-    public function store(StoreVehicleRequest $request): RedirectResponse
-    {
-        $this->authorize('create vehicles');
-        $validatedData = $request->validated();
-
-        if ($request->hasFile('photo')) {
-            $validatedData['photo_path'] = $request->file('photo')->store('vehicles/photos', 'public');
-        }
-        $validatedData['current_mileage'] = $validatedData['initial_mileage'];
-
-        Vehicle::create($validatedData);
-        return redirect()->route('admin.vehicles.index')->with('success', 'Nouveau véhicule ajouté avec succès.');
-    }
-
 
     /**
-     * Affiche une ressource spécifique.
+     * Affiche le formulaire de création d'un véhicule
+     */
+    public function create()
+    {
+        // Utilisation de la permission spécifique 'create vehicles'
+        $this->authorize('create vehicles');
+
+        $vehicleTypes = VehicleType::all();
+        $fuelTypes = FuelType::all();
+        $transmissionTypes = TransmissionType::all();
+        $statuses = VehicleStatus::all();
+
+        return view('admin.vehicles.create', compact('vehicleTypes', 'fuelTypes', 'transmissionTypes', 'statuses'));
+    }
+
+    /**
+     * Enregistre un nouveau véhicule
+     */
+    public function store(Request $request)
+    {
+        // Utilisation de la permission spécifique 'create vehicles'
+        $this->authorize('create vehicles');
+
+        try {
+            $validated = $request->validate([
+                'registration_plate' => 'required|string|max:20',
+                'vin' => 'nullable|string|max:50',
+                'brand' => 'required|string|max:50',
+                'model' => 'required|string|max:50',
+                'color' => 'nullable|string|max:30',
+                'vehicle_type_id' => 'required|exists:vehicle_types,id',
+                'fuel_type_id' => 'required|exists:fuel_types,id',
+                'transmission_type_id' => 'required|exists:transmission_types,id',
+                'vehicle_status_id' => 'required|exists:vehicle_statuses,id',
+                'year' => 'nullable|integer|min:1900|max:' . (date('Y') + 1),
+                'acquisition_date' => 'nullable|date',
+                'purchase_price' => 'nullable|numeric|min:0',
+                'current_value' => 'nullable|numeric|min:0',
+                'initial_mileage' => 'nullable|integer|min:0',
+                'engine_capacity' => 'nullable|integer|min:0',
+                'power' => 'nullable|integer|min:0',
+                'seats' => 'nullable|integer|min:0',
+                'notes' => 'nullable|string',
+                'photo' => 'nullable|image|max:2048',
+            ]);
+
+            // Ajouter l'ID de l'organisation
+            $validated['organization_id'] = auth()->user()->organization_id;
+
+            // Créer le véhicule
+            $vehicle = $this->vehicleService->createVehicle($validated, $request->file('photo'));
+
+            return redirect()->route('admin.vehicles.index')
+                ->with('success', __('vehicles.messages.create_success'));
+        } catch (\Exception $e) {
+            Log::error('Erreur lors de la création du véhicule', [
+                'exception' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            return back()->withInput()->with('error', 'Une erreur est survenue lors de la création du véhicule.');
+        }
+    }
+
+    /**
+     * Affiche les détails d'un véhicule
      */
     public function show(Vehicle $vehicle)
     {
+        // Utilisation de la permission spécifique 'view vehicles'
         $this->authorize('view vehicles');
-        return redirect()->route('admin.vehicles.edit', $vehicle);
+
+        return view('admin.vehicles.show', compact('vehicle'));
     }
 
-        /**
-     * Affiche le formulaire de modification.
+    /**
+     * Affiche le formulaire d'édition d'un véhicule
      */
-    public function edit(Vehicle $vehicle): View
+    public function edit(Vehicle $vehicle)
     {
+        // Utilisation de la permission spécifique 'edit vehicles'
         $this->authorize('edit vehicles');
-        $vehicleTypes = VehicleType::orderBy('name')->get();
-        $fuelTypes = FuelType::orderBy('name')->get();
-        $transmissionTypes = TransmissionType::orderBy('name')->get();
-        $vehicleStatuses = VehicleStatus::orderBy('name')->get();
-        return view('admin.vehicles.edit', compact('vehicle', 'vehicleTypes', 'fuelTypes', 'transmissionTypes', 'vehicleStatuses'));
-    }
 
+        $vehicleTypes = VehicleType::all();
+        $fuelTypes = FuelType::all();
+        $transmissionTypes = TransmissionType::all();
+        $statuses = VehicleStatus::all();
+
+        return view('admin.vehicles.edit', compact('vehicle', 'vehicleTypes', 'fuelTypes', 'transmissionTypes', 'statuses'));
+    }
 
     /**
-     * Met à jour un véhicule existant en utilisant une Form Request.
+     * Met à jour un véhicule
      */
-    public function update(UpdateVehicleRequest $request, Vehicle $vehicle): RedirectResponse
+    public function update(Request $request, Vehicle $vehicle)
     {
-        $validatedData = $request->validated();
-        if ($request->hasFile('photo')) {
-            if ($vehicle->photo_path) {
-                Storage::disk('public')->delete($vehicle->photo_path);
-            }
-            $validatedData['photo_path'] = $request->file('photo')->store('vehicles/photos', 'public');
+        // Utilisation de la permission spécifique 'edit vehicles'
+        $this->authorize('edit vehicles');
+
+        try {
+            $validated = $request->validate([
+                'registration_plate' => 'required|string|max:20',
+                'vin' => 'nullable|string|max:50',
+                'brand' => 'required|string|max:50',
+                'model' => 'required|string|max:50',
+                'color' => 'nullable|string|max:30',
+                'vehicle_type_id' => 'required|exists:vehicle_types,id',
+                'fuel_type_id' => 'required|exists:fuel_types,id',
+                'transmission_type_id' => 'required|exists:transmission_types,id',
+                'vehicle_status_id' => 'required|exists:vehicle_statuses,id',
+                'year' => 'nullable|integer|min:1900|max:' . (date('Y') + 1),
+                'acquisition_date' => 'nullable|date',
+                'purchase_price' => 'nullable|numeric|min:0',
+                'current_value' => 'nullable|numeric|min:0',
+                'initial_mileage' => 'nullable|integer|min:0',
+                'engine_capacity' => 'nullable|integer|min:0',
+                'power' => 'nullable|integer|min:0',
+                'seats' => 'nullable|integer|min:0',
+                'notes' => 'nullable|string',
+                'photo' => 'nullable|image|max:2048',
+            ]);
+
+            // Mettre à jour le véhicule
+            $this->vehicleService->updateVehicle($vehicle, $validated, $request->file('photo'));
+
+            return redirect()->route('admin.vehicles.index')
+                ->with('success', __('vehicles.messages.update_success'));
+        } catch (\Exception $e) {
+            Log::error('Erreur lors de la mise à jour du véhicule', [
+                'vehicle_id' => $vehicle->id,
+                'exception' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            return back()->withInput()->with('error', 'Une erreur est survenue lors de la mise à jour du véhicule.');
         }
-        $vehicle->update($validatedData);
-        return redirect()->route('admin.vehicles.index')->with('success', 'Les informations du véhicule ont été mises à jour.');
     }
 
-
-
-  //////////////////////////// ARCHIVER SUPPRIMER ET RESTAURER
-
-     /**
-     * Archive un véhicule.
+    /**
+     * Archive un véhicule (soft delete)
      */
-    public function destroy(Vehicle $vehicle): RedirectResponse
+    public function destroy(Vehicle $vehicle)
     {
+        // Utilisation de la permission spécifique 'delete vehicles'
         $this->authorize('delete vehicles');
-        $vehicle->delete();
-        return redirect()->route('admin.vehicles.index')->with('success', "Le véhicule {$vehicle->registration_plate} a été archivé.");
-    }
 
-    /**
-     * Restaure un véhicule archivé.
-     */
-    public function restore($vehicleId): RedirectResponse
-    {
-        $this->authorize('restore vehicles');
-        $vehicle = Vehicle::onlyTrashed()->findOrFail($vehicleId);
-        $vehicle->restore();
-        return redirect()->route('admin.vehicles.index', ['view_deleted' => 'true'])->with('success', "Le véhicule {$vehicle->registration_plate} a été restauré.");
-    }
+        try {
+            $this->vehicleService->archiveVehicle($vehicle);
 
-    /**
-     * Supprime définitivement un véhicule.
-     */
-    public function forceDelete($vehicleId): RedirectResponse
-    {
-        $this->authorize('force delete vehicles');
-        $vehicle = Vehicle::onlyTrashed()->findOrFail($vehicleId);
-        if ($vehicle->photo_path) {
-            Storage::disk('public')->delete($vehicle->photo_path);
+            return redirect()->route('admin.vehicles.index')
+                ->with('success', __('vehicles.messages.archive_success'));
+        } catch (\Exception $e) {
+            Log::error('Erreur lors de l\'archivage du véhicule', [
+                'vehicle_id' => $vehicle->id,
+                'exception' => $e->getMessage()
+            ]);
+
+            return back()->with('error', 'Une erreur est survenue lors de l\'archivage du véhicule.');
         }
-        $vehicle->forceDelete();
-        return redirect()->route('admin.vehicles.index', ['view_deleted' => 'true'])->with('success', 'Le véhicule a été supprimé définitivement.');
     }
 
-    //////////////////////////  FIN DES METHODES DE SUPPRIMER RESTAURER
+    /**
+     * Restaure un véhicule archivé
+     */
+    public function restore($id)
+    {
+        // Utilisation de la permission spécifique 'restore vehicles'
+        $this->authorize('restore vehicles');
 
+        try {
+            $this->vehicleService->restoreVehicle($id);
+
+            return redirect()->route('admin.vehicles.index')
+                ->with('success', __('vehicles.messages.restore_success'));
+        } catch (\Exception $e) {
+            Log::error('Erreur lors de la restauration du véhicule', [
+                'vehicle_id' => $id,
+                'exception' => $e->getMessage()
+            ]);
+
+            return back()->with('error', 'Une erreur est survenue lors de la restauration du véhicule.');
+        }
+    }
 
     /**
-     * Affiche le formulaire pour l'importation de véhicules via un fichier CSV.
+     * Supprime définitivement un véhicule
      */
-    public function showImportForm(): View
+    public function forceDelete($id)
     {
+        // Utilisation de la permission spécifique 'force delete vehicles'
+        $this->authorize('force delete vehicles');
+
+        try {
+            $this->vehicleService->forceDeleteVehicle($id);
+
+            return redirect()->route('admin.vehicles.index')
+                ->with('success', __('vehicles.messages.delete_success'));
+        } catch (\Exception $e) {
+            Log::error('Erreur lors de la suppression définitive du véhicule', [
+                'vehicle_id' => $id,
+                'exception' => $e->getMessage()
+            ]);
+
+            return back()->with('error', 'Une erreur est survenue lors de la suppression définitive du véhicule.');
+        }
+    }
+
+    /**
+     * Affiche la page d'importation de véhicules
+     */
+    public function showImportForm()
+    {
+        // Utilisation de la permission spécifique 'create vehicles' pour l'importation
         $this->authorize('create vehicles');
+
         return view('admin.vehicles.import');
     }
 
     /**
-     * Génère et télécharge un fichier CSV modèle avec des en-têtes en français et un exemple.
+     * Traite l'importation de véhicules depuis un fichier CSV
      */
-    public function downloadTemplate()
-    {
-        $this->authorize('create vehicles');
-        $headers = ['Content-Type' => 'text/csv; charset=utf-8', 'Content-Disposition' => 'attachment; filename="template_import_vehicules.csv"'];
-        $columns = array_keys($this->getImportHeaderMap());
-        $exampleRow = [
-            'AA-123-BB', '1G1YB2D33E4F56789', 'Renault', 'Clio', 'Grise',
-            'Berline', 'Diesel', 'Manuelle', 'En service',
-            '2022', '15/01/2023', '2500000.00', '2400000.00',
-            '15000', '1461', '90', '5', 'Véhicule de service pour le département commercial.'
-        ];
-        $callback = function() use ($columns, $exampleRow) {
-            $file = fopen('php://output', 'w');
-            fprintf($file, chr(0xEF).chr(0xBB).chr(0xBF));
-            fputcsv($file, $columns);
-            fputcsv($file, $exampleRow);
-            fclose($file);
-        };
-        return response()->stream($callback, 200, $headers);
-    }
-
-    /**
-     * Traite le fichier CSV uploadé pour l'importation de véhicules.
-     */
-    public function handleImport(Request $request): RedirectResponse
+     public function handleImport(Request $request): RedirectResponse
     {
         $this->authorize('create vehicles');
         $request->validate(['csv_file' => ['required', 'file', 'mimes:csv,txt']]);
 
-        $vehicleTypes = VehicleType::pluck('id', 'name')->mapWithKeys(fn($id, $name) => [strtolower($name) => $id]);
-        $fuelTypes = FuelType::pluck('id', 'name')->mapWithKeys(fn($id, $name) => [strtolower($name) => $id]);
-        $transmissionTypes = TransmissionType::pluck('id', 'name')->mapWithKeys(fn($id, $name) => [strtolower($name) => $id]);
-        $vehicleStatuses = VehicleStatus::pluck('id', 'name')->mapWithKeys(fn($id, $name) => [strtolower($name) => $id]);
-
-        $headerMap = $this->getImportHeaderMap();
+        // Pré-charger les données de référence (case-insensitive)
+        $vehicleTypes = VehicleType::all()->keyBy(fn($item) => strtolower($item->name));
+        $fuelTypes = FuelType::all()->keyBy(fn($item) => strtolower($item->name));
+        $transmissionTypes = TransmissionType::all()->keyBy(fn($item) => strtolower($item->name));
+        $vehicleStatuses = VehicleStatus::all()->keyBy(fn($item) => strtolower($item->name));
 
         $path = $request->file('csv_file')->getRealPath();
         $csv = Reader::createFromPath($path, 'r');
-        $headerFromFile = array_map(fn($h) => trim(preg_replace('/^\\x{FEFF}/u', '', $h)), $csv->fetchOne());
         $csv->setHeaderOffset(0);
-        $records = Statement::create()->process($csv, $headerFromFile);
+        $records = Statement::create()->process($csv);
 
         $successCount = 0;
         $errorRows = [];
@@ -241,35 +299,40 @@ class VehicleController extends Controller
 
         foreach ($records as $record) {
             $rowNumber++;
+            $data = array_map('trim', $record);
 
-            $data = [];
-            foreach ($headerMap as $frenchHeader => $systemKey) {
-                $value = $record[$frenchHeader] ?? null;
-                $data[$systemKey] = ($value === '' || $value === null) ? null : trim($value);
-            }
-
-            if (empty($data['vehicle_type_name'])) $data['vehicle_type_name'] = 'Berline';
-            if (empty($data['transmission_type_name'])) $data['transmission_type_name'] = 'Manuelle';
-            if (empty($data['status_name'])) $data['status_name'] = 'En attente';
-
-            if (!empty($data['acquisition_date'])) {
-                try {
-                    $data['acquisition_date'] = Carbon::createFromFormat('d/m/Y', $data['acquisition_date'])->format('Y-m-d');
-                } catch (\Exception $e) {
-                    // Laisser la date originale, le validateur Laravel échouera.
-                }
-            }
-
-            $dataToValidate = $this->prepareDataForValidation($data, $vehicleTypes, $fuelTypes, $transmissionTypes, $vehicleStatuses);
-
-            $validator = Validator::make($dataToValidate, $this->getValidationRules());
+            // Conversion des noms en ID
+            $preparedData = [
+                'registration_plate' => $data['immatriculation'] ?? null,
+                'vin' => $data['numero_serie_vin'] ?? null,
+                'brand' => $data['marque'] ?? null,
+                'model' => $data['modele'] ?? null,
+                'color' => $data['couleur'] ?? null,
+                'manufacturing_year' => $this->importExportService->formatInteger($data['annee_fabrication'] ?? null),
+                'acquisition_date' => $this->importExportService->formatDate($data['date_acquisition'] ?? null),
+                'purchase_price' => $this->importExportService->formatDecimal($data['prix_achat'] ?? null),
+                'current_value' => $this->importExportService->formatDecimal($data['valeur_actuelle'] ?? null),
+                'initial_mileage' => $this->importExportService->formatInteger($data['kilometrage_initial'] ?? null),
+                'engine_displacement_cc' => $this->importExportService->formatInteger($data['cylindree_cc'] ?? null),
+                'power_hp' => $this->importExportService->formatInteger($data['puissance_cv'] ?? null),
+                'seats' => $this->importExportService->formatInteger($data['nombre_places'] ?? null),
+                'notes' => $data['notes'] ?? null,
+                'vehicle_type_id' => $vehicleTypes->get(strtolower($data['type_vehicule'] ?? ''))?->id,
+                'fuel_type_id' => $fuelTypes->get(strtolower($data['type_carburant'] ?? ''))?->id,
+                'transmission_type_id' => $transmissionTypes->get(strtolower($data['type_transmission'] ?? ''))?->id,
+                'status_id' => $vehicleStatuses->get(strtolower($data['statut'] ?? ''))?->id,
+            ];
+            
+            $validator = Validator::make($preparedData, (new StoreVehicleRequest())->rules());
 
             if ($validator->fails()) {
-                $errorRows[] = ['row_number' => $rowNumber, 'errors' => $validator->errors()->all(), 'data' => $record];
+                // --- CORRECTION DÉFINITIVE ---
+                // On utilise la clé 'line' pour être cohérent avec la vue.
+                $errorRows[] = ['line' => $rowNumber, 'errors' => $validator->errors()->all(), 'data' => $record];
+                // --- FIN DE LA CORRECTION ---
             } else {
                 $validatedData = $validator->validated();
                 $validatedData["current_mileage"] = $validatedData["initial_mileage"] ?? 0;
-
                 Vehicle::create($validatedData);
                 $successCount++;
             }
@@ -281,87 +344,115 @@ class VehicleController extends Controller
     }
 
     /**
-     * Affiche la page des résultats de l'importation.
+     * Affiche les résultats de l'importation
      */
-    public function showImportResults(): View
+    public function showImportResults(Request $request)
     {
+        // Utilisation de la permission spécifique 'create vehicles' pour voir les résultats d'importation
+        $this->authorize('create vehicles');
+
+        // Récupérer les résultats de l'importation depuis la session
         $successCount = session('successCount', 0);
         $errorRows = session('errorRows', []);
-        return view('admin.vehicles.import-results', compact('successCount', 'errorRows'));
-    }
+        $importId = session('importId', null);
+        $fileName = session('fileName', 'Fichier CSV');
+        $encoding = session('encoding', 'utf8');
 
-    /**
-     * Méthode privée pour centraliser la map des en-têtes CSV.
-     */
-    private function getImportHeaderMap(): array
-    {
-        return [
-            'Immatriculation*' => 'registration_plate', 'N° de Série (VIN)' => 'vin',
-            'Marque*' => 'brand', 'Modèle*' => 'model', 'Couleur' => 'color',
-            'Type de Véhicule*' => 'vehicle_type_name', 'Type de Carburant*' => 'fuel_type_name',
-            'Type de Transmission*' => 'transmission_type_name', 'Statut Initial*' => 'status_name',
-            'Année de Fabrication' => 'manufacturing_year', 'Date d\'Acquisition' => 'acquisition_date',
-            'Prix d\'Achat (DA)' => 'purchase_price', 'Valeur Actuelle (DA)' => 'current_value',
-            'Kilométrage Initial' => 'initial_mileage', 'Cylindrée (cc)' => 'engine_displacement_cc',
-            'Puissance (CV)' => 'power_hp', 'Nombre de Places' => 'seats', 'Notes' => 'notes',
-        ];
-    }
-
-    /**
-     * Prépare les données pour la validation.
-     */
-    private function prepareDataForValidation(array $data, $vehicleTypes, $fuelTypes, $transmissionTypes, $vehicleStatuses): array
-    {
-        $dataToValidate = $data;
-        $dataToValidate['vehicle_type_id'] = $vehicleTypes[strtolower($data['vehicle_type_name'] ?? '')] ?? null;
-        $dataToValidate['fuel_type_id'] = $fuelTypes[strtolower($data['fuel_type_name'] ?? '')] ?? null;
-        $dataToValidate['transmission_type_id'] = $transmissionTypes[strtolower($data['transmission_type_name'] ?? '')] ?? null;
-        $dataToValidate['status_id'] = $vehicleStatuses[strtolower($data['status_name'] ?? '')] ?? null;
-
-        // Assurer que les champs numériques vides deviennent 0 pour la validation/création
-        $dataToValidate['initial_mileage'] = $data['initial_mileage'] ?? 0;
-
-        return $dataToValidate;
-    }
-
-     /**
-     * Centralise les règles de validation pour les véhicules.
-     */
-    private function getValidationRules(?int $vehicleId = null): array
-    {
-        $rules = [
-            'registration_plate' => ['required', 'string', 'max:50', Rule::unique('vehicles')->ignore($vehicleId)->whereNull('deleted_at')],
-            'vin' => ['nullable', 'string', 'size:17', Rule::unique('vehicles')->ignore($vehicleId)->whereNull('deleted_at')],
-            'brand' => ['required', 'string', 'max:100'],
-            'model' => ['required', 'string', 'max:100'],
-            'color' => ['nullable', 'string', 'max:50'],
-            'vehicle_type_id' => ['required', 'exists:vehicle_types,id'],
-            'fuel_type_id' => ['required', 'exists:fuel_types,id'],
-            'transmission_type_id' => ['required', 'exists:transmission_types,id'],
-            'status_id' => ['required', 'exists:vehicle_statuses,id'],
-            'manufacturing_year' => ['nullable', 'integer', 'digits:4'],
-            'acquisition_date' => ['nullable', 'date'],
-            'purchase_price' => ['nullable', 'numeric', 'min:0'],
-            'current_value' => ['nullable', 'numeric', 'min:0'],
-            'engine_displacement_cc' => ['nullable', 'integer', 'min:0'],
-            'power_hp' => ['nullable', 'integer', 'min:0'],
-            'seats' => ['nullable', 'integer', 'min:1'],
-            'notes' => ['nullable', 'string'],
-            'photo' => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif', 'max:2048'],
-        ];
-
-        if ($vehicleId) {
-            // Règle pour la mise à jour
-            $vehicle = Vehicle::find($vehicleId);
-            $rules['current_mileage'] = ['required', 'integer', 'min:0', 'gte:' . ($vehicle->current_mileage ?? 0)];
-        } else {
-            // Règles pour la création
-            $rules["initial_mileage"] = ["nullable", "integer", "min:0"];
-            $rules["current_mileage"] = ["nullable", "integer", "min:0"];
+        // Si aucun résultat n'est disponible, rediriger vers la page d'importation
+        if ($successCount === 0 && empty($errorRows)) {
+            return redirect()->route('admin.vehicles.import.show')
+                ->with('error', 'Aucun résultat d\'importation disponible. Veuillez importer un fichier.');
         }
 
-        return $rules;
+        return view('admin.vehicles.import-results', compact(
+            'successCount',
+            'errorRows',
+            'importId',
+            'fileName',
+            'encoding'
+        ));
+    }
+
+    /**
+     * Exporte les lignes en erreur vers un fichier CSV
+     */
+    public function exportErrors(Request $request, $import_id)
+    {
+        // Utilisation de la permission spécifique 'create vehicles' pour exporter les erreurs
+        $this->authorize('create vehicles');
+
+        // Récupérer les résultats de l'importation depuis la session
+        $results = session('import_results');
+
+        // Vérifier que les résultats correspondent à l'ID d'importation demandé
+        if (!$results || $results['import_id'] !== $import_id) {
+            return redirect()->route('admin.vehicles.import.show')
+                ->with('error', 'Les données d\'erreur demandées ne sont plus disponibles.');
+        }
+
+        $errorRows = $results['error_rows'] ?? [];
+
+        // Utiliser le service pour exporter les erreurs
+        return $this->importExportService->exportErrorRows($errorRows, $import_id);
+    }
+
+    /**
+     * Génère un fichier CSV modèle pour l'importation
+     */
+    public function downloadTemplate()
+    {
+        // Utilisation de la permission spécifique 'create vehicles' pour télécharger le template
+        $this->authorize('create vehicles');
+
+        // En-têtes du CSV
+        $headers = [
+            'immatriculation',
+            'numero_serie_vin',
+            'marque',
+            'modele',
+            'couleur',
+            'type_vehicule',
+            'type_carburant',
+            'type_transmission',
+            'statut',
+            'annee_fabrication',
+            'date_acquisition',
+            'prix_achat',
+            'valeur_actuelle',
+            'kilometrage_initial',
+            'cylindree_cc',
+            'puissance_cv',
+            'nombre_places',
+            'notes'
+        ];
+
+        // Exemple de données
+        $example = [
+            'AB-123-CD',
+            'VF1234567890ABCDE',
+            'Renault',
+            'Clio',
+            'Bleu',
+            'Berline',
+            'Diesel',
+            'Manuelle',
+            'Actif',
+            '2020',
+            '2021-01-15',
+            '15000',
+            '12000',
+            '10000',
+            '1500',
+            '90',
+            '5',
+            'Véhicule de service'
+        ];
+
+        // Utiliser le service pour générer le template
+        return $this->importExportService->generateCsvTemplate(
+            'modele_import_vehicules.csv',
+            $headers,
+            $example
+        );
     }
 }
-
-

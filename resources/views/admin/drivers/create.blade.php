@@ -8,201 +8,186 @@
     <div class="py-12">
         <div class="max-w-4xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-8 text-gray-900" x-data="{ currentStep: {{ old('current_step', 1) }} }" x-init="
+                <div class="p-8 text-gray-900" x-data="{
+                    currentStep: {{ old('current_step', 1) }},
+                    photoPreview: null,
+                    init() {
+                        new TomSelect(this.$refs.status_id, { create: false, placeholder: 'Sélectionnez un statut...' });
+                        new TomSelect(this.$refs.user_id, { create: false, placeholder: 'Rechercher un utilisateur...' });
+                    },
+                    updatePhotoPreview(event) {
+                        const file = event.target.files[0];
+                        if (file) {
+                            this.photoPreview = URL.createObjectURL(file);
+                        }
+                    }
+                }" x-init="
+                    init();
                     @if ($errors->any())
                         let errors = {{ json_encode($errors->messages()) }};
                         let firstErrorStep = null;
-
-                        const fieldToStepMap = {
-                            'first_name': 1, 'last_name': 1, 'birth_date': 1, 'personal_phone': 1, 'address': 1, 'blood_type': 1, 'personal_email': 1, 'photo': 1,
-                            'employee_number': 2, 'recruitment_date': 2, 'contract_end_date': 2, 'status_id': 2, 'user_id': 2,
-                            'license_number': 3, 'license_category': 3, 'license_issue_date': 3, 'license_authority': 3, 'emergency_contact_name': 3, 'emergency_contact_phone': 3
-                        };
-
+                        const fieldToStepMap = { 'first_name': 1, 'last_name': 1, 'birth_date': 1, 'personal_phone': 1, 'address': 1, 'blood_type': 1, 'personal_email': 1, 'photo': 1, 'employee_number': 2, 'recruitment_date': 2, 'contract_end_date': 2, 'status_id': 2, 'user_id': 2, 'license_number': 3, 'license_category': 3, 'license_issue_date': 3, 'license_authority': 3, 'emergency_contact_name': 3, 'emergency_contact_phone': 3 };
                         for (const field in fieldToStepMap) {
-                            if (errors.hasOwnProperty(field)) {
-                                firstErrorStep = fieldToStepMap[field];
-                                break;
-                            }
+                            if (errors.hasOwnProperty(field)) { firstErrorStep = fieldToStepMap[field]; break; }
                         }
-
-                        if (firstErrorStep !== null) {
-                            currentStep = firstErrorStep;
-                        } else if ({{ old('current_step', 0) }} > 0) {
-                            currentStep = {{ old('current_step') }};
-                        } else {
-                            currentStep = 1;
-                        }
+                        if (firstErrorStep) { currentStep = firstErrorStep; }
                     @endif
                 ">
 
-                    {{-- Indicateur d'étapes (Stepper) --}}
-                    <ol class="flex items-center w-full mb-6">
-                        <li class="flex w-full items-center text-violet-600 after:content-[''] after:w-full after:h-1 after:border-b after:border-violet-600 after:border-3 after:inline-block">
-                            <span class="flex items-center justify-center w-10 h-10 bg-violet-100 rounded-full lg:h-12 lg:w-12 shrink-0">
-                                <svg class="w-4 h-4 text-violet-600 lg:w-6 lg:h-6" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                    <ol class="flex items-center w-full mb-8">
+                        <li :class="currentStep >= 1 ? 'text-primary-600' : 'text-gray-500'" class="flex w-full items-center after:content-[''] after:w-full after:h-1 after:border-b after:border-4 after:inline-block" :class="currentStep > 1 ? 'after:border-primary-600' : 'after:border-gray-200'">
+                            <span class="flex items-center justify-center w-10 h-10 rounded-full shrink-0" :class="currentStep >= 1 ? 'bg-primary-100' : 'bg-gray-100'">
+                                <x-heroicon-s-user-circle class="w-5 h-5"/>
                             </span>
                         </li>
-                        <li class="flex w-full items-center after:content-[''] after:w-full after:h-1 after:border-b after:border-gray-200 after:border-3 after:inline-block" :class="{ 'text-violet-600 after:border-violet-600': currentStep >= 2 }">
-                            <span class="flex items-center justify-center w-10 h-10 rounded-full lg:h-12 lg:w-12 shrink-0" :class="{ 'bg-violet-100': currentStep >= 2, 'bg-gray-100': currentStep < 2 }">
-                                <span x-show="currentStep < 2">2</span>
-                                <svg x-show="currentStep >= 2" class="w-4 h-4 lg:w-6 lg:h-6" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                        <li :class="currentStep >= 2 ? 'text-primary-600' : 'text-gray-500'" class="flex w-full items-center after:content-[''] after:w-full after:h-1 after:border-b after:border-4 after:inline-block" :class="currentStep > 2 ? 'after:border-primary-600' : 'after:border-gray-200'">
+                            <span class="flex items-center justify-center w-10 h-10 rounded-full shrink-0" :class="currentStep >= 2 ? 'bg-primary-100' : 'bg-gray-100'">
+                                <x-heroicon-s-briefcase class="w-5 h-5"/>
                             </span>
                         </li>
-                        <li class="flex items-center" :class="{ 'text-violet-600': currentStep === 3 }">
-                            <span class="flex items-center justify-center w-10 h-10 rounded-full lg:h-12 lg:w-12 shrink-0" :class="{ 'bg-violet-100': currentStep === 3, 'bg-gray-100': currentStep < 3 }">3</span>
+                        <li :class="currentStep === 3 ? 'text-primary-600' : 'text-gray-500'" class="flex items-center">
+                            <span class="flex items-center justify-center w-10 h-10 rounded-full shrink-0" :class="currentStep === 3 ? 'bg-primary-100' : 'bg-gray-100'">
+                                <x-heroicon-s-identification class="w-5 h-5"/>
+                            </span>
                         </li>
                     </ol>
-
-                    @if ($errors->any())
-                        <div class="mb-6 bg-red-50 border-l-4 border-red-400 text-red-700 p-4" role="alert">
-                            <p class="font-bold">Veuillez corriger les erreurs ci-dessous:</p>
-                            <ul class="mt-3 list-disc list-inside text-sm text-red-600">
-                                @foreach ($errors->all() as $error)
-                                    <li>{{ $error }}</li>
-                                @endforeach
-                            </ul>
-                        </div>
-                    @endif
 
                     <form method="POST" action="{{ route('admin.drivers.store') }}" enctype="multipart/form-data">
                         @csrf
                         <input type="hidden" name="current_step" x-model="currentStep">
 
-                        {{-- Étape 1: Informations Personnelles --}}
-                        <section x-show="currentStep === 1">
-                            <h3 class="text-lg font-semibold text-gray-800 border-b pb-2 mb-6">Étape 1: Informations Personnelles</h3>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                        <fieldset x-show="currentStep === 1" class="border border-gray-200 p-6 rounded-lg">
+                            <legend class="text-lg font-semibold text-gray-800 px-2">Étape 1: Informations Personnelles</legend>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
                                 <div class="md:col-span-2">
-                                    <label for="photo" class="block font-medium text-sm text-gray-700">Photo</label>
-                                    <input id="photo" name="photo" type="file" class="block w-full text-sm text-gray-500 mt-1 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-violet-50 file:text-violet-700 hover:file:bg-violet-100"/>
+                                    <x-input-label for="photo" value="Photo" />
+                                    <div class="mt-2 flex items-center space-x-4">
+                                        <span class="inline-block h-20 w-20 overflow-hidden rounded-full bg-gray-100" :class="{'hidden': photoPreview}">
+                                            <x-heroicon-s-user class="h-full w-full text-gray-300"/>
+                                        </span>
+                                        <img x-show="photoPreview" :src="photoPreview" class="h-20 w-20 rounded-full object-cover">
+                                        <input id="photo" name="photo" type="file" @change="updatePhotoPreview" class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary-50 file:text-primary-700 hover:file:bg-primary-100"/>
+                                    </div>
                                     <x-input-error :messages="$errors->get('photo')" class="mt-2" />
                                 </div>
                                 <div>
-                                    <label for="first_name" class="block font-medium text-sm text-gray-700">Prénom <span class="text-red-500">*</span></label>
-                                    <x-text-input id="first_name" class="block mt-1 w-full" type="text" name="first_name" :value="old('first_name')" />
+                                    <x-input-label for="first_name" value="Prénom" required />
+                                    <x-text-input id="first_name" name="first_name" :value="old('first_name')" class="mt-1 block w-full" />
                                     <x-input-error :messages="$errors->get('first_name')" class="mt-2" />
                                 </div>
                                 <div>
-                                    <label for="last_name" class="block font-medium text-sm text-gray-700">Nom <span class="text-red-500">*</span></label>
-                                    <x-text-input id="last_name" class="block mt-1 w-full" type="text" name="last_name" :value="old('last_name')" />
+                                    <x-input-label for="last_name" value="Nom" required />
+                                    <x-text-input id="last_name" name="last_name" :value="old('last_name')" class="mt-1 block w-full" />
                                     <x-input-error :messages="$errors->get('last_name')" class="mt-2" />
                                 </div>
                                 <div>
-                                    <label for="birth_date" class="block font-medium text-sm text-gray-700">Date de Naissance</label>
-                                    <x-text-input id="birth_date" class="block mt-1 w-full" type="date" name="birth_date" :value="old('birth_date')" />
+                                    <x-input-label for="birth_date" value="Date de Naissance" />
+                                    <x-text-input id="birth_date" type="date" name="birth_date" :value="old('birth_date')" class="mt-1 block w-full" />
                                     <x-input-error :messages="$errors->get('birth_date')" class="mt-2" />
                                 </div>
+                                {{-- CHAMP CORRIGÉ --}}
                                 <div>
-                                    <label for="blood_type" class="block font-medium text-sm text-gray-700">Groupe Sanguin</label>
-                                    <x-text-input id="blood_type" class="block mt-1 w-full" type="text" placeholder="Ex: O+" name="blood_type" :value="old('blood_type')" />
+                                    <x-input-label for="blood_type" value="Groupe Sanguin" />
+                                    <x-text-input id="blood_type" name="blood_type" :value="old('blood_type')" placeholder="Ex: O+" class="mt-1 block w-full" />
                                     <x-input-error :messages="$errors->get('blood_type')" class="mt-2" />
                                 </div>
                                 <div>
-                                    <label for="personal_phone" class="block font-medium text-sm text-gray-700">Téléphone Personnel</label>
-                                    <x-text-input id="personal_phone" class="block mt-1 w-full" type="text" name="personal_phone" :value="old('personal_phone')" />
+                                    <x-input-label for="personal_phone" value="Téléphone Personnel" />
+                                    <x-text-input id="personal_phone" name="personal_phone" :value="old('personal_phone')" class="mt-1 block w-full" />
                                     <x-input-error :messages="$errors->get('personal_phone')" class="mt-2" />
                                 </div>
+                                {{-- CHAMP CORRIGÉ --}}
                                 <div>
-                                    <label for="personal_email" class="block font-medium text-sm text-gray-700">Adresse Email</label>
-                                    <x-text-input id="personal_email" class="block mt-1 w-full" type="email" name="personal_email" :value="old('personal_email')" />
+                                    <x-input-label for="personal_email" value="Email Personnel" />
+                                    <x-text-input id="personal_email" name="personal_email" type="email" :value="old('personal_email')" class="mt-1 block w-full" />
                                     <x-input-error :messages="$errors->get('personal_email')" class="mt-2" />
                                 </div>
                                 <div class="md:col-span-2">
-                                    <label for="address" class="block font-medium text-sm text-gray-700">Adresse</label>
-                                    <textarea id="address" name="address" rows="3" class="block mt-1 w-full border-gray-300 focus:border-violet-500 focus:ring-violet-500 rounded-md shadow-sm">{{ old('address') }}</textarea>
+                                    <x-input-label for="address" value="Adresse" />
+                                    <textarea id="address" name="address" rows="3" class="block mt-1 w-full border-gray-300 focus:border-primary-500 focus:ring-primary-500 rounded-md shadow-sm">{{ old('address') }}</textarea>
                                     <x-input-error :messages="$errors->get('address')" class="mt-2" />
                                 </div>
                             </div>
-                        </section>
+                        </fieldset>
 
-                        {{-- Étape 2: Informations Professionnelles --}}
-                        <section x-show="currentStep === 2" style="display: none;">
-                            <h3 class="text-lg font-semibold text-gray-800 border-b pb-2 mb-6">Étape 2: Informations Professionnelles</h3>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                        <fieldset x-show="currentStep === 2" style="display: none;" class="border border-gray-200 p-6 rounded-lg">
+                            <legend class="text-lg font-semibold text-gray-800 px-2">Étape 2: Informations Professionnelles</legend>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
                                 <div>
-                                    <label for="employee_number" class="block font-medium text-sm text-gray-700">Matricule</label>
-                                    <x-text-input id="employee_number" class="block mt-1 w-full" type="text" name="employee_number" :value="old('employee_number')" />
+                                    <x-input-label for="employee_number" value="Matricule" />
+                                    <x-text-input id="employee_number" name="employee_number" :value="old('employee_number')" class="mt-1 block w-full" />
                                     <x-input-error :messages="$errors->get('employee_number')" class="mt-2" />
                                 </div>
                                 <div>
-                                    <label for="recruitment_date" class="block font-medium text-sm text-gray-700">Date de Recrutement</label>
-                                    <x-text-input id="recruitment_date" class="block mt-1 w-full" type="date" name="recruitment_date" :value="old('recruitment_date')" />
-                                    <x-input-error :messages="$errors->get('recruitment_date')" class="mt-2" />
-                                </div>
-                                <div>
-                                    <label for="contract_end_date" class="block font-medium text-sm text-gray-700">Date de Fin de Contrat</label>
-                                    <x-text-input id="contract_end_date" name="contract_end_date" :value="old('contract_end_date')" type="date" class="mt-1 block w-full"/>
-                                    <x-input-error :messages="$errors->get('contract_end_date')" class="mt-2" />
-                                </div>
-                                <div>
-                                    <label for="status_id" class="block font-medium text-sm text-gray-700">Statut <span class="text-red-500">*</span></label>
-                                    <select name="status_id" id="status_id" class="block mt-1 w-full border-gray-300 focus:border-violet-500 focus:ring-violet-500 rounded-md shadow-sm">
-                                        <option value="">Sélectionnez un statut</option>
+                                    <x-input-label for="status_id" value="Statut" required />
+                                    <select x-ref="status_id" name="status_id" id="status_id">
                                         @foreach($driverStatuses as $status)<option value="{{ $status->id }}" @selected(old('status_id') == $status->id)>{{ $status->name }}</option>@endforeach
                                     </select>
                                     <x-input-error :messages="$errors->get('status_id')" class="mt-2" />
                                 </div>
                                 <div>
-                                    <label for="user_id" class="block font-medium text-sm text-gray-700">Lier à un Compte Utilisateur (Optionnel)</label>
-                                    <select name="user_id" id="user_id" class="block mt-1 w-full border-gray-300 focus:border-violet-500 focus:ring-violet-500 rounded-md shadow-sm">
-                                        <option value="">Ne pas lier de compte</option>
+                                    <x-input-label for="recruitment_date" value="Date de Recrutement" />
+                                    <x-text-input id="recruitment_date" type="date" name="recruitment_date" :value="old('recruitment_date')" class="mt-1 block w-full" />
+                                    <x-input-error :messages="$errors->get('recruitment_date')" class="mt-2" />
+                                </div>
+                                <div>
+                                    <x-input-label for="contract_end_date" value="Date de Fin de Contrat" />
+                                    <x-text-input id="contract_end_date" name="contract_end_date" :value="old('contract_end_date')" type="date" class="mt-1 block w-full"/>
+                                    <x-input-error :messages="$errors->get('contract_end_date')" class="mt-2" />
+                                </div>
+                                <div class="md:col-span-2">
+                                    <x-input-label for="user_id" value="Lier à un Compte Utilisateur (Optionnel)" />
+                                    <select x-ref="user_id" name="user_id" id="user_id">
+                                         <option value="">Ne pas lier de compte</option>
                                         @foreach($linkableUsers as $user)<option value="{{ $user->id }}" @selected(old('user_id') == $user->id)>{{ $user->name }} ({{ $user->email }})</option>@endforeach
                                     </select>
                                     <x-input-error :messages="$errors->get('user_id')" class="mt-2" />
                                 </div>
                             </div>
-                        </section>
+                        </fieldset>
 
-                        {{-- Étape 3: Permis & Urgence --}}
-                        <section x-show="currentStep === 3" style="display: none;">
-                            <h3 class="text-lg font-semibold text-gray-800 border-b pb-2 mb-6">Étape 3: Permis & Contact d'Urgence</h3>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                        <fieldset x-show="currentStep === 3" style="display: none;" class="border border-gray-200 p-6 rounded-lg">
+                            <legend class="text-lg font-semibold text-gray-800 px-2">Étape 3: Permis & Contact d'Urgence</legend>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
                                 <div>
-                                    <label for="license_number" class="block font-medium text-sm text-gray-700">Numéro de Permis</label>
+                                    <x-input-label for="license_number" value="Numéro de Permis" />
                                     <x-text-input id="license_number" name="license_number" :value="old('license_number')" class="mt-1 w-full"/>
                                     <x-input-error :messages="$errors->get('license_number')" class="mt-2" />
                                 </div>
                                 <div>
-                                    <label for="license_category" class="block font-medium text-sm text-gray-700">Catégorie(s)</label>
+                                    <x-input-label for="license_category" value="Catégorie(s)" />
                                     <x-text-input id="license_category" name="license_category" :value="old('license_category')" placeholder="Ex: B, C1E" class="mt-1 w-full"/>
                                     <x-input-error :messages="$errors->get('license_category')" class="mt-2" />
                                 </div>
                                 <div>
-                                    <label for="license_issue_date" class="block font-medium text-sm text-gray-700">Date de Délivrance</label>
+                                    <x-input-label for="license_issue_date" value="Date de Délivrance" />
                                     <x-text-input id="license_issue_date" name="license_issue_date" :value="old('license_issue_date')" type="date" class="mt-1 w-full"/>
                                     <x-input-error :messages="$errors->get('license_issue_date')" class="mt-2" />
                                 </div>
                                 <div>
-                                    <label for="license_authority" class="block font-medium text-sm text-gray-700">Délivré par</label>
+                                    <x-input-label for="license_authority" value="Délivré par" />
                                     <x-text-input id="license_authority" name="license_authority" :value="old('license_authority')" class="mt-1 w-full"/>
                                     <x-input-error :messages="$errors->get('license_authority')" class="mt-2" />
                                 </div>
                                 <div>
-                                    <label for="emergency_contact_name" class="block font-medium text-sm text-gray-700">Nom du Contact d'Urgence</label>
+                                    <x-input-label for="emergency_contact_name" value="Nom du Contact d'Urgence" />
                                     <x-text-input id="emergency_contact_name" name="emergency_contact_name" :value="old('emergency_contact_name')" class="mt-1 w-full"/>
                                     <x-input-error :messages="$errors->get('emergency_contact_name')" class="mt-2" />
                                 </div>
                                 <div>
-                                    <label for="emergency_contact_phone" class="block font-medium text-sm text-gray-700">Téléphone d'Urgence</label>
+                                    <x-input-label for="emergency_contact_phone" value="Téléphone d'Urgence" />
                                     <x-text-input id="emergency_contact_phone" name="emergency_contact_phone" :value="old('emergency_contact_phone')" class="mt-1 w-full"/>
                                     <x-input-error :messages="$errors->get('emergency_contact_phone')" class="mt-2" />
                                 </div>
                             </div>
-                        </section>
+                        </fieldset>
 
-                        {{-- Boutons de Navigation --}}
-                        <div class="mt-8 pt-6 border-t border-gray-200 flex justify-between items-center">
-                            <div>
-                                <button type="button" x-show="currentStep > 1" @click="currentStep--" class="inline-flex items-center px-4 py-2 bg-white border border-gray-300 rounded-md font-semibold text-xs text-gray-700 uppercase tracking-widest shadow-sm hover:bg-gray-50">
-                                    Précédent
-                                </button>
-                            </div>
+                        <div class="mt-8 pt-6 border-t border-gray-200 flex items-center justify-between">
+                            <x-secondary-button type="button" x-show="currentStep > 1" @click="currentStep--">Précédent</x-secondary-button>
+                            <div class="flex-grow"></div>
                             <div class="flex items-center gap-4">
                                 <a href="{{ route('admin.drivers.index') }}" class="text-sm font-semibold text-gray-600 hover:text-gray-900">Annuler</a>
-                                <button type="button" x-show="currentStep < 3" @click="currentStep++" class="inline-flex items-center px-4 py-2 bg-violet-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-violet-700">
-                                    Suivant
-                                </button>
+                                <x-primary-button type="button" x-show="currentStep < 3" @click="currentStep++">Suivant</x-primary-button>
                                 <button type="submit" x-show="currentStep === 3" class="inline-flex items-center px-4 py-2 bg-green-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-green-700">
                                     Créer le Chauffeur
                                 </button>
@@ -214,5 +199,3 @@
         </div>
     </div>
 </x-app-layout>
-
-

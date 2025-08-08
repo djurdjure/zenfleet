@@ -44,24 +44,48 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
         // --- FICHES DE REMISE ---
         Route::get('/assignments/{assignment}/handovers/create', [VehicleHandoverController::class, 'create'])->name('handovers.vehicles.create');
         Route::post('/handovers/{handover}/upload-signed', [VehicleHandoverController::class, 'uploadSigned'])->name('handovers.vehicles.uploadSigned');
+        Route::get('/handovers/{handover}/download', [VehicleHandoverController::class, 'downloadPdf'])->name('handovers.vehicles.downloadPdf');
         Route::resource('handovers', VehicleHandoverController::class)->names('handovers.vehicles')->except(['create', 'index']);
 
-        // --- GESTION DES RESSOURCES PRINCIPALES ---
+
+        // --- CORRECTION : DÉCLARATION DES ROUTES SPÉCIFIQUES AVANT LES ROUTES DE RESSOURCE ---
+
+        // --- ACTIONS SPÉCIFIQUES POUR LES VÉHICULES ---
+        Route::get('/vehicles/import', [VehicleController::class, 'showImportForm'])->name('vehicles.import.show');
+        Route::post('/vehicles/import', [VehicleController::class, 'handleImport'])->name('vehicles.import.handle');
+        Route::get('/vehicles/import-template', [VehicleController::class, 'downloadTemplate'])->name('vehicles.import.template');
+        Route::get('/vehicles/import/export-errors/{import_id}', [VehicleController::class, 'exportErrors'])->name('vehicles.import.export-errors');
+        Route::get('/vehicles/import/results', [VehicleController::class, 'showImportResults'])->name('vehicles.import.results');
+        Route::patch('/vehicles/{vehicle}/restore', [VehicleController::class, 'restore'])->name('vehicles.restore')->withTrashed();
+        Route::delete('/vehicles/{vehicle}/force-delete', [VehicleController::class, 'forceDelete'])->name('vehicles.force-delete')->withTrashed();
+        
+        // --- CHAUFFEURS ---
+        // --- ACTIONS SPÉCIFIQUES POUR LES CHAUFFEURS ---
+        Route::patch('/drivers/{driver}/restore', [DriverController::class, 'restore'])->name('drivers.restore')->withTrashed();
+        Route::delete('/drivers/{driver}/force-delete', [DriverController::class, 'forceDelete'])->name('drivers.force-delete')->withTrashed();
+
+        // AJOUT : Routes pour l'importation CSV des chauffeurs
+        Route::get('/drivers/import', [DriverController::class, 'showImportForm'])->name('drivers.import.show');
+        Route::post('/drivers/import', [DriverController::class, 'handleImport'])->name('drivers.import.handle');
+        Route::get('/drivers/import-template', [DriverController::class, 'downloadTemplate'])->name('drivers.import.template');
+        Route::get('/drivers/import/results', [DriverController::class, 'showImportResults'])->name('drivers.import.results');
+
+        // Routes existantes pour le CRUD des chauffeurs
+        Route::patch('/drivers/{driver}/restore', [DriverController::class, 'restore'])->name('drivers.restore')->withTrashed();
+        Route::delete('/drivers/{driver}/force-delete', [DriverController::class, 'forceDelete'])->name('drivers.force-delete')->withTrashed();
+        Route::resource('drivers', DriverController::class);
+
+
+        // --- ACTIONS SPÉCIFIQUES POUR LES AFFECTATIONS ---
+        Route::patch('/assignments/{assignment}/end', [AssignmentController::class, 'end'])->name('assignments.end');
+
+
+        // --- GESTION DES RESSOURCES PRINCIPALES (DÉCLARÉES APRÈS LES ROUTES SPÉCIFIQUES) ---
         Route::resource('users', UserController::class);
         Route::resource('drivers', DriverController::class);
         Route::resource('vehicles', VehicleController::class);
         Route::resource('assignments', AssignmentController::class);
 
-        // --- ACTIONS SPÉCIFIQUES (ARCHIVAGE, IMPORT, ETC.) ---
-        Route::patch('/drivers/{driver}/restore', [DriverController::class, 'restore'])->name('drivers.restore')->withTrashed();
-        Route::delete('/drivers/{driver}/force-delete', [DriverController::class, 'forceDelete'])->name('drivers.force-delete')->withTrashed();
-
-        Route::get('/vehicles/import', [VehicleController::class, 'showImportForm'])->name('vehicles.import.show');
-        Route::post('/vehicles/import', [VehicleController::class, 'handleImport'])->name('vehicles.import.handle');
-        Route::get('/vehicles/import-template', [VehicleController::class, 'downloadTemplate'])->name('vehicles.import.template');
-        Route::get('/vehicles/import/results', [VehicleController::class, 'showImportResults'])->name('vehicles.import.results');
-        Route::patch('/vehicles/{vehicle}/restore', [VehicleController::class, 'restore'])->name('vehicles.restore')->withTrashed();
-        Route::delete('/vehicles/{vehicle}/force-delete', [VehicleController::class, 'forceDelete'])->name('vehicles.force-delete')->withTrashed();
     });
 
     // --- Routes accessibles UNIQUEMENT au Super Admin ---

@@ -36,6 +36,7 @@ class UpdateDriverRequest extends FormRequest
             'license_authority' => ['nullable', 'string', 'max:255'],
             'emergency_contact_name' => ['nullable', 'string', 'max:255'],
             'emergency_contact_phone' => ['nullable', 'string', 'max:50'],
+            'personal_email' => ['nullable', 'string', 'email', 'max:255'],
 
 
         ];

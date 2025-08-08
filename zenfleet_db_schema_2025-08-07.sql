@@ -35,8 +35,10 @@ CREATE TABLE public.assignments (
     reason text,
     notes text,
     created_by_user_id bigint,
+    deleted_at timestamp(0) without time zone,
     created_at timestamp(0) without time zone,
-    updated_at timestamp(0) without time zone
+    updated_at timestamp(0) without time zone,
+    organization_id bigint
 );
 
 
@@ -61,6 +63,85 @@ ALTER TABLE public.assignments_id_seq OWNER TO zenfleet_user;
 --
 
 ALTER SEQUENCE public.assignments_id_seq OWNED BY public.assignments.id;
+
+
+--
+-- Name: document_types; Type: TABLE; Schema: public; Owner: zenfleet_user
+--
+
+CREATE TABLE public.document_types (
+    id bigint NOT NULL,
+    name character varying(100) NOT NULL
+);
+
+
+ALTER TABLE public.document_types OWNER TO zenfleet_user;
+
+--
+-- Name: document_types_id_seq; Type: SEQUENCE; Schema: public; Owner: zenfleet_user
+--
+
+CREATE SEQUENCE public.document_types_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.document_types_id_seq OWNER TO zenfleet_user;
+
+--
+-- Name: document_types_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: zenfleet_user
+--
+
+ALTER SEQUENCE public.document_types_id_seq OWNED BY public.document_types.id;
+
+
+--
+-- Name: documents; Type: TABLE; Schema: public; Owner: zenfleet_user
+--
+
+CREATE TABLE public.documents (
+    id bigint NOT NULL,
+    organization_id bigint NOT NULL,
+    documentable_type character varying(255) NOT NULL,
+    documentable_id bigint NOT NULL,
+    document_type_id bigint NOT NULL,
+    title character varying(255) NOT NULL,
+    file_path character varying(512) NOT NULL,
+    file_size bigint NOT NULL,
+    mime_type character varying(100) NOT NULL,
+    issue_date date,
+    expiry_date date,
+    created_by_user_id bigint,
+    created_at timestamp(0) without time zone,
+    updated_at timestamp(0) without time zone,
+    deleted_at timestamp(0) without time zone
+);
+
+
+ALTER TABLE public.documents OWNER TO zenfleet_user;
+
+--
+-- Name: documents_id_seq; Type: SEQUENCE; Schema: public; Owner: zenfleet_user
+--
+
+CREATE SEQUENCE public.documents_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.documents_id_seq OWNER TO zenfleet_user;
+
+--
+-- Name: documents_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: zenfleet_user
+--
+
+ALTER SEQUENCE public.documents_id_seq OWNED BY public.documents.id;
 
 
 --
@@ -124,7 +205,8 @@ CREATE TABLE public.drivers (
     created_at timestamp(0) without time zone,
     updated_at timestamp(0) without time zone,
     deleted_at timestamp(0) without time zone,
-    license_expiry_date date
+    license_expiry_date date,
+    organization_id bigint
 );
 
 
@@ -149,6 +231,84 @@ ALTER TABLE public.drivers_id_seq OWNER TO zenfleet_user;
 --
 
 ALTER SEQUENCE public.drivers_id_seq OWNED BY public.drivers.id;
+
+
+--
+-- Name: expense_types; Type: TABLE; Schema: public; Owner: zenfleet_user
+--
+
+CREATE TABLE public.expense_types (
+    id bigint NOT NULL,
+    name character varying(100) NOT NULL,
+    description text
+);
+
+
+ALTER TABLE public.expense_types OWNER TO zenfleet_user;
+
+--
+-- Name: expense_types_id_seq; Type: SEQUENCE; Schema: public; Owner: zenfleet_user
+--
+
+CREATE SEQUENCE public.expense_types_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.expense_types_id_seq OWNER TO zenfleet_user;
+
+--
+-- Name: expense_types_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: zenfleet_user
+--
+
+ALTER SEQUENCE public.expense_types_id_seq OWNED BY public.expense_types.id;
+
+
+--
+-- Name: expenses; Type: TABLE; Schema: public; Owner: zenfleet_user
+--
+
+CREATE TABLE public.expenses (
+    id bigint NOT NULL,
+    organization_id bigint NOT NULL,
+    vehicle_id bigint,
+    driver_id bigint,
+    expense_type_id bigint NOT NULL,
+    amount numeric(12,2) NOT NULL,
+    expense_date date NOT NULL,
+    description text,
+    receipt_path character varying(512),
+    created_by_user_id bigint,
+    created_at timestamp(0) without time zone,
+    updated_at timestamp(0) without time zone,
+    deleted_at timestamp(0) without time zone
+);
+
+
+ALTER TABLE public.expenses OWNER TO zenfleet_user;
+
+--
+-- Name: expenses_id_seq; Type: SEQUENCE; Schema: public; Owner: zenfleet_user
+--
+
+CREATE SEQUENCE public.expenses_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.expenses_id_seq OWNER TO zenfleet_user;
+
+--
+-- Name: expenses_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: zenfleet_user
+--
+
+ALTER SEQUENCE public.expenses_id_seq OWNED BY public.expenses.id;
 
 
 --
@@ -190,6 +350,50 @@ ALTER SEQUENCE public.failed_jobs_id_seq OWNED BY public.failed_jobs.id;
 
 
 --
+-- Name: fuel_refills; Type: TABLE; Schema: public; Owner: zenfleet_user
+--
+
+CREATE TABLE public.fuel_refills (
+    id bigint NOT NULL,
+    organization_id bigint NOT NULL,
+    vehicle_id bigint NOT NULL,
+    driver_id bigint,
+    refill_date timestamp(0) without time zone NOT NULL,
+    quantity_liters numeric(8,2) NOT NULL,
+    price_per_liter numeric(8,3) NOT NULL,
+    total_cost numeric(10,2) NOT NULL,
+    mileage_at_refill bigint NOT NULL,
+    full_tank boolean DEFAULT true NOT NULL,
+    station_name character varying(255),
+    created_at timestamp(0) without time zone,
+    updated_at timestamp(0) without time zone
+);
+
+
+ALTER TABLE public.fuel_refills OWNER TO zenfleet_user;
+
+--
+-- Name: fuel_refills_id_seq; Type: SEQUENCE; Schema: public; Owner: zenfleet_user
+--
+
+CREATE SEQUENCE public.fuel_refills_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.fuel_refills_id_seq OWNER TO zenfleet_user;
+
+--
+-- Name: fuel_refills_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: zenfleet_user
+--
+
+ALTER SEQUENCE public.fuel_refills_id_seq OWNED BY public.fuel_refills.id;
+
+
+--
 -- Name: fuel_types; Type: TABLE; Schema: public; Owner: zenfleet_user
 --
 
@@ -223,6 +427,89 @@ ALTER SEQUENCE public.fuel_types_id_seq OWNED BY public.fuel_types.id;
 
 
 --
+-- Name: incident_statuses; Type: TABLE; Schema: public; Owner: zenfleet_user
+--
+
+CREATE TABLE public.incident_statuses (
+    id bigint NOT NULL,
+    name character varying(100) NOT NULL
+);
+
+
+ALTER TABLE public.incident_statuses OWNER TO zenfleet_user;
+
+--
+-- Name: incident_statuses_id_seq; Type: SEQUENCE; Schema: public; Owner: zenfleet_user
+--
+
+CREATE SEQUENCE public.incident_statuses_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.incident_statuses_id_seq OWNER TO zenfleet_user;
+
+--
+-- Name: incident_statuses_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: zenfleet_user
+--
+
+ALTER SEQUENCE public.incident_statuses_id_seq OWNED BY public.incident_statuses.id;
+
+
+--
+-- Name: incidents; Type: TABLE; Schema: public; Owner: zenfleet_user
+--
+
+CREATE TABLE public.incidents (
+    id bigint NOT NULL,
+    organization_id bigint NOT NULL,
+    vehicle_id bigint NOT NULL,
+    driver_id bigint,
+    incident_date timestamp(0) without time zone NOT NULL,
+    type character varying(255) NOT NULL,
+    severity character varying(255) NOT NULL,
+    location text,
+    description text NOT NULL,
+    third_party_involved boolean DEFAULT false NOT NULL,
+    police_report_number character varying(255),
+    insurance_claim_number character varying(255),
+    incident_status_id bigint NOT NULL,
+    estimated_cost numeric(12,2),
+    actual_cost numeric(12,2),
+    created_by_user_id bigint,
+    created_at timestamp(0) without time zone,
+    updated_at timestamp(0) without time zone,
+    deleted_at timestamp(0) without time zone
+);
+
+
+ALTER TABLE public.incidents OWNER TO zenfleet_user;
+
+--
+-- Name: incidents_id_seq; Type: SEQUENCE; Schema: public; Owner: zenfleet_user
+--
+
+CREATE SEQUENCE public.incidents_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.incidents_id_seq OWNER TO zenfleet_user;
+
+--
+-- Name: incidents_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: zenfleet_user
+--
+
+ALTER SEQUENCE public.incidents_id_seq OWNED BY public.incidents.id;
+
+
+--
 -- Name: maintenance_logs; Type: TABLE; Schema: public; Owner: zenfleet_user
 --
 
@@ -237,8 +524,10 @@ CREATE TABLE public.maintenance_logs (
     cost numeric(12,2),
     details text,
     performed_by character varying(255),
+    deleted_at timestamp(0) without time zone,
     created_at timestamp(0) without time zone,
-    updated_at timestamp(0) without time zone
+    updated_at timestamp(0) without time zone,
+    organization_id bigint
 );
 
 
@@ -278,8 +567,10 @@ CREATE TABLE public.maintenance_plans (
     next_due_date date,
     next_due_mileage bigint,
     notes text,
+    deleted_at timestamp(0) without time zone,
     created_at timestamp(0) without time zone,
-    updated_at timestamp(0) without time zone
+    updated_at timestamp(0) without time zone,
+    organization_id bigint
 );
 
 
@@ -433,6 +724,45 @@ CREATE TABLE public.model_has_roles (
 
 
 ALTER TABLE public.model_has_roles OWNER TO zenfleet_user;
+
+--
+-- Name: organizations; Type: TABLE; Schema: public; Owner: zenfleet_user
+--
+
+CREATE TABLE public.organizations (
+    id bigint NOT NULL,
+    uuid uuid NOT NULL,
+    name character varying(255) NOT NULL,
+    address text,
+    contact_email character varying(255),
+    status character varying(255) DEFAULT 'active'::character varying NOT NULL,
+    created_at timestamp(0) without time zone,
+    updated_at timestamp(0) without time zone
+);
+
+
+ALTER TABLE public.organizations OWNER TO zenfleet_user;
+
+--
+-- Name: organizations_id_seq; Type: SEQUENCE; Schema: public; Owner: zenfleet_user
+--
+
+CREATE SEQUENCE public.organizations_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.organizations_id_seq OWNER TO zenfleet_user;
+
+--
+-- Name: organizations_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: zenfleet_user
+--
+
+ALTER SEQUENCE public.organizations_id_seq OWNED BY public.organizations.id;
+
 
 --
 -- Name: password_reset_tokens; Type: TABLE; Schema: public; Owner: zenfleet_user
@@ -665,7 +995,9 @@ CREATE TABLE public.users (
     updated_at timestamp(0) without time zone,
     first_name character varying(255),
     last_name character varying(255),
-    phone character varying(50)
+    phone character varying(50),
+    organization_id bigint,
+    deleted_at timestamp(0) without time zone
 );
 
 
@@ -741,7 +1073,7 @@ CREATE TABLE public.vehicle_handover_details (
     status character varying(255) NOT NULL,
     created_at timestamp(0) without time zone,
     updated_at timestamp(0) without time zone,
-    CONSTRAINT vehicle_handover_details_status_check CHECK (((status)::text = ANY ((ARRAY['Bon'::character varying, 'Moyen'::character varying, 'Mauvais'::character varying, 'N/A'::character varying])::text[])))
+    CONSTRAINT vehicle_handover_details_status_check CHECK (((status)::text = ANY ((ARRAY['Bon'::character varying, 'Moyen'::character varying, 'Mauvais'::character varying, 'N/A'::character varying, 'Oui'::character varying, 'Non'::character varying])::text[])))
 );
 
 
@@ -782,9 +1114,10 @@ CREATE TABLE public.vehicle_handover_forms (
     additional_observations text,
     signed_form_path character varying(512),
     is_latest_version boolean DEFAULT true NOT NULL,
+    deleted_at timestamp(0) without time zone,
     created_at timestamp(0) without time zone,
     updated_at timestamp(0) without time zone,
-    deleted_at timestamp(0) without time zone
+    organization_id bigint
 );
 
 
@@ -905,7 +1238,8 @@ CREATE TABLE public.vehicles (
     notes text,
     created_at timestamp(0) without time zone,
     updated_at timestamp(0) without time zone,
-    deleted_at timestamp(0) without time zone
+    deleted_at timestamp(0) without time zone,
+    organization_id bigint
 );
 
 
@@ -940,6 +1274,20 @@ ALTER TABLE ONLY public.assignments ALTER COLUMN id SET DEFAULT nextval('public.
 
 
 --
+-- Name: document_types id; Type: DEFAULT; Schema: public; Owner: zenfleet_user
+--
+
+ALTER TABLE ONLY public.document_types ALTER COLUMN id SET DEFAULT nextval('public.document_types_id_seq'::regclass);
+
+
+--
+-- Name: documents id; Type: DEFAULT; Schema: public; Owner: zenfleet_user
+--
+
+ALTER TABLE ONLY public.documents ALTER COLUMN id SET DEFAULT nextval('public.documents_id_seq'::regclass);
+
+
+--
 -- Name: driver_statuses id; Type: DEFAULT; Schema: public; Owner: zenfleet_user
 --
 
@@ -954,6 +1302,20 @@ ALTER TABLE ONLY public.drivers ALTER COLUMN id SET DEFAULT nextval('public.driv
 
 
 --
+-- Name: expense_types id; Type: DEFAULT; Schema: public; Owner: zenfleet_user
+--
+
+ALTER TABLE ONLY public.expense_types ALTER COLUMN id SET DEFAULT nextval('public.expense_types_id_seq'::regclass);
+
+
+--
+-- Name: expenses id; Type: DEFAULT; Schema: public; Owner: zenfleet_user
+--
+
+ALTER TABLE ONLY public.expenses ALTER COLUMN id SET DEFAULT nextval('public.expenses_id_seq'::regclass);
+
+
+--
 -- Name: failed_jobs id; Type: DEFAULT; Schema: public; Owner: zenfleet_user
 --
 
@@ -961,10 +1323,31 @@ ALTER TABLE ONLY public.failed_jobs ALTER COLUMN id SET DEFAULT nextval('public.
 
 
 --
+-- Name: fuel_refills id; Type: DEFAULT; Schema: public; Owner: zenfleet_user
+--
+
+ALTER TABLE ONLY public.fuel_refills ALTER COLUMN id SET DEFAULT nextval('public.fuel_refills_id_seq'::regclass);
+
+
+--
 -- Name: fuel_types id; Type: DEFAULT; Schema: public; Owner: zenfleet_user
 --
 
 ALTER TABLE ONLY public.fuel_types ALTER COLUMN id SET DEFAULT nextval('public.fuel_types_id_seq'::regclass);
+
+
+--
+-- Name: incident_statuses id; Type: DEFAULT; Schema: public; Owner: zenfleet_user
+--
+
+ALTER TABLE ONLY public.incident_statuses ALTER COLUMN id SET DEFAULT nextval('public.incident_statuses_id_seq'::regclass);
+
+
+--
+-- Name: incidents id; Type: DEFAULT; Schema: public; Owner: zenfleet_user
+--
+
+ALTER TABLE ONLY public.incidents ALTER COLUMN id SET DEFAULT nextval('public.incidents_id_seq'::regclass);
 
 
 --
@@ -1000,6 +1383,13 @@ ALTER TABLE ONLY public.maintenance_types ALTER COLUMN id SET DEFAULT nextval('p
 --
 
 ALTER TABLE ONLY public.migrations ALTER COLUMN id SET DEFAULT nextval('public.migrations_id_seq'::regclass);
+
+
+--
+-- Name: organizations id; Type: DEFAULT; Schema: public; Owner: zenfleet_user
+--
+
+ALTER TABLE ONLY public.organizations ALTER COLUMN id SET DEFAULT nextval('public.organizations_id_seq'::regclass);
 
 
 --
@@ -1095,6 +1485,30 @@ ALTER TABLE ONLY public.assignments
 
 
 --
+-- Name: document_types document_types_name_unique; Type: CONSTRAINT; Schema: public; Owner: zenfleet_user
+--
+
+ALTER TABLE ONLY public.document_types
+    ADD CONSTRAINT document_types_name_unique UNIQUE (name);
+
+
+--
+-- Name: document_types document_types_pkey; Type: CONSTRAINT; Schema: public; Owner: zenfleet_user
+--
+
+ALTER TABLE ONLY public.document_types
+    ADD CONSTRAINT document_types_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: documents documents_pkey; Type: CONSTRAINT; Schema: public; Owner: zenfleet_user
+--
+
+ALTER TABLE ONLY public.documents
+    ADD CONSTRAINT documents_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: driver_statuses driver_statuses_name_unique; Type: CONSTRAINT; Schema: public; Owner: zenfleet_user
 --
 
@@ -1135,6 +1549,30 @@ ALTER TABLE ONLY public.drivers
 
 
 --
+-- Name: expense_types expense_types_name_unique; Type: CONSTRAINT; Schema: public; Owner: zenfleet_user
+--
+
+ALTER TABLE ONLY public.expense_types
+    ADD CONSTRAINT expense_types_name_unique UNIQUE (name);
+
+
+--
+-- Name: expense_types expense_types_pkey; Type: CONSTRAINT; Schema: public; Owner: zenfleet_user
+--
+
+ALTER TABLE ONLY public.expense_types
+    ADD CONSTRAINT expense_types_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: expenses expenses_pkey; Type: CONSTRAINT; Schema: public; Owner: zenfleet_user
+--
+
+ALTER TABLE ONLY public.expenses
+    ADD CONSTRAINT expenses_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: failed_jobs failed_jobs_pkey; Type: CONSTRAINT; Schema: public; Owner: zenfleet_user
 --
 
@@ -1151,6 +1589,14 @@ ALTER TABLE ONLY public.failed_jobs
 
 
 --
+-- Name: fuel_refills fuel_refills_pkey; Type: CONSTRAINT; Schema: public; Owner: zenfleet_user
+--
+
+ALTER TABLE ONLY public.fuel_refills
+    ADD CONSTRAINT fuel_refills_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: fuel_types fuel_types_name_unique; Type: CONSTRAINT; Schema: public; Owner: zenfleet_user
 --
 
@@ -1164,6 +1610,30 @@ ALTER TABLE ONLY public.fuel_types
 
 ALTER TABLE ONLY public.fuel_types
     ADD CONSTRAINT fuel_types_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: incident_statuses incident_statuses_name_unique; Type: CONSTRAINT; Schema: public; Owner: zenfleet_user
+--
+
+ALTER TABLE ONLY public.incident_statuses
+    ADD CONSTRAINT incident_statuses_name_unique UNIQUE (name);
+
+
+--
+-- Name: incident_statuses incident_statuses_pkey; Type: CONSTRAINT; Schema: public; Owner: zenfleet_user
+--
+
+ALTER TABLE ONLY public.incident_statuses
+    ADD CONSTRAINT incident_statuses_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: incidents incidents_pkey; Type: CONSTRAINT; Schema: public; Owner: zenfleet_user
+--
+
+ALTER TABLE ONLY public.incidents
+    ADD CONSTRAINT incidents_pkey PRIMARY KEY (id);
 
 
 --
@@ -1236,6 +1706,22 @@ ALTER TABLE ONLY public.model_has_permissions
 
 ALTER TABLE ONLY public.model_has_roles
     ADD CONSTRAINT model_has_roles_pkey PRIMARY KEY (role_id, model_id, model_type);
+
+
+--
+-- Name: organizations organizations_pkey; Type: CONSTRAINT; Schema: public; Owner: zenfleet_user
+--
+
+ALTER TABLE ONLY public.organizations
+    ADD CONSTRAINT organizations_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: organizations organizations_uuid_unique; Type: CONSTRAINT; Schema: public; Owner: zenfleet_user
+--
+
+ALTER TABLE ONLY public.organizations
+    ADD CONSTRAINT organizations_uuid_unique UNIQUE (uuid);
 
 
 --
@@ -1463,6 +1949,76 @@ ALTER TABLE ONLY public.vehicles
 
 
 --
+-- Name: documents_documentable_type_documentable_id_index; Type: INDEX; Schema: public; Owner: zenfleet_user
+--
+
+CREATE INDEX documents_documentable_type_documentable_id_index ON public.documents USING btree (documentable_type, documentable_id);
+
+
+--
+-- Name: idx_assignments_dates_org; Type: INDEX; Schema: public; Owner: zenfleet_user
+--
+
+CREATE INDEX idx_assignments_dates_org ON public.assignments USING btree (start_datetime, end_datetime, organization_id);
+
+
+--
+-- Name: idx_assignments_organization; Type: INDEX; Schema: public; Owner: zenfleet_user
+--
+
+CREATE INDEX idx_assignments_organization ON public.assignments USING btree (organization_id);
+
+
+--
+-- Name: idx_drivers_organization; Type: INDEX; Schema: public; Owner: zenfleet_user
+--
+
+CREATE INDEX idx_drivers_organization ON public.drivers USING btree (organization_id);
+
+
+--
+-- Name: idx_maintenance_logs_organization; Type: INDEX; Schema: public; Owner: zenfleet_user
+--
+
+CREATE INDEX idx_maintenance_logs_organization ON public.maintenance_logs USING btree (organization_id);
+
+
+--
+-- Name: idx_maintenance_plans_next_due_date; Type: INDEX; Schema: public; Owner: zenfleet_user
+--
+
+CREATE INDEX idx_maintenance_plans_next_due_date ON public.maintenance_plans USING btree (next_due_date, organization_id);
+
+
+--
+-- Name: idx_maintenance_plans_next_due_mileage; Type: INDEX; Schema: public; Owner: zenfleet_user
+--
+
+CREATE INDEX idx_maintenance_plans_next_due_mileage ON public.maintenance_plans USING btree (next_due_mileage, organization_id);
+
+
+--
+-- Name: idx_maintenance_plans_organization; Type: INDEX; Schema: public; Owner: zenfleet_user
+--
+
+CREATE INDEX idx_maintenance_plans_organization ON public.maintenance_plans USING btree (organization_id);
+
+
+--
+-- Name: idx_vehicles_organization; Type: INDEX; Schema: public; Owner: zenfleet_user
+--
+
+CREATE INDEX idx_vehicles_organization ON public.vehicles USING btree (organization_id);
+
+
+--
+-- Name: idx_vehicles_status_org; Type: INDEX; Schema: public; Owner: zenfleet_user
+--
+
+CREATE INDEX idx_vehicles_status_org ON public.vehicles USING btree (status_id, organization_id);
+
+
+--
 -- Name: model_has_permissions_model_id_model_type_index; Type: INDEX; Schema: public; Owner: zenfleet_user
 --
 
@@ -1500,11 +2056,51 @@ ALTER TABLE ONLY public.assignments
 
 
 --
+-- Name: assignments assignments_organization_id_foreign; Type: FK CONSTRAINT; Schema: public; Owner: zenfleet_user
+--
+
+ALTER TABLE ONLY public.assignments
+    ADD CONSTRAINT assignments_organization_id_foreign FOREIGN KEY (organization_id) REFERENCES public.organizations(id) ON DELETE CASCADE;
+
+
+--
 -- Name: assignments assignments_vehicle_id_foreign; Type: FK CONSTRAINT; Schema: public; Owner: zenfleet_user
 --
 
 ALTER TABLE ONLY public.assignments
     ADD CONSTRAINT assignments_vehicle_id_foreign FOREIGN KEY (vehicle_id) REFERENCES public.vehicles(id) ON DELETE RESTRICT;
+
+
+--
+-- Name: documents documents_created_by_user_id_foreign; Type: FK CONSTRAINT; Schema: public; Owner: zenfleet_user
+--
+
+ALTER TABLE ONLY public.documents
+    ADD CONSTRAINT documents_created_by_user_id_foreign FOREIGN KEY (created_by_user_id) REFERENCES public.users(id) ON DELETE SET NULL;
+
+
+--
+-- Name: documents documents_document_type_id_foreign; Type: FK CONSTRAINT; Schema: public; Owner: zenfleet_user
+--
+
+ALTER TABLE ONLY public.documents
+    ADD CONSTRAINT documents_document_type_id_foreign FOREIGN KEY (document_type_id) REFERENCES public.document_types(id);
+
+
+--
+-- Name: documents documents_organization_id_foreign; Type: FK CONSTRAINT; Schema: public; Owner: zenfleet_user
+--
+
+ALTER TABLE ONLY public.documents
+    ADD CONSTRAINT documents_organization_id_foreign FOREIGN KEY (organization_id) REFERENCES public.organizations(id) ON DELETE CASCADE;
+
+
+--
+-- Name: drivers drivers_organization_id_foreign; Type: FK CONSTRAINT; Schema: public; Owner: zenfleet_user
+--
+
+ALTER TABLE ONLY public.drivers
+    ADD CONSTRAINT drivers_organization_id_foreign FOREIGN KEY (organization_id) REFERENCES public.organizations(id) ON DELETE CASCADE;
 
 
 --
@@ -1521,6 +2117,110 @@ ALTER TABLE ONLY public.drivers
 
 ALTER TABLE ONLY public.drivers
     ADD CONSTRAINT drivers_user_id_foreign FOREIGN KEY (user_id) REFERENCES public.users(id) ON DELETE SET NULL;
+
+
+--
+-- Name: expenses expenses_created_by_user_id_foreign; Type: FK CONSTRAINT; Schema: public; Owner: zenfleet_user
+--
+
+ALTER TABLE ONLY public.expenses
+    ADD CONSTRAINT expenses_created_by_user_id_foreign FOREIGN KEY (created_by_user_id) REFERENCES public.users(id) ON DELETE SET NULL;
+
+
+--
+-- Name: expenses expenses_driver_id_foreign; Type: FK CONSTRAINT; Schema: public; Owner: zenfleet_user
+--
+
+ALTER TABLE ONLY public.expenses
+    ADD CONSTRAINT expenses_driver_id_foreign FOREIGN KEY (driver_id) REFERENCES public.drivers(id) ON DELETE SET NULL;
+
+
+--
+-- Name: expenses expenses_expense_type_id_foreign; Type: FK CONSTRAINT; Schema: public; Owner: zenfleet_user
+--
+
+ALTER TABLE ONLY public.expenses
+    ADD CONSTRAINT expenses_expense_type_id_foreign FOREIGN KEY (expense_type_id) REFERENCES public.expense_types(id) ON DELETE RESTRICT;
+
+
+--
+-- Name: expenses expenses_organization_id_foreign; Type: FK CONSTRAINT; Schema: public; Owner: zenfleet_user
+--
+
+ALTER TABLE ONLY public.expenses
+    ADD CONSTRAINT expenses_organization_id_foreign FOREIGN KEY (organization_id) REFERENCES public.organizations(id) ON DELETE CASCADE;
+
+
+--
+-- Name: expenses expenses_vehicle_id_foreign; Type: FK CONSTRAINT; Schema: public; Owner: zenfleet_user
+--
+
+ALTER TABLE ONLY public.expenses
+    ADD CONSTRAINT expenses_vehicle_id_foreign FOREIGN KEY (vehicle_id) REFERENCES public.vehicles(id) ON DELETE SET NULL;
+
+
+--
+-- Name: fuel_refills fuel_refills_driver_id_foreign; Type: FK CONSTRAINT; Schema: public; Owner: zenfleet_user
+--
+
+ALTER TABLE ONLY public.fuel_refills
+    ADD CONSTRAINT fuel_refills_driver_id_foreign FOREIGN KEY (driver_id) REFERENCES public.drivers(id) ON DELETE SET NULL;
+
+
+--
+-- Name: fuel_refills fuel_refills_organization_id_foreign; Type: FK CONSTRAINT; Schema: public; Owner: zenfleet_user
+--
+
+ALTER TABLE ONLY public.fuel_refills
+    ADD CONSTRAINT fuel_refills_organization_id_foreign FOREIGN KEY (organization_id) REFERENCES public.organizations(id) ON DELETE CASCADE;
+
+
+--
+-- Name: fuel_refills fuel_refills_vehicle_id_foreign; Type: FK CONSTRAINT; Schema: public; Owner: zenfleet_user
+--
+
+ALTER TABLE ONLY public.fuel_refills
+    ADD CONSTRAINT fuel_refills_vehicle_id_foreign FOREIGN KEY (vehicle_id) REFERENCES public.vehicles(id) ON DELETE CASCADE;
+
+
+--
+-- Name: incidents incidents_created_by_user_id_foreign; Type: FK CONSTRAINT; Schema: public; Owner: zenfleet_user
+--
+
+ALTER TABLE ONLY public.incidents
+    ADD CONSTRAINT incidents_created_by_user_id_foreign FOREIGN KEY (created_by_user_id) REFERENCES public.users(id) ON DELETE SET NULL;
+
+
+--
+-- Name: incidents incidents_driver_id_foreign; Type: FK CONSTRAINT; Schema: public; Owner: zenfleet_user
+--
+
+ALTER TABLE ONLY public.incidents
+    ADD CONSTRAINT incidents_driver_id_foreign FOREIGN KEY (driver_id) REFERENCES public.drivers(id) ON DELETE SET NULL;
+
+
+--
+-- Name: incidents incidents_incident_status_id_foreign; Type: FK CONSTRAINT; Schema: public; Owner: zenfleet_user
+--
+
+ALTER TABLE ONLY public.incidents
+    ADD CONSTRAINT incidents_incident_status_id_foreign FOREIGN KEY (incident_status_id) REFERENCES public.incident_statuses(id);
+
+
+--
+-- Name: incidents incidents_organization_id_foreign; Type: FK CONSTRAINT; Schema: public; Owner: zenfleet_user
+--
+
+ALTER TABLE ONLY public.incidents
+    ADD CONSTRAINT incidents_organization_id_foreign FOREIGN KEY (organization_id) REFERENCES public.organizations(id) ON DELETE CASCADE;
+
+
+--
+-- Name: incidents incidents_vehicle_id_foreign; Type: FK CONSTRAINT; Schema: public; Owner: zenfleet_user
+--
+
+ALTER TABLE ONLY public.incidents
+    ADD CONSTRAINT incidents_vehicle_id_foreign FOREIGN KEY (vehicle_id) REFERENCES public.vehicles(id) ON DELETE CASCADE;
 
 
 --
@@ -1548,6 +2248,14 @@ ALTER TABLE ONLY public.maintenance_logs
 
 
 --
+-- Name: maintenance_logs maintenance_logs_organization_id_foreign; Type: FK CONSTRAINT; Schema: public; Owner: zenfleet_user
+--
+
+ALTER TABLE ONLY public.maintenance_logs
+    ADD CONSTRAINT maintenance_logs_organization_id_foreign FOREIGN KEY (organization_id) REFERENCES public.organizations(id) ON DELETE CASCADE;
+
+
+--
 -- Name: maintenance_logs maintenance_logs_vehicle_id_foreign; Type: FK CONSTRAINT; Schema: public; Owner: zenfleet_user
 --
 
@@ -1561,6 +2269,14 @@ ALTER TABLE ONLY public.maintenance_logs
 
 ALTER TABLE ONLY public.maintenance_plans
     ADD CONSTRAINT maintenance_plans_maintenance_type_id_foreign FOREIGN KEY (maintenance_type_id) REFERENCES public.maintenance_types(id) ON DELETE CASCADE;
+
+
+--
+-- Name: maintenance_plans maintenance_plans_organization_id_foreign; Type: FK CONSTRAINT; Schema: public; Owner: zenfleet_user
+--
+
+ALTER TABLE ONLY public.maintenance_plans
+    ADD CONSTRAINT maintenance_plans_organization_id_foreign FOREIGN KEY (organization_id) REFERENCES public.organizations(id) ON DELETE CASCADE;
 
 
 --
@@ -1628,6 +2344,14 @@ ALTER TABLE ONLY public.user_validation_levels
 
 
 --
+-- Name: users users_organization_id_foreign; Type: FK CONSTRAINT; Schema: public; Owner: zenfleet_user
+--
+
+ALTER TABLE ONLY public.users
+    ADD CONSTRAINT users_organization_id_foreign FOREIGN KEY (organization_id) REFERENCES public.organizations(id) ON DELETE CASCADE;
+
+
+--
 -- Name: vehicle_handover_details vehicle_handover_details_handover_form_id_foreign; Type: FK CONSTRAINT; Schema: public; Owner: zenfleet_user
 --
 
@@ -1644,11 +2368,27 @@ ALTER TABLE ONLY public.vehicle_handover_forms
 
 
 --
+-- Name: vehicle_handover_forms vehicle_handover_forms_organization_id_foreign; Type: FK CONSTRAINT; Schema: public; Owner: zenfleet_user
+--
+
+ALTER TABLE ONLY public.vehicle_handover_forms
+    ADD CONSTRAINT vehicle_handover_forms_organization_id_foreign FOREIGN KEY (organization_id) REFERENCES public.organizations(id) ON DELETE CASCADE;
+
+
+--
 -- Name: vehicles vehicles_fuel_type_id_foreign; Type: FK CONSTRAINT; Schema: public; Owner: zenfleet_user
 --
 
 ALTER TABLE ONLY public.vehicles
     ADD CONSTRAINT vehicles_fuel_type_id_foreign FOREIGN KEY (fuel_type_id) REFERENCES public.fuel_types(id) ON DELETE SET NULL;
+
+
+--
+-- Name: vehicles vehicles_organization_id_foreign; Type: FK CONSTRAINT; Schema: public; Owner: zenfleet_user
+--
+
+ALTER TABLE ONLY public.vehicles
+    ADD CONSTRAINT vehicles_organization_id_foreign FOREIGN KEY (organization_id) REFERENCES public.organizations(id) ON DELETE CASCADE;
 
 
 --

@@ -9,7 +9,7 @@
         <div class="max-w-4xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-8 text-gray-900">
-                    <h3 class="text-xl font-semibold text-gray-700 mb-6">Détails de l'Affectation</h3>
+                    <h3 class="text-xl font-semibold text-gray-700 mb-6 border-b pb-4">Détails de l'Affectation</h3>
 
                     @if ($errors->any())
                         <div class="mb-4 bg-red-100 border-l-4 border-red-500 text-red-700 p-4" role="alert">
@@ -22,8 +22,9 @@
                         @csrf
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
 
-                            <div>
-                                <label for="select-vehicle" class="block font-medium text-sm text-gray-700">Véhicule <span class="text-red-500">*</span></label>
+                            {{-- Sélection du Véhicule --}}
+                            <div class="md:col-span-2">
+                                <x-input-label for="select-vehicle" value="Véhicule" required />
                                 <select name="vehicle_id" id="select-vehicle" placeholder="Recherchez une immatriculation, marque..." required>
                                     <option value="">Sélectionnez un véhicule disponible</option>
                                     @foreach($availableVehicles as $vehicle)
@@ -35,8 +36,9 @@
                                 <x-input-error :messages="$errors->get('vehicle_id')" class="mt-2" />
                             </div>
 
-                            <div>
-                                <label for="select-driver" class="block font-medium text-sm text-gray-700">Chauffeur <span class="text-red-500">*</span></label>
+                            {{-- Sélection du Chauffeur --}}
+                            <div class="md:col-span-2">
+                                <x-input-label for="select-driver" value="Chauffeur" required />
                                 <select name="driver_id" id="select-driver" placeholder="Recherchez un chauffeur..." required>
                                     <option value="">Sélectionnez un chauffeur disponible</option>
                                     @foreach($availableDrivers as $driver)
@@ -46,32 +48,40 @@
                                  <x-input-error :messages="$errors->get('driver_id')" class="mt-2" />
                             </div>
 
+                            {{-- Date et Heure de Début --}}
                             <div>
-                                <label for="start_datetime" class="block font-medium text-sm text-gray-700">Date et Heure de Début <span class="text-red-500">*</span></label>
+                                <x-input-label for="start_datetime" value="Date et Heure de Début" required />
                                 <x-text-input id="start_datetime" class="block mt-1 w-full" type="datetime-local" name="start_datetime" :value="old('start_datetime', now()->format('Y-m-d\TH:i'))" required />
+                                <x-input-error :messages="$errors->get('start_datetime')" class="mt-2" />
                             </div>
 
+                            {{-- Kilométrage de Début --}}
                             <div>
-                                <label for="start_mileage" class="block font-medium text-sm text-gray-700">Kilométrage de Début <span class="text-red-500">*</span></label>
+                                <x-input-label for="start_mileage" value="Kilométrage de Début" required />
                                 <x-text-input id="start_mileage" class="block mt-1 w-full" type="number" name="start_mileage" :value="old('start_mileage')" required />
+                                <x-input-error :messages="$errors->get('start_mileage')" class="mt-2" />
                             </div>
 
+                            {{-- Motif et Notes --}}
                             <div class="md:col-span-2">
-                                <label for="reason" class="block font-medium text-sm text-gray-700">Motif de l'affectation</label>
+                                <x-input-label for="reason" value="Motif de l'affectation" />
                                 <x-text-input id="reason" name="reason" :value="old('reason')" class="block mt-1 w-full" type="text" />
+                                <x-input-error :messages="$errors->get('reason')" class="mt-2" />
                             </div>
 
                             <div class="md:col-span-2">
-                                <label for="notes" class="block font-medium text-sm text-gray-700">Notes</label>
-                                <textarea id="notes" name="notes" rows="3" class="block mt-1 w-full border-gray-300 focus:border-violet-500 focus:ring-violet-500 rounded-md shadow-sm">{{ old('notes') }}</textarea>
+                                <x-input-label for="notes" value="Notes" />
+                                <textarea id="notes" name="notes" rows="3" class="block mt-1 w-full border-gray-300 focus:border-primary-500 focus:ring-primary-500 rounded-md shadow-sm">{{ old('notes') }}</textarea>
+                                <x-input-error :messages="$errors->get('notes')" class="mt-2" />
                             </div>
                         </div>
 
-                        <div class="mt-8 flex items-center justify-end gap-4">
+                        <div class="mt-8 flex items-center justify-end gap-4 border-t pt-6">
                             <a href="{{ route('admin.assignments.index') }}" class="text-sm font-semibold text-gray-600 hover:text-gray-900">Annuler</a>
-                            <button type="submit" class="inline-flex items-center px-4 py-2 bg-violet-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-violet-700">
+                            <x-primary-button>
+                                <x-heroicon-o-check-circle class="w-5 h-5 mr-2"/>
                                 Créer l'Affectation
-                            </button>
+                            </x-primary-button>
                         </div>
                     </form>
                 </div>
@@ -82,19 +92,14 @@
     @push('scripts')
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // On s'assure que TomSelect a été chargé (depuis app.js)
             if (window.TomSelect) {
-                // --- CORRECTION DÉFINITIVE DE LA LOGIQUE ---
-                // 1. On prépare un objet JS simple: { id_vehicule: kilometrage, ... }
                 const vehicleMileageData = @json($availableVehicles->pluck('current_mileage', 'id'));
                 const mileageInput = document.getElementById('start_mileage');
 
-                // 2. On initialise TomSelect pour les véhicules
                 let tomSelectVehicle = new TomSelect('#select-vehicle',{
                     create: false,
                     sortField: { field: "text", direction: "asc" },
                     onChange: function(value) {
-                        // 3. Au changement, on utilise notre objet JS pour trouver le kilométrage
                         if (mileageInput && value && vehicleMileageData[value] !== undefined) {
                             mileageInput.value = vehicleMileageData[value];
                         } else if (mileageInput) {
@@ -102,14 +107,13 @@
                         }
                     }
                 });
-
-                // On initialise TomSelect pour les chauffeurs (sans logique additionnelle)
+                
                 new TomSelect('#select-driver',{
                     create: false,
                     sortField: { field: "text", direction: "asc" }
                 });
 
-                // 4. Si la page est rechargée après une erreur de validation,
+                // Si la page est rechargée après une erreur de validation,
                 // on s'assure que le kilométrage est bien pré-rempli pour la valeur "old()".
                 if (tomSelectVehicle.getValue()) {
                     tomSelectVehicle.trigger('change', tomSelectVehicle.getValue());
