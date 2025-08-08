@@ -25,14 +25,16 @@
                 </button>
                 <div x-show="open" x-transition class="mt-1 space-y-1 pl-8 border-l-2 border-dotted border-gray-300 ml-4">
                     @can('view vehicles')
-                        <a href="{{ route('admin.vehicles.index') }}" class="flex items-center w-full px-3 py-2 text-sm rounded-lg transition-colors {{ request()->routeIs('admin.vehicles.*') ? 'font-semibold text-primary-600 bg-primary-50' : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900' }}">
-                            <x-heroicon-o-truck class="mr-3 h-5 w-5 shrink-0"/> {{ __('Véhicules') }}
-                        </a>
+                        <x-sub-nav-link :href="route('admin.vehicles.index')" :active="request()->routeIs('admin.vehicles.*')">
+                            <x-slot name="icon"><x-heroicon-o-truck class="h-3 w-3 text-white"/></x-slot>
+                            {{ __('Véhicules') }}
+                        </x-sub-nav-link>
                     @endcan
                     @can('view assignments')
-                        <a href="{{ route('admin.assignments.index') }}" class="flex items-center w-full px-3 py-2 text-sm rounded-lg transition-colors {{ request()->routeIs('admin.assignments.*') ? 'font-semibold text-primary-600 bg-primary-50' : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900' }}">
-                            <x-heroicon-o-clipboard-document-list class="mr-3 h-5 w-5 shrink-0"/> {{ __('Affectations') }}
-                        </a>
+                        <x-sub-nav-link :href="route('admin.assignments.index')" :active="request()->routeIs('admin.assignments.*')">
+                            <x-slot name="icon"><x-heroicon-o-clipboard-document-list class="h-3 w-3 text-white"/></x-slot>
+                            {{ __('Affectations') }}
+                        </x-sub-nav-link>
                     @endcan
                 </div>
             </div>
@@ -48,10 +50,10 @@
                     <x-heroicon-o-chevron-down class="h-4 w-4 transform transition-transform" ::class="{'rotate-180': open}"/>
                 </button>
                 <div x-show="open" x-transition class="mt-1 space-y-1 pl-8 border-l-2 border-dotted border-gray-300 ml-4">
-                    <a href="{{ route('admin.drivers.index') }}" class="flex items-center w-full px-3 py-2 text-sm rounded-lg transition-colors {{ request()->routeIs('admin.drivers.*') ? 'font-semibold text-primary-600 bg-primary-50' : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900' }}">
-                        <x-heroicon-o-identification class="mr-3 h-5 w-5 shrink-0"/> {{ __('Liste des chauffeurs') }}
-                    </a>
-                    {{-- Futurs sous-menus pour les chauffeurs ici --}}
+                    <x-sub-nav-link :href="route('admin.drivers.index')" :active="request()->routeIs('admin.drivers.*')">
+                        <x-slot name="icon"><x-heroicon-o-identification class="h-3 w-3 text-white"/></x-slot>
+                        {{ __('Liste des chauffeurs') }}
+                    </x-sub-nav-link>
                 </div>
             </div>
         @endcan
@@ -66,12 +68,14 @@
                     <x-heroicon-o-chevron-down class="h-4 w-4 transform transition-transform" ::class="{'rotate-180': open}"/>
                 </button>
                 <div x-show="open" x-transition class="mt-1 space-y-1 pl-8 border-l-2 border-dotted border-gray-300 ml-4">
-                    <a href="{{ route('admin.maintenance.dashboard') }}" class="flex items-center w-full px-3 py-2 text-sm rounded-lg transition-colors {{ request()->routeIs('admin.maintenance.dashboard') ? 'font-semibold text-primary-600 bg-primary-50' : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900' }}">
-                        <x-heroicon-o-chart-bar class="mr-3 h-5 w-5 shrink-0"/> Tableau de Bord
-                    </a>
-                    <a href="{{ route('admin.maintenance.plans.index') }}" class="flex items-center w-full px-3 py-2 text-sm rounded-lg transition-colors {{ request()->routeIs('admin.maintenance.plans.*') ? 'font-semibold text-primary-600 bg-primary-50' : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900' }}">
-                        <x-heroicon-o-clipboard-document-check class="mr-3 h-5 w-5 shrink-0"/> Plans de Maintenance
-                    </a>
+                    <x-sub-nav-link :href="route('admin.maintenance.dashboard')" :active="request()->routeIs('admin.maintenance.dashboard')">
+                        <x-slot name="icon"><x-heroicon-o-chart-bar class="h-3 w-3 text-white"/></x-slot>
+                        Tableau de Bord
+                    </x-sub-nav-link>
+                    <x-sub-nav-link :href="route('admin.maintenance.plans.index')" :active="request()->routeIs('admin.maintenance.plans.*')">
+                        <x-slot name="icon"><x-heroicon-o-clipboard-document-check class="h-3 w-3 text-white"/></x-slot>
+                        Plans de Maintenance
+                    </x-sub-nav-link>
                 </div>
             </div>
         @endcanany
@@ -86,15 +90,18 @@
                     <x-heroicon-o-chevron-down class="h-4 w-4 transform transition-transform" ::class="{'rotate-180': open}"/>
                 </button>
                 <div x-show="open" x-transition class="mt-1 space-y-1 pl-8 border-l-2 border-dotted border-gray-300 ml-4">
-                    <a href="{{ route('admin.organizations.index') }}" class="flex items-center w-full px-3 py-2 text-sm rounded-lg transition-colors {{ request()->routeIs('admin.organizations.*') ? 'font-semibold text-primary-600 bg-primary-50' : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900' }}">
-                        <x-heroicon-o-building-office-2 class="mr-3 h-5 w-5 shrink-0"/> {{ __('Organisations') }}
-                    </a>
-                    <a href="{{ route('admin.users.index') }}" class="flex items-center w-full px-3 py-2 text-sm rounded-lg transition-colors {{ request()->routeIs('admin.users.*') ? 'font-semibold text-primary-600 bg-primary-50' : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900' }}">
-                        <x-heroicon-o-user-group class="mr-3 h-5 w-5 shrink-0"/> {{ __('Utilisateurs') }}
-                    </a>
-                    <a href="{{ route('admin.roles.index') }}" class="flex items-center w-full px-3 py-2 text-sm rounded-lg transition-colors {{ request()->routeIs('admin.roles.*') ? 'font-semibold text-primary-600 bg-primary-50' : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900' }}">
-                        <x-heroicon-o-key class="mr-3 h-5 w-5 shrink-0"/> {{ __('Rôles') }}
-                    </a>
+                    <x-sub-nav-link :href="route('admin.organizations.index')" :active="request()->routeIs('admin.organizations.*')">
+                        <x-slot name="icon"><x-heroicon-o-building-office-2 class="h-3 w-3 text-white"/></x-slot>
+                        {{ __('Organisations') }}
+                    </x-sub-nav-link>
+                    <x-sub-nav-link :href="route('admin.users.index')" :active="request()->routeIs('admin.users.*')">
+                        <x-slot name="icon"><x-heroicon-o-user-group class="h-3 w-3 text-white"/></x-slot>
+                        {{ __('Utilisateurs') }}
+                    </x-sub-nav-link>
+                    <x-sub-nav-link :href="route('admin.roles.index')" :active="request()->routeIs('admin.roles.*')">
+                        <x-slot name="icon"><x-heroicon-o-key class="h-3 w-3 text-white"/></x-slot>
+                        {{ __('Rôles') }}
+                    </x-sub-nav-link>
                 </div>
             </div>
         @endrole
