@@ -66,9 +66,9 @@ class VehicleController extends Controller
         $vehicleTypes = VehicleType::all();
         $fuelTypes = FuelType::all();
         $transmissionTypes = TransmissionType::all();
-        $statuses = VehicleStatus::all();
+        $vehicleStatuses = VehicleStatus::all();
 
-        return view('admin.vehicles.create', compact('vehicleTypes', 'fuelTypes', 'transmissionTypes', 'statuses'));
+        return view('admin.vehicles.create', compact('vehicleTypes', 'fuelTypes', 'transmissionTypes', 'vehicleStatuses'));
     }
 
     /**
@@ -142,9 +142,9 @@ class VehicleController extends Controller
         $vehicleTypes = VehicleType::all();
         $fuelTypes = FuelType::all();
         $transmissionTypes = TransmissionType::all();
-        $statuses = VehicleStatus::all();
+        $vehicleStatuses = VehicleStatus::all();
 
-        return view('admin.vehicles.edit', compact('vehicle', 'vehicleTypes', 'fuelTypes', 'transmissionTypes', 'statuses'));
+        return view('admin.vehicles.edit', compact('vehicle', 'vehicleTypes', 'fuelTypes', 'transmissionTypes', 'vehicleStatuses'));
     }
 
     /**
