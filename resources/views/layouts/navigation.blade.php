@@ -28,7 +28,7 @@
                         @php($active = request()->routeIs('admin.vehicles.*'))
                         <x-sub-nav-link :href="route('admin.vehicles.index')" :active="$active">
                             <x-slot name="icon">
-                                @if($active) <x-heroicon-s-truck /> @else <x-heroicon-o-truck /> @endif
+                                @if($active) <x-heroicon-s-truck class="h-4 w-4 text-white"/> @else <x-heroicon-o-truck class="h-4 w-4 text-gray-500 group-hover:text-gray-700"/> @endif
                             </x-slot>
                             {{ __('Véhicules') }}
                         </x-sub-nav-link>
@@ -37,7 +37,7 @@
                         @php($active = request()->routeIs('admin.assignments.*'))
                         <x-sub-nav-link :href="route('admin.assignments.index')" :active="$active">
                             <x-slot name="icon">
-                                @if($active) <x-heroicon-s-clipboard-document-list /> @else <x-heroicon-o-clipboard-document-list /> @endif
+                                @if($active) <x-heroicon-s-clipboard-document-list class="h-4 w-4 text-white"/> @else <x-heroicon-o-clipboard-document-list class="h-4 w-4 text-gray-500 group-hover:text-gray-700"/> @endif
                             </x-slot>
                             {{ __('Affectations') }}
                         </x-sub-nav-link>
@@ -59,7 +59,7 @@
                     @php($active = request()->routeIs('admin.drivers.*'))
                     <x-sub-nav-link :href="route('admin.drivers.index')" :active="$active">
                         <x-slot name="icon">
-                            @if($active) <x-heroicon-s-identification /> @else <x-heroicon-o-identification /> @endif
+                            @if($active) <x-heroicon-s-identification class="h-4 w-4 text-white"/> @else <x-heroicon-o-identification class="h-4 w-4 text-gray-500 group-hover:text-gray-700"/> @endif
                         </x-slot>
                         {{ __('Liste des chauffeurs') }}
                     </x-sub-nav-link>
@@ -80,14 +80,14 @@
                     @php($active = request()->routeIs('admin.maintenance.dashboard'))
                     <x-sub-nav-link :href="route('admin.maintenance.dashboard')" :active="$active">
                         <x-slot name="icon">
-                           @if($active) <x-heroicon-s-chart-bar /> @else <x-heroicon-o-chart-bar /> @endif
+                           @if($active) <x-heroicon-s-chart-bar class="h-4 w-4 text-white"/> @else <x-heroicon-o-chart-bar class="h-4 w-4 text-gray-500 group-hover:text-gray-700"/> @endif
                         </x-slot>
                         Tableau de Bord
                     </x-sub-nav-link>
                     @php($active = request()->routeIs('admin.maintenance.plans.*'))
                     <x-sub-nav-link :href="route('admin.maintenance.plans.index')" :active="$active">
                         <x-slot name="icon">
-                            @if($active) <x-heroicon-s-clipboard-document-check /> @else <x-heroicon-o-clipboard-document-check /> @endif
+                            @if($active) <x-heroicon-s-clipboard-document-check class="h-4 w-4 text-white"/> @else <x-heroicon-o-clipboard-document-check class="h-4 w-4 text-gray-500 group-hover:text-gray-700"/> @endif
                         </x-slot>
                         Plans de Maintenance
                     </x-sub-nav-link>
@@ -108,21 +108,21 @@
                     @php($active = request()->routeIs('admin.organizations.*'))
                     <x-sub-nav-link :href="route('admin.organizations.index')" :active="$active">
                         <x-slot name="icon">
-                            @if($active) <x-heroicon-s-building-office-2 /> @else <x-heroicon-o-building-office-2 /> @endif
+                            @if($active) <x-heroicon-s-building-office-2 class="h-4 w-4 text-white"/> @else <x-heroicon-o-building-office-2 class="h-4 w-4 text-gray-500 group-hover:text-gray-700"/> @endif
                         </x-slot>
                         {{ __('Organisations') }}
                     </x-sub-nav-link>
                     @php($active = request()->routeIs('admin.users.*'))
                     <x-sub-nav-link :href="route('admin.users.index')" :active="$active">
                         <x-slot name="icon">
-                            @if($active) <x-heroicon-s-user-group /> @else <x-heroicon-o-user-group /> @endif
+                            @if($active) <x-heroicon-s-user-group class="h-4 w-4 text-white"/> @else <x-heroicon-o-user-group class="h-4 w-4 text-gray-500 group-hover:text-gray-700"/> @endif
                         </x-slot>
                         {{ __('Utilisateurs') }}
                     </x-sub-nav-link>
                     @php($active = request()->routeIs('admin.roles.*'))
                     <x-sub-nav-link :href="route('admin.roles.index')" :active="$active">
                         <x-slot name="icon">
-                            @if($active) <x-heroicon-s-key /> @else <x-heroicon-o-key /> @endif
+                            @if($active) <x-heroicon-s-key class="h-4 w-4 text-white"/> @else <x-heroicon-o-key class="h-4 w-4 text-gray-500 group-hover:text-gray-700"/> @endif
                         </x-slot>
                         {{ __('Rôles') }}
                     </x-sub-nav-link>
