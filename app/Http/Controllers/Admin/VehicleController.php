@@ -341,7 +341,9 @@ class VehicleController extends Controller
         // Redirection vers la page de résultats
         return redirect()->route('admin.vehicles.import.results')
             ->with('successCount', $successCount)
-            ->with('errorRows', $errorRows);
+            ->with('errorRows', $errorRows)
+            ->with('importId', uniqid())
+            ->with('fileName', $request->file('csv_file')->getClientOriginalName());
     }
 
     /**
