@@ -301,7 +301,7 @@ class VehicleController extends Controller
             $rowNumber++;
             $data = array_map('trim', $record);
 
-            // Conversion des noms en ID
+            // Conversion des noms en ID et formatage des données
             $preparedData = [
                 'registration_plate' => $data['immatriculation'] ?? null,
                 'vin' => $data['numero_serie_vin'] ?? null,
@@ -323,21 +323,22 @@ class VehicleController extends Controller
                 'vehicle_status_id' => $vehicleStatuses->get(strtolower($data['statut'] ?? ''))?->id,
             ];
             
+            // Utilisation du FormRequest pour la validation pour la cohérence
             $validator = Validator::make($preparedData, (new StoreVehicleRequest())->rules());
 
             if ($validator->fails()) {
-                // --- CORRECTION DÉFINITIVE ---
-                // On utilise la clé 'line' pour être cohérent avec la vue.
                 $errorRows[] = ['line' => $rowNumber, 'errors' => $validator->errors()->all(), 'data' => $record];
-                // --- FIN DE LA CORRECTION ---
             } else {
                 $validatedData = $validator->validated();
                 $validatedData["current_mileage"] = $validatedData["initial_mileage"] ?? 0;
+                // Assurer que l'organization_id est ajouté
+                $validatedData['organization_id'] = auth()->user()->organization_id;
                 Vehicle::create($validatedData);
                 $successCount++;
             }
         }
 
+        // Redirection vers la page de résultats
         return redirect()->route('admin.vehicles.import.results')
             ->with('successCount', $successCount)
             ->with('errorRows', $errorRows);
