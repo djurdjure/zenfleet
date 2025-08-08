@@ -439,7 +439,7 @@ class VehicleController extends Controller
             'Berline',
             'Diesel',
             'Manuelle',
-            'Actif',
+            'Parking',
             '2020',
             '2021-01-15',
             '15000',
