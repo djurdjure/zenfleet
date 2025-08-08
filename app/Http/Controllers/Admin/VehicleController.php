@@ -89,7 +89,7 @@ class VehicleController extends Controller
                 'vehicle_type_id' => 'required|exists:vehicle_types,id',
                 'fuel_type_id' => 'required|exists:fuel_types,id',
                 'transmission_type_id' => 'required|exists:transmission_types,id',
-                'vehicle_status_id' => 'required|exists:vehicle_statuses,id',
+                'status_id' => 'required|exists:vehicle_statuses,id',
                 'year' => 'nullable|integer|min:1900|max:' . (date('Y') + 1),
                 'acquisition_date' => 'nullable|date',
                 'purchase_price' => 'nullable|numeric|min:0',
@@ -165,7 +165,7 @@ class VehicleController extends Controller
                 'vehicle_type_id' => 'required|exists:vehicle_types,id',
                 'fuel_type_id' => 'required|exists:fuel_types,id',
                 'transmission_type_id' => 'required|exists:transmission_types,id',
-                'vehicle_status_id' => 'required|exists:vehicle_statuses,id',
+                'status_id' => 'required|exists:vehicle_statuses,id',
                 'year' => 'nullable|integer|min:1900|max:' . (date('Y') + 1),
                 'acquisition_date' => 'nullable|date',
                 'purchase_price' => 'nullable|numeric|min:0',
@@ -320,7 +320,7 @@ class VehicleController extends Controller
                 'vehicle_type_id' => $vehicleTypes->get(strtolower($data['type_vehicule'] ?? ''))?->id,
                 'fuel_type_id' => $fuelTypes->get(strtolower($data['type_carburant'] ?? ''))?->id,
                 'transmission_type_id' => $transmissionTypes->get(strtolower($data['type_transmission'] ?? ''))?->id,
-                'vehicle_status_id' => $vehicleStatuses->get(strtolower($data['statut'] ?? ''))?->id,
+                'status_id' => $vehicleStatuses->get(strtolower($data['statut'] ?? ''))?->id,
             ];
             
             // Utilisation du FormRequest pour la validation pour la cohérence
