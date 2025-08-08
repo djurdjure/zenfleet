@@ -25,14 +25,20 @@
                 </button>
                 <div x-show="open" x-transition class="mt-1 space-y-1 pl-8 border-l-2 border-dotted border-gray-300 ml-4">
                     @can('view vehicles')
-                        <x-sub-nav-link :href="route('admin.vehicles.index')" :active="request()->routeIs('admin.vehicles.*')">
-                            <x-slot name="icon"><x-heroicon-o-truck /></x-slot>
+                        @php($active = request()->routeIs('admin.vehicles.*'))
+                        <x-sub-nav-link :href="route('admin.vehicles.index')" :active="$active">
+                            <x-slot name="icon">
+                                @if($active) <x-heroicon-s-truck /> @else <x-heroicon-o-truck /> @endif
+                            </x-slot>
                             {{ __('Véhicules') }}
                         </x-sub-nav-link>
                     @endcan
                     @can('view assignments')
-                        <x-sub-nav-link :href="route('admin.assignments.index')" :active="request()->routeIs('admin.assignments.*')">
-                            <x-slot name="icon"><x-heroicon-o-clipboard-document-list /></x-slot>
+                        @php($active = request()->routeIs('admin.assignments.*'))
+                        <x-sub-nav-link :href="route('admin.assignments.index')" :active="$active">
+                            <x-slot name="icon">
+                                @if($active) <x-heroicon-s-clipboard-document-list /> @else <x-heroicon-o-clipboard-document-list /> @endif
+                            </x-slot>
                             {{ __('Affectations') }}
                         </x-sub-nav-link>
                     @endcan
@@ -50,8 +56,11 @@
                     <x-heroicon-o-chevron-down class="h-4 w-4 transform transition-transform" ::class="{'rotate-180': open}"/>
                 </button>
                 <div x-show="open" x-transition class="mt-1 space-y-1 pl-8 border-l-2 border-dotted border-gray-300 ml-4">
-                    <x-sub-nav-link :href="route('admin.drivers.index')" :active="request()->routeIs('admin.drivers.*')">
-                        <x-slot name="icon"><x-heroicon-o-identification /></x-slot>
+                    @php($active = request()->routeIs('admin.drivers.*'))
+                    <x-sub-nav-link :href="route('admin.drivers.index')" :active="$active">
+                        <x-slot name="icon">
+                            @if($active) <x-heroicon-s-identification /> @else <x-heroicon-o-identification /> @endif
+                        </x-slot>
                         {{ __('Liste des chauffeurs') }}
                     </x-sub-nav-link>
                 </div>
@@ -68,12 +77,18 @@
                     <x-heroicon-o-chevron-down class="h-4 w-4 transform transition-transform" ::class="{'rotate-180': open}"/>
                 </button>
                 <div x-show="open" x-transition class="mt-1 space-y-1 pl-8 border-l-2 border-dotted border-gray-300 ml-4">
-                    <x-sub-nav-link :href="route('admin.maintenance.dashboard')" :active="request()->routeIs('admin.maintenance.dashboard')">
-                        <x-slot name="icon"><x-heroicon-o-chart-bar /></x-slot>
+                    @php($active = request()->routeIs('admin.maintenance.dashboard'))
+                    <x-sub-nav-link :href="route('admin.maintenance.dashboard')" :active="$active">
+                        <x-slot name="icon">
+                           @if($active) <x-heroicon-s-chart-bar /> @else <x-heroicon-o-chart-bar /> @endif
+                        </x-slot>
                         Tableau de Bord
                     </x-sub-nav-link>
-                    <x-sub-nav-link :href="route('admin.maintenance.plans.index')" :active="request()->routeIs('admin.maintenance.plans.*')">
-                        <x-slot name="icon"><x-heroicon-o-clipboard-document-check /></x-slot>
+                    @php($active = request()->routeIs('admin.maintenance.plans.*'))
+                    <x-sub-nav-link :href="route('admin.maintenance.plans.index')" :active="$active">
+                        <x-slot name="icon">
+                            @if($active) <x-heroicon-s-clipboard-document-check /> @else <x-heroicon-o-clipboard-document-check /> @endif
+                        </x-slot>
                         Plans de Maintenance
                     </x-sub-nav-link>
                 </div>
@@ -90,16 +105,25 @@
                     <x-heroicon-o-chevron-down class="h-4 w-4 transform transition-transform" ::class="{'rotate-180': open}"/>
                 </button>
                 <div x-show="open" x-transition class="mt-1 space-y-1 pl-8 border-l-2 border-dotted border-gray-300 ml-4">
-                    <x-sub-nav-link :href="route('admin.organizations.index')" :active="request()->routeIs('admin.organizations.*')">
-                        <x-slot name="icon"><x-heroicon-o-building-office-2 /></x-slot>
+                    @php($active = request()->routeIs('admin.organizations.*'))
+                    <x-sub-nav-link :href="route('admin.organizations.index')" :active="$active">
+                        <x-slot name="icon">
+                            @if($active) <x-heroicon-s-building-office-2 /> @else <x-heroicon-o-building-office-2 /> @endif
+                        </x-slot>
                         {{ __('Organisations') }}
                     </x-sub-nav-link>
-                    <x-sub-nav-link :href="route('admin.users.index')" :active="request()->routeIs('admin.users.*')">
-                        <x-slot name="icon"><x-heroicon-o-user-group /></x-slot>
+                    @php($active = request()->routeIs('admin.users.*'))
+                    <x-sub-nav-link :href="route('admin.users.index')" :active="$active">
+                        <x-slot name="icon">
+                            @if($active) <x-heroicon-s-user-group /> @else <x-heroicon-o-user-group /> @endif
+                        </x-slot>
                         {{ __('Utilisateurs') }}
                     </x-sub-nav-link>
-                    <x-sub-nav-link :href="route('admin.roles.index')" :active="request()->routeIs('admin.roles.*')">
-                        <x-slot name="icon"><x-heroicon-o-key /></x-slot>
+                    @php($active = request()->routeIs('admin.roles.*'))
+                    <x-sub-nav-link :href="route('admin.roles.index')" :active="$active">
+                        <x-slot name="icon">
+                            @if($active) <x-heroicon-s-key /> @else <x-heroicon-o-key /> @endif
+                        </x-slot>
                         {{ __('Rôles') }}
                     </x-sub-nav-link>
                 </div>
