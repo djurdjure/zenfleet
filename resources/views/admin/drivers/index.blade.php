@@ -85,21 +85,18 @@
 
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900">
-                    <div class="flex justify-between items-center mb-6">
+                    <div class="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4">
                         <h3 class="text-xl font-semibold text-gray-700">{{ __('Liste des Chauffeurs') }}</h3>
-                        @can('create drivers')
-                            <a href="{{ route('admin.drivers.create') }}" class="inline-flex items-center px-4 py-2 bg-primary-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-primary-700">
-                                <x-heroicon-o-plus-circle class="w-4 h-4 mr-2"/>
-                                Ajouter un Chauffeur
-                            </a>
-                        @endcan
-                    </div>
-                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
-                        <h3 class="text-xl font-semibold text-gray-700">Tous les Chauffeurs</h3>
                         <div class="flex space-x-2">
                             @can('create drivers')
-                                <a href="{{ route('admin.drivers.import.show') }}" class="inline-flex items-center px-4 py-2 bg-white border border-gray-300 ...">Importer</a>
-                                <a href="{{ route('admin.drivers.create') }}" class="inline-flex items-center px-4 py-2 bg-violet-600 ...">Ajouter un Chauffeur</a>
+                                <a href="{{ route('admin.drivers.import.show') }}" class="inline-flex items-center px-4 py-2 bg-white border border-gray-300 rounded-md font-semibold text-xs text-gray-700 uppercase tracking-widest shadow-sm hover:bg-gray-50 transition">
+                                    <x-heroicon-o-arrow-up-tray class="w-4 h-4 mr-2"/>
+                                    Importer
+                                </a>
+                                <a href="{{ route('admin.drivers.create') }}" class="inline-flex items-center px-4 py-2 bg-primary-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-primary-700">
+                                    <x-heroicon-o-plus-circle class="w-4 h-4 mr-2"/>
+                                    Ajouter
+                                </a>
                             @endcan
                         </div>
                     </div>
