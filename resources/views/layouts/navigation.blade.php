@@ -26,13 +26,13 @@
                 <div x-show="open" x-transition class="mt-1 space-y-1 pl-8 border-l-2 border-dotted border-gray-300 ml-4">
                     @can('view vehicles')
                         <x-sub-nav-link :href="route('admin.vehicles.index')" :active="request()->routeIs('admin.vehicles.*')">
-                            <x-slot name="icon"><x-heroicon-o-truck class="h-3 w-3 text-white"/></x-slot>
+                            <x-slot name="icon"><x-heroicon-o-truck /></x-slot>
                             {{ __('Véhicules') }}
                         </x-sub-nav-link>
                     @endcan
                     @can('view assignments')
                         <x-sub-nav-link :href="route('admin.assignments.index')" :active="request()->routeIs('admin.assignments.*')">
-                            <x-slot name="icon"><x-heroicon-o-clipboard-document-list class="h-3 w-3 text-white"/></x-slot>
+                            <x-slot name="icon"><x-heroicon-o-clipboard-document-list /></x-slot>
                             {{ __('Affectations') }}
                         </x-sub-nav-link>
                     @endcan
@@ -51,7 +51,7 @@
                 </button>
                 <div x-show="open" x-transition class="mt-1 space-y-1 pl-8 border-l-2 border-dotted border-gray-300 ml-4">
                     <x-sub-nav-link :href="route('admin.drivers.index')" :active="request()->routeIs('admin.drivers.*')">
-                        <x-slot name="icon"><x-heroicon-o-identification class="h-3 w-3 text-white"/></x-slot>
+                        <x-slot name="icon"><x-heroicon-o-identification /></x-slot>
                         {{ __('Liste des chauffeurs') }}
                     </x-sub-nav-link>
                 </div>
@@ -69,11 +69,11 @@
                 </button>
                 <div x-show="open" x-transition class="mt-1 space-y-1 pl-8 border-l-2 border-dotted border-gray-300 ml-4">
                     <x-sub-nav-link :href="route('admin.maintenance.dashboard')" :active="request()->routeIs('admin.maintenance.dashboard')">
-                        <x-slot name="icon"><x-heroicon-o-chart-bar class="h-3 w-3 text-white"/></x-slot>
+                        <x-slot name="icon"><x-heroicon-o-chart-bar /></x-slot>
                         Tableau de Bord
                     </x-sub-nav-link>
                     <x-sub-nav-link :href="route('admin.maintenance.plans.index')" :active="request()->routeIs('admin.maintenance.plans.*')">
-                        <x-slot name="icon"><x-heroicon-o-clipboard-document-check class="h-3 w-3 text-white"/></x-slot>
+                        <x-slot name="icon"><x-heroicon-o-clipboard-document-check /></x-slot>
                         Plans de Maintenance
                     </x-sub-nav-link>
                 </div>
@@ -91,15 +91,15 @@
                 </button>
                 <div x-show="open" x-transition class="mt-1 space-y-1 pl-8 border-l-2 border-dotted border-gray-300 ml-4">
                     <x-sub-nav-link :href="route('admin.organizations.index')" :active="request()->routeIs('admin.organizations.*')">
-                        <x-slot name="icon"><x-heroicon-o-building-office-2 class="h-3 w-3 text-white"/></x-slot>
+                        <x-slot name="icon"><x-heroicon-o-building-office-2 /></x-slot>
                         {{ __('Organisations') }}
                     </x-sub-nav-link>
                     <x-sub-nav-link :href="route('admin.users.index')" :active="request()->routeIs('admin.users.*')">
-                        <x-slot name="icon"><x-heroicon-o-user-group class="h-3 w-3 text-white"/></x-slot>
+                        <x-slot name="icon"><x-heroicon-o-user-group /></x-slot>
                         {{ __('Utilisateurs') }}
                     </x-sub-nav-link>
                     <x-sub-nav-link :href="route('admin.roles.index')" :active="request()->routeIs('admin.roles.*')">
-                        <x-slot name="icon"><x-heroicon-o-key class="h-3 w-3 text-white"/></x-slot>
+                        <x-slot name="icon"><x-heroicon-o-key /></x-slot>
                         {{ __('Rôles') }}
                     </x-sub-nav-link>
                 </div>
