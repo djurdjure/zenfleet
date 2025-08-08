@@ -320,7 +320,7 @@ class VehicleController extends Controller
                 'vehicle_type_id' => $vehicleTypes->get(strtolower($data['type_vehicule'] ?? ''))?->id,
                 'fuel_type_id' => $fuelTypes->get(strtolower($data['type_carburant'] ?? ''))?->id,
                 'transmission_type_id' => $transmissionTypes->get(strtolower($data['type_transmission'] ?? ''))?->id,
-                'status_id' => $vehicleStatuses->get(strtolower($data['statut'] ?? ''))?->id,
+                'vehicle_status_id' => $vehicleStatuses->get(strtolower($data['statut'] ?? ''))?->id,
             ];
             
             $validator = Validator::make($preparedData, (new StoreVehicleRequest())->rules());

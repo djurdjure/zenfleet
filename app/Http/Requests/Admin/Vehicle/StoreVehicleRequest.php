@@ -29,7 +29,7 @@ class StoreVehicleRequest extends FormRequest
             'vehicle_type_id' => ['required', 'exists:vehicle_types,id'],
             'fuel_type_id' => ['required', 'exists:fuel_types,id'],
             'transmission_type_id' => ['required', 'exists:transmission_types,id'],
-            'status_id' => ['required', 'exists:vehicle_statuses,id'],
+            'vehicle_status_id' => ['required', 'exists:vehicle_statuses,id'],
             'manufacturing_year' => ['nullable', 'integer', 'digits:4', 'min:1950', 'max:'.(date('Y') + 1)],
             'acquisition_date' => ['nullable', 'date'],
             'purchase_price' => ['nullable', 'numeric', 'min:0'],
