@@ -15,8 +15,8 @@
         </x-responsive-nav-link>
 
         {{-- Section Gestion de la Flotte --}}
-        @canany(['view vehicles', 'view drivers', 'view assignments'])
-            @php($isFleetActive = request()->routeIs('admin.vehicles.*') || request()->routeIs('admin.drivers.*') || request()->routeIs('admin.assignments.*'))
+        @canany(['view vehicles', 'view assignments'])
+            @php($isFleetActive = request()->routeIs('admin.vehicles.*') || request()->routeIs('admin.assignments.*'))
             <div x-data="{ open: {{ $isFleetActive ? 'true' : 'false' }} }" class="relative">
                 <button @click="open = !open" class="w-full flex items-center p-2 text-base text-gray-700 rounded-lg hover:bg-gray-100 group">
                     <x-heroicon-o-truck class="mr-3 h-6 w-6 shrink-0 text-gray-500 group-hover:text-gray-700"/>
@@ -29,11 +29,6 @@
                             <x-heroicon-o-truck class="mr-3 h-5 w-5 shrink-0"/> {{ __('Véhicules') }}
                         </a>
                     @endcan
-                    @can('view drivers')
-                        <a href="{{ route('admin.drivers.index') }}" class="flex items-center w-full px-3 py-2 text-sm rounded-lg transition-colors {{ request()->routeIs('admin.drivers.*') ? 'font-semibold text-primary-600 bg-primary-50' : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900' }}">
-                            <x-heroicon-o-users class="mr-3 h-5 w-5 shrink-0"/> {{ __('Chauffeurs') }}
-                        </a>
-                    @endcan
                     @can('view assignments')
                         <a href="{{ route('admin.assignments.index') }}" class="flex items-center w-full px-3 py-2 text-sm rounded-lg transition-colors {{ request()->routeIs('admin.assignments.*') ? 'font-semibold text-primary-600 bg-primary-50' : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900' }}">
                             <x-heroicon-o-clipboard-document-list class="mr-3 h-5 w-5 shrink-0"/> {{ __('Affectations') }}
@@ -42,6 +37,24 @@
                 </div>
             </div>
         @endcanany
+
+        {{-- Section Chauffeurs --}}
+        @can('view drivers')
+            @php($isDriversActive = request()->routeIs('admin.drivers.*'))
+            <div x-data="{ open: {{ $isDriversActive ? 'true' : 'false' }} }" class="relative">
+                <button @click="open = !open" class="w-full flex items-center p-2 text-base text-gray-700 rounded-lg hover:bg-gray-100 group">
+                    <x-heroicon-o-users class="mr-3 h-6 w-6 shrink-0 text-gray-500 group-hover:text-gray-700"/>
+                    <span class="flex-1 ml-1 text-left whitespace-nowrap">{{ __('Chauffeurs') }}</span>
+                    <x-heroicon-o-chevron-down class="h-4 w-4 transform transition-transform" ::class="{'rotate-180': open}"/>
+                </button>
+                <div x-show="open" x-transition class="mt-1 space-y-1 pl-8 border-l-2 border-dotted border-gray-300 ml-4">
+                    <a href="{{ route('admin.drivers.index') }}" class="flex items-center w-full px-3 py-2 text-sm rounded-lg transition-colors {{ request()->routeIs('admin.drivers.*') ? 'font-semibold text-primary-600 bg-primary-50' : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900' }}">
+                        <x-heroicon-o-identification class="mr-3 h-5 w-5 shrink-0"/> {{ __('Liste des chauffeurs') }}
+                    </a>
+                    {{-- Futurs sous-menus pour les chauffeurs ici --}}
+                </div>
+            </div>
+        @endcan
 
         {{-- Section Maintenance --}}
         @canany(['view maintenance', 'manage maintenance plans'])
