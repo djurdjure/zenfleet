@@ -190,8 +190,47 @@
         </div>
 
         {{-- Modale pour terminer l'affectation --}}
-        <div x-show="showEndModal" x-transition class="fixed inset-0 z-50 flex items-center justify-center bg-gray-900 bg-opacity-60" style="display: none;">
-            {{-- Contenu de la modale reste inchangé --}}
+        <div x-show="showEndModal" x-transition:enter="ease-out duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" x-transition:leave="ease-in duration-200" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" class="fixed inset-0 z-50 flex items-center justify-center bg-gray-900 bg-opacity-60" style="display: none;">
+            <div @click.away="showEndModal = false" class="bg-white rounded-lg shadow-xl p-6 sm:p-8 w-full max-w-lg mx-auto transform transition-all" x-show="showEndModal" x-transition:enter="ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100" x-transition:leave="ease-in duration-200" x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100" x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95">
+                <h3 class="text-xl font-semibold text-gray-800 mb-4">Terminer l'affectation</h3>
+                <p class="text-sm text-gray-600 mb-2">
+                    Véhicule: <strong x-text="`${assignmentToEnd.vehicle?.brand} ${assignmentToEnd.vehicle?.model} (${assignmentToEnd.vehicle?.registration_plate})`"></strong>
+                </p>
+                <p class="text-sm text-gray-600 mb-6">
+                    Début: <span x-text="new Date(assignmentToEnd.start_datetime).toLocaleString('fr-FR')"></span>
+                    avec <span x-text="assignmentToEnd.start_mileage ? assignmentToEnd.start_mileage.toLocaleString('fr-FR') : 'N/A'"></span> km.
+                </p>
+
+                <form x-ref="endForm" @submit.prevent="submitEndForm">
+                    <input type="hidden" name="_method" value="PATCH">
+                    <div class="space-y-4">
+                        <div>
+                            <label for="end_datetime" class="block text-sm font-medium text-gray-700">Date et heure de fin</label>
+                            <input type="datetime-local" name="end_datetime" id="end_datetime" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500">
+                            <template x-if="modalErrors.end_datetime"><p class="text-xs text-red-600 mt-1" x-text="modalErrors.end_datetime[0]"></p></template>
+                        </div>
+                        <div>
+                            <label for="end_mileage" class="block text-sm font-medium text-gray-700">Kilométrage de fin</label>
+                            <input type="number" name="end_mileage" id="end_mileage" :min="assignmentToEnd.start_mileage" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500">
+                            <template x-if="modalErrors.end_mileage"><p class="text-xs text-red-600 mt-1" x-text="modalErrors.end_mileage[0]"></p></template>
+                        </div>
+                        <template x-if="modalErrors.general"><p class="text-sm text-red-600 mt-2" x-text="modalErrors.general[0]"></p></template>
+                    </div>
+
+                    <div class="mt-8 flex justify-end space-x-3">
+                        <button type="button" @click="showEndModal = false" :disabled="isSubmitting" class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 disabled:opacity-50">
+                            Annuler
+                        </button>
+                        <button type="submit" :disabled="isSubmitting" class="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-primary-600 border border-transparent rounded-md shadow-sm hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 disabled:opacity-50">
+                            <span x-show="!isSubmitting">Confirmer la fin</span>
+                            <span x-show="isSubmitting" class="flex items-center">
+                                <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                                Chargement...
+                            </span>
+                        </button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
 </x-app-layout>
