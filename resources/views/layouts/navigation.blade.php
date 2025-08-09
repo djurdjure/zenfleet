@@ -40,14 +40,20 @@
                     <span class="flex-1 ml-1 text-left whitespace-nowrap">{{ __('Maintenance') }}</span>
                     <x-heroicon-o-chevron-down class="h-4 w-4 transform transition-transform" ::class="{'rotate-180': open}"/>
                 </button>
-                {{-- Utilisation de pl-8 au lieu de pl-4 car pl-4 n'existe pas dans le CSS compilé --}}
-                <div x-show="open" x-transition class="mt-1 space-y-1" style="padding-left: 1rem;">
-                    <a href="{{ route('admin.maintenance.dashboard') }}" class="flex items-center px-3 py-2 text-sm rounded-lg hover:bg-gray-100 {{ request()->routeIs('admin.maintenance.dashboard') ? 'font-semibold text-violet-700' : 'text-gray-600' }}">
-                        <x-heroicon-o-chart-bar class="mr-2 h-5 w-5 shrink-0"/>
+                <div x-show="open" x-transition class="mt-1 space-y-1 pl-4">
+                    @php($isDashboardActive = request()->routeIs('admin.maintenance.dashboard'))
+                    <a href="{{ route('admin.maintenance.dashboard') }}" class="flex items-center px-3 py-2 text-sm rounded-lg hover:bg-gray-100 {{ $isDashboardActive ? 'font-semibold text-violet-700' : 'text-gray-600' }}">
+                        <span class="mr-3 flex h-6 w-6 items-center justify-center rounded-full {{ $isDashboardActive ? 'bg-violet-100 text-violet-700' : 'bg-gray-100 text-gray-500' }}">
+                            <x-heroicon-o-chart-bar class="h-4 w-4"/>
+                        </span>
                         Tableau de Bord
                     </a>
-                    <a href="{{ route('admin.maintenance.plans.index') }}" class="flex items-center px-3 py-2 text-sm rounded-lg hover:bg-gray-100 {{ request()->routeIs('admin.maintenance.plans.*') ? 'font-semibold text-violet-700' : 'text-gray-600' }}">
-                        <x-heroicon-o-clipboard-document-check class="mr-2 h-5 w-5 shrink-0"/>
+
+                    @php($isPlansActive = request()->routeIs('admin.maintenance.plans.*'))
+                    <a href="{{ route('admin.maintenance.plans.index') }}" class="flex items-center px-3 py-2 text-sm rounded-lg hover:bg-gray-100 {{ $isPlansActive ? 'font-semibold text-violet-700' : 'text-gray-600' }}">
+                         <span class="mr-3 flex h-6 w-6 items-center justify-center rounded-full {{ $isPlansActive ? 'bg-violet-100 text-violet-700' : 'bg-gray-100 text-gray-500' }}">
+                            <x-heroicon-o-clipboard-document-check class="h-4 w-4"/>
+                        </span>
                         Plans de Maintenance
                     </a>
                 </div>
