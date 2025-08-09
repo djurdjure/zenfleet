@@ -27,6 +27,35 @@ nav[x-data] .sub-link-icon svg {
     color: inherit;
 }
 
+/* Sub-menu icon wrapper styles */
+.sub-link-icon-wrapper {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 1.5rem;
+    width: 1.5rem;
+    border-radius: 9999px;
+    border: 1px solid #d1d5db; /* border-gray-300 */
+    transition: all 0.2s ease-in-out;
+}
+
+.sub-link-icon-wrapper svg {
+    height: 0.875rem;
+    width: 0.875rem;
+    color: #6b7280; /* text-gray-500 */
+    transition: color 0.2s ease-in-out;
+}
+
+/* Active state for sub-menu links */
+a.active .sub-link-icon-wrapper {
+    background-color: rgb(2 132 199); /* bg-primary-600 */
+    border-color: rgb(2 132 199);
+}
+
+a.active .sub-link-icon-wrapper svg {
+    color: #ffffff;
+}
+
 
 /* STYLES SPÉCIFIQUES POUR L'IMPRESSION DE LA FICHE DE REMISE */
 @media print {

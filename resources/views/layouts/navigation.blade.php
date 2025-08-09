@@ -24,11 +24,13 @@
                 </x-slot>
                 @can('view vehicles')
                     <x-sidebar.sidebar-sub-link :href="route('admin.vehicles.index')" :active="request()->routeIs('admin.vehicles.*')">
+                        <x-slot name="icon"><x-lucide-truck /></x-slot>
                         {{ __('Véhicules') }}
                     </x-sidebar.sidebar-sub-link>
                 @endcan
                 @can('view assignments')
                     <x-sidebar.sidebar-sub-link :href="route('admin.assignments.index')" :active="request()->routeIs('admin.assignments.*')">
+                        <x-slot name="icon"><x-lucide-clipboard-list /></x-slot>
                         {{ __('Affectations') }}
                     </x-sidebar.sidebar-sub-link>
                 @endcan
@@ -42,9 +44,11 @@
                     <x-lucide-users />
                 </x-slot>
                 <x-sidebar.sidebar-sub-link :href="route('admin.drivers.index')" :active="request()->routeIs('admin.drivers.index')">
+                    <x-slot name="icon"><x-lucide-list /></x-slot>
                     {{ __('Liste des chauffeurs') }}
                 </x-sidebar.sidebar-sub-link>
                  <x-sidebar.sidebar-sub-link :href="route('admin.drivers.import.show')" :active="request()->routeIs('admin.drivers.import.*')">
+                    <x-slot name="icon"><x-lucide-file-up /></x-slot>
                     {{ __('Importer des chauffeurs') }}
                 </x-sidebar.sidebar-sub-link>
             </x-sidebar.sidebar-group>
@@ -57,9 +61,11 @@
                     <x-lucide-wrench />
                 </x-slot>
                 <x-sidebar.sidebar-sub-link :href="route('admin.maintenance.dashboard')" :active="request()->routeIs('admin.maintenance.dashboard')">
+                    <x-slot name="icon"><x-lucide-bar-chart-2 /></x-slot>
                     Tableau de Bord
                 </x-sidebar.sidebar-sub-link>
                 <x-sidebar.sidebar-sub-link :href="route('admin.maintenance.plans.index')" :active="request()->routeIs('admin.maintenance.plans.*')">
+                    <x-slot name="icon"><x-lucide-calendar-check /></x-slot>
                     Plans de Maintenance
                 </x-sidebar.sidebar-sub-link>
             </x-sidebar.sidebar-group>
@@ -72,12 +78,15 @@
                     <x-lucide-settings />
                 </x-slot>
                 <x-sidebar.sidebar-sub-link :href="route('admin.organizations.index')" :active="request()->routeIs('admin.organizations.*')">
+                    <x-slot name="icon"><x-lucide-building-2 /></x-slot>
                     {{ __('Organisations') }}
                 </x-sidebar.sidebar-sub-link>
                 <x-sidebar.sidebar-sub-link :href="route('admin.users.index')" :active="request()->routeIs('admin.users.*')">
+                    <x-slot name="icon"><x-lucide-user-cog /></x-slot>
                     {{ __('Utilisateurs') }}
                 </x-sidebar.sidebar-sub-link>
                 <x-sidebar.sidebar-sub-link :href="route('admin.roles.index')" :active="request()->routeIs('admin.roles.*')">
+                    <x-slot name="icon"><x-lucide-key-round /></x-slot>
                     {{ __('Rôles') }}
                 </x-sidebar.sidebar-sub-link>
             </x-sidebar.sidebar-group>
