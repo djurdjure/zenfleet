@@ -11,7 +11,7 @@
 
         <x-sidebar.sidebar-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
             <x-slot name="icon">
-                <x-lucide-layout-dashboard class="h-5 w-5" />
+                <x-lucide-layout-grid class="h-5 w-5" />
             </x-slot>
             {{ __('Tableau de bord') }}
         </x-sidebar.sidebar-link>
@@ -89,7 +89,7 @@
         <div x-data="{ open: false }" @keydown.escape.window="open = false" @click.away="open = false" class="relative">
             <button @click="open = !open" class="w-full flex-1 flex items-center space-x-3 group p-2 rounded-lg hover:bg-gray-100">
                 <span class="inline-block h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center">
-                     <x-lucide-user-circle class="h-8 w-8 text-gray-500"/>
+                     <x-lucide-user-round class="h-8 w-8 text-gray-500"/>
                 </span>
                 <div class="flex-1 text-left">
                     <p class="text-sm font-medium text-gray-700 group-hover:text-gray-900 truncate">{{ Auth::user()->name }}</p>
