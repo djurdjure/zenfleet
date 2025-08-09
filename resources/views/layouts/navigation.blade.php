@@ -44,7 +44,7 @@
                 <x-sidebar.sidebar-sub-link :href="route('admin.drivers.index')" :active="request()->routeIs('admin.drivers.index')">
                     {{ __('Liste des chauffeurs') }}
                 </x-sidebar.sidebar-sub-link>
-                 <x-sidebar.sidebar-sub-link :href="route('admin.drivers.import')" :active="request()->routeIs('admin.drivers.import')">
+                 <x-sidebar.sidebar-sub-link :href="route('admin.drivers.import.show')" :active="request()->routeIs('admin.drivers.import.*')">
                     {{ __('Importer des chauffeurs') }}
                 </x-sidebar.sidebar-sub-link>
             </x-sidebar.sidebar-group>
