@@ -86,7 +86,7 @@
                         <h3 class="text-xl font-semibold text-gray-700">Historique des Affectations</h3>
                         @can('create assignments')
                             <a href="{{ route('admin.assignments.create') }}" class="inline-flex items-center px-4 py-2 bg-primary-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-primary-700">
-                                <x-heroicon-o-plus-circle class="w-4 h-4 mr-2"/>
+                                <x-lucide-plus-circle class="w-4 h-4 mr-2"/>
                                 Nouvelle Affectation
                             </a>
                         @endcan
@@ -113,7 +113,7 @@
                                                         <img class="h-10 w-10 rounded-full object-cover" src="{{ asset('storage/' . $assignment->driver->photo_path) }}" alt="Photo de {{ $assignment->driver->first_name }}">
                                                     @else
                                                         <span class="h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center">
-                                                            <x-heroicon-s-user class="h-6 w-6 text-gray-400"/>
+                                                            <x-lucide-user class="h-6 w-6 text-gray-400"/>
                                                         </span>
                                                     @endif
                                                 </div>
@@ -128,8 +128,8 @@
                                             <div class="text-xs text-gray-500 font-mono">{{ $assignment->vehicle?->registration_plate }}</div>
                                             <div class="text-xs text-primary-600 font-semibold mt-1 flex items-center">
                                                 {{-- CORRECTION DÉFINITIVE : Remplacement par une icône universelle. --}}
-                                                {{-- Après la mise à jour du package, vous pourrez utiliser <x-heroicon-s-gauge /> si vous préférez. --}}
-                                                <x-heroicon-s-chart-bar class="w-4 h-4 mr-1"/>
+                                                {{-- Après la mise à jour du package, vous pourrez utiliser <x-lucide-gauge /> si vous préférez. --}}
+                                                <x-lucide-bar-chart class="w-4 h-4 mr-1"/>
                                                 {{ number_format($assignment->vehicle?->current_mileage, 0, ',', ' ') }} km
                                             </div>
                                         </td>
@@ -140,12 +140,12 @@
                                         <td class="px-6 py-2 whitespace-nowrap text-sm">
                                             @if(is_null($assignment->end_datetime))
                                                 <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                                                    <x-heroicon-s-play-circle class="w-4 h-4 mr-1.5"/>
+                                                    <x-lucide-play-circle class="w-4 h-4 mr-1.5"/>
                                                     En cours
                                                 </span>
                                             @else
                                                 <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
-                                                    <x-heroicon-s-check-circle class="w-4 h-4 mr-1.5"/>
+                                                    <x-lucide-check-circle class="w-4 h-4 mr-1.5"/>
                                                     Terminée
                                                 </span>
                                             @endif
@@ -155,23 +155,23 @@
                                                 @can('create handovers')
                                                     @if($assignment->handoverForm)
                                                         <a href="{{ route('admin.handovers.vehicles.show', $assignment->handoverForm) }}" title="Voir la Fiche de Remise" class="p-2 rounded-full text-gray-400 hover:bg-primary-100 hover:text-primary-600">
-                                                            <x-heroicon-o-document-text class="h-5 w-5"/>
+                                                            <x-lucide-file-text class="h-5 w-5"/>
                                                         </a>
                                                     @else
                                                         <a href="{{ route('admin.handovers.vehicles.create', ['assignment' => $assignment->id]) }}" title="Créer Fiche de Remise" class="p-2 rounded-full text-gray-400 hover:bg-blue-100 hover:text-blue-600">
-                                                            <x-heroicon-o-document-plus class="h-5 w-5"/>
+                                                            <x-lucide-file-plus class="h-5 w-5"/>
                                                         </a>
                                                     @endif
                                                 @endcan
                                                 @can('edit assignments')
                                                     <a href="{{ route('admin.assignments.edit', $assignment) }}" title="Modifier les notes/motif" class="p-2 rounded-full text-gray-400 hover:bg-primary-100 hover:text-primary-600">
-                                                        <x-heroicon-o-pencil-square class="h-5 w-5"/>
+                                                        <x-lucide-file-pen-line class="h-5 w-5"/>
                                                     </a>
                                                 @endcan
                                                 @if(is_null($assignment->end_datetime))
                                                     @can('end assignments')
                                                         <button type="button" @click="openEndModal($event)" data-assignment='@json($assignment->load('vehicle'))' data-url="{{ route('admin.assignments.end', $assignment) }}" title="Terminer l'affectation" class="p-2 rounded-full text-gray-400 hover:bg-yellow-100 hover:text-yellow-600">
-                                                            <x-heroicon-o-stop-circle class="h-5 w-5"/>
+                                                            <x-lucide-stop-circle class="h-5 w-5"/>
                                                         </button>
                                                     @endcan
                                                 @endif
