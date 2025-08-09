@@ -47,10 +47,10 @@
     <div class="rounded-lg shadow-lg border-l-4 p-4" :class="typeClasses()">
         <div class="flex items-start">
             <div class="flex-shrink-0" :class="iconClasses()">
-                <template x-if="type === 'success'"><x-heroicon-s-check-circle class="h-6 w-6" /></template>
-                <template x-if="type === 'error'"><x-heroicon-s-x-circle class="h-6 w-6" /></template>
-                <template x-if="type === 'warning'"><x-heroicon-s-exclamation-triangle class="h-6 w-6" /></template>
-                <template x-if="type === 'info'"><x-heroicon-s-information-circle class="h-6 w-6" /></template>
+                <template x-if="type === 'success'"><x-lucide-check-circle class="h-6 w-6" /></template>
+                <template x-if="type === 'error'"><x-lucide-x-circle class="h-6 w-6" /></template>
+                <template x-if="type === 'warning'"><x-lucide-alert-triangle class="h-6 w-6" /></template>
+                <template x-if="type === 'info'"><x-lucide-info class="h-6 w-6" /></template>
             </div>
             <div class="ml-3 w-0 flex-1 pt-0.5">
                 <p class="text-sm font-bold" x-text="message"></p>
@@ -59,7 +59,7 @@
             <div class="ml-4 flex-shrink-0 flex">
                 <button @click="show = false" class="inline-flex rounded-md text-gray-400 hover:text-gray-500 focus:outline-none">
                     <span class="sr-only">Close</span>
-                    <x-heroicon-s-x-mark class="h-5 w-5" />
+                    <x-lucide-x class="h-5 w-5" />
                 </button>
             </div>
         </div>

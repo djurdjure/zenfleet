@@ -79,7 +79,7 @@
                         <div class="mt-8 flex items-center justify-end gap-4 border-t pt-6">
                             <a href="{{ route('admin.assignments.index') }}" class="text-sm font-semibold text-gray-600 hover:text-gray-900">Annuler</a>
                             <x-primary-button>
-                                <x-heroicon-o-check-circle class="w-5 h-5 mr-2"/>
+                                <x-lucide-check-circle class="w-5 h-5 mr-2"/>
                                 Créer l'Affectation
                             </x-primary-button>
                         </div>

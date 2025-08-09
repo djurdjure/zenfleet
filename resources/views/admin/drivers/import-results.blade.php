@@ -5,7 +5,7 @@
                 {{ __('Résultats de l\'Importation des Chauffeurs') }}
             </h2>
             <a href="{{ route('admin.drivers.index') }}" class="inline-flex items-center px-3 py-1.5 bg-gray-100 border border-gray-300 rounded-md font-medium text-xs text-gray-700 uppercase tracking-widest hover:bg-gray-200 transition">
-                <x-heroicon-o-arrow-left class="h-4 w-4 mr-1"/>
+                <x-lucide-arrow-left class="h-4 w-4 mr-1"/>
                 Retour à la liste
             </a>
         </div>
@@ -17,7 +17,7 @@
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg mb-6">
                 <div class="p-6 border-b border-gray-200">
                     <div class="flex items-center">
-                        <x-heroicon-o-document-text class="h-8 w-8 text-violet-500 mr-3"/>
+                        <x-lucide-file-text class="h-8 w-8 text-primary-500 mr-3"/>
                         <div>
                             <h3 class="text-lg font-medium text-gray-900">Détails de l'importation</h3>
                             <div class="mt-1 text-sm text-gray-600">
@@ -36,7 +36,7 @@
                     <div class="p-6 bg-gradient-to-br from-green-50 to-green-100 border-l-4 border-green-500">
                         <div class="flex items-center">
                             <div class="p-3 rounded-full bg-green-100 bg-opacity-60">
-                                <x-heroicon-o-check-circle class="h-8 w-8 text-green-600"/>
+                                <x-lucide-check-circle-2 class="h-8 w-8 text-green-600"/>
                             </div>
                             <div class="ml-4">
                                 <p class="text-3xl font-bold text-green-800">{{ $successCount }}</p>
@@ -50,7 +50,7 @@
                     <div class="p-6 bg-gradient-to-br from-red-50 to-red-100 border-l-4 border-red-500">
                         <div class="flex items-center">
                             <div class="p-3 rounded-full bg-red-100 bg-opacity-60">
-                                <x-heroicon-o-x-circle class="h-8 w-8 text-red-600"/>
+                                <x-lucide-x-circle class="h-8 w-8 text-red-600"/>
                             </div>
                             <div class="ml-4">
                                 <p class="text-3xl font-bold text-red-800">{{ count($errorRows) }}</p>
@@ -66,7 +66,7 @@
                 <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg mb-6">
                     <div class="p-6 md:p-8 text-gray-900">
                         <div class="flex items-center mb-4">
-                            <x-heroicon-o-exclamation-triangle class="h-6 w-6 text-amber-500 mr-2"/>
+                            <x-lucide-alert-triangle class="h-6 w-6 text-amber-500 mr-2"/>
                             <h3 class="text-xl font-semibold text-gray-800">Détail des Lignes en Erreur</h3>
                         </div>
                         
@@ -117,12 +117,12 @@
 
             {{-- Actions --}}
             <div class="flex items-center justify-end gap-4">
-                <a href="{{ route('admin.drivers.import.show') }}" class="inline-flex items-center px-4 py-2 bg-white border border-gray-300 rounded-md font-semibold text-xs text-gray-700 uppercase tracking-widest shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 transition">
-                    <x-heroicon-o-arrow-path class="h-4 w-4 mr-2"/>
+                <a href="{{ route('admin.drivers.import.show') }}" class="inline-flex items-center px-4 py-2 bg-white border border-gray-300 rounded-md font-semibold text-xs text-gray-700 uppercase tracking-widest shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 transition">
+                    <x-lucide-rotate-cw class="h-4 w-4 mr-2"/>
                     Nouvelle Importation
                 </a>
-                <a href="{{ route('admin.drivers.index') }}" class="inline-flex items-center px-4 py-2 bg-violet-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-violet-700 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 transition">
-                    <x-heroicon-o-user-group class="h-4 w-4 mr-2"/>
+                <a href="{{ route('admin.drivers.index') }}" class="inline-flex items-center px-4 py-2 bg-primary-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 transition">
+                    <x-lucide-users class="h-4 w-4 mr-2"/>
                     Voir tous les Chauffeurs
                 </a>
             </div>

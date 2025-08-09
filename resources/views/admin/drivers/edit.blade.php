@@ -40,17 +40,17 @@
                     <ol class="flex items-center w-full mb-8">
                         <li :class="currentStep >= 1 ? 'text-primary-600' : 'text-gray-500'" class="flex w-full items-center after:content-[''] after:w-full after:h-1 after:border-b after:border-4 after:inline-block" :class="currentStep > 1 ? 'after:border-primary-600' : 'after:border-gray-200'">
                             <span class="flex items-center justify-center w-10 h-10 rounded-full shrink-0" :class="currentStep >= 1 ? 'bg-primary-100' : 'bg-gray-100'">
-                                <x-heroicon-s-user-circle class="w-5 h-5"/>
+                                <x-lucide-user-circle-2 class="w-5 h-5"/>
                             </span>
                         </li>
                         <li :class="currentStep >= 2 ? 'text-primary-600' : 'text-gray-500'" class="flex w-full items-center after:content-[''] after:w-full after:h-1 after:border-b after:border-4 after:inline-block" :class="currentStep > 2 ? 'after:border-primary-600' : 'after:border-gray-200'">
                             <span class="flex items-center justify-center w-10 h-10 rounded-full shrink-0" :class="currentStep >= 2 ? 'bg-primary-100' : 'bg-gray-100'">
-                                <x-heroicon-s-briefcase class="w-5 h-5"/>
+                                <x-lucide-briefcase class="w-5 h-5"/>
                             </span>
                         </li>
                         <li :class="currentStep === 3 ? 'text-primary-600' : 'text-gray-500'" class="flex items-center">
                             <span class="flex items-center justify-center w-10 h-10 rounded-full shrink-0" :class="currentStep === 3 ? 'bg-primary-100' : 'bg-gray-100'">
-                                <x-heroicon-s-identification class="w-5 h-5"/>
+                                <x-lucide-contact class="w-5 h-5"/>
                             </span>
                         </li>
                     </ol>
@@ -67,7 +67,7 @@
                                     <x-input-label for="photo" value="Photo" />
                                     <div class="mt-2 flex items-center space-x-4">
                                         <span x-show="!photoPreview" class="inline-block h-20 w-20 overflow-hidden rounded-full bg-gray-100">
-                                            <x-heroicon-s-user class="h-full w-full text-gray-300"/>
+                                            <x-lucide-user-circle-2 class="h-full w-full text-gray-300"/>
                                         </span>
                                         <img x-show="photoPreview" :src="photoPreview" class="h-20 w-20 rounded-full object-cover">
                                         <input id="photo" name="photo" type="file" @change="updatePhotoPreview" class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary-50 file:text-primary-700 hover:file:bg-primary-100"/>

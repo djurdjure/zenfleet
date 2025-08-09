@@ -23,7 +23,7 @@
                         <div class="absolute top-0 right-0 -mr-12 pt-2">
                             <button @click="sidebarOpen = false" type="button" class="ml-1 flex items-center justify-center h-10 w-10 rounded-full focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white">
                                 <span class="sr-only">Close sidebar</span>
-                                <x-heroicon-o-x-mark class="h-6 w-6 text-white" />
+                                <x-lucide-x class="h-6 w-6 text-white" />
                             </button>
                         </div>
                         @include('layouts.navigation')
@@ -34,7 +34,7 @@
                     <header class="relative z-10 flex-shrink-0 flex h-16 bg-white shadow">
                         <button @click.stop="sidebarOpen = true" type="button" class="px-4 border-r border-gray-200 text-gray-500 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-primary-500 md:hidden">
                             <span class="sr-only">Open sidebar</span>
-                            <x-heroicon-o-bars-3 class="h-6 w-6" />
+                            <x-lucide-menu class="h-6 w-6" />
                         </button>
                         <div class="flex-1 px-4 flex justify-between">
                             <div class="flex-1 flex items-center">

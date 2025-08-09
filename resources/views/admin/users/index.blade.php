@@ -22,8 +22,7 @@
                         <h3 class="text-xl font-semibold text-gray-700">{{ __('Liste des Utilisateurs') }}</h3>
                         @can('create users')
                             <a href="{{ route('admin.users.create') }}" class="inline-flex items-center px-4 py-2 bg-primary-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition ease-in-out duration-150">
-                                {{-- Utilisation de notre nouveau composant d'icône Blade --}}
-                                <x-heroicon-o-plus-circle class="w-5 h-5 mr-2"/>
+                                <x-lucide-plus-circle class="w-5 h-5 mr-2"/>
                                 {{ __('Ajouter un Utilisateur') }}
                             </a>
                         @endcan
@@ -47,7 +46,7 @@
                                         <td class="px-6 py-4 text-sm text-gray-500">{{ $user->email }}</td>
                                         <td class="px-6 py-4 text-sm text-gray-500">
                                             @forelse($user->roles as $role)
-                                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-violet-100 text-violet-800">
+                                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-primary-100 text-primary-800">
                                                     {{ $role->name }}
                                                 </span>
                                             @empty
@@ -56,12 +55,11 @@
                                         </td>
                                         <td class="px-6 py-4 text-sm text-gray-500">{{ $user->created_at->format('d/m/Y') }}</td>
 
-                                        {{-- ##### SECTION DES BOUTONS D'ACTION CORRIGÉE ##### --}}
                                         <td class="px-6 py-4 text-right text-sm font-medium">
                                             <div class="flex items-center justify-end space-x-2">
                                                 @can('edit users')
-                                                    <a href="{{ route('admin.users.edit', $user) }}" title="Modifier" class="p-2 rounded-full text-gray-400 hover:bg-violet-100 hover:text-violet-600 transition-colors duration-200">
-                                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.536L16.732 3.732z" /></svg>
+                                                    <a href="{{ route('admin.users.edit', $user) }}" title="Modifier" class="p-2 rounded-full text-gray-400 hover:bg-primary-100 hover:text-primary-600 transition-colors duration-200">
+                                                        <x-lucide-file-pen-line class="h-5 w-5"/>
                                                     </a>
                                                 @endcan
                                                 @can('delete users')
@@ -69,12 +67,11 @@
                                                             @click="showConfirmModal = true; userToDelete = {{ json_encode($user->only(['id', 'name'])) }}; deleteFormUrl = '{{ route('admin.users.destroy', $user->id) }}'" 
                                                             title="Supprimer" 
                                                             class="p-2 rounded-full text-gray-400 hover:bg-red-100 hover:text-red-600 transition-colors duration-200">
-                                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                                                        <x-lucide-trash-2 class="h-5 w-5"/>
                                                     </button>
                                                 @endcan
                                             </div>
                                         </td>
-                                        {{-- ##### FIN DE LA SECTION CORRIGÉE ##### --}}
 
                                     </tr>
                                 @empty
@@ -93,7 +90,7 @@
             <div @click.away="showConfirmModal = false" class="bg-white rounded-lg shadow-xl p-6 md:p-8 w-full max-w-md mx-4">
                 <div class="sm:flex sm:items-start">
                     <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
-                        <svg class="h-6 w-6 text-red-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" /></svg>
+                        <x-lucide-alert-triangle class="h-6 w-6 text-red-600"/>
                     </div>
                     <div class="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left">
                         <h3 class="text-base font-semibold leading-6 text-gray-900" id="modal-title">Confirmer la Suppression</h3>
