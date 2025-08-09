@@ -8,7 +8,7 @@ $classes = ($active ?? false)
 
 <a {{ $attributes->merge(['class' => $classes]) }}>
     <span class="sub-link-icon mr-3">
-        <x-tabler-point class="h-4 w-4"/>
+        <x-lucide-dot class="h-4 w-4"/>
     </span>
     {{ $slot }}
 </a>

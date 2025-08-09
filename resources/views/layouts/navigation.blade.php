@@ -11,7 +11,7 @@
 
         <x-sidebar.sidebar-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
             <x-slot name="icon">
-                <x-tabler-dashboard class="h-5 w-5" />
+                <x-lucide-layout-dashboard class="h-5 w-5" />
             </x-slot>
             {{ __('Tableau de bord') }}
         </x-sidebar.sidebar-link>
@@ -20,7 +20,7 @@
         @canany(['view vehicles', 'view assignments'])
             <x-sidebar.sidebar-group title="Flotte" :active="request()->routeIs('admin.vehicles.*') || request()->routeIs('admin.assignments.*')">
                 <x-slot name="icon">
-                    <x-tabler-truck />
+                    <x-lucide-truck />
                 </x-slot>
                 @can('view vehicles')
                     <x-sidebar.sidebar-sub-link :href="route('admin.vehicles.index')" :active="request()->routeIs('admin.vehicles.*')">
@@ -39,7 +39,7 @@
         @can('view drivers')
              <x-sidebar.sidebar-group title="Chauffeurs" :active="request()->routeIs('admin.drivers.*')">
                 <x-slot name="icon">
-                    <x-tabler-users />
+                    <x-lucide-users />
                 </x-slot>
                 <x-sidebar.sidebar-sub-link :href="route('admin.drivers.index')" :active="request()->routeIs('admin.drivers.index')">
                     {{ __('Liste des chauffeurs') }}
@@ -54,7 +54,7 @@
         @canany(['view maintenance', 'manage maintenance plans'])
             <x-sidebar.sidebar-group title="Maintenance" :active="request()->routeIs('admin.maintenance.*')">
                 <x-slot name="icon">
-                    <x-tabler-wrench />
+                    <x-lucide-wrench />
                 </x-slot>
                 <x-sidebar.sidebar-sub-link :href="route('admin.maintenance.dashboard')" :active="request()->routeIs('admin.maintenance.dashboard')">
                     Tableau de Bord
@@ -69,7 +69,7 @@
         @role('Super Admin')
             <x-sidebar.sidebar-group title="Administration" :active="request()->routeIs('admin.organizations.*') || request()->routeIs('admin.users.*') || request()->routeIs('admin.roles.*')">
                 <x-slot name="icon">
-                    <x-tabler-settings />
+                    <x-lucide-settings />
                 </x-slot>
                 <x-sidebar.sidebar-sub-link :href="route('admin.organizations.index')" :active="request()->routeIs('admin.organizations.*')">
                     {{ __('Organisations') }}
@@ -89,13 +89,13 @@
         <div x-data="{ open: false }" @keydown.escape.window="open = false" @click.away="open = false" class="relative">
             <button @click="open = !open" class="w-full flex-1 flex items-center space-x-3 group p-2 rounded-lg hover:bg-gray-100">
                 <span class="inline-block h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center">
-                     <x-tabler-user-circle class="h-8 w-8 text-gray-500"/>
+                     <x-lucide-user-circle class="h-8 w-8 text-gray-500"/>
                 </span>
                 <div class="flex-1 text-left">
                     <p class="text-sm font-medium text-gray-700 group-hover:text-gray-900 truncate">{{ Auth::user()->name }}</p>
                     <p class="text-xs text-gray-500">Options</p>
                 </div>
-                <x-tabler-chevron-up class="h-5 w-5 text-gray-400 shrink-0"/>
+                <x-lucide-chevron-up class="h-5 w-5 text-gray-400 shrink-0"/>
             </button>
 
             <div x-show="open"
@@ -109,13 +109,13 @@
                  style="display: none;">
                 <div class="bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5 p-1">
                     <a href="{{ route('profile.edit') }}" class="flex items-center w-full px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-md">
-                        <x-tabler-user class="mr-3 h-5 w-5"/>
+                        <x-lucide-user class="mr-3 h-5 w-5"/>
                         Mon Profil
                     </a>
                     <form method="POST" action="{{ route('logout') }}">
                         @csrf
                         <a href="{{ route('logout') }}" onclick="event.preventDefault(); this.closest('form').submit();" class="flex items-center w-full px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-md">
-                            <x-tabler-logout class="mr-3 h-5 w-5"/>
+                            <x-lucide-log-out class="mr-3 h-5 w-5"/>
                             Déconnexion
                         </a>
                     </form>
