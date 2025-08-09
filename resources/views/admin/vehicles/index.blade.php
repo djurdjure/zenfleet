@@ -94,11 +94,11 @@
                         <div class="flex space-x-2">
                             @can('create vehicles')
                                 <a href="{{ route('admin.vehicles.import.show') }}" class="inline-flex items-center px-4 py-2 bg-white border border-gray-300 rounded-md font-semibold text-xs text-gray-700 uppercase tracking-widest shadow-sm hover:bg-gray-50">
-                                    <x-lucide-upload class="w-4 h-4 mr-2"/>
+                                    <x-lucide-upload class="w-4 h-4 mr-2" stroke-width="1.5"/>
                                     Importer
                                 </a>
                                 <a href="{{ route('admin.vehicles.create') }}" class="inline-flex items-center px-4 py-2 bg-primary-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-primary-700">
-                                    <x-lucide-plus-circle class="w-4 h-4 mr-2"/>
+                                    <x-lucide-plus-circle class="w-4 h-4 mr-2" stroke-width="1.5"/>
                                     Ajouter
                                 </a>
                             @endcan
@@ -147,24 +147,24 @@
                                                         <form method="POST" action="{{ route('admin.vehicles.restore', $vehicle->id) }}">
                                                             @csrf @method('PATCH')
                                                             <button type="submit" title="Restaurer" class="p-2 rounded-full text-gray-400 hover:bg-green-100 hover:text-green-600">
-                                                                <x-lucide-rotate-ccw class="h-5 w-5"/>
+                                                                <x-lucide-rotate-ccw class="h-5 w-5" stroke-width="1.5"/>
                                                             </button>
                                                         </form>
                                                     @endcan
                                                     @can('force delete vehicles')
                                                         <button type="button" @click="openModal($event, 'delete')" data-vehicle='@json($vehicle)' data-url="{{ route('admin.vehicles.force-delete', $vehicle->id) }}" title="Supprimer Définitivement" class="p-2 rounded-full text-gray-400 hover:bg-red-100 hover:text-red-600">
-                                                            <x-lucide-trash-2 class="h-5 w-5"/>
+                                                            <x-lucide-trash-2 class="h-5 w-5" stroke-width="1.5"/>
                                                         </button>
                                                     @endcan
                                                 @else
                                                     @can('edit vehicles')
                                                         <a href="{{ route('admin.vehicles.edit', $vehicle) }}" title="Modifier" class="p-2 rounded-full text-gray-400 hover:bg-primary-100 hover:text-primary-600">
-                                                            <x-lucide-file-pen-line class="h-5 w-5"/>
+                                                            <x-lucide-file-pen-line class="h-5 w-5" stroke-width="1.5"/>
                                                         </a>
                                                     @endcan
                                                     @can('delete vehicles')
                                                         <button type="button" @click="openModal($event, 'archive')" data-vehicle='@json($vehicle)' data-url="{{ route('admin.vehicles.destroy', $vehicle->id) }}" title="Archiver" class="p-2 rounded-full text-gray-400 hover:bg-yellow-100 hover:text-yellow-600">
-                                                            <x-lucide-archive class="h-5 w-5"/>
+                                                            <x-lucide-archive class="h-5 w-5" stroke-width="1.5"/>
                                                         </button>
                                                     @endcan
                                                 @endif
@@ -189,7 +189,7 @@
             <div @click.away="showConfirmModal = false" class="bg-white rounded-lg shadow-xl p-6 w-full max-w-md mx-4">
                 <div class="sm:flex sm:items-start">
                     <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full sm:mx-0 sm:h-10 sm:w-10" :class="modalIconClass">
-                        <x-lucide-alert-triangle x-show="modalAction === 'archive' || modalAction === 'delete'" class="h-6 w-6"/>
+                        <x-lucide-alert-triangle x-show="modalAction === 'archive' || modalAction === 'delete'" class="h-6 w-6" stroke-width="1.5"/>
                     </div>
                     <div class="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left">
                         <h3 class="text-base font-semibold leading-6 text-gray-900" x-text="modalTitle"></h3>

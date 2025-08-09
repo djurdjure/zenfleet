@@ -40,8 +40,8 @@ nav[x-data] .sub-link-icon svg {
 }
 
 .sub-link-icon-wrapper svg {
-    height: 0.875rem;
-    width: 0.875rem;
+    height: 0.75rem; /* 12px */
+    width: 0.75rem;  /* 12px */
     color: #6b7280; /* text-gray-500 */
     transition: color 0.2s ease-in-out;
 }

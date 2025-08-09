@@ -8,7 +8,7 @@
             </span>
         @endif
         <span class="flex-1 ml-1 text-left whitespace-nowrap">{{ $title }}</span>
-        <x-lucide-chevron-down class="h-4 w-4 transform transition-transform" ::class="{'rotate-180': open}"/>
+        <x-lucide-chevron-down class="h-4 w-4 transform transition-transform" ::class="{'rotate-180': open}" stroke-width="1.5"/>
     </button>
     <div x-show="open" x-transition class="mt-1 space-y-1 pl-4 border-l-2 border-dotted border-gray-300 ml-4">
         {{ $slot }}
