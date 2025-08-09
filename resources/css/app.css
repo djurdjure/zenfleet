@@ -10,7 +10,8 @@ nav[x-data] {
     font-size: 0.925rem;
 }
 
-nav[x-data] a svg {
+nav[x-data] a svg,
+nav[x-data] button svg {
     height: 1.25rem;
     width: 1.25rem;
 }
