@@ -81,16 +81,34 @@
                        $conditionStatuses = ['Bon', 'Moyen', 'Mauvais', 'N/A'];
                    @endphp
 
-                   <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
-                       @foreach($checklist as $category => $items)
-                           <div class="space-y-3">
-                               <h4 class="font-semibold text-gray-700">{{ $category }}</h4>
-                               @foreach($items as $item)
+                   <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-10">
+                       @php
+                           // Regrouper les catégories pour l'affichage en colonnes
+                           $groupedChecklist = $isMoto ? [
+                               ['Papiers & Accessoires'],
+                               ['État Général']
+                           ] : [
+                               ['Papiers du véhicule', 'Pneumatiques'],
+                               ['Accessoires Intérieur', 'État Extérieur']
+                           ];
+                       @endphp
+
+                       @foreach($groupedChecklist as $column)
+                           <div class="flex flex-col gap-y-6">
+                               @foreach($column as $categoryName)
                                    @php
-                                       $statusesToUse = in_array($category, ['Papiers du véhicule', 'Accessoires Intérieur', 'Papiers & Accessoires']) ? $binaryStatuses : $conditionStatuses;
+                                       $items = $checklist[$categoryName] ?? [];
                                    @endphp
-                                   <div class="bg-gray-50 rounded-md p-2 border border-gray-200">
-                                        <x-handover-status-switcher :item="$item" :category="$category" :statuses="$statusesToUse" />
+                                   <div class="space-y-3">
+                                       <h4 class="font-semibold text-gray-700">{{ $categoryName }}</h4>
+                                       @foreach($items as $item)
+                                           @php
+                                               $statusesToUse = in_array($categoryName, ['Papiers du véhicule', 'Accessoires Intérieur', 'Papiers & Accessoires']) ? $binaryStatuses : $conditionStatuses;
+                                           @endphp
+                                           <div class="bg-gray-50 rounded-md p-2 border border-gray-200">
+                                               <x-handover-status-switcher :item="$item" :category="$categoryName" :statuses="$statusesToUse" />
+                                           </div>
+                                       @endforeach
                                    </div>
                                @endforeach
                            </div>

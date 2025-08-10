@@ -72,20 +72,37 @@
 
                 <section class="mt-6">
                     <h2 class="text-base font-bold mb-3 text-gray-800 uppercase tracking-wider border-b pb-1">Checklist de Contrôle</h2>
+                    @php
+                        $isMoto = $handoverForm->assignment->vehicle->vehicleType->name === 'Moto';
+                        // Recréer la structure de regroupement comme sur la page de création
+                        $groupedChecklist = $isMoto ? [
+                            ['Papiers & Accessoires'],
+                            ['État Général']
+                        ] : [
+                            ['Papiers du véhicule', 'Pneumatiques'],
+                            ['Accessoires Intérieur', 'État Extérieur']
+                        ];
+                    @endphp
                     <div class="grid grid-cols-2 gap-x-8 text-xs">
-                    @foreach($checklist as $category => $items)
-                        <div class="mb-4 break-inside-avoid">
-                            <h3 class="font-semibold text-gray-700 mb-2 border-b">{{ $category }}</h3>
-                            <div class="space-y-1">
-                            @foreach($items as $detail)
-                                <div class="flex justify-between border-b border-dotted">
-                                    <span>{{ $detail->item }}</span>
-                                    <span class="font-bold">{{ $detail->status }}</span>
-                                </div>
-                            @endforeach
+                        @foreach($groupedChecklist as $column)
+                            <div class="flex flex-col gap-y-4">
+                                @foreach($column as $categoryName)
+                                    @if(isset($checklist[$categoryName]))
+                                        <div class="break-inside-avoid">
+                                            <h3 class="font-semibold text-gray-700 mb-2 border-b">{{ $categoryName }}</h3>
+                                            <div class="space-y-1">
+                                                @foreach($checklist[$categoryName] as $detail)
+                                                    <div class="flex justify-between border-b border-dotted">
+                                                        <span>{{ $detail->item }}</span>
+                                                        <span class="font-bold">{{ $detail->status }}</span>
+                                                    </div>
+                                                @endforeach
+                                            </div>
+                                        </div>
+                                    @endif
+                                @endforeach
                             </div>
-                        </div>
-                    @endforeach
+                        @endforeach
                     </div>
                 </section>
             </main>

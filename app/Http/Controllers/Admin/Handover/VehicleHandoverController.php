@@ -177,11 +177,12 @@ class VehicleHandoverController extends Controller
             ]);
 
         } catch (\Exception $e) {
-            // --- CORRECTION DE DÉBOGAGE ---
-            // On ne redirige plus. On "dump and die" : on affiche l'erreur complète et on arrête tout.
-            // C'est la boîte noire de l'avion, elle nous dira tout.
-            dd($e);
-            // --- FIN DE LA CORRECTION ---
+            \Log::error("Erreur de génération PDF pour la fiche {$handover->id}: " . $e->getMessage());
+            return back()->with('flash', [
+                'type' => 'error',
+                'message' => 'Erreur lors de la génération du PDF.',
+                'description' => 'Le service de PDF a rencontré un problème. Veuillez réessayer plus tard ou contacter le support technique.'
+            ]);
         }
     }
 }
