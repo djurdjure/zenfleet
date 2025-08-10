@@ -5,7 +5,7 @@
                 {{ __('Résultats de l\'Importation des Véhicules') }}
             </h2>
             <a href="{{ route('admin.vehicles.index') }}" class="inline-flex items-center px-3 py-1.5 bg-gray-100 border border-gray-300 rounded-md font-medium text-xs text-gray-700 uppercase tracking-widest hover:bg-gray-200 transition">
-                <x-heroicon-o-arrow-left class="h-4 w-4 mr-1"/>
+                <x-lucide-arrow-left class="h-4 w-4 mr-1"/>
                 Retour à la liste
             </a>
         </div>
@@ -17,7 +17,7 @@
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg mb-6">
                 <div class="p-6 border-b border-gray-200">
                     <div class="flex items-center">
-                        <x-heroicon-o-document-text class="h-8 w-8 text-violet-500 mr-3"/>
+                        <x-lucide-file-text class="h-8 w-8 text-primary-500 mr-3"/>
                         <div>
                             <h3 class="text-lg font-medium text-gray-900">Détails de l'importation</h3>
                             <div class="mt-1 text-sm text-gray-600">
@@ -37,7 +37,7 @@
                     <div class="p-6 bg-gradient-to-br from-green-50 to-green-100 border-l-4 border-green-500">
                         <div class="flex items-center">
                             <div class="p-3 rounded-full bg-green-100 bg-opacity-60">
-                                <x-heroicon-o-check-circle class="h-8 w-8 text-green-600"/>
+                                <x-lucide-check-circle-2 class="h-8 w-8 text-green-600"/>
                             </div>
                             <div class="ml-4">
                                 <p class="text-3xl font-bold text-green-800">{{ $successCount }}</p>
@@ -51,7 +51,7 @@
                     <div class="p-6 bg-gradient-to-br from-red-50 to-red-100 border-l-4 border-red-500">
                         <div class="flex items-center">
                             <div class="p-3 rounded-full bg-red-100 bg-opacity-60">
-                                <x-heroicon-o-x-circle class="h-8 w-8 text-red-600"/>
+                                <x-lucide-x-circle class="h-8 w-8 text-red-600"/>
                             </div>
                             <div class="ml-4">
                                 <p class="text-3xl font-bold text-red-800">{{ count($errorRows) }}</p>
@@ -65,7 +65,7 @@
                     <div class="p-6 bg-gradient-to-br from-blue-50 to-blue-100 border-l-4 border-blue-500">
                         <div class="flex items-center">
                             <div class="p-3 rounded-full bg-blue-100 bg-opacity-60">
-                                <x-heroicon-o-chart-bar class="h-8 w-8 text-blue-600"/>
+                                <x-lucide-bar-chart-3 class="h-8 w-8 text-blue-600"/>
                             </div>
                             <div class="ml-4">
                                 <p class="text-3xl font-bold text-blue-800">{{ $successCount + count($errorRows) }}</p>
@@ -81,7 +81,7 @@
                 <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg mb-6">
                     <div class="p-6 md:p-8 text-gray-900">
                         <div class="flex items-center mb-4">
-                            <x-heroicon-o-exclamation-triangle class="h-6 w-6 text-amber-500 mr-2"/>
+                            <x-lucide-alert-triangle class="h-6 w-6 text-amber-500 mr-2"/>
                             <h3 class="text-xl font-semibold text-gray-800">Détail des Lignes en Erreur</h3>
                         </div>
                         
@@ -132,7 +132,7 @@
                         <div class="mt-6 p-4 bg-amber-50 border border-amber-200 rounded-lg">
                             <div class="flex">
                                 <div class="flex-shrink-0">
-                                    <x-heroicon-o-light-bulb class="h-5 w-5 text-amber-500"/>
+                                    <x-lucide-lightbulb class="h-5 w-5 text-amber-500"/>
                                 </div>
                                 <div class="ml-3">
                                     <h4 class="text-sm font-medium text-amber-800">Conseils pour résoudre les erreurs</h4>
@@ -153,11 +153,11 @@
                     <div class="p-6 border-b border-gray-200">
                         <div class="flex items-center justify-between">
                             <div class="flex items-center">
-                                <x-heroicon-o-arrow-down-tray class="h-6 w-6 text-violet-500 mr-2"/>
+                                <x-lucide-download class="h-6 w-6 text-primary-500 mr-2"/>
                                 <h3 class="text-lg font-medium text-gray-900">Exporter les erreurs</h3>
                             </div>
-                            <a href="{{ route('admin.vehicles.import.export-errors', ['import_id' => $importId]) }}" class="inline-flex items-center px-4 py-2 bg-violet-100 border border-violet-200 rounded-md font-semibold text-xs text-violet-700 uppercase tracking-widest hover:bg-violet-200 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 transition">
-                                <x-heroicon-o-document-arrow-down class="h-4 w-4 mr-2"/>
+                            <a href="{{ route('admin.vehicles.import.export-errors', ['import_id' => $importId]) }}" class="inline-flex items-center px-4 py-2 bg-primary-100 border border-primary-200 rounded-md font-semibold text-xs text-primary-700 uppercase tracking-widest hover:bg-primary-200 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 transition">
+                                <x-lucide-file-down class="h-4 w-4 mr-2"/>
                                 Télécharger le rapport d'erreurs
                             </a>
                         </div>
@@ -171,7 +171,7 @@
                 <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg mb-6">
                     <div class="p-6 md:p-8 text-gray-900">
                         <div class="text-center py-12">
-                            <x-heroicon-o-sparkles class="mx-auto h-16 w-16 text-green-500"/>
+                            <x-lucide-sparkles class="mx-auto h-16 w-16 text-green-500"/>
                             <h3 class="mt-4 text-2xl font-bold text-gray-900">Importation Parfaite !</h3>
                             <p class="mt-2 text-base text-gray-600">
                                 Tous les véhicules de votre fichier ont été importés avec succès dans votre flotte.
@@ -183,12 +183,12 @@
 
             {{-- Actions --}}
             <div class="flex flex-col sm:flex-row items-center justify-end gap-4">
-                <a href="{{ route('admin.vehicles.import.show') }}" class="w-full sm:w-auto inline-flex items-center justify-center px-4 py-2 bg-white border border-gray-300 rounded-md font-semibold text-xs text-gray-700 uppercase tracking-widest shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 transition">
-                    <x-heroicon-o-arrow-path class="h-4 w-4 mr-2"/>
+                <a href="{{ route('admin.vehicles.import.show') }}" class="w-full sm:w-auto inline-flex items-center justify-center px-4 py-2 bg-white border border-gray-300 rounded-md font-semibold text-xs text-gray-700 uppercase tracking-widest shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 transition">
+                    <x-lucide-rotate-cw class="h-4 w-4 mr-2"/>
                     Nouvelle Importation
                 </a>
-                <a href="{{ route('admin.vehicles.index') }}" class="w-full sm:w-auto inline-flex items-center justify-center px-4 py-2 bg-violet-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-violet-700 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 transition">
-                    <x-heroicon-o-truck class="h-4 w-4 mr-2"/>
+                <a href="{{ route('admin.vehicles.index') }}" class="w-full sm:w-auto inline-flex items-center justify-center px-4 py-2 bg-primary-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 transition">
+                    <x-lucide-truck class="h-4 w-4 mr-2"/>
                     Voir tous les Véhicules
                 </a>
             </div>

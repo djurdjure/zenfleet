@@ -45,4 +45,3 @@ class StoreVehicleRequest extends FormRequest
     }
 }
 
-

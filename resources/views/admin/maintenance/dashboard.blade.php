@@ -23,7 +23,7 @@
                 </div>
                  <div class="bg-white overflow-hidden shadow-sm rounded-lg p-6 flex flex-col justify-center">
                     <h4 class="text-sm font-medium text-gray-500">Total Véhicules</h4>
-                    <p class="mt-1 text-3xl font-semibold text-violet-600">{{ $vehicleStats->sum() }}</p>
+                    <p class="mt-1 text-3xl font-semibold text-primary-600">{{ $vehicleStats->sum() }}</p>
                     <p class="text-xs text-gray-500">actifs dans la flotte</p>
                 </div>
             </div>
@@ -70,7 +70,7 @@
                 series: Object.values(fleetStatusData),
                 labels: Object.keys(fleetStatusData),
                 chart: { type: 'donut', height: 250 },
-                colors: ['#10B981', '#F59E0B', '#6D28D9', '#EF4444', '#6B7280'], // Vert, Orange, Violet, Rouge, Gris
+                colors: ['#10B981', '#F59E0B', '#3B82F6', '#EF4444', '#6B7280'], // Vert, Orange, Bleu, Rouge, Gris
                 legend: { position: 'bottom' },
                 responsive: [{ breakpoint: 480, options: { chart: { width: 200 }, legend: { position: 'bottom' } } }]
             };

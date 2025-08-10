@@ -17,6 +17,9 @@ services:
         GROUP_ID: ${GID:-1000}
     container_name: zenfleet_php
     restart: unless-stopped
+    dns:
+      - 8.8.8.8
+      - 1.1.1.1
     volumes:
       - ./:/var/www/html
     networks:
@@ -89,6 +92,9 @@ services:
     container_name: zenfleet_node_dev
     volumes:
       - .:/var/www/html
+    dns:
+      - 8.8.8.8
+      - 1.1.1.1
     working_dir: /var/www/html
     tty: true
 
@@ -101,7 +107,7 @@ services:
     networks:
       zenfleet_network:
         aliases:
-          - node  # Alias pour compatibilité
+          - node
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
       interval: 30s

@@ -66,9 +66,9 @@ class VehicleController extends Controller
         $vehicleTypes = VehicleType::all();
         $fuelTypes = FuelType::all();
         $transmissionTypes = TransmissionType::all();
-        $statuses = VehicleStatus::all();
+        $vehicleStatuses = VehicleStatus::all();
 
-        return view('admin.vehicles.create', compact('vehicleTypes', 'fuelTypes', 'transmissionTypes', 'statuses'));
+        return view('admin.vehicles.create', compact('vehicleTypes', 'fuelTypes', 'transmissionTypes', 'vehicleStatuses'));
     }
 
     /**
@@ -89,7 +89,7 @@ class VehicleController extends Controller
                 'vehicle_type_id' => 'required|exists:vehicle_types,id',
                 'fuel_type_id' => 'required|exists:fuel_types,id',
                 'transmission_type_id' => 'required|exists:transmission_types,id',
-                'vehicle_status_id' => 'required|exists:vehicle_statuses,id',
+                'status_id' => 'required|exists:vehicle_statuses,id',
                 'year' => 'nullable|integer|min:1900|max:' . (date('Y') + 1),
                 'acquisition_date' => 'nullable|date',
                 'purchase_price' => 'nullable|numeric|min:0',
@@ -142,9 +142,9 @@ class VehicleController extends Controller
         $vehicleTypes = VehicleType::all();
         $fuelTypes = FuelType::all();
         $transmissionTypes = TransmissionType::all();
-        $statuses = VehicleStatus::all();
+        $vehicleStatuses = VehicleStatus::all();
 
-        return view('admin.vehicles.edit', compact('vehicle', 'vehicleTypes', 'fuelTypes', 'transmissionTypes', 'statuses'));
+        return view('admin.vehicles.edit', compact('vehicle', 'vehicleTypes', 'fuelTypes', 'transmissionTypes', 'vehicleStatuses'));
     }
 
     /**
@@ -165,7 +165,7 @@ class VehicleController extends Controller
                 'vehicle_type_id' => 'required|exists:vehicle_types,id',
                 'fuel_type_id' => 'required|exists:fuel_types,id',
                 'transmission_type_id' => 'required|exists:transmission_types,id',
-                'vehicle_status_id' => 'required|exists:vehicle_statuses,id',
+                'status_id' => 'required|exists:vehicle_statuses,id',
                 'year' => 'nullable|integer|min:1900|max:' . (date('Y') + 1),
                 'acquisition_date' => 'nullable|date',
                 'purchase_price' => 'nullable|numeric|min:0',
@@ -301,7 +301,7 @@ class VehicleController extends Controller
             $rowNumber++;
             $data = array_map('trim', $record);
 
-            // Conversion des noms en ID
+            // Conversion des noms en ID et formatage des données
             $preparedData = [
                 'registration_plate' => $data['immatriculation'] ?? null,
                 'vin' => $data['numero_serie_vin'] ?? null,
@@ -323,24 +323,27 @@ class VehicleController extends Controller
                 'status_id' => $vehicleStatuses->get(strtolower($data['statut'] ?? ''))?->id,
             ];
             
+            // Utilisation du FormRequest pour la validation pour la cohérence
             $validator = Validator::make($preparedData, (new StoreVehicleRequest())->rules());
 
             if ($validator->fails()) {
-                // --- CORRECTION DÉFINITIVE ---
-                // On utilise la clé 'line' pour être cohérent avec la vue.
                 $errorRows[] = ['line' => $rowNumber, 'errors' => $validator->errors()->all(), 'data' => $record];
-                // --- FIN DE LA CORRECTION ---
             } else {
                 $validatedData = $validator->validated();
                 $validatedData["current_mileage"] = $validatedData["initial_mileage"] ?? 0;
+                // Assurer que l'organization_id est ajouté
+                $validatedData['organization_id'] = auth()->user()->organization_id;
                 Vehicle::create($validatedData);
                 $successCount++;
             }
         }
 
+        // Redirection vers la page de résultats
         return redirect()->route('admin.vehicles.import.results')
             ->with('successCount', $successCount)
-            ->with('errorRows', $errorRows);
+            ->with('errorRows', $errorRows)
+            ->with('importId', uniqid())
+            ->with('fileName', $request->file('csv_file')->getClientOriginalName());
     }
 
     /**
@@ -436,7 +439,7 @@ class VehicleController extends Controller
             'Berline',
             'Diesel',
             'Manuelle',
-            'Actif',
+            'Parking',
             '2020',
             '2021-01-15',
             '15000',

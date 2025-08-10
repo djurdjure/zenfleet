@@ -16,7 +16,7 @@
                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm">
                        <div class="p-4 border rounded-lg flex items-center space-x-4">
                            <div class="flex-shrink-0">
-                               <x-heroicon-s-user-circle class="h-10 w-10 text-gray-400"/>
+                               <x-lucide-user-circle-2 class="h-10 w-10 text-gray-400"/>
                            </div>
                            <div>
                                <p class="text-gray-500 font-semibold">Chauffeur</p>
@@ -26,7 +26,7 @@
                        </div>
                        <div class="p-4 border rounded-lg flex items-center space-x-4">
                            <div class="flex-shrink-0">
-                               <x-heroicon-s-truck class="h-10 w-10 text-gray-400"/>
+                               <x-lucide-truck class="h-10 w-10 text-gray-400"/>
                            </div>
                            <div>
                                <p class="text-gray-500 font-semibold">Véhicule</p>
@@ -101,7 +101,7 @@
                <div class="flex items-center justify-end mt-8 gap-4">
                    <a href="{{ route('admin.assignments.index') }}" class="text-sm font-semibold text-gray-600 hover:text-gray-900">Annuler</a>
                    <x-primary-button>
-                        <x-heroicon-o-check-circle class="w-5 h-5 mr-2"/>
+                        <x-lucide-check-circle class="w-5 h-5 mr-2"/>
                         Créer la Fiche
                    </x-primary-button>
                </div>

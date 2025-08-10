@@ -85,21 +85,18 @@
 
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900">
-                    <div class="flex justify-between items-center mb-6">
+                    <div class="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4">
                         <h3 class="text-xl font-semibold text-gray-700">{{ __('Liste des Chauffeurs') }}</h3>
-                        @can('create drivers')
-                            <a href="{{ route('admin.drivers.create') }}" class="inline-flex items-center px-4 py-2 bg-primary-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-primary-700">
-                                <x-heroicon-o-plus-circle class="w-4 h-4 mr-2"/>
-                                Ajouter un Chauffeur
-                            </a>
-                        @endcan
-                    </div>
-                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
-                        <h3 class="text-xl font-semibold text-gray-700">Tous les Chauffeurs</h3>
                         <div class="flex space-x-2">
                             @can('create drivers')
-                                <a href="{{ route('admin.drivers.import.show') }}" class="inline-flex items-center px-4 py-2 bg-white border border-gray-300 ...">Importer</a>
-                                <a href="{{ route('admin.drivers.create') }}" class="inline-flex items-center px-4 py-2 bg-violet-600 ...">Ajouter un Chauffeur</a>
+                                <a href="{{ route('admin.drivers.import.show') }}" class="inline-flex items-center px-4 py-2 bg-white border border-gray-300 rounded-md font-semibold text-xs text-gray-700 uppercase tracking-widest shadow-sm hover:bg-gray-50 transition">
+                                    <x-lucide-upload class="w-4 h-4 mr-2" stroke-width="1.5"/>
+                                    Importer
+                                </a>
+                                <a href="{{ route('admin.drivers.create') }}" class="inline-flex items-center px-4 py-2 bg-primary-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-primary-700">
+                                    <x-lucide-plus-circle class="w-4 h-4 mr-2" stroke-width="1.5"/>
+                                    Ajouter
+                                </a>
                             @endcan
                         </div>
                     </div>
@@ -125,7 +122,7 @@
                                                         <img class="h-10 w-10 rounded-full object-cover" src="{{ asset('storage/' . $driver->photo_path) }}" alt="Photo de {{ $driver->first_name }}">
                                                     @else
                                                         <span class="h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center">
-                                                            <x-heroicon-s-user class="h-6 w-6 text-gray-400"/>
+                                                            <x-lucide-user-circle-2 class="h-6 w-6 text-gray-400" stroke-width="1.5"/>
                                                         </span>
                                                     @endif
                                                 </div>
@@ -165,24 +162,24 @@
                                                         <form method="POST" action="{{ route('admin.drivers.restore', $driver->id) }}">
                                                             @csrf @method('PATCH')
                                                             <button type="submit" title="Restaurer" class="p-2 rounded-full text-gray-400 hover:bg-green-100 hover:text-green-600">
-                                                                <x-heroicon-o-arrow-uturn-left class="h-5 w-5"/>
+                                                                <x-lucide-rotate-ccw class="h-5 w-5" stroke-width="1.5"/>
                                                             </button>
                                                         </form>
                                                     @endcan
                                                     @can('force delete drivers')
                                                         <button type="button" @click="openModal($event, 'delete')" data-driver='@json($driver->only(['id', 'first_name', 'last_name']))' data-url="{{ route('admin.drivers.force-delete', $driver->id) }}" title="Supprimer Définitivement" class="p-2 rounded-full text-gray-400 hover:bg-red-100 hover:text-red-600">
-                                                            <x-heroicon-o-trash class="h-5 w-5"/>
+                                                            <x-lucide-trash-2 class="h-5 w-5" stroke-width="1.5"/>
                                                         </button>
                                                     @endcan
                                                 @else
                                                     @can('edit drivers')
                                                         <a href="{{ route('admin.drivers.edit', $driver) }}" title="Modifier" class="p-2 rounded-full text-gray-400 hover:bg-primary-100 hover:text-primary-600">
-                                                            <x-heroicon-o-pencil-square class="h-5 w-5"/>
+                                                            <x-lucide-file-pen-line class="h-5 w-5" stroke-width="1.5"/>
                                                         </a>
                                                     @endcan
                                                     @can('delete drivers')
                                                         <button type="button" @click="openModal($event, 'archive')" data-driver='@json($driver->only(['id', 'first_name', 'last_name']))' data-url="{{ route('admin.drivers.destroy', $driver->id) }}" title="Archiver" class="p-2 rounded-full text-gray-400 hover:bg-yellow-100 hover:text-yellow-600">
-                                                            <x-heroicon-o-archive-box-arrow-down class="h-5 w-5"/>
+                                                            <x-lucide-archive class="h-5 w-5" stroke-width="1.5"/>
                                                         </button>
                                                     @endcan
                                                 @endif
@@ -205,7 +202,7 @@
             <div @click.away="showConfirmModal = false" class="bg-white rounded-lg shadow-xl p-6 w-full max-w-md mx-4">
                 <div class="sm:flex sm:items-start">
                     <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full sm:mx-0 sm:h-10 sm:w-10" :class="modalIconClass">
-                        <x-heroicon-o-exclamation-triangle class="h-6 w-6"/>
+                        <x-lucide-alert-triangle class="h-6 w-6" stroke-width="1.5"/>
                     </div>
                     <div class="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left">
                         <h3 class="text-base font-semibold leading-6 text-gray-900" x-text="modalTitle"></h3>

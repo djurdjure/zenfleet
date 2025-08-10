@@ -5,8 +5,9 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
         <title>{{ config('app.name', 'Laravel') }}</title>
-        <link rel="preconnect" href="https://fonts.bunny.net">
-        <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
     <body class="font-sans antialiased">
@@ -22,7 +23,7 @@
                         <div class="absolute top-0 right-0 -mr-12 pt-2">
                             <button @click="sidebarOpen = false" type="button" class="ml-1 flex items-center justify-center h-10 w-10 rounded-full focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white">
                                 <span class="sr-only">Close sidebar</span>
-                                <x-heroicon-o-x-mark class="h-6 w-6 text-white" />
+                                <x-lucide-x class="h-6 w-6 text-white" />
                             </button>
                         </div>
                         @include('layouts.navigation')
@@ -33,7 +34,7 @@
                     <header class="relative z-10 flex-shrink-0 flex h-16 bg-white shadow">
                         <button @click.stop="sidebarOpen = true" type="button" class="px-4 border-r border-gray-200 text-gray-500 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-primary-500 md:hidden">
                             <span class="sr-only">Open sidebar</span>
-                            <x-heroicon-o-bars-3 class="h-6 w-6" />
+                            <x-lucide-menu class="h-6 w-6" />
                         </button>
                         <div class="flex-1 px-4 flex justify-between">
                             <div class="flex-1 flex items-center">

@@ -5,10 +5,57 @@
 @tailwind utilities;
 
 
-/* TEST DE RECHARGEMENT À CHAUD */
-body {
-    background-color: red !important;
+/* Sidebar Custom Styles */
+nav[x-data] {
+    font-size: 0.925rem;
 }
+
+nav[x-data] a svg,
+nav[x-data] button svg {
+    height: 1.25rem;
+    width: 1.25rem;
+}
+
+nav[x-data] .group .mr-3 svg {
+    color: #6b7280;
+}
+nav[x-data] .group:hover .mr-3 svg {
+    color: #374151;
+}
+
+nav[x-data] .sub-link-icon svg {
+    color: inherit;
+}
+
+/* Sub-menu icon wrapper styles */
+.sub-link-icon-wrapper {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 1.5rem;
+    width: 1.5rem;
+    border-radius: 9999px;
+    border: 1px solid #d1d5db; /* border-gray-300 */
+    transition: all 0.2s ease-in-out;
+}
+
+.sub-link-icon-wrapper svg {
+    height: 0.75rem; /* 12px */
+    width: 0.75rem;  /* 12px */
+    color: #6b7280; /* text-gray-500 */
+    transition: color 0.2s ease-in-out;
+}
+
+/* Active state for sub-menu links */
+a.active .sub-link-icon-wrapper {
+    background-color: rgb(2 132 199); /* bg-primary-600 */
+    border-color: rgb(2 132 199);
+}
+
+a.active .sub-link-icon-wrapper svg {
+    color: #ffffff;
+}
+
 
 /* STYLES SPÉCIFIQUES POUR L'IMPRESSION DE LA FICHE DE REMISE */
 @media print {
