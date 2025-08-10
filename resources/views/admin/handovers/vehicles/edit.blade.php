@@ -7,9 +7,9 @@
 
     <div class="py-12">
         <div class="max-w-5xl mx-auto sm:px-6 lg:px-8">
-            <form action="{{ route('admin.handovers.vehicles.store') }}" method="POST" class="space-y-6">
+            <form action="{{ route('admin.handovers.vehicles.update', $handover) }}" method="POST" class="space-y-6">
                 @csrf
-                <input type="hidden" name="assignment_id" value="{{ $assignment->id }}">
+                @method('PUT')
 
                 {{-- CARTE 1: INFORMATIONS GÉNÉRALES --}}
                 <div class="bg-white p-6 shadow-sm sm:rounded-lg">

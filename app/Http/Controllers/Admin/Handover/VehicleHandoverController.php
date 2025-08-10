@@ -77,10 +77,12 @@ class VehicleHandoverController extends Controller
     {
         $this->authorize('edit handovers');
         $handover->load(['assignment.vehicle.vehicleType', 'assignment.driver', 'details']);
+        $assignment = $handover->assignment;
+
         $detailsMap = $handover->details->mapWithKeys(function ($detail) {
             return [Str::slug($detail->category, '_') . '.' . Str::slug($detail->item, '_') => $detail->status];
         });
-        return view('admin.handovers.vehicles.edit', compact('handover', 'detailsMap'));
+        return view('admin.handovers.vehicles.edit', compact('handover', 'assignment', 'detailsMap'));
     }
 
     public function update(Request $request, VehicleHandoverForm $handover): RedirectResponse
