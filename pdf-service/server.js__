@@ -19,7 +19,8 @@ app.post('/generate-pdf', async (req, res) => {
 
     let browser = null;
     try {
-        console.log('Lancement du navigateur pour la génération PDF...');
+        console.log('Lancement du navigateur...');
+        // Puppeteer trouvera automatiquement le navigateur installé dans le conteneur
         browser = await puppeteer.launch({
             headless: true,
             args: [
@@ -32,27 +33,9 @@ app.post('/generate-pdf', async (req, res) => {
         });
 
         const page = await browser.newPage();
-        
-        // Émuler le média 'print' pour appliquer les styles @media print
-        await page.emulateMediaType('print');
-
-        // Définir le contenu de la page
         await page.setContent(html, { waitUntil: 'networkidle0' });
 
-        // Options PDF par défaut, qui peuvent être surchargées par la requête
-        const pdfOptions = {
-            format: 'A4',
-            printBackground: true,
-            margin: {
-                top: '15mm',
-                right: '15mm',
-                bottom: '15mm',
-                left: '15mm',
-            },
-            ...options,
-        };
-
-        const pdfBuffer = await page.pdf(pdfOptions);
+        const pdfBuffer = await page.pdf({ format: 'A4', printBackground: true, ...options });
         console.log(`PDF généré avec succès (${(pdfBuffer.length / 1024).toFixed(2)} KB)`);
 
         res.setHeader('Content-Type', 'application/pdf');
@@ -63,10 +46,7 @@ app.post('/generate-pdf', async (req, res) => {
         console.error('Erreur lors de la génération du PDF:', error);
         res.status(500).json({ error: 'Erreur serveur lors de la génération du PDF.', details: error.message });
     } finally {
-        if (browser) {
-            await browser.close();
-            console.log('Navigateur fermé.');
-        }
+        if (browser) await browser.close();
     }
 });
 

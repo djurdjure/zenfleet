@@ -14,6 +14,8 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\File;
 
 class VehicleHandoverController extends Controller
 {
@@ -153,8 +155,7 @@ class VehicleHandoverController extends Controller
     }
 
     /**
-     * Génère et télécharge la fiche de remise au format PDF via le microservice.
-     * VERSION DE DÉBOGAGE
+     * Génère et télécharge la fiche de remise au format PDF en utilisant la nouvelle vue optimisée.
      */
     public function downloadPdf(VehicleHandoverForm $handover, PdfGenerationService $pdfService): Response|RedirectResponse
     {
@@ -162,9 +163,20 @@ class VehicleHandoverController extends Controller
         $handover->load(['assignment.vehicle.vehicleType', 'assignment.driver', 'assignment.organization', 'details']);
         $checklist = $handover->details->groupBy('category');
 
-        $html = view('admin.handovers.vehicles.show', [
+        // Déterminer le chemin de l'image du croquis et la convertir en base64
+        $sketchName = $handover->assignment->vehicle->vehicleType->name === 'Moto' ? 'scooter_sketch.png' : 'car_sketch.png';
+        $sketchPath = public_path('images/' . $sketchName);
+        $vehicle_sketch_base64 = '';
+        if (File::exists($sketchPath)) {
+            $fileContent = File::get($sketchPath);
+            $vehicle_sketch_base64 = 'data:image/png;base64,' . base64_encode($fileContent);
+        }
+
+        // Rendre la nouvelle vue PDF avec les données nécessaires
+        $html = view('admin.handovers.vehicles.pdf', [
             'handoverForm' => $handover,
             'checklist' => $checklist,
+            'vehicle_sketch_base64' => $vehicle_sketch_base64,
         ])->render();
 
         try {
@@ -177,11 +189,13 @@ class VehicleHandoverController extends Controller
             ]);
 
         } catch (\Exception $e) {
-            // --- CORRECTION DE DÉBOGAGE ---
-            // On ne redirige plus. On "dump and die" : on affiche l'erreur complète et on arrête tout.
-            // C'est la boîte noire de l'avion, elle nous dira tout.
-            dd($e);
-            // --- FIN DE LA CORRECTION ---
+            Log::error("Erreur de génération PDF pour la fiche {$handover->id}: " . $e->getMessage(), ['exception' => $e]);
+            
+            return back()->with('flash', [
+                'type' => 'error',
+                'message' => 'Erreur lors de la génération du PDF.',
+                'description' => 'Le service PDF a échoué. Veuillez réessayer ou contacter le support si le problème persiste.'
+            ]);
         }
     }
 }
