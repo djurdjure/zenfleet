@@ -56,6 +56,25 @@ class VehicleController extends Controller
         return view('admin.vehicles.index', compact('vehicles', 'vehicleStatuses', 'filters'));
     }
 
+
+    /**
+     * Méthode privée pour récupérer les utilisateurs assignables
+     * en fonction du rôle de l'utilisateur connecté.
+     */
+    private function getAssignableUsers()
+    {
+        $user = Auth::user();
+
+        if ($user->hasRole('Super Admin')) {
+            // Le Super Admin peut voir tous les utilisateurs
+            return User::orderBy('name')->get();
+        }
+
+        // Un Admin ne voit que les utilisateurs de sa propre organisation
+        return User::where('organization_id', $user->organization_id)->orderBy('name')->get();
+    }
+
+    
     /**
      * Affiche le formulaire de création d'un véhicule
      */
@@ -64,7 +83,8 @@ class VehicleController extends Controller
         // Utilisation de la permission spécifique 'create vehicles'
         $this->authorize('create vehicles');
 
-        $users = User::orderBy('name')->get();
+        $users = $this->getAssignableUsers();
+        //$users = User::orderBy('name')->get();
         $vehicleTypes = VehicleType::all();
         $fuelTypes = FuelType::all();
         $transmissionTypes = TransmissionType::all();
@@ -141,7 +161,8 @@ class VehicleController extends Controller
         // Utilisation de la permission spécifique 'edit vehicles'
         $this->authorize('edit vehicles');
 
-        $users = User::orderBy('name')->get();
+        $users = $this->getAssignableUsers();
+        //$users = User::orderBy('name')->get();
         $vehicleTypes = VehicleType::all();
         $fuelTypes = FuelType::all();
         $transmissionTypes = TransmissionType::all();

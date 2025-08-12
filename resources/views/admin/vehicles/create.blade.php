@@ -13,6 +13,11 @@
                         new TomSelect(this.$refs.fuel_type_id, { create: false, placeholder: 'Sélectionnez un carburant...' });
                         new TomSelect(this.$refs.transmission_type_id, { create: false, placeholder: 'Sélectionnez une transmission...' });
                         new TomSelect(this.$refs.status_id, { create: false, placeholder: 'Sélectionnez un statut...' });
+                        
+                        // Configuration TomSelect pour les utilisateurs
+                        if (this.$refs.users && window.initUserTomSelect) {
+                            window.initUserTomSelect(this.$refs.users);
+                        }
                     }
                 }" x-init="
                     initTomSelect();
@@ -157,17 +162,25 @@
                                     </select>
                                     <x-input-error :messages="$errors->get('status_id')" class="mt-2" />
                                 </div>
-                                {{-- --- AJOUT DU CHAMP UTILISATEURS --- --}}
+                                {{-- --- CHAMP UTILISATEURS AMÉLIORÉ --- --}}
                                 <div class="md:col-span-2">
-                                    <label for="users" class="block font-medium text-sm text-gray-700">Utilisateurs Autorisés</label>
-                                    <select name="users[]" id="users" multiple x-ref="users">
+                                    <x-input-label for="users" value="Utilisateurs Autorisés" />
+                                    <select name="users[]" id="users" multiple x-ref="users" class="tomselect-users">
                                         @foreach($users as $user)
-                                            <option value="{{ $user->id }}" @selected(in_array($user->id, old('users', [])))>{{ $user->name }} ({{ $user->email }})</option>
+                                            <option value="{{ $user->id }}" 
+                                                    data-name="{{ $user->name }}" 
+                                                    data-email="{{ $user->email }}"
+                                                    @selected(in_array($user->id, old('users', [])))>
+                                                {{ $user->name }} ({{ $user->email }})
+                                            </option>
                                         @endforeach
                                     </select>
-                                    <p class="mt-1 text-xs text-gray-500">Laissez vide si non applicable.</p>
+                                    <p class="mt-1 text-xs text-gray-500">
+                                        Recherchez et sélectionnez les utilisateurs autorisés à utiliser ce véhicule.
+                                    </p>
+                                    <x-input-error :messages="$errors->get('users')" class="mt-2" />
                                 </div>
-                                {{-- --- FIN DE L'AJOUT --- --}}
+                                {{-- --- FIN CHAMP UTILISATEURS --- --}}
                                 <div class="md:col-span-2">
                                     <x-input-label for="notes" value="Notes" />
                                     <textarea id="notes" name="notes" rows="3" class="block mt-1 w-full border-gray-300 focus:border-primary-500 focus:ring-primary-500 rounded-md shadow-sm">{{ old('notes') }}</textarea>

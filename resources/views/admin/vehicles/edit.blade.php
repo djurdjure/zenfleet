@@ -18,6 +18,12 @@
                         new TomSelect(this.$refs.fuel_type_id, tomConfig('{{ old('fuel_type_id', $vehicle->fuel_type_id) }}'));
                         new TomSelect(this.$refs.transmission_type_id, tomConfig('{{ old('transmission_type_id', $vehicle->transmission_type_id) }}'));
                         new TomSelect(this.$refs.status_id, tomConfig('{{ old('status_id', $vehicle->status_id) }}'));
+                        
+                        // Configuration TomSelect pour les utilisateurs avec présélection
+                        if (this.$refs.users && window.initUserTomSelect) {
+                            const assignedUserIds = @json(old('users', $vehicle->users->pluck('id')->toArray()));
+                            window.initUserTomSelect(this.$refs.users, assignedUserIds);
+                        }
                     }
                 }" x-init="
                     initTomSelect();
@@ -163,13 +169,11 @@
                                     </select>
                                     <x-input-error :messages="$errors->get('status_id')" class="mt-2" />
                                 </div>
-                                {{-- --- AJOUT DU CHAMP UTILISATEURS --- --}}
+                                {{-- --- CHAMP UTILISATEURS AMÉLIORÉ --- --}}
                                 <div class="md:col-span-2">
-                                    <label for="users" class="block font-medium text-sm text-gray-700">Utilisateurs Autorisés</label>
+                                    <x-input-label for="users" value="Utilisateurs Autorisés" />
                                     
-                                    {{-- On utilise x-ref pour que Alpine.js puisse cibler cet élément --}}
-                                    <select name="users[]" id="users" multiple x-ref="users">
-                                        
+                                    <select name="users[]" id="users" multiple x-ref="users" class="tomselect-users">
                                         {{-- On prépare en PHP la liste des IDs déjà assignés --}}
                                         @php
                                             $assignedUserIds = old('users', $vehicle->users->pluck('id')->toArray());
@@ -177,14 +181,20 @@
 
                                         {{-- On boucle sur tous les utilisateurs disponibles pour créer les options --}}
                                         @foreach($users as $user)
-                                            <option value="{{ $user->id }}" @selected(in_array($user->id, $assignedUserIds))>
+                                            <option value="{{ $user->id }}" 
+                                                    data-name="{{ $user->name }}" 
+                                                    data-email="{{ $user->email }}"
+                                                    @selected(in_array($user->id, $assignedUserIds))>
                                                 {{ $user->name }} ({{ $user->email }})
                                             </option>
                                         @endforeach
                                     </select>
-                                    <p class="mt-1 text-xs text-gray-500">Laissez vide si non applicable. Vous pouvez rechercher et sélectionner plusieurs utilisateurs.</p>
+                                    <p class="mt-1 text-xs text-gray-500">
+                                        Recherchez et sélectionnez les utilisateurs autorisés à utiliser ce véhicule.
+                                    </p>
+                                    <x-input-error :messages="$errors->get('users')" class="mt-2" />
                                 </div>
-                                                                {{-- --- FIN DE L'AJOUT --- --}}
+                                {{-- --- FIN CHAMP UTILISATEURS --- --}}
                                  <div class="md:col-span-2">
                                     <x-input-label for="notes" value="Notes" />
                                     <textarea id="notes" name="notes" rows="3" class="block mt-1 w-full border-gray-300 focus:border-primary-500 focus:ring-primary-500 rounded-md shadow-sm">{{ old('notes', $vehicle->notes) }}</textarea>
