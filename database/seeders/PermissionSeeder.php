@@ -53,8 +53,11 @@ class PermissionSeeder extends Seeder
         ]);
         $this->command->info('Permissions granted to "Gestionnaire Flotte" role.');
 
-        // Le rôle Chauffeur n'a aucune permission pour le moment.
-        $driverRole->syncPermissions([]);
+        // Le rôle Chauffeur peut voir les véhicules et ses affectations.
+        $driverRole->syncPermissions([
+            'view vehicles',
+            'view assignments',
+        ]);
         $this->command->info('Permissions for "Chauffeur" role have been set.');
     }
 }
