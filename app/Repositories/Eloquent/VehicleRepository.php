@@ -4,6 +4,7 @@ namespace App\Repositories\Eloquent;
 use App\Models\Vehicle;
 use App\Repositories\Interfaces\VehicleRepositoryInterface;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\Auth;
 
 class VehicleRepository implements VehicleRepositoryInterface
 {
@@ -11,6 +12,19 @@ class VehicleRepository implements VehicleRepositoryInterface
     {
         $perPage = $filters['per_page'] ?? 15;
         $query = Vehicle::query()->with(['vehicleType', 'vehicleStatus']);
+        $user = Auth::user();
+
+        // Appliquer le filtre par organisation pour tous sauf Super Admin
+        if ($user && !$user->hasRole('Super Admin')) {
+            $query->where('organization_id', $user->organization_id);
+        }
+
+        // Si l'utilisateur n'est ni Super Admin, ni Admin, restreindre aux véhicules assignés
+        if ($user && !$user->hasAnyRole(['Super Admin', 'Admin'])) {
+            $query->whereHas('users', function ($q) use ($user) {
+                $q->where('user_id', $user->id);
+            });
+        }
 
         if (!empty($filters['view_deleted'])) {
             $query->onlyTrashed();
