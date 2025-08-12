@@ -441,8 +441,11 @@ class DriverController extends Controller
         $sanitized = [];
         
         foreach ($record as $key => $value) {
-            // Nettoyage des clés
+            // Nettoyage des clés (y compris le BOM UTF-8)
             $cleanKey = trim($key);
+            if (str_starts_with($cleanKey, "\xef\xbb\xbf")) {
+                $cleanKey = substr($cleanKey, 3);
+            }
             
             // Nettoyage des valeurs
             if (is_string($value)) {
