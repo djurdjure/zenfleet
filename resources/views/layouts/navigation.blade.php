@@ -72,15 +72,17 @@
         @endcanany
 
         {{-- Section Administration --}}
-        @role('Super Admin')
+        @hasanyrole('Super Admin|Admin')
             <x-sidebar.sidebar-group title="Administration" :active="request()->routeIs('admin.organizations.*') || request()->routeIs('admin.users.*') || request()->routeIs('admin.roles.*')">
                 <x-slot name="icon">
                     <x-lucide-settings stroke-width="1.5" />
                 </x-slot>
+                @role('Super Admin')
                 <x-sidebar.sidebar-sub-link :href="route('admin.organizations.index')" :active="request()->routeIs('admin.organizations.*')">
                     <x-slot name="icon"><x-lucide-building-2 stroke-width="1.5" /></x-slot>
                     {{ __('Organisations') }}
                 </x-sidebar.sidebar-sub-link>
+                @endrole
                 <x-sidebar.sidebar-sub-link :href="route('admin.users.index')" :active="request()->routeIs('admin.users.*')">
                     <x-slot name="icon"><x-lucide-user-cog stroke-width="1.5" /></x-slot>
                     {{ __('Utilisateurs') }}
@@ -90,7 +92,7 @@
                     {{ __('Rôles') }}
                 </x-sidebar.sidebar-sub-link>
             </x-sidebar.sidebar-group>
-        @endrole
+        @endhasanyrole
     </div>
 
     {{-- Section Utilisateur / Déconnexion --}}

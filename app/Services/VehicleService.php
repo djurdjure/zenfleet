@@ -20,27 +20,38 @@ class VehicleService
         return $this->vehicleRepository->getFiltered($filters);
     }
 
-    public function createVehicle(array $data): Vehicle
+    public function createVehicle(array $data, ?UploadedFile $photo, array $userIds = []): Vehicle
     {
-        if (isset($data['photo'])) {
-            $data['photo_path'] = $data['photo']->store('vehicles/photos', 'public');
-            unset($data['photo']);
+        if ($photo) {
+            $data['photo_path'] = $photo->store('vehicles/photos', 'public');
         }
         $data['current_mileage'] = $data['initial_mileage'];
 
-        return $this->vehicleRepository->create($data);
+        $vehicle = $this->vehicleRepository->create($data);
+
+        if (!empty($userIds)) {
+            $vehicle->users()->sync($userIds);
+        }
+
+        return $vehicle;
     }
 
-    public function updateVehicle(Vehicle $vehicle, array $data): bool
+    public function updateVehicle(Vehicle $vehicle, array $data, ?UploadedFile $photo, array $userIds = []): bool
     {
-        if (isset($data['photo'])) {
+        if ($photo) {
             if ($vehicle->photo_path) {
                 Storage::disk('public')->delete($vehicle->photo_path);
             }
-            $data['photo_path'] = $data['photo']->store('vehicles/photos', 'public');
-            unset($data['photo']);
+            $data['photo_path'] = $photo->store('vehicles/photos', 'public');
         }
-        return $this->vehicleRepository->update($vehicle, $data);
+
+        $updated = $this->vehicleRepository->update($vehicle, $data);
+
+        if ($updated) {
+            $vehicle->users()->sync($userIds);
+        }
+
+        return $updated;
     }
 
     public function archiveVehicle(Vehicle $vehicle): bool

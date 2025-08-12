@@ -15,6 +15,7 @@ use App\Services\ImportExportService;
 use App\Services\VehicleService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
@@ -122,13 +123,19 @@ class VehicleController extends Controller
                 'seats' => 'nullable|integer|min:0',
                 'notes' => 'nullable|string',
                 'photo' => 'nullable|image|max:2048',
+                'users' => 'nullable|array',
+                'users.*' => 'exists:users,id',
             ]);
 
             // Ajouter l'ID de l'organisation
             $validated['organization_id'] = auth()->user()->organization_id;
 
             // Créer le véhicule
-            $vehicle = $this->vehicleService->createVehicle($validated, $request->file('photo'));
+            $vehicle = $this->vehicleService->createVehicle(
+                $validated,
+                $request->file('photo'),
+                $request->input('users', [])
+            );
 
             return redirect()->route('admin.vehicles.index')
                 ->with('success', __('vehicles.messages.create_success'));
@@ -200,10 +207,17 @@ class VehicleController extends Controller
                 'seats' => 'nullable|integer|min:0',
                 'notes' => 'nullable|string',
                 'photo' => 'nullable|image|max:2048',
+                'users' => 'nullable|array',
+                'users.*' => 'exists:users,id',
             ]);
 
             // Mettre à jour le véhicule
-            $this->vehicleService->updateVehicle($vehicle, $validated, $request->file('photo'));
+            $this->vehicleService->updateVehicle(
+                $vehicle,
+                $validated,
+                $request->file('photo'),
+                $request->input('users', [])
+            );
 
             return redirect()->route('admin.vehicles.index')
                 ->with('success', __('vehicles.messages.update_success'));
