@@ -40,9 +40,7 @@ class PermissionSeeder extends Seeder
         $superAdminRole->givePermissionTo(Permission::all());
         $this->command->info('All permissions granted to Super Admin role.');
 
-        $adminPermissions = Permission::where('name', 'not like', '%organizations%')
-                                        ->where('name', '!=', 'manage roles')
-                                        ->get();
+        $adminPermissions = Permission::where('name', 'not like', '%organizations%')->get();
         $adminRole->syncPermissions($adminPermissions);
         $this->command->info('Permissions granted to Admin role.');
 
