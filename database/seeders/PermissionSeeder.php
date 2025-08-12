@@ -40,9 +40,7 @@ class PermissionSeeder extends Seeder
         $superAdminRole->givePermissionTo(Permission::all());
         $this->command->info('All permissions granted to Super Admin role.');
 
-        $adminPermissions = Permission::where('name', 'not like', '%organizations%')
-                                        ->where('name', '!=', 'manage roles')
-                                        ->get();
+        $adminPermissions = Permission::where('name', 'not like', '%organizations%')->get();
         $adminRole->syncPermissions($adminPermissions);
         $this->command->info('Permissions granted to Admin role.');
 
@@ -55,8 +53,11 @@ class PermissionSeeder extends Seeder
         ]);
         $this->command->info('Permissions granted to "Gestionnaire Flotte" role.');
 
-        // Le rôle Chauffeur n'a aucune permission pour le moment.
-        $driverRole->syncPermissions([]);
+        // Le rôle Chauffeur peut voir les véhicules et ses affectations.
+        $driverRole->syncPermissions([
+            'view vehicles',
+            'view assignments',
+        ]);
         $this->command->info('Permissions for "Chauffeur" role have been set.');
     }
 }

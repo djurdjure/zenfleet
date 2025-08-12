@@ -17,7 +17,16 @@ class UserController extends Controller
     public function index(): View
     {
         $this->authorize('view users');
-        $users = User::with(['roles', 'organization'])->orderBy('id', 'desc')->paginate(15);
+
+        $query = User::with(['roles', 'organization']);
+
+        // Si l'utilisateur n'est pas Super Admin, on filtre par son organisation
+        if (!auth()->user()->hasRole('Super Admin')) {
+            $query->where('organization_id', auth()->user()->organization_id);
+        }
+
+        $users = $query->orderBy('id', 'desc')->paginate(15);
+
         return view('admin.users.index', compact('users'));
     }
 
@@ -25,13 +34,26 @@ class UserController extends Controller
     {
         $this->authorize('create users');
         $roles = Role::all();
-        $organizations = Organization::withoutGlobalScope('organization')->orderBy('name')->get();
+        $user = auth()->user();
+
+        if ($user->hasRole('Super Admin')) {
+            $organizations = Organization::withoutGlobalScope('organization')->orderBy('name')->get();
+        } else {
+            $organizations = Organization::where('id', $user->organization_id)->get();
+        }
+
         return view('admin.users.create', compact('roles', 'organizations'));
     }
 
     public function store(Request $request): RedirectResponse
     {
         $this->authorize('create users');
+
+        $user = auth()->user();
+        $organizationId = $user->hasRole('Super Admin') ? $request->input('organization_id') : $user->organization_id;
+
+        $request->merge(['organization_id' => $organizationId]);
+
         $validated = $request->validate([
             'first_name' => ['required', 'string', 'max:255'],
             'last_name' => ['required', 'string', 'max:255'],
@@ -42,7 +64,7 @@ class UserController extends Controller
             'roles.*' => 'exists:roles,id', // Valide que les IDs existent
         ]);
 
-        $user = User::create([
+        $newUser = User::create([
             'first_name' => $validated['first_name'],
             'last_name' => $validated['last_name'],
             'email' => $validated['email'],
@@ -53,7 +75,7 @@ class UserController extends Controller
         // CORRECTION : On récupère les modèles de Rôle avant de synchroniser
         if (!empty($validated['roles'])) {
             $rolesToSync = Role::whereIn('id', $validated['roles'])->get();
-            $user->syncRoles($rolesToSync);
+            $newUser->syncRoles($rolesToSync);
         }
 
         return redirect()->route('admin.users.index')->with('success', 'Utilisateur créé avec succès.');
@@ -63,13 +85,34 @@ class UserController extends Controller
     {
         $this->authorize('edit users');
         $roles = Role::all();
-        $organizations = Organization::withoutGlobalScope('organization')->orderBy('name')->get();
+        $loggedInUser = auth()->user();
+
+        if ($loggedInUser->hasRole('Super Admin')) {
+            $organizations = Organization::withoutGlobalScope('organization')->orderBy('name')->get();
+        } else {
+            // Un admin ne peut voir que sa propre organisation
+            $organizations = Organization::where('id', $loggedInUser->organization_id)->get();
+            // On s'assure qu'un admin ne peut pas éditer un utilisateur d'une autre organisation
+            if ($user->organization_id !== $loggedInUser->organization_id) {
+                abort(403, 'Vous n\'êtes pas autorisé à modifier cet utilisateur.');
+            }
+        }
+
         return view('admin.users.edit', compact('user', 'roles', 'organizations'));
     }
 
     public function update(Request $request, User $user): RedirectResponse
     {
         $this->authorize('edit users');
+        $loggedInUser = auth()->user();
+
+        // Un admin ne peut pas changer l'organisation d'un utilisateur
+        if (!$loggedInUser->hasRole('Super Admin')) {
+            if ($request->input('organization_id') && $request->input('organization_id') != $loggedInUser->organization_id) {
+                abort(403, 'Vous n\'êtes pas autorisé à changer l\'organisation de l\'utilisateur.');
+            }
+        }
+
         $validated = $request->validate([
             'first_name' => ['required', 'string', 'max:255'],
             'last_name' => ['required', 'string', 'max:255'],

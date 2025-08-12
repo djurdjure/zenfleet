@@ -34,7 +34,9 @@ Route::middleware('auth')->group(function () {
 Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () {
 
     // --- Routes accessibles au Super Admin ET aux Admins d'organisation ---
-    Route::middleware(['role:Super Admin|Admin'])->group(function() {
+    // La vérification des permissions se fait maintenant au niveau de chaque contrôleur,
+    // donc on retire le middleware de rôle qui était trop restrictif.
+    Route::middleware([])->group(function() {
 
         // --- MAINTENANCE ---
         Route::get('/maintenance', [MaintenanceDashboardController::class, 'index'])->name('maintenance.dashboard');
@@ -91,6 +93,10 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     // --- Routes accessibles UNIQUEMENT au Super Admin ---
     Route::middleware(['role:Super Admin'])->group(function() {
         Route::resource('organizations', OrganizationController::class);
+    });
+
+    // --- Routes accessibles au Super Admin et Admin pour la gestion des rôles ---
+    Route::middleware(['role:Super Admin|Admin'])->group(function() {
         Route::resource('roles', RoleController::class)->only(['index', 'edit', 'update']);
     });
 });
