@@ -200,174 +200,96 @@ class DriverController extends Controller
 
     /**
      * Traite l'importation du fichier CSV.
-     * Version améliorée avec détection d'encodage et gestion robuste des erreurs.
-     * Correction du bug avec ResultSet::rewind()
+     * Version refactorisée pour une gestion robuste du BOM et une simplification.
      */
     public function handleImport(Request $request): RedirectResponse
     {
         $this->authorize('create drivers');
         
-        $request->validate([
-            'csv_file' => 'required|file|mimes:csv,txt',
-            'encoding' => 'nullable|string|in:auto,utf8,iso,windows'
-        ]);
+        $request->validate(['csv_file' => 'required|file|mimes:csv,txt']);
         
         $file = $request->file('csv_file');
-        $filePath = $file->getPathname();
         
-        // Détection et conversion d'encodage
         try {
-            $encoding = $request->input('encoding', 'auto');
-            $fileContent = file_get_contents($filePath);
+            // Lecture du contenu du fichier
+            $fileContent = file_get_contents($file->getRealPath());
             
-            // Détection automatique de l'encodage si demandé
-            if ($encoding === 'auto') {
-                $encoding = $this->detectEncoding($fileContent);
+            // Correction : Suppression manuelle et fiable du BOM UTF-8
+            if (str_starts_with($fileContent, "\xef\xbb\xbf")) {
+                $fileContent = substr($fileContent, 3);
             }
             
-            // Conversion vers UTF-8 si nécessaire
-            if ($encoding !== 'utf8') {
-                $fileContent = $this->convertToUtf8($fileContent, $encoding);
-                // Écrire le contenu converti dans un fichier temporaire
-                $tempFile = tempnam(sys_get_temp_dir(), 'csv_import_');
-                file_put_contents($tempFile, $fileContent);
-                $filePath = $tempFile;
-            }
-            
-            // Création du lecteur CSV avec le fichier converti
-            $csv = Reader::createFromPath($filePath, 'r');
+            // Création du lecteur CSV directement depuis la chaîne de caractères nettoyée
+            $csv = Reader::createFromString($fileContent);
             $csv->setHeaderOffset(0);
             
-            // Traitement des enregistrements
             $records = Statement::create()->process($csv);
             
             $successCount = 0;
             $errorRows = [];
-            $importId = Str::uuid()->toString(); // Identifiant unique pour cette importation
+            $importId = Str::uuid()->toString();
             
             $statuses = DriverStatus::pluck('id', 'name');
             $defaultStatusId = $statuses->get('Disponible');
             
-            // Journalisation du début de l'importation
-            Log::info("Début de l'importation CSV des chauffeurs", [
+            Log::info("Début de l'importation CSV des chauffeurs (refactorisée)", [
                 'import_id' => $importId,
                 'file' => $file->getClientOriginalName(),
-                'encoding' => $encoding,
-                'records_count' => iterator_count($records),
+                'records_count' => count($records),
             ]);
             
-            // CORRECTION: Ne pas utiliser rewind() sur ResultSet
-            // Convertir le ResultSet en tableau pour pouvoir l'itérer à nouveau
-            $recordsArray = iterator_to_array($records);
-            
-            foreach ($recordsArray as $offset => $record) {
+            foreach ($records as $offset => $record) {
                 try {
-                    // Nettoyage préventif des données
-                    $record = $this->sanitizeRecord($record);
-                    
-                    // Préparation des données pour validation
-                    $data = $this->prepareDataForValidation($record);
-                    
-                    // Validation des données
+                    // La sanitisation des clés n'est plus nécessaire car le BOM est supprimé à la source.
+                    // On nettoie juste les valeurs.
+                    $sanitizedRecord = array_map('trim', $record);
+
+                    $data = $this->prepareDataForValidation($sanitizedRecord);
                     $validator = Validator::make($data, $this->getValidationRules());
                     
                     if ($validator->fails()) {
-                        $errorRows[] = [
-                            'line' => $offset + 2,
-                            'errors' => $validator->errors()->all(),
-                            'data' => $record,
-                            'raw' => json_encode($record, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES)
-                        ];
+                        $errorRows[] = ['line' => $offset + 2, 'errors' => $validator->errors()->all(), 'data' => $record];
                         continue;
                     }
                     
                     $validatedData = $validator->validated();
-                    
-                    // Gestion du statut
                     $statusName = $validatedData['statut'] ?? null;
                     $statusId = $statuses->get($statusName, $defaultStatusId);
                     
                     unset($validatedData['statut']);
                     $validatedData['status_id'] = $statusId;
                     
-                    // Création du chauffeur
-                    $driver = Driver::create($validatedData);
+                    Driver::create($validatedData);
                     $successCount++;
                     
-                    // Journalisation du succès
-                    Log::debug("Chauffeur importé avec succès", [
-                        'import_id' => $importId,
-                        'line' => $offset + 2,
-                        'driver_id' => $driver->id,
-                        'name' => "{$driver->first_name} {$driver->last_name}"
-                    ]);
-                    
                 } catch (QueryException $e) {
-                    // Gestion des erreurs de base de données
                     $errorMessage = $this->formatDatabaseError($e);
-                    $errorRows[] = [
-                        'line' => $offset + 2,
-                        'errors' => [$errorMessage],
-                        'data' => $record,
-                        'raw' => json_encode($record, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES)
-                    ];
-                    
-                    // Journalisation de l'erreur
-                    Log::error("Erreur d'importation (Base de données)", [
-                        'import_id' => $importId,
-                        'line' => $offset + 2,
-                        'error' => $e->getMessage(),
-                        'data' => json_encode($record, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES)
-                    ]);
-                    
+                    $errorRows[] = ['line' => $offset + 2, 'errors' => [$errorMessage], 'data' => $record];
                 } catch (\Exception $e) {
-                    // Gestion des autres erreurs
-                    $errorRows[] = [
-                        'line' => $offset + 2,
-                        'errors' => ["Erreur inattendue: {$e->getMessage()}"],
-                        'data' => $record,
-                        'raw' => json_encode($record, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES)
-                    ];
-                    
-                    // Journalisation de l'erreur
-                    Log::error("Erreur d'importation (Générale)", [
-                        'import_id' => $importId,
-                        'line' => $offset + 2,
-                        'error' => $e->getMessage(),
-                        'data' => json_encode($record, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES)
-                    ]);
+                    $errorRows[] = ['line' => $offset + 2, 'errors' => ["Erreur inattendue: " . $e->getMessage()], 'data' => $record];
                 }
             }
             
-            // Journalisation de la fin de l'importation
             Log::info("Fin de l'importation CSV des chauffeurs", [
                 'import_id' => $importId,
                 'success_count' => $successCount,
                 'error_count' => count($errorRows)
             ]);
             
-            // Nettoyage du fichier temporaire si créé
-            if (isset($tempFile) && file_exists($tempFile)) {
-                unlink($tempFile);
-            }
-            
-            // Redirection vers la page de résultats
             return redirect()->route('admin.drivers.import.results')
                 ->with('successCount', $successCount)
                 ->with('errorRows', $errorRows)
                 ->with('importId', $importId)
-                ->with('fileName', $file->getClientOriginalName())
-                ->with('encoding', $encoding);
+                ->with('fileName', $file->getClientOriginalName());
                 
         } catch (\Exception $e) {
-            // Gestion des erreurs critiques (ex: problème de lecture du fichier)
             Log::critical("Erreur critique lors de l'importation CSV", [
                 'error' => $e->getMessage(),
                 'file' => $file->getClientOriginalName()
             ]);
             
             return redirect()->route('admin.drivers.import.show')
-                ->with('error', "Une erreur est survenue lors de la lecture du fichier CSV: {$e->getMessage()}")
+                ->with('error', "Une erreur est survenue lors de la lecture du fichier CSV: " . $e->getMessage())
                 ->withInput();
         }
     }
@@ -441,8 +363,11 @@ class DriverController extends Controller
         $sanitized = [];
         
         foreach ($record as $key => $value) {
-            // Nettoyage des clés
+            // Nettoyage des clés (y compris le BOM UTF-8)
             $cleanKey = trim($key);
+            if (str_starts_with($cleanKey, "\xef\xbb\xbf")) {
+                $cleanKey = substr($cleanKey, 3);
+            }
             
             // Nettoyage des valeurs
             if (is_string($value)) {
