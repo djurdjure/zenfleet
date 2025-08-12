@@ -84,12 +84,24 @@
 │   ├── Observers
 │   │   ├── DriverObserver.php
 │   │   └── UserObserver.php
+│   ├── Policies
+│   │   └── VehiclePolicy.php
 │   ├── Providers
 │   │   ├── AppServiceProvider.php
 │   │   ├── AuthServiceProvider.php
 │   │   ├── BroadcastServiceProvider.php
 │   │   ├── EventServiceProvider.php
+│   │   ├── RepositoryServiceProvider.php
 │   │   └── RouteServiceProvider.php
+│   ├── Repositories
+│   │   ├── Eloquent
+│   │   │   └── VehicleRepository.php
+│   │   └── Interfaces
+│   │       └── VehicleRepositoryInterface.php
+│   ├── Services
+│   │   ├── ImportExportService.php
+│   │   ├── PdfGenerationService.php
+│   │   └── VehicleService.php
 │   └── View
 │       └── Components
 │           ├── AppLayout.php
@@ -100,6 +112,7 @@
 │   └── cache
 │       ├── packages.php
 │       └── services.php
+├── commande___snapshot___SQL__Arborescence____description.txt
 ├── composer.json
 ├── composer.lock
 ├── config
@@ -119,6 +132,7 @@
 │   ├── services.php
 │   ├── session.php
 │   └── view.php
+├── create_snapshot.sh
 ├── database
 │   ├── factories
 │   │   ├── DriverFactory.php
@@ -153,7 +167,9 @@
 │   │   ├── 2025_06_17_233757_create_vehicle_handover_details_table.php
 │   │   ├── 2025_07_07_000048_create_organizations_table.php
 │   │   ├── 2025_07_07_000238_add_organization_id_to_tables.php
-│   │   └── 2025_07_07_160317_add_soft_deletes_to_users_table.php
+│   │   ├── 2025_07_07_160317_add_soft_deletes_to_users_table.php
+│   │   ├── 2025_07_22_012046_add_strategic_indexes_to_tables.php
+│   │   └── 2025_07_22_014038_create_fleet_management_extended_tables.php
 │   └── seeders
 │       ├── DatabaseSeeder.php
 │       ├── DriverSeeder.php
@@ -175,22 +191,52 @@
 ├── docker
 │   ├── nginx
 │   │   ├── Dockerfile
+│   │   ├── default.conf
 │   │   └── zenfleet.conf
 │   ├── node
-│   │   ├── Dockerfile
-│   │   └── entrypoint.sh
+│   │   ├── Dockerfile - Copy.ok:Zone.Identifier
+│   │   ├── Dockerfile - Copy:Zone.Identifier
+│   │   ├── Dockerfile - OK
+│   │   ├── Dockerfile.ok
+│   │   ├── Dockerfile___
+│   │   ├── entrypoint - Copy.sh
+│   │   ├── entrypoint - Copy.sh:Zone.Identifier
+│   │   └── entrypoint.sh___supperime__2025-07-31
+│   ├── node_dev
+│   │   └── Dockerfile
 │   └── php
 │       ├── Dockerfile
 │       └── supervisord.conf
+├── docker-compose - Copy.yml:Zone.Identifier
 ├── docker-compose.yml
+├── docker-compose_corrige.yml:Zone.Identifier
+├── docker-compose_final.yml:Zone.Identifier
+├── lang
+│   └── en
+│       ├── auth.php
+│       ├── pagination.php
+│       ├── passwords.php
+│       └── validation.php
+├── package - Copy.json:Zone.Identifier
 ├── package.json
+├── package.json.back
+├── package.json___etait OK
+├── package_json_corrige.json:Zone.Identifier
+├── pdf-service
+│   ├── Dockerfile
+│   ├── package.json
+│   ├── server - Copy.js:Zone.Identifier
+│   ├── server.js
+│   ├── server.js.ok
+│   ├── server.js:Zone.Identifier
+│   └── server.js__
 ├── phpunit.xml
 ├── postcss.config.js
 ├── public
 │   ├── build
 │   │   ├── assets
-│   │   │   ├── app-2-t-S8U5.js
-│   │   │   └── app-CUucPwIP.css
+│   │   │   ├── app-2pwdUy0N.js
+│   │   │   └── app-C9SUIdyY.css
 │   │   └── manifest.json
 │   ├── css
 │   │   ├── vehicle_handover_form.css
@@ -216,13 +262,16 @@
 │       │   ├── drivers
 │       │   │   ├── create.blade.php
 │       │   │   ├── edit.blade.php
+│       │   │   ├── import-results.blade.php
+│       │   │   ├── import.blade.php
 │       │   │   └── index.blade.php
 │       │   ├── handovers
 │       │   │   └── vehicles
 │       │   │       ├── create.blade.php
 │       │   │       ├── edit.blade.php
-│       │   │       ├── show.blade.php
-│       │   │       └── show.blade.php.txt
+│       │   │       ├── pdf.blade.php
+│       │   │       ├── pdf.blade.php:Zone.Identifier
+│       │   │       └── show.blade.php
 │       │   ├── maintenance
 │       │   │   ├── dashboard.blade.php
 │       │   │   └── plans
@@ -266,7 +315,14 @@
 │       │   ├── primary-button.blade.php
 │       │   ├── responsive-nav-link.blade.php
 │       │   ├── secondary-button.blade.php
-│       │   └── text-input.blade.php
+│       │   ├── sidebar
+│       │   │   ├── sidebar-group.blade.php
+│       │   │   ├── sidebar-link.blade.php
+│       │   │   └── sidebar-sub-link.blade.php
+│       │   ├── sub-nav-link.blade.php
+│       │   ├── text-input.blade.php
+│       │   ├── toast.blade.php
+│       │   └── toast.blade.php.OK.php
 │       ├── dashboard.blade.php
 │       ├── layouts
 │       │   ├── app.blade.php
@@ -285,6 +341,10 @@
 │   ├── channels.php
 │   ├── console.php
 │   └── web.php
+├── server.js:Zone.Identifier
+├── server_express5_corrige.js:Zone.Identifier
+├── server_simplifie (1).js:Zone.Identifier
+├── server_simplifie (2).js:Zone.Identifier
 ├── supervisord.log
 ├── supervisord.pid
 ├── tailwind.config.js
@@ -305,12 +365,7 @@
 │       └── ExampleTest.php
 ├── vite.config.js
 ├── yarn.lock
-├── zenfleet_arborescence.txt
-├── zenfleet_code_snapshot.txt
-├── zenfleet_db_schema.sql
-├── zenfleet_full_snapshot.txt
-├── zenfleet_schema____2025-06-18____14-25.sql
-├── zenfleet_snapshot.txt
-└── zenfleet_snapshot_final.txt
+├── zenfleet_arborescence_2025-08-11.txt
+└── zenfleet_project_snapshot_2025-08-11.txt
 
-66 directories, 247 files
+77 directories, 291 files

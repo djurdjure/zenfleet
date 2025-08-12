@@ -7,6 +7,7 @@ use App\Models\Maintenance\MaintenanceLog;
 use App\Models\Maintenance\MaintenancePlan;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 // CORRECTION : Ajout des bons namespaces pour les relations
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -44,5 +45,13 @@ class Vehicle extends Model
     public function isCurrentlyAssigned(): bool
     {
        return $this->assignments()->whereNull('end_datetime')->exists();
+    }
+
+    /**
+     * La relation qui retourne les utilisateurs autorisés à utiliser ce véhicule.
+     */
+    public function users(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class, 'user_vehicle');
     }
 }

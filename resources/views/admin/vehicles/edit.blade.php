@@ -163,11 +163,34 @@
                                     </select>
                                     <x-input-error :messages="$errors->get('status_id')" class="mt-2" />
                                 </div>
+                                {{-- --- AJOUT DU CHAMP UTILISATEURS --- --}}
+                                <div class="md:col-span-2">
+                                    <label for="users" class="block font-medium text-sm text-gray-700">Utilisateurs Autorisés</label>
+                                    
+                                    {{-- On utilise x-ref pour que Alpine.js puisse cibler cet élément --}}
+                                    <select name="users[]" id="users" multiple x-ref="users">
+                                        
+                                        {{-- On prépare en PHP la liste des IDs déjà assignés --}}
+                                        @php
+                                            $assignedUserIds = old('users', $vehicle->users->pluck('id')->toArray());
+                                        @endphp
+
+                                        {{-- On boucle sur tous les utilisateurs disponibles pour créer les options --}}
+                                        @foreach($users as $user)
+                                            <option value="{{ $user->id }}" @selected(in_array($user->id, $assignedUserIds))>
+                                                {{ $user->name }} ({{ $user->email }})
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                    <p class="mt-1 text-xs text-gray-500">Laissez vide si non applicable. Vous pouvez rechercher et sélectionner plusieurs utilisateurs.</p>
+                                </div>
+                                                                {{-- --- FIN DE L'AJOUT --- --}}
                                  <div class="md:col-span-2">
                                     <x-input-label for="notes" value="Notes" />
                                     <textarea id="notes" name="notes" rows="3" class="block mt-1 w-full border-gray-300 focus:border-primary-500 focus:ring-primary-500 rounded-md shadow-sm">{{ old('notes', $vehicle->notes) }}</textarea>
                                     <x-input-error :messages="$errors->get('notes')" class="mt-2" />
                                 </div>
+                                
                              </div>
                         </fieldset>
 

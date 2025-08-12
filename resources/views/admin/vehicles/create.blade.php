@@ -157,6 +157,17 @@
                                     </select>
                                     <x-input-error :messages="$errors->get('status_id')" class="mt-2" />
                                 </div>
+                                {{-- --- AJOUT DU CHAMP UTILISATEURS --- --}}
+                                <div class="md:col-span-2">
+                                    <label for="users" class="block font-medium text-sm text-gray-700">Utilisateurs Autorisés</label>
+                                    <select name="users[]" id="users" multiple x-ref="users">
+                                        @foreach($users as $user)
+                                            <option value="{{ $user->id }}" @selected(in_array($user->id, old('users', [])))>{{ $user->name }} ({{ $user->email }})</option>
+                                        @endforeach
+                                    </select>
+                                    <p class="mt-1 text-xs text-gray-500">Laissez vide si non applicable.</p>
+                                </div>
+                                {{-- --- FIN DE L'AJOUT --- --}}
                                 <div class="md:col-span-2">
                                     <x-input-label for="notes" value="Notes" />
                                     <textarea id="notes" name="notes" rows="3" class="block mt-1 w-full border-gray-300 focus:border-primary-500 focus:ring-primary-500 rounded-md shadow-sm">{{ old('notes') }}</textarea>

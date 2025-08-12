@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Repositories\Eloquent;
 
 use App\Models\Vehicle;
@@ -8,9 +7,6 @@ use Illuminate\Pagination\LengthAwarePaginator;
 
 class VehicleRepository implements VehicleRepositoryInterface
 {
-    /**
-     * Récupère une liste paginée et filtrée de véhicules.
-     */
     public function getFiltered(array $filters): LengthAwarePaginator
     {
         $perPage = $filters['per_page'] ?? 15;
@@ -19,11 +15,9 @@ class VehicleRepository implements VehicleRepositoryInterface
         if (!empty($filters['view_deleted'])) {
             $query->onlyTrashed();
         }
-
         if (!empty($filters['status_id'])) {
             $query->where('status_id', $filters['status_id']);
         }
-
         if (!empty($filters['search'])) {
             $searchTerm = strtolower($filters['search']);
             $query->where(function ($q) use ($searchTerm) {
@@ -32,23 +26,41 @@ class VehicleRepository implements VehicleRepositoryInterface
                   ->orWhereRaw('LOWER(model) LIKE ?', ["%{$searchTerm}%"]);
             });
         }
-
         return $query->orderBy('id', 'desc')->paginate($perPage)->withQueryString();
     }
 
-    /**
-     * Crée un nouveau véhicule.
-     */
+    public function find(int $id): ?Vehicle
+    {
+        return Vehicle::find($id);
+    }
+
+    public function findTrashed(int $id): ?Vehicle
+    {
+        return Vehicle::onlyTrashed()->find($id);
+    }
+
     public function create(array $data): Vehicle
     {
         return Vehicle::create($data);
     }
 
-    /**
-     * Met à jour un véhicule existant.
-     */
     public function update(Vehicle $vehicle, array $data): bool
     {
         return $vehicle->update($data);
+    }
+
+    public function delete(Vehicle $vehicle): bool
+    {
+        return $vehicle->delete();
+    }
+
+    public function restore(Vehicle $vehicle): bool
+    {
+        return $vehicle->restore();
+    }
+
+    public function forceDelete(Vehicle $vehicle): bool
+    {
+        return $vehicle->forceDelete();
     }
 }

@@ -7,6 +7,7 @@ use App\Http\Requests\Admin\Vehicle\StoreVehicleRequest;
 use App\Http\Requests\Admin\UpdateVehicleRequest;
 use App\Models\FuelType;
 use App\Models\TransmissionType;
+use App\Models\User;
 use App\Models\Vehicle;
 use App\Models\VehicleStatus;
 use App\Models\VehicleType;
@@ -63,12 +64,13 @@ class VehicleController extends Controller
         // Utilisation de la permission spécifique 'create vehicles'
         $this->authorize('create vehicles');
 
+        $users = User::orderBy('name')->get();
         $vehicleTypes = VehicleType::all();
         $fuelTypes = FuelType::all();
         $transmissionTypes = TransmissionType::all();
         $vehicleStatuses = VehicleStatus::all();
 
-        return view('admin.vehicles.create', compact('vehicleTypes', 'fuelTypes', 'transmissionTypes', 'vehicleStatuses'));
+        return view('admin.vehicles.create', compact('users','vehicleTypes', 'fuelTypes', 'transmissionTypes', 'vehicleStatuses'));
     }
 
     /**
@@ -139,12 +141,13 @@ class VehicleController extends Controller
         // Utilisation de la permission spécifique 'edit vehicles'
         $this->authorize('edit vehicles');
 
+        $users = User::orderBy('name')->get();
         $vehicleTypes = VehicleType::all();
         $fuelTypes = FuelType::all();
         $transmissionTypes = TransmissionType::all();
         $vehicleStatuses = VehicleStatus::all();
 
-        return view('admin.vehicles.edit', compact('vehicle', 'vehicleTypes', 'fuelTypes', 'transmissionTypes', 'vehicleStatuses'));
+        return view('admin.vehicles.edit', compact('vehicle', 'users', 'vehicleTypes', 'fuelTypes', 'transmissionTypes', 'vehicleStatuses'));
     }
 
     /**

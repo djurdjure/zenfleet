@@ -1,10 +1,8 @@
 <?php
-
 namespace App\Services;
 
 use App\Models\Vehicle;
 use App\Repositories\Interfaces\VehicleRepositoryInterface;
-use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Storage;
 
@@ -17,17 +15,11 @@ class VehicleService
         $this->vehicleRepository = $vehicleRepository;
     }
 
-    /**
-     * Récupère les véhicules pour la page d'index avec filtres et pagination.
-     */
     public function getFilteredVehicles(array $filters): LengthAwarePaginator
     {
         return $this->vehicleRepository->getFiltered($filters);
     }
 
-    /**
-     * Gère la création d'un véhicule, y compris la photo.
-     */
     public function createVehicle(array $data): Vehicle
     {
         if (isset($data['photo'])) {
@@ -39,9 +31,6 @@ class VehicleService
         return $this->vehicleRepository->create($data);
     }
 
-    /**
-     * Gère la mise à jour d'un véhicule, y compris la photo.
-     */
     public function updateVehicle(Vehicle $vehicle, array $data): bool
     {
         if (isset($data['photo'])) {
@@ -54,32 +43,29 @@ class VehicleService
         return $this->vehicleRepository->update($vehicle, $data);
     }
 
-    /**
-     * Archive un véhicule.
-     */
     public function archiveVehicle(Vehicle $vehicle): bool
     {
-        return $vehicle->delete();
+        return $this->vehicleRepository->delete($vehicle);
     }
 
-    /**
-     * Restaure un véhicule archivé.
-     */
     public function restoreVehicle(int $vehicleId): bool
     {
-        $vehicle = Vehicle::onlyTrashed()->findOrFail($vehicleId);
-        return $vehicle->restore();
+        $vehicle = $this->vehicleRepository->findTrashed($vehicleId);
+        if ($vehicle) {
+            return $this->vehicleRepository->restore($vehicle);
+        }
+        return false;
     }
 
-    /**
-     * Supprime définitivement un véhicule et sa photo.
-     */
     public function forceDeleteVehicle(int $vehicleId): bool
     {
-        $vehicle = Vehicle::onlyTrashed()->findOrFail($vehicleId);
-        if ($vehicle->photo_path) {
-            Storage::disk('public')->delete($vehicle->photo_path);
+        $vehicle = $this->vehicleRepository->findTrashed($vehicleId);
+        if ($vehicle) {
+            if ($vehicle->photo_path) {
+                Storage::disk('public')->delete($vehicle->photo_path);
+            }
+            return $this->vehicleRepository->forceDelete($vehicle);
         }
-        return $vehicle->forceDelete();
+        return false;
     }
 }

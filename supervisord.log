@@ -3871,3 +3871,14 @@
 2025-08-09 09:34:14,577 INFO gave up: laravel-worker_01 entered FATAL state, too many start retries too quickly
 2025-08-09 09:35:51,202 INFO reaped unknown pid 301 (exit status 0)
 2025-08-09 10:11:06,622 INFO reaped unknown pid 520 (exit status 0)
+2025-08-11 16:59:29,549 WARN received SIGQUIT indicating exit request
+2025-08-11 16:59:29,564 INFO waiting for php-fpm to die
+2025-08-11 16:59:31,780 INFO stopped: php-fpm (exit status 0)
+2025-08-11 17:11:13,103 INFO Set uid to user 1000 succeeded
+2025-08-11 17:11:13,111 INFO supervisord started with pid 1
+2025-08-11 17:11:14,115 INFO spawned: 'php-fpm' with pid 7
+2025-08-11 17:11:14,119 INFO spawned: 'laravel-worker_00' with pid 8
+2025-08-11 17:11:14,125 INFO spawned: 'laravel-worker_01' with pid 9
+2025-08-11 17:11:15,285 INFO success: php-fpm entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-08-11 17:11:15,285 INFO success: laravel-worker_00 entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-08-11 17:11:15,285 INFO success: laravel-worker_01 entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
