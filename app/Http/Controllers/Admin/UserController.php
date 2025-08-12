@@ -75,7 +75,7 @@ class UserController extends Controller
         // CORRECTION : On récupère les modèles de Rôle avant de synchroniser
         if (!empty($validated['roles'])) {
             $rolesToSync = Role::whereIn('id', $validated['roles'])->get();
-            $user->syncRoles($rolesToSync);
+            $newUser->syncRoles($rolesToSync);
         }
 
         return redirect()->route('admin.users.index')->with('success', 'Utilisateur créé avec succès.');
