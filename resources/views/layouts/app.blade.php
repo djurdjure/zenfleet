@@ -5,20 +5,25 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
         <title>{{ config('app.name', 'Laravel') }}</title>
+
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
         @vite(['resources/css/app.css', 'resources/js/app.js'])
-        <script src="{{ asset('js/tomselect-users-config.js') }}"></script>
     </head>
     <body class="font-sans antialiased">
         <div x-data="{ sidebarOpen: false }" class="min-h-screen bg-gray-100">
             <div class="flex h-screen bg-gray-100">
+                
                 <aside class="hidden w-72 flex-shrink-0 bg-white border-r md:block">
                     @include('layouts.navigation')
                 </aside>
 
-                <div x-show="sidebarOpen" class="fixed inset-0 z-40 flex md:hidden" x-transition:enter="transition-opacity ease-linear duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" x-transition:leave="transition-opacity ease-linear duration-300" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" style="display: none;">
+                <div x-show="sidebarOpen" class="fixed inset-0 z-40 flex md:hidden" 
+                     x-transition:enter="transition-opacity ease-linear duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" 
+                     x-transition:leave="transition-opacity ease-linear duration-300" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" 
+                     style="display: none;">
                     <div @click="sidebarOpen = false" class="fixed inset-0 bg-gray-600 bg-opacity-75"></div>
                     <div class="relative flex-1 flex flex-col max-w-xs w-full bg-white">
                         <div class="absolute top-0 right-0 -mr-12 pt-2">
@@ -49,6 +54,7 @@
                     <main class="flex-1 relative overflow-y-auto focus:outline-none">
                          <div class="py-6">
                             <div class="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
+                                {{-- Le contenu de chaque page sera injecté ici --}}
                                 {{ $slot }}
                             </div>
                         </div>
@@ -56,7 +62,11 @@
                 </div>
             </div>
         </div>
+        
+        {{-- Composant de notification global (Toast) --}}
         <x-toast />
+
+        {{-- Emplacement pour les scripts spécifiques à une page --}}
         @stack('scripts')
     </body>
 </html>

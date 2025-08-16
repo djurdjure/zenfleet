@@ -20,137 +20,99 @@ use League\Csv\Writer;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
+use App\Services\DriverService;
+use App\Services\ImportExportService;
+
 
 class DriverController extends Controller
 {
+
+    protected DriverService $driverService;
+    protected ImportExportService $importExportService;
+
+    public function __construct(DriverService $driverService, ImportExportService $importExportService)
+    {
+        $this->driverService = $driverService;
+        $this->importExportService = $importExportService;
+    }
+
     // Méthodes existantes inchangées (index, create, store, edit, update, destroy, restore, forceDelete)
     public function index(Request $request): View
     {
         $this->authorize('view drivers');
-
-        $perPage = $request->query('per_page', 15);
-        $query = Driver::query()->with(['driverStatus', 'user']);
-
-        // AJOUT : Logique pour voir les archives
-        if ($request->query('view_deleted')) {
-            $query->onlyTrashed();
-        }
-
-        // Filtre par Statut
-        if ($request->filled('status_id')) {
-            $query->where('status_id', $request->status_id);
-        }
-
-        // Moteur de Recherche (CORRIGÉ pour être insensible à la casse)
-        if ($request->filled('search')) {
-            $searchTerm = strtolower($request->search); // Convertit le terme de recherche en minuscules
-            $query->where(function ($q) use ($searchTerm) {
-                $q->whereRaw('LOWER(first_name) LIKE ?', ["%{$searchTerm}%"])
-                  ->orWhereRaw('LOWER(last_name) LIKE ?', ["%{$searchTerm}%"])
-                  ->orWhereRaw("LOWER(CONCAT(first_name, ' ', last_name)) LIKE ?", ["%{$searchTerm}%"])
-                  ->orWhereRaw('LOWER(employee_number) LIKE ?', ["%{$searchTerm}%"])
-                  ->orWhereRaw('LOWER(license_number) LIKE ?', ["%{$searchTerm}%"]);
-            });
-        }
-
-        $drivers = $query->orderBy('last_name')->orderBy('first_name')->paginate($perPage)->withQueryString();
+        $filters = $request->only(['search', 'status_id', 'per_page', 'view_deleted']);
+        $drivers = $this->driverService->getFilteredDrivers($filters);
         $driverStatuses = DriverStatus::orderBy('name')->get();
+        return view('admin.drivers.index', compact('drivers', 'driverStatuses', 'filters'));
+    }
 
-        return view('admin.drivers.index', [
-            'drivers' => $drivers,
-            'driverStatuses' => $driverStatuses,
-            'filters' => $request->only(['search', 'status_id', 'per_page', 'view_deleted']),
-        ]);
+    public function create(): View
+    {
+        $this->authorize('create drivers');
+        $driverStatuses = DriverStatus::orderBy('name')->get();
+        $users = User::orderBy('name')->get();
+        return view('admin.drivers.create', compact('driverStatuses', 'users'));
     }
 
     public function store(StoreDriverRequest $request): RedirectResponse
     {
-        $validatedData = $request->validated();
-        if ($request->hasFile('photo')) {
-            $validatedData['photo_path'] = $request->file('photo')->store('drivers/photos', 'public');
-        }
-        Driver::create($validatedData);
+        $this->driverService->createDriver($request->validated());
         return redirect()->route('admin.drivers.index')->with('success', 'Nouveau chauffeur ajouté avec succès.');
     }
 
     public function edit(Driver $driver): View
     {
         $this->authorize('edit drivers');
-        $linkableUsers = User::whereDoesntHave('driver')->orWhere('id', $driver->user_id)->orderBy('name')->get();
+
+        // CORRECTION : On récupère la liste des utilisateurs qui ne sont pas encore chauffeurs,
+        // en y ajoutant l'utilisateur actuel du chauffeur s'il en a un.
+        $assignedUserIds = Driver::whereNotNull('user_id')->where('id', '!=', $driver->id)->pluck('user_id');
+        $linkableUsers = User::whereNotIn('id', $assignedUserIds)->orderBy('name')->get();
+
         $driverStatuses = DriverStatus::orderBy('name')->get();
-        return view('admin.drivers.edit', compact('driver', 'linkableUsers', 'driverStatuses'));
+
+        // CORRECTION : On ajoute la variable '$linkableUsers' aux données passées à la vue
+        return view('admin.drivers.edit', compact('driver', 'driverStatuses', 'linkableUsers'));
     }
 
     public function update(UpdateDriverRequest $request, Driver $driver): RedirectResponse
     {
-        $validatedData = $request->validated();
-        if ($request->hasFile('photo')) {
-            if ($driver->photo_path) {
-                Storage::disk('public')->delete($driver->photo_path);
-            }
-            $validatedData['photo_path'] = $request->file('photo')->store('drivers/photos', 'public');
-        }
-        $driver->update($validatedData);
-
-        // CORRECTION : Nouveau format de message flash
-        $flash = [
-            'type' => 'success',
-            'message' => 'Mise à jour réussie',
-            'description' => "Les informations du chauffeur {$driver->first_name} {$driver->last_name} ont été mises à jour."
-        ];
-
-        return redirect()->route('admin.drivers.index')->with('flash', $flash);
-    }
-
-    public function create(): View
-    {
-        $this->authorize('create drivers');
-        $linkableUsers = User::whereDoesntHave('driver')->orderBy('name')->get();
-        $driverStatuses = DriverStatus::orderBy('name')->get();
-        return view('admin.drivers.create', compact('linkableUsers', 'driverStatuses'));
+        $this->driverService->updateDriver($driver, $request->validated());
+        return redirect()->route('admin.drivers.index')->with('success', 'Le chauffeur a été mis à jour.');
     }
 
     public function destroy(Driver $driver): RedirectResponse
     {
         $this->authorize('delete drivers');
-        $driver->delete();
-
-        // CORRECTION : Nouveau format de message flash
-        $flash = [
-            'type' => 'warning',
-            'message' => 'Archivage Effectué',
-            'description' => "Le chauffeur {$driver->first_name} {$driver->last_name} a été archivé."
-        ];
-
-        return redirect()->route('admin.drivers.index')->with('flash', $flash);
+        $this->driverService->archiveDriver($driver);
+        return redirect()->route('admin.drivers.index')->with('success', "Le chauffeur {$driver->last_name} a été archivé.");
     }
 
     public function restore($driverId): RedirectResponse
     {
         $this->authorize('restore drivers');
-        $driver = Driver::onlyTrashed()->findOrFail($driverId);
-        $driver->restore();
-
-        // CORRECTION : Nouveau format de message flash
-        $flash = [
-            'type' => 'success',
-            'message' => 'Restauration Réussie',
-            'description' => "Le chauffeur {$driver->first_name} {$driver->last_name} a été restauré."
-        ];
-
-        return redirect()->route('admin.drivers.index', ['view_deleted' => 'true'])->with('flash', $flash);
+        $this->driverService->restoreDriver($driverId);
+        return redirect()->route('admin.drivers.index', ['view_deleted' => true])->with('success', "Le chauffeur a été restauré.");
     }
 
+    /**
+     * Supprime définitivement un chauffeur.
+     */
     public function forceDelete($driverId): RedirectResponse
     {
         $this->authorize('force delete drivers');
-        $driver = Driver::onlyTrashed()->findOrFail($driverId);
-        if ($driver->photo_path) {
-            Storage::disk('public')->delete($driver->photo_path);
+
+        // On appelle le service et on vérifie le résultat
+        $deleted = $this->driverService->forceDeleteDriver($driverId);
+
+        if ($deleted) {
+            return redirect()->route('admin.drivers.index', ['view_deleted' => true])->with('success', 'Le chauffeur a été supprimé définitivement.');
         }
-        $driver->forceDelete();
-        return redirect()->route('admin.drivers.index', ['view_deleted' => 'true'])->with('success', 'Le chauffeur a été supprimé définitivement.');
+
+        // Si la suppression a échoué, on affiche un message d'erreur clair
+        return redirect()->back()->with('error', 'Impossible de supprimer ce chauffeur car il est lié à un historique d\'affectations.');
     }
+
 
     /**
      * Affiche le formulaire d'importation de chauffeurs.

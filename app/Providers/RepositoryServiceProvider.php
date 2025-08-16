@@ -2,9 +2,14 @@
 
 namespace App\Providers;
 
+use App\Repositories\Eloquent\DriverRepository;
 use App\Repositories\Eloquent\VehicleRepository;
+use App\Repositories\Interfaces\DriverRepositoryInterface;
 use App\Repositories\Interfaces\VehicleRepositoryInterface;
 use Illuminate\Support\ServiceProvider;
+use App\Repositories\Interfaces\AssignmentRepositoryInterface;
+use App\Repositories\Eloquent\AssignmentRepository;
+
 
 class RepositoryServiceProvider extends ServiceProvider
 {
@@ -13,13 +18,23 @@ class RepositoryServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        // On lie l'interface du repository des véhicules à son implémentation Eloquent.
+        // Liaison pour les Véhicules (déjà présente)
         $this->app->bind(
             VehicleRepositoryInterface::class,
             VehicleRepository::class
         );
 
-        // Plus tard, nous ajouterons ici les autres repositories (Driver, etc.)
+        // CORRECTION : Ajout de la liaison pour les Chauffeurs
+        $this->app->bind(
+            DriverRepositoryInterface::class,
+            DriverRepository::class
+        );
+
+        // --- AJOUT POUR LES AFFECTATION
+        $this->app->bind(
+            AssignmentRepositoryInterface::class,
+            AssignmentRepository::class
+        );
     }
 
     /**
