@@ -49,7 +49,7 @@ class AssignmentService
     }
 
    
-    public function endAssignment(Assignment $assignment, int $endMileage): bool
+    public function endAssignment(Assignment $assignment, int $endMileage, string $endDateTime): bool
     {
         // On récupère le statut "Parking" pour le véhicule
         $parkingStatusId = VehicleStatus::where('name', 'Parking')->firstOrFail()->id;
@@ -64,7 +64,7 @@ class AssignmentService
 
         // On met à jour l'affectation elle-même
         return $this->assignmentRepository->update($assignment, [
-            'end_datetime' => Carbon::now(),
+            'end_datetime' => $endDateTime,
             'end_mileage' => $endMileage,
         ]);
     }
