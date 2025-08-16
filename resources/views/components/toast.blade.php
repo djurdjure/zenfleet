@@ -14,7 +14,7 @@
                 clearTimeout(this.timer);
                 this.timer = setTimeout(() => {
                     this.show = false;
-                }, 5000);
+                }, 8000);
             });
         },
         typeClasses() {

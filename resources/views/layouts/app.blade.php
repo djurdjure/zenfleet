@@ -68,5 +68,25 @@
 
         {{-- Emplacement pour les scripts spécifiques à une page --}}
         @stack('scripts')
+
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                @if (session('success'))
+                    window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'success', message: '{{ session('success') }}' } }));
+                @endif
+
+                @if (session('error'))
+                    window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'error', message: '{{ session('error') }}' } }));
+                @endif
+
+                @if (session('warning'))
+                    window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'warning', message: '{{ session('warning') }}' } }));
+                @endif
+
+                @if (session('info'))
+                    window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'info', message: '{{ session('info') }}' } }));
+                @endif
+            });
+        </script>
     </body>
 </html>
