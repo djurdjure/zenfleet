@@ -84,8 +84,13 @@ class DriverController extends Controller
     public function destroy(Driver $driver): RedirectResponse
     {
         $this->authorize('delete drivers');
-        $this->driverService->archiveDriver($driver);
-        return redirect()->route('admin.drivers.index')->with('success', "Le chauffeur {$driver->last_name} a été archivé.");
+        $archived = $this->driverService->archiveDriver($driver);
+
+        if ($archived) {
+            return redirect()->route('admin.drivers.index')->with('success', "Le chauffeur {$driver->first_name} {$driver->last_name} a été archivé.");
+        }
+
+        return redirect()->back()->with('error', 'Impossible d\'archiver ce chauffeur car il est lié à des affectations.');
     }
 
     public function restore($driverId): RedirectResponse

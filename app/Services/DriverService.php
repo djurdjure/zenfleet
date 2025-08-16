@@ -33,7 +33,14 @@ class DriverService
         return $this->driverRepository->update($driver, $data);
     }
 
-    public function archiveDriver(Driver $driver): bool { return $this->driverRepository->delete($driver); }
+    public function archiveDriver(Driver $driver): bool
+    {
+        // RÈGLE MÉTIER : On ne peut pas archiver un chauffeur avec des affectations.
+        if ($driver->assignments()->exists()) {
+            return false;
+        }
+        return $this->driverRepository->delete($driver);
+    }
 
     public function restoreDriver(int $driverId): bool
     {
