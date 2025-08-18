@@ -25,8 +25,8 @@ class StoreSupplierRequest extends FormRequest
         return [
             'name' => ['required', 'string', 'max:255'],
             'contact_name' => ['nullable', 'string', 'max:255'],
-            'phone' => ['nullable', 'string', 'max:50'],
-            'email' => ['nullable', 'email', 'max:255', Rule::unique('suppliers', 'email')],
+            'phone' => ['nullable', 'string', 'regex:/^[\+\d\s\(\)-]{8,20}$/'],
+            'email' => ['nullable', 'email:rfc,dns', 'max:255', Rule::unique('suppliers', 'email')],
             'address' => ['nullable', 'string'],
             'supplier_category_id' => ['nullable', 'exists:supplier_categories,id'],
         ];

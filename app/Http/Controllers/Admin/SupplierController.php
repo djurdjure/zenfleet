@@ -46,8 +46,9 @@ class SupplierController extends Controller
     public function edit(Supplier $supplier): View
     {
         $this->authorize('edit suppliers');
-        $categories = $this->supplierService->getDataForCreateForm();
-        return view('admin.suppliers.edit', compact('supplier', 'categories'));
+        $data = $this->supplierService->getDataForCreateForm();
+        $data['supplier'] = $supplier;
+        return view('admin.suppliers.edit', $data);
     }
 
     public function update(UpdateSupplierRequest $request, Supplier $supplier): RedirectResponse
