@@ -68,5 +68,25 @@
 
         {{-- Emplacement pour les scripts spécifiques à une page --}}
         @stack('scripts')
+
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                @if (session('success'))
+                    window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'success', message: {{ Illuminate\Support\Js::from(session('success')) }} } }));
+                @endif
+
+                @if (session('error'))
+                    window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'error', message: {{ Illuminate\Support\Js::from(session('error')) }} } }));
+                @endif
+
+                @if (session('warning'))
+                    window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'warning', message: {{ Illuminate\Support\Js::from(session('warning')) }} } }));
+                @endif
+
+                @if (session('info'))
+                    window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'info', message: {{ Illuminate\Support\Js::from(session('info')) }} } }));
+                @endif
+            });
+        </script>
     </body>
 </html>

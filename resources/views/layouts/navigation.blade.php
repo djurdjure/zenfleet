@@ -71,6 +71,15 @@
             </x-sidebar.sidebar-group>
         @endcanany
 
+        {{-- Section Supplier --}}
+        @can('view suppliers')
+            <x-responsive-nav-link :href="route('admin.suppliers.index')" :active="request()->routeIs('admin.suppliers.*')">
+                <x-lucide-building-2 class="mr-3 h-6 w-6 shrink-0"/>
+                {{ __('Fournisseurs') }}
+            </x-responsive-nav-link>
+        @endcan
+
+
         {{-- Section Administration --}}
         @hasanyrole('Super Admin|Admin')
             <x-sidebar.sidebar-group title="Administration" :active="request()->routeIs('admin.organizations.*') || request()->routeIs('admin.users.*') || request()->routeIs('admin.roles.*')">

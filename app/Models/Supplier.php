@@ -1,64 +1,56 @@
 <?php
 
-// app/Models/Supplier.php
-
 namespace App\Models;
 
+use App\Models\Concerns\BelongsToOrganization;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Supplier extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory, SoftDeletes, BelongsToOrganization;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array<int, string>
-     */
     protected $fillable = [
-        "organization_id",
-        "name",
-        "contact_person",
-        "phone",
-        "email",
-        "address",
-        "website",
-        "notes",
-        "is_active",
+        'name',
+        'contact_name',
+        'phone',
+        'email',
+        'address',
+        'supplier_category_id',
+        'organization_id',
     ];
 
     /**
-     * The attributes that should be cast.
-     *
-     * @var array<string, string>
+     * Relation : Un fournisseur appartient à une catégorie.
      */
-    protected $casts = [
-        "is_active" => "boolean",
-    ];
-
-    /**
-     * Get the organization that owns the supplier.
-     */
-    public function organization()
+    public function category(): BelongsTo
     {
-        return $this->belongsTo(Organization::class);
+        return $this->belongsTo(SupplierCategory::class, 'supplier_category_id');
     }
 
     /**
-     * Get the expenses associated with the supplier.
+     * Relation : Un fournisseur peut être lié à plusieurs dépenses.
+     * (Anticipation pour le futur module de gestion des dépenses)
      */
-    public function expenses()
+    public function expenses(): HasMany
     {
-        return $this->hasMany(Expense::class);
+        // Note : Le modèle Expense sera à créer dans le futur.
+        // return $this->hasMany(Expense::class);
+        return $this->hasMany('App\Models\Expense'); // Placeholder
     }
 
     /**
-     * Get the repair requests associated with the supplier.
+     * Relation : Un fournisseur peut être lié à plusieurs interventions de maintenance.
+     * (Anticipation pour le futur module de maintenance)
      */
-    public function repairRequests()
+    public function maintenances(): HasMany
     {
-        return $this->hasMany(RepairRequest::class);
+        // Note : Le modèle MaintenanceLog existe déjà.
+        return $this->hasMany(Maintenance\MaintenanceLog::class);
     }
+
+    // La relation organization() est maintenant gérée par le trait BelongsToOrganization.
 }

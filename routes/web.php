@@ -9,6 +9,7 @@ use App\Http\Controllers\Admin\DriverController;
 use App\Http\Controllers\Admin\VehicleController;
 use App\Http\Controllers\Admin\AssignmentController;
 use App\Http\Controllers\Admin\OrganizationController;
+use App\Http\Controllers\Admin\SupplierController; // AJOUT : Import du SupplierController
 use App\Http\Controllers\Admin\Maintenance\DashboardController as MaintenanceDashboardController;
 use App\Http\Controllers\Admin\Maintenance\MaintenancePlanController;
 use App\Http\Controllers\Admin\Maintenance\MaintenanceLogController;
@@ -87,6 +88,7 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
         Route::resource('drivers', DriverController::class);
         Route::resource('vehicles', VehicleController::class);
         Route::resource('assignments', AssignmentController::class);
+        Route::resource('suppliers', SupplierController::class); // AJOUT : Route resource pour les suppliers
 
     });
 
@@ -102,3 +104,4 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
 });
 
 require __DIR__.'/auth.php';
+

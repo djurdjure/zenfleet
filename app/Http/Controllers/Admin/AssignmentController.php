@@ -90,11 +90,28 @@ class AssignmentController extends Controller
     public function end(Request $request, Assignment $assignment): JsonResponse|RedirectResponse
     {
         $this->authorize('end assignments');
-        $validated = $request->validate([
-            'end_mileage' => ['required', 'integer', 'min:'.$assignment->start_mileage],
-        ]);
 
-        $success = $this->assignmentService->endAssignment($assignment, $validated['end_mileage']);
+        // Personnalisation des messages d'erreur
+        $messages = [
+            'end_datetime.required' => 'La date de fin est obligatoire.',
+            'end_datetime.date' => 'Le format de la date de fin est invalide.',
+            'end_datetime.after_or_equal' => 'La date de fin doit être supérieure ou égale à la date de début.',
+            'end_mileage.required' => 'Le kilométrage de fin est obligatoire.',
+            'end_mileage.integer' => 'Le kilométrage de fin doit être un nombre.',
+            'end_mileage.min' => 'Le kilométrage de fin doit être supérieur ou égal au kilométrage de début.',
+        ];
+
+        // Validation des données de la requête
+        $validated = $request->validate([
+            'end_datetime' => ['required', 'date', 'after_or_equal:'.$assignment->start_datetime],
+            'end_mileage' => ['required', 'integer', 'min:'.$assignment->start_mileage],
+        ], $messages);
+
+        $success = $this->assignmentService->endAssignment(
+            $assignment,
+            $validated['end_mileage'],
+            $validated['end_datetime']
+        );
 
         if ($success) {
             $message = 'Affectation terminée avec succès.';

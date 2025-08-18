@@ -40,7 +40,6 @@
             }
         }" class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-
             {{-- Section des Filtres et de la Recherche --}}
             <div class="mb-6 bg-white p-4 shadow-sm sm:rounded-lg">
                 <form action="{{ route('admin.drivers.index') }}" method="GET">

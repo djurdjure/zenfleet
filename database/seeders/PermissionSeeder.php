@@ -22,6 +22,7 @@ class PermissionSeeder extends Seeder
             'view assignments', 'create assignments', 'edit assignments', 'end assignments',
             'view maintenance', 'manage maintenance plans', 'log maintenance',
             'create handovers', 'view handovers', 'edit handovers', 'delete handovers', 'upload signed handovers',
+            'view suppliers', 'create suppliers', 'edit suppliers', 'delete suppliers',
         ];
 
         foreach ($permissions as $permission) {
