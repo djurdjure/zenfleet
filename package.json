@@ -17,6 +17,7 @@
     },
     "dependencies": {
         "apexcharts": "^3.49.1",
-        "tom-select": "^2.3.1"
+        "tom-select": "^2.3.1",
+        "flatpickr": "^4.6.13"
     }
 }
