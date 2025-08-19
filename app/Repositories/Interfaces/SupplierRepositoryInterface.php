@@ -10,4 +10,5 @@ interface SupplierRepositoryInterface
     public function getFiltered(array $filters): LengthAwarePaginator;
     public function create(array $data): Supplier;
     public function update(Supplier $supplier, array $data): bool;
+    public function archive(Supplier $supplier): bool;
 }

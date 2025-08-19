@@ -53,4 +53,12 @@ class SupplierService
     {
         return $this->supplierRepository->update($supplier, $data);
     }
+
+    /**
+     * Gère l'archivage d'un fournisseur.
+     */
+    public function archiveSupplier(Supplier $supplier): bool
+    {
+        return $this->supplierRepository->archive($supplier);
+    }
 }

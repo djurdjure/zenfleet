@@ -205,8 +205,11 @@
                     <input type="hidden" name="_method" value="PATCH">
                     <div class="space-y-4">
                         <div>
-                            <label for="end_datetime" class="block text-sm font-medium text-gray-700">Date et heure de fin</label>
-                            <input type="datetime-local" name="end_datetime" id="end_datetime" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500">
+                            <x-datetime-picker
+                                id="end_datetime"
+                                name="end_datetime"
+                                label="Date et heure de fin"
+                            />
                             <template x-if="modalErrors.end_datetime"><p class="text-xs text-red-600 mt-1" x-text="modalErrors.end_datetime[0]"></p></template>
                         </div>
                         <div>

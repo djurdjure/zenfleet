@@ -14,11 +14,11 @@ class SupplierRepository implements SupplierRepositoryInterface
         $query = Supplier::query()->with('category');
 
         if (!empty($filters['search'])) {
-            $searchTerm = strtolower($filters['search']);
+            $searchTerm = '%' . $filters['search'] . '%';
             $query->where(function ($q) use ($searchTerm) {
-                $q->whereRaw('LOWER(name) LIKE ?', ["%{$searchTerm}%"])
-                  ->orWhereRaw('LOWER(contact_name) LIKE ?', ["%{$searchTerm}%"])
-                  ->orWhereRaw('LOWER(email) LIKE ?', ["%{$searchTerm}%"]);
+                $q->where('name', 'ILIKE', $searchTerm)
+                  ->orWhere('contact_name', 'ILIKE', $searchTerm)
+                  ->orWhere('email', 'ILIKE', $searchTerm);
             });
         }
 
@@ -33,5 +33,10 @@ class SupplierRepository implements SupplierRepositoryInterface
     public function update(Supplier $supplier, array $data): bool
     {
         return $supplier->update($data);
+    }
+
+    public function archive(Supplier $supplier): bool
+    {
+        return $supplier->delete();
     }
 }

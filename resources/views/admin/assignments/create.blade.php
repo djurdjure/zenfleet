@@ -50,8 +50,13 @@
 
                             {{-- Date et Heure de Début --}}
                             <div>
-                                <x-input-label for="start_datetime" value="Date et Heure de Début" required />
-                                <x-text-input id="start_datetime" class="block mt-1 w-full" type="datetime-local" name="start_datetime" :value="old('start_datetime', now()->format('Y-m-d\TH:i'))" required />
+                                <x-datetime-picker
+                                    id="start_datetime"
+                                    name="start_datetime"
+                                    label="Date et Heure de Début"
+                                    :value="old('start_datetime', now()->format('Y-m-d H:i'))"
+                                    required
+                                />
                                 <x-input-error :messages="$errors->get('start_datetime')" class="mt-2" />
                             </div>
 
