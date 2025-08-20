@@ -4,7 +4,9 @@ namespace App\Services;
 
 use App\Models\Assignment;
 use App\Models\Driver;
+use App\Models\DriverStatus;
 use App\Models\Vehicle;
+use App\Models\VehicleStatus;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Auth;
@@ -17,7 +19,8 @@ class AssignmentService
      */
     public function getFilteredAssignments(array $filters): LengthAwarePaginator
     {
-        $query = Assignment::with(['vehicle', 'driver', 'creator', 'handoverForm'])
+        $query = Assignment::query()
+            ->with(['vehicle', 'driver', 'creator', 'handoverForm'])
             ->where('organization_id', Auth::user()->organization_id)
             ->orderBy('start_datetime', 'desc');
 
@@ -116,28 +119,20 @@ class AssignmentService
     /**
      * Récupère les données nécessaires pour le formulaire de création.
      */
+    /**
+     * Récupère les données nécessaires pour le formulaire de création.
+     */
     public function getDataForCreateForm(): array
     {
-        $availableVehicles = Vehicle::where('organization_id', Auth::user()->organization_id)
-            ->where('status', 'active')
-            ->whereDoesntHave('assignments', function ($query) {
-                $query->whereNull('end_datetime');
-            })
-            ->orderBy('registration_plate')
-            ->get();
+        $availableVehicles = Vehicle::whereHas('vehicleStatus', function ($query) {
+            $query->where('name', 'Parking');
+        })->get();
 
-        $availableDrivers = Driver::where('organization_id', Auth::user()->organization_id)
-            ->where('status', 'active')
-            ->whereDoesntHave('assignments', function ($query) {
-                $query->whereNull('end_datetime');
-            })
-            ->orderBy('last_name')
-            ->get();
+        $availableDrivers = Driver::whereHas('driverStatus', function ($query) {
+            $query->where('name', 'Disponible');
+        })->get();
 
-        return [
-            'vehicles' => $availableVehicles,
-            'drivers' => $availableDrivers,
-        ];
+        return compact('availableVehicles', 'availableDrivers');
     }
 
     /**
@@ -151,8 +146,8 @@ class AssignmentService
         $assignment = Assignment::create($data);
 
         // Mise à jour du statut du véhicule et du conducteur
-        $this->updateVehicleStatus($assignment->vehicle_id, 'assigned');
-        $this->updateDriverStatus($assignment->driver_id, 'assigned');
+        $this->updateVehicleStatus($assignment->vehicle_id, 'En mission');
+        $this->updateDriverStatus($assignment->driver_id, 'En mission');
 
         return $assignment->load(['vehicle', 'driver']);
     }
@@ -183,8 +178,8 @@ class AssignmentService
             ]);
 
             // Mise à jour du statut du véhicule et du conducteur
-            $this->updateVehicleStatus($assignment->vehicle_id, 'available');
-            $this->updateDriverStatus($assignment->driver_id, 'available');
+            $this->updateVehicleStatus($assignment->vehicle_id, 'Parking');
+            $this->updateDriverStatus($assignment->driver_id, 'Disponible');
 
             return true;
         } catch (\Exception $e) {
@@ -196,17 +191,23 @@ class AssignmentService
     /**
      * Met à jour le statut d'un véhicule.
      */
-    private function updateVehicleStatus(int $vehicleId, string $status): void
+    private function updateVehicleStatus(int $vehicleId, string $statusName): void
     {
-        Vehicle::where('id', $vehicleId)->update(['status' => $status]);
+        $status = VehicleStatus::where('name', $statusName)->first();
+        if ($status) {
+            Vehicle::where('id', $vehicleId)->update(['status_id' => $status->id]);
+        }
     }
 
     /**
      * Met à jour le statut d'un conducteur.
      */
-    private function updateDriverStatus(int $driverId, string $status): void
+    private function updateDriverStatus(int $driverId, string $statusName): void
     {
-        Driver::where('id', $driverId)->update(['status' => $status]);
+        $status = DriverStatus::where('name', $statusName)->first();
+        if ($status) {
+            Driver::where('id', $driverId)->update(['status_id' => $status->id]);
+        }
     }
 
     /**
@@ -290,4 +291,3 @@ class AssignmentService
         return $query->with(['vehicle', 'driver'])->get();
     }
 }
-
