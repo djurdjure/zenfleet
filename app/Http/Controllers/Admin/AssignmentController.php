@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\Assignment\StoreAssignmentRequest;
 use App\Http\Requests\Admin\Assignment\UpdateAssignmentRequest;
 use App\Models\Assignment;
+use App\Models\Vehicle;
 use App\Services\AssignmentService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -49,8 +50,9 @@ class AssignmentController extends Controller
         
         $assignments = $this->assignmentService->getAssignmentsForCalendarPeriod($date, $period);
         $totalAssignments = $this->assignmentService->getTotalAssignmentsCount();
+        $vehicles = Vehicle::orderBy('brand')->orderBy('model')->get();
 
-        return view('admin.assignments.calendar', compact('assignments', 'totalAssignments', 'date', 'period'));
+        return view('admin.assignments.calendar', compact('assignments', 'totalAssignments', 'date', 'period', 'vehicles'));
     }
 
     /**
@@ -64,9 +66,11 @@ class AssignmentController extends Controller
         $period = $request->get('period', 'month');
         
         $assignments = $this->assignmentService->getAssignmentsForCalendarPeriod($date, $period);
+        $vehicles = Vehicle::orderBy('brand')->orderBy('model')->get();
         
         return response()->json([
             'assignments' => $assignments,
+            'vehicles' => $vehicles,
             'period' => $period,
             'date' => $date
         ]);
