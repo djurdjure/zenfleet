@@ -4,89 +4,224 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
-        <title>{{ config('app.name', 'Laravel') }}</title>
 
-        <link rel="preconnect" href="https://fonts.googleapis.com">
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+        <title>{{ config('app.name', 'ZenFleet') }}</title>
 
+        <!-- Fonts -->
+        <link rel="preconnect" href="https://fonts.bunny.net">
+        <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
+
+        <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
+        
+        <!-- Styles CSS améliorés -->
+        <link href="{{ asset('css/calendar-improvements.css') }}" rel="stylesheet">
+        
+        <!-- Meta tags pour PWA (optionnel) -->
+        <meta name="theme-color" content="#3b82f6">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-status-bar-style" content="default">
+        
+        <!-- Styles additionnels -->
+        @stack('styles')
     </head>
     <body class="font-sans antialiased">
-        <div x-data="{ sidebarOpen: false }" class="min-h-screen bg-gray-100">
-            <div class="flex h-screen bg-gray-100">
-                
-                <aside class="hidden w-72 flex-shrink-0 bg-white border-r md:block">
-                    @include('layouts.navigation')
-                </aside>
+        <div class="min-h-screen bg-gray-100">
+            @include('layouts.navigation')
 
-                <div x-show="sidebarOpen" class="fixed inset-0 z-40 flex md:hidden" 
-                     x-transition:enter="transition-opacity ease-linear duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" 
-                     x-transition:leave="transition-opacity ease-linear duration-300" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" 
-                     style="display: none;">
-                    <div @click="sidebarOpen = false" class="fixed inset-0 bg-gray-600 bg-opacity-75"></div>
-                    <div class="relative flex-1 flex flex-col max-w-xs w-full bg-white">
-                        <div class="absolute top-0 right-0 -mr-12 pt-2">
-                            <button @click="sidebarOpen = false" type="button" class="ml-1 flex items-center justify-center h-10 w-10 rounded-full focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white">
-                                <span class="sr-only">Close sidebar</span>
-                                <x-lucide-x class="h-6 w-6 text-white" />
-                            </button>
-                        </div>
-                        @include('layouts.navigation')
+            <!-- Page Heading -->
+            @if (isset($header))
+                <header class="bg-white shadow">
+                    <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+                        {{ $header }}
                     </div>
-                </div>
+                </header>
+            @endif
 
-                <div class="flex-1 flex flex-col overflow-hidden">
-                    <header class="relative z-10 flex-shrink-0 flex h-16 bg-white shadow">
-                        <button @click.stop="sidebarOpen = true" type="button" class="px-4 border-r border-gray-200 text-gray-500 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-primary-500 md:hidden">
-                            <span class="sr-only">Open sidebar</span>
-                            <x-lucide-menu class="h-6 w-6" />
-                        </button>
-                        <div class="flex-1 px-4 flex justify-between">
-                            <div class="flex-1 flex items-center">
-                                @if (isset($header))
-                                    {{ $header }}
-                                @endif
-                            </div>
-                        </div>
-                    </header>
+            <!-- Page Content -->
+            <main>
+                {{ $slot }}
+            </main>
+        </div>
 
-                    <main class="flex-1 relative overflow-y-auto focus:outline-none">
-                         <div class="py-6">
-                            <div class="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
-                                {{-- Le contenu de chaque page sera injecté ici --}}
-                                {{ $slot }}
-                            </div>
-                        </div>
-                    </main>
-                </div>
+        <!-- Toast Container -->
+        <div id="toast-container" class="fixed top-4 right-4 z-50 space-y-2">
+            <!-- Les toasts seront injectés ici dynamiquement -->
+        </div>
+
+        <!-- Loading Indicator Global -->
+        <div class="loading-indicator fixed top-4 left-1/2 transform -translate-x-1/2 z-50 hidden">
+            <div class="bg-white rounded-lg shadow-lg p-4 flex items-center space-x-3">
+                <div class="loading-spinner"></div>
+                <span class="text-sm text-gray-600">Chargement...</span>
             </div>
         </div>
-        
-        {{-- Composant de notification global (Toast) --}}
-        <x-toast />
 
-        {{-- Emplacement pour les scripts spécifiques à une page --}}
+        <!-- Scripts JavaScript améliorés -->
+        <script src="{{ asset('js/calendar-enhancements.js') }}"></script>
+        
+        <!-- Scripts additionnels -->
         @stack('scripts')
 
+        <!-- Toast System -->
         <script>
-            document.addEventListener('DOMContentLoaded', function () {
-                @if (session('success'))
-                    window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'success', message: {{ Illuminate\Support\Js::from(session('success')) }} } }));
-                @endif
+            // Système de toast amélioré
+            class ToastSystem {
+                constructor() {
+                    this.container = document.getElementById('toast-container');
+                    this.setupEventListeners();
+                }
 
-                @if (session('error'))
-                    window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'error', message: {{ Illuminate\Support\Js::from(session('error')) }} } }));
-                @endif
+                setupEventListeners() {
+                    window.addEventListener('toast', (e) => {
+                        this.show(e.detail);
+                    });
+                }
 
-                @if (session('warning'))
-                    window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'warning', message: {{ Illuminate\Support\Js::from(session('warning')) }} } }));
-                @endif
+                show({ type = 'info', message, description = '', duration = 5000 }) {
+                    const toast = this.createToast(type, message, description);
+                    this.container.appendChild(toast);
 
-                @if (session('info'))
-                    window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'info', message: {{ Illuminate\Support\Js::from(session('info')) }} } }));
-                @endif
+                    // Animation d'entrée
+                    requestAnimationFrame(() => {
+                        toast.classList.remove('translate-x-full', 'opacity-0');
+                        toast.classList.add('translate-x-0', 'opacity-100');
+                    });
+
+                    // Auto-suppression
+                    setTimeout(() => {
+                        this.remove(toast);
+                    }, duration);
+
+                    return toast;
+                }
+
+                createToast(type, message, description) {
+                    const toast = document.createElement('div');
+                    toast.className = `transform transition-all duration-300 translate-x-full opacity-0 max-w-sm w-full bg-white shadow-lg rounded-lg pointer-events-auto ring-1 ring-black ring-opacity-5 overflow-hidden`;
+
+                    const colors = {
+                        success: 'text-green-500',
+                        error: 'text-red-500',
+                        warning: 'text-yellow-500',
+                        info: 'text-blue-500'
+                    };
+
+                    const icons = {
+                        success: '✓',
+                        error: '✕',
+                        warning: '⚠',
+                        info: 'ℹ'
+                    };
+
+                    toast.innerHTML = `
+                        <div class="p-4">
+                            <div class="flex items-start">
+                                <div class="flex-shrink-0">
+                                    <span class="inline-flex items-center justify-center h-8 w-8 rounded-full ${colors[type]} bg-opacity-10">
+                                        ${icons[type]}
+                                    </span>
+                                </div>
+                                <div class="ml-3 w-0 flex-1 pt-0.5">
+                                    <p class="text-sm font-medium text-gray-900">${message}</p>
+                                    ${description ? `<p class="mt-1 text-sm text-gray-500">${description}</p>` : ''}
+                                </div>
+                                <div class="ml-4 flex-shrink-0 flex">
+                                    <button class="bg-white rounded-md inline-flex text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" onclick="this.closest('.transform').remove()">
+                                        <span class="sr-only">Fermer</span>
+                                        <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                            <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+
+                    return toast;
+                }
+
+                remove(toast) {
+                    toast.classList.remove('translate-x-0', 'opacity-100');
+                    toast.classList.add('translate-x-full', 'opacity-0');
+                    
+                    setTimeout(() => {
+                        if (toast.parentNode) {
+                            toast.parentNode.removeChild(toast);
+                        }
+                    }, 300);
+                }
+            }
+
+            // Initialisation du système de toast
+            document.addEventListener('DOMContentLoaded', () => {
+                new ToastSystem();
             });
+
+            // Gestion des messages flash Laravel
+            @if(session('success'))
+                window.addEventListener('DOMContentLoaded', () => {
+                    window.dispatchEvent(new CustomEvent('toast', {
+                        detail: {
+                            type: 'success',
+                            message: 'Succès',
+                            description: '{{ session('success') }}'
+                        }
+                    }));
+                });
+            @endif
+
+            @if(session('error'))
+                window.addEventListener('DOMContentLoaded', () => {
+                    window.dispatchEvent(new CustomEvent('toast', {
+                        detail: {
+                            type: 'error',
+                            message: 'Erreur',
+                            description: '{{ session('error') }}'
+                        }
+                    }));
+                });
+            @endif
+
+            @if(session('warning'))
+                window.addEventListener('DOMContentLoaded', () => {
+                    window.dispatchEvent(new CustomEvent('toast', {
+                        detail: {
+                            type: 'warning',
+                            message: 'Attention',
+                            description: '{{ session('warning') }}'
+                        }
+                    }));
+                });
+            @endif
+
+            @if(session('info'))
+                window.addEventListener('DOMContentLoaded', () => {
+                    window.dispatchEvent(new CustomEvent('toast', {
+                        detail: {
+                            type: 'info',
+                            message: 'Information',
+                            description: '{{ session('info') }}'
+                        }
+                    }));
+                });
+            @endif
+        </script>
+
+        <!-- Service Worker pour PWA (optionnel) -->
+        <script>
+            if ('serviceWorker' in navigator) {
+                window.addEventListener('load', () => {
+                    navigator.serviceWorker.register('/sw.js')
+                        .then((registration) => {
+                            console.log('SW registered: ', registration);
+                        })
+                        .catch((registrationError) => {
+                            console.log('SW registration failed: ', registrationError);
+                        });
+                });
+            }
         </script>
     </body>
 </html>
+

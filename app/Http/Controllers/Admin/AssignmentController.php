@@ -22,7 +22,7 @@ class AssignmentController extends Controller
     }
 
     /**
-     * Affiche la liste des affectations.
+     * Affiche la liste des affectations avec vue tableau et calendaire.
      */
     public function index(Request $request): View
     {
@@ -30,7 +30,46 @@ class AssignmentController extends Controller
         $filters = $request->only(['search', 'status', 'per_page']);
         $assignments = $this->assignmentService->getFilteredAssignments($filters);
 
-        return view('admin.assignments.index', compact('assignments', 'filters'));
+        // Préparation des données pour la vue calendaire
+        $assignmentsForCalendar = $this->assignmentService->getAssignmentsForCalendar();
+
+        return view('admin.assignments.index', compact('assignments', 'filters', 'assignmentsForCalendar'));
+    }
+
+    /**
+     * Affiche uniquement la vue calendaire des affectations.
+     */
+    public function calendar(Request $request): View
+    {
+        $this->authorize('view assignments');
+        
+        // Récupération des paramètres de date
+        $date = $request->get('date', now()->format('Y-m-d'));
+        $period = $request->get('period', 'month');
+        
+        $assignments = $this->assignmentService->getAssignmentsForCalendarPeriod($date, $period);
+        $totalAssignments = $this->assignmentService->getTotalAssignmentsCount();
+
+        return view('admin.assignments.calendar', compact('assignments', 'totalAssignments', 'date', 'period'));
+    }
+
+    /**
+     * API pour récupérer les affectations d'une période donnée (AJAX).
+     */
+    public function getCalendarData(Request $request): JsonResponse
+    {
+        $this->authorize('view assignments');
+        
+        $date = $request->get('date', now()->format('Y-m-d'));
+        $period = $request->get('period', 'month');
+        
+        $assignments = $this->assignmentService->getAssignmentsForCalendarPeriod($date, $period);
+        
+        return response()->json([
+            'assignments' => $assignments,
+            'period' => $period,
+            'date' => $date
+        ]);
     }
 
     /**
@@ -49,8 +88,18 @@ class AssignmentController extends Controller
      */
     public function store(StoreAssignmentRequest $request): RedirectResponse
     {
-        $this->assignmentService->createAssignment($request->validated());
-        return redirect()->route('admin.assignments.index')->with('success', 'Affectation créée avec succès.');
+        $assignment = $this->assignmentService->createAssignment($request->validated());
+        
+        // Redirection intelligente selon la source
+        $redirectTo = $request->get('redirect_to', 'index');
+        
+        if ($redirectTo === 'calendar') {
+            return redirect()->route('admin.assignments.calendar')
+                ->with('success', 'Affectation créée avec succès.');
+        }
+        
+        return redirect()->route('admin.assignments.index')
+            ->with('success', 'Affectation créée avec succès.');
     }
 
     /**
@@ -81,7 +130,17 @@ class AssignmentController extends Controller
     public function update(UpdateAssignmentRequest $request, Assignment $assignment): RedirectResponse
     {
         $this->assignmentService->updateAssignment($assignment, $request->validated());
-        return redirect()->route('admin.assignments.index')->with('success', 'Affectation mise à jour avec succès.');
+        
+        // Redirection intelligente selon la source
+        $redirectTo = $request->get('redirect_to', 'index');
+        
+        if ($redirectTo === 'calendar') {
+            return redirect()->route('admin.assignments.calendar')
+                ->with('success', 'Affectation mise à jour avec succès.');
+        }
+        
+        return redirect()->route('admin.assignments.index')
+            ->with('success', 'Affectation mise à jour avec succès.');
     }
 
     /**
@@ -119,7 +178,14 @@ class AssignmentController extends Controller
             if ($request->expectsJson()) {
                 return response()->json(['success' => true, 'message' => $message]);
             }
-            // Sinon, on fait une redirection classique
+            
+            // Redirection intelligente selon la source
+            $redirectTo = $request->get('redirect_to', 'index');
+            
+            if ($redirectTo === 'calendar') {
+                return redirect()->route('admin.assignments.calendar')->with('success', $message);
+            }
+            
             return redirect()->route('admin.assignments.index')->with('success', $message);
         }
 
@@ -130,4 +196,18 @@ class AssignmentController extends Controller
         }
         return redirect()->back()->with('error', $errorMessage);
     }
+
+    /**
+     * Supprime une affectation.
+     */
+    public function destroy(Assignment $assignment): RedirectResponse
+    {
+        $this->authorize('delete assignments');
+        
+        $assignment->delete();
+        
+        return redirect()->route('admin.assignments.index')
+            ->with('success', 'Affectation supprimée avec succès.');
+    }
 }
+
