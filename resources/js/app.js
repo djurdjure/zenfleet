@@ -1,4 +1,5 @@
 import './bootstrap';
+import './timeline.js';
 
 import Alpine from 'alpinejs';
 import TomSelect from 'tom-select';

@@ -7,6 +7,7 @@ use App\Http\Requests\Admin\Assignment\StoreAssignmentRequest;
 use App\Http\Requests\Admin\Assignment\UpdateAssignmentRequest;
 use App\Models\Assignment;
 use App\Models\Vehicle;
+use App\Models\Driver;
 use App\Services\AssignmentService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -81,10 +82,12 @@ class AssignmentController extends Controller
      */
     public function create(): View
     {
-         $this->authorize('create assignments');
-        $data = $this->assignmentService->getDataForCreateForm();
+        $this->authorize('create assignments');
 
-        return view('admin.assignments.create', $data);
+        $vehicles = Vehicle::where('status', '!=', 'inactive')->orderBy('brand')->orderBy('model')->get();
+        $drivers = Driver::where('status', 'active')->orderBy('first_name')->orderBy('last_name')->get();
+
+        return view('admin.assignments.create', compact('vehicles', 'drivers'));
     }
 
     /**

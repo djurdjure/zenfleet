@@ -1,0 +1,562 @@
+/* Timeline/GANTT Styles pour ZenFleet */
+
+/* Variables CSS pour la cohérence des couleurs */
+:root {
+  --primary-50: #f0f9ff;
+  --primary-100: #e0f2fe;
+  --primary-500: #0ea5e9;
+  --primary-600: #0284c7;
+  --primary-700: #0369a1;
+  --success-500: #22c55e;
+  --success-600: #16a34a;
+  --warning-500: #f59e0b;
+  --warning-600: #d97706;
+  --gray-50: #f8fafc;
+  --gray-100: #f1f5f9;
+  --gray-200: #e2e8f0;
+  --gray-300: #cbd5e1;
+  --gray-400: #94a3b8;
+  --gray-500: #64748b;
+  --gray-600: #475569;
+  --gray-700: #334155;
+  --gray-800: #1e293b;
+  --gray-900: #0f172a;
+}
+
+/* Container principal de la timeline */
+.timeline-container {
+  position: relative;
+  background: white;
+  border-radius: 0.75rem;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+  border: 1px solid var(--gray-200);
+  overflow: hidden;
+}
+
+/* En-tête fixe de la timeline */
+.timeline-header {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: white;
+  border-bottom: 1px solid var(--gray-200);
+}
+
+.timeline-header-row {
+  display: flex;
+  min-height: 4rem;
+}
+
+.timeline-vehicle-header {
+  width: 20rem;
+  flex-shrink: 0;
+  padding: 1rem 1.5rem;
+  background: var(--gray-50);
+  border-right: 1px solid var(--gray-200);
+  display: flex;
+  align-items: center;
+  font-weight: 500;
+  color: var(--gray-700);
+}
+
+.timeline-time-columns {
+  flex: 1;
+  display: flex;
+  min-width: 0;
+}
+
+.timeline-time-column {
+  flex: 1;
+  min-width: 5rem;
+  padding: 1rem 0.75rem;
+  text-align: center;
+  border-right: 1px solid var(--gray-200);
+  background: var(--gray-50);
+  transition: background-color 0.2s ease;
+}
+
+.timeline-time-column:hover {
+  background: var(--primary-50);
+}
+
+.timeline-time-column-label {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--gray-500);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.timeline-time-column-value {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--gray-900);
+  margin-top: 0.25rem;
+}
+
+/* Corps de la timeline */
+.timeline-body {
+  max-height: 37.5rem;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--gray-300) var(--gray-100);
+}
+
+.timeline-body::-webkit-scrollbar {
+  width: 8px;
+}
+
+.timeline-body::-webkit-scrollbar-track {
+  background: var(--gray-100);
+}
+
+.timeline-body::-webkit-scrollbar-thumb {
+  background: var(--gray-300);
+  border-radius: 4px;
+}
+
+.timeline-body::-webkit-scrollbar-thumb:hover {
+  background: var(--gray-400);
+}
+
+/* Lignes de véhicules */
+.timeline-vehicle-row {
+  display: flex;
+  border-bottom: 1px solid var(--gray-100);
+  transition: background-color 0.2s ease;
+}
+
+.timeline-vehicle-row:nth-child(even) {
+  background: white;
+}
+
+.timeline-vehicle-row:nth-child(odd) {
+  background: var(--gray-50);
+}
+
+.timeline-vehicle-row:hover {
+  background: var(--primary-50);
+}
+
+.timeline-vehicle-cell {
+  width: 20rem;
+  flex-shrink: 0;
+  padding: 1rem 1.5rem;
+  border-right: 1px solid var(--gray-200);
+}
+
+.timeline-vehicle-info {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.timeline-vehicle-icon {
+  width: 2.5rem;
+  height: 2.5rem;
+  background: var(--primary-100);
+  border-radius: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.timeline-vehicle-icon svg {
+  width: 1.25rem;
+  height: 1.25rem;
+  color: var(--primary-600);
+}
+
+.timeline-vehicle-details {
+  flex: 1;
+  min-width: 0;
+}
+
+.timeline-vehicle-name {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--gray-900);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.timeline-vehicle-plate {
+  font-size: 0.875rem;
+  color: var(--gray-500);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.timeline-vehicle-status {
+  margin-top: 0.25rem;
+}
+
+.timeline-vehicle-status-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.125rem 0.5rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.timeline-vehicle-status-available {
+  background: var(--success-100);
+  color: var(--success-800);
+}
+
+.timeline-vehicle-status-assigned {
+  background: var(--primary-100);
+  color: var(--primary-800);
+}
+
+/* Zone des affectations */
+.timeline-assignments-zone {
+  flex: 1;
+  position: relative;
+  min-height: 5rem;
+  display: flex;
+  align-items: center;
+  padding: 0.5rem 0;
+}
+
+/* Barres d'affectation */
+.timeline-assignment-bar {
+  position: absolute;
+  height: 1.5rem;
+  border-radius: 0.375rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  top: 50%;
+  transform: translateY(-50%);
+  overflow: hidden;
+}
+
+.timeline-assignment-bar:hover {
+  transform: translateY(-50%) scale(1.02);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  z-index: 10;
+}
+
+.timeline-assignment-bar-active {
+  background: linear-gradient(135deg, var(--primary-500), var(--primary-600));
+}
+
+.timeline-assignment-bar-completed {
+  background: linear-gradient(135deg, var(--success-500), var(--success-600));
+}
+
+.timeline-assignment-bar-upcoming {
+  background: linear-gradient(135deg, var(--warning-500), var(--warning-600));
+}
+
+.timeline-assignment-bar-content {
+  padding: 0.25rem 0.5rem;
+  color: white;
+  font-size: 0.75rem;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  height: 100%;
+  display: flex;
+  align-items: center;
+}
+
+/* Grille de fond pour les colonnes temporelles */
+.timeline-grid-background {
+  position: absolute;
+  top: 0;
+  left: 20rem;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.timeline-grid-column {
+  flex: 1;
+  border-right: 1px solid var(--gray-100);
+  opacity: 0.5;
+}
+
+/* Tooltip pour les affectations */
+.timeline-tooltip {
+  position: absolute;
+  z-index: 30;
+  background: var(--gray-900);
+  color: white;
+  font-size: 0.875rem;
+  border-radius: 0.5rem;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  padding: 0.75rem;
+  max-width: 20rem;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.timeline-tooltip.show {
+  opacity: 1;
+}
+
+.timeline-tooltip-arrow {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+  border-top: 4px solid var(--gray-900);
+}
+
+.timeline-tooltip-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.timeline-tooltip-title {
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+}
+
+.timeline-tooltip-detail {
+  font-size: 0.75rem;
+  opacity: 0.9;
+}
+
+.timeline-tooltip-status {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  margin-top: 0.25rem;
+}
+
+.timeline-tooltip-status-dot {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+}
+
+.timeline-tooltip-status-dot-active {
+  background: var(--primary-400);
+}
+
+.timeline-tooltip-status-dot-completed {
+  background: var(--success-400);
+}
+
+.timeline-tooltip-status-dot-upcoming {
+  background: var(--warning-400);
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .timeline-vehicle-header,
+  .timeline-vehicle-cell {
+    width: 16rem;
+  }
+
+  .timeline-time-column {
+    min-width: 4rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .timeline-vehicle-header,
+  .timeline-vehicle-cell {
+    width: 14rem;
+    padding: 0.75rem 1rem;
+  }
+
+  .timeline-time-column {
+    min-width: 3.5rem;
+    padding: 0.75rem 0.5rem;
+  }
+
+  .timeline-vehicle-icon {
+    width: 2rem;
+    height: 2rem;
+  }
+
+  .timeline-vehicle-icon svg {
+    width: 1rem;
+    height: 1rem;
+  }
+
+  .timeline-assignment-bar {
+    height: 1.25rem;
+  }
+
+  .timeline-assignment-bar-content {
+    font-size: 0.625rem;
+    padding: 0.125rem 0.375rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .timeline-vehicle-header,
+  .timeline-vehicle-cell {
+    width: 12rem;
+    padding: 0.5rem 0.75rem;
+  }
+
+  .timeline-time-column {
+    min-width: 3rem;
+    padding: 0.5rem 0.25rem;
+  }
+
+  .timeline-time-column-label {
+    font-size: 0.625rem;
+  }
+
+  .timeline-time-column-value {
+    font-size: 0.75rem;
+  }
+
+  .timeline-vehicle-name,
+  .timeline-vehicle-plate {
+    font-size: 0.75rem;
+  }
+
+  .timeline-assignment-bar {
+    height: 1rem;
+  }
+
+  .timeline-assignment-bar-content {
+    font-size: 0.5rem;
+    padding: 0.125rem 0.25rem;
+  }
+}
+
+/* Animations */
+@keyframes slideInFromLeft {
+  from {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.timeline-vehicle-row {
+  animation: slideInFromLeft 0.3s ease-out;
+}
+
+.timeline-assignment-bar {
+  animation: fadeIn 0.4s ease-out;
+}
+
+/* États de chargement */
+.timeline-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem;
+  color: var(--gray-500);
+}
+
+.timeline-loading-spinner {
+  width: 2rem;
+  height: 2rem;
+  border: 2px solid var(--gray-200);
+  border-top: 2px solid var(--primary-500);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-right: 0.75rem;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* États vides */
+.timeline-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem;
+  color: var(--gray-500);
+  text-align: center;
+}
+
+.timeline-empty-icon {
+  width: 4rem;
+  height: 4rem;
+  color: var(--gray-300);
+  margin-bottom: 1rem;
+}
+
+.timeline-empty-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--gray-700);
+  margin-bottom: 0.5rem;
+}
+
+.timeline-empty-description {
+  font-size: 0.875rem;
+  color: var(--gray-500);
+  max-width: 24rem;
+}
+
+/* Accessibilité */
+.timeline-assignment-bar:focus {
+  outline: 2px solid var(--primary-500);
+  outline-offset: 2px;
+}
+
+.timeline-vehicle-row:focus-within {
+  background: var(--primary-50);
+}
+
+/* Mode sombre (optionnel) */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --gray-50: #0f172a;
+    --gray-100: #1e293b;
+    --gray-200: #334155;
+    --gray-300: #475569;
+    --gray-400: #64748b;
+    --gray-500: #94a3b8;
+    --gray-600: #cbd5e1;
+    --gray-700: #e2e8f0;
+    --gray-800: #f1f5f9;
+    --gray-900: #f8fafc;
+  }
+
+  .timeline-container {
+    background: var(--gray-100);
+    border-color: var(--gray-200);
+  }
+
+  .timeline-tooltip {
+    background: var(--gray-800);
+  }
+
+  .timeline-tooltip-arrow {
+    border-top-color: var(--gray-800);
+  }
+}

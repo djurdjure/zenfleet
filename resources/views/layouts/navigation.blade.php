@@ -29,9 +29,15 @@
                     </x-sidebar.sidebar-sub-link>
                 @endcan
                 @can('view assignments')
-                    <x-sidebar.sidebar-sub-link :href="route('admin.assignments.index')" :active="request()->routeIs('admin.assignments.*')">
+                    <x-sidebar.sidebar-sub-link :href="route('admin.assignments.index')" :active="request()->routeIs('admin.assignments.*') && !request()->routeIs('admin.assignments.timeline.*')">
                         <x-slot name="icon"><x-lucide-clipboard-list stroke-width="1.5" /></x-slot>
                         {{ __('Affectations') }}
+                    </x-sidebar.sidebar-sub-link>
+                @endcan
+                @can('view assignments')
+                    <x-sidebar.sidebar-sub-link :href="route('admin.assignments.timeline.index')" :active="request()->routeIs('admin.assignments.timeline.*')">
+                        <x-slot name="icon"><x-lucide-calendar-days stroke-width="1.5" /></x-slot>
+                        {{ __('Planning') }}
                     </x-sidebar.sidebar-sub-link>
                 @endcan
             </x-sidebar.sidebar-group>

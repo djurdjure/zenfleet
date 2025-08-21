@@ -8,6 +8,7 @@ use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\DriverController;
 use App\Http\Controllers\Admin\VehicleController;
 use App\Http\Controllers\Admin\AssignmentController;
+use App\Http\Controllers\Admin\AssignmentTimelineController;
 use App\Http\Controllers\Admin\OrganizationController;
 use App\Http\Controllers\Admin\SupplierController;
 use App\Http\Controllers\Admin\SupplierCategoryController;
@@ -82,6 +83,14 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
 
         // --- ACTIONS SPÉCIFIQUES POUR LES AFFECTATIONS ---
         Route::patch('/assignments/{assignment}/end', [AssignmentController::class, 'end'])->name('assignments.end');
+
+        // --- NOUVELLES ROUTES POUR LA TIMELINE ---
+        Route::prefix('assignments/timeline')->name('assignments.timeline.')->group(function () {
+            Route::get('/', [AssignmentTimelineController::class, 'index'])->name('index');
+            Route::get('/data', [AssignmentTimelineController::class, 'getData'])->name('data');
+            Route::get('/search', [AssignmentTimelineController::class, 'search'])->name('search');
+            Route::get('/export', [AssignmentTimelineController::class, 'export'])->name('export');
+        });
 
 
         // --- GESTION DES RESSOURCES PRINCIPALES (DÉCLARÉES APRÈS LES ROUTES SPÉCIFIQUES) ---
