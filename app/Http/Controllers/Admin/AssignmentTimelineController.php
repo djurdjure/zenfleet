@@ -57,7 +57,8 @@ class AssignmentTimelineController extends Controller
 
         // Récupération de toutes les affectations pour la période
         $assignments = Assignment::with([
-            'vehicle:id,brand,model,registration_plate,current_mileage,status',
+            'vehicle:id,brand,model,registration_plate,current_mileage,status_id',
+            'vehicle.vehicleStatus',
             'driver:id,first_name,last_name,personal_phone,photo_path'
         ])
         ->where(function ($query) use ($startDate, $endDate) {
@@ -134,7 +135,8 @@ class AssignmentTimelineController extends Controller
 
         // Récupération des affectations
         $assignments = Assignment::with([
-            'vehicle:id,brand,model,registration_plate,current_mileage,status',
+            'vehicle:id,brand,model,registration_plate,current_mileage,status_id',
+            'vehicle.vehicleStatus',
             'driver:id,first_name,last_name,personal_phone,photo_path'
         ])
         ->where(function ($query) use ($startDate, $endDate) {
@@ -237,7 +239,8 @@ class AssignmentTimelineController extends Controller
 
         // Récupération des affectations filtrées
         $assignments = Assignment::with([
-            'vehicle:id,brand,model,registration_plate,current_mileage,status',
+            'vehicle:id,brand,model,registration_plate,current_mileage,status_id',
+            'vehicle.vehicleStatus',
             'driver:id,first_name,last_name,personal_phone,photo_path'
         ])
         ->where(function ($query) use ($startDate, $endDate) {
