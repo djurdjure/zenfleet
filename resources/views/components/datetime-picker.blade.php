@@ -105,9 +105,10 @@
                 });
 
                 if (this.value) {
-                    const [date, time] = this.value.split(' ');
-                    this.datePicker.setDate(date);
-                    this.timePicker.setDate(time);
+                    // Pass the full datetime string to the time picker as well.
+                    // It will correctly extract the time part.
+                    this.datePicker.setDate(this.value);
+                    this.timePicker.setDate(this.value);
                     this.$refs.timePicker.disabled = false;
                 } else {
                     // Set default time when no value is provided
