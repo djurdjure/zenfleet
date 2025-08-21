@@ -48,7 +48,9 @@ class AssignmentTimelineController extends Controller
                 ->orderBy('start_datetime');
             }
         ])
-        ->where('status', '!=', 'inactive')
+        ->whereHas('vehicleStatus', function ($query) {
+            $query->where('name', '!=', 'inactive');
+        })
         ->orderBy('brand')
         ->orderBy('model')
         ->get();
@@ -123,7 +125,9 @@ class AssignmentTimelineController extends Controller
                 ->orderBy('start_datetime');
             }
         ])
-        ->where('status', '!=', 'inactive')
+        ->whereHas('vehicleStatus', function ($query) {
+            $query->where('name', '!=', 'inactive');
+        })
         ->orderBy('brand')
         ->orderBy('model')
         ->get();
@@ -219,7 +223,9 @@ class AssignmentTimelineController extends Controller
             $driverQuery->where('first_name', 'like', "%{$query}%")
                        ->orWhere('last_name', 'like', "%{$query}%");
         })
-        ->where('status', '!=', 'inactive')
+        ->whereHas('vehicleStatus', function ($query) {
+            $query->where('name', '!=', 'inactive');
+        })
         ->orderBy('brand')
         ->orderBy('model')
         ->get();
