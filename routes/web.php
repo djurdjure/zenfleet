@@ -83,6 +83,8 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
         // --- ACTIONS SPÉCIFIQUES POUR LES AFFECTATIONS ---
         Route::patch('/assignments/{assignment}/end', [AssignmentController::class, 'end'])->name('assignments.end');
 
+        // --- NOUVEAU : Route pour le planning GANTT ---
+        Route::get('/planning', [\App\Http\Controllers\Admin\PlanningController::class, 'index'])->name('planning.index');
 
         // --- GESTION DES RESSOURCES PRINCIPALES (DÉCLARÉES APRÈS LES ROUTES SPÉCIFIQUES) ---
         Route::resource('users', UserController::class);

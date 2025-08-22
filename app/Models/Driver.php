@@ -53,4 +53,14 @@ class Driver extends Model
     {
        return $this->assignments()->whereNull('end_datetime')->exists();
     }
+
+    /**
+     * Get the user's full name.
+     *
+     * @return string
+     */
+    public function getFullNameAttribute(): string
+    {
+        return "{$this->first_name} {$this->last_name}";
+    }
 }

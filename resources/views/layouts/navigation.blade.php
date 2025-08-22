@@ -34,6 +34,12 @@
                         {{ __('Affectations') }}
                     </x-sidebar.sidebar-sub-link>
                 @endcan
+                @can('view assignments') {{-- Reuse same permission for now --}}
+                    <x-sidebar.sidebar-sub-link :href="route('admin.planning.index')" :active="request()->routeIs('admin.planning.*')">
+                        <x-slot name="icon"><x-lucide-calendar-days stroke-width="1.5" /></x-slot>
+                        {{ __('Planning') }}
+                    </x-sidebar.sidebar-sub-link>
+                @endcan
             </x-sidebar.sidebar-group>
         @endcanany
 

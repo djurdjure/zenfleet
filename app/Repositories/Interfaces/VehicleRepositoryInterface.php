@@ -7,6 +7,7 @@ use Illuminate\Pagination\LengthAwarePaginator;
 interface VehicleRepositoryInterface
 {
     public function getFiltered(array $filters): LengthAwarePaginator;
+    public function getForPlanning(array $filters, string $startDate, string $endDate): LengthAwarePaginator;
     public function find(int $id): ?Vehicle;
     public function findTrashed(int $id): ?Vehicle;
     public function create(array $data): Vehicle;
