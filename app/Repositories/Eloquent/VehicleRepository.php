@@ -80,7 +80,14 @@ class VehicleRepository implements VehicleRepositoryInterface
             });
         }
 
-        return $query->orderBy('brand')->orderBy('model')->paginate($perPage)->withQueryString();
+        if (!empty($filters['sort']) && $filters['sort'] === 'alpha_asc') {
+            $query->orderBy('brand', 'asc')->orderBy('model', 'asc');
+        } else {
+            // Default sort
+            $query->orderBy('id', 'desc');
+        }
+
+        return $query->paginate($perPage)->withQueryString();
     }
 
     public function find(int $id): ?Vehicle

@@ -31,16 +31,28 @@ class PlanningController extends Controller
         $viewMode = $request->input('view_mode', 'week');
         $baseDate = $request->has('date') ? Carbon::parse($request->input('date')) : Carbon::today();
 
-        if ($viewMode === 'month') {
-            $startDate = $baseDate->copy()->startOfMonth();
-            $endDate = $baseDate->copy()->endOfMonth();
-        } else {
-            $startDate = $baseDate->copy()->startOfWeek(Carbon::MONDAY);
-            $endDate = $baseDate->copy()->endOfWeek(Carbon::SUNDAY);
+        switch ($viewMode) {
+            case 'day':
+                $startDate = $baseDate->copy()->startOfDay();
+                $endDate = $baseDate->copy()->endOfDay();
+                break;
+            case 'month':
+                $startDate = $baseDate->copy()->startOfMonth();
+                $endDate = $baseDate->copy()->endOfMonth();
+                break;
+            case 'year':
+                $startDate = $baseDate->copy()->startOfYear();
+                $endDate = $baseDate->copy()->endOfYear();
+                break;
+            case 'week':
+            default:
+                $startDate = $baseDate->copy()->startOfWeek(Carbon::MONDAY);
+                $endDate = $baseDate->copy()->endOfWeek(Carbon::SUNDAY);
+                break;
         }
 
         // --- Récupération des données ---
-        $filters = $request->only(['search', 'per_page']);
+        $filters = $request->only(['search', 'per_page', 'sort']);
         $vehicles = $this->vehicleRepository->getForPlanning(
             $filters,
             $startDate->toDateString(),
