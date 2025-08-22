@@ -84,13 +84,20 @@ class AssignmentController extends Controller
     {
         $this->authorize('create assignments');
 
+        // Fetch vehicles with status 'parking'
         $vehicles = Vehicle::whereHas('vehicleStatus', function ($q) {
-            $q->where('name', '!=', 'inactive');
+            $q->where('name', 'parking');
         })->orderBy('brand')->orderBy('model')->get();
 
+        // Fetch drivers who are active and not currently assigned
+        $assignedDriverIds = Assignment::whereNull('end_datetime')->pluck('driver_id')->unique();
         $drivers = Driver::whereHas('driverStatus', function ($q) {
             $q->where('name', 'active');
-        })->orderBy('first_name')->orderBy('last_name')->get();
+        })
+        ->whereNotIn('id', $assignedDriverIds)
+        ->orderBy('first_name')
+        ->orderBy('last_name')
+        ->get();
 
         return view('admin.assignments.create', compact('vehicles', 'drivers'));
     }

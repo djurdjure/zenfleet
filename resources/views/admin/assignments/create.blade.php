@@ -152,43 +152,44 @@
                     </div>
                     <div class="p-6">
                         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                            <div>
-                                <label for="start_datetime" class="block text-sm font-medium text-gray-700 mb-2">
-                                    Date et heure de début <span class="text-red-500">*</span>
-                                </label>
-                                <div class="relative">
-                                    <input type="datetime-local" id="start_datetime" name="start_datetime"
-                                           value="{{ old('start_datetime') }}" required
-                                           class="block w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-sm @error('start_datetime') border-red-300 @enderror">
-                                    <x-lucide-clock class="absolute left-3 top-3.5 h-4 w-4 text-gray-400"/>
+                            {{-- Date et heure de début --}}
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label for="start_date" class="block text-sm font-medium text-gray-700 mb-2">
+                                        Date de début <span class="text-red-500">*</span>
+                                    </label>
+                                    <input type="date" id="start_date" name="start_date" value="{{ old('start_date', now()->format('Y-m-d')) }}" required class="block w-full py-3 border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-sm @error('start_date') border-red-300 @enderror">
+                                    @error('start_date') <p class="mt-2 text-sm text-red-600">{{ $message }}</p> @enderror
                                 </div>
-                                @error('start_datetime')
-                                    <p class="mt-2 text-sm text-red-600 flex items-center">
-                                        <x-lucide-alert-circle class="w-4 h-4 mr-1"/>
-                                        {{ $message }}
-                                    </p>
-                                @enderror
+                                <div>
+                                    <label for="start_time" class="block text-sm font-medium text-gray-700 mb-2">
+                                        Heure de début <span class="text-red-500">*</span>
+                                    </label>
+                                    <input type="time" id="start_time" name="start_time" value="{{ old('start_time', now()->format('H:i')) }}" required class="block w-full py-3 border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-sm @error('start_time') border-red-300 @enderror">
+                                    @error('start_time') <p class="mt-2 text-sm text-red-600">{{ $message }}</p> @enderror
+                                </div>
                             </div>
 
-                            <div>
-                                <label for="end_datetime" class="block text-sm font-medium text-gray-700 mb-2">
-                                    Date et heure de fin
-                                </label>
-                                <div class="relative">
-                                    <input type="datetime-local" id="end_datetime" name="end_datetime"
-                                           value="{{ old('end_datetime') }}"
-                                           class="block w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-sm @error('end_datetime') border-red-300 @enderror">
-                                    <x-lucide-clock class="absolute left-3 top-3.5 h-4 w-4 text-gray-400"/>
+                            {{-- Date et heure de fin --}}
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label for="end_date" class="block text-sm font-medium text-gray-700 mb-2">
+                                        Date de fin
+                                    </label>
+                                    <input type="date" id="end_date" name="end_date" value="{{ old('end_date') }}" class="block w-full py-3 border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-sm @error('end_date') border-red-300 @enderror">
+                                    @error('end_date') <p class="mt-2 text-sm text-red-600">{{ $message }}</p> @enderror
                                 </div>
-                                <p class="mt-1 text-xs text-gray-500">Laissez vide pour une affectation en cours</p>
-                                @error('end_datetime')
-                                    <p class="mt-2 text-sm text-red-600 flex items-center">
-                                        <x-lucide-alert-circle class="w-4 h-4 mr-1"/>
-                                        {{ $message }}
-                                    </p>
-                                @enderror
+                                <div>
+                                    <label for="end_time" class="block text-sm font-medium text-gray-700 mb-2">
+                                        Heure de fin
+                                    </label>
+                                    <input type="time" id="end_time" name="end_time" value="{{ old('end_time') }}" class="block w-full py-3 border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-sm @error('end_time') border-red-300 @enderror">
+                                    @error('end_time') <p class="mt-2 text-sm text-red-600">{{ $message }}</p> @enderror
+                                </div>
                             </div>
                         </div>
+                         @error('start_datetime') <p class="mt-2 text-sm text-red-600">{{ $message }}</p> @enderror
+                         @error('end_datetime') <p class="mt-2 text-sm text-red-600">{{ $message }}</p> @enderror
                     </div>
                 </div>
 
@@ -279,20 +280,11 @@
             // Gestion de la sélection du conducteur
             driverSelect.addEventListener('change', function() {
                 const driverId = this.value;
-
                 if (driverId && driversData[driverId]) {
                     const driver = driversData[driverId];
-
                     driverDetails.innerHTML = `
                         <div class="flex items-center space-x-3 mb-3">
-                            ${driver.photo_path ?
-                                `<img class="h-12 w-12 rounded-full object-cover border-2 border-gray-200" src="/storage/${driver.photo_path}" alt="Photo">` :
-                                `<div class="h-12 w-12 rounded-full bg-gray-200 flex items-center justify-center border-2 border-gray-200">
-                                    <svg class="h-6 w-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-                                        <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"></path>
-                                    </svg>
-                                </div>`
-                            }
+                            ${driver.photo_path ? `<img class="h-12 w-12 rounded-full object-cover border-2 border-gray-200" src="/storage/${driver.photo_path}" alt="Photo">` : `<div class="h-12 w-12 rounded-full bg-gray-200 flex items-center justify-center border-2 border-gray-200"><svg class="h-6 w-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"></path></svg></div>`}
                             <div>
                                 <p class="font-medium text-gray-900">${driver.first_name} ${driver.last_name}</p>
                                 <p class="text-sm text-gray-500">${driver.personal_phone || 'Téléphone non renseigné'}</p>
@@ -304,7 +296,6 @@
                             <p><span class="font-medium">Date d'embauche:</span> ${driver.hire_date ? new Date(driver.hire_date).toLocaleDateString('fr-FR') : 'Non renseignée'}</p>
                         </div>
                     `;
-
                     driverInfo.classList.remove('hidden');
                 } else {
                     driverInfo.classList.add('hidden');
@@ -314,21 +305,16 @@
             // Gestion de la sélection du véhicule
             vehicleSelect.addEventListener('change', function() {
                 const selectedOption = this.options[this.selectedIndex];
-                
                 if (selectedOption.value) {
                     const brand = selectedOption.dataset.brand;
                     const model = selectedOption.dataset.model;
                     const plate = selectedOption.dataset.plate;
                     const mileage = selectedOption.dataset.mileage;
                     const status = selectedOption.dataset.status;
-
                     vehicleDetails.innerHTML = `
                         <div class="flex items-center space-x-3 mb-3">
                             <div class="w-12 h-12 bg-primary-100 rounded-lg flex items-center justify-center">
-                                <svg class="w-6 h-6 text-primary-600" fill="currentColor" viewBox="0 0 20 20">
-                                    <path d="M8 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM15 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z"/>
-                                    <path d="M3 4a1 1 0 00-1 1v10a1 1 0 001 1h1.05a2.5 2.5 0 014.9 0H10a1 1 0 001-1V5a1 1 0 00-1-1H3zM14 7a1 1 0 00-1 1v6.05A2.5 2.5 0 0115.95 16H17a1 1 0 001-1V8a1 1 0 00-1-1h-3z"/>
-                                </svg>
+                                <svg class="w-6 h-6 text-primary-600" fill="currentColor" viewBox="0 0 20 20"><path d="M8 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM15 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z"/><path d="M3 4a1 1 0 00-1 1v10a1 1 0 001 1h1.05a2.5 2.5 0 014.9 0H10a1 1 0 001-1V5a1 1 0 00-1-1H3zM14 7a1 1 0 00-1 1v6.05A2.5 2.5 0 0115.95 16H17a1 1 0 001-1V8a1 1 0 00-1-1h-3z"/></svg>
                             </div>
                             <div>
                                 <p class="font-medium text-gray-900">${brand} ${model}</p>
@@ -337,14 +323,9 @@
                         </div>
                         <div class="space-y-1">
                             <p><span class="font-medium">Kilométrage:</span> ${parseInt(mileage).toLocaleString()} km</p>
-                            <p><span class="font-medium">Statut:</span>
-                                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${status === 'available' ? 'bg-success-100 text-success-800' : 'bg-warning-100 text-warning-800'}">
-                                    ${status === 'available' ? 'Disponible' : 'En cours d\'utilisation'}
-                                </span>
-                            </p>
+                            <p><span class="font-medium">Statut:</span> <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${status === 'available' ? 'bg-success-100 text-success-800' : 'bg-warning-100 text-warning-800'}">${status === 'available' ? 'Disponible' : 'En cours d\'utilisation'}</span></p>
                         </div>
                     `;
-
                     vehicleInfo.classList.remove('hidden');
                 } else {
                     vehicleInfo.classList.add('hidden');
@@ -352,27 +333,36 @@
             });
 
             // Validation des dates
-            const startDatetime = document.getElementById('start_datetime');
-            const endDatetime = document.getElementById('end_datetime');
+            const startDate = document.getElementById('start_date');
+            const startTime = document.getElementById('start_time');
+            const endDate = document.getElementById('end_date');
+            const endTime = document.getElementById('end_time');
 
-            startDatetime.addEventListener('change', function() {
-                if (endDatetime.value && this.value >= endDatetime.value) {
-                    endDatetime.value = '';
+            function validateDates() {
+                if (!startDate.value || !startTime.value || !endDate.value || !endTime.value) {
+                    return;
                 }
-                endDatetime.min = this.value;
-            });
+                const startDateTime = new Date(`${startDate.value}T${startTime.value}`);
+                const endDateTime = new Date(`${endDate.value}T${endTime.value}`);
 
-            endDatetime.addEventListener('change', function() {
-                if (startDatetime.value && this.value <= startDatetime.value) {
-                    alert('La date de fin doit être postérieure à la date de début');
-                    this.value = '';
+                if (endDateTime <= startDateTime) {
+                    alert('La date et heure de fin doivent être postérieures à la date et heure de début.');
+                    endDate.value = '';
+                    endTime.value = '';
+                }
+            }
+
+            startDate.addEventListener('change', validateDates);
+            startTime.addEventListener('change', validateDates);
+            endDate.addEventListener('change', validateDates);
+            endTime.addEventListener('change', validateDates);
+
+            // Set minimum date for end_date based on start_date
+            startDate.addEventListener('change', function() {
+                if (this.value) {
+                    endDate.min = this.value;
                 }
             });
-
-            // Définir la date/heure actuelle par défaut
-            const now = new Date();
-            now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
-            startDatetime.value = now.toISOString().slice(0, 16);
         });
     </script>
     @endpush
