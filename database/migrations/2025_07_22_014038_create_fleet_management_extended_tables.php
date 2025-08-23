@@ -79,27 +79,30 @@ return new class extends Migration
             $table->softDeletes();
         });
 
-        // MODULE: GESTION DOCUMENTAIRE (Polymorphique)
-        Schema::create('document_types', function (Blueprint $table) {
-            $table->id();
-            $table->string('name', 100)->unique();
-        });
+    //recréé par la suite pour une meilleures gestion
 
-        Schema::create('documents', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('organization_id')->constrained('organizations')->onDelete('cascade');
-            $table->morphs('documentable'); // Crée `documentable_id` (BIGINT) et `documentable_type` (VARCHAR)
-            $table->foreignId('document_type_id')->constrained('document_types');
-            $table->string('title');
-            $table->string('file_path', 512);
-            $table->unsignedBigInteger('file_size'); // en octets
-            $table->string('mime_type', 100);
-            $table->date('issue_date')->nullable();
-            $table->date('expiry_date')->nullable();
-            $table->foreignId('created_by_user_id')->nullable()->constrained('users')->onDelete('set null');
-            $table->timestamps();
-            $table->softDeletes();
-        });
+    // MODULE: GESTION DOCUMENTAIRE (Polymorphique)
+    //    Schema::create('document_types', function (Blueprint $table) {
+    //        $table->id();
+    //        $table->string('name', 100)->unique();
+    //    });
+
+    // RECREE PLUTARD
+    //    Schema::create('documents', function (Blueprint $table) {
+    //        $table->id();
+    //        $table->foreignId('organization_id')->constrained('organizations')->onDelete('cascade');
+    //        $table->morphs('documentable'); // Crée `documentable_id` (BIGINT) et `documentable_type` (VARCHAR)
+    //        $table->foreignId('document_type_id')->constrained('document_types');
+    //        $table->string('title');
+    //        $table->string('file_path', 512);
+    //        $table->unsignedBigInteger('file_size'); // en octets
+    //        $table->string('mime_type', 100);
+    //        $table->date('issue_date')->nullable();
+    //        $table->date('expiry_date')->nullable();
+    //        $table->foreignId('created_by_user_id')->nullable()->constrained('users')->onDelete('set null');
+    //        $table->timestamps();
+    //        $table->softDeletes();
+    //    });
     }
 
     /**

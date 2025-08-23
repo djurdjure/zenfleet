@@ -128,30 +128,55 @@
                                     @foreach ($vehicle->assignments as $assignment)
                                         @php
                                             $start = \Carbon\Carbon::parse($assignment->start_datetime);
-                                            $end = $assignment->end_datetime ? \Carbon\Carbon::parse($assignment->end_datetime) : $dateRange['end']->copy()->endOfDay();
-                                            $clampedStart = $start->max($dateRange['start']);
-                                            $clampedEnd = $end->min($dateRange['end']->copy()->endOfDay());
+                                            $isOngoing = is_null($assignment->end_datetime);
+                                            // Si pas de date de fin, on la fait courir jusqu'à la fin de la période visible pour le calcul
+                                            $end = $isOngoing ? $dateRange['end']->copy()->endOfDay() : \Carbon\Carbon::parse($assignment->end_datetime);
 
-                                            if ($viewMode === 'day') {
-                                                $startUnit = $dateRange['start']->diffInHours($clampedStart);
-                                                $duration = $clampedStart->diffInHours($clampedEnd);
-                                                $duration = $duration > 0 ? $duration : 1;
-                                            } else {
-                                                $startUnit = $dateRange['start']->diffInDays($clampedStart);
-                                                $duration = $clampedStart->diffInDays($clampedEnd) + 1;
+                                            // On ne processe que les affectations visibles dans la période
+                                            if ($end->isBefore($dateRange['start']) || $start->isAfter($dateRange['end'])) {
+                                                continue;
                                             }
-                                            if ($startUnit < 0 || $startUnit > $totalUnits) continue;
+
+                                            $viewStart = $dateRange['start']->copy()->startOfDay();
+                                            $viewEnd = $dateRange['end']->copy()->endOfDay();
+                                            $totalMinutesInView = $viewStart->diffInMinutes($viewEnd);
+
+                                            // On s'assure que les barres ne dépassent pas de la vue
+                                            $barStart = $start->max($viewStart);
+                                            $barEnd = $end->min($viewEnd);
+
+                                            $startOffsetMinutes = $viewStart->diffInMinutes($barStart);
+                                            $durationMinutes = $barStart->diffInMinutes($barEnd);
+
+                                            // Sécurité pour éviter les divisions par zéro ou les durées négatives
+                                            if ($totalMinutesInView <= 0 || $durationMinutes <= 0) {
+                                                continue;
+                                            }
+
+                                            $leftPercentage = ($startOffsetMinutes / $totalMinutesInView) * 100;
+                                            $widthPercentage = ($durationMinutes / $totalMinutesInView) * 100;
                                         @endphp
 
                                         <div id="assignment_{{ $assignment->id }}"
                                              data-assignment-id="{{ $assignment->id }}"
-                                             data-duration-days="{{ $start->diffInDays($end) }}"
+                                             data-duration-minutes="{{ $start->diffInMinutes($end) }}"
                                              @click="openEditModal({{ $assignment->id }})"
                                              class="absolute h-full p-1 z-10"
-                                             style="left: {{ ($startUnit / $totalUnits) * 100 }}%; width: {{ ($duration / $totalUnits) * 100 }}%;">
-                                            <div class="relative h-full w-full bg-blue-100 border-l-4 border-blue-500 rounded-md shadow-sm text-gray-800 text-xs font-semibold flex flex-col justify-center px-2 truncate cursor-pointer hover:ring-2 hover:ring-blue-500">
-                                                <p class="font-bold">{{ $assignment->driver->full_name ?? 'N/A' }}</p>
-                                                <p class="text-gray-600">{{ $start->format('H:i') }} - {{ $assignment->end_datetime ? $end->format('H:i') : '...' }}</p>
+                                             style="left: {{ $leftPercentage }}%; width: {{ $widthPercentage }}%;">
+                                            <div @class([
+                                                    'relative h-full w-full border-l-4 border-blue-600 rounded-md shadow-sm text-blue-900 text-xs flex flex-col justify-center px-2 truncate cursor-pointer hover:ring-2 hover:ring-blue-500',
+                                                    'bg-blue-200' => !$isOngoing,
+                                                    'ongoing-assignment-bar' => $isOngoing,
+                                                ])>
+                                                <p class="font-bold truncate">{{ $assignment->driver->full_name ?? 'N/A' }}</p>
+                                                <p class="font-normal">
+                                                    {{ $start->format('H:i') }}
+                                                    @if (!$isOngoing)
+                                                        - {{ $end->format('H:i') }}
+                                                    @else
+                                                        - No end date
+                                                    @endif
+                                                </p>
                                             </div>
                                         </div>
                                     @endforeach
@@ -224,19 +249,14 @@
                                     const totalWidth = toRow.offsetWidth;
                                     const leftPosition = item.offsetLeft;
 
-                                    const dayWidth = totalWidth / {{ $totalUnits }};
-                                    const daysOffset = Math.round(leftPosition / dayWidth);
+                                    const totalMinutesInView = (new Date('{{ $dateRange['end']->toDateTimeString() }}') - new Date('{{ $dateRange['start']->toDateTimeString() }}')) / 60000;
+                                    const minutesOffset = (leftPosition / totalWidth) * totalMinutesInView;
 
-                                    let newStartDate = new Date('{{ $dateRange['start']->toDateString() }}');
-                                    if ('{{ $viewMode }}' === 'day') {
-                                        newStartDate.setHours(newStartDate.getHours() + daysOffset);
-                                    } else {
-                                        newStartDate.setDate(newStartDate.getDate() + daysOffset);
-                                    }
+                                    let newStartDate = new Date('{{ $dateRange['start']->toDateTimeString() }}');
+                                    newStartDate.setMinutes(newStartDate.getMinutes() + minutesOffset);
 
-                                    let durationDays = parseInt(item.dataset.durationDays, 10);
-                                    let newEndDate = new Date(newStartDate);
-                                    newEndDate.setDate(newEndDate.getDate() + durationDays);
+                                    let durationMinutes = parseInt(item.dataset.durationMinutes, 10);
+                                    let newEndDate = new Date(newStartDate.getTime() + durationMinutes * 60000);
 
                                     this.updateAssignment(assignmentId, newVehicleId, newStartDate, newEndDate);
                                 }
