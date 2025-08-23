@@ -11,6 +11,11 @@
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
         @vite(['resources/css/app.css', 'resources/js/app.js'])
+        <style>
+            .ongoing-assignment-bar {
+                background-image: linear-gradient(to right, #93c5fd, #bfdbfe);
+            }
+        </style>
     </head>
     <body class="font-sans antialiased">
         <div x-data="{ sidebarOpen: false }" class="min-h-screen bg-gray-100">
