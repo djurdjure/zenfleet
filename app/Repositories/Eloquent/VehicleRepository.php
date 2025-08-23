@@ -43,6 +43,53 @@ class VehicleRepository implements VehicleRepositoryInterface
         return $query->orderBy('id', 'desc')->paginate($perPage)->withQueryString();
     }
 
+    public function getForPlanning(array $filters, string $startDate, string $endDate): LengthAwarePaginator
+    {
+        $perPage = $filters['per_page'] ?? 15;
+        $query = Vehicle::query()->with(['assignments' => function ($query) use ($startDate, $endDate) {
+            $query->where(function ($q) use ($startDate, $endDate) {
+                // Affectations qui commencent pendant la période
+                $q->whereBetween('start_datetime', [$startDate, $endDate]);
+            })->orWhere(function ($q) use ($startDate, $endDate) {
+                // Affectations qui se terminent pendant la période
+                $q->whereBetween('end_datetime', [$startDate, $endDate]);
+            })->orWhere(function ($q) use ($startDate, $endDate) {
+                // Affectations qui commencent avant et se terminent après (englobent la période)
+                $q->where('start_datetime', '<', $startDate)->where('end_datetime', '>', $endDate);
+            })->orWhere(function ($q) use ($startDate, $endDate) {
+                // Affectations en cours qui ont commencé avant la période
+                $q->where('start_datetime', '<', $startDate)->whereNull('end_datetime');
+            })->with('driver'); // Charger le chauffeur pour l'affectation
+        }]);
+
+        $user = Auth::user();
+        if ($user && !$user->hasRole('Super Admin')) {
+            $query->where('organization_id', $user->organization_id);
+        }
+
+        if (!empty($filters['search'])) {
+            $searchTerm = strtolower($filters['search']);
+            $query->where(function ($q) use ($searchTerm) {
+                $q->whereRaw('LOWER(registration_plate) LIKE ?', ["%{$searchTerm}%"])
+                  ->orWhereRaw('LOWER(brand) LIKE ?', ["%{$searchTerm}%"])
+                  ->orWhereRaw('LOWER(model) LIKE ?', ["%{$searchTerm}%"])
+                  ->orWhereHas('assignments.driver', function ($subQuery) use ($searchTerm) {
+                      $subQuery->whereRaw('LOWER(first_name) LIKE ?', ["%{$searchTerm}%"])
+                               ->orWhereRaw('LOWER(last_name) LIKE ?', ["%{$searchTerm}%"]);
+                  });
+            });
+        }
+
+        if (!empty($filters['sort']) && $filters['sort'] === 'alpha_asc') {
+            $query->orderBy('brand', 'asc')->orderBy('model', 'asc');
+        } else {
+            // Default sort
+            $query->orderBy('id', 'desc');
+        }
+
+        return $query->paginate($perPage)->withQueryString();
+    }
+
     public function find(int $id): ?Vehicle
     {
         return Vehicle::find($id);
