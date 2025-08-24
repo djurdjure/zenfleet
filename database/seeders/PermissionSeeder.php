@@ -23,6 +23,8 @@ class PermissionSeeder extends Seeder
             'view maintenance', 'manage maintenance plans', 'log maintenance',
             'create handovers', 'view handovers', 'edit handovers', 'delete handovers', 'upload signed handovers',
             'view suppliers', 'create suppliers', 'edit suppliers', 'delete suppliers',
+            'view documents', 'create documents', 'edit documents', 'delete documents',
+            'manage document_categories',
         ];
 
         foreach ($permissions as $permission) {
@@ -51,6 +53,8 @@ class PermissionSeeder extends Seeder
             'view assignments', 'create assignments', 'edit assignments', 'end assignments',
             'view maintenance', 'manage maintenance plans', 'log maintenance',
             'create handovers', 'view handovers', 'edit handovers',
+            'view documents', 'create documents', 'edit documents', 'delete documents',
+            'manage document_categories',
         ]);
         $this->command->info('Permissions granted to "Gestionnaire Flotte" role.');
 

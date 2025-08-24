@@ -77,6 +77,27 @@
             </x-sidebar.sidebar-group>
         @endcanany
 
+        {{-- Section Documents --}}
+        @canany(['view documents', 'manage document_categories'])
+            <x-sidebar.sidebar-group title="Documents" :active="request()->routeIs('admin.documents.*') || request()->routeIs('admin.document-categories.*')">
+                <x-slot name="icon">
+                    <x-lucide-folder-open stroke-width="1.5" />
+                </x-slot>
+                @can('view documents')
+                    <x-sidebar.sidebar-sub-link :href="route('admin.documents.index')" :active="request()->routeIs('admin.documents.*')">
+                        <x-slot name="icon"><x-lucide-file-text stroke-width="1.5" /></x-slot>
+                        {{ __('Liste des Documents') }}
+                    </x-sidebar.sidebar-sub-link>
+                @endcan
+                @can('manage document_categories')
+                    <x-sidebar.sidebar-sub-link :href="route('admin.document-categories.index')" :active="request()->routeIs('admin.document-categories.*')">
+                        <x-slot name="icon"><x-lucide-folder-cog stroke-width="1.5" /></x-slot>
+                        {{ __('Catégories de document') }}
+                    </x-sidebar.sidebar-sub-link>
+                @endcan
+            </x-sidebar.sidebar-group>
+        @endcanany
+
         {{-- Section Supplier --}}
         @can('view suppliers')
             <x-responsive-nav-link :href="route('admin.suppliers.index')" :active="request()->routeIs('admin.suppliers.*')">

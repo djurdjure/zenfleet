@@ -34,7 +34,7 @@ class DocumentCategoryController extends Controller
         return ['index', 'create', 'store'];
     }
 
-    protected function authorize($ability, $arguments = [])
+    public function authorize($ability, $arguments = [])
     {
         // Custom authorization logic to use a single permission for the entire resource
         return parent::authorize('manage document_categories');
@@ -61,7 +61,7 @@ class DocumentCategoryController extends Controller
 
         Auth::user()->organization->documentCategories()->create($validated);
 
-        return redirect()->route('admin.document_categories.index')->with('success', 'Catégorie de document créée avec succès.');
+        return redirect()->route('admin.document-categories.index')->with('success', 'Catégorie de document créée avec succès.');
     }
 
     public function edit(DocumentCategory $documentCategory)
@@ -78,7 +78,7 @@ class DocumentCategoryController extends Controller
 
         $documentCategory->update($validated);
 
-        return redirect()->route('admin.document_categories.index')->with('success', 'Catégorie de document mise à jour avec succès.');
+        return redirect()->route('admin.document-categories.index')->with('success', 'Catégorie de document mise à jour avec succès.');
     }
 
     public function destroy(DocumentCategory $documentCategory)
@@ -88,6 +88,6 @@ class DocumentCategoryController extends Controller
         }
 
         $documentCategory->delete();
-        return redirect()->route('admin.document_categories.index')->with('success', 'Catégorie de document supprimée avec succès.');
+        return redirect()->route('admin.document-categories.index')->with('success', 'Catégorie de document supprimée avec succès.');
     }
 }
