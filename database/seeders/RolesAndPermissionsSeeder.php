@@ -42,6 +42,7 @@ class RolesAndPermissionsSeeder extends Seeder
         Permission::firstOrCreate(['name' => 'view drivers', 'guard_name' => 'web']);
         Permission::firstOrCreate(['name' => 'manage missions', 'guard_name' => 'web']); // CRUD missions
         Permission::firstOrCreate(['name' => 'view missions', 'guard_name' => 'web']);
+        Permission::firstOrCreate(['name' => 'manage document_categories', 'guard_name' => 'web']);
 
 
         // === CRÉATION DES RÔLES ET ASSIGNATION DES PERMISSIONS ===
@@ -50,6 +51,7 @@ class RolesAndPermissionsSeeder extends Seeder
         $superAdminRole = Role::firstOrCreate(['name' => 'Super Admin', 'guard_name' => 'web']);
         // Pour le Super Admin, on peut soit lui donner toutes les permissions explicitement,
         // soit utiliser un Gate::before (voir étape suivante) pour un accès global.
+        $superAdminRole->givePermissionTo('manage document_categories');
         // $superAdminRole->givePermissionTo(Permission::all()); // Optionnel si Gate::before est utilisé
 
         // Rôle: Gestionnaire de Flotte
@@ -66,6 +68,7 @@ class RolesAndPermissionsSeeder extends Seeder
             'view drivers',
             'manage missions',
             'view missions',
+            'manage document_categories',
         ]);
 
         // Rôle: Chauffeur

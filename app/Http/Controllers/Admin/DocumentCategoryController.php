@@ -43,7 +43,9 @@ class DocumentCategoryController extends Controller
     public function index()
     {
         $organization_id = Auth::user()->organization_id;
-        $categories = DocumentCategory::where('organization_id', $organization_id)->paginate(15);
+        $categories = DocumentCategory::where('organization_id', $organization_id)
+            ->withCount('documents')
+            ->paginate(15);
         return view('admin.document_categories.index', compact('categories'));
     }
 
