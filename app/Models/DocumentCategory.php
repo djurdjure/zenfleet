@@ -18,10 +18,14 @@ class DocumentCategory extends Model
         'name',
         'description',
         'is_active',
+        'is_default',
+        'meta_schema',
     ];
 
     protected $casts = [
         'is_active' => 'boolean',
+        'is_default' => 'boolean',
+        'meta_schema' => 'array',
     ];
 
     /**

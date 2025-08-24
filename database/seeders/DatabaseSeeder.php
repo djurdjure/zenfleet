@@ -17,6 +17,7 @@ class DatabaseSeeder extends Seeder
             VehicleDataSeeder::class,
             DriverStatusSeeder::class,
             Maintenance\MaintenanceDataSeeder::class,
+            DefaultDocumentCategoriesSeeder::class,
         ]);
 
         $zenfleetOrganization = Organization::firstOrCreate(

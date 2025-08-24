@@ -89,6 +89,14 @@ class Document extends Model
     {
         return $this->morphedByMany(User::class, 'documentable');
     }
+
+    /**
+     * Get all of the suppliers that are assigned this document.
+     */
+    public function suppliers(): MorphToMany
+    {
+        return $this->morphedByMany(Supplier::class, 'documentable');
+    }
     
     /**
      * Get the human-readable file size.
