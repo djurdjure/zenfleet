@@ -5,9 +5,9 @@
                 {{ __('Catégories de Documents') }}
             </h2>
             @can('manage document_categories')
-                <x-primary-button-link href="{{ route('admin.document_categories.create') }}">
+                <a href="{{ route('admin.document_categories.create') }}" class="inline-flex items-center px-4 py-2 bg-gray-800 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-700 focus:bg-gray-700 active:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150">
                     {{ __('Ajouter une Catégorie') }}
-                </x-primary-button-link>
+                </a>
             @endcan
         </div>
     </x-slot>
