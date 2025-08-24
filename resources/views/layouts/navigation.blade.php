@@ -100,10 +100,12 @@
 
         {{-- Section Supplier --}}
         @can('view suppliers')
-            <x-responsive-nav-link :href="route('admin.suppliers.index')" :active="request()->routeIs('admin.suppliers.*')">
-                <x-lucide-building-2 class="mr-3 h-6 w-6 shrink-0"/>
+            <x-sidebar.sidebar-link :href="route('admin.suppliers.index')" :active="request()->routeIs('admin.suppliers.*')">
+                <x-slot name="icon">
+                    <x-lucide-building-2 class="h-5 w-5" stroke-width="1.5" />
+                </x-slot>
                 {{ __('Fournisseurs') }}
-            </x-responsive-nav-link>
+            </x-sidebar.sidebar-link>
         @endcan
 
 

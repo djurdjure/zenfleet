@@ -51,8 +51,23 @@ class RolesAndPermissionsSeeder extends Seeder
         $superAdminRole = Role::firstOrCreate(['name' => 'Super Admin', 'guard_name' => 'web']);
         // Pour le Super Admin, on peut soit lui donner toutes les permissions explicitement,
         // soit utiliser un Gate::before (voir étape suivante) pour un accès global.
-        $superAdminRole->givePermissionTo('manage document_categories');
-        // $superAdminRole->givePermissionTo(Permission::all()); // Optionnel si Gate::before est utilisé
+        $superAdminRole->givePermissionTo(Permission::all()); // Le Super Admin a toutes les permissions
+
+        // RÔLE : Administrateur d'Organisation
+        $adminRole = Role::firstOrCreate(['name' => 'Admin', 'guard_name' => 'web']);
+        $adminRole->givePermissionTo([
+            'manage users',
+            'view users',
+            'manage fleet',
+            'view fleet dashboard',
+            'manage vehicles',
+            'view vehicles',
+            'manage drivers',
+            'view drivers',
+            'manage missions',
+            'view missions',
+            'manage document_categories',
+        ]);
 
         // Rôle: Gestionnaire de Flotte
         $fleetManagerRole = Role::firstOrCreate(['name' => 'Fleet Manager', 'guard_name' => 'web']);
@@ -101,6 +116,16 @@ class RolesAndPermissionsSeeder extends Seeder
             ]
         );
         $fleetManagerUser->assignRole($fleetManagerRole);
+
+        // Utilisateur Administrateur (pour tests)
+        $adminUser = User::firstOrCreate(
+            ['email' => 'admin@zenfleet.com'],
+            [
+                'name' => 'Admin User',
+                'password' => Hash::make('password'), // Changez ceci !
+            ]
+        );
+        $adminUser->assignRole($adminRole);
 
          // Utilisateur Chauffeur (pour tests)
          $driverUser = User::firstOrCreate(

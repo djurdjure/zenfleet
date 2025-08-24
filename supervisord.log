@@ -3992,3 +3992,27 @@
 2025-08-24 13:14:17,407 WARN exited: laravel-worker_00 (exit status 1; not expected)
 2025-08-24 13:14:18,410 INFO spawned: 'laravel-worker_00' with pid 136
 2025-08-24 13:14:19,413 INFO success: laravel-worker_00 entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-08-24 16:26:54,674 INFO reaped unknown pid 301 (exit status 0)
+2025-08-24 16:29:34,943 WARN received SIGQUIT indicating exit request
+2025-08-24 16:29:34,946 INFO waiting for php-fpm, laravel-worker_00 to die
+2025-08-24 16:29:34,955 WARN stopped: laravel-worker_00 (terminated by SIGTERM)
+2025-08-24 16:29:35,001 INFO stopped: php-fpm (exit status 0)
+2025-08-24 16:30:06,001 INFO Set uid to user 1000 succeeded
+2025-08-24 16:30:06,005 INFO supervisord started with pid 1
+2025-08-24 16:30:07,010 INFO spawned: 'php-fpm' with pid 7
+2025-08-24 16:30:07,016 INFO spawned: 'laravel-worker_00' with pid 8
+2025-08-24 16:30:07,020 INFO spawned: 'laravel-worker_01' with pid 9
+2025-08-24 16:30:08,160 INFO success: php-fpm entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-08-24 16:30:08,161 INFO success: laravel-worker_00 entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-08-24 16:30:08,161 INFO success: laravel-worker_01 entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-08-24 16:33:10,110 INFO reaped unknown pid 64 (exit status 0)
+2025-08-24 16:38:38,750 INFO reaped unknown pid 99 (exit status 0)
+2025-08-24 16:40:01,586 INFO reaped unknown pid 183 (exit status 0)
+2025-08-24 17:17:13,464 INFO Set uid to user 1000 succeeded
+2025-08-24 17:17:13,482 INFO supervisord started with pid 1
+2025-08-24 17:17:14,489 INFO spawned: 'php-fpm' with pid 7
+2025-08-24 17:17:14,492 INFO spawned: 'laravel-worker_00' with pid 8
+2025-08-24 17:17:14,495 INFO spawned: 'laravel-worker_01' with pid 9
+2025-08-24 17:17:15,581 INFO success: php-fpm entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-08-24 17:17:15,581 INFO success: laravel-worker_00 entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-08-24 17:17:15,581 INFO success: laravel-worker_01 entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)

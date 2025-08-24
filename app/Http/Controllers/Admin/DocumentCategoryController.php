@@ -13,31 +13,8 @@ class DocumentCategoryController extends Controller
 {
     public function __construct()
     {
+        // This will automatically use the DocumentCategoryPolicy for authorization.
         $this->authorizeResource(DocumentCategory::class, 'document_category');
-    }
-
-    protected function resourceAbilityMap()
-    {
-        // Override the default map to use our custom permission
-        return [
-            'index' => 'manage',
-            'create' => 'manage',
-            'store' => 'manage',
-            'edit' => 'manage',
-            'update' => 'manage',
-            'destroy' => 'manage',
-        ];
-    }
-
-    protected function resourceMethodsWithoutModels()
-    {
-        return ['index', 'create', 'store'];
-    }
-
-    public function authorize($ability, $arguments = [])
-    {
-        // Custom authorization logic to use a single permission for the entire resource
-        return parent::authorize('manage document_categories');
     }
 
     public function index()
