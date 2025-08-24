@@ -10,7 +10,7 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900 dark:text-gray-100">
-                    <form action="{{ route('admin.document_categories.update', $documentCategory) }}" method="POST">
+                    <form action="{{ route('admin.document-categories.update', $documentCategory) }}" method="POST">
                         @csrf
                         @method('PUT')
                         <div class="grid grid-cols-1 gap-6">
@@ -27,7 +27,7 @@
                         </div>
 
                         <div class="flex items-center justify-end mt-6">
-                            <a href="{{ route('admin.document_categories.index') }}" class="text-sm text-gray-600 hover:text-gray-900 dark:text-ray-400 dark:hover:text-white mr-4">
+                            <a href="{{ route('admin.document-categories.index') }}" class="text-sm text-gray-600 hover:text-gray-900 dark:text-ray-400 dark:hover:text-white mr-4">
                                 {{ __('Annuler') }}
                             </a>
                             <x-primary-button>

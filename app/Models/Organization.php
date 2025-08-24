@@ -31,4 +31,5 @@ class Organization extends Model
     public function maintenancePlans(): HasMany { return $this->hasMany(MaintenancePlan::class); }
     public function maintenanceLogs(): HasMany { return $this->hasMany(MaintenanceLog::class); }
     public function handoverForms(): HasMany { return $this->hasMany(VehicleHandoverForm::class); }
+    public function documentCategories(): HasMany { return $this->hasMany(DocumentCategory::class); }
 }
