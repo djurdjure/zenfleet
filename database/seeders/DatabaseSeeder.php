@@ -2,8 +2,11 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
+use App\Models\Driver;
 use App\Models\Organization;
+use App\Models\Supplier;
+use App\Models\User;
+use App\Models\Vehicle;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Str;
 
@@ -17,6 +20,7 @@ class DatabaseSeeder extends Seeder
             VehicleDataSeeder::class,
             DriverStatusSeeder::class,
             Maintenance\MaintenanceDataSeeder::class,
+            DefaultDocumentCategoriesSeeder::class,
         ]);
 
         $zenfleetOrganization = Organization::firstOrCreate(
@@ -39,21 +43,40 @@ class DatabaseSeeder extends Seeder
         // CORRECTION : On assigne le bon rôle
         $superAdminUser->syncRoles(['Super Admin']);
         $this->command->info('Super Admin user created and assigned.');
-
-        // --- Création de données de test pour une organisation cliente ---
+        
+        // --- Création de données de test pour les environnements de développement ---
         if (app()->environment('local', 'development')) {
-            $clientOrganization = Organization::factory()->create(['name' => 'Client de Démo Inc.']);
-            if ($clientOrganization) {
-                $clientAdmin = User::factory()->create([
+            // Seed data for ZENFLEET organization only if it was just created
+            if ($zenfleetOrganization->wasRecentlyCreated) {
+                Driver::factory()->count(2)->create(['organization_id' => $zenfleetOrganization->id]);
+                Vehicle::factory()->count(3)->create(['organization_id' => $zenfleetOrganization->id]);
+                Supplier::factory()->count(2)->create(['organization_id' => $zenfleetOrganization->id]);
+                $this->command->info('Test data for ZENFLEET organization created.');
+            }
+
+            // Seed data for a demo client organization
+            $clientOrganization = Organization::firstOrCreate(
+                ['name' => 'Client de Démo Inc.'],
+                ['uuid' => (string) Str::uuid()]
+            );
+
+            $clientAdmin = User::firstOrCreate(
+                ['email' => 'client.admin@exemple.com'],
+                [
                     'first_name' => 'Admin',
                     'last_name' => 'Client',
-                    'email' => 'client.admin@exemple.com',
+                    'password' => bcrypt('password'),
                     'organization_id' => $clientOrganization->id,
-                ]);
-                $clientAdmin->assignRole('Admin');
+                    'email_verified_at' => now(),
+                ]
+            );
+            $clientAdmin->assignRole('Admin');
 
-                \App\Models\Driver::factory()->count(5)->create(['organization_id' => $clientOrganization->id]);
-                \App\Models\Vehicle::factory()->count(10)->create(['organization_id' => $clientOrganization->id]);
+            // Seed related data only if the demo organization was just created
+            if ($clientOrganization->wasRecentlyCreated) {
+                Driver::factory()->count(5)->create(['organization_id' => $clientOrganization->id]);
+                Vehicle::factory()->count(10)->create(['organization_id' => $clientOrganization->id]);
+                Supplier::factory()->count(5)->create(['organization_id' => $clientOrganization->id]);
                 $this->command->info('Demo organization with data created.');
             }
         }
