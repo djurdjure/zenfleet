@@ -50,8 +50,12 @@ class DriverController extends Controller
     {
         $this->authorize('create drivers');
         $driverStatuses = DriverStatus::orderBy('name')->get();
-        $users = User::orderBy('name')->get();
-        return view('admin.drivers.create', compact('driverStatuses', 'users'));
+        
+        // CORRECTION: On ne récupère que les utilisateurs qui ne sont pas déjà liés à un chauffeur
+        $assignedUserIds = Driver::whereNotNull('user_id')->pluck('user_id');
+        $linkableUsers = User::whereNotIn('id', $assignedUserIds)->orderBy('name')->get();
+
+        return view('admin.drivers.create', compact('driverStatuses', 'linkableUsers'));
     }
 
     public function store(StoreDriverRequest $request): RedirectResponse
