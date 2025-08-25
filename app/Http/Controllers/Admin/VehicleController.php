@@ -127,9 +127,6 @@ class VehicleController extends Controller
                 'users.*' => 'exists:users,id',
             ]);
 
-            // Ajouter l'ID de l'organisation
-            $validated['organization_id'] = auth()->user()->organization_id;
-
             // Créer le véhicule
             $vehicle = $this->vehicleService->createVehicle(
                 $validated,
@@ -369,8 +366,7 @@ class VehicleController extends Controller
             } else {
                 $validatedData = $validator->validated();
                 $validatedData["current_mileage"] = $validatedData["initial_mileage"] ?? 0;
-                // Assurer que l'organization_id est ajouté
-                $validatedData['organization_id'] = auth()->user()->organization_id;
+                // L'organization_id est ajouté automatiquement via le trait BelongsToOrganization
                 Vehicle::create($validatedData);
                 $successCount++;
             }
