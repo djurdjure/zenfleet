@@ -1,66 +1,136 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# ZenFleet
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Bienvenue sur le dépôt GitHub de ZenFleet, un projet de gestion de flotte robuste et standardisé.
 
-## About Laravel
+## Table des Matières
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+- [Introduction](#introduction)
+- [Environnement de Développement et Standards](#environnement-de-développement-et-standards)
+  - [Stack Technologique](#stack-technologique)
+  - [Outils et Commandes Standards](#outils-et-commandes-standards)
+- [Catalogue des Commandes Standards du Projet ZENFLEET](#catalogue-des-commandes-standards-du-projet-zenfleet)
+  - [Analyse des Commandes Spécifiques](#analyse-des-commandes-spécifiques)
+  - [Pour la Base de Données](#pour-la-base-de-données)
+  - [Pour la Logique Applicative](#pour-la-logique-applicative)
+  - [Pour l'Interface (Vues & Composants)](#pour-linterface-vues--composants)
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Introduction
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+Ce document fournit une description détaillée de l'environnement, des standards, de la structure des fichiers et de la base de données du projet ZenFleet. Notre objectif est de garantir une reproductibilité parfaite et une cohérence maximale dans le développement.
 
-## Learning Laravel
+## Environnement de Développement et Standards
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+Notre environnement est standardisé et conteneurisé pour garantir une reproductibilité parfaite.
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+### Stack Technologique
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+| Composant | Technologie/Version | Rôle |
+| :--- | :--- | :--- |
+| Serveur Web | Nginx 1.25-alpine | Point d'entrée HTTP. |
+| Backend | PHP 8.2-fpm-alpine | Moteur de l'application Laravel. |
+| Framework | Laravel 10.x | Cœur de l'application. |
+| Base de Données| PostgreSQL 15-alpine | Stockage des données. |
+| Cache & Jobs | Redis alpine | Gestion du cache et des files d'attente. |
+| Frontend | Node.js 20-bullseye | Compilation des assets et serveur Vite. |
+| CSS | Tailwind CSS | Framework de design. |
+| JavaScript| Alpine.js | Interactivité de l'interface. |
+| Icônes | blade-ui-kit/blade-icons | Gestion centralisée des icônes SVG. |
 
-## Laravel Sponsors
+### Outils et Commandes Standards
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+Il est impératif d'utiliser les mêmes outils et commandes pour garantir la cohérence.
 
-### Premium Partners
+**Gestion des Dépendances Backend (PHP) :**
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
+- **Outil :** Composer
+- **Exécution :** `docker compose exec -u zenfleet_user php composer <commande>`
+- **Exemple :** `docker compose exec -u zenfleet_user php composer require nouvelle/librairie`
 
-## Contributing
+**Gestion des Dépendances Frontend (JavaScript) :**
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+- **Outil :** Yarn (et non npm).
+- **Raison :** Nous utilisons Yarn pour sa gestion stricte et reproductible des versions de paquets via le fichier `yarn.lock`, ce qui élimine les conflits.
+- **Exécution :** `docker compose exec -u zenfleet_user node yarn <commande>`
+- **Exemples :**
+  - Installer les dépendances : `docker compose exec -u zenfleet_user node yarn install`
+  - Lancer le serveur de dev : `docker compose exec -u zenfleet_user node yarn dev`
+  - Compiler pour la prod : `docker compose exec -u zenfleet_user node yarn build`
 
-## Code of Conduct
+**Commandes Laravel (Artisan) :**
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+- **Exécution :** `docker compose exec -u zenfleet_user php php artisan <commande>`
+- **Exemple (migration) :** `docker compose exec -u zenfleet_user php php artisan migrate`
 
-## Security Vulnerabilities
+## Catalogue des Commandes Standards du Projet ZENFLEET
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+Voici le guide de référence des commandes Artisan pour ZENFLEET.
 
-## License
+### Analyse des Commandes Spécifiques
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+1.  `make:service SupplierService`
+    - **Analyse :** Cette commande a généré une erreur car `make:service` n'est pas une commande standard de Laravel.
+    - **Objectif visé :** Créer une classe de service dans le dossier `app/Services`.
+    - **Notre Procédure Standard :** Comme cette commande n'existe pas, nous créons les fichiers de service manuellement.
+      - Créer le répertoire : `mkdir -p app/Services`
+      - Créer le fichier : `touch app/Services/SupplierService.php` et le remplir.
+
+2.  `make:controller Admin/SupplierController --resource --model=Supplier`
+    - **Analyse :** C'est la commande parfaite et standard pour notre projet.
+    - **Décomposition d'Expert :**
+      - `make:controller Admin/SupplierController` : Crée le contrôleur `SupplierController.php` dans le bon sous-dossier `app/Http/Controllers/Admin/`, ce qui maintient notre code organisé.
+      - `--resource` : Génère automatiquement les 7 méthodes CRUD (`index`, `create`, `store`, `show`, `edit`, `update`, `destroy`), nous faisant gagner du temps et garantissant une structure cohérente.
+      - `--model=Supplier` : Lie le contrôleur au modèle `Supplier`. C'est une pratique "ultra pro" qui active le "route-model binding", simplifiant notre code dans les méthodes comme `edit(Supplier $supplier)`.
+
+### Pour la Base de Données
+
+**Créer un Modèle Eloquent :**
+
+- **Commande :** `docker compose exec -u zenfleet_user php php artisan make:model NomDuModele -m`
+- **Description :** Crée un fichier de modèle dans `app/Models/` et son fichier de migration (`-m`) associé.
+- **Exemple :** `... make:model Document -m`
+
+**Créer une Migration (Nouvelle Table) :**
+
+- **Commande :** `docker compose exec -u zenfleet_user php php artisan make:migration create_nom_de_la_table_table`
+- **Description :** Crée un fichier de migration pour une nouvelle table.
+- **Exemple :** `... make:migration create_documents_table`
+
+**Créer une Migration (Modifier une Table) :**
+
+- **Commande :** `docker compose exec -u zenfleet_user php php artisan make:migration add_colonne_to_nom_de_la_table_table`
+- **Description :** Crée un fichier de migration pour modifier une table existante.
+- **Exemple :** `... make:migration add_expiry_date_to_documents_table`
+
+**Créer un Seeder :**
+
+- **Commande :** `docker compose exec -u zenfleet_user php php artisan make:seeder NomSeeder`
+- **Description :** Crée un fichier pour peupler la base de données.
+- **Exemple :** `... make:seeder DocumentTypeSeeder`
+
+### Pour la Logique Applicative
+
+**Créer un Contrôleur :** (Voir analyse ci-dessus)
+
+**Créer une Form Request :**
+
+- **Commande :** `docker compose exec -u zenfleet_user php php artisan make:request Admin/NomDuModule/StoreNomRequest`
+- **Description :** Crée une classe de validation pour sécuriser les données d'un formulaire. C'est une de nos pratiques clés.
+- **Exemple :** `... make:request Admin/Document/StoreDocumentRequest`
+
+**Créer un Service Provider :**
+
+- **Commande :** `docker compose exec -u zenfleet_user php php artisan make:provider NomServiceProvider`
+- **Description :** Crée un fournisseur de services, comme nous l'avons fait pour `RepositoryServiceProvider`.
+- **Exemple :** `... make:provider DocumentServiceProvider`
+
+### Pour l'Interface (Vues & Composants)
+
+**Créer un Composant Blade :**
+
+- **Commande :** `docker compose exec -u zenfleet_user php php artisan make:component NomDuComposant`
+- **Description :** Crée une classe et une vue pour un composant Blade réutilisable.
+- **Exemple :** `... make:component Forms/DocumentUploader`
+
+En respectant ce catalogue de commandes, nous garantissons que chaque nouvelle partie de l'application est construite de manière cohérente, propre et professionnelle.
+
+

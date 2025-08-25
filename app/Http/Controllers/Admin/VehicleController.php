@@ -339,7 +339,7 @@ class VehicleController extends Controller
             // Conversion des noms en ID et formatage des données
             $preparedData = [
                 'registration_plate' => $data['immatriculation'] ?? null,
-                'vin' => $data['numero_serie_vin'] ?? null,
+                'vin' => ($data['numero_serie_vin'] === '') ? null : ($data['numero_serie_vin'] ?? null),
                 'brand' => $data['marque'] ?? null,
                 'model' => $data['modele'] ?? null,
                 'color' => $data['couleur'] ?? null,
@@ -364,11 +364,18 @@ class VehicleController extends Controller
             if ($validator->fails()) {
                 $errorRows[] = ['line' => $rowNumber, 'errors' => $validator->errors()->all(), 'data' => $record];
             } else {
-                $validatedData = $validator->validated();
-                $validatedData["current_mileage"] = $validatedData["initial_mileage"] ?? 0;
-                // L'organization_id est ajouté automatiquement via le trait BelongsToOrganization
-                Vehicle::create($validatedData);
-                $successCount++;
+                try {
+                    $validatedData = $validator->validated();
+                    $validatedData["current_mileage"] = $validatedData["initial_mileage"] ?? 0;
+                    // L'organization_id est ajouté automatiquement via le trait BelongsToOrganization
+                    Vehicle::create($validatedData);
+                    $successCount++;
+                } catch (\Illuminate\Database\UniqueConstraintViolationException $e) {
+                    $errorRows[] = ['line' => $rowNumber, 'errors' => ['Le numéro de série (VIN) ou l\'immatriculation est déjà utilisé.'], 'data' => $record];
+                } catch (\Exception $e) {
+                    Log::error("Erreur d'importation de véhicule à la ligne {$rowNumber}: " . $e->getMessage());
+                    $errorRows[] = ['line' => $rowNumber, 'errors' => ['Une erreur inattendue est survenue: ' . $e->getMessage()], 'data' => $record];
+                }
             }
         }
 
