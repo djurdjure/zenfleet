@@ -404,33 +404,30 @@ class DriverController extends Controller
     private function formatDate($dateString)
     {
         if (!$dateString) return null;
-        
-        // Si la date est déjà au format YYYY-MM-DD
+
+        // Si la date est déjà au format YYYY-MM-DD, on la retourne directement.
         if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $dateString)) {
             return $dateString;
         }
-        
-        // Essayer de parser différents formats de date
+
         $formats = [
-            'd/m/Y', // 31/12/2023
-            'd-m-Y', // 31-12-2023
-            'd.m.Y', // 31.12.2023
-            'Y/m/d', // 2023/12/31
-            'Y-m-d', // 2023-12-31
-            'Y.m.d', // 2023.12.31
-            'd/m/y', // 31/12/23
-            'd-m-y', // 31-12-23
-            'd.m.y'  // 31.12.23
+            'd/m/Y', 'd-m-Y', 'd.m.Y',
+            'Y/m/d', 'Y-m-d', 'Y.m.d',
+            'd/m/y', 'd-m-y', 'd.m.y'
         ];
-        
+
         foreach ($formats as $format) {
             $date = \DateTime::createFromFormat($format, $dateString);
-            if ($date !== false) {
+            // On vérifie que la date a été créée et qu'il n'y a pas d'erreurs critiques.
+            // On ignore les avertissements (warning_count) qui peuvent être trop stricts (ex: données en trop).
+            $errors = \DateTime::getLastErrors();
+            if ($date !== false && $errors['error_count'] === 0) {
                 return $date->format('Y-m-d');
             }
         }
-        
-        // Si aucun format ne correspond, retourner la chaîne originale
+
+        // Si aucun format n'a fonctionné, on retourne la chaîne originale pour qu'elle échoue à la validation 'date_format:Y-m-d'
+        // et retourne un message d'erreur clair à l'utilisateur.
         return $dateString;
     }
     
