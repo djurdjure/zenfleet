@@ -182,28 +182,27 @@ class DriverController extends Controller
         $file = $request->file('csv_file');
         
         try {
-            // Lecture du contenu du fichier
+            // Lecture du contenu du fichier et suppression du BOM
             $fileContent = file_get_contents($file->getRealPath());
-            
-            // Correction : Suppression manuelle et fiable du BOM UTF-8
             if (str_starts_with($fileContent, "\xef\xbb\xbf")) {
                 $fileContent = substr($fileContent, 3);
             }
-            
-            // Création du lecteur CSV directement depuis la chaîne de caractères nettoyée
-            $csv = Reader::createFromString($fileContent);
-            $csv->setHeaderOffset(0);
-            
-            $records = Statement::create()->process($csv);
+
+            // Détection du format et appel du parseur approprié
+            $format = $this->detectFileFormat($fileContent);
+            $records = match ($format) {
+                'csv' => $this->parseCsvFormat($fileContent),
+                'key_value' => $this->parseCustomFormat($fileContent),
+                default => throw new \Exception("Format de fichier inconnu ou non supporté."),
+            };
             
             $successCount = 0;
             $errorRows = [];
             $importId = Str::uuid()->toString();
-            
             $statuses = DriverStatus::pluck('id', 'name');
             $defaultStatusId = $statuses->get('Disponible');
             
-            Log::info("Début de l'importation CSV des chauffeurs (refactorisée)", [
+            Log::info("Début de l'importation (format personnalisé) des chauffeurs", [
                 'import_id' => $importId,
                 'file' => $file->getClientOriginalName(),
                 'records_count' => count($records),
@@ -211,15 +210,14 @@ class DriverController extends Controller
             
             foreach ($records as $offset => $record) {
                 try {
-                    // La sanitisation des clés n'est plus nécessaire car le BOM est supprimé à la source.
-                    // On nettoie juste les valeurs.
+                    // Les valeurs sont déjà nettoyées par le parseur, mais un trim supplémentaire ne fait pas de mal.
                     $sanitizedRecord = array_map('trim', $record);
 
                     $data = $this->prepareDataForValidation($sanitizedRecord);
                     $validator = Validator::make($data, $this->getValidationRules());
                     
                     if ($validator->fails()) {
-                        $errorRows[] = ['line' => $offset + 2, 'errors' => $validator->errors()->all(), 'data' => $record];
+                        $errorRows[] = ['line' => $offset + 1, 'errors' => $validator->errors()->all(), 'data' => $record];
                         continue;
                     }
                     
@@ -235,13 +233,19 @@ class DriverController extends Controller
                     
                 } catch (QueryException $e) {
                     $errorMessage = $this->formatDatabaseError($e);
-                    $errorRows[] = ['line' => $offset + 2, 'errors' => [$errorMessage], 'data' => $record];
+                    $errorRows[] = ['line' => $offset + 1, 'errors' => [$errorMessage], 'data' => $record];
                 } catch (\Exception $e) {
-                    $errorRows[] = ['line' => $offset + 2, 'errors' => ["Erreur inattendue: " . $e->getMessage()], 'data' => $record];
+                    $detailedError = sprintf(
+                        "Erreur inattendue: %s dans %s ligne %d",
+                        $e->getMessage(),
+                        basename($e->getFile()),
+                        $e->getLine()
+                    );
+                    $errorRows[] = ['line' => $offset + 1, 'errors' => [$detailedError], 'data' => $record];
                 }
             }
             
-            Log::info("Fin de l'importation CSV des chauffeurs", [
+            Log::info("Fin de l'importation (format personnalisé) des chauffeurs", [
                 'import_id' => $importId,
                 'success_count' => $successCount,
                 'error_count' => count($errorRows)
@@ -254,13 +258,21 @@ class DriverController extends Controller
                 ->with('fileName', $file->getClientOriginalName());
                 
         } catch (\Exception $e) {
-            Log::critical("Erreur critique lors de l'importation CSV", [
+            $detailedError = sprintf(
+                "Une erreur critique est survenue: %s dans %s ligne %d",
+                $e->getMessage(),
+                basename($e->getFile()),
+                $e->getLine()
+            );
+
+            Log::critical("Erreur critique lors de l'importation (format personnalisé)", [
                 'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
                 'file' => $file->getClientOriginalName()
             ]);
             
             return redirect()->route('admin.drivers.import.show')
-                ->with('error', "Une erreur est survenue lors de la lecture du fichier CSV: " . $e->getMessage())
+                ->with('error', $detailedError)
                 ->withInput();
         }
     }
@@ -356,6 +368,93 @@ class DriverController extends Controller
     }
     
     /**
+     * Detects the format of the import file based on its content.
+     *
+     * @param string $content
+     * @return string 'csv', 'key_value', or 'unknown'
+     */
+    private function detectFileFormat(string $content): string
+    {
+        $lines = preg_split("/\r\n|\n|\r/", $content);
+        $firstNonEmptyLine = '';
+        foreach ($lines as $line) {
+            if (trim($line) !== '') {
+                $firstNonEmptyLine = $line;
+                break;
+            }
+        }
+
+        if ($firstNonEmptyLine === '') {
+            return 'unknown';
+        }
+
+        if (str_contains($firstNonEmptyLine, ',')) {
+            return 'csv';
+        }
+
+        if (str_contains($firstNonEmptyLine, ':')) {
+            return 'key_value';
+        }
+
+        return 'unknown';
+    }
+
+    /**
+     * Parses a custom key:value format from a string.
+     * Records are separated by empty lines.
+     *
+     * @param string $content
+     * @return array
+     */
+    private function parseCustomFormat(string $content): array
+    {
+        $records = [];
+        $currentRecord = [];
+        $lines = preg_split("/\r\n|\n|\r/", $content);
+
+        foreach ($lines as $line) {
+            $line = trim($line);
+
+            if (empty($line)) {
+                if (!empty($currentRecord)) {
+                    $records[] = $currentRecord;
+                    $currentRecord = [];
+                }
+                continue;
+            }
+
+            $parts = explode(':', $line, 2);
+            if (count($parts) === 2) {
+                $key = trim($parts[0]);
+                $value = trim($parts[1]);
+                $currentRecord[$key] = $value;
+            }
+        }
+
+        if (!empty($currentRecord)) {
+            $records[] = $currentRecord;
+        }
+
+        return $records;
+    }
+
+    /**
+     * Parses a standard CSV string into an array of records.
+     *
+     * @param string $content
+     * @return array
+     */
+    private function parseCsvFormat(string $content): array
+    {
+        $csv = \League\Csv\Reader::createFromString($content);
+        $csv->setHeaderOffset(0);
+        
+        $records = \League\Csv\Statement::create()->process($csv);
+        
+        return iterator_to_array($records, true);
+    }
+
+    /**
      * Prépare les données pour la validation.
      */
     private function prepareDataForValidation(array $record): array
@@ -385,6 +484,12 @@ class DriverController extends Controller
         foreach ($map as $csvHeader => $dbField) {
             if (array_key_exists($csvHeader, $record)) {
                 $value = $record[$csvHeader];
+
+                // Convert empty strings to null so they pass 'nullable' validation
+                // and are correctly stored in the database.
+                if ($value === '') {
+                    $value = null;
+                }
                 
                 // Traitement spécifique pour les dates
                 if (in_array($dbField, ['birth_date', 'license_issue_date', 'recruitment_date', 'contract_end_date']) && $value) {
@@ -418,10 +523,11 @@ class DriverController extends Controller
 
         foreach ($formats as $format) {
             $date = \DateTime::createFromFormat($format, $dateString);
-            // On vérifie que la date a été créée et qu'il n'y a pas d'erreurs critiques.
-            // On ignore les avertissements (warning_count) qui peuvent être trop stricts (ex: données en trop).
-            $errors = \DateTime::getLastErrors();
-            if ($date !== false && $errors['error_count'] === 0) {
+
+            // This is a robust check. If the date was created successfully AND
+            // re-formatting it with the same format produces the original string,
+            // then the parse was successful and unambiguous.
+            if ($date instanceof \DateTime && $date->format($format) === $dateString) {
                 return $date->format('Y-m-d');
             }
         }
@@ -438,36 +544,42 @@ class DriverController extends Controller
     {
         $errorCode = $e->getCode();
         $errorMessage = $e->getMessage();
-        
-        // Erreurs de contrainte d'unicité
-        if (strpos($errorMessage, 'unique constraint') !== false || $errorCode == 23505) {
-            if (strpos($errorMessage, 'employee_number') !== false) {
-                return "Le matricule existe déjà dans la base de données.";
+
+        // Erreurs de contrainte d'unicité (PostgreSQL: 23505)
+        if ($errorCode == 23505) {
+            if (str_contains($errorMessage, 'drivers_employee_number_unique')) {
+                return "Le matricule fourni existe déjà.";
             }
-            if (strpos($errorMessage, 'personal_email') !== false) {
-                return "L'adresse email existe déjà dans la base de données.";
+            if (str_contains($errorMessage, 'drivers_personal_email_unique')) {
+                return "L'adresse email fournie existe déjà.";
             }
-            if (strpos($errorMessage, 'license_number') !== false) {
-                return "Le numéro de permis existe déjà dans la base de données.";
+            if (str_contains($errorMessage, 'drivers_license_number_unique')) {
+                return "Le numéro de permis fourni existe déjà.";
+            }
+            // Essayer d'extraire les détails de la clé pour un message plus générique
+            if (preg_match('/Key \((.*?)\)=\((.*?)\) already exists./', $errorMessage, $matches)) {
+                $column = $matches[1];
+                $value = $matches[2];
+                return "La valeur '$value' existe déjà pour le champ '$column'.";
             }
             return "Une valeur unique existe déjà dans la base de données.";
         }
-        
-        // Erreurs de contrainte de clé étrangère
-        if (strpos($errorMessage, 'foreign key constraint') !== false || $errorCode == 23503) {
-            return "Référence à une valeur qui n'existe pas dans la base de données.";
-        }
-        
-        // Erreurs de type de données
-        if (strpos($errorMessage, 'invalid input syntax') !== false || $errorCode == 22007) {
-            if (strpos($errorMessage, 'date/time') !== false) {
-                return "Format de date invalide. Utilisez le format AAAA-MM-JJ.";
+
+        // Erreurs de type de données (PostgreSQL: 22P02, 22007)
+        if ($errorCode == '22P02' || $errorCode == '22007') {
+            if (str_contains($errorMessage, 'date') || str_contains($errorMessage, 'time')) {
+                return "Format de date invalide. Le format attendu est AAAA-MM-JJ.";
             }
-            return "Format de données invalide.";
+            return "Format de données invalide pour l'une des colonnes.";
         }
-        
+
+        // Erreurs de contrainte de clé étrangère (PostgreSQL: 23503)
+        if ($errorCode == 23503) {
+            return "Référence à une valeur qui n'existe pas (ex: statut de chauffeur invalide).";
+        }
+
         // Erreur par défaut
-        return "Erreur de base de données: " . $e->getMessage();
+        return "Erreur de base de données: " . Str::limit($e->getMessage(), 150);
     }
     
     /**
