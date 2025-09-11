@@ -1,100 +1,65 @@
-@import 'tom-select/dist/css/tom-select.default.css';
+/*!
+ * 🚀 ZENFLEET - CSS Principal (Pages Publiques)
+ * Compatible avec Tailwind CSS + Vite
+ */
 
-@import "flatpickr/dist/flatpickr.css";
+/* ✅ Import des librairies tierces EN PREMIER */
+@import 'tom-select/dist/css/tom-select.css';
+@import 'flatpickr/dist/flatpickr.min.css';
 
+/* ✅ Import Tailwind CSS */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-
-/* Sidebar Custom Styles */
-nav[x-data] {
-    font-size: 0.925rem;
-}
-
-nav[x-data] a svg,
-nav[x-data] button svg {
-    height: 1.25rem;
-    width: 1.25rem;
-}
-
-nav[x-data] .group .mr-3 svg {
-    color: #6b7280;
-}
-nav[x-data] .group:hover .mr-3 svg {
-    color: #374151;
-}
-
-nav[x-data] .sub-link-icon svg {
-    color: inherit;
-}
-
-/* Sub-menu icon wrapper styles */
-.sub-link-icon-wrapper {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    height: 1.5rem;
-    width: 1.5rem;
-    border-radius: 9999px;
-    border: 1px solid #d1d5db; /* border-gray-300 */
-    transition: all 0.2s ease-in-out;
-}
-
-.sub-link-icon-wrapper svg {
-    /*height: 0.6rem; 12px */
-    /*width: 0.6rem;   12px */
-    height: inherit !important;
-    width: inherit !important;
-    color: #6b7280; /* text-gray-500 */
-    transition: color 0.2s ease-in-out;
-}
-
-/* Active state for sub-menu links */
-a.active .sub-link-icon-wrapper {
-    background-color: rgb(2 132 199); /* bg-primary-600 */
-    border-color: rgb(2 132 199);
-}
-
-a.active .sub-link-icon-wrapper svg {
-    color: #ffffff;
-}
-
-
-/* STYLES SPÉCIFIQUES POUR L'IMPRESSION DE LA FICHE DE REMISE */
-@media print {
-    /* Cache tous les éléments de l'interface par défaut */
-    body * {
-        visibility: hidden;
+/* Variables globales ZenFleet */
+@layer base {
+    :root {
+        --zenfleet-primary: #3b82f6;
+        --zenfleet-secondary: #1e293b;
+        --zenfleet-success: #10b981;
+        --zenfleet-warning: #f59e0b;
+        --zenfleet-danger: #ef4444;
+        --zenfleet-info: #06b6d4;
     }
-
     
-    
-    /* Ne rend visible que la zone d'impression et son contenu */
-    #print-area, #print-area * {
-        visibility: visible;
-    }
-
-    /* Positionne la zone d'impression en haut de la page */
-    #print-area {
-        position: absolute;
-        left: 0;
-        top: 0;
-        width: 100%;
-        box-shadow: none !important;
-        border: none !important;
-    }
-
-    /* Cache spécifiquement les éléments non désirés comme les boutons */
-    .print\:hidden {
-        display: none !important;
-    }
-
-    /* Optimisation de la police pour le format A4 */
-    body, #print-area {
-        font-size: 10pt;
-        background-color: white !important;
-        -webkit-print-color-adjust: exact;
-        print-color-adjust: exact;
+    body {
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        @apply bg-gray-50 text-gray-900 antialiased;
     }
 }
+
+/* Composants publics */
+@layer components {
+    .zenfleet-card {
+        @apply bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden;
+        @apply transition-all duration-300 hover:shadow-lg;
+    }
+    
+    .zenfleet-btn {
+        @apply inline-flex items-center justify-center px-4 py-2 text-sm font-medium rounded-lg;
+        @apply transition-all duration-200;
+    }
+    
+    .zenfleet-btn-primary {
+        @apply zenfleet-btn bg-blue-600 text-white border border-blue-600;
+        @apply hover:bg-blue-700 focus:ring-4 focus:ring-blue-200;
+    }
+    
+    .zenfleet-input {
+        @apply block w-full px-3 py-2 text-sm border border-gray-300 rounded-lg;
+        @apply focus:ring-2 focus:ring-blue-500 focus:border-blue-500;
+    }
+}
+
+/* Utilitaires */
+@layer utilities {
+    .text-zenfleet-primary {
+        color: var(--zenfleet-primary);
+    }
+    
+    .bg-zenfleet-primary {
+        background-color: var(--zenfleet-primary);
+    }
+}
+

@@ -1,16 +1,84 @@
-@props(['title', 'active'])
+{{-- 
+    🚀 ZENFLEET - Composant Sidebar Group Optimisé
+    Correction : Gestion professionnelle de la variable $active
+--}}
+@props([
+    'title' => '',
+    'icon' => null,
+    'active' => false,
+    'collapsed' => false,
+    'permission' => null,
+    'routes' => []
+])
 
-<div x-data="{ open: {{ $active ? 'true' : 'false' }} }" class="relative">
-    <button @click="open = !open" class="w-full flex items-center p-2 text-sm text-gray-700 rounded-lg hover:bg-gray-100 group">
-        @if(isset($icon))
-            <span class="mr-3 text-gray-500 group-hover:text-gray-700">
-                {{ $icon }}
-            </span>
+{{-- Vérification des permissions si spécifiées --}}
+@can($permission ?? 'view-sidebar')
+    @php
+        // Détection intelligente du statut actif
+        $isActive = $active || collect($routes)->contains(function($route) {
+            return request()->routeIs($route);
+        });
+        
+        // Classes CSS dynamiques
+        $groupClasses = $isActive ? 'sidebar-group active' : 'sidebar-group';
+        $iconClasses = $isActive ? 'sidebar-icon active' : 'sidebar-icon';
+    @endphp
+
+    <div class="{{ $groupClasses }}" data-group="{{ Str::slug($title) }}">
+        @if($title)
+            <div class="sidebar-group-header" 
+                 onclick="toggleSidebarGroup('{{ Str::slug($title) }}')"
+                 role="button" 
+                 tabindex="0"
+                 aria-expanded="{{ $collapsed ? 'false' : 'true' }}">
+                
+                @if($icon)
+                    <i class="{{ $iconClasses }} {{ $icon }}"></i>
+                @endif
+                
+                <span class="sidebar-group-title">{{ $title }}</span>
+                
+                <i class="sidebar-group-arrow fas fa-chevron-{{ $collapsed ? 'right' : 'down' }}"></i>
+            </div>
         @endif
-        <span class="flex-1 ml-1 text-left whitespace-nowrap">{{ $title }}</span>
-        <x-lucide-chevron-down class="h-4 w-4 transform transition-transform" ::class="{'rotate-180': open}" stroke-width="1.5"/>
-    </button>
-    <div x-show="open" x-transition class="mt-1 space-y-1 pl-4 border-l-2 border-dotted border-gray-300 ml-4">
-        {{ $slot }}
+
+        <div class="sidebar-group-content {{ $collapsed ? 'collapsed' : '' }}">
+            {{ $slot }}
+        </div>
     </div>
-</div>
+@endcan
+
+@push('scripts')
+<script>
+function toggleSidebarGroup(groupSlug) {
+    const group = document.querySelector(`[data-group="${groupSlug}"]`);
+    const content = group.querySelector('.sidebar-group-content');
+    const arrow = group.querySelector('.sidebar-group-arrow');
+    
+    content.classList.toggle('collapsed');
+    arrow.classList.toggle('fa-chevron-right');
+    arrow.classList.toggle('fa-chevron-down');
+    
+    // Sauvegarde de l'état dans localStorage
+    const isCollapsed = content.classList.contains('collapsed');
+    localStorage.setItem(`sidebar-group-${groupSlug}`, isCollapsed ? 'collapsed' : 'expanded');
+}
+
+// Restauration de l'état au chargement
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('[data-group]').forEach(group => {
+        const groupSlug = group.dataset.group;
+        const savedState = localStorage.getItem(`sidebar-group-${groupSlug}`);
+        
+        if (savedState === 'collapsed') {
+            const content = group.querySelector('.sidebar-group-content');
+            const arrow = group.querySelector('.sidebar-group-arrow');
+            
+            content.classList.add('collapsed');
+            arrow.classList.remove('fa-chevron-down');
+            arrow.classList.add('fa-chevron-right');
+        }
+    });
+});
+</script>
+@endpush

@@ -1,32 +1,73 @@
 /**
- * We'll load the axios HTTP library which allows us to easily issue requests
- * to our Laravel back-end. This library automatically handles sending the
- * CSRF token as a header based on the value of the "XSRF" token cookie.
+ * 🔧 ZENFLEET BOOTSTRAP - Configuration système
+ * Gestion des requêtes HTTP, CSRF, et configuration globale
  */
 
 import axios from 'axios';
-window.axios = axios;
 
+// Configuration Axios globale
+window.axios = axios;
 window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
 
-/**
- * Echo exposes an expressive API for subscribing to channels and listening
- * for events that are broadcast by Laravel. Echo and event broadcasting
- * allows your team to easily build robust real-time web applications.
- */
+// Configuration CSRF automatique
+const token = document.head.querySelector('meta[name="csrf-token"]');
+if (token) {
+    window.axios.defaults.headers.common['X-CSRF-TOKEN'] = token.content;
+} else {
+    console.error('❌ CSRF token not found. Vérifiez la balise meta dans le layout.');
+}
 
-// import Echo from 'laravel-echo';
+// Configuration des intercepteurs Axios pour gestion des erreurs
+window.axios.interceptors.response.use(
+    response => response,
+    error => {
+        if (error.response) {
+            const status = error.response.status;
+            
+            switch (status) {
+                case 401:
+                    console.error('🔐 Non authentifié - Redirection vers login');
+                    window.location.href = '/login';
+                    break;
+                case 403:
+                    console.error('🚫 Accès refusé');
+                    if (window.ZenFleet) {
+                        window.ZenFleet.notify('Accès refusé', 'error');
+                    }
+                    break;
+                case 404:
+                    console.error('🔍 Ressource non trouvée');
+                    break;
+                case 422:
+                    console.error('✍️ Erreurs de validation');
+                    // Les erreurs de validation sont gérées par Laravel
+                    break;
+                case 500:
+                    console.error('💥 Erreur serveur');
+                    if (window.ZenFleet) {
+                        window.ZenFleet.notify('Erreur serveur', 'error');
+                    }
+                    break;
+                default:
+                    console.error(`❌ Erreur HTTP ${status}`);
+            }
+        }
+        
+        return Promise.reject(error);
+    }
+);
 
-// import Pusher from 'pusher-js';
-// window.Pusher = Pusher;
+// Configuration pour le développement
+if (import.meta.env.DEV) {
+    console.log('🔧 Mode développement activé');
+    
+    // Debug des requêtes Ajax
+    window.axios.interceptors.request.use(request => {
+        console.log('📤 Requête:', request.method.toUpperCase(), request.url);
+        return request;
+    });
+}
 
-// window.Echo = new Echo({
-//     broadcaster: 'pusher',
-//     key: import.meta.env.VITE_PUSHER_APP_KEY,
-//     cluster: import.meta.env.VITE_PUSHER_APP_CLUSTER ?? 'mt1',
-//     wsHost: import.meta.env.VITE_PUSHER_HOST ? import.meta.env.VITE_PUSHER_HOST : `ws-${import.meta.env.VITE_PUSHER_APP_CLUSTER}.pusher.com`,
-//     wsPort: import.meta.env.VITE_PUSHER_PORT ?? 80,
-//     wssPort: import.meta.env.VITE_PUSHER_PORT ?? 443,
-//     forceTLS: (import.meta.env.VITE_PUSHER_SCHEME ?? 'https') === 'https',
-//     enabledTransports: ['ws', 'wss'],
-// });
+// Export des utilities
+export { axios };
+

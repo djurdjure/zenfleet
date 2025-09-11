@@ -1,0 +1,577 @@
+.
+├── .editorconfig
+├── .env
+├── .env.example
+├── .gitattributes
+├── .gitignore
+├── README.md
+├── app
+│   ├── Console
+│   │   ├── Commands
+│   │   │   └── DiagnoseDatabase.php
+│   │   └── Kernel.php
+│   ├── Exceptions
+│   │   └── Handler.php
+│   ├── Http
+│   │   ├── Controllers
+│   │   │   ├── Admin
+│   │   │   │   ├── AssignmentController.php
+│   │   │   │   ├── DashboardController.php
+│   │   │   │   ├── DocumentCategoryController.php
+│   │   │   │   ├── DocumentController.php
+│   │   │   │   ├── DriverController.php
+│   │   │   │   ├── Handover
+│   │   │   │   │   └── VehicleHandoverController.php
+│   │   │   │   ├── Maintenance
+│   │   │   │   │   ├── DashboardController.php
+│   │   │   │   │   ├── MaintenanceLogController.php
+│   │   │   │   │   └── MaintenancePlanController.php
+│   │   │   │   ├── OrganizationController.php
+│   │   │   │   ├── PlanningController.php
+│   │   │   │   ├── RoleController.php
+│   │   │   │   ├── SupplierCategoryController.php
+│   │   │   │   ├── SupplierController.php
+│   │   │   │   ├── UserController.php
+│   │   │   │   └── VehicleController.php
+│   │   │   ├── Api
+│   │   │   │   └── AssignmentController.php
+│   │   │   ├── Auth
+│   │   │   │   ├── AuthenticatedSessionController.php
+│   │   │   │   ├── ConfirmablePasswordController.php
+│   │   │   │   ├── EmailVerificationNotificationController.php
+│   │   │   │   ├── EmailVerificationPromptController.php
+│   │   │   │   ├── NewPasswordController.php
+│   │   │   │   ├── PasswordController.php
+│   │   │   │   ├── PasswordResetLinkController.php
+│   │   │   │   ├── RegisteredUserController.php
+│   │   │   │   └── VerifyEmailController.php
+│   │   │   ├── Controller.php
+│   │   │   └── ProfileController.php
+│   │   ├── Kernel.php
+│   │   ├── Livewire
+│   │   │   └── OrganizationManager.php
+│   │   ├── Middleware
+│   │   │   ├── AuditUserActions.php
+│   │   │   ├── Authenticate.php
+│   │   │   ├── EncryptCookies.php
+│   │   │   ├── PerformanceMonitoring.php
+│   │   │   ├── PreventPrivilegeEscalation.php
+│   │   │   ├── PreventRequestsDuringMaintenance.php
+│   │   │   ├── RedirectIfAuthenticated.php
+│   │   │   ├── TrimStrings.php
+│   │   │   ├── TrustHosts.php
+│   │   │   ├── TrustProxies.php
+│   │   │   ├── ValidateSignature.php
+│   │   │   └── VerifyCsrfToken.php
+│   │   └── Requests
+│   │       ├── Admin
+│   │       │   ├── Assignment
+│   │       │   │   └── StoreAssignmentRequest.php
+│   │       │   ├── Driver
+│   │       │   │   ├── StoreDriverRequest.php
+│   │       │   │   └── UpdateDriverRequest.php
+│   │       │   ├── Organization
+│   │       │   │   ├── StoreOrganizationRequest.php
+│   │       │   │   └── UpdateOrganizationRequest.php
+│   │       │   ├── Supplier
+│   │       │   │   ├── StoreSupplierRequest.php
+│   │       │   │   └── UpdateSupplierRequest.php
+│   │       │   ├── SupplierCategory
+│   │       │   │   └── StoreSupplierCategoryRequest.php
+│   │       │   └── Vehicle
+│   │       │       ├── StoreVehicleRequest.php
+│   │       │       └── UpdateVehicleRequest.php
+│   │       ├── Auth
+│   │       │   └── LoginRequest.php
+│   │       └── ProfileUpdateRequest.php
+│   ├── Livewire
+│   │   └── OrganizationManager.php
+│   ├── Logging
+│   │   └── CustomTeamsLogger.php
+│   ├── Models
+│   │   ├── Assignment.php
+│   │   ├── Concerns
+│   │   │   └── BelongsToOrganization.php
+│   │   ├── Document.php
+│   │   ├── DocumentCategory.php
+│   │   ├── Driver.php
+│   │   ├── DriverStatus.php
+│   │   ├── FuelType.php
+│   │   ├── Handover
+│   │   │   ├── VehicleHandoverDetail.php
+│   │   │   └── VehicleHandoverForm.php
+│   │   ├── Maintenance
+│   │   │   ├── MaintenanceLog.php
+│   │   │   ├── MaintenancePlan.php
+│   │   │   ├── MaintenanceStatus.php
+│   │   │   ├── MaintenanceType.php
+│   │   │   └── RecurrenceUnit.php
+│   │   ├── Organization.php
+│   │   ├── Supplier.php
+│   │   ├── SupplierCategory.php
+│   │   ├── TransmissionType.php
+│   │   ├── User.php
+│   │   ├── ValidationLevel.php
+│   │   ├── Vehicle.php
+│   │   ├── VehicleStatus.php
+│   │   └── VehicleType.php
+│   ├── Observers
+│   │   ├── DriverObserver.php
+│   │   └── UserObserver.php
+│   ├── Policies
+│   │   ├── DocumentCategoryPolicy.php
+│   │   ├── DocumentPolicy.php
+│   │   ├── RoleAssignmentPolicy.php
+│   │   ├── RolePolicy.php
+│   │   └── VehiclePolicy.php
+│   ├── Providers
+│   │   ├── AppServiceProvider.php
+│   │   ├── AuthServiceProvider.php
+│   │   ├── BroadcastServiceProvider.php
+│   │   ├── EventServiceProvider.php
+│   │   ├── LoggingServiceProvider.php
+│   │   ├── RepositoryServiceProvider.php
+│   │   └── RouteServiceProvider.php
+│   ├── Repositories
+│   │   ├── Eloquent
+│   │   │   ├── AssignmentRepository.php
+│   │   │   ├── DriverRepository.php
+│   │   │   ├── SupplierRepository.php
+│   │   │   └── VehicleRepository.php
+│   │   └── Interfaces
+│   │       ├── AssignmentRepositoryInterface.php
+│   │       ├── DriverRepositoryInterface.php
+│   │       ├── SupplierRepositoryInterface.php
+│   │       └── VehicleRepositoryInterface.php
+│   ├── Services
+│   │   ├── AssignmentService.php
+│   │   ├── CacheService.php
+│   │   ├── DriverService.php
+│   │   ├── EnterprisePermissionService.php
+│   │   ├── ImportExportService.php
+│   │   ├── PdfGenerationService.php
+│   │   ├── PermissionService.php
+│   │   ├── SupplierCategoryService.php
+│   │   ├── SupplierService.php
+│   │   └── VehicleService.php
+│   └── View
+│       └── Components
+│           ├── Admin
+│           │   └── Sidebar.php
+│           ├── AppLayout.php
+│           └── GuestLayout.php
+├── artisan
+├── bootstrap
+│   ├── app.php
+│   └── cache
+│       ├── .gitignore
+│       ├── packages.php
+│       └── services.php
+├── commande___snapshot___SQL__Arborescence____description.txt
+├── composer.json
+├── composer.lock
+├── config
+│   ├── app.php
+│   ├── auth.php
+│   ├── broadcasting.php
+│   ├── cache.php
+│   ├── cors.php
+│   ├── database.php
+│   ├── filesystems.php
+│   ├── hashing.php
+│   ├── logging.php
+│   ├── mail.php
+│   ├── permission.php
+│   ├── queue.php
+│   ├── sanctum.php
+│   ├── services.php
+│   ├── session.php
+│   └── view.php
+├── create_snapshot.sh
+├── database
+│   ├── .gitignore
+│   ├── factories
+│   │   ├── DriverFactory.php
+│   │   ├── OrganizationFactory.php
+│   │   ├── SupplierFactory.php
+│   │   ├── UserFactory.php
+│   │   └── VehicleFactory.php
+│   ├── migrations
+│   │   ├── 2014_10_12_000000_create_users_table.php
+│   │   ├── 2014_10_12_100000_create_password_reset_tokens_table.php
+│   │   ├── 2019_08_19_000000_create_failed_jobs_table.php
+│   │   ├── 2019_12_14_000001_create_personal_access_tokens_table.php
+│   │   ├── 2025_06_05_134749_add_custom_fields_to_users_table.php
+│   │   ├── 2025_06_05_144141_create_permission_tables.php
+│   │   ├── 2025_06_05_150327_create_validation_levels_table.php
+│   │   ├── 2025_06_05_150533_create_user_validation_levels_table.php
+│   │   ├── 2025_06_06_204451_create_vehicle_types_table.php
+│   │   ├── 2025_06_06_204514_create_fuel_types_table.php
+│   │   ├── 2025_06_06_204531_create_transmission_types_table.php
+│   │   ├── 2025_06_06_204549_create_vehicle_statuses_table.php
+│   │   ├── 2025_06_06_205007_create_vehicles_table.php
+│   │   ├── 2025_06_07_202347_add_soft_deletes_to_vehicles_table.php
+│   │   ├── 2025_06_07_231226_create_driver_statuses_table.php
+│   │   ├── 2025_06_07_231452_create_drivers_table.php
+│   │   ├── 2025_06_09_144736_create_assignments_table.php
+│   │   ├── 2025_06_10_113936_add_license_expiry_date_to_drivers_table.php
+│   │   ├── 2025_06_10_160701_create_maintenance_types_table.php
+│   │   ├── 2025_06_10_160701_create_recurrence_units_table.php
+│   │   ├── 2025_06_10_160702_create_maintenance_statuses_table.php
+│   │   ├── 2025_06_10_160703_create_maintenance_plans_table.php
+│   │   ├── 2025_06_10_160704_create_maintenance_logs_table.php
+│   │   ├── 2025_06_17_233747_create_vehicle_handover_forms_table.php
+│   │   ├── 2025_06_17_233757_create_vehicle_handover_details_table.php
+│   │   ├── 2025_07_07_000048_create_organizations_table.php
+│   │   ├── 2025_07_07_000238_add_organization_id_to_tables.php
+│   │   ├── 2025_07_07_160317_add_soft_deletes_to_users_table.php
+│   │   ├── 2025_07_22_012046_add_strategic_indexes_to_tables.php
+│   │   ├── 2025_07_22_014038_create_fleet_management_extended_tables.php
+│   │   ├── 2025_08_12_015505_create_user_vehicle_pivot_table.php
+│   │   ├── 2025_08_15_014729_create_supplier_categories_table.php
+│   │   ├── 2025_08_15_014730_create_suppliers_table.php
+│   │   ├── 2025_08_23_214824_create_document_categories_table.php
+│   │   ├── 2025_08_23_214900_create_documents_table.php
+│   │   ├── 2025_08_24_223300_add_is_default_and_meta_schema_to_document_categories_table.php
+│   │   ├── 2025_09_06_101000_create_enhanced_rbac_system.php
+│   │   └── 2025_09_06_212409_add_missing_columns_to_organizations_table.php
+│   └── seeders
+│       ├── DatabaseSeeder.php
+│       ├── DefaultDocumentCategoriesSeeder.php
+│       ├── DefaultDocumentCategoriesSeeder.php:Zone.Identifier
+│       ├── DriverSeeder.php
+│       ├── DriverStatusSeeder.php
+│       ├── EnterpriseRbacSeeder.php
+│       ├── FuelTypeSeeder.php
+│       ├── InitialRbacSeeder.php
+│       ├── Maintenance
+│       │   ├── MaintenanceDataSeeder.php
+│       │   ├── MaintenanceStatusSeeder.php
+│       │   ├── MaintenanceTypeSeeder.php
+│       │   └── RecurrenceUnitSeeder.php
+│       ├── PermissionSeeder.php
+│       ├── RoleSeeder.php
+│       ├── RolesAndPermissionsSeeder.php
+│       ├── SecurityEnhancedRbacSeeder.php
+│       ├── TransmissionTypeSeeder.php
+│       ├── ValidationLevelSeeder.php
+│       ├── VehicleDataSeeder.php
+│       ├── VehicleStatusSeeder.php
+│       └── VehicleTypeSeeder.php
+├── docker
+│   ├── nginx
+│   │   ├── Dockerfile
+│   │   ├── default.conf
+│   │   └── zenfleet.conf
+│   ├── node
+│   │   ├── Dockerfile - Copy.ok:Zone.Identifier
+│   │   ├── Dockerfile - Copy:Zone.Identifier
+│   │   ├── Dockerfile - OK
+│   │   ├── Dockerfile.ok
+│   │   ├── Dockerfile___
+│   │   ├── entrypoint - Copy.sh
+│   │   ├── entrypoint - Copy.sh:Zone.Identifier
+│   │   └── entrypoint.sh___supperime__2025-07-31
+│   ├── node_dev
+│   │   └── Dockerfile
+│   └── php
+│       ├── Dockerfile
+│       └── supervisord.conf
+├── docker-compose - Copy.yml:Zone.Identifier
+├── docker-compose.yml
+├── docker-compose_corrige.yml:Zone.Identifier
+├── docker-compose_final.yml:Zone.Identifier
+├── lang
+│   └── en
+│       ├── auth.php
+│       ├── pagination.php
+│       ├── passwords.php
+│       └── validation.php
+├── package - Copy.json:Zone.Identifier
+├── package.json
+├── package.json.back
+├── package.json___etait OK
+├── package_json_corrige.json:Zone.Identifier
+├── pdf-service
+│   ├── Dockerfile
+│   ├── package.json
+│   ├── server - Copy.js:Zone.Identifier
+│   ├── server.js
+│   ├── server.js.ok
+│   ├── server.js:Zone.Identifier
+│   └── server.js__
+├── phpunit.xml
+├── postcss.config.js
+├── public
+│   ├── .htaccess
+│   ├── build
+│   │   ├── assets
+│   │   │   ├── app-BGOR2DVo.js
+│   │   │   ├── app-D1yzDcpL.css
+│   │   │   ├── app-DA9GTZgU.js
+│   │   │   ├── app-Miae3zrf.css
+│   │   │   ├── charts-IicPiUfl.js
+│   │   │   ├── ui-public-DW1AYtNs.js
+│   │   │   └── vendor-common-NIGUFBhG.js
+│   │   └── manifest.json
+│   ├── css
+│   │   ├── tomselect-users.css
+│   │   ├── vehicle_handover_form.css
+│   │   └── vehicle_handover_form.css:Zone.Identifier
+│   ├── favicon.ico
+│   ├── images
+│   │   ├── car_sketch.png
+│   │   └── scooter_sketch.png
+│   ├── index.php
+│   ├── js
+│   │   └── tomselect-users-config.js
+│   ├── robots.txt
+│   └── storage -> /var/www/html/storage/app/public
+├── resources
+│   ├── css
+│   │   ├── admin
+│   │   │   └── app.css
+│   │   ├── app.css
+│   │   ├── components
+│   │   │   ├── components.css
+│   │   │   └── sidebar.css
+│   │   └── sidebar.css
+│   ├── js
+│   │   ├── admin
+│   │   │   └── app.js
+│   │   ├── app.js
+│   │   └── bootstrap.js
+│   └── views
+│       ├── admin
+│       │   ├── assignments
+│       │   │   ├── create.blade.php
+│       │   │   ├── edit.blade.php
+│       │   │   └── index.blade.php
+│       │   ├── dashboard
+│       │   │   ├── index.blade.php
+│       │   │   ├── super-admin.blade.php
+│       │   │   └── supervisor.blade.php
+│       │   ├── document_categories
+│       │   │   ├── create.blade.php
+│       │   │   ├── edit.blade.php
+│       │   │   └── index.blade.php
+│       │   ├── documents
+│       │   │   ├── _form.blade.php
+│       │   │   ├── create.blade.php
+│       │   │   ├── edit.blade.php
+│       │   │   └── index.blade.php
+│       │   ├── drivers
+│       │   │   ├── create.blade.php
+│       │   │   ├── edit.blade.php
+│       │   │   ├── import-results.blade.php
+│       │   │   ├── import.blade.php
+│       │   │   └── index.blade.php
+│       │   ├── handovers
+│       │   │   └── vehicles
+│       │   │       ├── create.blade.php
+│       │   │       ├── edit.blade.php
+│       │   │       ├── pdf.blade.php
+│       │   │       ├── pdf.blade.php:Zone.Identifier
+│       │   │       └── show.blade.php
+│       │   ├── maintenance
+│       │   │   ├── dashboard.blade.php
+│       │   │   └── plans
+│       │   │       ├── create.blade.php
+│       │   │       └── index.blade.php
+│       │   ├── organizations
+│       │   │   ├── create.blade.php
+│       │   │   ├── edit.blade.php
+│       │   │   ├── index.blade.php
+│       │   │   └── show.blade.php
+│       │   ├── planning
+│       │   │   └── index.blade.php
+│       │   ├── roles
+│       │   │   ├── edit.blade.php
+│       │   │   └── index.blade.php
+│       │   ├── suppliers
+│       │   │   ├── create.blade.php
+│       │   │   ├── edit.blade.php
+│       │   │   └── index.blade.php
+│       │   ├── users
+│       │   │   ├── create.blade.php
+│       │   │   ├── edit.blade.php
+│       │   │   └── index.blade.php
+│       │   └── vehicles
+│       │       ├── create.blade.php
+│       │       ├── edit.blade.php
+│       │       ├── import-results.blade.php
+│       │       ├── import.blade.php
+│       │       └── index.blade.php
+│       ├── auth
+│       │   ├── confirm-password.blade.php
+│       │   ├── forgot-password.blade.php
+│       │   ├── login.blade.php
+│       │   ├── register.blade.php
+│       │   ├── reset-password.blade.php
+│       │   └── verify-email.blade.php
+│       ├── components
+│       │   ├── admin
+│       │   │   ├── Sidebar.php
+│       │   │   └── sidebar.blade.php
+│       │   ├── application-logo.blade.php
+│       │   ├── auth-session-status.blade.php
+│       │   ├── danger-button.blade.php
+│       │   ├── date-picker.blade.php
+│       │   ├── datetime-picker.blade.php
+│       │   ├── dropdown-link.blade.php
+│       │   ├── dropdown.blade.php
+│       │   ├── flash-message.blade.php
+│       │   ├── handover-status-switcher.blade.php
+│       │   ├── input-error.blade.php
+│       │   ├── input-label.blade.php
+│       │   ├── modal.blade.php
+│       │   ├── nav-link.blade.php
+│       │   ├── primary-button.blade.php
+│       │   ├── responsive-nav-link.blade.php
+│       │   ├── secondary-button.blade.php
+│       │   ├── sidebar
+│       │   │   ├── SidebarGroup.php
+│       │   │   ├── sidebar-group.blade.php
+│       │   │   ├── sidebar-link.blade.php
+│       │   │   └── sidebar-sub-link.blade.php
+│       │   ├── sub-nav-link.blade.php
+│       │   ├── text-input.blade.php
+│       │   ├── toast.blade.php
+│       │   └── toast.blade.php.OK.php
+│       ├── dashboard
+│       │   ├── driver.blade.php
+│       │   └── error.blade.php
+│       ├── dashboard.blade.php
+│       ├── layouts
+│       │   ├── admin
+│       │   │   ├── app.blade.php
+│       │   │   └── partials
+│       │   │       ├── footer.blade.php
+│       │   │       ├── header.blade.php
+│       │   │       ├── notifications.blade.php
+│       │   │       └── sidebar.blade.php
+│       │   ├── app.blade.php
+│       │   ├── guest.blade.php
+│       │   └── navigation.blade.php
+│       ├── livewire
+│       │   ├── organization-manager-error.blade.php
+│       │   └── organization-manager.blade.php
+│       ├── profile
+│       │   ├── edit.blade.php
+│       │   └── partials
+│       │       ├── delete-user-form.blade.php
+│       │       ├── update-password-form.blade.php
+│       │       └── update-profile-information-form.blade.php
+│       └── welcome.blade.php
+├── routes
+│   ├── api.php
+│   ├── auth.php
+│   ├── channels.php
+│   ├── console.php
+│   └── web.php
+├── server.js:Zone.Identifier
+├── server_express5_corrige.js:Zone.Identifier
+├── server_simplifie (1).js:Zone.Identifier
+├── server_simplifie (2).js:Zone.Identifier
+├── storage
+│   ├── app
+│   │   ├── .gitignore
+│   │   ├── imports
+│   │   │   └── temp
+│   │   └── public
+│   │       ├── .gitignore
+│   │       ├── drivers
+│   │       │   └── photos
+│   │       └── handovers
+│   │           └── signed
+│   ├── framework
+│   │   ├── .gitignore
+│   │   ├── cache
+│   │   │   ├── .gitignore
+│   │   │   └── data
+│   │   │       ├── .gitignore
+│   │   │       └── 85
+│   │   │           └── 5f
+│   │   │               └── 855f92484c8c414d36c1b25cb24876e30229cbbf
+│   │   ├── sessions
+│   │   │   ├── .gitignore
+│   │   │   ├── JltXIdtCoAy5bpXvHJqCd6xzgaAjvRRL0wqXPpVW
+│   │   │   └── QPBr6hsDkAPTJuMU27ajw4cfQ83oPxMfb0hXNOe3
+│   │   ├── testing
+│   │   │   └── .gitignore
+│   │   └── views
+│   │       ├── .gitignore
+│   │       ├── 00c32972c15efdc5e6671387887e923e.php
+│   │       ├── 16e3af590898d203d6654ee44c023506.php
+│   │       ├── 1c645976ff27fda170e9e34909e4d469.php
+│   │       ├── 4162c0a699b7e6d288a7bb823ea26132.php
+│   │       ├── 4267eefae24d43c6c9b8ec2f2e7fe4d0.php
+│   │       ├── 4489b75d1c7bac46e5e0a1f033cca51b.php
+│   │       ├── 46fcee1a34608bcfbb822583098cdc5d.php
+│   │       ├── 4a0edfa7418ca9dca2928c49fbb314c8.php
+│   │       ├── 4dec509c40b359a615529cce3c39659d.php
+│   │       ├── 64702f4eb1b63cedb8805fef769633da.php
+│   │       ├── 668028038dc5f5116ea4de98becc817d.php
+│   │       ├── 71c629470c3c9316e5b7a207722e4476.php
+│   │       ├── 8af96f1aa4ca539680bbb419b6450c05.php
+│   │       ├── 972787c7f86a744a53932fd400199a6d.php
+│   │       ├── abf084188bf94f9b7d3d3a695162c45f.php
+│   │       ├── b6924da589b7ce2a78c1b5acc78c14a9.php
+│   │       ├── d52f526cdd9a0360bfc3814248f8a897.php
+│   │       ├── d776615a0bb2383e1128b1697b67a333.php
+│   │       └── ff0287b16b1537d62a0074d5fbe09d11.php
+│   └── logs
+│       ├── .gitignore
+│       ├── api
+│       ├── audit
+│       │   ├── audit-2025-09-06.log
+│       │   ├── audit-2025-09-07.log
+│       │   ├── audit-2025-09-08.log
+│       │   └── audit-2025-09-09.log
+│       ├── auth
+│       ├── business
+│       ├── critical
+│       ├── database
+│       ├── errors
+│       │   ├── errors-2025-09-06.log
+│       │   ├── errors-2025-09-07.log
+│       │   └── errors-2025-09-09.log
+│       ├── imports
+│       ├── laravel-2025-09-06.log
+│       ├── laravel-2025-09-07.log
+│       ├── laravel.log
+│       ├── performance
+│       ├── security
+│       ├── webhooks
+│       └── worker.log
+├── supervisord.log
+├── supervisord.pid
+├── tailwind.config.js
+├── tests
+│   ├── CreatesApplication.php
+│   ├── Feature
+│   │   ├── Admin
+│   │   │   ├── DocumentManagementTest.php
+│   │   │   └── DocumentManagementTest.php:Zone.Identifier
+│   │   ├── Auth
+│   │   │   ├── AuthenticationTest.php
+│   │   │   ├── EmailVerificationTest.php
+│   │   │   ├── PasswordConfirmationTest.php
+│   │   │   ├── PasswordResetTest.php
+│   │   │   ├── PasswordUpdateTest.php
+│   │   │   └── RegistrationTest.php
+│   │   ├── ExampleTest.php
+│   │   └── ProfileTest.php
+│   ├── TestCase.php
+│   └── Unit
+│       └── ExampleTest.php
+├── vite.config.js
+├── yarn.lock
+├── zenfleet_db_schema_2025-09-07.sql
+├── zenfleet_db_schema_2025-09-09.sql
+├── zenfleet_full_arborescence__2025-09-09.txt
+├── zenfleet_project_snapshot_2025-09-07.txt
+├── zenfleet_project_snapshot_2025-09-09.md
+└── zenfleet_project_snapshot_2025-09-09.txt
+
+130 directories, 444 files

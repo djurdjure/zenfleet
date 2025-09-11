@@ -133,4 +133,97 @@ Voici le guide de référence des commandes Artisan pour ZENFLEET.
 
 En respectant ce catalogue de commandes, nous garantissons que chaque nouvelle partie de l'application est construite de manière cohérente, propre et professionnelle.
 
+//////////////////////////////   PUIS MIS à JOUR AVEC CE QUI SUIT :
+
+# ZenFleet
+
+Bienvenue sur le dépôt GitHub de **ZenFleet**, plateforme SaaS de gestion de flotte conçue pour les exigences Enterprise-grade : performance, sécurité, UX moderne et code 100 % conforme aux standards Laravel.
+
+---
+
+## Table des Matières
+- [Introduction](#introduction)
+- [Environnement de Développement et Standards](#environnement-de-développement-et-standards)
+  - [Stack Technologique](#stack-technologique)
+  - [Outils et Commandes Standards](#outils-et-commandes-standards)
+- [Catalogue des Commandes Standards ZenFleet](#catalogue-des-commandes-standards-zenfleet)
+  - [Pour la Base de Données](#pour-la-base-de-données)
+  - [Pour la Logique Applicative](#pour-la-logique-applicative)
+  - [Pour l’Interface (Vues & Composants)](#pour-linterface-vues--composants)
+- [Flux CI/CD & Qualité](#flux-cicd--qualité)
+- [Démarrage Rapide](#démarrage-rapide)
+
+---
+
+## Introduction
+Ce document décrit la stack, la structure projet, les bonnes pratiques et les commandes incontournables afin de garantir **reproductibilité** et **robustesse** sur tous les environnements.
+
+---
+
+## Environnement de Développement et Standards
+Le projet est entièrement conteneurisé via **Docker Compose v2** : un simple `make up` suffit pour disposer d’un stack fonctionnel identique à celui de production.
+
+### Stack Technologique
+
+| Composant      | Version / Technologie  | Rôle                                 |
+| :------------- | :--------------------- | :----------------------------------- |
+| Serveur Web    | **Nginx 1.25-alpine**  | Point d’entrée HTTP/3, gzip & brotli |
+| Backend        | **PHP 8.3-fpm-alpine** | Application Laravel                  |
+| Framework      | **Laravel 12.x**       | Cœur applicatif, policies & jobs     |
+| UI temps réel  | **Livewire 3.x**       | Composants dynamiques (table, stats) |
+| Base de données| **PostgreSQL 16-postgis** | Stockage + géo-requêtes             |
+| Cache / Queue  | **Redis 7-alpine**     | Cache, files d’attente               |
+| Frontend build | **Node 20-bullseye**   | Vite + Tailwind                      |
+| CSS Framework  | **Tailwind CSS 3.4**   | Design system ZenFleet Admin         |
+| JS utilitaire  | **Alpine.js 3.13**     | Micro-interactions                   |
+| Tests          | **Pest ^2**            | Unit & Feature tests                 |
+| CI             | **GitHub Actions**     | Lint + PHPStan 6 + coverage 85 %      |
+
+### Outils et Commandes Standards
+| Besoin              | Outil / Wrapper                                                |
+| ------------------- | -------------------------------------------------------------- |
+| Dépendances PHP     | `composer` (via container) : `docker compose exec php composer …` |
+| Dépendances JS      | `yarn` : `docker compose exec node yarn …`                    |
+| Laravel Artisan     | `docker compose exec php php artisan …`                       |
+| Docker helpers      | `make up / down / test / seed / debug-on`                     |
+
+---
+
+## Catalogue des Commandes Standards ZenFleet
+
+### Pour la Base de Données
+| Action                           | Commande |
+| --------------------------------|----------|
+| Créer modèle + migration        | `php artisan make:model Vehicle -m` |
+| Créer migration additionnelle   | `php artisan make:migration add_idx_to_vehicles_table` |
+| Seeder de démo                  | `php artisan make:seeder DemoSeeder` |
+
+### Pour la Logique Applicative
+| Élément          | Commande Exemple |
+| ---------------- | ---------------- |
+| Contrôleur CRUD  | `php artisan make:controller Admin/VehicleController --resource --model=Vehicle` |
+| Form Request     | `php artisan make:request Admin/Vehicle/StoreVehicleRequest` |
+| Event / Listener | `php artisan make:event VehicleAssigned` |
+
+### Pour l’Interface (Vues & Composants)
+| Type                       | Commande |
+| -------------------------- | -------- |
+| Composant Blade            | `php artisan make:component Tables/StatusBadge` |
+| Composant Livewire         | `php artisan make:livewire OrganizationTable` |
+| Publication assets Livewire| `php artisan livewire:publish --assets` |
+
+---
+
+## Flux CI/CD & Qualité
+1. **Pre-commit Hooks** : Pint + Prettier + Tailwind lint.  
+2. **GitHub Actions** :  
+   - Build & tests (Pest, coverage ≥ 85 %, PHPStan 6)  
+   - Static analysis JS (ESLint)  
+   - Docker image push sur `ghcr.io/zenfleet/zenfleet-app` tag =`sha`.  
+3. **Deploy** : auto-promotion vers staging via Argo CD (k8s).
+
+---
+
+## Démarrage Rapide
+
 
