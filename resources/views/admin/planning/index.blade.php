@@ -1,9 +1,7 @@
-<x-app-layout>
-    <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Planning des Affectations') }}
-        </h2>
-    </x-slot>
+@extends('layouts.admin.catalyst')
+@section('title', 'Planning des Affectations')
+
+@section('content')
 
     <div class="py-12" x-data="planningGantt()">
         <div class="max-w-full mx-auto sm:px-6 lg:px-8">
@@ -371,4 +369,4 @@
         }
     </script>
     @endpush
-</x-app-layout>
+@endsection

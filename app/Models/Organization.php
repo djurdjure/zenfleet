@@ -21,58 +21,51 @@ class Organization extends Model
     use HasFactory, SoftDeletes, HasSlug;
 
     protected $fillable = [
+        // Informations générales
+        'uuid',
         'name',
-        'slug', 
         'legal_name',
         'organization_type',
         'industry',
         'description',
-        'siret',
-        'vat_number',
-        'legal_form',
-        'registration_number',
-        'registration_date',
-        'email',
-        'phone',
         'website',
-        'address',
-        'address_line_2',
-        'city',
-        'postal_code',
-        'state_province',
-        'country',
-        'timezone',
-        'currency',
-        'language',
-        'date_format',
-        'time_format',
+        'phone_number',
         'logo_path',
         'status',
-        'subscription_plan',
-        'subscription_expires_at',
-        'max_vehicles',
-        'max_drivers', 
-        'max_users',
-        'working_days',
-        'settings',
-        'created_by',
-        'updated_by',
-        'admin_user_id',
-        'total_users',
-        'active_users',
+
+        // Informations légales
+        'trade_register',
+        'nif',
+        'ai',
+        'nis',
+        'address',
+        'city',
+        'zip_code',
+        'wilaya',
+        'scan_nif_path',
+        'scan_ai_path',
+        'scan_nis_path',
+
+        // Représentant légal
+        'manager_first_name',
+        'manager_last_name',
+        'manager_nin',
+        'manager_address',
+        'manager_dob',
+        'manager_pob',
+        'manager_phone_number',
+        'manager_id_scan_path',
     ];
 
     protected $casts = [
-        'registration_date' => 'date',
-        'subscription_expires_at' => 'datetime',
-        'is_active' => 'boolean',
-        'settings' => 'array',
-        'working_days' => 'array',
+        'manager_dob' => 'date',
+        'uuid' => 'string',
     ];
 
     protected $dates = [
-        'subscription_expires_at',
-        'deleted_at'
+        'manager_dob',
+        'created_at',
+        'updated_at'
     ];
 
     public function getSlugOptions(): SlugOptions
@@ -260,7 +253,9 @@ class Organization extends Model
         });
     }
 
-    // ✅ NOUVELLE MÉTHODE: Vérifier les rôles disponibles
+    /**
+     * Get available roles for this organization
+     */
     public function getAvailableRoles(): array
     {
         return \Spatie\Permission\Models\Role::where('guard_name', 'web')
@@ -268,13 +263,70 @@ class Organization extends Model
             ->toArray();
     }
 
-    // ✅ NOUVELLE MÉTHODE: Statistiques sécurisées par rôle
+    /**
+     * Get user count by role
+     */
     public function getUserCountByRole(string $roleName): int
     {
-        try {
-            return $this->users()->role($roleName)->count();
-        } catch (\Spatie\Permission\Exceptions\RoleDoesNotExist $e) {
-            return 0;
-        }
+        return $this->users()->whereHas('roles', function($q) use ($roleName) {
+            $q->where('name', $roleName);
+        })->count();
+    }
+
+    /**
+     * Get organization statistics
+     */
+    public function getStatistics(): array
+    {
+        return [
+            'users' => [
+                'total' => $this->current_users,
+                'active' => $this->activeUsers()->count(),
+                'by_role' => [
+                    'admins' => $this->admins()->count(),
+                    'fleet_managers' => $this->fleetManagers()->count(),
+                    'supervisors' => $this->supervisors()->count(),
+                    'drivers' => $this->drivers()->count(),
+                ]
+            ],
+            'fleet' => [
+                'vehicles' => $this->current_vehicles,
+                'drivers' => $this->current_drivers,
+            ],
+            'limits' => [
+                'users' => "{$this->current_users}/{$this->max_users}",
+                'vehicles' => "{$this->current_vehicles}/{$this->max_vehicles}",
+                'drivers' => "{$this->current_drivers}/{$this->max_drivers}",
+                'storage' => "{$this->current_storage_mb}/{$this->max_storage_mb} MB",
+            ],
+            'subscription' => [
+                'plan' => $this->subscription_plan,
+                'active' => $this->isSubscriptionActive(),
+                'expires_at' => $this->subscription_expires_at,
+            ]
+        ];
+    }
+
+    /**
+     * Convert the model to an array optimized for API responses
+     */
+    public function toApiArray(): array
+    {
+        return [
+            'id' => $this->id,
+            'uuid' => $this->uuid,
+            'name' => $this->name,
+            'slug' => $this->slug,
+            'display_name' => $this->display_name,
+            'organization_type' => $this->organization_type,
+            'industry' => $this->industry,
+            'status' => $this->status,
+            'country' => $this->country,
+            'city' => $this->city,
+            'logo_url' => $this->logo_path ? asset('storage/' . $this->logo_path) : null,
+            'subscription_plan' => $this->subscription_plan,
+            'created_at' => $this->created_at,
+            'updated_at' => $this->updated_at,
+        ];
     }
 }

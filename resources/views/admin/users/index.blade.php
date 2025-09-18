@@ -1,10 +1,8 @@
 {{-- resources/views/admin/users/index.blade.php --}}
-<x-app-layout>
-    <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Administration - Gestion des Utilisateurs') }}
-        </h2>
-    </x-slot>
+@extends('layouts.admin.catalyst')
+@section('title', 'Gestion des Utilisateurs')
+
+@section('content')
 
     {{-- Initialisation d'Alpine.js pour la modale de confirmation --}}
     <div x-data="{ showConfirmModal: false, userToDelete: {}, deleteFormUrl: '' }" class="py-12">
@@ -116,4 +114,4 @@
         </div>
 
     </div>
-</x-app-layout>
+@endsection

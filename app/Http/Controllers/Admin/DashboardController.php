@@ -8,7 +8,8 @@ use App\Models\User;
 use App\Models\Vehicle;
 use App\Models\Driver;
 use App\Models\Assignment;
-use App\Models\MaintenancePlan;
+use App\Models\Maintenance\MaintenancePlan;
+use App\Models\Maintenance\MaintenanceLog;
 use App\Services\CacheService;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -120,7 +121,6 @@ class DashboardController extends Controller
                     'role' => $role,
                     'error' => $e->getMessage()
                 ]);
-                
                 return $this->getFallbackDashboardData($user, $role);
             }
         });
@@ -238,13 +238,20 @@ class DashboardController extends Controller
         
         return Cache::remember("admin_dashboard_{$orgId}", 300, function () use ($user, $orgId) {
             try {
+
                 $organizationStats = [
                     'organizationUsers' => User::where('organization_id', $orgId)->count(),
                     'activeUsers' => User::where('organization_id', $orgId)->where('is_active', true)->count(),
                     'organizationVehicles' => Vehicle::where('organization_id', $orgId)->count(),
-                    'availableVehicles' => Vehicle::where('organization_id', $orgId)->where('status', 'available')->count(),
+                    'availableVehicles' => Vehicle::where('organization_id', $orgId)
+                        ->whereHas('vehicleStatus', function ($q) {
+                            $q->where('name', 'Disponible');
+                        })->count(),
                     'organizationDrivers' => Driver::where('organization_id', $orgId)->count(),
-                    'activeDrivers' => Driver::where('organization_id', $orgId)->where('status', 'active')->count(),
+                    'activeDrivers' => Driver::where('organization_id', $orgId)
+                        ->whereHas('driverStatus', function ($q) {
+                            $q->where('name', 'Actif');
+                        })->count(),
                     'activeAssignments' => Assignment::whereHas('vehicle', function ($q) use ($orgId) {
                         $q->where('organization_id', $orgId);
                     })->whereNull('end_datetime')->count(),
@@ -267,7 +274,7 @@ class DashboardController extends Controller
                     'organization_id' => $orgId,
                     'error' => $e->getMessage()
                 ]);
-                
+
                 return $this->getFallbackDashboardData($user, 'Admin');
             }
         });
@@ -660,11 +667,98 @@ class DashboardController extends Controller
 
 
 
-    // Méthodes placeholder pour éviter les erreurs
-    private function getOrganizationActivity(int $organizationId): array { return []; }
-    private function getOrganizationAlerts(int $organizationId): array { return []; }
-    private function getUpcomingMaintenance(int $organizationId) { return collect(); }
-    private function getVehicleStatusDistribution(int $organizationId): array { return []; }
+    // Méthodes pour récupérer les données réelles
+    private function getOrganizationActivity(int $organizationId): array
+    {
+        try {
+            $activities = [];
+
+            // Activité des véhicules récents
+            $recentVehicles = Vehicle::where('organization_id', $organizationId)
+                ->where('created_at', '>=', now()->subDays(7))
+                ->orderBy('created_at', 'desc')
+                ->limit(3)
+                ->get();
+
+            foreach ($recentVehicles as $vehicle) {
+                $activities[] = [
+                    'title' => "Nouveau véhicule ajouté: {$vehicle->registration_plate}",
+                    'description' => "{$vehicle->brand} {$vehicle->model}",
+                    'timestamp' => $vehicle->created_at,
+                    'icon' => 'car',
+                    'color' => 'blue'
+                ];
+            }
+
+            return $activities;
+        } catch (\Exception $e) {
+            return [];
+        }
+    }
+
+    private function getOrganizationAlerts(int $organizationId): array
+    {
+        try {
+            $alerts = [];
+
+            // Véhicules en maintenance
+            $maintenanceVehicles = Vehicle::where('organization_id', $organizationId)
+                ->whereHas('vehicleStatus', function ($q) {
+                    $q->where('name', 'Maintenance');
+                })
+                ->count();
+
+            if ($maintenanceVehicles > 0) {
+                $alerts[] = [
+                    'title' => 'Véhicules en maintenance',
+                    'message' => "{$maintenanceVehicles} véhicule(s) nécessitent une maintenance",
+                    'priority' => 'yellow',
+                    'icon' => 'wrench',
+                    'time' => 'Il y a 2h'
+                ];
+            }
+
+            return $alerts;
+        } catch (\Exception $e) {
+            return [];
+        }
+    }
+
+    private function getUpcomingMaintenance(int $organizationId)
+    {
+        try {
+            return MaintenancePlan::whereHas('vehicle', function ($q) use ($organizationId) {
+                $q->where('organization_id', $organizationId);
+            })
+            ->where('next_date', '>=', now())
+            ->where('next_date', '<=', now()->addDays(30))
+            ->orderBy('next_date', 'asc')
+            ->get();
+        } catch (\Exception $e) {
+            return collect();
+        }
+    }
+
+    private function getVehicleStatusDistribution(int $organizationId): array
+    {
+        try {
+            $distribution = [];
+
+            $statuses = Vehicle::where('organization_id', $organizationId)
+                ->join('vehicle_statuses', 'vehicles.status_id', '=', 'vehicle_statuses.id')
+                ->groupBy('vehicle_statuses.name')
+                ->selectRaw('vehicle_statuses.name, count(*) as count')
+                ->get();
+
+            foreach ($statuses as $status) {
+                $distribution[$status->name] = $status->count;
+            }
+
+            return $distribution;
+        } catch (\Exception $e) {
+            return [];
+        }
+    }
     private function getMaintenanceAlertsCount(int $organizationId): int { return 0; }
     private function calculateVehicleAvailabilityRate(int $organizationId): float { return 85.0; }
     private function calculateVehicleUtilizationRate(int $organizationId): float { return 75.5; }

@@ -48,7 +48,7 @@ services:
 
   # --- Base de Données (PostgreSQL) ---
   database:
-    image: postgres:15-alpine
+    image: postgis/postgis:16-3.4-alpine
     container_name: zenfleet_database
     restart: unless-stopped
     ports: ["5432:5432"]
@@ -68,7 +68,7 @@ services:
 
   # --- Cache & Queues (Redis) ---
   redis:
-    image: redis:alpine
+    image: redis:7-alpine
     container_name: zenfleet_redis
     restart: unless-stopped
     volumes:

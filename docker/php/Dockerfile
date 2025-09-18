@@ -1,4 +1,4 @@
-FROM php:8.2-fpm-alpine
+FROM php:8.3-fpm-alpine
 
 # Installer les dépendances système, y compris les librairies pour Redis
 RUN apk update && apk add --no-cache \

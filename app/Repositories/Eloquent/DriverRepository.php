@@ -10,7 +10,7 @@ class DriverRepository implements DriverRepositoryInterface
     public function getFiltered(array $filters): LengthAwarePaginator
     {
         $perPage = $filters['per_page'] ?? 15;
-        $query = Driver::query()->with(['driverStatus', 'user']);
+        $query = Driver::query()->with(['driverStatus', 'user', 'organization']);
 
         if (!empty($filters['view_deleted'])) {
             $query->onlyTrashed();
@@ -23,7 +23,10 @@ class DriverRepository implements DriverRepositoryInterface
             $query->where(function ($q) use ($searchTerm) {
                 $q->whereRaw('LOWER(first_name) LIKE ?', ["%{$searchTerm}%"])
                   ->orWhereRaw('LOWER(last_name) LIKE ?', ["%{$searchTerm}%"])
-                  ->orWhereRaw('LOWER(employee_number) LIKE ?', ["%{$searchTerm}%"]);
+                  ->orWhereRaw('LOWER(employee_number) LIKE ?', ["%{$searchTerm}%"])
+                  ->orWhereHas('organization', function($orgQuery) use ($searchTerm) {
+                      $orgQuery->whereRaw('LOWER(name) LIKE ?', ["%{$searchTerm}%"]);
+                  });
             });
         }
         return $query->orderBy('id', 'desc')->paginate($perPage)->withQueryString();
