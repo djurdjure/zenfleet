@@ -20,16 +20,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        // Drop existing organizations table if it exists
-        Schema::dropIfExists('organizations');
-
-        Schema::create('organizations', function (Blueprint $table) {
+        // Only create if organizations table doesn't exist
+        if (!Schema::hasTable('organizations')) {
+            Schema::create('organizations', function (Blueprint $table) {
             // ===== INFORMATIONS GÉNÉRALES =====
             $table->id(); // Clé primaire (BIGINT UNSIGNED AUTO_INCREMENT)
             $table->uuid('uuid')->unique(); // UUID unique
             $table->string('name'); // Nom sous lequel l'organisation sera affichée
             $table->string('legal_name')->nullable(); // Raison sociale
-            $table->string('organization_type')->nullable()->index(); // Type d'organisation
+            $table->string('organization_type')->nullable(); // Type d'organisation
             $table->string('industry')->nullable(); // Secteur d'activité
             $table->text('description')->nullable(); // Description
             $table->string('website')->nullable(); // Site web
@@ -69,6 +68,7 @@ return new class extends Migration
             $table->index(['city', 'wilaya']);
             $table->index(['name']);
         });
+        }
 
         // Add organization_id to related tables
         $this->addOrganizationIdToTables();

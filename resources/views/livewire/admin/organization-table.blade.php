@@ -25,10 +25,10 @@
                     @endforeach
                 </select>
 
-                <select wire:model.live="country" class="zenfleet-input bg-white/80 focus:bg-white min-w-[150px] transition-all">
-                    <option value="">Tous les pays</option>
-                    @foreach($filterOptions['countries'] as $value => $label)
-                        <option value="{{ $value }}">{{ $label }}</option>
+                <select wire:model.live="wilaya" class="zenfleet-input bg-white/80 focus:bg-white min-w-[150px] transition-all">
+                    <option value="">Toutes les wilayas</option>
+                    @foreach($filterOptions['wilayas'] as $value => $label)
+                        <option value="{{ $value }}">{{ $value }} - {{ $label }}</option>
                     @endforeach
                 </select>
 
@@ -39,9 +39,9 @@
                     @endforeach
                 </select>
 
-                @if($search || $status || $country || $type)
-                    <button 
-                        wire:click="$set('search', ''); $set('status', ''); $set('country', ''); $set('type', '')"
+                @if($search || $status || $wilaya || $type)
+                    <button
+                        wire:click="$set('search', ''); $set('status', ''); $set('wilaya', ''); $set('type', '')"
                         class="zenfleet-btn bg-gray-200/80 hover:bg-gray-300/80 text-gray-700 !px-4 !py-2.5 transition-all"
                         title="Réinitialiser les filtres"
                     >
@@ -172,7 +172,7 @@
                                         <div class="flex items-center gap-3 mt-1 text-sm text-gray-500">
                                             <div class="flex items-center gap-1">
                                                 <i class="fas fa-map-marker-alt text-xs"></i>
-                                                <span>{{ $org->city }}, {{ $org->country }}</span>
+                                                <span>{{ $org->city }}@if($org->wilaya), Wilaya {{ $org->wilaya }}@endif</span>
                                             </div>
                                             @if($org->industry)
                                                 <div class="flex items-center gap-1">
@@ -340,14 +340,14 @@
 
                                     <div class="text-center space-y-2">
                                         <h3 class="text-2xl font-bold text-gray-800">
-                                            @if($search || $status || $country || $type)
+                                            @if($search || $status || $wilaya || $type)
                                                 Aucun résultat pour cette recherche
                                             @else
                                                 Aucune organisation enregistrée
                                             @endif
                                         </h3>
                                         <p class="text-gray-500 text-lg max-w-md mx-auto">
-                                            @if($search || $status || $country || $type)
+                                            @if($search || $status || $wilaya || $type)
                                                 Essayez d'ajuster vos critères de filtrage pour élargir les résultats.
                                             @else
                                                 Commencez par créer votre première organisation pour démarrer la gestion multi-tenant.
@@ -357,9 +357,9 @@
 
                                     <!-- Action Buttons -->
                                     <div class="flex items-center gap-4">
-                                        @if($search || $status || $country || $type)
+                                        @if($search || $status || $wilaya || $type)
                                             <button
-                                                wire:click="$set('search', ''); $set('status', ''); $set('country', ''); $set('type', '')"
+                                                wire:click="$set('search', ''); $set('status', ''); $set('wilaya', ''); $set('type', '')"
                                                 class="inline-flex items-center gap-2 px-6 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl font-medium transition-all duration-200"
                                             >
                                                 <i class="fas fa-filter"></i>

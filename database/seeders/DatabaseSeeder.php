@@ -22,12 +22,16 @@ class DatabaseSeeder extends Seeder
             ZenFleetRolesPermissionsSeeder::class,
         ]);
 
-        // 2. Créer l'organisation principale ZenFleet
-        $this->createZenFleetOrganization();
+        // 2. Run Algeria-specific migrations and seeders
+        $this->call([
+            AlgeriaOrganizationSeeder::class,
+        ]);
 
-        // 3. Créer des organisations de test avec tous les types d'utilisateurs
+        // 3. Create fleet data for organizations
         if (app()->environment('local', 'development', 'testing')) {
-            $this->createTestOrganizations();
+            $this->call([
+                AlgeriaFleetSeeder::class,
+            ]);
         }
 
         $this->command->info('✅ Seeding ZenFleet terminé avec succès!');

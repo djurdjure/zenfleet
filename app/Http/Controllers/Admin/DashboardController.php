@@ -361,11 +361,34 @@ class DashboardController extends Controller
     private function renderDriverDashboard(User $user): array
     {
         try {
+            // Pour les admins, on affiche un dashboard simplifié plutôt qu'un dashboard chauffeur
+            if ($user->is_super_admin || $user->hasRole(['Super Admin', 'Admin'])) {
+                return [
+                    'user' => $user,
+                    'stats' => [
+                        'currentAssignment' => null,
+                        'totalTrips' => 0,
+                        'monthlyKm' => 0,
+                        'safetyScore' => 100.0,
+                    ],
+                    'recentTrips' => [],
+                    'upcomingMaintenance' => [],
+                    'notifications' => [],
+                    'dashboardType' => 'admin-simplified'
+                ];
+            }
+
             $driverId = $user->driver_id ?? null;
-            
+
             if (!$driverId) {
                 return [
                     'user' => $user,
+                    'stats' => [
+                        'currentAssignment' => null,
+                        'totalTrips' => 0,
+                        'monthlyKm' => 0,
+                        'safetyScore' => 95.0,
+                    ],
                     'error' => 'Profil chauffeur non configuré',
                     'dashboardType' => 'driver',
                     'setupRequired' => true

@@ -67,5 +67,8 @@ class Kernel extends HttpKernel
         'organization.scope' => \App\Http\Middleware\OrganizationScope::class,
         'super.admin.only' => \App\Http\Middleware\SuperAdminOnly::class,
         'same.organization' => \App\Http\Middleware\SameOrganization::class,
+
+        // 🏢 MIDDLEWARE ENTERPRISE ULTRA-PROFESSIONNEL
+        'enterprise.permission' => \App\Http\Middleware\EnterprisePermissionMiddleware::class,
     ];
 }

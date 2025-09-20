@@ -169,13 +169,19 @@
                             @enderror
                         </div>
 
-                        <!-- Organization Type -->
+                        <!-- Organization Type with Tom Select -->
                         <div class="space-y-3">
                             <label class="block text-sm font-semibold text-gray-700">
                                 Type d'organisation <span class="text-red-500">*</span>
                             </label>
                             <div class="relative">
-                                <select name="organization_type" class="w-full px-4 py-4 bg-white/80 border border-gray-200 rounded-xl focus:border-blue-400 focus:ring-4 focus:ring-blue-50 transition-all appearance-none" required>
+                                <select
+                                    name="organization_type"
+                                    id="organization_type"
+                                    class="tom-select w-full px-4 py-4 bg-white/80 border border-gray-200 rounded-xl focus:border-blue-400 focus:ring-4 focus:ring-blue-50 transition-all"
+                                    required
+                                    data-placeholder="Sélectionnez un type d'organisation"
+                                >
                                     <option value="">Sélectionnez un type</option>
                                     @foreach($organizationTypes as $value => $label)
                                         <option value="{{ $value }}" {{ old('organization_type', $organization->organization_type ?? '') === $value ? 'selected' : '' }}>
@@ -183,7 +189,6 @@
                                         </option>
                                     @endforeach
                                 </select>
-                                <i class="fas fa-chevron-down absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"></i>
                             </div>
                             @error('organization_type')
                                 <p class="text-sm text-red-600 flex items-center gap-2">
@@ -192,18 +197,47 @@
                             @enderror
                         </div>
 
-                        <!-- Industry -->
+                        <!-- Industry with Tom Select -->
                         <div class="space-y-3">
                             <label class="block text-sm font-semibold text-gray-700">
                                 Secteur d'activité
                             </label>
-                            <input
-                                type="text"
+                            <select
                                 name="industry"
-                                value="{{ old('industry', $organization->industry ?? '') }}"
-                                class="w-full px-4 py-4 bg-white/80 border border-gray-200 rounded-xl focus:border-blue-400 focus:ring-4 focus:ring-blue-50 transition-all"
-                                placeholder="ex: Transport, Logistique, BTP..."
+                                id="industry"
+                                class="tom-select-taggable w-full px-4 py-4 bg-white/80 border border-gray-200 rounded-xl focus:border-blue-400 focus:ring-4 focus:ring-blue-50 transition-all"
+                                data-placeholder="Sélectionnez ou saisissez un secteur d'activité"
                             >
+                                @php
+                                    $industries = [
+                                        'Transport et Logistique',
+                                        'BTP et Construction',
+                                        'Agriculture et Agroalimentaire',
+                                        'Industrie Manufacturière',
+                                        'Technologies de l\'Information',
+                                        'Santé et Pharmaceutique',
+                                        'Éducation et Formation',
+                                        'Commerce et Distribution',
+                                        'Tourisme et Hôtellerie',
+                                        'Énergie et Hydrocarbures',
+                                        'Mines et Métallurgie',
+                                        'Textile et Cuir',
+                                        'Services Financiers',
+                                        'Télécommunications',
+                                        'Chimie et Pétrochimie'
+                                    ];
+                                    $currentIndustry = old('industry', $organization->industry ?? '');
+                                @endphp
+                                <option value="">Sélectionnez un secteur</option>
+                                @foreach($industries as $industry)
+                                    <option value="{{ $industry }}" {{ $currentIndustry === $industry ? 'selected' : '' }}>
+                                        {{ $industry }}
+                                    </option>
+                                @endforeach
+                                @if($currentIndustry && !in_array($currentIndustry, $industries))
+                                    <option value="{{ $currentIndustry }}" selected>{{ $currentIndustry }}</option>
+                                @endif
+                            </select>
                             @error('industry')
                                 <p class="text-sm text-red-600 flex items-center gap-2">
                                     <i class="fas fa-exclamation-triangle"></i> {{ $message }}
@@ -609,13 +643,13 @@
                             </label>
                             <input
                                 type="tel"
-                                name="phone"
-                                value="{{ old('phone', $organization->phone ?? '') }}"
+                                name="phone_number"
+                                value="{{ old('phone_number', $organization->phone_number ?? '') }}"
                                 class="w-full px-4 py-4 bg-white/80 border border-gray-200 rounded-xl focus:border-blue-400 focus:ring-4 focus:ring-blue-50 transition-all"
                                 placeholder="+213 XX XX XX XX XX"
                                 required
                             >
-                            @error('phone')
+                            @error('phone_number')
                                 <p class="text-sm text-red-600 flex items-center gap-2">
                                     <i class="fas fa-exclamation-triangle"></i> {{ $message }}
                                 </p>
@@ -641,13 +675,18 @@
                             @enderror
                         </div>
 
-                        <!-- Wilaya -->
+                        <!-- Wilaya with Tom Select -->
                         <div class="space-y-3">
                             <label class="block text-sm font-semibold text-gray-700">
                                 Wilaya <span class="text-red-500">*</span>
                             </label>
-                            <div class="relative">
-                                <select name="wilaya" class="w-full px-4 py-4 bg-white/80 border border-gray-200 rounded-xl focus:border-blue-400 focus:ring-4 focus:ring-blue-50 transition-all appearance-none" required>
+                            <select
+                                name="wilaya"
+                                id="wilaya"
+                                class="tom-select w-full px-4 py-4 bg-white/80 border border-gray-200 rounded-xl focus:border-blue-400 focus:ring-4 focus:ring-blue-50 transition-all"
+                                required
+                                data-placeholder="Recherchez et sélectionnez une wilaya"
+                            >
                                 <option value="">Sélectionnez une wilaya</option>
                                 @foreach([
                                     '01' => '01 - Adrar',
@@ -713,9 +752,7 @@
                                         {{ $name }}
                                     </option>
                                 @endforeach
-                                </select>
-                                <i class="fas fa-chevron-down absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"></i>
-                            </div>
+                            </select>
                             @error('wilaya')
                                 <p class="text-sm text-red-600 flex items-center gap-2">
                                     <i class="fas fa-exclamation-triangle"></i> {{ $message }}
@@ -793,19 +830,18 @@
                             <!-- Code postal -->
                             <div class="space-y-3">
                                 <label class="block text-sm font-semibold text-gray-700">
-                                    Code postal <span class="text-red-500">*</span>
+                                    Code postal
                                 </label>
                                 <input
                                     type="text"
-                                    name="postal_code"
-                                    value="{{ old('postal_code', $organization->postal_code ?? '') }}"
+                                    name="zip_code"
+                                    value="{{ old('zip_code', $organization->zip_code ?? '') }}"
                                     class="w-full px-4 py-4 bg-white/80 border border-gray-200 rounded-xl focus:border-blue-400 focus:ring-4 focus:ring-blue-50 transition-all"
                                     placeholder="XXXXX"
                                     pattern="[0-9]{5}"
                                     maxlength="5"
-                                    required
                                 >
-                                @error('postal_code')
+                                @error('zip_code')
                                     <p class="text-sm text-red-600 flex items-center gap-2">
                                         <i class="fas fa-exclamation-triangle"></i> {{ $message }}
                                     </p>
@@ -1245,12 +1281,86 @@ function documentUploader(documentType) {
     };
 }
 
-// Auto-format SIRET input
+// Initialize Tom Select components
 document.addEventListener('DOMContentLoaded', function() {
-    const siretInput = document.querySelector('input[name="siret"]');
-    if (siretInput) {
-        siretInput.addEventListener('input', function() {
-            this.value = this.value.replace(/\D/g, '').slice(0, 14);
+    // Auto-format NIF/AI/NIS inputs
+    const nifInput = document.querySelector('input[name="nif"]');
+    if (nifInput) {
+        nifInput.addEventListener('input', function() {
+            this.value = this.value.replace(/\D/g, '').slice(0, 15);
+        });
+    }
+
+    // Initialize Tom Select for Organization Type
+    if (document.getElementById('organization_type')) {
+        new TomSelect('#organization_type', {
+            placeholder: 'Sélectionnez un type d\'organisation',
+            allowEmptyOption: true,
+            searchField: ['text'],
+            render: {
+                option: function(data, escape) {
+                    return '<div class="flex items-center py-2 px-3 hover:bg-blue-50 transition-colors">' +
+                           '<div class="flex-1">' +
+                           '<div class="font-medium text-gray-900">' + escape(data.text) + '</div>' +
+                           '</div>' +
+                           '</div>';
+                }
+            }
+        });
+    }
+
+    // Initialize Tom Select for Industry (with create option)
+    if (document.getElementById('industry')) {
+        new TomSelect('#industry', {
+            placeholder: 'Sélectionnez ou saisissez un secteur d\'activité',
+            allowEmptyOption: true,
+            create: true,
+            searchField: ['text'],
+            render: {
+                option: function(data, escape) {
+                    return '<div class="flex items-center py-2 px-3 hover:bg-blue-50 transition-colors">' +
+                           '<div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mr-3">' +
+                           '<i class="fas fa-industry text-blue-600 text-sm"></i>' +
+                           '</div>' +
+                           '<div class="flex-1">' +
+                           '<div class="font-medium text-gray-900">' + escape(data.text) + '</div>' +
+                           '</div>' +
+                           '</div>';
+                },
+                item: function(data, escape) {
+                    return '<div class="flex items-center">' +
+                           '<i class="fas fa-industry text-blue-600 text-sm mr-2"></i>' +
+                           '<span>' + escape(data.text) + '</span>' +
+                           '</div>';
+                }
+            }
+        });
+    }
+
+    // Initialize Tom Select for Wilaya (with search)
+    if (document.getElementById('wilaya')) {
+        new TomSelect('#wilaya', {
+            placeholder: 'Recherchez et sélectionnez une wilaya',
+            allowEmptyOption: true,
+            searchField: ['text'],
+            render: {
+                option: function(data, escape) {
+                    return '<div class="flex items-center py-2 px-3 hover:bg-blue-50 transition-colors">' +
+                           '<div class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center mr-3">' +
+                           '<i class="fas fa-map-marker-alt text-green-600 text-sm"></i>' +
+                           '</div>' +
+                           '<div class="flex-1">' +
+                           '<div class="font-medium text-gray-900">' + escape(data.text) + '</div>' +
+                           '</div>' +
+                           '</div>';
+                },
+                item: function(data, escape) {
+                    return '<div class="flex items-center">' +
+                           '<i class="fas fa-map-marker-alt text-green-600 text-sm mr-2"></i>' +
+                           '<span>' + escape(data.text) + '</span>' +
+                           '</div>';
+                }
+            }
         });
     }
 });

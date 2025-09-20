@@ -6,9 +6,11 @@ return new class extends Migration {
     public function up(): void {
         $tables = ['users', 'vehicles', 'drivers', 'assignments', 'maintenance_plans', 'maintenance_logs', 'vehicle_handover_forms'];
         foreach ($tables as $tableName) {
-            Schema::table($tableName, function (Blueprint $table) {
-                $table->foreignId('organization_id')->nullable()->constrained('organizations')->onDelete('cascade');
-            });
+            if (Schema::hasTable($tableName) && !Schema::hasColumn($tableName, 'organization_id')) {
+                Schema::table($tableName, function (Blueprint $table) {
+                    $table->foreignId('organization_id')->nullable()->constrained('organizations')->onDelete('cascade');
+                });
+            }
         }
     }
     public function down(): void {

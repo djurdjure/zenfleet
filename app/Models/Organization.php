@@ -6,19 +6,15 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Sluggable\HasSlug;
 use Spatie\Sluggable\SlugOptions;
-use App\Models\User;
-use App\Models\Vehicle;
-use App\Models\Supplier;
-use App\Models\MaintenanceRecord;
-use App\Models\Trip;
-use App\Models\PermissionAuditLog;
+use Illuminate\Support\Str;
 
 class Organization extends Model
 {
-    use HasFactory, SoftDeletes, HasSlug;
+    use HasFactory, HasSlug, SoftDeletes;
 
     protected $fillable = [
         // Informations générales
@@ -30,16 +26,18 @@ class Organization extends Model
         'description',
         'website',
         'phone_number',
+        'primary_email',
         'logo_path',
         'status',
 
-        // Informations légales
+        // Informations légales Algeria
         'trade_register',
         'nif',
         'ai',
         'nis',
         'address',
         'city',
+        'commune',
         'zip_code',
         'wilaya',
         'scan_nif_path',
@@ -65,7 +63,7 @@ class Organization extends Model
     protected $dates = [
         'manager_dob',
         'created_at',
-        'updated_at'
+        'updated_at',
     ];
 
     public function getSlugOptions(): SlugOptions
@@ -95,7 +93,10 @@ class Organization extends Model
             return $this->users()->role('Admin');
         } catch (\Spatie\Permission\Exceptions\RoleDoesNotExist $e) {
             \Log::warning("Role 'Admin' does not exist for organization {$this->name}");
-            return $this->users()->whereHas('roles', function($q) { $q->where('name', 'Admin'); });
+
+            return $this->users()->whereHas('roles', function ($q) {
+                $q->where('name', 'Admin');
+            });
         }
     }
 
@@ -106,8 +107,9 @@ class Organization extends Model
             return $this->users()->role('Gestionnaire Flotte');
         } catch (\Spatie\Permission\Exceptions\RoleDoesNotExist $e) {
             \Log::warning("Role 'Gestionnaire Flotte' does not exist for organization {$this->name}");
-            return $this->users()->whereHas('roles', function($q) { 
-                $q->whereIn('name', ['Gestionnaire Flotte', 'fleet_manager']); 
+
+            return $this->users()->whereHas('roles', function ($q) {
+                $q->whereIn('name', ['Gestionnaire Flotte', 'fleet_manager']);
             });
         }
     }
@@ -118,7 +120,10 @@ class Organization extends Model
             return $this->users()->role('supervisor');
         } catch (\Spatie\Permission\Exceptions\RoleDoesNotExist $e) {
             \Log::warning("Role 'supervisor' does not exist for organization {$this->name}");
-            return $this->users()->whereHas('roles', function($q) { $q->where('name', 'supervisor'); });
+
+            return $this->users()->whereHas('roles', function ($q) {
+                $q->where('name', 'supervisor');
+            });
         }
     }
 
@@ -129,9 +134,10 @@ class Organization extends Model
             return $this->users()->role('Chauffeur');
         } catch (\Spatie\Permission\Exceptions\RoleDoesNotExist $e) {
             \Log::warning("Role 'Chauffeur' does not exist for organization {$this->name}");
+
             // Fallback avec requête directe
-            return $this->users()->whereHas('roles', function($q) { 
-                $q->whereIn('name', ['Chauffeur', 'driver']); 
+            return $this->users()->whereHas('roles', function ($q) {
+                $q->whereIn('name', ['Chauffeur', 'driver']);
             });
         }
     }
@@ -167,6 +173,12 @@ class Organization extends Model
         return $this->hasMany(PermissionAuditLog::class);
     }
 
+    // Algeria-specific relationships
+    public function wilayaInfo(): BelongsTo
+    {
+        return $this->belongsTo(AlgeriaWilaya::class, 'wilaya', 'code');
+    }
+
     // Scopes
     public function scopeActive($query)
     {
@@ -176,7 +188,7 @@ class Organization extends Model
     public function scopeWithActiveSubscription($query)
     {
         return $query->where('subscription_expires_at', '>', now())
-                     ->orWhereNull('subscription_expires_at');
+            ->orWhereNull('subscription_expires_at');
     }
 
     // Méthodes utilitaires
@@ -194,7 +206,7 @@ class Organization extends Model
         $limits = [
             'basic' => 10,
             'professional' => 50,
-            'enterprise' => null // Illimité
+            'enterprise' => null, // Illimité
         ];
 
         $limit = $limits[$this->subscription_plan] ?? 10;
@@ -211,7 +223,7 @@ class Organization extends Model
         $limits = [
             'basic' => 25,
             'professional' => 100,
-            'enterprise' => null // Illimité
+            'enterprise' => null, // Illimité
         ];
 
         $limit = $limits[$this->subscription_plan] ?? 25;
@@ -226,16 +238,15 @@ class Organization extends Model
     public function getSettingsAttribute($value): array
     {
         $default = [
-            'timezone' => 'UTC',
-            'currency' => 'EUR',
-            'language' => 'fr',
+            'locale' => 'ar',
             'date_format' => 'd/m/Y',
+            'phone_format' => '+213',
             'notifications' => [
                 'maintenance_alerts' => true,
                 'fuel_alerts' => true,
                 'driver_alerts' => true,
-                'email_reports' => true
-            ]
+                'email_reports' => true,
+            ],
         ];
 
         return array_merge($default, json_decode($value, true) ?? []);
@@ -244,6 +255,12 @@ class Organization extends Model
     protected static function boot()
     {
         parent::boot();
+
+        static::creating(function ($organization) {
+            if (empty($organization->uuid)) {
+                $organization->uuid = (string) Str::uuid();
+            }
+        });
 
         static::deleting(function ($organization) {
             // Soft delete tous les utilisateurs liés
@@ -268,7 +285,7 @@ class Organization extends Model
      */
     public function getUserCountByRole(string $roleName): int
     {
-        return $this->users()->whereHas('roles', function($q) use ($roleName) {
+        return $this->users()->whereHas('roles', function ($q) use ($roleName) {
             $q->where('name', $roleName);
         })->count();
     }
@@ -287,7 +304,7 @@ class Organization extends Model
                     'fleet_managers' => $this->fleetManagers()->count(),
                     'supervisors' => $this->supervisors()->count(),
                     'drivers' => $this->drivers()->count(),
-                ]
+                ],
             ],
             'fleet' => [
                 'vehicles' => $this->current_vehicles,
@@ -303,7 +320,7 @@ class Organization extends Model
                 'plan' => $this->subscription_plan,
                 'active' => $this->isSubscriptionActive(),
                 'expires_at' => $this->subscription_expires_at,
-            ]
+            ],
         ];
     }
 
@@ -321,9 +338,9 @@ class Organization extends Model
             'organization_type' => $this->organization_type,
             'industry' => $this->industry,
             'status' => $this->status,
-            'country' => $this->country,
+            'wilaya' => $this->wilaya,
             'city' => $this->city,
-            'logo_url' => $this->logo_path ? asset('storage/' . $this->logo_path) : null,
+            'logo_url' => $this->logo_path ? asset('storage/'.$this->logo_path) : null,
             'subscription_plan' => $this->subscription_plan,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,

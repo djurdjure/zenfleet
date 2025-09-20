@@ -13,7 +13,7 @@ use App\Http\Controllers\Admin\SupplierController;
 use App\Http\Controllers\Admin\SupplierCategoryController;
 use App\Http\Controllers\Admin\DocumentController;
 use App\Http\Controllers\Admin\DocumentCategoryController;
-use App\Http\Controllers\Admin\MaintenanceDashboardController;
+// use App\Http\Controllers\Admin\MaintenanceDashboardController;
 use App\Http\Controllers\Admin\MaintenancePlanController;
 use App\Http\Controllers\Admin\MaintenanceLogController;
 use App\Http\Controllers\Admin\VehicleHandoverController;
@@ -91,17 +91,15 @@ Route::middleware(['auth', 'verified'])
         
         // 🏢 ✅ ORGANISATIONS - INTERFACE ULTRA-PROFESSIONNELLE INTÉGRÉE
         Route::prefix('organizations')->name('organizations.')->group(function () {
-            // Route principale avec composant Livewire
-            Route::get('/', function () {
-                return view('admin.organizations.index');
-            })->name('index');
+            // Route principale avec données
+            Route::get('/', [OrganizationController::class, 'index'])->name('index');
             
             // Routes CRUD traditionnelles pour compatibilité
             Route::get('/create', [OrganizationController::class, 'create'])->name('create');
             Route::post('/', [OrganizationController::class, 'store'])->name('store');
             Route::get('/{organization}', [OrganizationController::class, 'show'])->name('show');
             Route::get('/{organization}/edit', [OrganizationController::class, 'edit'])->name('edit');
-            Route::patch('/{organization}', [OrganizationController::class, 'update'])->name('update');
+            Route::put('/{organization}', [OrganizationController::class, 'update'])->name('update');
             Route::delete('/{organization}', [OrganizationController::class, 'destroy'])->name('destroy');
             
             // Actions avancées
@@ -141,11 +139,11 @@ Route::middleware(['auth', 'verified'])
 
     /*
     |--------------------------------------------------------------------------
-    | 👥 GESTION UTILISATEURS - ADMIN & SUPER ADMIN
+    | 👥 GESTION UTILISATEURS - SYSTÈME DE PERMISSIONS ENTERPRISE
     |--------------------------------------------------------------------------
     */
-    Route::middleware('role:Super Admin|Admin')->group(function () {
-        
+    Route::middleware(['auth', 'verified', 'enterprise.permission'])->group(function () {
+
         // Utilisateurs avec actions avancées
         Route::resource('users', UserController::class);
         Route::prefix('users')->name('users.')->group(function () {
@@ -163,10 +161,10 @@ Route::middleware(['auth', 'verified'])
 
     /*
     |--------------------------------------------------------------------------
-    | 🚗 GESTION OPÉRATIONNELLE - FLOTTE COMPLÈTE
+    | 🚗 GESTION OPÉRATIONNELLE - FLOTTE COMPLÈTE ENTERPRISE
     |--------------------------------------------------------------------------
     */
-    Route::middleware('role:Super Admin|Admin|Gestionnaire Flotte')->group(function () {
+    Route::middleware(['auth', 'verified', 'enterprise.permission'])->group(function () {
         
         // 🚙 Véhicules avec Import/Export Avancé
         Route::resource('vehicles', VehicleController::class);
@@ -236,13 +234,13 @@ Route::middleware(['auth', 'verified'])
     */
     Route::middleware('role:Super Admin|Admin|Gestionnaire Flotte|Supervisor')->group(function () {
         
-        // Dashboard Maintenance
-        Route::prefix('maintenance')->name('maintenance.')->group(function () {
-            Route::get('/', [MaintenanceDashboardController::class, 'index'])->name('dashboard');
-            Route::get('calendar', [MaintenanceDashboardController::class, 'calendar'])->name('calendar');
-            Route::get('alerts', [MaintenanceDashboardController::class, 'alerts'])->name('alerts');
-            Route::get('analytics', [MaintenanceDashboardController::class, 'analytics'])->name('analytics');
-        });
+        // Dashboard Maintenance (temporairement désactivé)
+        // Route::prefix('maintenance')->name('maintenance.')->group(function () {
+        //     Route::get('/', [MaintenanceDashboardController::class, 'index'])->name('dashboard');
+        //     Route::get('calendar', [MaintenanceDashboardController::class, 'calendar'])->name('calendar');
+        //     Route::get('alerts', [MaintenanceDashboardController::class, 'alerts'])->name('alerts');
+        //     Route::get('analytics', [MaintenanceDashboardController::class, 'analytics'])->name('analytics');
+        // });
 
         // Plans et Logs de Maintenance
         Route::resource('maintenance/plans', MaintenancePlanController::class)->names('maintenance.plans');
@@ -377,6 +375,22 @@ Route::middleware(['auth', 'verified'])
 |--------------------------------------------------------------------------
 */
 require __DIR__.'/auth.php';
+
+/*
+|--------------------------------------------------------------------------
+| 🚧 ROUTES PLACEHOLDER POUR MODULES EN DÉVELOPPEMENT
+|--------------------------------------------------------------------------
+*/
+Route::middleware(['auth', 'verified', 'enterprise.permission'])->prefix('admin')->name('admin.')->group(function () {
+    // Modules temporaires en développement
+    Route::get('assignments', [\App\Http\Controllers\Admin\PlaceholderController::class, 'index'])->name('assignments.index');
+    Route::get('drivers', [\App\Http\Controllers\Admin\PlaceholderController::class, 'index'])->name('drivers.index');
+    Route::get('planning', [\App\Http\Controllers\Admin\PlaceholderController::class, 'index'])->name('planning.index');
+    Route::get('documents', [\App\Http\Controllers\Admin\PlaceholderController::class, 'index'])->name('documents.index');
+    Route::get('suppliers', [\App\Http\Controllers\Admin\PlaceholderController::class, 'index'])->name('suppliers.index');
+    Route::get('reports', [\App\Http\Controllers\Admin\PlaceholderController::class, 'index'])->name('reports.index');
+    Route::get('audit', [\App\Http\Controllers\Admin\PlaceholderController::class, 'index'])->name('audit.index');
+});
 
 /*
 |--------------------------------------------------------------------------

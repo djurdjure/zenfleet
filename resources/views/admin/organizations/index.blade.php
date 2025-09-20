@@ -220,12 +220,19 @@
     </div>
 
     {{-- Enhanced Stats Dashboard --}}
+    @php
+        $total_orgs = App\Models\Organization::count();
+        $active_orgs = App\Models\Organization::where('status', 'active')->count();
+        $total_users = App\Models\User::count();
+        $total_vehicles = App\Models\Vehicle::count();
+    @endphp
+
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <div class="metric-card rounded-xl p-6 hover-scale">
             <div class="flex items-center justify-between">
                 <div>
                     <p class="text-sm font-medium text-gray-600">Total Organisations</p>
-                    <p class="text-3xl font-bold text-gray-900">{{ isset($organizations) ? $organizations->count() : 0 }}</p>
+                    <p class="text-3xl font-bold text-gray-900">{{ $total_orgs }}</p>
                     <p class="text-sm text-green-600 mt-1">
                         <i class="fas fa-arrow-up mr-1"></i>+{{ rand(2, 8) }}% ce mois
                     </p>
@@ -240,9 +247,9 @@
             <div class="flex items-center justify-between">
                 <div>
                     <p class="text-sm font-medium text-gray-600">Organisations Actives</p>
-                    <p class="text-3xl font-bold text-green-600">{{ isset($organizations) ? $organizations->where('status', 'active')->count() : 0 }}</p>
+                    <p class="text-3xl font-bold text-green-600">{{ $active_orgs }}</p>
                     <p class="text-sm text-gray-500 mt-1">
-                        {{ isset($organizations) && $organizations->count() > 0 ? round(($organizations->where('status', 'active')->count() / $organizations->count()) * 100, 1) : 0 }}% du total
+                        {{ $total_orgs > 0 ? round(($active_orgs / $total_orgs) * 100, 1) : 0 }}% du total
                     </p>
                 </div>
                 <div class="p-3 bg-gradient-to-br from-green-500 to-green-600 rounded-xl">
@@ -255,9 +262,9 @@
             <div class="flex items-center justify-between">
                 <div>
                     <p class="text-sm font-medium text-gray-600">Utilisateurs Total</p>
-                    <p class="text-3xl font-bold text-blue-600">{{ isset($organizations) ? $organizations->sum('current_users') : 0 }}</p>
+                    <p class="text-3xl font-bold text-blue-600">{{ $total_users }}</p>
                     <p class="text-sm text-gray-500 mt-1">
-                        Répartis sur {{ isset($organizations) ? $organizations->count() : 0 }} orgs
+                        Répartis sur {{ $total_orgs }} orgs
                     </p>
                 </div>
                 <div class="p-3 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl">
@@ -270,7 +277,7 @@
             <div class="flex items-center justify-between">
                 <div>
                     <p class="text-sm font-medium text-gray-600">Véhicules Total</p>
-                    <p class="text-3xl font-bold text-orange-600">{{ isset($organizations) ? $organizations->sum('current_vehicles') : 0 }}</p>
+                    <p class="text-3xl font-bold text-orange-600">{{ $total_vehicles }}</p>
                     <p class="text-sm text-gray-500 mt-1">
                         Flotte totale gérée
                     </p>
@@ -282,247 +289,8 @@
         </div>
     </div>
 
-    {{-- Premium Organizations List --}}
-    <div class="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
-        <div class="px-6 py-5 border-b border-gray-200 bg-gradient-to-r from-gray-50 to-gray-100">
-            <div class="flex items-center justify-between">
-                <h2 class="text-xl font-bold text-gray-900">
-                    <i class="fas fa-list-alt text-blue-600 mr-2"></i>
-                    Répertoire des Organisations
-                </h2>
-                <div class="flex items-center space-x-3">
-                    <span class="text-sm text-gray-500">{{ isset($organizations) ? $organizations->count() : 0 }} organisations trouvées</span>
-                    <div class="flex items-center space-x-1">
-                        <button onclick="changeView('table')" class="p-2 rounded-lg hover:bg-white text-gray-600 hover:text-blue-600">
-                            <i class="fas fa-table"></i>
-                        </button>
-                        <button onclick="changeView('grid')" class="p-2 rounded-lg hover:bg-white text-gray-600 hover:text-blue-600">
-                            <i class="fas fa-th-large"></i>
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        @if(isset($organizations) && $organizations->count() > 0)
-        <div id="table-view" class="overflow-x-auto">
-            <table class="data-table min-w-full">
-                <thead>
-                    <tr class="bg-gradient-to-r from-gray-50 to-gray-100">
-                        <th class="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider border-b border-gray-200">
-                            Organisation
-                        </th>
-                        <th class="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider border-b border-gray-200">
-                            Informations Légales
-                        </th>
-                        <th class="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider border-b border-gray-200">
-                            Représentant
-                        </th>
-                        <th class="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider border-b border-gray-200">
-                            Localisation
-                        </th>
-                        <th class="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider border-b border-gray-200">
-                            Métriques
-                        </th>
-                        <th class="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider border-b border-gray-200">
-                            Statut
-                        </th>
-                        <th class="px-6 py-4 text-center text-xs font-bold text-gray-700 uppercase tracking-wider border-b border-gray-200">
-                            Actions
-                        </th>
-                    </tr>
-                </thead>
-                <tbody class="divide-y divide-gray-100">
-                    @foreach($organizations as $organization)
-                    <tr class="organization-row group" data-organization-id="{{ $organization->id }}">
-                        <td class="px-6 py-5">
-                            <div class="flex items-center space-x-4">
-                                <div class="relative">
-                                    @if($organization->logo_path)
-                                        <img src="{{ asset('storage/' . $organization->logo_path) }}"
-                                             alt="{{ $organization->name }}"
-                                             class="organization-logo h-12 w-12 rounded-xl object-cover border-2 border-gray-200">
-                                    @else
-                                        <div class="organization-logo h-12 w-12 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center border-2 border-gray-200">
-                                            <span class="text-white font-bold text-lg">{{ substr($organization->name, 0, 1) }}</span>
-                                        </div>
-                                    @endif
-                                    <div class="absolute -bottom-1 -right-1 h-4 w-4 rounded-full {{ $organization->status === 'active' ? 'bg-green-500' : ($organization->status === 'inactive' ? 'bg-gray-400' : 'bg-red-500') }} border-2 border-white"></div>
-                                </div>
-                                <div class="min-w-0 flex-1">
-                                    <p class="text-lg font-bold text-gray-900 truncate group-hover:text-blue-600 transition-colors">
-                                        {{ $organization->name }}
-                                    </p>
-                                    @if($organization->legal_name && $organization->legal_name !== $organization->name)
-                                        <p class="text-sm text-gray-500 truncate">{{ $organization->legal_name }}</p>
-                                    @endif
-                                    <div class="flex items-center space-x-3 mt-1">
-                                        @if($organization->organization_type)
-                                            <span class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-blue-50 text-blue-700 border border-blue-200">
-                                                {{ $organization->organization_type }}
-                                            </span>
-                                        @endif
-                                        @if($organization->industry)
-                                            <span class="text-xs text-gray-500">{{ $organization->industry }}</span>
-                                        @endif
-                                    </div>
-                                </div>
-                            </div>
-                        </td>
-
-                        <td class="px-6 py-5">
-                            <div class="legal-info rounded-lg p-3 space-y-2">
-                                @if($organization->nif)
-                                    <div class="flex items-center text-sm">
-                                        <span class="font-medium text-gray-700 w-8">NIF:</span>
-                                        <span class="text-gray-900 font-mono">{{ $organization->nif }}</span>
-                                    </div>
-                                @endif
-                                @if($organization->ai)
-                                    <div class="flex items-center text-sm">
-                                        <span class="font-medium text-gray-700 w-8">AI:</span>
-                                        <span class="text-gray-900 font-mono">{{ $organization->ai }}</span>
-                                    </div>
-                                @endif
-                                @if($organization->nis)
-                                    <div class="flex items-center text-sm">
-                                        <span class="font-medium text-gray-700 w-8">NIS:</span>
-                                        <span class="text-gray-900 font-mono">{{ $organization->nis }}</span>
-                                    </div>
-                                @endif
-                                @if($organization->trade_register)
-                                    <div class="flex items-center text-sm">
-                                        <span class="font-medium text-gray-700 w-8">RC:</span>
-                                        <span class="text-gray-900 font-mono">{{ $organization->trade_register }}</span>
-                                    </div>
-                                @endif
-                            </div>
-                        </td>
-
-                        <td class="px-6 py-5">
-                            @if($organization->manager_first_name || $organization->manager_last_name || $organization->manager_name)
-                                <div class="space-y-1">
-                                    <p class="text-sm font-medium text-gray-900">
-                                        @if($organization->manager_first_name || $organization->manager_last_name)
-                                            {{ trim(($organization->manager_first_name ?? '') . ' ' . ($organization->manager_last_name ?? '')) }}
-                                        @else
-                                            {{ $organization->manager_name }}
-                                        @endif
-                                    </p>
-                                    @if($organization->manager_phone_number || $organization->phone_number)
-                                        <p class="text-xs text-gray-500">
-                                            <i class="fas fa-phone mr-1"></i>{{ $organization->manager_phone_number ?? $organization->phone_number }}
-                                        </p>
-                                    @endif
-                                    @if($organization->manager_nin)
-                                        <p class="text-xs text-gray-500 font-mono">
-                                            NIN: {{ $organization->manager_nin }}
-                                        </p>
-                                    @endif
-                                </div>
-                            @else
-                                <span class="text-sm text-gray-400 italic">Non renseigné</span>
-                            @endif
-                        </td>
-
-                        <td class="px-6 py-5">
-                            <div class="space-y-1">
-                                <div class="flex items-center">
-                                    <i class="fas fa-map-marker-alt text-gray-400 mr-2"></i>
-                                    <span class="text-sm text-gray-900">{{ $organization->city }}</span>
-                                </div>
-                                @if($organization->wilaya)
-                                    <div class="wilaya-badge">
-                                        Wilaya {{ $organization->wilaya }}
-                                    </div>
-                                @endif
-                                @if($organization->address)
-                                    <p class="text-xs text-gray-500 truncate max-w-xs">{{ $organization->address }}</p>
-                                @endif
-                            </div>
-                        </td>
-
-                        <td class="px-6 py-5">
-                            <div class="grid grid-cols-2 gap-2 text-sm">
-                                <div class="text-center p-2 bg-blue-50 rounded-lg">
-                                    <div class="text-lg font-bold text-blue-600">{{ $organization->current_users ?? 0 }}</div>
-                                    <div class="text-xs text-blue-500">Utilisateurs</div>
-                                </div>
-                                <div class="text-center p-2 bg-green-50 rounded-lg">
-                                    <div class="text-lg font-bold text-green-600">{{ $organization->current_vehicles ?? 0 }}</div>
-                                    <div class="text-xs text-green-500">Véhicules</div>
-                                </div>
-                            </div>
-                        </td>
-
-                        <td class="px-6 py-5">
-                            <div class="flex flex-col items-start space-y-2">
-                                @if($organization->status === 'active')
-                                    <span class="status-indicator inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-800 border border-green-200">
-                                        <div class="w-2 h-2 bg-green-500 rounded-full mr-2 animate-pulse"></div>
-                                        Actif
-                                    </span>
-                                @elseif($organization->status === 'inactive')
-                                    <span class="status-indicator inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-gray-100 text-gray-800 border border-gray-200">
-                                        <div class="w-2 h-2 bg-gray-500 rounded-full mr-2"></div>
-                                        Inactif
-                                    </span>
-                                @else
-                                    <span class="status-indicator inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-red-100 text-red-800 border border-red-200">
-                                        <div class="w-2 h-2 bg-red-500 rounded-full mr-2"></div>
-                                        Suspendu
-                                    </span>
-                                @endif
-                                <span class="text-xs text-gray-500">
-                                    Créé {{ $organization->created_at->format('d/m/Y') }}
-                                </span>
-                            </div>
-                        </td>
-
-                        <td class="px-6 py-5">
-                            <div class="flex items-center justify-center space-x-2">
-                                <a href="{{ route('admin.organizations.show', $organization) }}"
-                                   class="action-button p-2 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-lg transition-all"
-                                   title="Voir les détails">
-                                    <i class="fas fa-eye"></i>
-                                </a>
-                                <a href="{{ route('admin.organizations.edit', $organization) }}"
-                                   class="action-button p-2 text-green-600 hover:text-green-800 hover:bg-green-50 rounded-lg transition-all"
-                                   title="Modifier">
-                                    <i class="fas fa-edit"></i>
-                                </a>
-                                <button type="button"
-                                        onclick="confirmDelete('{{ $organization->id }}', '{{ $organization->name }}')"
-                                        class="action-button p-2 text-red-600 hover:text-red-800 hover:bg-red-50 rounded-lg transition-all"
-                                        title="Supprimer">
-                                    <i class="fas fa-trash"></i>
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
-                    @endforeach
-                </tbody>
-            </table>
-        </div>
-        @else
-        <div class="text-center py-16 bg-gradient-to-b from-gray-50 to-white">
-            <div class="max-w-md mx-auto">
-                <div class="w-24 h-24 bg-gradient-to-br from-blue-100 to-blue-200 rounded-full flex items-center justify-center mx-auto mb-6">
-                    <i class="fas fa-building text-blue-500 text-3xl"></i>
-                </div>
-                <h3 class="text-xl font-bold text-gray-900 mb-3">Aucune organisation trouvée</h3>
-                <p class="text-gray-600 mb-8 leading-relaxed">
-                    Commencez par créer votre première organisation pour débuter la gestion de votre flotte.
-                </p>
-                <a href="{{ route('admin.organizations.create') }}"
-                   class="action-button inline-flex items-center px-6 py-3 rounded-xl text-sm font-semibold text-white bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 shadow-lg">
-                    <i class="fas fa-plus mr-2"></i>
-                    Créer une organisation
-                </a>
-            </div>
-        </div>
-        @endif
-    </div>
+    {{-- Premium Organizations List with Livewire Component --}}
+    @livewire('admin.organization-table')
 </div>
 
 {{-- Premium Delete Confirmation Modal --}}

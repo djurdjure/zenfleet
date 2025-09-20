@@ -103,13 +103,15 @@
                                 </li>
                                 @endhasanyrole
 
-                                {{-- Maintenance --}}
+                                {{-- Maintenance (Temporairement désactivé) --}}
                                 @hasanyrole('Super Admin|Admin|Gestionnaire Flotte|Supervisor')
                                 <li>
-                                    <a href="{{ route('admin.maintenance.dashboard') }}"
-                                       class="group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold {{ request()->routeIs('admin.maintenance.*') ? 'bg-zinc-950 text-white' : 'text-zinc-700 hover:text-zinc-950 hover:bg-zinc-100' }}">
+                                    <a href="#"
+                                       onclick="alert('Module de maintenance en cours de développement')"
+                                       class="group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold text-zinc-700 hover:text-zinc-950 hover:bg-zinc-100">
                                         <i class="fas fa-wrench h-5 w-5 shrink-0"></i>
                                         Maintenance
+                                        <span class="ml-auto text-xs bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full">Bientôt</span>
                                     </a>
                                 </li>
                                 @endhasanyrole

@@ -106,7 +106,7 @@
                 Affectation Actuelle
             </h3>
             <div class="mt-6">
-                @if($stats['currentAssignment'])
+                @if(isset($stats) && $stats['currentAssignment'])
                     <div class="rounded-md bg-blue-50 p-4">
                         <div class="flex">
                             <div class="flex-shrink-0">
