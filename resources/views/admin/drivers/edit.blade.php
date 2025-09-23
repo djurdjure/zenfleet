@@ -1,200 +1,542 @@
-<x-app-layout>
-    <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">Modifier le Chauffeur : <span class="text-primary-600">{{ $driver->first_name }} {{ $driver->last_name }}</span></h2>
-    </x-slot>
+@extends('layouts.admin.catalyst')
+@section('title', 'Modifier ' . $driver->first_name . ' ' . $driver->last_name . ' - ZenFleet Enterprise')
 
-    <div class="py-12">
-        <div class="max-w-4xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-8 text-gray-900" x-data="{
-                    currentStep: {{ old('current_step', 1) }},
-                    photoPreview: '{{ $driver->photo_path ? asset('storage/' . $driver->photo_path) : null }}',
-                    init() {
-                        const tomConfig = (selectedValue) => ({
-                            create: false,
-                            placeholder: 'Sélectionnez...',
-                            items: [selectedValue]
-                        });
-                        new TomSelect(this.$refs.status_id, tomConfig('{{ old('status_id', $driver->status_id) }}'));
-                        new TomSelect(this.$refs.user_id, tomConfig('{{ old('user_id', $driver->user_id) }}'));
-                    },
-                    updatePhotoPreview(event) {
-                        const file = event.target.files[0];
-                        if (file) {
-                            this.photoPreview = URL.createObjectURL(file);
+@section('content')
+<div class="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 -m-6 p-6">
+    <div x-data="{
+            currentStep: {{ old('current_step', 1) }},
+            photoPreview: '{{ $driver->photo_path ? asset('storage/' . $driver->photo_path) : null }}',
+            formData: {},
+
+            updatePhotoPreview(event) {
+                const file = event.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        this.photoPreview = e.target.result;
+                    };
+                    reader.readAsDataURL(file);
+                }
+            },
+
+            nextStep() {
+                if (this.currentStep < 4) {
+                    this.currentStep++;
+                    this.updateProgressBar();
+                }
+            },
+
+            prevStep() {
+                if (this.currentStep > 1) {
+                    this.currentStep--;
+                    this.updateProgressBar();
+                }
+            },
+
+            updateProgressBar() {
+                const progress = (this.currentStep / 4) * 100;
+                const progressBar = this.$refs.progressBar;
+                if (progressBar) {
+                    progressBar.style.width = progress + '%';
+                }
+            },
+
+            init() {
+                this.updateProgressBar();
+                @if ($errors->any())
+                    const fieldToStepMap = {
+                        'first_name': 1, 'last_name': 1, 'birth_date': 1, 'personal_phone': 1, 'address': 1,
+                        'blood_type': 1, 'personal_email': 1, 'photo': 1,
+                        'employee_number': 2, 'recruitment_date': 2, 'contract_end_date': 2, 'status_id': 2,
+                        'license_number': 3, 'license_category': 3, 'license_issue_date': 3, 'license_authority': 3,
+                        'user_id': 4, 'emergency_contact_name': 4, 'emergency_contact_phone': 4
+                    };
+
+                    const errors = @json($errors->keys());
+                    let firstErrorStep = null;
+
+                    for (const field of errors) {
+                        if (fieldToStepMap[field]) {
+                            firstErrorStep = fieldToStepMap[field];
+                            break;
                         }
                     }
-                }" x-init="
-                    init();
-                    @if ($errors->any())
-                        let errors = {{ json_encode($errors->messages()) }};
-                        let firstErrorStep = null;
-                        const fieldToStepMap = { 'first_name': 1, 'last_name': 1, 'birth_date': 1, 'personal_phone': 1, 'address': 1, 'blood_type': 1, 'personal_email': 1, 'photo': 1, 'employee_number': 2, 'recruitment_date': 2, 'contract_end_date': 2, 'status_id': 2, 'user_id': 2, 'license_number': 3, 'license_category': 3, 'license_issue_date': 3, 'license_authority': 3, 'emergency_contact_name': 3, 'emergency_contact_phone': 3 };
-                        for (const field in fieldToStepMap) {
-                            if (errors.hasOwnProperty(field)) { firstErrorStep = fieldToStepMap[field]; break; }
-                        }
-                        if (firstErrorStep) { currentStep = firstErrorStep; }
-                    @endif
-                ">
 
-                    <ol class="flex items-center w-full mb-8">
-                        <li :class="currentStep >= 1 ? 'text-primary-600' : 'text-gray-500'" class="flex w-full items-center after:content-[''] after:w-full after:h-1 after:border-b after:border-4 after:inline-block" :class="currentStep > 1 ? 'after:border-primary-600' : 'after:border-gray-200'">
-                            <span class="flex items-center justify-center w-10 h-10 rounded-full shrink-0" :class="currentStep >= 1 ? 'bg-primary-100' : 'bg-gray-100'">
-                                <x-lucide-user-circle-2 class="w-5 h-5"/>
-                            </span>
-                        </li>
-                        <li :class="currentStep >= 2 ? 'text-primary-600' : 'text-gray-500'" class="flex w-full items-center after:content-[''] after:w-full after:h-1 after:border-b after:border-4 after:inline-block" :class="currentStep > 2 ? 'after:border-primary-600' : 'after:border-gray-200'">
-                            <span class="flex items-center justify-center w-10 h-10 rounded-full shrink-0" :class="currentStep >= 2 ? 'bg-primary-100' : 'bg-gray-100'">
-                                <x-lucide-briefcase class="w-5 h-5"/>
-                            </span>
-                        </li>
-                        <li :class="currentStep === 3 ? 'text-primary-600' : 'text-gray-500'" class="flex items-center">
-                            <span class="flex items-center justify-center w-10 h-10 rounded-full shrink-0" :class="currentStep === 3 ? 'bg-primary-100' : 'bg-gray-100'">
-                                <x-lucide-contact class="w-5 h-5"/>
-                            </span>
-                        </li>
-                    </ol>
+                    if (firstErrorStep) {
+                        this.currentStep = firstErrorStep;
+                        this.updateProgressBar();
+                    }
+                @endif
+            }
+        }" x-init="init()" class="space-y-8">
 
-                    <form method="POST" action="{{ route('admin.drivers.update', $driver) }}" enctype="multipart/form-data">
+        <!-- 🎨 Enterprise Header Section -->
+        <div class="max-w-5xl mx-auto">
+            <div class="bg-white/90 backdrop-blur-sm rounded-2xl shadow-sm border border-gray-100 p-8">
+                <!-- Breadcrumb -->
+                <nav class="flex items-center gap-2 text-sm text-gray-600 mb-6">
+                    <a href="{{ route('admin.dashboard') }}" class="hover:text-blue-600 transition-colors">
+                        <i class="fas fa-home"></i> Dashboard
+                    </a>
+                    <i class="fas fa-chevron-right text-gray-400 text-xs"></i>
+                    <a href="{{ route('admin.drivers.index') }}" class="hover:text-blue-600 transition-colors">
+                        Gestion des Chauffeurs
+                    </a>
+                    <i class="fas fa-chevron-right text-gray-400 text-xs"></i>
+                    <span class="font-semibold text-gray-900">Modifier {{ $driver->first_name }} {{ $driver->last_name }}</span>
+                </nav>
+
+                <!-- Hero Content -->
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-6">
+                        <div class="w-16 h-16 bg-gradient-to-br from-amber-600 to-orange-600 rounded-2xl flex items-center justify-center shadow-lg">
+                            <i class="fas fa-user-edit text-white text-2xl"></i>
+                        </div>
+                        <div>
+                            <h1 class="text-4xl font-bold text-gray-900">Modifier le Chauffeur</h1>
+                            <p class="text-gray-600 text-lg mt-2">
+                                <span class="font-semibold text-amber-600">{{ $driver->first_name }} {{ $driver->last_name }}</span>
+                                @if($driver->employee_number)
+                                    • Matricule: {{ $driver->employee_number }}
+                                @endif
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Driver Info Card -->
+                    <div class="bg-amber-50 rounded-xl p-4 text-center min-w-[200px]">
+                        <div class="flex items-center justify-center gap-3 mb-2">
+                            @if($driver->photo_path)
+                                <img class="w-12 h-12 rounded-full object-cover ring-4 ring-white shadow-lg"
+                                     src="{{ asset('storage/' . $driver->photo_path) }}"
+                                     alt="Photo de {{ $driver->first_name }}">
+                            @else
+                                <div class="w-12 h-12 bg-gradient-to-br from-gray-100 to-gray-200 rounded-full flex items-center justify-center shadow-lg">
+                                    <i class="fas fa-user text-gray-400 text-xl"></i>
+                                </div>
+                            @endif
+                            <div>
+                                <div class="text-sm font-semibold text-gray-900">{{ $driver->driverStatus?->name ?? 'Statut non défini' }}</div>
+                                <div class="text-xs text-gray-500">Étape <span x-text="currentStep"></span> sur 4</div>
+                            </div>
+                        </div>
+                        <div class="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
+                            <div x-ref="progressBar" class="h-full bg-gradient-to-r from-amber-500 to-orange-500 transition-all duration-500 ease-out"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 📋 Form Section -->
+        <div class="max-w-5xl mx-auto">
+            <div class="bg-white/90 backdrop-blur-sm rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                <!-- Step Indicator -->
+                <div class="bg-gradient-to-r from-gray-50 to-gray-100 p-6">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-6">
+                            <!-- Step 1 -->
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300"
+                                     :class="currentStep >= 1 ? 'bg-amber-100 text-amber-600' : 'bg-gray-200 text-gray-400'">
+                                    <i class="fas fa-user"></i>
+                                </div>
+                                <div class="hidden md:block">
+                                    <div class="text-sm font-semibold" :class="currentStep >= 1 ? 'text-amber-600' : 'text-gray-400'">
+                                        Informations Personnelles
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="w-8 h-0.5 bg-gray-300" :class="currentStep > 1 ? 'bg-amber-500' : 'bg-gray-300'"></div>
+
+                            <!-- Step 2 -->
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300"
+                                     :class="currentStep >= 2 ? 'bg-amber-100 text-amber-600' : 'bg-gray-200 text-gray-400'">
+                                    <i class="fas fa-briefcase"></i>
+                                </div>
+                                <div class="hidden md:block">
+                                    <div class="text-sm font-semibold" :class="currentStep >= 2 ? 'text-amber-600' : 'text-gray-400'">
+                                        Informations Professionnelles
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="w-8 h-0.5 bg-gray-300" :class="currentStep > 2 ? 'bg-amber-500' : 'bg-gray-300'"></div>
+
+                            <!-- Step 3 -->
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300"
+                                     :class="currentStep >= 3 ? 'bg-amber-100 text-amber-600' : 'bg-gray-200 text-gray-400'">
+                                    <i class="fas fa-id-card"></i>
+                                </div>
+                                <div class="hidden md:block">
+                                    <div class="text-sm font-semibold" :class="currentStep >= 3 ? 'text-amber-600' : 'text-gray-400'">
+                                        Permis de Conduire
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="w-8 h-0.5 bg-gray-300" :class="currentStep > 3 ? 'bg-amber-500' : 'bg-gray-300'"></div>
+
+                            <!-- Step 4 -->
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300"
+                                     :class="currentStep >= 4 ? 'bg-amber-100 text-amber-600' : 'bg-gray-200 text-gray-400'">
+                                    <i class="fas fa-link"></i>
+                                </div>
+                                <div class="hidden md:block">
+                                    <div class="text-sm font-semibold" :class="currentStep >= 4 ? 'text-amber-600' : 'text-gray-400'">
+                                        Compte & Contact d'Urgence
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Form Content -->
+                <div class="p-8">
+                    <form method="POST" action="{{ route('admin.drivers.update', $driver) }}" enctype="multipart/form-data" class="space-y-8">
                         @csrf
                         @method('PUT')
                         <input type="hidden" name="current_step" x-model="currentStep">
 
-                        <fieldset x-show="currentStep === 1" class="border border-gray-200 p-6 rounded-lg">
-                             <legend class="text-lg font-semibold text-gray-800 px-2">Étape 1: Informations Personnelles</legend>
-                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
-                                <div class="md:col-span-2">
-                                    <x-input-label for="photo" value="Photo" />
-                                    <div class="mt-2 flex items-center space-x-4">
-                                        <span x-show="!photoPreview" class="inline-block h-20 w-20 overflow-hidden rounded-full bg-gray-100">
-                                            <x-lucide-user-circle-2 class="h-full w-full text-gray-300"/>
-                                        </span>
-                                        <img x-show="photoPreview" :src="photoPreview" class="h-20 w-20 rounded-full object-cover">
-                                        <input id="photo" name="photo" type="file" @change="updatePhotoPreview" class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary-50 file:text-primary-700 hover:file:bg-primary-100"/>
+                        <!-- 👤 STEP 1: Informations Personnelles -->
+                        <div x-show="currentStep === 1" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 transform translate-x-10" x-transition:enter-end="opacity-100 transform translate-x-0">
+                            <div class="mb-6">
+                                <h3 class="text-2xl font-bold text-gray-900 mb-2">Informations Personnelles</h3>
+                                <p class="text-gray-600">Modifiez les informations personnelles du chauffeur</p>
+                            </div>
+
+                            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                                <!-- Photo Section -->
+                                <div class="lg:col-span-1">
+                                    <div class="bg-gray-50 rounded-xl p-6 text-center">
+                                        <label for="photo" class="block text-sm font-semibold text-gray-700 mb-4">
+                                            <i class="fas fa-camera text-gray-400 mr-2"></i>Photo de Profil
+                                        </label>
+
+                                        <div class="mb-4">
+                                            <div x-show="!photoPreview" class="w-32 h-32 mx-auto bg-gray-200 rounded-full flex items-center justify-center">
+                                                <i class="fas fa-user text-gray-400 text-4xl"></i>
+                                            </div>
+                                            <img x-show="photoPreview" :src="photoPreview" class="w-32 h-32 mx-auto rounded-full object-cover border-4 border-white shadow-lg">
+                                        </div>
+
+                                        <input id="photo" name="photo" type="file" @change="updatePhotoPreview($event)"
+                                               accept="image/*"
+                                               class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-amber-50 file:text-amber-700 hover:file:bg-amber-100 transition-all">
+
+                                        @error('photo')
+                                            <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                                        @enderror
+
+                                        @if($driver->photo_path)
+                                            <p class="mt-2 text-xs text-gray-500">
+                                                <i class="fas fa-info-circle mr-1"></i>
+                                                Laissez vide pour conserver la photo actuelle
+                                            </p>
+                                        @endif
                                     </div>
-                                    <x-input-error :messages="$errors->get('photo')" class="mt-2" />
                                 </div>
-                                <div>
-                                    <x-input-label for="first_name" value="Prénom" required />
-                                    <x-text-input id="first_name" name="first_name" :value="old('first_name', $driver->first_name)" class="mt-1 block w-full" />
-                                    <x-input-error :messages="$errors->get('first_name')" class="mt-2" />
-                                </div>
-                                <div>
-                                    <x-input-label for="last_name" value="Nom" required />
-                                    <x-text-input id="last_name" name="last_name" :value="old('last_name', $driver->last_name)" class="mt-1 block w-full" />
-                                    <x-input-error :messages="$errors->get('last_name')" class="mt-2" />
-                                </div>
-                                <div>
-                                    <x-input-label for="birth_date" value="Date de Naissance" />
-                                    <x-text-input id="birth_date" type="date" name="birth_date" :value="old('birth_date', $driver->birth_date?->format('Y-m-d'))" class="mt-1 block w-full" />
-                                    <x-input-error :messages="$errors->get('birth_date')" class="mt-2" />
-                                </div>
-                                {{-- CHAMP CORRIGÉ --}}
-                                <div>
-                                    <x-input-label for="blood_type" value="Groupe Sanguin" />
-                                    <x-text-input id="blood_type" name="blood_type" :value="old('blood_type', $driver->blood_type)" placeholder="Ex: O+" class="mt-1 block w-full" />
-                                    <x-input-error :messages="$errors->get('blood_type')" class="mt-2" />
-                                </div>
-                                <div>
-                                    <x-input-label for="personal_phone" value="Téléphone Personnel" />
-                                    <x-text-input id="personal_phone" name="personal_phone" :value="old('personal_phone', $driver->personal_phone)" class="mt-1 block w-full" />
-                                    <x-input-error :messages="$errors->get('personal_phone')" class="mt-2" />
-                                </div>
-                                {{-- CHAMP CORRIGÉ --}}
-                                
-                                <div>
-                                    <label for="personal_email" class="block font-medium text-sm text-gray-700">Email Personnelle</label>
-                                    <x-text-input id="personal_email" name="personal_email" type="email" :value="old('personal_email', $driver->personal_email)" class="mt-1 w-full" />
-                                    <x-input-error :messages="$errors->get('personal_email')" class="mt-2" />
-                                </div>
-                                <div class="md:col-span-2">
-                                    <x-input-label for="address" value="Adresse" />
-                                    <textarea id="address" name="address" rows="3" class="block mt-1 w-full border-gray-300 focus:border-primary-500 focus:ring-primary-500 rounded-md shadow-sm">{{ old('address', $driver->address) }}</textarea>
-                                    <x-input-error :messages="$errors->get('address')" class="mt-2" />
+
+                                <!-- Personal Information -->
+                                <div class="lg:col-span-2 space-y-6">
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                        <div>
+                                            <label for="first_name" class="block text-sm font-semibold text-gray-700 mb-2">
+                                                <i class="fas fa-user text-gray-400 mr-2"></i>Prénom *
+                                            </label>
+                                            <input type="text" id="first_name" name="first_name" value="{{ old('first_name', $driver->first_name) }}" required
+                                                   class="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl focus:border-amber-400 focus:ring-4 focus:ring-amber-50 transition-all">
+                                            @error('first_name')
+                                                <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                                            @enderror
+                                        </div>
+
+                                        <div>
+                                            <label for="last_name" class="block text-sm font-semibold text-gray-700 mb-2">
+                                                <i class="fas fa-user text-gray-400 mr-2"></i>Nom *
+                                            </label>
+                                            <input type="text" id="last_name" name="last_name" value="{{ old('last_name', $driver->last_name) }}" required
+                                                   class="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl focus:border-amber-400 focus:ring-4 focus:ring-amber-50 transition-all">
+                                            @error('last_name')
+                                                <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                                            @enderror
+                                        </div>
+
+                                        <div>
+                                            <label for="birth_date" class="block text-sm font-semibold text-gray-700 mb-2">
+                                                <i class="fas fa-calendar text-gray-400 mr-2"></i>Date de Naissance
+                                            </label>
+                                            <input type="date" id="birth_date" name="birth_date" value="{{ old('birth_date', $driver->birth_date?->format('Y-m-d')) }}"
+                                                   class="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl focus:border-amber-400 focus:ring-4 focus:ring-amber-50 transition-all">
+                                            @error('birth_date')
+                                                <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                                            @enderror
+                                        </div>
+
+                                        <div>
+                                            <label for="blood_type" class="block text-sm font-semibold text-gray-700 mb-2">
+                                                <i class="fas fa-tint text-gray-400 mr-2"></i>Groupe Sanguin
+                                            </label>
+                                            <input type="text" id="blood_type" name="blood_type" value="{{ old('blood_type', $driver->blood_type) }}"
+                                                   placeholder="Ex: O+"
+                                                   class="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl focus:border-amber-400 focus:ring-4 focus:ring-amber-50 transition-all">
+                                            @error('blood_type')
+                                                <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                                            @enderror
+                                        </div>
+
+                                        <div>
+                                            <label for="personal_phone" class="block text-sm font-semibold text-gray-700 mb-2">
+                                                <i class="fas fa-phone text-gray-400 mr-2"></i>Téléphone Personnel
+                                            </label>
+                                            <input type="tel" id="personal_phone" name="personal_phone" value="{{ old('personal_phone', $driver->personal_phone) }}"
+                                                   class="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl focus:border-amber-400 focus:ring-4 focus:ring-amber-50 transition-all">
+                                            @error('personal_phone')
+                                                <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                                            @enderror
+                                        </div>
+
+                                        <div>
+                                            <label for="personal_email" class="block text-sm font-semibold text-gray-700 mb-2">
+                                                <i class="fas fa-envelope text-gray-400 mr-2"></i>Email Personnel
+                                            </label>
+                                            <input type="email" id="personal_email" name="personal_email" value="{{ old('personal_email', $driver->personal_email) }}"
+                                                   class="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl focus:border-amber-400 focus:ring-4 focus:ring-amber-50 transition-all">
+                                            @error('personal_email')
+                                                <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                                            @enderror
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <label for="address" class="block text-sm font-semibold text-gray-700 mb-2">
+                                            <i class="fas fa-map-marker-alt text-gray-400 mr-2"></i>Adresse Complète
+                                        </label>
+                                        <textarea id="address" name="address" rows="3"
+                                                  class="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl focus:border-amber-400 focus:ring-4 focus:ring-amber-50 transition-all">{{ old('address', $driver->address) }}</textarea>
+                                        @error('address')
+                                            <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                                        @enderror
+                                    </div>
                                 </div>
                             </div>
-                        </fieldset>
+                        </div>
 
-                        <fieldset x-show="currentStep === 2" style="display: none;" class="border border-gray-200 p-6 rounded-lg">
-                             <legend class="text-lg font-semibold text-gray-800 px-2">Étape 2: Informations Professionnelles</legend>
-                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
+                        <!-- 💼 STEP 2: Informations Professionnelles -->
+                        <div x-show="currentStep === 2" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 transform translate-x-10" x-transition:enter-end="opacity-100 transform translate-x-0" style="display: none;">
+                            <div class="mb-6">
+                                <h3 class="text-2xl font-bold text-gray-900 mb-2">Informations Professionnelles</h3>
+                                <p class="text-gray-600">Modifiez le statut et les informations d'emploi</p>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div>
-                                    <x-input-label for="employee_number" value="Matricule" />
-                                    <x-text-input id="employee_number" name="employee_number" :value="old('employee_number', $driver->employee_number)" class="mt-1 block w-full" />
-                                    <x-input-error :messages="$errors->get('employee_number')" class="mt-2" />
+                                    <label for="employee_number" class="block text-sm font-semibold text-gray-700 mb-2">
+                                        <i class="fas fa-id-badge text-gray-400 mr-2"></i>Matricule Employé
+                                    </label>
+                                    <input type="text" id="employee_number" name="employee_number" value="{{ old('employee_number', $driver->employee_number) }}"
+                                           class="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl focus:border-amber-400 focus:ring-4 focus:ring-amber-50 transition-all">
+                                    @error('employee_number')
+                                        <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                                    @enderror
                                 </div>
+
                                 <div>
-                                    <x-input-label for="status_id" value="Statut" required />
-                                    <select x-ref="status_id" name="status_id" id="status_id">
-                                        @foreach($driverStatuses as $status)<option value="{{ $status->id }}">{{ $status->name }}</option>@endforeach
+                                    <label for="status_id" class="block text-sm font-semibold text-gray-700 mb-2">
+                                        <i class="fas fa-user-check text-gray-400 mr-2"></i>Statut *
+                                    </label>
+                                    <select id="status_id" name="status_id" required
+                                            class="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl focus:border-amber-400 focus:ring-4 focus:ring-amber-50 transition-all appearance-none">
+                                        <option value="">Sélectionnez un statut</option>
+                                        @foreach($driverStatuses as $status)
+                                            <option value="{{ $status->id }}" {{ (old('status_id', $driver->status_id) == $status->id) ? 'selected' : '' }}>
+                                                {{ $status->name }}
+                                            </option>
+                                        @endforeach
                                     </select>
-                                    <x-input-error :messages="$errors->get('status_id')" class="mt-2" />
+                                    @error('status_id')
+                                        <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                                    @enderror
                                 </div>
+
                                 <div>
-                                    <x-input-label for="recruitment_date" value="Date de Recrutement" />
-                                    <x-text-input id="recruitment_date" type="date" name="recruitment_date" :value="old('recruitment_date', $driver->recruitment_date?->format('Y-m-d'))" class="mt-1 block w-full" />
-                                    <x-input-error :messages="$errors->get('recruitment_date')" class="mt-2" />
+                                    <label for="recruitment_date" class="block text-sm font-semibold text-gray-700 mb-2">
+                                        <i class="fas fa-calendar-plus text-gray-400 mr-2"></i>Date de Recrutement
+                                    </label>
+                                    <input type="date" id="recruitment_date" name="recruitment_date" value="{{ old('recruitment_date', $driver->recruitment_date?->format('Y-m-d')) }}"
+                                           class="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl focus:border-amber-400 focus:ring-4 focus:ring-amber-50 transition-all">
+                                    @error('recruitment_date')
+                                        <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                                    @enderror
                                 </div>
+
                                 <div>
-                                    <x-input-label for="contract_end_date" value="Date de Fin de Contrat" />
-                                    <x-text-input id="contract_end_date" name="contract_end_date" :value="old('contract_end_date', $driver->contract_end_date?->format('Y-m-d'))" type="date" class="mt-1 block w-full"/>
-                                    <x-input-error :messages="$errors->get('contract_end_date')" class="mt-2" />
-                                </div>
-                                <div class="md:col-span-2">
-                                    <x-input-label for="user_id" value="Lier à un Compte Utilisateur (Optionnel)" />
-                                    <select x-ref="user_id" name="user_id" id="user_id">
-                                         <option value="">Ne pas lier de compte</option>
-                                        @foreach($linkableUsers as $user)<option value="{{ $user->id }}">{{ $user->name }} ({{ $user->email }})</option>@endforeach
-                                    </select>
-                                    <x-input-error :messages="$errors->get('user_id')" class="mt-2" />
+                                    <label for="contract_end_date" class="block text-sm font-semibold text-gray-700 mb-2">
+                                        <i class="fas fa-calendar-times text-gray-400 mr-2"></i>Date de Fin de Contrat
+                                    </label>
+                                    <input type="date" id="contract_end_date" name="contract_end_date" value="{{ old('contract_end_date', $driver->contract_end_date?->format('Y-m-d')) }}"
+                                           class="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl focus:border-amber-400 focus:ring-4 focus:ring-amber-50 transition-all">
+                                    @error('contract_end_date')
+                                        <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                                    @enderror
                                 </div>
                             </div>
-                        </fieldset>
+                        </div>
 
-                        <fieldset x-show="currentStep === 3" style="display: none;" class="border border-gray-200 p-6 rounded-lg">
-                             <legend class="text-lg font-semibold text-gray-800 px-2">Étape 3: Permis & Contact d'Urgence</legend>
-                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
+                        <!-- 🆔 STEP 3: Permis de Conduire -->
+                        <div x-show="currentStep === 3" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 transform translate-x-10" x-transition:enter-end="opacity-100 transform translate-x-0" style="display: none;">
+                            <div class="mb-6">
+                                <h3 class="text-2xl font-bold text-gray-900 mb-2">Permis de Conduire</h3>
+                                <p class="text-gray-600">Modifiez les informations sur le permis de conduire</p>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div>
-                                    <x-input-label for="license_number" value="Numéro de Permis" />
-                                    <x-text-input id="license_number" name="license_number" :value="old('license_number', $driver->license_number)" class="mt-1 w-full"/>
-                                    <x-input-error :messages="$errors->get('license_number')" class="mt-2" />
+                                    <label for="license_number" class="block text-sm font-semibold text-gray-700 mb-2">
+                                        <i class="fas fa-id-card text-gray-400 mr-2"></i>Numéro de Permis
+                                    </label>
+                                    <input type="text" id="license_number" name="license_number" value="{{ old('license_number', $driver->license_number) }}"
+                                           class="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl focus:border-amber-400 focus:ring-4 focus:ring-amber-50 transition-all">
+                                    @error('license_number')
+                                        <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                                    @enderror
                                 </div>
+
                                 <div>
-                                    <x-input-label for="license_category" value="Catégorie(s)" />
-                                    <x-text-input id="license_category" name="license_category" :value="old('license_category', $driver->license_category)" placeholder="Ex: B, C1E" class="mt-1 w-full"/>
-                                    <x-input-error :messages="$errors->get('license_category')" class="mt-2" />
+                                    <label for="license_category" class="block text-sm font-semibold text-gray-700 mb-2">
+                                        <i class="fas fa-certificate text-gray-400 mr-2"></i>Catégorie(s)
+                                    </label>
+                                    <input type="text" id="license_category" name="license_category" value="{{ old('license_category', $driver->license_category) }}"
+                                           placeholder="Ex: B, C1E"
+                                           class="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl focus:border-amber-400 focus:ring-4 focus:ring-amber-50 transition-all">
+                                    @error('license_category')
+                                        <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                                    @enderror
                                 </div>
+
                                 <div>
-                                    <x-input-label for="license_issue_date" value="Date de Délivrance" />
-                                    <x-text-input id="license_issue_date" name="license_issue_date" :value="old('license_issue_date', $driver->license_issue_date?->format('Y-m-d'))" type="date" class="mt-1 w-full"/>
-                                    <x-input-error :messages="$errors->get('license_issue_date')" class="mt-2" />
+                                    <label for="license_issue_date" class="block text-sm font-semibold text-gray-700 mb-2">
+                                        <i class="fas fa-calendar text-gray-400 mr-2"></i>Date de Délivrance
+                                    </label>
+                                    <input type="date" id="license_issue_date" name="license_issue_date" value="{{ old('license_issue_date', $driver->license_issue_date?->format('Y-m-d')) }}"
+                                           class="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl focus:border-amber-400 focus:ring-4 focus:ring-amber-50 transition-all">
+                                    @error('license_issue_date')
+                                        <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                                    @enderror
                                 </div>
+
                                 <div>
-                                    <x-input-label for="license_authority" value="Délivré par" />
-                                    <x-text-input id="license_authority" name="license_authority" :value="old('license_authority', $driver->license_authority)" class="mt-1 w-full"/>
-                                    <x-input-error :messages="$errors->get('license_authority')" class="mt-2" />
-                                </div>
-                                <div>
-                                    <x-input-label for="emergency_contact_name" value="Nom du Contact d'Urgence" />
-                                    <x-text-input id="emergency_contact_name" name="emergency_contact_name" :value="old('emergency_contact_name', $driver->emergency_contact_name)" class="mt-1 w-full"/>
-                                    <x-input-error :messages="$errors->get('emergency_contact_name')" class="mt-2" />
-                                </div>
-                                <div>
-                                    <x-input-label for="emergency_contact_phone" value="Téléphone d'Urgence" />
-                                    <x-text-input id="emergency_contact_phone" name="emergency_contact_phone" :value="old('emergency_contact_phone', $driver->emergency_contact_phone)" class="mt-1 w-full"/>
-                                    <x-input-error :messages="$errors->get('emergency_contact_phone')" class="mt-2" />
+                                    <label for="license_authority" class="block text-sm font-semibold text-gray-700 mb-2">
+                                        <i class="fas fa-building text-gray-400 mr-2"></i>Autorité de Délivrance
+                                    </label>
+                                    <input type="text" id="license_authority" name="license_authority" value="{{ old('license_authority', $driver->license_authority) }}"
+                                           class="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl focus:border-amber-400 focus:ring-4 focus:ring-amber-50 transition-all">
+                                    @error('license_authority')
+                                        <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                                    @enderror
                                 </div>
                             </div>
-                        </fieldset>
+                        </div>
 
-                        <div class="mt-8 pt-6 border-t border-gray-200 flex items-center justify-between">
-                            <x-secondary-button type="button" x-show="currentStep > 1" @click="currentStep--">Précédent</x-secondary-button>
-                            <div class="flex-grow"></div>
+                        <!-- 🔗 STEP 4: Compte Utilisateur & Contact d'Urgence -->
+                        <div x-show="currentStep === 4" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 transform translate-x-10" x-transition:enter-end="opacity-100 transform translate-x-0" style="display: none;">
+                            <div class="mb-6">
+                                <h3 class="text-2xl font-bold text-gray-900 mb-2">Compte Utilisateur & Contact d'Urgence</h3>
+                                <p class="text-gray-600">Modifiez la liaison du compte utilisateur et le contact d'urgence</p>
+                            </div>
+
+                            <div class="space-y-8">
+                                <!-- User Account Section -->
+                                <div class="bg-blue-50 rounded-xl p-6">
+                                    <h4 class="text-lg font-semibold text-blue-900 mb-4">
+                                        <i class="fas fa-user-circle mr-2"></i>Compte Utilisateur
+                                    </h4>
+                                    <div>
+                                        <label for="user_id" class="block text-sm font-semibold text-gray-700 mb-2">
+                                            Lié au compte utilisateur
+                                        </label>
+                                        <select id="user_id" name="user_id"
+                                                class="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl focus:border-amber-400 focus:ring-4 focus:ring-amber-50 transition-all appearance-none">
+                                            <option value="">Ne pas lier de compte</option>
+                                            @foreach($linkableUsers as $user)
+                                                <option value="{{ $user->id }}" {{ (old('user_id', $driver->user_id) == $user->id) ? 'selected' : '' }}>
+                                                    {{ $user->name }} ({{ $user->email }})
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                        @error('user_id')
+                                            <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                                        @enderror
+                                        @if($driver->user_id)
+                                            <p class="mt-2 text-sm text-blue-600">
+                                                <i class="fas fa-info-circle mr-1"></i>
+                                                Actuellement lié à: <strong>{{ $driver->user?->name }} ({{ $driver->user?->email }})</strong>
+                                            </p>
+                                        @endif
+                                    </div>
+                                </div>
+
+                                <!-- Emergency Contact Section -->
+                                <div class="bg-red-50 rounded-xl p-6">
+                                    <h4 class="text-lg font-semibold text-red-900 mb-4">
+                                        <i class="fas fa-phone-square-alt mr-2"></i>Contact d'Urgence
+                                    </h4>
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                        <div>
+                                            <label for="emergency_contact_name" class="block text-sm font-semibold text-gray-700 mb-2">
+                                                <i class="fas fa-user text-gray-400 mr-2"></i>Nom du Contact
+                                            </label>
+                                            <input type="text" id="emergency_contact_name" name="emergency_contact_name" value="{{ old('emergency_contact_name', $driver->emergency_contact_name) }}"
+                                                   class="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl focus:border-amber-400 focus:ring-4 focus:ring-amber-50 transition-all">
+                                            @error('emergency_contact_name')
+                                                <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                                            @enderror
+                                        </div>
+
+                                        <div>
+                                            <label for="emergency_contact_phone" class="block text-sm font-semibold text-gray-700 mb-2">
+                                                <i class="fas fa-phone text-gray-400 mr-2"></i>Téléphone d'Urgence
+                                            </label>
+                                            <input type="tel" id="emergency_contact_phone" name="emergency_contact_phone" value="{{ old('emergency_contact_phone', $driver->emergency_contact_phone) }}"
+                                                   class="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl focus:border-amber-400 focus:ring-4 focus:ring-amber-50 transition-all">
+                                            @error('emergency_contact_phone')
+                                                <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                                            @enderror
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Navigation Buttons -->
+                        <div class="flex items-center justify-between pt-8 border-t border-gray-200">
+                            <button type="button" @click="prevStep()" x-show="currentStep > 1"
+                                    class="inline-flex items-center gap-3 px-6 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl font-semibold transition-all duration-200">
+                                <i class="fas fa-arrow-left"></i>
+                                <span>Précédent</span>
+                            </button>
+
                             <div class="flex items-center gap-4">
-                                <a href="{{ route('admin.drivers.index') }}" class="text-sm font-semibold text-gray-600 hover:text-gray-900">Annuler</a>
-                                <x-primary-button type="button" x-show="currentStep < 3" @click="currentStep++">Suivant</x-primary-button>
-                                <button type="submit" x-show="currentStep === 3" class="inline-flex items-center px-4 py-2 bg-green-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-green-700">
-                                    Enregistrer les Modifications
+                                <a href="{{ route('admin.drivers.index') }}"
+                                   class="text-gray-600 hover:text-gray-900 font-semibold transition-colors">
+                                    Annuler
+                                </a>
+
+                                <button type="button" @click="nextStep()" x-show="currentStep < 4"
+                                        class="inline-flex items-center gap-3 px-6 py-3 bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 text-white rounded-xl font-semibold transition-all duration-200 shadow-sm hover:shadow-md">
+                                    <span>Suivant</span>
+                                    <i class="fas fa-arrow-right"></i>
+                                </button>
+
+                                <button type="submit" x-show="currentStep === 4"
+                                        class="inline-flex items-center gap-3 px-8 py-3 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white rounded-xl font-semibold transition-all duration-200 shadow-sm hover:shadow-md">
+                                    <i class="fas fa-save"></i>
+                                    <span>Enregistrer les Modifications</span>
                                 </button>
                             </div>
                         </div>
@@ -203,4 +545,48 @@
             </div>
         </div>
     </div>
-</x-app-layout>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize TomSelect for enhanced dropdowns
+    if (typeof TomSelect !== 'undefined') {
+        // Status dropdown
+        const statusSelect = document.getElementById('status_id');
+        if (statusSelect) {
+            new TomSelect(statusSelect, {
+                create: false,
+                placeholder: 'Sélectionnez un statut...',
+                searchField: ['text', 'value'],
+                render: {
+                    option: function(data, escape) {
+                        return '<div class="flex items-center gap-2 py-2">' +
+                               '<i class="fas fa-circle text-xs"></i>' +
+                               '<span>' + escape(data.text) + '</span>' +
+                               '</div>';
+                    }
+                }
+            });
+        }
+
+        // User dropdown
+        const userSelect = document.getElementById('user_id');
+        if (userSelect) {
+            new TomSelect(userSelect, {
+                create: false,
+                placeholder: 'Rechercher un utilisateur...',
+                searchField: ['text', 'value'],
+                render: {
+                    option: function(data, escape) {
+                        return '<div class="py-2">' +
+                               '<div class="font-semibold">' + escape(data.text.split(' (')[0]) + '</div>' +
+                               '<div class="text-sm text-gray-500">' + escape(data.text.split(' (')[1]?.replace(')', '') || '') + '</div>' +
+                               '</div>';
+                    }
+                }
+            });
+        }
+    }
+});
+</script>
+@endsection

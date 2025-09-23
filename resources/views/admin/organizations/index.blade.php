@@ -3,6 +3,7 @@
 @section('title', 'Organisations - ZenFleet')
 
 @push('styles')
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.min.css">
 <style>
 /* Custom animations et styles for enterprise-grade experience */
 .fade-in {
@@ -131,93 +132,22 @@
 
 @section('content')
 <div class="space-y-8 fade-in">
-    {{-- Header Section with Advanced Controls --}}
+    {{-- Header Section --}}
     <div class="bg-gradient-to-r from-gray-50 to-gray-100 rounded-xl p-6 border border-gray-200">
-        <div class="sm:flex sm:items-center sm:justify-between">
+        <div class="flex items-center justify-between">
             <div>
-                <h1 class="text-3xl font-bold leading-tight text-gray-900 sm:text-4xl">
+                <h1 class="text-xl font-bold text-gray-900">
                     <i class="fas fa-building text-blue-600 mr-3"></i>
                     Gestion des Organisations
                 </h1>
-                <p class="mt-2 text-lg text-gray-600 max-w-2xl">
-                    Plateforme centralisée pour la gestion complète des organisations, avec suivi des informations légales et représentants.
-                </p>
-                <div class="mt-4 flex items-center space-x-4 text-sm text-gray-500">
+                <div class="mt-3 flex items-center space-x-4 text-sm text-gray-500">
                     <span><i class="fas fa-calendar mr-1"></i>Dernière mise à jour: {{ now()->format('d/m/Y à H:i') }}</span>
                     <span><i class="fas fa-user mr-1"></i>Connecté: {{ auth()->user()->name }}</span>
                 </div>
             </div>
-            <div class="mt-6 sm:mt-0 flex flex-col sm:flex-row gap-3">
-                <button type="button" onclick="exportData()"
-                        class="action-button inline-flex items-center px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">
-                    <i class="fas fa-download mr-2"></i>
-                    Exporter
-                </button>
-                <button type="button" onclick="toggleAdvancedFilters()"
-                        class="action-button inline-flex items-center px-4 py-2 border border-blue-300 rounded-lg text-sm font-medium text-blue-700 bg-blue-50 hover:bg-blue-100">
-                    <i class="fas fa-filter mr-2"></i>
-                    Filtres Avancés
-                </button>
-                <a href="{{ route('admin.organizations.create') }}"
-                   class="action-button inline-flex items-center px-6 py-2 rounded-lg text-sm font-semibold text-white bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 shadow-md">
-                    <i class="fas fa-plus mr-2"></i>
-                    Nouvelle Organisation
-                </a>
-            </div>
         </div>
     </div>
 
-    {{-- Advanced Search and Filters --}}
-    <div id="advanced-filters" class="hidden bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">Recherche globale</label>
-                <input type="text" id="global-search" placeholder="Nom, NIF, gérant..."
-                       class="search-input w-full px-4 py-2 rounded-lg focus:outline-none">
-            </div>
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">Type d'organisation</label>
-                <select id="type-filter" class="search-input w-full px-4 py-2 rounded-lg focus:outline-none">
-                    <option value="">Tous les types</option>
-                    <option value="Grande Entreprise">Grande Entreprise</option>
-                    <option value="PME">PME</option>
-                    <option value="Association">Association</option>
-                    <option value="StartUp">StartUp</option>
-                    <option value="ONG">ONG</option>
-                    <option value="Cooperative">Cooperative</option>
-                    <option value="Société Public">Société Public</option>
-                </select>
-            </div>
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">Wilaya</label>
-                <select id="wilaya-filter" class="search-input w-full px-4 py-2 rounded-lg focus:outline-none">
-                    <option value="">Toutes les wilayas</option>
-                    @for($i = 1; $i <= 58; $i++)
-                        <option value="{{ str_pad($i, 2, '0', STR_PAD_LEFT) }}">{{ str_pad($i, 2, '0', STR_PAD_LEFT) }} - {{ config('constants.wilayas.' . str_pad($i, 2, '0', STR_PAD_LEFT), 'Wilaya ' . $i) }}</option>
-                    @endfor
-                </select>
-            </div>
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">Statut</label>
-                <select id="status-filter" class="search-input w-full px-4 py-2 rounded-lg focus:outline-none">
-                    <option value="">Tous les statuts</option>
-                    <option value="active">Actif</option>
-                    <option value="inactive">Inactif</option>
-                    <option value="suspended">Suspendu</option>
-                </select>
-            </div>
-        </div>
-        <div class="mt-4 flex justify-end space-x-3">
-            <button type="button" onclick="resetFilters()"
-                    class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg">
-                Réinitialiser
-            </button>
-            <button type="button" onclick="applyFilters()"
-                    class="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg">
-                Appliquer les filtres
-            </button>
-        </div>
-    </div>
 
     {{-- Enhanced Stats Dashboard --}}
     @php
@@ -285,6 +215,59 @@
                 <div class="p-3 bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl">
                     <i class="fas fa-car text-white text-xl"></i>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    {{-- Action Buttons --}}
+    <div class="flex justify-end space-x-3">
+        <button type="button" onclick="exportData()"
+                class="action-button inline-flex items-center px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">
+            <i class="fas fa-download mr-2"></i>
+            Exporter
+        </button>
+        <a href="{{ route('admin.organizations.create') }}"
+           class="action-button inline-flex items-center px-6 py-2 rounded-lg text-sm font-semibold text-white bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 shadow-md">
+            <i class="fas fa-plus mr-2"></i>
+            Nouvelle Organisation
+        </a>
+    </div>
+
+    {{-- Compact Search and Filters --}}
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div>
+                <input type="text"
+                       id="global-search"
+                       placeholder="Rechercher..."
+                       class="search-input w-full px-3 py-2 text-sm rounded-lg focus:outline-none">
+            </div>
+            <div>
+                <select id="status-filter" class="search-input w-full px-3 py-2 text-sm rounded-lg focus:outline-none">
+                    <option value="">Tous les statuts</option>
+                    <option value="active">Actif</option>
+                    <option value="inactive">Inactif</option>
+                    <option value="suspended">Suspendu</option>
+                </select>
+            </div>
+            <div>
+                <select id="wilaya-filter" class="search-input w-full px-3 py-2 text-sm rounded-lg focus:outline-none">
+                    <option value="">Toutes les wilayas</option>
+                    @foreach($wilayas as $code => $name)
+                        <option value="{{ $code }}">{{ $code }} - {{ $name }}</option>
+                    @endforeach
+                </select>
+            </div>
+            <div>
+                <select id="type-filter" class="search-input w-full px-3 py-2 text-sm rounded-lg focus:outline-none">
+                    <option value="">Tous les types</option>
+                    <option value="enterprise">Grande Entreprise</option>
+                    <option value="sme">PME</option>
+                    <option value="startup">Start-up</option>
+                    <option value="public">Secteur Public</option>
+                    <option value="ngo">ONG</option>
+                    <option value="cooperative">Coopérative</option>
+                </select>
             </div>
         </div>
     </div>
@@ -364,69 +347,24 @@
 </div>
 
 @push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js"></script>
 <script>
 // Advanced functionality for enterprise-grade experience
-function toggleAdvancedFilters() {
-    const filters = document.getElementById('advanced-filters');
-    filters.classList.toggle('hidden');
 
-    if (!filters.classList.contains('hidden')) {
-        filters.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
-}
-
+// Filter functions integrated with TomSelect
 function applyFilters() {
-    const globalSearch = document.getElementById('global-search').value.toLowerCase();
-    const typeFilter = document.getElementById('type-filter').value;
-    const wilayaFilter = document.getElementById('wilaya-filter').value;
-    const statusFilter = document.getElementById('status-filter').value;
-
-    const rows = document.querySelectorAll('.organization-row');
-    let visibleCount = 0;
-
-    rows.forEach(row => {
-        const text = row.textContent.toLowerCase();
-        const matchesGlobal = !globalSearch || text.includes(globalSearch);
-        const matchesType = !typeFilter || text.includes(typeFilter.toLowerCase());
-        const matchesWilaya = !wilayaFilter || text.includes('wilaya ' + wilayaFilter.replace(/^0+/, ''));
-        const matchesStatus = !statusFilter || text.includes(statusFilter);
-
-        const shouldShow = matchesGlobal && matchesType && matchesWilaya && matchesStatus;
-
-        if (shouldShow) {
-            row.style.display = '';
-            visibleCount++;
-        } else {
-            row.style.display = 'none';
-        }
-    });
-
-    // Update counter
-    const counter = document.querySelector('.flex.items-center.space-x-3 span');
-    if (counter) {
-        counter.textContent = `${visibleCount} organisations trouvées`;
-    }
-
-    // Show notification
-    showNotification(`Filtres appliqués - ${visibleCount} résultats trouvés`, 'success');
+    // The filtering is now handled by Livewire component
+    showNotification('Filtres appliqués avec succès', 'success');
 }
 
 function resetFilters() {
+    // Reset TomSelect dropdowns
+    if (statusSelect) statusSelect.clear();
+    if (wilayaSelect) wilayaSelect.clear();
+    if (typeSelect) typeSelect.clear();
+
+    // Clear search input
     document.getElementById('global-search').value = '';
-    document.getElementById('type-filter').value = '';
-    document.getElementById('wilaya-filter').value = '';
-    document.getElementById('status-filter').value = '';
-
-    document.querySelectorAll('.organization-row').forEach(row => {
-        row.style.display = '';
-    });
-
-    // Reset counter
-    const counter = document.querySelector('.flex.items-center.space-x-3 span');
-    if (counter) {
-        const totalRows = document.querySelectorAll('.organization-row').length;
-        counter.textContent = `${totalRows} organisations trouvées`;
-    }
 
     showNotification('Filtres réinitialisés', 'info');
 }
@@ -542,8 +480,34 @@ function deleteOrganization() {
     }
 }
 
+// Global TomSelect instances
+let statusSelect, wilayaSelect, typeSelect;
+
 // Real-time search functionality
 document.addEventListener('DOMContentLoaded', function() {
+    // Initialize TomSelect for filters
+    statusSelect = new TomSelect('#status-filter', {
+        placeholder: 'Tous les statuts',
+        searchField: ['text', 'value'],
+        allowEmptyOption: true,
+        create: false
+    });
+
+    wilayaSelect = new TomSelect('#wilaya-filter', {
+        placeholder: 'Toutes les wilayas',
+        searchField: ['text'],
+        allowEmptyOption: true,
+        create: false,
+        maxOptions: 100
+    });
+
+    typeSelect = new TomSelect('#type-filter', {
+        placeholder: 'Tous les types',
+        searchField: ['text', 'value'],
+        allowEmptyOption: true,
+        create: false
+    });
+
     const globalSearch = document.getElementById('global-search');
     if (globalSearch) {
         globalSearch.addEventListener('input', function() {

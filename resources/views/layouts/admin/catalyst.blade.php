@@ -22,192 +22,231 @@
 </head>
 <body class="h-full">
     <div class="min-h-full">
-        {{-- Sidebar pour desktop --}}
+        {{-- Sidebar pour desktop - Style FleetIO Enterprise --}}
         <div class="hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-72 lg:flex-col">
-            <div class="flex grow flex-col gap-y-5 overflow-y-auto bg-zinc-50 px-6 pb-4 border-r border-zinc-200">
-                {{-- Logo --}}
-                <div class="flex h-16 shrink-0 items-center">
-                    <div class="flex items-center">
-                        <i class="fas fa-truck text-zinc-900 text-2xl mr-3"></i>
-                        <span class="text-zinc-900 text-xl font-bold">ZenFleet</span>
+            <div class="flex grow flex-col overflow-hidden" style="background: linear-gradient(180deg, #ebf2f9 0%, #e3ecf6 100%); width: 240px; border-right: 1px solid rgba(0,0,0,0.1);">
+                {{-- En-tête avec logo --}}
+                <div class="w-full flex-none px-4 py-4 h-16 flex items-center border-b border-white/20">
+                    <div class="flex items-center w-full">
+                        <div class="relative mr-3">
+                            <div class="w-8 h-8 bg-white rounded-full flex items-center justify-center shadow-sm">
+                                <i class="fas fa-truck text-blue-600 text-lg"></i>
+                            </div>
+                        </div>
+                        <div class="flex-1">
+                            <span class="text-slate-800 text-lg font-bold tracking-tight">ZenFleet</span>
+                            <div class="text-xs text-slate-500 font-medium">Fleet Management</div>
+                        </div>
                     </div>
                 </div>
 
-                {{-- Navigation --}}
-                <nav class="flex flex-1 flex-col">
-                    <ul role="list" class="flex flex-1 flex-col gap-y-2">
-                        <li>
-                            <ul role="list" class="-mx-2 space-y-1">
-                                {{-- Dashboard --}}
-                                <li>
-                                    <a href="{{ route('admin.dashboard') }}"
-                                       class="group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold {{ request()->routeIs('admin.dashboard') ? 'bg-zinc-950 text-white' : 'text-zinc-700 hover:text-zinc-950 hover:bg-zinc-100' }}">
-                                        <i class="fas fa-home h-5 w-5 shrink-0"></i>
-                                        Dashboard
-                                    </a>
-                                </li>
-
-                                {{-- Organisations (Super Admin uniquement) --}}
-                                @hasrole('Super Admin')
-                                <li>
-                                    <a href="{{ route('admin.organizations.index') }}"
-                                       class="group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold {{ request()->routeIs('admin.organizations.*') ? 'bg-zinc-950 text-white' : 'text-zinc-700 hover:text-zinc-950 hover:bg-zinc-100' }}">
-                                        <i class="fas fa-building h-5 w-5 shrink-0"></i>
-                                        Organisations
-                                    </a>
-                                </li>
-                                @endhasrole
-
-                                {{-- Véhicules avec sous-menu --}}
-                                @hasanyrole('Super Admin|Admin|Gestionnaire Flotte')
-                                <li x-data="{ open: {{ request()->routeIs('admin.vehicles.*', 'admin.assignments.*') ? 'true' : 'false' }} }">
-                                    <button @click="open = !open"
-                                            class="group flex w-full gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold {{ request()->routeIs('admin.vehicles.*', 'admin.assignments.*') ? 'bg-zinc-950 text-white' : 'text-zinc-700 hover:text-zinc-950 hover:bg-zinc-100' }}">
-                                        <i class="fas fa-car h-5 w-5 shrink-0"></i>
-                                        <span class="flex-1 text-left">Véhicules</span>
-                                        <i class="fas fa-chevron-right h-4 w-4 transition-transform" :class="{ 'rotate-90': open }"></i>
-                                    </button>
-                                    <div x-show="open" x-transition class="mt-1">
-                                        <ul class="ml-6 space-y-1">
-                                            <li class="relative">
-                                                <div class="absolute left-0 top-0 bottom-0 w-px bg-zinc-300"></div>
-                                                <div class="absolute left-0 top-3 w-3 h-px bg-zinc-300"></div>
-                                                <a href="{{ route('admin.vehicles.index') }}"
-                                                   class="group flex gap-x-3 rounded-md p-2 pl-4 text-sm leading-6 font-medium {{ request()->routeIs('admin.vehicles.*') ? 'bg-zinc-100 text-zinc-900' : 'text-zinc-600 hover:text-zinc-900 hover:bg-zinc-50' }}">
-                                                    <i class="fas fa-car h-4 w-4 shrink-0"></i>
-                                                    Gestion Véhicules
-                                                </a>
-                                            </li>
-                                            <li class="relative">
-                                                <div class="absolute left-0 top-0 bottom-0 w-px bg-zinc-300"></div>
-                                                <div class="absolute left-0 top-3 w-3 h-px bg-zinc-300"></div>
-                                                <a href="{{ route('admin.assignments.index') }}"
-                                                   class="group flex gap-x-3 rounded-md p-2 pl-4 text-sm leading-6 font-medium {{ request()->routeIs('admin.assignments.*') ? 'bg-zinc-100 text-zinc-900' : 'text-zinc-600 hover:text-zinc-900 hover:bg-zinc-50' }}">
-                                                    <i class="fas fa-clipboard-list h-4 w-4 shrink-0"></i>
-                                                    Affectations
-                                                </a>
-                                            </li>
-                                        </ul>
+                {{-- Navigation Enterprise --}}
+                <div class="flex flex-col flex-1 overflow-hidden">
+                    <ul class="grow overflow-x-hidden overflow-y-auto w-full p-4 mb-0" role="tree" style="scrollbar-color: rgba(156, 163, 175, 0.3) transparent; scrollbar-width: thin;">
+                        {{-- Dashboard --}}
+                        <li class="flex">
+                            <a href="{{ route('admin.dashboard') }}"
+                               class="flex items-center w-full h-10 px-4 py-2 rounded-lg text-sm font-normal transition-all duration-200 {{ request()->routeIs('admin.dashboard') ? 'bg-blue-50 text-blue-700 shadow-sm' : 'text-slate-600 hover:bg-white/60 hover:text-slate-800' }}">
+                                <div class="relative mr-3">
+                                    <div class="w-8 h-8 rounded-full border-2 border-white flex items-center justify-center">
+                                        <i class="fas fa-tachometer-alt text-sm {{ request()->routeIs('admin.dashboard') ? 'text-blue-600' : 'text-slate-500' }}"></i>
                                     </div>
-                                </li>
-                                @endhasanyrole
-
-                                {{-- Chauffeurs --}}
-                                @hasanyrole('Super Admin|Admin|Gestionnaire Flotte')
-                                <li>
-                                    <a href="{{ route('admin.drivers.index') }}"
-                                       class="group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold {{ request()->routeIs('admin.drivers.*') ? 'bg-zinc-950 text-white' : 'text-zinc-700 hover:text-zinc-950 hover:bg-zinc-100' }}">
-                                        <i class="fas fa-user-tie h-5 w-5 shrink-0"></i>
-                                        Chauffeurs
-                                    </a>
-                                </li>
-                                @endhasanyrole
-
-                                {{-- Maintenance (Temporairement désactivé) --}}
-                                @hasanyrole('Super Admin|Admin|Gestionnaire Flotte|Supervisor')
-                                <li>
-                                    <a href="#"
-                                       onclick="alert('Module de maintenance en cours de développement')"
-                                       class="group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold text-zinc-700 hover:text-zinc-950 hover:bg-zinc-100">
-                                        <i class="fas fa-wrench h-5 w-5 shrink-0"></i>
-                                        Maintenance
-                                        <span class="ml-auto text-xs bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full">Bientôt</span>
-                                    </a>
-                                </li>
-                                @endhasanyrole
-
-                                {{-- Planning --}}
-                                @hasanyrole('Super Admin|Admin|Gestionnaire Flotte|Supervisor')
-                                <li>
-                                    <a href="{{ route('admin.planning.index') }}"
-                                       class="group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold {{ request()->routeIs('admin.planning.*') ? 'bg-zinc-950 text-white' : 'text-zinc-700 hover:text-zinc-950 hover:bg-zinc-100' }}">
-                                        <i class="fas fa-calendar-alt h-5 w-5 shrink-0"></i>
-                                        Planning
-                                    </a>
-                                </li>
-                                @endhasanyrole
-
-                                {{-- Documents --}}
-                                @hasanyrole('Super Admin|Admin|Gestionnaire Flotte')
-                                <li>
-                                    <a href="{{ route('admin.documents.index') }}"
-                                       class="group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold {{ request()->routeIs('admin.documents.*') ? 'bg-zinc-950 text-white' : 'text-zinc-700 hover:text-zinc-950 hover:bg-zinc-100' }}">
-                                        <i class="fas fa-file-alt h-5 w-5 shrink-0"></i>
-                                        Documents
-                                    </a>
-                                </li>
-                                @endhasanyrole
-
-                                {{-- Fournisseurs --}}
-                                @hasanyrole('Super Admin|Admin|Gestionnaire Flotte')
-                                <li>
-                                    <a href="{{ route('admin.suppliers.index') }}"
-                                       class="group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold {{ request()->routeIs('admin.suppliers.*') ? 'bg-zinc-950 text-white' : 'text-zinc-700 hover:text-zinc-950 hover:bg-zinc-100' }}">
-                                        <i class="fas fa-handshake h-5 w-5 shrink-0"></i>
-                                        Fournisseurs
-                                    </a>
-                                </li>
-                                @endhasanyrole
-
-                                {{-- Rapports --}}
-                                @hasanyrole('Super Admin|Admin|Gestionnaire Flotte')
-                                <li>
-                                    <a href="{{ route('admin.reports.index') }}"
-                                       class="group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold {{ request()->routeIs('admin.reports.*') ? 'bg-zinc-950 text-white' : 'text-zinc-700 hover:text-zinc-950 hover:bg-zinc-100' }}">
-                                        <i class="fas fa-chart-bar h-5 w-5 shrink-0"></i>
-                                        Rapports
-                                    </a>
-                                </li>
-                                @endhasanyrole
-
-                                {{-- Administration avec sous-menu --}}
-                                @hasanyrole('Super Admin|Admin')
-                                <li x-data="{ open: {{ request()->routeIs('admin.users.*', 'admin.roles.*', 'admin.audit.*') ? 'true' : 'false' }} }">
-                                    <button @click="open = !open"
-                                            class="group flex w-full gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold {{ request()->routeIs('admin.users.*', 'admin.roles.*', 'admin.audit.*') ? 'bg-zinc-950 text-white' : 'text-zinc-700 hover:text-zinc-950 hover:bg-zinc-100' }}">
-                                        <i class="fas fa-cogs h-5 w-5 shrink-0"></i>
-                                        <span class="flex-1 text-left">Administration</span>
-                                        <i class="fas fa-chevron-right h-4 w-4 transition-transform" :class="{ 'rotate-90': open }"></i>
-                                    </button>
-                                    <div x-show="open" x-transition class="mt-1">
-                                        <ul class="ml-6 space-y-1">
-                                            <li class="relative">
-                                                <div class="absolute left-0 top-0 bottom-0 w-px bg-zinc-300"></div>
-                                                <div class="absolute left-0 top-3 w-3 h-px bg-zinc-300"></div>
-                                                <a href="{{ route('admin.users.index') }}"
-                                                   class="group flex gap-x-3 rounded-md p-2 pl-4 text-sm leading-6 font-medium {{ request()->routeIs('admin.users.*') ? 'bg-zinc-100 text-zinc-900' : 'text-zinc-600 hover:text-zinc-900 hover:bg-zinc-50' }}">
-                                                    <i class="fas fa-users h-4 w-4 shrink-0"></i>
-                                                    Utilisateurs
-                                                </a>
-                                            </li>
-                                            <li class="relative">
-                                                <div class="absolute left-0 top-0 bottom-0 w-px bg-zinc-300"></div>
-                                                <div class="absolute left-0 top-3 w-3 h-px bg-zinc-300"></div>
-                                                <a href="{{ route('admin.roles.index') }}"
-                                                   class="group flex gap-x-3 rounded-md p-2 pl-4 text-sm leading-6 font-medium {{ request()->routeIs('admin.roles.*') ? 'bg-zinc-100 text-zinc-900' : 'text-zinc-600 hover:text-zinc-900 hover:bg-zinc-50' }}">
-                                                    <i class="fas fa-user-shield h-4 w-4 shrink-0"></i>
-                                                    Rôles & Permissions
-                                                </a>
-                                            </li>
-                                            @hasrole('Super Admin')
-                                            <li class="relative">
-                                                <div class="absolute left-0 top-0 w-px bg-zinc-300" style="height: calc(100% - 8px);"></div>
-                                                <div class="absolute left-0 top-3 w-3 h-px bg-zinc-300"></div>
-                                                <a href="{{ route('admin.audit.index') }}"
-                                                   class="group flex gap-x-3 rounded-md p-2 pl-4 text-sm leading-6 font-medium {{ request()->routeIs('admin.audit.*') ? 'bg-zinc-100 text-zinc-900' : 'text-zinc-600 hover:text-zinc-900 hover:bg-zinc-50' }}">
-                                                    <i class="fas fa-shield-alt h-4 w-4 shrink-0"></i>
-                                                    Audit & Sécurité
-                                                </a>
-                                            </li>
-                                            @endhasrole
-                                        </ul>
-                                    </div>
-                                </li>
-                                @endhasanyrole
-                            </ul>
+                                </div>
+                                <span class="flex-1">Dashboard</span>
+                            </a>
                         </li>
+
+                        {{-- Organisations (Super Admin uniquement) --}}
+                        @hasrole('Super Admin')
+                        <li class="flex">
+                            <a href="{{ route('admin.organizations.index') }}"
+                               class="flex items-center w-full h-10 px-4 py-2 rounded-lg text-sm font-normal transition-all duration-200 {{ request()->routeIs('admin.organizations.*') ? 'bg-blue-50 text-blue-700 shadow-sm' : 'text-slate-600 hover:bg-white/60 hover:text-slate-800' }}">
+                                <div class="relative mr-3">
+                                    <div class="w-8 h-8 rounded-full border-2 border-white flex items-center justify-center">
+                                        <i class="fas fa-building text-sm {{ request()->routeIs('admin.organizations.*') ? 'text-blue-600' : 'text-slate-500' }}"></i>
+                                    </div>
+                                </div>
+                                <span class="flex-1">Organisations</span>
+                            </a>
+                        </li>
+                        @endhasrole
+
+                        {{-- Véhicules avec sous-menu --}}
+                        @hasanyrole('Super Admin|Admin|Gestionnaire Flotte')
+                        <li class="flex flex-col" x-data="{ open: {{ request()->routeIs('admin.vehicles.*', 'admin.assignments.*') ? 'true' : 'false' }} }">
+                            <button @click="open = !open"
+                                    class="flex items-center w-full h-10 px-4 py-2 rounded-lg text-sm font-normal transition-all duration-200 {{ request()->routeIs('admin.vehicles.*', 'admin.assignments.*') ? 'bg-blue-50 text-blue-700 shadow-sm' : 'text-slate-600 hover:bg-white/60 hover:text-slate-800' }}">
+                                <div class="relative mr-3">
+                                    <div class="w-8 h-8 rounded-full border-2 border-white flex items-center justify-center">
+                                        <i class="fas fa-car text-sm {{ request()->routeIs('admin.vehicles.*', 'admin.assignments.*') ? 'text-blue-600' : 'text-slate-500' }}"></i>
+                                    </div>
+                                </div>
+                                <span class="flex-1 text-left">Véhicules</span>
+                                <i class="fas fa-chevron-down text-xs transition-transform duration-200" :class="{ 'rotate-180': !open }"></i>
+                            </button>
+                            <div x-show="open" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 max-h-0" x-transition:enter-end="opacity-100 max-h-96" x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100 max-h-96" x-transition:leave-end="opacity-0 max-h-0" class="overflow-hidden">
+                                <div class="flex w-full mt-2 pl-6">
+                                    <div class="mr-3">
+                                        <div class="px-3 py-2 h-full relative">
+                                            <div class="bg-slate-300/40 w-0.5 h-full rounded-full"></div>
+                                            <div class="absolute w-0.5 rounded-full bg-blue-500 transition-all duration-300" style="height: {{ request()->routeIs('admin.vehicles.index') ? '50' : (request()->routeIs('admin.assignments.*') ? '50' : '0') }}%; top: {{ request()->routeIs('admin.assignments.*') ? '50' : '0' }}%;"></div>
+                                        </div>
+                                    </div>
+                                    <div class="flex-1 min-w-0 space-y-1">
+                                        <a href="{{ route('admin.vehicles.index') }}"
+                                           class="flex items-center w-full h-8 px-3 py-1 rounded-md text-sm font-normal transition-all duration-200 {{ request()->routeIs('admin.vehicles.index') ? 'bg-blue-50/80 text-blue-700' : 'text-slate-600 hover:bg-white/40 hover:text-slate-800' }}">
+                                            <i class="fas fa-list-ul text-sm mr-2 {{ request()->routeIs('admin.vehicles.index') ? 'text-blue-600' : 'text-slate-500' }}"></i>
+                                            Gestion Véhicules
+                                        </a>
+                                        <a href="{{ route('admin.assignments.index') }}"
+                                           class="flex items-center w-full h-8 px-3 py-1 rounded-md text-sm font-normal transition-all duration-200 {{ request()->routeIs('admin.assignments.*') ? 'bg-blue-50/80 text-blue-700' : 'text-slate-600 hover:bg-white/40 hover:text-slate-800' }}">
+                                            <i class="fas fa-clipboard-list text-sm mr-2 {{ request()->routeIs('admin.assignments.*') ? 'text-blue-600' : 'text-slate-500' }}"></i>
+                                            Affectations
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                        @endhasanyrole
+
+                        {{-- Chauffeurs --}}
+                        @hasanyrole('Super Admin|Admin|Gestionnaire Flotte')
+                        <li class="flex">
+                            <a href="{{ route('admin.drivers.index') }}"
+                               class="flex items-center w-full h-10 px-4 py-2 rounded-lg text-sm font-normal transition-all duration-200 {{ request()->routeIs('admin.drivers.*') ? 'bg-blue-50 text-blue-700 shadow-sm' : 'text-slate-600 hover:bg-white/60 hover:text-slate-800' }}">
+                                <div class="relative mr-3">
+                                    <div class="w-8 h-8 rounded-full border-2 border-white flex items-center justify-center">
+                                        <i class="fas fa-user-tie text-sm {{ request()->routeIs('admin.drivers.*') ? 'text-blue-600' : 'text-slate-500' }}"></i>
+                                    </div>
+                                </div>
+                                <span class="flex-1">Chauffeurs</span>
+                            </a>
+                        </li>
+                        @endhasanyrole
+
+                        {{-- Maintenance --}}
+                        @hasanyrole('Super Admin|Admin|Gestionnaire Flotte|Supervisor')
+                        <li class="flex">
+                            <a href="{{ route('admin.maintenance.dashboard') }}"
+                               class="flex items-center w-full h-10 px-4 py-2 rounded-lg text-sm font-normal transition-all duration-200 {{ request()->routeIs('admin.maintenance.*') ? 'bg-blue-50 text-blue-700 shadow-sm' : 'text-slate-600 hover:bg-white/60 hover:text-slate-800' }}">
+                                <div class="relative mr-3">
+                                    <div class="w-8 h-8 rounded-full border-2 border-white flex items-center justify-center">
+                                        <i class="fas fa-wrench text-sm {{ request()->routeIs('admin.maintenance.*') ? 'text-blue-600' : 'text-slate-500' }}"></i>
+                                    </div>
+                                </div>
+                                <span class="flex-1">Maintenance</span>
+                            </a>
+                        </li>
+                        @endhasanyrole
+
+                        {{-- Planning --}}
+                        @hasanyrole('Super Admin|Admin|Gestionnaire Flotte|Supervisor')
+                        <li class="flex">
+                            <a href="{{ route('admin.planning.index') }}"
+                               class="flex items-center w-full h-10 px-4 py-2 rounded-lg text-sm font-normal transition-all duration-200 {{ request()->routeIs('admin.planning.*') ? 'bg-blue-50 text-blue-700 shadow-sm' : 'text-slate-600 hover:bg-white/60 hover:text-slate-800' }}">
+                                <div class="relative mr-3">
+                                    <div class="w-8 h-8 rounded-full border-2 border-white flex items-center justify-center">
+                                        <i class="fas fa-calendar-alt text-sm {{ request()->routeIs('admin.planning.*') ? 'text-blue-600' : 'text-slate-500' }}"></i>
+                                    </div>
+                                </div>
+                                <span class="flex-1">Planning</span>
+                            </a>
+                        </li>
+                        @endhasanyrole
+
+                        {{-- Documents --}}
+                        @hasanyrole('Super Admin|Admin|Gestionnaire Flotte')
+                        <li class="flex">
+                            <a href="{{ route('admin.documents.index') }}"
+                               class="flex items-center w-full h-10 px-4 py-2 rounded-lg text-sm font-normal transition-all duration-200 {{ request()->routeIs('admin.documents.*') ? 'bg-blue-50 text-blue-700 shadow-sm' : 'text-slate-600 hover:bg-white/60 hover:text-slate-800' }}">
+                                <div class="relative mr-3">
+                                    <div class="w-8 h-8 rounded-full border-2 border-white flex items-center justify-center">
+                                        <i class="fas fa-file-alt text-sm {{ request()->routeIs('admin.documents.*') ? 'text-blue-600' : 'text-slate-500' }}"></i>
+                                    </div>
+                                </div>
+                                <span class="flex-1">Documents</span>
+                            </a>
+                        </li>
+                        @endhasanyrole
+
+                        {{-- Fournisseurs --}}
+                        @hasanyrole('Super Admin|Admin|Gestionnaire Flotte')
+                        <li class="flex">
+                            <a href="{{ route('admin.suppliers.index') }}"
+                               class="flex items-center w-full h-10 px-4 py-2 rounded-lg text-sm font-normal transition-all duration-200 {{ request()->routeIs('admin.suppliers.*') ? 'bg-blue-50 text-blue-700 shadow-sm' : 'text-slate-600 hover:bg-white/60 hover:text-slate-800' }}">
+                                <div class="relative mr-3">
+                                    <div class="w-8 h-8 rounded-full border-2 border-white flex items-center justify-center">
+                                        <i class="fas fa-handshake text-sm {{ request()->routeIs('admin.suppliers.*') ? 'text-blue-600' : 'text-slate-500' }}"></i>
+                                    </div>
+                                </div>
+                                <span class="flex-1">Fournisseurs</span>
+                            </a>
+                        </li>
+                        @endhasanyrole
+
+                        {{-- Rapports --}}
+                        @hasanyrole('Super Admin|Admin|Gestionnaire Flotte')
+                        <li class="flex">
+                            <a href="{{ route('admin.reports.index') }}"
+                               class="flex items-center w-full h-10 px-4 py-2 rounded-lg text-sm font-normal transition-all duration-200 {{ request()->routeIs('admin.reports.*') ? 'bg-blue-50 text-blue-700 shadow-sm' : 'text-slate-600 hover:bg-white/60 hover:text-slate-800' }}">
+                                <div class="relative mr-3">
+                                    <div class="w-8 h-8 rounded-full border-2 border-white flex items-center justify-center">
+                                        <i class="fas fa-chart-bar text-sm {{ request()->routeIs('admin.reports.*') ? 'text-blue-600' : 'text-slate-500' }}"></i>
+                                    </div>
+                                </div>
+                                <span class="flex-1">Rapports</span>
+                            </a>
+                        </li>
+                        @endhasanyrole
+
+                        {{-- Administration avec sous-menu --}}
+                        @hasanyrole('Super Admin|Admin')
+                        <li class="flex flex-col" x-data="{ open: {{ request()->routeIs('admin.users.*', 'admin.roles.*', 'admin.audit.*') ? 'true' : 'false' }} }">
+                            <button @click="open = !open"
+                                    class="flex items-center w-full h-10 px-4 py-2 rounded-lg text-sm font-normal transition-all duration-200 {{ request()->routeIs('admin.users.*', 'admin.roles.*', 'admin.audit.*') ? 'bg-blue-50 text-blue-700 shadow-sm' : 'text-slate-600 hover:bg-white/60 hover:text-slate-800' }}">
+                                <div class="relative mr-3">
+                                    <div class="w-8 h-8 rounded-full border-2 border-white flex items-center justify-center">
+                                        <i class="fas fa-cogs text-sm {{ request()->routeIs('admin.users.*', 'admin.roles.*', 'admin.audit.*') ? 'text-blue-600' : 'text-slate-500' }}"></i>
+                                    </div>
+                                </div>
+                                <span class="flex-1 text-left">Administration</span>
+                                <i class="fas fa-chevron-down text-xs transition-transform duration-200" :class="{ 'rotate-180': !open }"></i>
+                            </button>
+                            <div x-show="open" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 max-h-0" x-transition:enter-end="opacity-100 max-h-96" x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100 max-h-96" x-transition:leave-end="opacity-0 max-h-0" class="overflow-hidden">
+                                <div class="flex w-full mt-2 pl-6">
+                                    <div class="mr-3">
+                                        <div class="px-3 py-2 h-full relative">
+                                            <div class="bg-slate-300/40 w-0.5 h-full rounded-full"></div>
+                                            <div class="absolute w-0.5 rounded-full bg-blue-500 transition-all duration-300" style="height: {{ request()->routeIs('admin.users.*') ? '33.33' : (request()->routeIs('admin.roles.*') ? '33.33' : (request()->routeIs('admin.audit.*') ? '33.33' : '0')) }}%; top: {{ request()->routeIs('admin.roles.*') ? '33.33' : (request()->routeIs('admin.audit.*') ? '66.66' : '0') }}%;"></div>
+                                        </div>
+                                    </div>
+                                    <div class="flex-1 min-w-0 space-y-1">
+                                        <a href="{{ route('admin.users.index') }}"
+                                           class="flex items-center w-full h-8 px-3 py-1 rounded-md text-sm font-normal transition-all duration-200 {{ request()->routeIs('admin.users.*') ? 'bg-blue-50/80 text-blue-700' : 'text-slate-600 hover:bg-white/40 hover:text-slate-800' }}">
+                                            <i class="fas fa-users text-sm mr-2 {{ request()->routeIs('admin.users.*') ? 'text-blue-600' : 'text-slate-500' }}"></i>
+                                            Utilisateurs
+                                        </a>
+                                        <a href="{{ route('admin.roles.index') }}"
+                                           class="flex items-center w-full h-8 px-3 py-1 rounded-md text-sm font-normal transition-all duration-200 {{ request()->routeIs('admin.roles.*') ? 'bg-blue-50/80 text-blue-700' : 'text-slate-600 hover:bg-white/40 hover:text-slate-800' }}">
+                                            <i class="fas fa-user-shield text-sm mr-2 {{ request()->routeIs('admin.roles.*') ? 'text-blue-600' : 'text-slate-500' }}"></i>
+                                            Rôles & Permissions
+                                        </a>
+                                        @hasrole('Super Admin')
+                                        <a href="{{ route('admin.audit.index') }}"
+                                           class="flex items-center w-full h-8 px-3 py-1 rounded-md text-sm font-normal transition-all duration-200 {{ request()->routeIs('admin.audit.*') ? 'bg-blue-50/80 text-blue-700' : 'text-slate-600 hover:bg-white/40 hover:text-slate-800' }}">
+                                            <i class="fas fa-shield-alt text-sm mr-2 {{ request()->routeIs('admin.audit.*') ? 'text-blue-600' : 'text-slate-500' }}"></i>
+                                            Audit & Sécurité
+                                        </a>
+                                        @endhasrole
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                        @endhasanyrole
                     </ul>
-                </nav>
+
+                    {{-- Footer du menu supprimé --}}
+                </div>
             </div>
         </div>
 

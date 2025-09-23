@@ -1,0 +1,4 @@
+registration_plate,vin,brand,model,color,vehicle_type,fuel_type,transmission_type,status,manufacturing_year,acquisition_date,purchase_price,current_value,initial_mileage,current_mileage,engine_displacement_cc,power_hp,seats,notes
+AB-123-CD,1HGCM82633A123456,Toyota,Corolla,Blanc,Berline,Essence,Manuelle,Parking,2020,2020-01-15,25000.00,20000.00,5000,15000,1600,120,5,Véhicule en excellent état
+EF-456-GH,2HGCM82633A789012,Peugeot,308,Noir,Berline,Diesel,Automatique,En mission,2019,20/06/2019,30000.00,22000.00,10000,45000,1600,130,5,Maintenance régulière effectuée
+IJ-789-KL,3HGCM82633A345678,Renault,Clio,Rouge,Citadine,Essence,Manuelle,Parking,2021,10/03/2021,18000.00,16000.00,0,8500,1200,75,5,Véhicule neuf avec garantie

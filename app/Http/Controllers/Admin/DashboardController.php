@@ -801,4 +801,237 @@ class DashboardController extends Controller
     private function getDriverRecentTrips(int $driverId): array { return []; }
     private function getDriverUpcomingMaintenance(int $driverId): array { return []; }
     private function getDriverNotifications(int $driverId): array { return []; }
+
+    // ============================================================
+    // 🔧 MÉTHODES MAINTENANCE - ENTERPRISE SOLUTION
+    // ============================================================
+
+    /**
+     * 📋 Dashboard Maintenance Principal
+     */
+    public function maintenanceDashboard(): View
+    {
+        try {
+            $user = Auth::user();
+
+            $stats = [
+                'pending_maintenance' => MaintenancePlan::where('status', 'pending')->count(),
+                'overdue_maintenance' => MaintenancePlan::where('due_date', '<', now())->where('status', 'pending')->count(),
+                'completed_this_month' => MaintenanceLog::whereMonth('completed_at', now()->month)->count(),
+                'total_cost_this_month' => MaintenanceLog::whereMonth('completed_at', now()->month)->sum('cost') ?? 0,
+                'vehicles_in_maintenance' => Vehicle::whereHas('assignments', function($q) {
+                    $q->where('status', 'maintenance');
+                })->count()
+            ];
+
+            $recentMaintenance = MaintenanceLog::with(['vehicle', 'maintenancePlan'])
+                ->latest()
+                ->limit(10)
+                ->get();
+
+            $upcomingMaintenance = MaintenancePlan::with('vehicle')
+                ->where('due_date', '>', now())
+                ->where('due_date', '<', now()->addDays(30))
+                ->orderBy('due_date')
+                ->limit(15)
+                ->get();
+
+            return view('admin.maintenance.dashboard', compact('stats', 'recentMaintenance', 'upcomingMaintenance', 'user'));
+
+        } catch (\Exception $e) {
+            Log::error('Maintenance dashboard error', ['error' => $e->getMessage()]);
+            return view('admin.maintenance.dashboard', [
+                'stats' => ['error' => 'Données indisponibles'],
+                'recentMaintenance' => [],
+                'upcomingMaintenance' => [],
+                'user' => Auth::user()
+            ]);
+        }
+    }
+
+    /**
+     * 📅 Calendrier Maintenance
+     */
+    public function maintenanceCalendar(): View
+    {
+        $maintenanceEvents = MaintenancePlan::with('vehicle')
+            ->where('due_date', '>=', now()->startOfMonth())
+            ->where('due_date', '<=', now()->addMonths(3)->endOfMonth())
+            ->get()
+            ->map(function ($plan) {
+                return [
+                    'id' => $plan->id,
+                    'title' => $plan->vehicle->name . ' - ' . $plan->type,
+                    'start' => $plan->due_date->format('Y-m-d'),
+                    'className' => $plan->status === 'overdue' ? 'bg-red-500' : 'bg-blue-500',
+                    'vehicle' => $plan->vehicle->name,
+                    'type' => $plan->type,
+                    'status' => $plan->status
+                ];
+            });
+
+        return view('admin.maintenance.calendar', compact('maintenanceEvents'));
+    }
+
+    /**
+     * 🚨 Alertes Maintenance
+     */
+    public function maintenanceAlerts(): View
+    {
+        $alerts = [
+            'overdue' => MaintenancePlan::with('vehicle')
+                ->where('due_date', '<', now())
+                ->where('status', 'pending')
+                ->orderBy('due_date')
+                ->get(),
+            'due_soon' => MaintenancePlan::with('vehicle')
+                ->whereBetween('due_date', [now(), now()->addDays(7)])
+                ->where('status', 'pending')
+                ->orderBy('due_date')
+                ->get(),
+            'high_cost' => MaintenanceLog::with('vehicle')
+                ->where('cost', '>', 10000)
+                ->whereMonth('completed_at', now()->month)
+                ->orderBy('cost', 'desc')
+                ->get()
+        ];
+
+        return view('admin.maintenance.alerts', compact('alerts'));
+    }
+
+    /**
+     * 📊 Analytics Maintenance
+     */
+    public function maintenanceAnalytics(): View
+    {
+        $analytics = [
+            'monthly_costs' => $this->getMaintenanceMonthlyCosts(),
+            'maintenance_types' => $this->getMaintenanceTypeDistribution(),
+            'vehicle_reliability' => $this->getVehicleReliabilityMetrics(),
+            'performance_trends' => $this->getMaintenancePerformanceTrends()
+        ];
+
+        return view('admin.maintenance.analytics', compact('analytics'));
+    }
+
+    // Méthodes utilitaires pour les analytics
+    private function getMaintenanceMonthlyCosts(): array
+    {
+        $costs = [];
+        for ($i = 11; $i >= 0; $i--) {
+            $date = now()->subMonths($i);
+            $costs[] = [
+                'month' => $date->format('M Y'),
+                'cost' => MaintenanceLog::whereMonth('completed_at', $date->month)
+                    ->whereYear('completed_at', $date->year)
+                    ->sum('cost') ?? 0
+            ];
+        }
+        return $costs;
+    }
+
+    private function getMaintenanceTypeDistribution(): array
+    {
+        return MaintenanceLog::selectRaw('maintenance_type, COUNT(*) as count, SUM(cost) as total_cost')
+            ->whereMonth('completed_at', '>=', now()->subMonths(12))
+            ->groupBy('maintenance_type')
+            ->orderBy('count', 'desc')
+            ->get()
+            ->toArray();
+    }
+
+    private function getVehicleReliabilityMetrics(): array
+    {
+        return Vehicle::with('maintenanceLogs')
+            ->get()
+            ->map(function ($vehicle) {
+                $logs = $vehicle->maintenanceLogs()->whereMonth('completed_at', '>=', now()->subMonths(12))->get();
+                return [
+                    'vehicle' => $vehicle->name,
+                    'maintenance_count' => $logs->count(),
+                    'total_cost' => $logs->sum('cost'),
+                    'reliability_score' => max(0, 100 - ($logs->count() * 5)) // Simple scoring
+                ];
+            })
+            ->toArray();
+    }
+
+    private function getMaintenancePerformanceTrends(): array
+    {
+        return [
+            'average_resolution_time' => MaintenanceLog::avg('resolution_time_hours') ?? 0,
+            'on_time_completion_rate' => $this->calculateOnTimeCompletionRate(),
+            'cost_efficiency_trend' => $this->calculateCostEfficiencyTrend(),
+            'recurring_issues' => $this->getRecurringMaintenanceIssues()
+        ];
+    }
+
+    private function calculateOnTimeCompletionRate(): float
+    {
+        $total = MaintenanceLog::whereMonth('completed_at', '>=', now()->subMonths(3))->count();
+        $onTime = MaintenanceLog::whereMonth('completed_at', '>=', now()->subMonths(3))
+            ->whereColumn('completed_at', '<=', 'due_date')->count();
+
+        return $total > 0 ? ($onTime / $total) * 100 : 0;
+    }
+
+    private function calculateCostEfficiencyTrend(): array
+    {
+        // Trend des coûts moyens par mois
+        $trends = [];
+        for ($i = 5; $i >= 0; $i--) {
+            $date = now()->subMonths($i);
+            $avgCost = MaintenanceLog::whereMonth('completed_at', $date->month)
+                ->whereYear('completed_at', $date->year)
+                ->avg('cost') ?? 0;
+            $trends[] = [
+                'month' => $date->format('M'),
+                'avg_cost' => round($avgCost, 2)
+            ];
+        }
+        return $trends;
+    }
+
+    private function getRecurringMaintenanceIssues(): array
+    {
+        return MaintenanceLog::selectRaw('maintenance_type, COUNT(*) as frequency')
+            ->whereMonth('completed_at', '>=', now()->subMonths(6))
+            ->groupBy('maintenance_type')
+            ->having('frequency', '>=', 3)
+            ->orderBy('frequency', 'desc')
+            ->limit(10)
+            ->get()
+            ->toArray();
+    }
+
+    /**
+     * 📋 Logs de Maintenance
+     */
+    public function maintenanceLogs(): View
+    {
+        try {
+            $logs = MaintenanceLog::with(['vehicle'])
+                ->latest()
+                ->paginate(20);
+
+            return view('admin.maintenance.logs', compact('logs'));
+        } catch (\Exception $e) {
+            Log::error('Maintenance logs error', ['error' => $e->getMessage()]);
+            return view('admin.maintenance.logs', ['logs' => []]);
+        }
+    }
+
+    /**
+     * 📊 Export Maintenance Logs
+     */
+    public function exportMaintenanceLogs()
+    {
+        try {
+            $logs = MaintenanceLog::with(['vehicle'])->get();
+            // Logique d'export ici
+            return response()->json(['message' => 'Export en cours de développement']);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Erreur lors de l\'export'], 500);
+        }
+    }
 }

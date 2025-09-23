@@ -1,176 +1,230 @@
+{{-- resources/views/admin/vehicles/enterprise-create.blade.php --}}
 @extends('layouts.admin.catalyst')
+@section('title', 'Nouveau Véhicule - ZenFleet')
 
-@section('title', 'Nouveau Véhicule Enterprise')
+@push('styles')
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.min.css">
+<style>
+/* Enterprise-grade animations et styles ultra-modernes */
+.fade-in {
+    animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.form-section {
+    background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+    border: 1px solid #e2e8f0;
+    transition: all 0.3s ease;
+}
+
+.form-section:hover {
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    border-color: #cbd5e1;
+}
+
+.form-input {
+    background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+    border: 2px solid #e2e8f0;
+    transition: all 0.3s ease;
+}
+
+.form-input:focus {
+    border-color: #6366f1;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+    background: white;
+}
+
+.tom-select .ts-control {
+    background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.tom-select.focus .ts-control {
+    border-color: #6366f1;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+.section-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.section-icon {
+    width: 2rem;
+    height: 2rem;
+    border-radius: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 0.75rem;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+    border: none;
+    color: white;
+    transition: all 0.2s ease;
+}
+
+.btn-primary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(99, 102, 241, 0.3);
+}
+
+.btn-secondary {
+    background: white;
+    border: 2px solid #e2e8f0;
+    color: #6b7280;
+    transition: all 0.2s ease;
+}
+
+.btn-secondary:hover {
+    border-color: #6366f1;
+    color: #6366f1;
+    transform: translateY(-1px);
+}
+</style>
+@endpush
 
 @section('content')
-{{-- 🚗 Header Enterprise Ultra-Professionnel --}}
-<div class="zenfleet-header-enterprise">
-    <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between">
-        <div class="min-w-0 flex-1">
-            <nav class="flex items-center space-x-2 text-sm font-medium text-gray-600 mb-4">
-                <a href="{{ route('admin.vehicles.index') }}" class="hover:text-blue-600 transition-colors">
-                    <i class="fas fa-car mr-1"></i>
-                    Véhicules
-                </a>
-                <i class="fas fa-chevron-right text-gray-400"></i>
-                <span class="text-blue-600 font-bold">Nouveau Véhicule</span>
-            </nav>
+<div class="fade-in">
+    {{-- En-tête compact --}}
+    <div class="mb-8">
+        <nav class="flex items-center space-x-2 text-sm font-medium text-gray-600 mb-4">
+            <a href="{{ route('admin.vehicles.index') }}" class="hover:text-indigo-600 transition-colors">
+                <svg class="w-4 h-4 inline mr-1" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M8 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM15 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z"></path>
+                    <path d="M3 4a1 1 0 00-1 1v10a1 1 0 001 1h1.05a2.5 2.5 0 014.9 0H10a1 1 0 001-1V5a1 1 0 00-1-1H3zM14 7a1 1 0 00-1 1v6.05A2.5 2.5 0 0115.95 16H17a1 1 0 001-1V8a1 1 0 00-1-1h-3z"></path>
+                </svg>
+                Véhicules
+            </a>
+            <svg class="w-4 h-4 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
+            </svg>
+            <span class="text-indigo-600 font-semibold">Nouveau véhicule</span>
+        </nav>
 
-            <h1 class="text-4xl font-black leading-tight text-gray-900 sm:text-5xl">
-                <span class="bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-700 bg-clip-text text-transparent">
-                    <i class="fas fa-plus-circle mr-3"></i>
-                    Nouveau Véhicule Enterprise
-                </span>
-            </h1>
-
-            <div class="mt-2 flex flex-col sm:flex-row sm:flex-wrap sm:space-x-6">
-                <div class="mt-2 flex items-center text-sm text-gray-600">
-                    <i class="fas fa-shield-check mr-2 h-5 w-5 text-emerald-500"></i>
-                    Validation Enterprise Avancée
-                </div>
-                <div class="mt-2 flex items-center text-sm text-gray-600">
-                    <i class="fas fa-magic mr-2 h-5 w-5 text-purple-500"></i>
-                    Saisie Assistée Intelligente
+        <div class="md:flex md:items-center md:justify-between">
+            <div class="flex-1 min-w-0">
+                <h1 class="text-xl font-semibold leading-6 text-gray-900">Nouveau véhicule</h1>
+                <div class="mt-1 flex flex-col sm:flex-row sm:flex-wrap sm:mt-0 sm:space-x-6">
+                    <div class="mt-2 flex items-center text-sm text-gray-500">
+                        <svg class="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                        </svg>
+                        Formulaire sécurisé avec validation avancée
+                    </div>
                 </div>
             </div>
-        </div>
-
-        <div class="mt-5 lg:ml-4 lg:mt-0">
-            <a href="{{ route('admin.vehicles.index') }}"
-               class="zenfleet-btn-enterprise-secondary">
-                <i class="fas fa-arrow-left mr-2"></i>
-                Retour à la liste
-            </a>
+            <div class="mt-4 flex md:mt-0 md:ml-4">
+                <a href="{{ route('admin.vehicles.index') }}" class="btn-secondary inline-flex items-center px-4 py-2 text-sm font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                    <svg class="-ml-1 mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                    Annuler
+                </a>
+            </div>
         </div>
     </div>
-</div>
 
-{{-- 🔥 Formulaire Enterprise Ultra-Moderne --}}
-<div class="zenfleet-form-enterprise zenfleet-fade-in">
+    {{-- Formulaire --}}
     <form action="{{ route('admin.vehicles.store') }}" method="POST" id="vehicle-form" class="space-y-8">
         @csrf
 
-        {{-- Section Informations Principales --}}
-        <div class="bg-gradient-to-r from-blue-50 via-indigo-50 to-purple-50 rounded-2xl p-6 border border-blue-200/50">
-            <div class="flex items-center mb-6">
-                <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center mr-4">
-                    <i class="fas fa-info-circle text-white"></i>
+        {{-- Section Informations principales --}}
+        <div class="form-section rounded-lg p-6">
+            <div class="section-header">
+                <div class="section-icon bg-blue-500 text-white">
+                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+                    </svg>
                 </div>
-                <h3 class="text-xl font-black text-gray-900">Informations Principales</h3>
+                <h3 class="text-lg font-medium text-gray-900">Informations principales</h3>
             </div>
 
-            <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
-                {{-- Plaque d'Immatriculation --}}
-                <div class="zenfleet-form-group-enterprise">
-                    <label for="registration_plate" class="zenfleet-label-enterprise">
-                        <i class="fas fa-hashtag mr-1 text-blue-600"></i>
-                        Plaque d'Immatriculation
-                        <span class="text-red-500 ml-1">*</span>
+            <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                <div>
+                    <label for="registration_plate" class="block text-sm font-medium text-gray-700 mb-1">
+                        Plaque d'immatriculation <span class="text-red-500">*</span>
                     </label>
-                    <input type="text"
-                           name="registration_plate"
-                           id="registration_plate"
-                           value="{{ old('registration_plate') }}"
+                    <input type="text" name="registration_plate" id="registration_plate" value="{{ old('registration_plate') }}"
                            placeholder="Ex: 123 ABC 01"
-                           class="zenfleet-input-premium @error('registration_plate') border-red-500 @enderror"
+                           class="form-input block w-full rounded-md text-sm px-3 py-2 focus:outline-none @error('registration_plate') border-red-500 @enderror"
                            required>
                     @error('registration_plate')
                         <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                     @enderror
                 </div>
 
-                {{-- VIN --}}
-                <div class="zenfleet-form-group-enterprise">
-                    <label for="vin" class="zenfleet-label-enterprise">
-                        <i class="fas fa-barcode mr-1 text-blue-600"></i>
-                        Numéro VIN
-                        <span class="text-red-500 ml-1">*</span>
+                <div>
+                    <label for="vin" class="block text-sm font-medium text-gray-700 mb-1">
+                        Numéro VIN <span class="text-red-500">*</span>
                     </label>
-                    <input type="text"
-                           name="vin"
-                           id="vin"
-                           value="{{ old('vin') }}"
-                           placeholder="17 caractères (Ex: 1HGBH41JXMN109186)"
+                    <input type="text" name="vin" id="vin" value="{{ old('vin') }}"
+                           placeholder="17 caractères"
                            maxlength="17"
-                           class="zenfleet-input-premium @error('vin') border-red-500 @enderror"
+                           class="form-input block w-full rounded-md text-sm px-3 py-2 focus:outline-none @error('vin') border-red-500 @enderror"
                            required>
                     @error('vin')
                         <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                     @enderror
                 </div>
 
-                {{-- Marque --}}
-                <div class="zenfleet-form-group-enterprise">
-                    <label for="brand" class="zenfleet-label-enterprise">
-                        <i class="fas fa-industry mr-1 text-blue-600"></i>
-                        Marque
-                        <span class="text-red-500 ml-1">*</span>
+                <div>
+                    <label for="brand" class="block text-sm font-medium text-gray-700 mb-1">
+                        Marque <span class="text-red-500">*</span>
                     </label>
-                    <input type="text"
-                           name="brand"
-                           id="brand"
-                           value="{{ old('brand') }}"
-                           placeholder="Ex: Toyota, Renault, Peugeot..."
-                           class="zenfleet-input-premium @error('brand') border-red-500 @enderror"
+                    <input type="text" name="brand" id="brand" value="{{ old('brand') }}"
+                           placeholder="Ex: Toyota, Renault..."
+                           class="form-input block w-full rounded-md text-sm px-3 py-2 focus:outline-none @error('brand') border-red-500 @enderror"
                            required>
                     @error('brand')
                         <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                     @enderror
                 </div>
 
-                {{-- Modèle --}}
-                <div class="zenfleet-form-group-enterprise">
-                    <label for="model" class="zenfleet-label-enterprise">
-                        <i class="fas fa-car mr-1 text-blue-600"></i>
-                        Modèle
-                        <span class="text-red-500 ml-1">*</span>
+                <div>
+                    <label for="model" class="block text-sm font-medium text-gray-700 mb-1">
+                        Modèle <span class="text-red-500">*</span>
                     </label>
-                    <input type="text"
-                           name="model"
-                           id="model"
-                           value="{{ old('model') }}"
-                           placeholder="Ex: Corolla, Clio, 308..."
-                           class="zenfleet-input-premium @error('model') border-red-500 @enderror"
+                    <input type="text" name="model" id="model" value="{{ old('model') }}"
+                           placeholder="Ex: Corolla, Clio..."
+                           class="form-input block w-full rounded-md text-sm px-3 py-2 focus:outline-none @error('model') border-red-500 @enderror"
                            required>
                     @error('model')
                         <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                     @enderror
                 </div>
 
-                {{-- Couleur --}}
-                <div class="zenfleet-form-group-enterprise">
-                    <label for="color" class="zenfleet-label-enterprise">
-                        <i class="fas fa-palette mr-1 text-blue-600"></i>
-                        Couleur
-                        <span class="text-red-500 ml-1">*</span>
+                <div>
+                    <label for="color" class="block text-sm font-medium text-gray-700 mb-1">
+                        Couleur <span class="text-red-500">*</span>
                     </label>
-                    <input type="text"
-                           name="color"
-                           id="color"
-                           value="{{ old('color') }}"
-                           placeholder="Ex: Blanc, Noir, Rouge..."
-                           class="zenfleet-input-premium @error('color') border-red-500 @enderror"
+                    <input type="text" name="color" id="color" value="{{ old('color') }}"
+                           placeholder="Ex: Blanc, Noir..."
+                           class="form-input block w-full rounded-md text-sm px-3 py-2 focus:outline-none @error('color') border-red-500 @enderror"
                            required>
                     @error('color')
                         <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                     @enderror
                 </div>
 
-                {{-- Année de Fabrication --}}
-                <div class="zenfleet-form-group-enterprise">
-                    <label for="manufacturing_year" class="zenfleet-label-enterprise">
-                        <i class="fas fa-calendar mr-1 text-blue-600"></i>
-                        Année de Fabrication
-                        <span class="text-red-500 ml-1">*</span>
+                <div>
+                    <label for="manufacturing_year" class="block text-sm font-medium text-gray-700 mb-1">
+                        Année de fabrication <span class="text-red-500">*</span>
                     </label>
-                    <input type="number"
-                           name="manufacturing_year"
-                           id="manufacturing_year"
-                           value="{{ old('manufacturing_year') }}"
-                           min="1990"
-                           max="2030"
-                           placeholder="{{ date('Y') }}"
-                           class="zenfleet-input-premium @error('manufacturing_year') border-red-500 @enderror"
+                    <input type="number" name="manufacturing_year" id="manufacturing_year" value="{{ old('manufacturing_year') }}"
+                           min="1990" max="2030" placeholder="{{ date('Y') }}"
+                           class="form-input block w-full rounded-md text-sm px-3 py-2 focus:outline-none @error('manufacturing_year') border-red-500 @enderror"
                            required>
                     @error('manufacturing_year')
                         <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
@@ -179,27 +233,23 @@
             </div>
         </div>
 
-        {{-- Section Configuration Technique --}}
-        <div class="bg-gradient-to-r from-purple-50 via-pink-50 to-rose-50 rounded-2xl p-6 border border-purple-200/50">
-            <div class="flex items-center mb-6">
-                <div class="w-10 h-10 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl flex items-center justify-center mr-4">
-                    <i class="fas fa-cog text-white"></i>
+        {{-- Section Configuration technique --}}
+        <div class="form-section rounded-lg p-6">
+            <div class="section-header">
+                <div class="section-icon bg-purple-500 text-white">
+                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd"></path>
+                    </svg>
                 </div>
-                <h3 class="text-xl font-black text-gray-900">Configuration Technique</h3>
+                <h3 class="text-lg font-medium text-gray-900">Configuration technique</h3>
             </div>
 
-            <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                {{-- Type de Véhicule --}}
-                <div class="zenfleet-form-group-enterprise">
-                    <label for="vehicle_type_id" class="zenfleet-label-enterprise">
-                        <i class="fas fa-tag mr-1 text-purple-600"></i>
-                        Type de Véhicule
-                        <span class="text-red-500 ml-1">*</span>
+            <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+                <div>
+                    <label for="vehicle_type_id" class="block text-sm font-medium text-gray-700 mb-1">
+                        Type de véhicule <span class="text-red-500">*</span>
                     </label>
-                    <select name="vehicle_type_id"
-                            id="vehicle_type_id"
-                            class="zenfleet-input-premium @error('vehicle_type_id') border-red-500 @enderror"
-                            required>
+                    <select name="vehicle_type_id" id="vehicle_type_id" class="tom-select-type w-full" required>
                         <option value="">Sélectionner un type</option>
                         @foreach($referenceData['vehicle_types'] ?? [] as $type)
                             <option value="{{ $type->id }}" {{ old('vehicle_type_id') == $type->id ? 'selected' : '' }}>
@@ -212,17 +262,11 @@
                     @enderror
                 </div>
 
-                {{-- Type de Carburant --}}
-                <div class="zenfleet-form-group-enterprise">
-                    <label for="fuel_type_id" class="zenfleet-label-enterprise">
-                        <i class="fas fa-gas-pump mr-1 text-purple-600"></i>
-                        Type de Carburant
-                        <span class="text-red-500 ml-1">*</span>
+                <div>
+                    <label for="fuel_type_id" class="block text-sm font-medium text-gray-700 mb-1">
+                        Type de carburant <span class="text-red-500">*</span>
                     </label>
-                    <select name="fuel_type_id"
-                            id="fuel_type_id"
-                            class="zenfleet-input-premium @error('fuel_type_id') border-red-500 @enderror"
-                            required>
+                    <select name="fuel_type_id" id="fuel_type_id" class="tom-select-fuel w-full" required>
                         <option value="">Sélectionner un carburant</option>
                         @foreach($referenceData['fuel_types'] ?? [] as $fuel)
                             <option value="{{ $fuel->id }}" {{ old('fuel_type_id') == $fuel->id ? 'selected' : '' }}>
@@ -235,17 +279,11 @@
                     @enderror
                 </div>
 
-                {{-- Type de Transmission --}}
-                <div class="zenfleet-form-group-enterprise">
-                    <label for="transmission_type_id" class="zenfleet-label-enterprise">
-                        <i class="fas fa-cogs mr-1 text-purple-600"></i>
-                        Transmission
-                        <span class="text-red-500 ml-1">*</span>
+                <div>
+                    <label for="transmission_type_id" class="block text-sm font-medium text-gray-700 mb-1">
+                        Transmission <span class="text-red-500">*</span>
                     </label>
-                    <select name="transmission_type_id"
-                            id="transmission_type_id"
-                            class="zenfleet-input-premium @error('transmission_type_id') border-red-500 @enderror"
-                            required>
+                    <select name="transmission_type_id" id="transmission_type_id" class="tom-select-transmission w-full" required>
                         <option value="">Sélectionner une transmission</option>
                         @foreach($referenceData['transmission_types'] ?? [] as $transmission)
                             <option value="{{ $transmission->id }}" {{ old('transmission_type_id') == $transmission->id ? 'selected' : '' }}>
@@ -258,17 +296,11 @@
                     @enderror
                 </div>
 
-                {{-- Statut --}}
-                <div class="zenfleet-form-group-enterprise">
-                    <label for="status_id" class="zenfleet-label-enterprise">
-                        <i class="fas fa-traffic-light mr-1 text-purple-600"></i>
-                        Statut
-                        <span class="text-red-500 ml-1">*</span>
+                <div>
+                    <label for="status_id" class="block text-sm font-medium text-gray-700 mb-1">
+                        Statut <span class="text-red-500">*</span>
                     </label>
-                    <select name="status_id"
-                            id="status_id"
-                            class="zenfleet-input-premium @error('status_id') border-red-500 @enderror"
-                            required>
+                    <select name="status_id" id="status_id" class="tom-select-status w-full" required>
                         <option value="">Sélectionner un statut</option>
                         @foreach($referenceData['vehicle_statuses'] ?? [] as $status)
                             <option value="{{ $status->id }}" {{ old('status_id') == $status->id ? 'selected' : '' }}>
@@ -281,63 +313,39 @@
                     @enderror
                 </div>
 
-                {{-- Cylindrée --}}
-                <div class="zenfleet-form-group-enterprise">
-                    <label for="engine_displacement_cc" class="zenfleet-label-enterprise">
-                        <i class="fas fa-tachometer-alt mr-1 text-purple-600"></i>
-                        Cylindrée (cc)
-                        <span class="text-red-500 ml-1">*</span>
+                <div>
+                    <label for="engine_displacement_cc" class="block text-sm font-medium text-gray-700 mb-1">
+                        Cylindrée (cc) <span class="text-red-500">*</span>
                     </label>
-                    <input type="number"
-                           name="engine_displacement_cc"
-                           id="engine_displacement_cc"
-                           value="{{ old('engine_displacement_cc') }}"
-                           min="50"
-                           max="10000"
-                           placeholder="Ex: 1600"
-                           class="zenfleet-input-premium @error('engine_displacement_cc') border-red-500 @enderror"
+                    <input type="number" name="engine_displacement_cc" id="engine_displacement_cc" value="{{ old('engine_displacement_cc') }}"
+                           min="50" max="10000" placeholder="Ex: 1600"
+                           class="form-input block w-full rounded-md text-sm px-3 py-2 focus:outline-none @error('engine_displacement_cc') border-red-500 @enderror"
                            required>
                     @error('engine_displacement_cc')
                         <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                     @enderror
                 </div>
 
-                {{-- Puissance --}}
-                <div class="zenfleet-form-group-enterprise">
-                    <label for="power_hp" class="zenfleet-label-enterprise">
-                        <i class="fas fa-bolt mr-1 text-purple-600"></i>
-                        Puissance (HP)
-                        <span class="text-red-500 ml-1">*</span>
+                <div>
+                    <label for="power_hp" class="block text-sm font-medium text-gray-700 mb-1">
+                        Puissance (HP) <span class="text-red-500">*</span>
                     </label>
-                    <input type="number"
-                           name="power_hp"
-                           id="power_hp"
-                           value="{{ old('power_hp') }}"
-                           min="1"
-                           max="2000"
-                           placeholder="Ex: 120"
-                           class="zenfleet-input-premium @error('power_hp') border-red-500 @enderror"
+                    <input type="number" name="power_hp" id="power_hp" value="{{ old('power_hp') }}"
+                           min="1" max="2000" placeholder="Ex: 120"
+                           class="form-input block w-full rounded-md text-sm px-3 py-2 focus:outline-none @error('power_hp') border-red-500 @enderror"
                            required>
                     @error('power_hp')
                         <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                     @enderror
                 </div>
 
-                {{-- Nombre de Places --}}
-                <div class="zenfleet-form-group-enterprise">
-                    <label for="seats" class="zenfleet-label-enterprise">
-                        <i class="fas fa-chair mr-1 text-purple-600"></i>
-                        Nombre de Places
-                        <span class="text-red-500 ml-1">*</span>
+                <div>
+                    <label for="seats" class="block text-sm font-medium text-gray-700 mb-1">
+                        Nombre de places <span class="text-red-500">*</span>
                     </label>
-                    <input type="number"
-                           name="seats"
-                           id="seats"
-                           value="{{ old('seats') }}"
-                           min="1"
-                           max="100"
-                           placeholder="Ex: 5"
-                           class="zenfleet-input-premium @error('seats') border-red-500 @enderror"
+                    <input type="number" name="seats" id="seats" value="{{ old('seats') }}"
+                           min="1" max="100" placeholder="Ex: 5"
+                           class="form-input block w-full rounded-md text-sm px-3 py-2 focus:outline-none @error('seats') border-red-500 @enderror"
                            required>
                     @error('seats')
                         <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
@@ -346,109 +354,76 @@
             </div>
         </div>
 
-        {{-- Section Informations Financières --}}
-        <div class="bg-gradient-to-r from-emerald-50 via-green-50 to-teal-50 rounded-2xl p-6 border border-emerald-200/50">
-            <div class="flex items-center mb-6">
-                <div class="w-10 h-10 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-xl flex items-center justify-center mr-4">
-                    <i class="fas fa-euro-sign text-white"></i>
+        {{-- Section Informations financières --}}
+        <div class="form-section rounded-lg p-6">
+            <div class="section-header">
+                <div class="section-icon bg-green-500 text-white">
+                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M4 4a2 2 0 00-2 2v4a2 2 0 002 2V6h10a2 2 0 00-2-2H4zm2 6a2 2 0 012-2h8a2 2 0 012 2v4a2 2 0 01-2 2H8a2 2 0 01-2-2v-4zm6 4a2 2 0 100-4 2 2 0 000 4z"></path>
+                    </svg>
                 </div>
-                <h3 class="text-xl font-black text-gray-900">Informations Financières</h3>
+                <h3 class="text-lg font-medium text-gray-900">Informations financières et kilométrage</h3>
             </div>
 
             <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                {{-- Date d'Acquisition --}}
-                <div class="zenfleet-form-group-enterprise">
-                    <label for="acquisition_date" class="zenfleet-label-enterprise">
-                        <i class="fas fa-calendar-plus mr-1 text-emerald-600"></i>
-                        Date d'Acquisition
-                        <span class="text-red-500 ml-1">*</span>
+                <div>
+                    <label for="acquisition_date" class="block text-sm font-medium text-gray-700 mb-1">
+                        Date d'acquisition <span class="text-red-500">*</span>
                     </label>
-                    <input type="date"
-                           name="acquisition_date"
-                           id="acquisition_date"
-                           value="{{ old('acquisition_date') }}"
+                    <input type="date" name="acquisition_date" id="acquisition_date" value="{{ old('acquisition_date') }}"
                            max="{{ date('Y-m-d') }}"
-                           class="zenfleet-input-premium @error('acquisition_date') border-red-500 @enderror"
+                           class="form-input block w-full rounded-md text-sm px-3 py-2 focus:outline-none @error('acquisition_date') border-red-500 @enderror"
                            required>
                     @error('acquisition_date')
                         <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                     @enderror
                 </div>
 
-                {{-- Prix d'Achat --}}
-                <div class="zenfleet-form-group-enterprise">
-                    <label for="purchase_price" class="zenfleet-label-enterprise">
-                        <i class="fas fa-money-bill mr-1 text-emerald-600"></i>
-                        Prix d'Achat (€)
-                        <span class="text-red-500 ml-1">*</span>
+                <div>
+                    <label for="purchase_price" class="block text-sm font-medium text-gray-700 mb-1">
+                        Prix d'achat (€) <span class="text-red-500">*</span>
                     </label>
-                    <input type="number"
-                           name="purchase_price"
-                           id="purchase_price"
-                           value="{{ old('purchase_price') }}"
-                           min="0"
-                           step="0.01"
-                           placeholder="Ex: 25000.00"
-                           class="zenfleet-input-premium @error('purchase_price') border-red-500 @enderror"
+                    <input type="number" name="purchase_price" id="purchase_price" value="{{ old('purchase_price') }}"
+                           min="0" step="0.01" placeholder="Ex: 25000.00"
+                           class="form-input block w-full rounded-md text-sm px-3 py-2 focus:outline-none @error('purchase_price') border-red-500 @enderror"
                            required>
                     @error('purchase_price')
                         <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                     @enderror
                 </div>
 
-                {{-- Valeur Actuelle --}}
-                <div class="zenfleet-form-group-enterprise">
-                    <label for="current_value" class="zenfleet-label-enterprise">
-                        <i class="fas fa-chart-line mr-1 text-emerald-600"></i>
-                        Valeur Actuelle (€)
+                <div>
+                    <label for="current_value" class="block text-sm font-medium text-gray-700 mb-1">
+                        Valeur actuelle (€)
                     </label>
-                    <input type="number"
-                           name="current_value"
-                           id="current_value"
-                           value="{{ old('current_value') }}"
-                           min="0"
-                           step="0.01"
-                           placeholder="Ex: 20000.00"
-                           class="zenfleet-input-premium @error('current_value') border-red-500 @enderror">
+                    <input type="number" name="current_value" id="current_value" value="{{ old('current_value') }}"
+                           min="0" step="0.01" placeholder="Ex: 20000.00"
+                           class="form-input block w-full rounded-md text-sm px-3 py-2 focus:outline-none @error('current_value') border-red-500 @enderror">
                     @error('current_value')
                         <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                     @enderror
                 </div>
 
-                {{-- Kilométrage Initial --}}
-                <div class="zenfleet-form-group-enterprise">
-                    <label for="initial_mileage" class="zenfleet-label-enterprise">
-                        <i class="fas fa-road mr-1 text-emerald-600"></i>
-                        Kilométrage Initial
-                        <span class="text-red-500 ml-1">*</span>
+                <div>
+                    <label for="initial_mileage" class="block text-sm font-medium text-gray-700 mb-1">
+                        Kilométrage initial <span class="text-red-500">*</span>
                     </label>
-                    <input type="number"
-                           name="initial_mileage"
-                           id="initial_mileage"
-                           value="{{ old('initial_mileage') }}"
-                           min="0"
-                           placeholder="Ex: 10000"
-                           class="zenfleet-input-premium @error('initial_mileage') border-red-500 @enderror"
+                    <input type="number" name="initial_mileage" id="initial_mileage" value="{{ old('initial_mileage') }}"
+                           min="0" placeholder="Ex: 10000"
+                           class="form-input block w-full rounded-md text-sm px-3 py-2 focus:outline-none @error('initial_mileage') border-red-500 @enderror"
                            required>
                     @error('initial_mileage')
                         <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                     @enderror
                 </div>
 
-                {{-- Kilométrage Actuel --}}
-                <div class="zenfleet-form-group-enterprise">
-                    <label for="current_mileage" class="zenfleet-label-enterprise">
-                        <i class="fas fa-tachometer-alt mr-1 text-emerald-600"></i>
-                        Kilométrage Actuel
-                        <span class="text-red-500 ml-1">*</span>
+                <div>
+                    <label for="current_mileage" class="block text-sm font-medium text-gray-700 mb-1">
+                        Kilométrage actuel <span class="text-red-500">*</span>
                     </label>
-                    <input type="number"
-                           name="current_mileage"
-                           id="current_mileage"
-                           value="{{ old('current_mileage') }}"
-                           min="0"
-                           placeholder="Ex: 15000"
-                           class="zenfleet-input-premium @error('current_mileage') border-red-500 @enderror"
+                    <input type="number" name="current_mileage" id="current_mileage" value="{{ old('current_mileage') }}"
+                           min="0" placeholder="Ex: 15000"
+                           class="form-input block w-full rounded-md text-sm px-3 py-2 focus:outline-none @error('current_mileage') border-red-500 @enderror"
                            required>
                     @error('current_mileage')
                         <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
@@ -458,24 +433,23 @@
         </div>
 
         {{-- Section Notes --}}
-        <div class="bg-gradient-to-r from-amber-50 via-yellow-50 to-orange-50 rounded-2xl p-6 border border-amber-200/50">
-            <div class="flex items-center mb-6">
-                <div class="w-10 h-10 bg-gradient-to-br from-amber-500 to-amber-600 rounded-xl flex items-center justify-center mr-4">
-                    <i class="fas fa-sticky-note text-white"></i>
+        <div class="form-section rounded-lg p-6">
+            <div class="section-header">
+                <div class="section-icon bg-yellow-500 text-white">
+                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M18 13V5a2 2 0 00-2-2H4a2 2 0 00-2 2v8a2 2 0 002 2h3l3 3 3-3h3a2 2 0 002-2zM5 7a1 1 0 011-1h8a1 1 0 110 2H6a1 1 0 01-1-1zm1 3a1 1 0 100 2h3a1 1 0 100-2H6z" clip-rule="evenodd"></path>
+                    </svg>
                 </div>
-                <h3 class="text-xl font-black text-gray-900">Notes et Observations</h3>
+                <h3 class="text-lg font-medium text-gray-900">Notes et observations</h3>
             </div>
 
-            <div class="zenfleet-form-group-enterprise">
-                <label for="notes" class="zenfleet-label-enterprise">
-                    <i class="fas fa-comment mr-1 text-amber-600"></i>
-                    Notes (Optionnel)
+            <div>
+                <label for="notes" class="block text-sm font-medium text-gray-700 mb-1">
+                    Notes (optionnel)
                 </label>
-                <textarea name="notes"
-                          id="notes"
-                          rows="4"
+                <textarea name="notes" id="notes" rows="4"
                           placeholder="Informations complémentaires, observations, etc..."
-                          class="zenfleet-input-premium @error('notes') border-red-500 @enderror">{{ old('notes') }}</textarea>
+                          class="form-input block w-full rounded-md text-sm px-3 py-2 focus:outline-none @error('notes') border-red-500 @enderror">{{ old('notes') }}</textarea>
                 @error('notes')
                     <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                 @enderror
@@ -483,65 +457,80 @@
         </div>
 
         {{-- Actions --}}
-        <div class="flex items-center justify-end space-x-4 pt-8 border-t border-gray-200">
-            <a href="{{ route('admin.vehicles.index') }}"
-               class="zenfleet-btn-enterprise-secondary">
-                <i class="fas fa-times mr-2"></i>
+        <div class="flex items-center justify-end space-x-4 pt-6 border-t border-gray-200">
+            <a href="{{ route('admin.vehicles.index') }}" class="btn-secondary inline-flex items-center px-4 py-2 text-sm font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
                 Annuler
             </a>
-
-            <button type="submit"
-                    class="zenfleet-btn-enterprise-primary"
-                    id="submit-btn">
-                <i class="fas fa-save mr-2"></i>
-                <span id="submit-text">Créer le Véhicule</span>
-                <div id="submit-loading" class="zenfleet-loading ml-2 hidden"></div>
+            <button type="submit" class="btn-primary inline-flex items-center px-6 py-2 text-sm font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" id="submit-btn">
+                <svg class="-ml-1 mr-2 h-4 w-4" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                </svg>
+                <span id="submit-text">Créer le véhicule</span>
             </button>
         </div>
     </form>
-</div>
 
-{{-- Recommandations Enterprise --}}
-@if(isset($recommendations) && !empty($recommendations))
-<div class="mt-8 bg-gradient-to-r from-indigo-50 via-blue-50 to-cyan-50 rounded-2xl p-6 border border-indigo-200/50">
-    <div class="flex items-center mb-4">
-        <div class="w-8 h-8 bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-lg flex items-center justify-center mr-3">
-            <i class="fas fa-lightbulb text-white text-sm"></i>
+    {{-- Recommandations --}}
+    @if(isset($recommendations) && !empty($recommendations))
+    <div class="mt-8 bg-blue-50 rounded-lg p-6 border border-blue-200">
+        <div class="flex items-center mb-4">
+            <div class="w-6 h-6 bg-blue-500 rounded-lg flex items-center justify-center mr-3">
+                <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
+                </svg>
+            </div>
+            <h4 class="text-lg font-medium text-gray-900">Conseils d'experts</h4>
         </div>
-        <h4 class="text-lg font-bold text-gray-900">Recommandations Enterprise</h4>
-    </div>
-
-    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        @foreach($recommendations as $recommendation)
-            <div class="bg-white rounded-lg p-4 border border-indigo-200/30">
-                <div class="flex items-start">
-                    <i class="{{ $recommendation['icon'] }} text-indigo-600 mr-2 mt-1"></i>
-                    <div>
-                        <p class="text-sm font-semibold text-gray-900">{{ $recommendation['title'] }}</p>
-                        <p class="text-xs text-gray-600 mt-1">{{ $recommendation['description'] }}</p>
+        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            @foreach($recommendations as $recommendation)
+                <div class="bg-white rounded-lg p-4 border border-blue-100">
+                    <div class="flex items-start">
+                        <svg class="w-5 h-5 text-blue-500 mr-2 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+                        </svg>
+                        <div>
+                            <p class="text-sm font-medium text-gray-900">{{ $recommendation['title'] }}</p>
+                            <p class="text-sm text-gray-600 mt-1">{{ $recommendation['description'] }}</p>
+                        </div>
                     </div>
                 </div>
-            </div>
-        @endforeach
+            @endforeach
+        </div>
     </div>
+    @endif
 </div>
-@endif
-
 @endsection
 
 @push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    // Initialize TomSelect for all select elements
+    ['tom-select-type', 'tom-select-fuel', 'tom-select-transmission', 'tom-select-status'].forEach(className => {
+        const element = document.querySelector('.' + className);
+        if (element) {
+            new TomSelect(element, {
+                plugins: ['clear_button'],
+                placeholder: 'Sélectionner...',
+                allowEmptyOption: true,
+                searchField: ['text'],
+                render: {
+                    no_results: function() {
+                        return '<div class="no-results">Aucun résultat trouvé</div>';
+                    }
+                }
+            });
+        }
+    });
+
     const form = document.getElementById('vehicle-form');
     const submitBtn = document.getElementById('submit-btn');
     const submitText = document.getElementById('submit-text');
-    const submitLoading = document.getElementById('submit-loading');
 
     // Form submission avec état de loading
     form.addEventListener('submit', function() {
         submitBtn.disabled = true;
         submitText.textContent = 'Création en cours...';
-        submitLoading.classList.remove('hidden');
     });
 
     // Validation du VIN

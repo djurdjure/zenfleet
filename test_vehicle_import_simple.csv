@@ -1,0 +1,2 @@
+registration_plate,vin,brand,model,color,vehicle_type,fuel_type,transmission_type,status,manufacturing_year,acquisition_date,purchase_price,current_value,initial_mileage,current_mileage,engine_displacement_cc,power_hp,seats,notes
+TEST-004,1HGCM82633A123459,Toyota,Corolla,Blanc,Berline,Essence,Manuelle,Parking,2020,2020-01-15,25000.00,20000.00,5000,15000,1600,120,5,Test véhicule import

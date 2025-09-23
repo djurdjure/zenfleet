@@ -2,7 +2,7 @@
 @section('title', 'Nouvelle Organisation - ZenFleet')
 
 @section('content')
-<x-organization-form-algeria
+<x-organization-form-enterprise
     :organization="null"
     :isEdit="false"
     :wilayas="$wilayas"

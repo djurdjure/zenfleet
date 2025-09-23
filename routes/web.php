@@ -14,9 +14,9 @@ use App\Http\Controllers\Admin\SupplierCategoryController;
 use App\Http\Controllers\Admin\DocumentController;
 use App\Http\Controllers\Admin\DocumentCategoryController;
 // use App\Http\Controllers\Admin\MaintenanceDashboardController;
-use App\Http\Controllers\Admin\MaintenancePlanController;
+// use App\Http\Controllers\Admin\MaintenancePlanController; // Temporairement désactivé
 use App\Http\Controllers\Admin\MaintenanceLogController;
-use App\Http\Controllers\Admin\VehicleHandoverController;
+// use App\Http\Controllers\Admin\VehicleHandoverController; // Temporairement désactivé
 use App\Http\Controllers\Admin\PlanningController;
 
 /*
@@ -166,17 +166,35 @@ Route::middleware(['auth', 'verified'])
     */
     Route::middleware(['auth', 'verified', 'enterprise.permission'])->group(function () {
         
-        // 🚙 Véhicules avec Import/Export Avancé
-        Route::resource('vehicles', VehicleController::class);
+        // 🚙 Véhicules avec Import/Export Avancé - Configuration Enterprise
         Route::prefix('vehicles')->name('vehicles.')->group(function () {
-            // Import/Export
+            // CORRECTION MAJEURE: Routes spécifiques AVANT les routes avec paramètres
+            // Import/Export Enterprise
             Route::get('import', [VehicleController::class, 'showImportForm'])->name('import.show');
             Route::post('import', [VehicleController::class, 'handleImport'])->name('import.handle');
+            Route::post('import/validate', [VehicleController::class, 'preValidateImportFile'])->name('import.validate');
             Route::get('import-template', [VehicleController::class, 'downloadTemplate'])->name('import.template');
             Route::get('import/results', [VehicleController::class, 'showImportResults'])->name('import.results');
             Route::get('export', [VehicleController::class, 'export'])->name('export');
-            
-            // Actions spécifiques
+
+            // Gestion des archives
+            Route::get('archived', [VehicleController::class, 'archived'])->name('archived');
+
+            // Route de création
+            Route::get('create', [VehicleController::class, 'create'])->name('create');
+
+            // Routes CRUD principales
+            Route::get('/', [VehicleController::class, 'index'])->name('index');
+            Route::post('/', [VehicleController::class, 'store'])->name('store');
+
+            // Routes avec paramètres {vehicle} - TOUJOURS EN DERNIER
+            Route::get('{vehicle}', [VehicleController::class, 'show'])->name('show');
+            Route::get('{vehicle}/edit', [VehicleController::class, 'edit'])->name('edit');
+            Route::put('{vehicle}', [VehicleController::class, 'update'])->name('update');
+            Route::patch('{vehicle}', [VehicleController::class, 'update'])->name('update');
+            Route::delete('{vehicle}', [VehicleController::class, 'destroy'])->name('destroy');
+
+            // Actions spécifiques avec paramètres
             Route::patch('{vehicle}/restore', [VehicleController::class, 'restore'])->name('restore')->withTrashed();
             Route::delete('{vehicle}/force-delete', [VehicleController::class, 'forceDelete'])->name('force-delete')->withTrashed();
             Route::get('{vehicle}/history', [VehicleController::class, 'history'])->name('history');
@@ -185,20 +203,32 @@ Route::middleware(['auth', 'verified'])
         });
 
         // 👨‍💼 Chauffeurs avec Import/Export
-        Route::resource('drivers', DriverController::class);
         Route::prefix('drivers')->name('drivers.')->group(function () {
-            // Import/Export
+            // CORRECTION MAJEURE: Routes spécifiques AVANT les routes avec paramètres
+            Route::get('statistics', [DriverController::class, 'statistics'])->name('statistics');
             Route::get('import', [DriverController::class, 'showImportForm'])->name('import.show');
             Route::post('import', [DriverController::class, 'handleImport'])->name('import.handle');
             Route::get('import-template', [DriverController::class, 'downloadTemplate'])->name('import.template');
             Route::get('import/results', [DriverController::class, 'showImportResults'])->name('import.results');
             Route::get('export', [DriverController::class, 'export'])->name('export');
-            
-            // Actions spécifiques
+            Route::get('archived', [DriverController::class, 'archived'])->name('archived');
+            Route::get('create', [DriverController::class, 'create'])->name('create');
+
+            // Routes CRUD principales
+            Route::get('/', [DriverController::class, 'index'])->name('index');
+            Route::post('/', [DriverController::class, 'store'])->name('store');
+
+            // Routes avec paramètres {driver} - TOUJOURS EN DERNIER
+            Route::get('{driver}', [DriverController::class, 'show'])->name('show');
+            Route::get('{driver}/edit', [DriverController::class, 'edit'])->name('edit');
+            Route::put('{driver}', [DriverController::class, 'update'])->name('update');
+            Route::delete('{driver}', [DriverController::class, 'destroy'])->name('destroy');
             Route::patch('{driver}/restore', [DriverController::class, 'restore'])->name('restore')->withTrashed();
             Route::delete('{driver}/force-delete', [DriverController::class, 'forceDelete'])->name('force-delete')->withTrashed();
-            Route::get('{driver}/history', [DriverController::class, 'history'])->name('history');
-            Route::get('{driver}/performance', [DriverController::class, 'performance'])->name('performance');
+
+            // Routes futures (à implémenter)
+            // Route::get('{driver}/history', [DriverController::class, 'history'])->name('history');
+            // Route::get('{driver}/performance', [DriverController::class, 'performance'])->name('performance');
         });
 
         // 🔄 Affectations Avancées
@@ -234,22 +264,24 @@ Route::middleware(['auth', 'verified'])
     */
     Route::middleware('role:Super Admin|Admin|Gestionnaire Flotte|Supervisor')->group(function () {
         
-        // Dashboard Maintenance (temporairement désactivé)
-        // Route::prefix('maintenance')->name('maintenance.')->group(function () {
-        //     Route::get('/', [MaintenanceDashboardController::class, 'index'])->name('dashboard');
-        //     Route::get('calendar', [MaintenanceDashboardController::class, 'calendar'])->name('calendar');
-        //     Route::get('alerts', [MaintenanceDashboardController::class, 'alerts'])->name('alerts');
-        //     Route::get('analytics', [MaintenanceDashboardController::class, 'analytics'])->name('analytics');
-        // });
+        // Dashboard Maintenance - ACTIVATION ENTERPRISE
+        Route::prefix('maintenance')->name('maintenance.')->group(function () {
+            Route::get('/', [DashboardController::class, 'maintenanceDashboard'])->name('dashboard');
+            Route::get('calendar', [DashboardController::class, 'maintenanceCalendar'])->name('calendar');
+            Route::get('alerts', [DashboardController::class, 'maintenanceAlerts'])->name('alerts');
+            Route::get('analytics', [DashboardController::class, 'maintenanceAnalytics'])->name('analytics');
+        });
 
-        // Plans et Logs de Maintenance
-        Route::resource('maintenance/plans', MaintenancePlanController::class)->names('maintenance.plans');
-        Route::post('maintenance/plans/{plan}/duplicate', [MaintenancePlanController::class, 'duplicate'])
-            ->name('maintenance.plans.duplicate');
-        
-        Route::resource('maintenance/logs', MaintenanceLogController::class)->names('maintenance.logs');
-        Route::get('maintenance/logs/{log}/pdf', [MaintenanceLogController::class, 'exportPdf'])
-            ->name('maintenance.logs.pdf');
+        // Plans et Logs de Maintenance - Temporairement simplifiés
+        // Route::resource('maintenance/plans', MaintenancePlanController::class)->names('maintenance.plans');
+        // Route::post('maintenance/plans/{plan}/duplicate', [MaintenancePlanController::class, 'duplicate'])
+        //     ->name('maintenance.plans.duplicate');
+
+        // Logs de maintenance fonctionnels
+        Route::prefix('maintenance/logs')->name('maintenance.logs.')->group(function () {
+            Route::get('/', [DashboardController::class, 'maintenanceLogs'])->name('index');
+            Route::get('export', [DashboardController::class, 'exportMaintenanceLogs'])->name('export');
+        });
     });
 
     /*
@@ -259,26 +291,20 @@ Route::middleware(['auth', 'verified'])
     */
     Route::middleware('role:Super Admin|Admin|Gestionnaire Flotte|Supervisor')->group(function () {
         
-        // ✅ CORRECTION CRITIQUE : Groupe principal des handovers
-        Route::prefix('handovers')->name('handovers.vehicles.')->group(function () {
-            Route::get('/', [VehicleHandoverController::class, 'index'])->name('index');
-            Route::get('create', [VehicleHandoverController::class, 'create'])->name('create');
-            Route::post('/', [VehicleHandoverController::class, 'store'])->name('store');
-            Route::get('{handover}', [VehicleHandoverController::class, 'show'])->name('show');
-            Route::get('{handover}/edit', [VehicleHandoverController::class, 'edit'])->name('edit');
-            Route::put('{handover}', [VehicleHandoverController::class, 'update'])->name('update');
-            Route::delete('{handover}', [VehicleHandoverController::class, 'destroy'])->name('destroy');
-            Route::post('{handover}/upload-signed', [VehicleHandoverController::class, 'uploadSigned'])
-                ->name('uploadSigned');
-            Route::get('{handover}/download', [VehicleHandoverController::class, 'downloadPdf'])
-                ->name('downloadPdf');
-            Route::get('{handover}/preview', [VehicleHandoverController::class, 'preview'])
-                ->name('preview');
-        });
+        // Handovers - Temporairement désactivés en attendant le contrôleur
+        // Route::prefix('handovers')->name('handovers.vehicles.')->group(function () {
+        //     Route::get('/', [VehicleHandoverController::class, 'index'])->name('index');
+        //     Route::get('create', [VehicleHandoverController::class, 'create'])->name('create');
+        //     Route::post('/', [VehicleHandoverController::class, 'store'])->name('store');
+        //     Route::get('{handover}', [VehicleHandoverController::class, 'show'])->name('show');
+        //     Route::get('{handover}/edit', [VehicleHandoverController::class, 'edit'])->name('edit');
+        //     Route::put('{handover}', [VehicleHandoverController::class, 'update'])->name('update');
+        //     Route::delete('{handover}', [VehicleHandoverController::class, 'destroy'])->name('destroy');
+        // });
 
-        // ✅ CORRECTION CRITIQUE : Route spéciale depuis affectation avec nom unique
-        Route::get('assignments/{assignment}/handovers/create', [VehicleHandoverController::class, 'create'])
-            ->name('assignments.handovers.create'); // ← NOM UNIQUE POUR ÉVITER LE CONFLIT
+        // Placeholder pour handovers
+        Route::get('handovers', [\App\Http\Controllers\Admin\PlaceholderController::class, 'index'])
+            ->name('handovers.vehicles.index');
     });
 
     /*
@@ -382,14 +408,13 @@ require __DIR__.'/auth.php';
 |--------------------------------------------------------------------------
 */
 Route::middleware(['auth', 'verified', 'enterprise.permission'])->prefix('admin')->name('admin.')->group(function () {
-    // Modules temporaires en développement
-    Route::get('assignments', [\App\Http\Controllers\Admin\PlaceholderController::class, 'index'])->name('assignments.index');
-    Route::get('drivers', [\App\Http\Controllers\Admin\PlaceholderController::class, 'index'])->name('drivers.index');
-    Route::get('planning', [\App\Http\Controllers\Admin\PlaceholderController::class, 'index'])->name('planning.index');
-    Route::get('documents', [\App\Http\Controllers\Admin\PlaceholderController::class, 'index'])->name('documents.index');
-    Route::get('suppliers', [\App\Http\Controllers\Admin\PlaceholderController::class, 'index'])->name('suppliers.index');
-    Route::get('reports', [\App\Http\Controllers\Admin\PlaceholderController::class, 'index'])->name('reports.index');
-    Route::get('audit', [\App\Http\Controllers\Admin\PlaceholderController::class, 'index'])->name('audit.index');
+    // Modules temporaires en développement - ATTENTION: Vérifier que ces routes ne créent pas de conflits
+    // CORRECTION: Suppression des routes qui écrasent les vraies routes des modules fonctionnels
+    // Route::get('assignments', [\App\Http\Controllers\Admin\PlaceholderController::class, 'index'])->name('assignments.index');
+    // Route::get('drivers', [\App\Http\Controllers\Admin\PlaceholderController::class, 'index'])->name('drivers.index');
+
+    // Modules temporaires - Redirection vers Dashboard avec info
+    Route::get('maintenance-temp', [\App\Http\Controllers\Admin\PlaceholderController::class, 'index'])->name('maintenance-temp.index');
 });
 
 /*

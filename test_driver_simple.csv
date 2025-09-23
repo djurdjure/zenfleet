@@ -1,0 +1,3 @@
+nom,prenom,date_naissance,matricule,statut,date_recrutement,date_fin_contrat,telephone,email_personnel,adresse,numero_permis,categorie_permis,date_delivrance_permis,date_expiration_permis,autorite_delivrance,contact_urgence_nom,contact_urgence_telephone,groupe_sanguin
+Dupont,Jean,1985-03-15,EMP-2024-001,Disponible,2024-01-15,2026-12-31,0550123456,jean.dupont@test.com,"123 Rue Test, 16000 Alger",P-DZ-2020-001234,"B,C",2020-06-15,2030-06-14,Wilaya d'Alger,Dupont Marie,0661234567,O+
+Martin,Sophie,1990-07-22,EMP-2024-002,En formation,2024-02-01,,0770987654,sophie.martin@test.com,"456 Avenue Test, 31000 Oran",P-DZ-2021-005678,B,2021-09-10,2031-09-09,Wilaya d'Oran,Martin Paul,0552987654,A+

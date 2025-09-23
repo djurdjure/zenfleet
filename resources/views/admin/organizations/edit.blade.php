@@ -2,7 +2,7 @@
 @section('title', 'Modifier ' . $organization->name)
 
 @section('content')
-<x-organization-form-algeria
+<x-organization-form-enterprise
     :organization="$organization"
     :isEdit="true"
     :wilayas="$wilayas ?? []"

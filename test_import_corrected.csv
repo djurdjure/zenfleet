@@ -1,0 +1,3 @@
+registration_plate,vin,brand,model,color,vehicle_type,fuel_type,transmission_type,status,manufacturing_year,acquisition_date,purchase_price,current_value,initial_mileage,current_mileage,engine_displacement_cc,power_hp,seats,notes
+TEST-002,1HGCM82633A123457,Toyota,Camry,Blanc,Berline,Essence,Automatique,Parking,2021,2021-03-15,28000.00,25000.00,0,12000,2000,150,5,Véhicule de test importation
+TEST-003,2HGCM82633A123458,Peugeot,308,Noir,Berline,Diesel,Manuelle,Parking,2020,2020-06-20,25000.00,22000.00,5000,35000,1600,130,5,Import test diesel
