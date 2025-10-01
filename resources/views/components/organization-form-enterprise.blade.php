@@ -391,13 +391,13 @@
                     <div class="relative">
                         <i class="field-icon fas fa-envelope"></i>
                         <input type="email"
-                               name="primary_email"
-                               class="form-input with-icon @error('primary_email') error @enderror"
-                               value="{{ old('primary_email', $organization?->primary_email ?? '') }}"
+                               name="email"
+                               class="form-input with-icon @error('email') error @enderror"
+                               value="{{ old('email', $organization?->email ?? '') }}"
                                placeholder="contact@entreprise.dz"
                                required>
                     </div>
-                    @error('primary_email')
+                    @error('email')
                         <div class="error-message">
                             <i class="fas fa-exclamation-circle mr-1"></i>
                             {{ $message }}

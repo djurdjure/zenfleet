@@ -16,6 +16,11 @@ class SupplierController extends Controller
 
     public function __construct(SupplierService $supplierService)
     {
+        $this->middleware('auth');
+
+        // ✅ Utiliser authorizeResource pour appliquer automatiquement SupplierPolicy
+        $this->authorizeResource(Supplier::class, 'supplier');
+
         $this->supplierService = $supplierService;
     }
 

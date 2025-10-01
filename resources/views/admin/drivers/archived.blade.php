@@ -191,9 +191,9 @@
                                         <td class="px-6 py-4 whitespace-nowrap">
                                             <div class="flex items-center">
                                                 <div class="flex-shrink-0 h-10 w-10">
-                                                    @if($driver->photo_path)
+                                                    @if($driver->photo)
                                                         <img class="h-10 w-10 rounded-full object-cover border-2 border-amber-200"
-                                                             src="{{ asset('storage/' . $driver->photo_path) }}"
+                                                             src="{{ asset('storage/' . $driver->photo) }}"
                                                              alt="Photo de {{ $driver->first_name }}">
                                                     @else
                                                         <div class="h-10 w-10 rounded-full bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center">

@@ -1,0 +1,16 @@
+{{-- VUE TEST TEMPORAIRE --}}
+<h1>🔧 MAINTENANCE DASHBOARD - TEST</h1>
+<p>Si vous voyez ceci, le bon contrôleur MaintenanceController est exécuté !</p>
+<p>Timestamp: {{ now() }}</p>
+
+{{-- Debug des variables --}}
+<div>
+    <h3>Variables passées:</h3>
+    <ul>
+        <li>stats: {{ isset($stats) ? 'Défini' : 'Non défini' }}</li>
+        <li>criticalAlerts: {{ isset($criticalAlerts) ? 'Défini' : 'Non défini' }}</li>
+        <li>upcomingMaintenance: {{ isset($upcomingMaintenance) ? 'Défini' : 'Non défini' }}</li>
+        <li>activeOperations: {{ isset($activeOperations) ? 'Défini' : 'Non défini' }}</li>
+        <li>chartData: {{ isset($chartData) ? 'Défini' : 'Non défini' }}</li>
+    </ul>
+</div>

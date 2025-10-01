@@ -1,175 +1,394 @@
-<nav x-data="{ open: true }" class="flex flex-col h-full bg-white shadow-md font-sans">
-    {{-- Logo --}}
-    <div class="flex items-center justify-center h-20 border-b border-gray-200 shrink-0 px-6">
-        <a href="{{ route('dashboard') }}">
-            <x-application-logo class="block h-10 w-auto" />
+<nav x-data="{
+    open: true,
+    activeSection: '{{ request()->segment(2) }}',
+    notifications: {
+        alerts: {{ auth()->user()->unreadNotifications->where('type', 'like', '%Alert%')->count() }},
+        repairs: {{ auth()->user()->unreadNotifications->where('type', 'like', '%Repair%')->count() }},
+        expenses: {{ auth()->user()->unreadNotifications->where('type', 'like', '%Expense%')->count() }},
+        maintenance: {{ auth()->user()->unreadNotifications->where('type', 'like', '%Maintenance%')->count() }}
+    }
+}" class="flex flex-col h-full bg-gradient-to-b from-slate-900 to-slate-800 shadow-2xl font-inter text-white">
+
+    {{-- Logo Enterprise --}}
+    <div class="flex items-center justify-center h-20 border-b border-slate-700/50 shrink-0 px-6 bg-slate-800/30">
+        <a href="{{ route('dashboard') }}" class="flex items-center space-x-3 group">
+            <div class="p-2 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-lg shadow-lg group-hover:shadow-xl transition-all duration-300">
+                <x-lucide-truck class="h-8 w-8 text-white" stroke-width="2" />
+            </div>
+            <div class="flex flex-col">
+                <span class="text-xl font-bold text-white group-hover:text-blue-300 transition-colors">ZenFleet</span>
+                <span class="text-xs text-slate-400 font-medium">Enterprise Suite</span>
+            </div>
         </a>
     </div>
 
-    {{-- Liens de navigation --}}
-    <div class="flex-1 px-4 py-4 overflow-y-auto space-y-1 text-sm">
+    {{-- Système d'alertes global --}}
+    @if(auth()->user()->unreadNotifications->count() > 0)
+    <div class="mx-4 mt-4 p-3 bg-gradient-to-r from-red-500/20 to-orange-500/20 border border-red-500/30 rounded-lg">
+        <div class="flex items-center space-x-2">
+            <x-lucide-bell class="h-4 w-4 text-red-400 animate-pulse" />
+            <span class="text-sm font-medium text-red-300">{{ auth()->user()->unreadNotifications->count() }} alertes actives</span>
+        </div>
+    </div>
+    @endif
 
-        <x-sidebar.sidebar-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
-            <x-slot name="icon">
-                <x-lucide-layout-grid class="h-5 w-5" stroke-width="1.5" />
-            </x-slot>
-            {{ __('Tableau de bord') }}
-        </x-sidebar.sidebar-link>
+    {{-- Navigation principale --}}
+    <div class="flex-1 px-4 py-6 overflow-y-auto space-y-3 text-sm"
+         x-data="{ searchQuery: '' }"
+         x-init="
+            $watch('searchQuery', value => {
+                const items = document.querySelectorAll('.nav-item');
+                items.forEach(item => {
+                    const text = item.textContent.toLowerCase();
+                    item.style.display = text.includes(value.toLowerCase()) ? 'block' : 'none';
+                });
+            })
+         ">
 
-        {{-- Section Gestion de la Flotte --}}
-        @canany(['view vehicles', 'view assignments'])
-            <x-sidebar.sidebar-group title="Flotte" :active="request()->routeIs('admin.vehicles.*') || request()->routeIs('admin.assignments.*')">
-                <x-slot name="icon">
-                    <x-lucide-truck stroke-width="1.5" />
-                </x-slot>
-                @can('view vehicles')
-                    <x-sidebar.sidebar-sub-link :href="route('admin.vehicles.index')" :active="request()->routeIs('admin.vehicles.*')">
-                        <x-slot name="icon"><x-lucide-truck stroke-width="1.5" /></x-slot>
-                        {{ __('Véhicules') }}
-                    </x-sidebar.sidebar-sub-link>
-                @endcan
-                @can('view assignments')
-                    <x-sidebar.sidebar-sub-link :href="route('admin.assignments.index')" :active="request()->routeIs('admin.assignments.*')">
-                        <x-slot name="icon"><x-lucide-clipboard-list stroke-width="1.5" /></x-slot>
-                        {{ __('Affectations') }}
-                    </x-sidebar.sidebar-sub-link>
-                @endcan
-                @can('view assignments') {{-- Reuse same permission for now --}}
-                    <x-sidebar.sidebar-sub-link :href="route('admin.planning.index')" :active="request()->routeIs('admin.planning.*')">
-                        <x-slot name="icon"><x-lucide-calendar-days stroke-width="1.5" /></x-slot>
-                        {{ __('Planning') }}
-                    </x-sidebar.sidebar-sub-link>
-                @endcan
-            </x-sidebar.sidebar-group>
-        @endcanany
+        {{-- Barre de recherche Enterprise --}}
+        <div class="relative mb-6">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <x-lucide-search class="h-4 w-4 text-slate-400" />
+            </div>
+            <input type="text" x-model="searchQuery"
+                   placeholder="Rechercher dans le menu..."
+                   class="w-full pl-10 pr-4 py-2 bg-slate-800/50 border border-slate-600/30 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200">
+        </div>
 
-        {{-- Section Chauffeurs --}}
-        @can('view drivers')
-             <x-sidebar.sidebar-group title="Chauffeurs" :active="request()->routeIs('admin.drivers.*')">
-                <x-slot name="icon">
-                    <x-lucide-users stroke-width="1.5" />
-                </x-slot>
-                <x-sidebar.sidebar-sub-link :href="route('admin.drivers.index')" :active="request()->routeIs('admin.drivers.index')">
-                    <x-slot name="icon"><x-lucide-list stroke-width="1.5" /></x-slot>
-                    {{ __('Liste des chauffeurs') }}
-                </x-sidebar.sidebar-sub-link>
-                 <x-sidebar.sidebar-sub-link :href="route('admin.drivers.import.show')" :active="request()->routeIs('admin.drivers.import.*')">
-                    <x-slot name="icon"><x-lucide-file-up stroke-width="1.5" /></x-slot>
-                    {{ __('Importer des chauffeurs') }}
-                </x-sidebar.sidebar-sub-link>
-            </x-sidebar.sidebar-group>
-        @endcan
+        {{-- Dashboard Principal --}}
+        <a href="{{ route('dashboard') }}"
+           class="nav-item flex items-center px-4 py-3 rounded-xl text-white/90 hover:text-white hover:bg-gradient-to-r hover:from-blue-500/20 hover:to-indigo-500/20 transition-all duration-300 group {{ request()->routeIs('dashboard') ? 'bg-gradient-to-r from-blue-500/30 to-indigo-500/30 text-white border border-blue-500/30' : '' }}">
+            <div class="flex items-center justify-center w-10 h-10 rounded-lg {{ request()->routeIs('dashboard') ? 'bg-gradient-to-r from-blue-500 to-indigo-600' : 'bg-slate-700/50 group-hover:bg-slate-600/50' }} transition-all duration-300">
+                <x-lucide-layout-grid class="h-5 w-5" />
+            </div>
+            <span class="ml-3 font-medium">Tableau de Bord</span>
+            @if(request()->routeIs('dashboard'))
+                <div class="ml-auto w-2 h-2 bg-blue-400 rounded-full animate-pulse"></div>
+            @endif
+        </a>
 
-        {{-- Section Maintenance --}}
-        @canany(['view maintenance', 'manage maintenance plans'])
-            <x-sidebar.sidebar-group title="Maintenance" :active="request()->routeIs('admin.maintenance.*')">
-                <x-slot name="icon">
-                    <x-lucide-wrench stroke-width="1.5" />
-                </x-slot>
-                <x-sidebar.sidebar-sub-link :href="route('admin.maintenance.dashboard')" :active="request()->routeIs('admin.maintenance.dashboard')">
-                    <x-slot name="icon"><x-lucide-bar-chart-2 stroke-width="1.5" /></x-slot>
-                    Tableau de Bord
-                </x-sidebar.sidebar-sub-link>
-                <x-sidebar.sidebar-sub-link :href="route('admin.maintenance.plans.index')" :active="request()->routeIs('admin.maintenance.plans.*')">
-                    <x-slot name="icon"><x-lucide-calendar-check stroke-width="1.5" /></x-slot>
-                    Plans de Maintenance
-                </x-sidebar.sidebar-sub-link>
-            </x-sidebar.sidebar-group>
-        @endcanany
+        {{-- Section Alertes & Notifications --}}
+        <div class="nav-item mt-8 mb-4">
+            <h3 class="px-4 text-xs font-semibold text-slate-400 uppercase tracking-wider">Alertes & Surveillance</h3>
+        </div>
 
-        {{-- Section Documents --}}
-        @canany(['view documents', 'manage document_categories'])
-            <x-sidebar.sidebar-group title="Documents" :active="request()->routeIs('admin.documents.*') || request()->routeIs('admin.document-categories.*')">
-                <x-slot name="icon">
-                    <x-lucide-folder-open stroke-width="1.5" />
-                </x-slot>
-                @can('view documents')
-                    <x-sidebar.sidebar-sub-link :href="route('admin.documents.index')" :active="request()->routeIs('admin.documents.*')">
-                        <x-slot name="icon"><x-lucide-file-text stroke-width="1.5" /></x-slot>
-                        {{ __('Liste des Documents') }}
-                    </x-sidebar.sidebar-sub-link>
-                @endcan
-                @can('manage document_categories')
-                    <x-sidebar.sidebar-sub-link :href="route('admin.document-categories.index')" :active="request()->routeIs('admin.document-categories.*')">
-                        <x-slot name="icon"><x-lucide-folder-cog stroke-width="1.5" /></x-slot>
-                        {{ __('Catégories de document') }}
-                    </x-sidebar.sidebar-sub-link>
-                @endcan
-            </x-sidebar.sidebar-group>
-        @endcanany
+        <a href="{{ route('admin.alerts.index') }}"
+           class="nav-item flex items-center px-4 py-3 rounded-xl text-white/90 hover:text-white hover:bg-gradient-to-r hover:from-red-500/20 hover:to-orange-500/20 transition-all duration-300 group {{ request()->routeIs('admin.alerts.*') ? 'bg-gradient-to-r from-red-500/30 to-orange-500/30 text-white border border-red-500/30' : '' }}">
+            <div class="flex items-center justify-center w-10 h-10 rounded-lg {{ request()->routeIs('admin.alerts.*') ? 'bg-gradient-to-r from-red-500 to-orange-600' : 'bg-slate-700/50 group-hover:bg-slate-600/50' }} transition-all duration-300 relative">
+                <x-lucide-alert-triangle class="h-5 w-5" />
+                @if(auth()->user()->unreadNotifications->where('type', 'like', '%Alert%')->count() > 0)
+                    <span class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center animate-pulse">
+                        {{ auth()->user()->unreadNotifications->where('type', 'like', '%Alert%')->count() }}
+                    </span>
+                @endif
+            </div>
+            <div class="ml-3 flex-1">
+                <span class="font-medium">Alertes Système</span>
+                <div class="text-xs text-slate-400">Maintenance • Réparations • Budgets</div>
+            </div>
+        </a>
 
-        {{-- Section Supplier --}}
-        @can('view suppliers')
-            <x-sidebar.sidebar-link :href="route('admin.suppliers.index')" :active="request()->routeIs('admin.suppliers.*')">
-                <x-slot name="icon">
-                    <x-lucide-building-2 class="h-5 w-5" stroke-width="1.5" />
-                </x-slot>
-                {{ __('Fournisseurs') }}
-            </x-sidebar.sidebar-link>
-        @endcan
+        {{-- Section Modules Principaux --}}
+        <div class="nav-item mt-8 mb-4">
+            <h3 class="px-4 text-xs font-semibold text-slate-400 uppercase tracking-wider">Modules Enterprise</h3>
+        </div>
+
+        {{-- Gestion de la Flotte --}}
+        <div class="nav-item" x-data="{ expanded: {{ request()->routeIs('admin.vehicles.*', 'admin.assignments.*', 'admin.planning.*') ? 'true' : 'false' }} }">
+            <button @click="expanded = !expanded"
+                    class="w-full flex items-center px-4 py-3 rounded-xl text-white/90 hover:text-white hover:bg-gradient-to-r hover:from-green-500/20 hover:to-emerald-500/20 transition-all duration-300 group">
+                <div class="flex items-center justify-center w-10 h-10 rounded-lg bg-slate-700/50 group-hover:bg-slate-600/50 transition-all duration-300">
+                    <x-lucide-truck class="h-5 w-5" />
+                </div>
+                <div class="ml-3 flex-1 text-left">
+                    <span class="font-medium">Gestion Flotte</span>
+                    <div class="text-xs text-slate-400">Véhicules • Affectations</div>
+                </div>
+                <x-lucide-chevron-down class="h-4 w-4 transition-transform duration-200" :class="expanded ? 'rotate-180' : ''" />
+            </button>
+            <div x-show="expanded" x-collapse class="mt-2 ml-6 space-y-1">
+                <a href="{{ route('admin.vehicles.index') }}" class="flex items-center px-4 py-2 rounded-lg text-slate-300 hover:text-white hover:bg-slate-700/50 transition-all duration-200 {{ request()->routeIs('admin.vehicles.*') ? 'text-white bg-slate-700/50' : '' }}">
+                    <x-lucide-truck class="h-4 w-4 mr-3" />
+                    Véhicules
+                </a>
+                <a href="{{ route('admin.assignments.index') }}" class="flex items-center px-4 py-2 rounded-lg text-slate-300 hover:text-white hover:bg-slate-700/50 transition-all duration-200 {{ request()->routeIs('admin.assignments.*') ? 'text-white bg-slate-700/50' : '' }}">
+                    <x-lucide-clipboard-list class="h-4 w-4 mr-3" />
+                    Affectations
+                </a>
+                <a href="{{ route('admin.planning.index') }}" class="flex items-center px-4 py-2 rounded-lg text-slate-300 hover:text-white hover:bg-slate-700/50 transition-all duration-200 {{ request()->routeIs('admin.planning.*') ? 'text-white bg-slate-700/50' : '' }}">
+                    <x-lucide-calendar-days class="h-4 w-4 mr-3" />
+                    Planning
+                </a>
+            </div>
+        </div>
+
+        {{-- Chauffeurs --}}
+        <div class="nav-item" x-data="{ expanded: {{ request()->routeIs('admin.drivers.*') ? 'true' : 'false' }} }">
+            <button @click="expanded = !expanded"
+                    class="w-full flex items-center px-4 py-3 rounded-xl text-white/90 hover:text-white hover:bg-gradient-to-r hover:from-purple-500/20 hover:to-violet-500/20 transition-all duration-300 group">
+                <div class="flex items-center justify-center w-10 h-10 rounded-lg bg-slate-700/50 group-hover:bg-slate-600/50 transition-all duration-300">
+                    <x-lucide-users class="h-5 w-5" />
+                </div>
+                <div class="ml-3 flex-1 text-left">
+                    <span class="font-medium">Chauffeurs</span>
+                    <div class="text-xs text-slate-400">Personnel • Import/Export</div>
+                </div>
+                <x-lucide-chevron-down class="h-4 w-4 transition-transform duration-200" :class="expanded ? 'rotate-180' : ''" />
+            </button>
+            <div x-show="expanded" x-collapse class="mt-2 ml-6 space-y-1">
+                <a href="{{ route('admin.drivers.index') }}" class="flex items-center px-4 py-2 rounded-lg text-slate-300 hover:text-white hover:bg-slate-700/50 transition-all duration-200 {{ request()->routeIs('admin.drivers.index') ? 'text-white bg-slate-700/50' : '' }}">
+                    <x-lucide-list class="h-4 w-4 mr-3" />
+                    Liste des chauffeurs
+                </a>
+                <a href="{{ route('admin.drivers.import.show') }}" class="flex items-center px-4 py-2 rounded-lg text-slate-300 hover:text-white hover:bg-slate-700/50 transition-all duration-200 {{ request()->routeIs('admin.drivers.import.*') ? 'text-white bg-slate-700/50' : '' }}">
+                    <x-lucide-file-up class="h-4 w-4 mr-3" />
+                    Importer chauffeurs
+                </a>
+            </div>
+        </div>
 
 
-        {{-- Section Administration --}}
+        {{-- Fournisseurs Enterprise --}}
+        <a href="{{ route('admin.suppliers-enterprise.index') }}"
+           class="nav-item flex items-center px-4 py-3 rounded-xl text-white/90 hover:text-white hover:bg-gradient-to-r hover:from-teal-500/20 hover:to-cyan-500/20 transition-all duration-300 group {{ request()->routeIs('admin.suppliers-enterprise.*') ? 'bg-gradient-to-r from-teal-500/30 to-cyan-500/30 text-white border border-teal-500/30' : '' }}">
+            <div class="flex items-center justify-center w-10 h-10 rounded-lg {{ request()->routeIs('admin.suppliers-enterprise.*') ? 'bg-gradient-to-r from-teal-500 to-cyan-600' : 'bg-slate-700/50 group-hover:bg-slate-600/50' }} transition-all duration-300">
+                <x-lucide-building-2 class="h-5 w-5" />
+            </div>
+            <div class="ml-3 flex-1">
+                <span class="font-medium">Fournisseurs</span>
+                <div class="text-xs text-slate-400">Conformité DZ • Évaluations</div>
+            </div>
+            @if(request()->routeIs('admin.suppliers-enterprise.*'))
+                <div class="w-2 h-2 bg-teal-400 rounded-full animate-pulse"></div>
+            @endif
+        </a>
+
+        {{-- Dépenses Enterprise --}}
+        <a href="{{ route('admin.vehicle-expenses.index') }}"
+           class="nav-item flex items-center px-4 py-3 rounded-xl text-white/90 hover:text-white hover:bg-gradient-to-r hover:from-emerald-500/20 hover:to-green-500/20 transition-all duration-300 group {{ request()->routeIs('admin.vehicle-expenses.*', 'admin.expense-budgets.*') ? 'bg-gradient-to-r from-emerald-500/30 to-green-500/30 text-white border border-emerald-500/30' : '' }}">
+            <div class="flex items-center justify-center w-10 h-10 rounded-lg {{ request()->routeIs('admin.vehicle-expenses.*', 'admin.expense-budgets.*') ? 'bg-gradient-to-r from-emerald-500 to-green-600' : 'bg-slate-700/50 group-hover:bg-slate-600/50' }} transition-all duration-300 relative">
+                <x-lucide-credit-card class="h-5 w-5" />
+                @if(auth()->user()->unreadNotifications->where('type', 'like', '%Expense%')->count() > 0)
+                    <span class="absolute -top-2 -right-2 bg-emerald-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                        {{ auth()->user()->unreadNotifications->where('type', 'like', '%Expense%')->count() }}
+                    </span>
+                @endif
+            </div>
+            <div class="ml-3 flex-1">
+                <span class="font-medium">Dépenses</span>
+                <div class="text-xs text-slate-400">Budgets • Paiements • Rapports</div>
+            </div>
+            @if(request()->routeIs('admin.vehicle-expenses.*', 'admin.expense-budgets.*'))
+                <div class="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></div>
+            @endif
+        </a>
+
+        {{-- Maintenance Enterprise avec sous-menus --}}
+        <div class="nav-item" x-data="{ expanded: {{ request()->routeIs('admin.maintenance.*') ? 'true' : 'false' }} }">
+            <button @click="expanded = !expanded"
+                    class="w-full flex items-center px-4 py-3 rounded-xl text-white/90 hover:text-white hover:bg-gradient-to-r hover:from-indigo-500/20 hover:to-purple-500/20 transition-all duration-300 group {{ request()->routeIs('admin.maintenance.*') ? 'bg-gradient-to-r from-indigo-500/30 to-purple-500/30 text-white border border-indigo-500/30' : '' }}">
+                <div class="flex items-center justify-center w-10 h-10 rounded-lg {{ request()->routeIs('admin.maintenance.*') ? 'bg-gradient-to-r from-indigo-500 to-purple-600' : 'bg-slate-700/50 group-hover:bg-slate-600/50' }} transition-all duration-300 relative">
+                    <x-lucide-cog class="h-5 w-5" />
+                    @if(auth()->user()->unreadNotifications->where('type', 'like', '%Maintenance%')->count() > 0)
+                        <span class="absolute -top-2 -right-2 bg-indigo-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                            {{ auth()->user()->unreadNotifications->where('type', 'like', '%Maintenance%')->count() }}
+                        </span>
+                    @endif
+                </div>
+                <div class="ml-3 flex-1 text-left">
+                    <span class="font-medium">Maintenance</span>
+                    <div class="text-xs text-slate-400">Surveillance • Planification</div>
+                </div>
+                <x-lucide-chevron-down class="h-4 w-4 transition-transform duration-200" :class="expanded ? 'rotate-180' : ''" />
+            </button>
+            <div x-show="expanded" x-collapse class="mt-2 ml-6 space-y-1">
+                <a href="{{ route('admin.maintenance.surveillance.index') }}" class="flex items-center px-4 py-2 rounded-lg text-slate-300 hover:text-white hover:bg-slate-700/50 transition-all duration-200 {{ request()->routeIs('admin.maintenance.surveillance.*') ? 'text-white bg-slate-700/50' : '' }}">
+                    <x-lucide-monitor class="h-4 w-4 mr-3" />
+                    Surveillance
+                </a>
+                <a href="{{ route('admin.maintenance.schedules.index') }}" class="flex items-center px-4 py-2 rounded-lg text-slate-300 hover:text-white hover:bg-slate-700/50 transition-all duration-200 {{ request()->routeIs('admin.maintenance.schedules.*') ? 'text-white bg-slate-700/50' : '' }}">
+                    <x-lucide-calendar-check class="h-4 w-4 mr-3" />
+                    Planifications
+                </a>
+                <a href="{{ route('admin.repair-requests.index') }}" class="flex items-center px-4 py-2 rounded-lg text-slate-300 hover:text-white hover:bg-slate-700/50 transition-all duration-200 {{ request()->routeIs('admin.repair-requests.*') ? 'text-white bg-slate-700/50' : '' }}">
+                    <x-lucide-wrench class="h-4 w-4 mr-3" />
+                    Demandes de réparation
+                </a>
+                <a href="{{ route('admin.maintenance.operations.index') }}" class="flex items-center px-4 py-2 rounded-lg text-slate-300 hover:text-white hover:bg-slate-700/50 transition-all duration-200 {{ request()->routeIs('admin.maintenance.operations.*') ? 'text-white bg-slate-700/50' : '' }}">
+                    <x-lucide-tool class="h-4 w-4 mr-3" />
+                    Opérations
+                </a>
+            </div>
+        </div>
+
+        {{-- Section Système --}}
+        <div class="nav-item mt-8 mb-4">
+            <h3 class="px-4 text-xs font-semibold text-slate-400 uppercase tracking-wider">Système & Configuration</h3>
+        </div>
+
+        {{-- Documents --}}
+        <div class="nav-item" x-data="{ expanded: {{ request()->routeIs('admin.documents.*', 'admin.document-categories.*') ? 'true' : 'false' }} }">
+            <button @click="expanded = !expanded"
+                    class="w-full flex items-center px-4 py-3 rounded-xl text-white/90 hover:text-white hover:bg-gradient-to-r hover:from-slate-500/20 hover:to-gray-500/20 transition-all duration-300 group">
+                <div class="flex items-center justify-center w-10 h-10 rounded-lg bg-slate-700/50 group-hover:bg-slate-600/50 transition-all duration-300">
+                    <x-lucide-folder-open class="h-5 w-5" />
+                </div>
+                <div class="ml-3 flex-1 text-left">
+                    <span class="font-medium">Documents</span>
+                    <div class="text-xs text-slate-400">Fichiers • Catégories</div>
+                </div>
+                <x-lucide-chevron-down class="h-4 w-4 transition-transform duration-200" :class="expanded ? 'rotate-180' : ''" />
+            </button>
+            <div x-show="expanded" x-collapse class="mt-2 ml-6 space-y-1">
+                <a href="{{ route('admin.documents.index') }}" class="flex items-center px-4 py-2 rounded-lg text-slate-300 hover:text-white hover:bg-slate-700/50 transition-all duration-200 {{ request()->routeIs('admin.documents.*') ? 'text-white bg-slate-700/50' : '' }}">
+                    <x-lucide-file-text class="h-4 w-4 mr-3" />
+                    Liste des Documents
+                </a>
+                <a href="{{ route('admin.document-categories.index') }}" class="flex items-center px-4 py-2 rounded-lg text-slate-300 hover:text-white hover:bg-slate-700/50 transition-all duration-200 {{ request()->routeIs('admin.document-categories.*') ? 'text-white bg-slate-700/50' : '' }}">
+                    <x-lucide-folder-cog class="h-4 w-4 mr-3" />
+                    Catégories
+                </a>
+            </div>
+        </div>
+
+        {{-- Administration --}}
         @hasanyrole('Super Admin|Admin')
-            <x-sidebar.sidebar-group title="Administration" :active="request()->routeIs('admin.organizations.*') || request()->routeIs('admin.users.*') || request()->routeIs('admin.roles.*')">
-                <x-slot name="icon">
-                    <x-lucide-settings stroke-width="1.5" />
-                </x-slot>
+        <div class="nav-item" x-data="{ expanded: {{ request()->routeIs('admin.organizations.*', 'admin.users.*', 'admin.roles.*') ? 'true' : 'false' }} }">
+            <button @click="expanded = !expanded"
+                    class="w-full flex items-center px-4 py-3 rounded-xl text-white/90 hover:text-white hover:bg-gradient-to-r hover:from-rose-500/20 hover:to-pink-500/20 transition-all duration-300 group">
+                <div class="flex items-center justify-center w-10 h-10 rounded-lg bg-slate-700/50 group-hover:bg-slate-600/50 transition-all duration-300">
+                    <x-lucide-shield-check class="h-5 w-5" />
+                </div>
+                <div class="ml-3 flex-1 text-left">
+                    <span class="font-medium">Administration</span>
+                    <div class="text-xs text-slate-400">Utilisateurs • Permissions</div>
+                </div>
+                <x-lucide-chevron-down class="h-4 w-4 transition-transform duration-200" :class="expanded ? 'rotate-180' : ''" />
+            </button>
+            <div x-show="expanded" x-collapse class="mt-2 ml-6 space-y-1">
                 @role('Super Admin')
-                <x-sidebar.sidebar-sub-link :href="route('admin.organizations.index')" :active="request()->routeIs('admin.organizations.*')">
-                    <x-slot name="icon"><x-lucide-building-2 stroke-width="1.5" /></x-slot>
-                    {{ __('Organisations') }}
-                </x-sidebar.sidebar-sub-link>
+                <a href="{{ route('admin.organizations.index') }}" class="flex items-center px-4 py-2 rounded-lg text-slate-300 hover:text-white hover:bg-slate-700/50 transition-all duration-200 {{ request()->routeIs('admin.organizations.*') ? 'text-white bg-slate-700/50' : '' }}">
+                    <x-lucide-building-2 class="h-4 w-4 mr-3" />
+                    Organisations
+                </a>
                 @endrole
-                <x-sidebar.sidebar-sub-link :href="route('admin.users.index')" :active="request()->routeIs('admin.users.*')">
-                    <x-slot name="icon"><x-lucide-user-cog stroke-width="1.5" /></x-slot>
-                    {{ __('Utilisateurs') }}
-                </x-sidebar.sidebar-sub-link>
-                <x-sidebar.sidebar-sub-link :href="route('admin.roles.index')" :active="request()->routeIs('admin.roles.*')">
-                    <x-slot name="icon"><x-lucide-key-round stroke-width="1.5" /></x-slot>
-                    {{ __('Rôles') }}
-                </x-sidebar.sidebar-sub-link>
-            </x-sidebar.sidebar-group>
+                <a href="{{ route('admin.users.index') }}" class="flex items-center px-4 py-2 rounded-lg text-slate-300 hover:text-white hover:bg-slate-700/50 transition-all duration-200 {{ request()->routeIs('admin.users.*') ? 'text-white bg-slate-700/50' : '' }}">
+                    <x-lucide-user-cog class="h-4 w-4 mr-3" />
+                    Utilisateurs
+                </a>
+                <a href="{{ route('admin.roles.index') }}" class="flex items-center px-4 py-2 rounded-lg text-slate-300 hover:text-white hover:bg-slate-700/50 transition-all duration-200 {{ request()->routeIs('admin.roles.*') ? 'text-white bg-slate-700/50' : '' }}">
+                    <x-lucide-key-round class="h-4 w-4 mr-3" />
+                    Rôles & Permissions
+                </a>
+            </div>
+        </div>
         @endhasanyrole
     </div>
 
-    {{-- Section Utilisateur / Déconnexion --}}
-    <div class="mt-auto shrink-0 p-4 border-t border-gray-200">
+    {{-- Section Utilisateur Enterprise --}}
+    <div class="mt-auto shrink-0 p-4 border-t border-slate-700/50">
         <div x-data="{ open: false }" @keydown.escape.window="open = false" @click.away="open = false" class="relative">
-            <button @click="open = !open" class="w-full flex-1 flex items-center space-x-3 group p-2 rounded-lg hover:bg-gray-100">
-                <span class="inline-block h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center">
-                     <x-lucide-user-round class="h-8 w-8 text-gray-500" stroke-width="1.5"/>
-                </span>
-                <div class="flex-1 text-left">
-                    <p class="text-sm font-medium text-gray-700 group-hover:text-gray-900 truncate">{{ Auth::user()->name }}</p>
-                    <p class="text-xs text-gray-500">Options</p>
+            <button @click="open = !open" class="w-full flex items-center space-x-3 group p-3 rounded-xl hover:bg-slate-700/30 transition-all duration-300">
+                <div class="relative">
+                    <div class="h-12 w-12 rounded-full bg-gradient-to-r from-blue-500 to-indigo-600 flex items-center justify-center shadow-lg">
+                        <span class="text-white font-bold text-lg">{{ strtoupper(substr(Auth::user()->name, 0, 2)) }}</span>
+                    </div>
+                    <div class="absolute -bottom-1 -right-1 h-4 w-4 bg-green-500 rounded-full border-2 border-slate-800"></div>
                 </div>
-                <x-lucide-chevron-up class="h-5 w-5 text-gray-400 shrink-0" stroke-width="1.5"/>
+                <div class="flex-1 text-left">
+                    <p class="text-sm font-semibold text-white truncate">{{ Auth::user()->name }}</p>
+                    <div class="flex items-center space-x-2">
+                        <p class="text-xs text-slate-300">{{ Auth::user()->roles->first()?->name ?? 'Utilisateur' }}</p>
+                        @if(Auth::user()->organization)
+                            <span class="text-xs text-slate-400">•</span>
+                            <p class="text-xs text-slate-400 truncate">{{ Auth::user()->organization->name }}</p>
+                        @endif
+                    </div>
+                </div>
+                <x-lucide-chevron-up class="h-4 w-4 text-slate-400 shrink-0 transition-transform duration-200" :class="open ? 'rotate-180' : ''" />
             </button>
 
             <div x-show="open"
-                 x-transition:enter="transition ease-out duration-100"
+                 x-transition:enter="transition ease-out duration-200"
                  x-transition:enter-start="transform opacity-0 scale-95"
                  x-transition:enter-end="transform opacity-100 scale-100"
-                 x-transition:leave="transition ease-in duration-75"
+                 x-transition:leave="transition ease-in duration-150"
                  x-transition:leave-start="transform opacity-100 scale-100"
                  x-transition:leave-end="transform opacity-0 scale-95"
-                 class="absolute bottom-full left-0 right-0 mb-2 w-full origin-bottom z-10"
+                 class="absolute bottom-full left-0 right-0 mb-2 w-full origin-bottom z-50"
                  style="display: none;">
-                <div class="bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5 p-1">
-                    <a href="{{ route('profile.edit') }}" class="flex items-center w-full px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-md">
-                        <x-lucide-user class="mr-3 h-5 w-5" stroke-width="1.5"/>
-                        Mon Profil
-                    </a>
-                    <form method="POST" action="{{ route('logout') }}">
-                        @csrf
-                        <a href="{{ route('logout') }}" onclick="event.preventDefault(); this.closest('form').submit();" class="flex items-center w-full px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-md">
-                            <x-lucide-log-out class="mr-3 h-5 w-5" stroke-width="1.5"/>
-                            Déconnexion
+                <div class="bg-slate-800 rounded-xl shadow-2xl ring-1 ring-slate-600/50 p-2 backdrop-blur-sm border border-slate-600/20">
+                    <div class="space-y-1">
+                        <a href="{{ route('profile.edit') }}"
+                           class="flex items-center w-full px-4 py-3 text-sm text-slate-300 hover:text-white hover:bg-slate-700/50 rounded-lg transition-all duration-200 group">
+                            <div class="flex items-center justify-center w-8 h-8 rounded-lg bg-slate-700/50 group-hover:bg-blue-500/20 transition-all duration-200 mr-3">
+                                <x-lucide-user class="h-4 w-4" />
+                            </div>
+                            <div class="flex-1">
+                                <div class="font-medium">Mon Profil</div>
+                                <div class="text-xs text-slate-400">Paramètres du compte</div>
+                            </div>
                         </a>
-                    </form>
+
+                        <a href="{{ route('admin.notifications.index') }}"
+                           class="flex items-center w-full px-4 py-3 text-sm text-slate-300 hover:text-white hover:bg-slate-700/50 rounded-lg transition-all duration-200 group">
+                            <div class="flex items-center justify-center w-8 h-8 rounded-lg bg-slate-700/50 group-hover:bg-yellow-500/20 transition-all duration-200 mr-3 relative">
+                                <x-lucide-bell class="h-4 w-4" />
+                                @if(auth()->user()->unreadNotifications->count() > 0)
+                                    <span class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center">
+                                        {{ auth()->user()->unreadNotifications->count() }}
+                                    </span>
+                                @endif
+                            </div>
+                            <div class="flex-1">
+                                <div class="font-medium">Notifications</div>
+                                <div class="text-xs text-slate-400">{{ auth()->user()->unreadNotifications->count() }} non lues</div>
+                            </div>
+                        </a>
+
+                        <div class="my-2 border-t border-slate-600/30"></div>
+
+                        <form method="POST" action="{{ route('logout') }}">
+                            @csrf
+                            <button type="submit"
+                                    class="flex items-center w-full px-4 py-3 text-sm text-slate-300 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-all duration-200 group">
+                                <div class="flex items-center justify-center w-8 h-8 rounded-lg bg-slate-700/50 group-hover:bg-red-500/20 transition-all duration-200 mr-3">
+                                    <x-lucide-log-out class="h-4 w-4" />
+                                </div>
+                                <div class="flex-1 text-left">
+                                    <div class="font-medium">Déconnexion</div>
+                                    <div class="text-xs text-slate-400">Terminer la session</div>
+                                </div>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {{-- Statistiques rapides utilisateur --}}
+        <div class="mt-4 p-3 bg-slate-800/50 rounded-xl border border-slate-600/30">
+            <div class="grid grid-cols-2 gap-3 text-center">
+                <div>
+                    <div class="text-lg font-bold text-blue-400">{{ auth()->user()->vehicles_count ?? 0 }}</div>
+                    <div class="text-xs text-slate-400">Véhicules</div>
+                </div>
+                <div>
+                    <div class="text-lg font-bold text-emerald-400">{{ auth()->user()->assignments_count ?? 0 }}</div>
+                    <div class="text-xs text-slate-400">Affectations</div>
                 </div>
             </div>
         </div>
     </div>
 </nav>
+
+<style>
+    /* Styles pour le menu enterprise */
+    .nav-item:hover {
+        transform: translateX(2px);
+    }
+
+    .nav-item .animate-pulse {
+        animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    }
+</style>

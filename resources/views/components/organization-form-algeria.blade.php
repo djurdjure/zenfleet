@@ -80,10 +80,10 @@
                         />
 
                         <x-algeria-form-field
-                            name="primary_email"
+                            name="email"
                             label="Email Principal"
                             type="email"
-                            :value="old('primary_email', $organization?->primary_email ?? '')"
+                            :value="old('email', $organization?->email ?? '')"
                             required="true"
                             icon="fa-envelope"
                             placeholder="contact@entreprise.dz"

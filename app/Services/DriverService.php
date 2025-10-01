@@ -14,23 +14,24 @@ class DriverService
 
     public function createDriver(array $data): Driver
     {
-        if (isset($data['photo'])) {
-            $data['photo_path'] = $data['photo']->store('drivers/photos', 'public');
-            unset($data['photo']);
+        if (isset($data['photo']) && $data['photo'] instanceof \Illuminate\Http\UploadedFile) {
+            $photoPath = $data['photo']->store('drivers/photos', 'public');
+            $data['photo'] = $photoPath;
         }
         return $this->driverRepository->create($data);
     }
 
-    public function updateDriver(Driver $driver, array $data): bool
+    public function updateDriver(Driver $driver, array $data): Driver
     {
-        if (isset($data['photo'])) {
-            if ($driver->photo_path) {
-                Storage::disk('public')->delete($driver->photo_path);
+        if (isset($data['photo']) && $data['photo'] instanceof \Illuminate\Http\UploadedFile) {
+            if ($driver->photo) {
+                Storage::disk('public')->delete($driver->photo);
             }
-            $data['photo_path'] = $data['photo']->store('drivers/photos', 'public');
-            unset($data['photo']);
+            $photoPath = $data['photo']->store('drivers/photos', 'public');
+            $data['photo'] = $photoPath;
         }
-        return $this->driverRepository->update($driver, $data);
+        $this->driverRepository->update($driver, $data);
+        return $driver->fresh(); // Retourne l'objet Driver mis à jour
     }
 
     public function archiveDriver(Driver $driver): bool

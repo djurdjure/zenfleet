@@ -20,16 +20,32 @@ class StoreVehicleRequest extends FormRequest
      */
     public function rules(): array
     {
+        $organizationId = auth()->user()->organization_id;
+
         return [
-            'registration_plate' => ['required', 'string', 'max:50', Rule::unique('vehicles')->whereNull('deleted_at')],
-            'vin' => ['nullable', 'string', 'size:17', Rule::unique('vehicles')->whereNull('deleted_at')],
-            'brand' => ['required', 'string', 'max:100'],
-            'model' => ['required', 'string', 'max:100'],
+            'registration_plate' => [
+                'required',
+                'string',
+                'max:50',
+                Rule::unique('vehicles')
+                    ->where('organization_id', $organizationId)
+                    ->whereNull('deleted_at')
+            ],
+            'vin' => [
+                'nullable',
+                'string',
+                'size:17',
+                Rule::unique('vehicles')
+                    ->where('organization_id', $organizationId)
+                    ->whereNull('deleted_at')
+            ],
+            'brand' => ['nullable', 'string', 'max:100'],
+            'model' => ['nullable', 'string', 'max:100'],
             'color' => ['nullable', 'string', 'max:50'],
-            'vehicle_type_id' => ['required', 'exists:vehicle_types,id'],
-            'fuel_type_id' => ['required', 'exists:fuel_types,id'],
-            'transmission_type_id' => ['required', 'exists:transmission_types,id'],
-            'status_id' => ['required', 'exists:vehicle_statuses,id'],
+            'vehicle_type_id' => ['nullable', 'exists:vehicle_types,id'],
+            'fuel_type_id' => ['nullable', 'exists:fuel_types,id'],
+            'transmission_type_id' => ['nullable', 'exists:transmission_types,id'],
+            'status_id' => ['nullable', 'exists:vehicle_statuses,id'],
             'manufacturing_year' => ['nullable', 'integer', 'digits:4', 'min:1950', 'max:'.(date('Y') + 1)],
             'acquisition_date' => ['nullable', 'date'],
             'purchase_price' => ['nullable', 'numeric', 'min:0'],

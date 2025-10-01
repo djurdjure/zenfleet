@@ -147,6 +147,7 @@ Route::middleware(['auth', 'verified'])
         // Utilisateurs avec actions avancées
         Route::resource('users', UserController::class);
         Route::prefix('users')->name('users.')->group(function () {
+            Route::get('{user}/permissions', fn($user) => view('admin.users.permissions', ['userId' => $user]))->name('permissions');
             Route::post('{user}/assign-role', [UserController::class, 'assignRole'])->name('assign-role');
             Route::post('{user}/toggle-status', [UserController::class, 'toggleStatus'])->name('toggle-status');
             Route::post('{user}/reset-password', [UserController::class, 'resetPassword'])->name('reset-password');
@@ -231,20 +232,153 @@ Route::middleware(['auth', 'verified'])
             // Route::get('{driver}/performance', [DriverController::class, 'performance'])->name('performance');
         });
 
-        // 🔄 Affectations Avancées
+        // 🔄 Affectations Enterprise-Grade
         Route::resource('assignments', AssignmentController::class);
         Route::prefix('assignments')->name('assignments.')->group(function () {
             Route::patch('{assignment}/end', [AssignmentController::class, 'end'])->name('end');
             Route::get('{assignment}/details', [AssignmentController::class, 'details'])->name('details');
             Route::post('{assignment}/extend', [AssignmentController::class, 'extend'])->name('extend');
             Route::get('calendar', [AssignmentController::class, 'calendar'])->name('calendar');
+            Route::get('gantt', [AssignmentController::class, 'gantt'])->name('gantt');
             Route::get('export', [AssignmentController::class, 'export'])->name('export');
+            Route::get('stats', [AssignmentController::class, 'stats'])->name('stats');
         });
 
-        // 🏪 Fournisseurs et Catégories
+        // 🚗 API pour les ressources disponibles (via AssignmentController)
+        Route::get('vehicles/available', [AssignmentController::class, 'availableVehicles'])->name('vehicles.available');
+        Route::get('drivers/available', [AssignmentController::class, 'availableDrivers'])->name('drivers.available');
+
+        // 🏪 Fournisseurs et Catégories - LEGACY (maintenu pour compatibilité)
         Route::resource('suppliers', SupplierController::class);
         Route::get('suppliers/export', [SupplierController::class, 'export'])->name('suppliers.export');
         Route::resource('supplier-categories', SupplierCategoryController::class);
+
+        /*
+        |--------------------------------------------------------------------------
+        | 🔧 MODULES ENTERPRISE - RÉPARATIONS, FOURNISSEURS, DÉPENSES
+        |--------------------------------------------------------------------------
+        | Modules développés avec architecture enterprise-grade
+        | - Workflow validation 2 niveaux pour réparations
+        | - Conformité DZ totale pour fournisseurs
+        | - Traçabilité maximale pour dépenses
+        */
+
+        // 🔧 MODULE RÉPARATIONS - Workflow Validation 2 Niveaux
+        Route::prefix('repair-requests')->name('repair-requests.')->group(function () {
+            // Dashboard principal avec vue Kanban
+            Route::get('/', [\App\Http\Controllers\Admin\RepairRequestController::class, 'index'])->name('index');
+            Route::get('/dashboard', [\App\Http\Controllers\Admin\RepairRequestController::class, 'dashboard'])->name('dashboard');
+
+            // CRUD operations
+            Route::get('/create', [\App\Http\Controllers\Admin\RepairRequestController::class, 'create'])->name('create');
+            Route::post('/', [\App\Http\Controllers\Admin\RepairRequestController::class, 'store'])->name('store');
+            Route::get('/{repairRequest}', [\App\Http\Controllers\Admin\RepairRequestController::class, 'show'])->name('show');
+            Route::get('/{repairRequest}/edit', [\App\Http\Controllers\Admin\RepairRequestController::class, 'edit'])->name('edit');
+            Route::put('/{repairRequest}', [\App\Http\Controllers\Admin\RepairRequestController::class, 'update'])->name('update');
+            Route::delete('/{repairRequest}', [\App\Http\Controllers\Admin\RepairRequestController::class, 'destroy'])->name('destroy');
+
+            // Workflow actions - Niveau 1 : Superviseur
+            Route::post('/{repairRequest}/approve', [\App\Http\Controllers\Admin\RepairRequestController::class, 'approve'])->name('approve');
+            Route::post('/{repairRequest}/reject', [\App\Http\Controllers\Admin\RepairRequestController::class, 'reject'])->name('reject');
+
+            // Workflow actions - Niveau 2 : Manager
+            Route::post('/{repairRequest}/validate', [\App\Http\Controllers\Admin\RepairRequestController::class, 'validateRepairRequest'])->name('validate');
+            Route::post('/{repairRequest}/reject-manager', [\App\Http\Controllers\Admin\RepairRequestController::class, 'rejectByManager'])->name('reject-manager');
+
+            // Gestion des travaux
+            Route::post('/{repairRequest}/assign-supplier', [\App\Http\Controllers\Admin\RepairRequestController::class, 'assignSupplier'])->name('assign-supplier');
+            Route::post('/{repairRequest}/start-work', [\App\Http\Controllers\Admin\RepairRequestController::class, 'startWork'])->name('start-work');
+            Route::post('/{repairRequest}/complete-work', [\App\Http\Controllers\Admin\RepairRequestController::class, 'completeWork'])->name('complete-work');
+            Route::post('/{repairRequest}/cancel', [\App\Http\Controllers\Admin\RepairRequestController::class, 'cancel'])->name('cancel');
+        });
+
+        // 🏢 MODULE FOURNISSEURS ENTERPRISE - Conformité DZ Totale
+        // TODO: Implémenter SupplierEnterpriseController
+        /*
+        Route::prefix('suppliers-enterprise')->name('suppliers-enterprise.')->group(function () {
+            Route::get('/', [\App\Http\Controllers\Admin\SupplierEnterpriseController::class, 'index'])->name('index');
+            Route::get('/create', [\App\Http\Controllers\Admin\SupplierEnterpriseController::class, 'create'])->name('create');
+            Route::post('/', [\App\Http\Controllers\Admin\SupplierEnterpriseController::class, 'store'])->name('store');
+            Route::get('/{supplier}', [\App\Http\Controllers\Admin\SupplierEnterpriseController::class, 'show'])->name('show');
+            Route::get('/{supplier}/edit', [\App\Http\Controllers\Admin\SupplierEnterpriseController::class, 'edit'])->name('edit');
+            Route::put('/{supplier}', [\App\Http\Controllers\Admin\SupplierEnterpriseController::class, 'update'])->name('update');
+            Route::delete('/{supplier}', [\App\Http\Controllers\Admin\SupplierEnterpriseController::class, 'destroy'])->name('destroy');
+
+            // Actions spécialisées
+            Route::post('/{supplier}/blacklist', [\App\Http\Controllers\Admin\SupplierEnterpriseController::class, 'blacklist'])->name('blacklist');
+            Route::post('/{supplier}/unblacklist', [\App\Http\Controllers\Admin\SupplierEnterpriseController::class, 'unblacklist'])->name('unblacklist');
+            Route::post('/{supplier}/toggle-preferred', [\App\Http\Controllers\Admin\SupplierEnterpriseController::class, 'togglePreferred'])->name('toggle-preferred');
+            Route::post('/{supplier}/rate', [\App\Http\Controllers\Admin\SupplierEnterpriseController::class, 'rate'])->name('rate');
+
+            // Export et validation DZ
+            Route::get('/export', [\App\Http\Controllers\Admin\SupplierEnterpriseController::class, 'export'])->name('export');
+            Route::post('/validate-nif', [\App\Http\Controllers\Admin\SupplierEnterpriseController::class, 'validateNIF'])->name('validate-nif');
+            Route::post('/validate-rc', [\App\Http\Controllers\Admin\SupplierEnterpriseController::class, 'validateRC'])->name('validate-rc');
+
+            // Gestion des évaluations
+            Route::prefix('{supplier}/ratings')->name('ratings.')->group(function () {
+                Route::get('/', [\App\Http\Controllers\Admin\SupplierRatingController::class, 'index'])->name('index');
+                Route::post('/', [\App\Http\Controllers\Admin\SupplierRatingController::class, 'store'])->name('store');
+                Route::delete('/{rating}', [\App\Http\Controllers\Admin\SupplierRatingController::class, 'destroy'])->name('destroy');
+            });
+        });
+        */
+
+        // 💰 MODULE DÉPENSES - Traçabilité Maximale
+        // TODO: VehicleExpenseController needs to be created
+        /*
+        Route::prefix('vehicle-expenses')->name('vehicle-expenses.')->group(function () {
+            // Dashboard principal avec analytics
+            Route::get('/', [\App\Http\Controllers\Admin\VehicleExpenseController::class, 'index'])->name('index');
+            Route::get('/dashboard', [\App\Http\Controllers\Admin\VehicleExpenseController::class, 'dashboard'])->name('dashboard');
+
+            // CRUD operations
+            Route::get('/create', [\App\Http\Controllers\Admin\VehicleExpenseController::class, 'create'])->name('create');
+            Route::post('/', [\App\Http\Controllers\Admin\VehicleExpenseController::class, 'store'])->name('store');
+            Route::get('/{expense}', [\App\Http\Controllers\Admin\VehicleExpenseController::class, 'show'])->name('show');
+            Route::get('/{expense}/edit', [\App\Http\Controllers\Admin\VehicleExpenseController::class, 'edit'])->name('edit');
+            Route::put('/{expense}', [\App\Http\Controllers\Admin\VehicleExpenseController::class, 'update'])->name('update');
+            Route::delete('/{expense}', [\App\Http\Controllers\Admin\VehicleExpenseController::class, 'destroy'])->name('destroy');
+
+            // Workflow d'approbation
+            Route::post('/{expense}/request-approval', [\App\Http\Controllers\Admin\VehicleExpenseController::class, 'requestApproval'])->name('request-approval');
+            Route::post('/{expense}/approve', [\App\Http\Controllers\Admin\VehicleExpenseController::class, 'approve'])->name('approve');
+            Route::post('/{expense}/reject-approval', [\App\Http\Controllers\Admin\VehicleExpenseController::class, 'rejectApproval'])->name('reject-approval');
+
+            // Gestion des paiements
+            Route::post('/{expense}/mark-paid', [\App\Http\Controllers\Admin\VehicleExpenseController::class, 'markAsPaid'])->name('mark-paid');
+            Route::post('/{expense}/audit', [\App\Http\Controllers\Admin\VehicleExpenseController::class, 'audit'])->name('audit');
+
+            // Import/Export et récurrence
+            Route::get('/import', [\App\Http\Controllers\Admin\VehicleExpenseController::class, 'showImportForm'])->name('import.show');
+            Route::post('/import', [\App\Http\Controllers\Admin\VehicleExpenseController::class, 'handleImport'])->name('import.handle');
+            Route::get('/export', [\App\Http\Controllers\Admin\VehicleExpenseController::class, 'export'])->name('export');
+            Route::post('/create-recurring', [\App\Http\Controllers\Admin\VehicleExpenseController::class, 'createRecurring'])->name('create-recurring');
+
+            // Analytics et rapports
+            Route::get('/analytics/fuel-efficiency', [\App\Http\Controllers\Admin\VehicleExpenseController::class, 'fuelEfficiencyReport'])->name('analytics.fuel-efficiency');
+            Route::get('/analytics/cost-trends', [\App\Http\Controllers\Admin\VehicleExpenseController::class, 'costTrendsReport'])->name('analytics.cost-trends');
+            Route::get('/analytics/budget-utilization', [\App\Http\Controllers\Admin\VehicleExpenseController::class, 'budgetUtilizationReport'])->name('analytics.budget-utilization');
+        });
+        */
+
+        // 📊 GESTION DES BUDGETS DE DÉPENSES
+        // TODO: ExpenseBudgetController needs to be created
+        /*
+        Route::prefix('expense-budgets')->name('expense-budgets.')->group(function () {
+            Route::get('/', [\App\Http\Controllers\Admin\ExpenseBudgetController::class, 'index'])->name('index');
+            Route::get('/create', [\App\Http\Controllers\Admin\ExpenseBudgetController::class, 'create'])->name('create');
+            Route::post('/', [\App\Http\Controllers\Admin\ExpenseBudgetController::class, 'store'])->name('store');
+            Route::get('/{budget}', [\App\Http\Controllers\Admin\ExpenseBudgetController::class, 'show'])->name('show');
+            Route::get('/{budget}/edit', [\App\Http\Controllers\Admin\ExpenseBudgetController::class, 'edit'])->name('edit');
+            Route::put('/{budget}', [\App\Http\Controllers\Admin\ExpenseBudgetController::class, 'update'])->name('update');
+            Route::delete('/{budget}', [\App\Http\Controllers\Admin\ExpenseBudgetController::class, 'destroy'])->name('destroy');
+
+            // Actions spéciales
+            Route::post('/{budget}/recalculate', [\App\Http\Controllers\Admin\ExpenseBudgetController::class, 'recalculate'])->name('recalculate');
+            Route::get('/alerts/overruns', [\App\Http\Controllers\Admin\ExpenseBudgetController::class, 'budgetOverruns'])->name('alerts.overruns');
+        });
+        */
 
         // 📄 Documents et Catégories
         Route::resource('documents', DocumentController::class);
@@ -259,29 +393,163 @@ Route::middleware(['auth', 'verified'])
 
     /*
     |--------------------------------------------------------------------------
-    | 🔧 MAINTENANCE - SUPERVISEURS INCLUS
+    | 🔧 MODULE MAINTENANCE ENTERPRISE-GRADE - ROUTES INTÉGRÉES
+    |--------------------------------------------------------------------------
+    | Architecture corrigée : Routes maintenance directement intégrées
+    | pour éviter les conflits de préfixe et assurer le bon routage
+    */
+
+    // 🚨 SYSTÈME D'ALERTES ENTERPRISE
+    Route::prefix('alerts')->name('alerts.')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Admin\AlertController::class, 'index'])->name('index');
+        Route::get('/api', [\App\Http\Controllers\Admin\AlertController::class, 'getAlertsApi'])->name('api');
+        Route::post('/mark-as-read', [\App\Http\Controllers\Admin\AlertController::class, 'markAsRead'])->name('mark-as-read');
+        Route::get('/export', [\App\Http\Controllers\Admin\AlertController::class, 'export'])->name('export');
+    });
+
+    // 💰 MODULE DÉPENSES ENTERPRISE-GRADE
+    Route::prefix('expenses')->name('expenses.')->group(function () {
+        // Dashboard et liste
+        Route::get('/', [\App\Http\Controllers\Admin\ExpenseController::class, 'index'])->name('index');
+        Route::get('/analytics', [\App\Http\Controllers\Admin\ExpenseController::class, 'analytics'])->name('analytics');
+
+        // CRUD operations
+        Route::get('/create', [\App\Http\Controllers\Admin\ExpenseController::class, 'create'])->name('create');
+        Route::post('/', [\App\Http\Controllers\Admin\ExpenseController::class, 'store'])->name('store');
+        Route::get('/{expense}', [\App\Http\Controllers\Admin\ExpenseController::class, 'show'])->name('show');
+        Route::get('/{expense}/edit', [\App\Http\Controllers\Admin\ExpenseController::class, 'edit'])->name('edit');
+        Route::put('/{expense}', [\App\Http\Controllers\Admin\ExpenseController::class, 'update'])->name('update');
+        Route::delete('/{expense}', [\App\Http\Controllers\Admin\ExpenseController::class, 'destroy'])->name('destroy');
+
+        // Actions spécialisées
+        Route::post('/{expense}/approve', [\App\Http\Controllers\Admin\ExpenseController::class, 'approve'])->name('approve');
+        Route::post('/{expense}/reject', [\App\Http\Controllers\Admin\ExpenseController::class, 'reject'])->name('reject');
+        Route::get('/{expense}/receipt', [\App\Http\Controllers\Admin\ExpenseController::class, 'downloadReceipt'])->name('receipt');
+
+        // Export et rapports
+        Route::get('/export/excel', [\App\Http\Controllers\Admin\ExpenseController::class, 'export'])->name('export');
+        Route::get('/reports/summary', [\App\Http\Controllers\Admin\ExpenseController::class, 'reportSummary'])->name('reports.summary');
+    });
+
+    // 🔧 Dashboard Maintenance Principal
+    Route::prefix('maintenance')->name('maintenance.')->group(function () {
+        // Dashboard principal et overview
+        Route::get('/', [\App\Http\Controllers\Admin\MaintenanceController::class, 'dashboard'])->name('dashboard');
+        Route::get('/overview', [\App\Http\Controllers\Admin\MaintenanceController::class, 'overview'])->name('overview');
+
+        // 📊 Sous-menu Surveillance
+        Route::prefix('surveillance')->name('surveillance.')->group(function () {
+            Route::get('/', [\App\Http\Controllers\Admin\Maintenance\SurveillanceController::class, 'index'])->name('index');
+        });
+
+        // 📋 Gestion des Types de Maintenance
+        Route::prefix('types')->name('types.')->group(function () {
+            Route::get('/', [\App\Http\Controllers\Admin\MaintenanceTypeController::class, 'index'])->name('index');
+            Route::get('/create', [\App\Http\Controllers\Admin\MaintenanceTypeController::class, 'create'])->name('create');
+            Route::post('/', [\App\Http\Controllers\Admin\MaintenanceTypeController::class, 'store'])->name('store');
+            Route::get('/{maintenanceType}', [\App\Http\Controllers\Admin\MaintenanceTypeController::class, 'show'])->name('show');
+            Route::get('/{maintenanceType}/edit', [\App\Http\Controllers\Admin\MaintenanceTypeController::class, 'edit'])->name('edit');
+            Route::put('/{maintenanceType}', [\App\Http\Controllers\Admin\MaintenanceTypeController::class, 'update'])->name('update');
+            Route::delete('/{maintenanceType}', [\App\Http\Controllers\Admin\MaintenanceTypeController::class, 'destroy'])->name('destroy');
+        });
+
+        // 🏢 Gestion des Fournisseurs de Maintenance
+        Route::prefix('providers')->name('providers.')->group(function () {
+            Route::get('/', [\App\Http\Controllers\Admin\MaintenanceProviderController::class, 'index'])->name('index');
+            Route::get('/create', [\App\Http\Controllers\Admin\MaintenanceProviderController::class, 'create'])->name('create');
+            Route::post('/', [\App\Http\Controllers\Admin\MaintenanceProviderController::class, 'store'])->name('store');
+            Route::get('/{provider}', [\App\Http\Controllers\Admin\MaintenanceProviderController::class, 'show'])->name('show');
+            Route::get('/{provider}/edit', [\App\Http\Controllers\Admin\MaintenanceProviderController::class, 'edit'])->name('edit');
+            Route::put('/{provider}', [\App\Http\Controllers\Admin\MaintenanceProviderController::class, 'update'])->name('update');
+            Route::delete('/{provider}', [\App\Http\Controllers\Admin\MaintenanceProviderController::class, 'destroy'])->name('destroy');
+        });
+
+        // 📅 Gestion des Planifications de Maintenance
+        Route::prefix('schedules')->name('schedules.')->group(function () {
+            Route::get('/', [\App\Http\Controllers\Admin\MaintenanceScheduleController::class, 'index'])->name('index');
+            Route::get('/create', [\App\Http\Controllers\Admin\MaintenanceScheduleController::class, 'create'])->name('create');
+            Route::post('/', [\App\Http\Controllers\Admin\MaintenanceScheduleController::class, 'store'])->name('store');
+            Route::get('/{schedule}', [\App\Http\Controllers\Admin\MaintenanceScheduleController::class, 'show'])->name('show');
+            Route::get('/{schedule}/edit', [\App\Http\Controllers\Admin\MaintenanceScheduleController::class, 'edit'])->name('edit');
+            Route::put('/{schedule}', [\App\Http\Controllers\Admin\MaintenanceScheduleController::class, 'update'])->name('update');
+            Route::delete('/{schedule}', [\App\Http\Controllers\Admin\MaintenanceScheduleController::class, 'destroy'])->name('destroy');
+        });
+
+        // 🔧 Gestion des Opérations de Maintenance
+        Route::prefix('operations')->name('operations.')->group(function () {
+            Route::get('/', [\App\Http\Controllers\Admin\MaintenanceOperationController::class, 'index'])->name('index');
+            Route::get('/create', [\App\Http\Controllers\Admin\MaintenanceOperationController::class, 'create'])->name('create');
+            Route::post('/', [\App\Http\Controllers\Admin\MaintenanceOperationController::class, 'store'])->name('store');
+            Route::get('/{operation}', [\App\Http\Controllers\Admin\MaintenanceOperationController::class, 'show'])->name('show');
+            Route::get('/{operation}/edit', [\App\Http\Controllers\Admin\MaintenanceOperationController::class, 'edit'])->name('edit');
+            Route::put('/{operation}', [\App\Http\Controllers\Admin\MaintenanceOperationController::class, 'update'])->name('update');
+            Route::delete('/{operation}', [\App\Http\Controllers\Admin\MaintenanceOperationController::class, 'destroy'])->name('destroy');
+        });
+
+        // 🚨 Gestion des Alertes de Maintenance
+        Route::prefix('alerts')->name('alerts.')->group(function () {
+            Route::get('/', [\App\Http\Controllers\Admin\MaintenanceAlertController::class, 'index'])->name('index');
+            Route::get('/dashboard', [\App\Http\Controllers\Admin\MaintenanceAlertController::class, 'dashboard'])->name('dashboard');
+            Route::get('/{alert}', [\App\Http\Controllers\Admin\MaintenanceAlertController::class, 'show'])->name('show');
+            Route::delete('/{alert}', [\App\Http\Controllers\Admin\MaintenanceAlertController::class, 'destroy'])->name('destroy');
+            Route::post('/{alert}/acknowledge', [\App\Http\Controllers\Admin\MaintenanceAlertController::class, 'acknowledge'])->name('acknowledge');
+        });
+
+        // 📊 Rapports et Analytiques de Maintenance
+        Route::prefix('reports')->name('reports.')->group(function () {
+            Route::get('/', [\App\Http\Controllers\Admin\MaintenanceReportController::class, 'index'])->name('index');
+            Route::get('/performance', [\App\Http\Controllers\Admin\MaintenanceReportController::class, 'performance'])->name('performance');
+            Route::get('/costs', [\App\Http\Controllers\Admin\MaintenanceReportController::class, 'costs'])->name('costs');
+            Route::get('/kpis', [\App\Http\Controllers\Admin\MaintenanceReportController::class, 'kpis'])->name('kpis');
+            Route::get('/compliance', [\App\Http\Controllers\Admin\MaintenanceReportController::class, 'compliance'])->name('compliance');
+            Route::get('/providers-analysis', [\App\Http\Controllers\Admin\MaintenanceReportController::class, 'providersAnalysis'])->name('providers-analysis');
+            Route::get('/custom', [\App\Http\Controllers\Admin\MaintenanceReportController::class, 'custom'])->name('custom');
+            Route::post('/custom/generate', [\App\Http\Controllers\Admin\MaintenanceReportController::class, 'generateCustom'])->name('custom.generate');
+        });
+
+        // 🔄 Automatisation et Jobs
+        Route::prefix('automation')->name('automation.')->group(function () {
+            Route::post('/check-schedules', [\App\Http\Controllers\Admin\MaintenanceController::class, 'triggerScheduleCheck'])->name('check-schedules');
+            Route::post('/generate-alerts', [\App\Http\Controllers\Admin\MaintenanceController::class, 'generateAlerts'])->name('generate-alerts');
+        });
+    });
+
+    /*
+    |--------------------------------------------------------------------------
+    | 🔧 LEGACY MAINTENANCE SYSTEM - DÉSACTIVÉ POUR ÉVITER CONFLITS
+    |--------------------------------------------------------------------------
+    | ⚠️ SYSTÈME LEGACY DÉSACTIVÉ - Remplacé par le module Enterprise
+    | Le nouveau système est défini dans /routes/maintenance.php
+    |
+    | PROBLÈME RÉSOLU: Conflit de nommage des routes 'maintenance.dashboard'
+    | - Ancien: DashboardController::maintenanceDashboard (avec $urgentPlans)
+    | - Nouveau: MaintenanceController::dashboard (variables correctes)
     |--------------------------------------------------------------------------
     */
     Route::middleware('role:Super Admin|Admin|Gestionnaire Flotte|Supervisor')->group(function () {
-        
-        // Dashboard Maintenance - ACTIVATION ENTERPRISE
+
+        // ❌ LEGACY Dashboard Maintenance - DÉSACTIVÉ pour éviter conflit de routes
+        /*
         Route::prefix('maintenance')->name('maintenance.')->group(function () {
             Route::get('/', [DashboardController::class, 'maintenanceDashboard'])->name('dashboard');
             Route::get('calendar', [DashboardController::class, 'maintenanceCalendar'])->name('calendar');
             Route::get('alerts', [DashboardController::class, 'maintenanceAlerts'])->name('alerts');
             Route::get('analytics', [DashboardController::class, 'maintenanceAnalytics'])->name('analytics');
         });
+        */
 
-        // Plans et Logs de Maintenance - Temporairement simplifiés
+        // ❌ LEGACY Plans et Logs - DÉSACTIVÉ
         // Route::resource('maintenance/plans', MaintenancePlanController::class)->names('maintenance.plans');
         // Route::post('maintenance/plans/{plan}/duplicate', [MaintenancePlanController::class, 'duplicate'])
         //     ->name('maintenance.plans.duplicate');
 
-        // Logs de maintenance fonctionnels
+        // ❌ LEGACY Logs de maintenance - DÉSACTIVÉ
+        /*
         Route::prefix('maintenance/logs')->name('maintenance.logs.')->group(function () {
             Route::get('/', [DashboardController::class, 'maintenanceLogs'])->name('index');
             Route::get('export', [DashboardController::class, 'exportMaintenanceLogs'])->name('export');
         });
+        */
     });
 
     /*

@@ -1,46 +1,200 @@
 {{-- resources/views/admin/roles/index.blade.php --}}
-<x-app-layout>
-    <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Administration - Gestion des Rôles') }}
-        </h2>
-    </x-slot>
+@extends('layouts.admin.catalyst')
+@section('title', 'Gestion des Rôles - ZenFleet')
 
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            @if (session('success'))
-                <div class="mb-4 bg-green-100 border-l-4 border-green-500 text-green-700 p-4" role="alert">
-                    <p class="font-bold">{{ session('success') }}</p>
+@push('styles')
+<style>
+.role-card {
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+.role-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 24px rgba(0,0,0,0.15);
+}
+.fade-in {
+    animation: fadeIn 0.5s ease-in;
+}
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+</style>
+@endpush
+
+@section('content')
+<div class="fade-in">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+        {{-- En-tête avec fil d'Ariane --}}
+        <div class="mb-6">
+            <nav class="flex items-center space-x-2 text-sm font-medium text-gray-600 mb-4">
+                <a href="{{ route('admin.dashboard') }}" class="hover:text-blue-600 transition-colors">
+                    <i class="fas fa-home mr-1"></i> Tableau de bord
+                </a>
+                <i class="fas fa-chevron-right text-gray-400 text-xs"></i>
+                <span class="text-blue-600 font-semibold">Rôles & Permissions</span>
+            </nav>
+
+            <div class="flex items-center justify-between">
+                <div>
+                    <h1 class="text-3xl font-bold text-gray-900">Gestion des Rôles</h1>
+                    <p class="text-sm text-gray-600 mt-1">Gérez les rôles et leurs permissions associées</p>
                 </div>
-            @endif
+            </div>
+        </div>
 
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6 text-gray-900">
-                    <h3 class="text-xl font-semibold text-gray-700 mb-6">{{ __('Liste des Rôles') }}</h3>
-                    <div class="overflow-x-auto border border-gray-200 rounded-lg">
-                        <table class="min-w-full divide-y divide-gray-200">
-                            <thead class="bg-gray-100">
-                                <tr>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">ID</th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Nom du Rôle</th>
-                                    <th scope="col" class="relative px-6 py-3"><span class="sr-only">Actions</span></th>
-                                </tr>
-                            </thead>
-                            <tbody class="bg-white divide-y divide-gray-200">
-                                @foreach ($roles as $role)
-                                    <tr class="hover:bg-gray-50">
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ $role->id }}</td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-800">{{ $role->name }}</td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                            <a href="{{ route('admin.roles.edit', $role) }}" class="text-violet-600 hover:text-violet-900">Gérer les Permissions</a>
-                                        </td>
-                                    </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
+        {{-- Messages de succès --}}
+        @if (session('success'))
+            <div class="mb-6 bg-green-50 border-l-4 border-green-500 rounded-lg p-4 shadow-sm" role="alert">
+                <div class="flex items-center">
+                    <i class="fas fa-check-circle text-green-500 text-xl mr-3"></i>
+                    <p class="font-semibold text-green-800">{{ session('success') }}</p>
+                </div>
+            </div>
+        @endif
+
+        {{-- Cartes des rôles --}}
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            @foreach ($roles as $role)
+                @php
+                    $roleConfig = [
+                        'Super Admin' => [
+                            'gradient' => 'from-red-500 to-red-600',
+                            'icon' => 'fa-crown',
+                            'iconBg' => 'bg-red-100',
+                            'iconColor' => 'text-red-600',
+                            'description' => 'Accès total et illimité à toutes les fonctionnalités'
+                        ],
+                        'Admin' => [
+                            'gradient' => 'from-purple-500 to-purple-600',
+                            'icon' => 'fa-user-shield',
+                            'iconBg' => 'bg-purple-100',
+                            'iconColor' => 'text-purple-600',
+                            'description' => 'Gestion complète de son organisation'
+                        ],
+                        'Superviseur' => [
+                            'gradient' => 'from-orange-500 to-orange-600',
+                            'icon' => 'fa-user-tie',
+                            'iconBg' => 'bg-orange-100',
+                            'iconColor' => 'text-orange-600',
+                            'description' => 'Supervision des opérations et du personnel'
+                        ],
+                        'Gestionnaire Flotte' => [
+                            'gradient' => 'from-blue-500 to-blue-600',
+                            'icon' => 'fa-car',
+                            'iconBg' => 'bg-blue-100',
+                            'iconColor' => 'text-blue-600',
+                            'description' => 'Gestion des véhicules et affectations'
+                        ],
+                        'Chauffeur' => [
+                            'gradient' => 'from-green-500 to-green-600',
+                            'icon' => 'fa-id-card',
+                            'iconBg' => 'bg-green-100',
+                            'iconColor' => 'text-green-600',
+                            'description' => 'Accès limité aux missions assignées'
+                        ],
+                    ];
+                    $config = $roleConfig[$role->name] ?? [
+                        'gradient' => 'from-gray-500 to-gray-600',
+                        'icon' => 'fa-user',
+                        'iconBg' => 'bg-gray-100',
+                        'iconColor' => 'text-gray-600',
+                        'description' => 'Rôle personnalisé'
+                    ];
+                @endphp
+
+                <div class="role-card bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
+                    {{-- Header avec gradient --}}
+                    <div class="bg-gradient-to-r {{ $config['gradient'] }} px-6 py-5">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center">
+                                    <i class="fas {{ $config['icon'] }} text-2xl text-white"></i>
+                                </div>
+                                <div>
+                                    <h3 class="text-xl font-bold text-white">{{ $role->name }}</h3>
+                                    <p class="text-white/80 text-xs">ID: {{ $role->id }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- Body --}}
+                    <div class="p-6">
+                        <p class="text-sm text-gray-600 mb-4">{{ $config['description'] }}</p>
+
+                        {{-- Statistiques --}}
+                        <div class="bg-gray-50 rounded-lg p-4 mb-4">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-xs text-gray-500 uppercase tracking-wide font-semibold">Permissions</p>
+                                    <p class="text-2xl font-bold text-gray-900 mt-1">{{ $role->permissions->count() }}</p>
+                                </div>
+                                <div class="w-12 h-12 {{ $config['iconBg'] }} rounded-lg flex items-center justify-center">
+                                    <i class="fas fa-key text-xl {{ $config['iconColor'] }}"></i>
+                                </div>
+                            </div>
+                        </div>
+
+                        {{-- Liste aperçu permissions (max 3) --}}
+                        @if($role->permissions->count() > 0)
+                            <div class="mb-4">
+                                <p class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Permissions clés :</p>
+                                <div class="space-y-1">
+                                    @foreach($role->permissions->take(3) as $permission)
+                                        <div class="flex items-center text-xs text-gray-600">
+                                            <i class="fas fa-check-circle text-green-500 mr-2"></i>
+                                            {{ $permission->name }}
+                                        </div>
+                                    @endforeach
+                                    @if($role->permissions->count() > 3)
+                                        <div class="text-xs text-gray-500 italic">
+                                            + {{ $role->permissions->count() - 3 }} autres...
+                                        </div>
+                                    @endif
+                                </div>
+                            </div>
+                        @else
+                            <div class="mb-4 text-center py-3">
+                                <i class="fas fa-exclamation-triangle text-yellow-500 text-2xl mb-2"></i>
+                                <p class="text-xs text-gray-500">Aucune permission assignée</p>
+                            </div>
+                        @endif
+
+                        {{-- Bouton action --}}
+                        <a href="{{ route('admin.roles.edit', $role) }}"
+                           class="w-full inline-flex items-center justify-center px-4 py-3 bg-gradient-to-r {{ $config['gradient'] }} border border-transparent rounded-lg font-semibold text-sm text-white hover:opacity-90 transition-all shadow-md hover:shadow-lg">
+                            <i class="fas fa-cog mr-2"></i>
+                            Gérer les Permissions
+                        </a>
+                    </div>
+                </div>
+            @endforeach
+        </div>
+
+        {{-- Info box --}}
+        <div class="mt-8 bg-blue-50 border-l-4 border-blue-500 rounded-lg p-6">
+            <div class="flex items-start">
+                <i class="fas fa-info-circle text-blue-500 text-2xl mr-4 mt-1"></i>
+                <div>
+                    <h4 class="text-lg font-bold text-blue-900 mb-2">À propos des Rôles</h4>
+                    <p class="text-sm text-blue-800 mb-3">
+                        Les rôles définissent les permissions accordées aux utilisateurs dans le système. Chaque utilisateur peut avoir un ou plusieurs rôles.
+                    </p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm text-blue-800">
+                        <div class="flex items-start">
+                            <i class="fas fa-shield-alt text-blue-600 mr-2 mt-0.5"></i>
+                            <span><strong>Hiérarchie :</strong> Super Admin > Admin > Superviseur > Gestionnaire > Chauffeur</span>
+                        </div>
+                        <div class="flex items-start">
+                            <i class="fas fa-lock text-blue-600 mr-2 mt-0.5"></i>
+                            <span><strong>Sécurité :</strong> Les permissions sont héritées par les utilisateurs</span>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-</x-app-layout>
+</div>
+@endsection

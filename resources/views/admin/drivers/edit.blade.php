@@ -5,7 +5,7 @@
 <div class="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 -m-6 p-6">
     <div x-data="{
             currentStep: {{ old('current_step', 1) }},
-            photoPreview: '{{ $driver->photo_path ? asset('storage/' . $driver->photo_path) : null }}',
+            photoPreview: '{{ $driver->photo ? asset('storage/' . $driver->photo) : null }}',
             formData: {},
 
             updatePhotoPreview(event) {
@@ -106,9 +106,9 @@
                     <!-- Driver Info Card -->
                     <div class="bg-amber-50 rounded-xl p-4 text-center min-w-[200px]">
                         <div class="flex items-center justify-center gap-3 mb-2">
-                            @if($driver->photo_path)
+                            @if($driver->photo)
                                 <img class="w-12 h-12 rounded-full object-cover ring-4 ring-white shadow-lg"
-                                     src="{{ asset('storage/' . $driver->photo_path) }}"
+                                     src="{{ asset('storage/' . $driver->photo) }}"
                                      alt="Photo de {{ $driver->first_name }}">
                             @else
                                 <div class="w-12 h-12 bg-gradient-to-br from-gray-100 to-gray-200 rounded-full flex items-center justify-center shadow-lg">
@@ -118,6 +118,10 @@
                             <div>
                                 <div class="text-sm font-semibold text-gray-900">{{ $driver->driverStatus?->name ?? 'Statut non défini' }}</div>
                                 <div class="text-xs text-gray-500">Étape <span x-text="currentStep"></span> sur 4</div>
+                                <div class="text-xs text-blue-600 mt-1">
+                                    <i class="fas fa-info-circle mr-1"></i>
+                                    Utilisez les boutons "Suivant/Précédent" ou le bouton vert flottant pour enregistrer
+                                </div>
                             </div>
                         </div>
                         <div class="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
@@ -198,7 +202,7 @@
 
                 <!-- Form Content -->
                 <div class="p-8">
-                    <form method="POST" action="{{ route('admin.drivers.update', $driver) }}" enctype="multipart/form-data" class="space-y-8">
+                    <form id="driverEditForm" method="POST" action="{{ route('admin.drivers.update', $driver) }}" enctype="multipart/form-data" class="space-y-8">
                         @csrf
                         @method('PUT')
                         <input type="hidden" name="current_step" x-model="currentStep">
@@ -233,7 +237,7 @@
                                             <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
                                         @enderror
 
-                                        @if($driver->photo_path)
+                                        @if($driver->photo)
                                             <p class="mt-2 text-xs text-gray-500">
                                                 <i class="fas fa-info-circle mr-1"></i>
                                                 Laissez vide pour conserver la photo actuelle
@@ -346,22 +350,155 @@
                                     @enderror
                                 </div>
 
-                                <div>
-                                    <label for="status_id" class="block text-sm font-semibold text-gray-700 mb-2">
-                                        <i class="fas fa-user-check text-gray-400 mr-2"></i>Statut *
+                                @php
+                                    $statusesData = $driverStatuses ? $driverStatuses->map(function($status) {
+                                        return [
+                                            'id' => $status->id,
+                                            'name' => $status->name,
+                                            'description' => $status->description ?? '',
+                                            'color' => $status->color,
+                                            'icon' => $status->icon ?? 'fa-circle',
+                                            'can_drive' => $status->can_drive ?? true,
+                                            'can_assign' => $status->can_assign ?? true
+                                        ];
+                                    })->toArray() : [];
+                                @endphp
+
+                                <!-- 🎯 Statut Chauffeur - Design Enterprise Ultra Moderne -->
+                                <div x-data="{
+                                    open: false,
+                                    selectedStatus: null,
+                                    selectedId: '{{ old('status_id', $driver->status_id) }}',
+                                    statuses: {{ json_encode($statusesData) }}
+                                }" x-init="
+                                    if (selectedId && statuses.length > 0) {
+                                        selectedStatus = statuses.find(s => s.id == selectedId);
+                                    }
+                                " class="relative">
+
+                                    <label for="status_id" class="block text-sm font-semibold text-gray-700 mb-3">
+                                        <i class="fas fa-user-check text-amber-500 mr-2"></i>
+                                        Statut du Chauffeur <span class="text-red-500">*</span>
+                                        @if($driver->driverStatus)
+                                            <span class="ml-2 text-xs text-gray-500">
+                                                (Actuel: {{ $driver->driverStatus->name }})
+                                            </span>
+                                        @endif
                                     </label>
-                                    <select id="status_id" name="status_id" required
-                                            class="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl focus:border-amber-400 focus:ring-4 focus:ring-amber-50 transition-all appearance-none">
-                                        <option value="">Sélectionnez un statut</option>
-                                        @foreach($driverStatuses as $status)
-                                            <option value="{{ $status->id }}" {{ (old('status_id', $driver->status_id) == $status->id) ? 'selected' : '' }}>
-                                                {{ $status->name }}
-                                            </option>
-                                        @endforeach
-                                    </select>
+
+                                    <!-- Hidden Select for Form Submission -->
+                                    <input type="hidden" name="status_id" :value="selectedId" required>
+
+                                    <!-- Custom Dropdown Button -->
+                                    <button type="button" @click="open = !open" @click.away="open = false"
+                                            class="w-full px-4 py-3 bg-white border-2 border-gray-200 rounded-xl focus:border-amber-400 focus:ring-4 focus:ring-amber-50 transition-all duration-200 flex items-center justify-between hover:border-amber-300 group">
+
+                                        <div class="flex items-center" x-show="selectedStatus">
+                                            <div class="flex items-center gap-3">
+                                                <div class="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-medium shadow-sm"
+                                                     :style="`background-color: ${selectedStatus?.color || '#6B7280'}`">
+                                                    <i :class="selectedStatus?.icon || 'fas fa-circle'" class="text-xs"></i>
+                                                </div>
+                                                <div class="text-left">
+                                                    <div class="font-semibold text-gray-900" x-text="selectedStatus?.name"></div>
+                                                    <div class="text-xs text-gray-500" x-text="selectedStatus?.description" x-show="selectedStatus?.description"></div>
+                                                </div>
+                                                <div class="flex gap-1 ml-auto">
+                                                    <span x-show="selectedStatus?.can_drive" class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                                        <i class="fas fa-car text-green-600 mr-1"></i> Conduite
+                                                    </span>
+                                                    <span x-show="selectedStatus?.can_assign" class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                                        <i class="fas fa-tasks text-blue-600 mr-1"></i> Missions
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div x-show="!selectedStatus" class="text-gray-500">
+                                            <i class="fas fa-user-edit mr-2"></i> Modifier le statut
+                                        </div>
+
+                                        <i class="fas fa-chevron-down transition-transform duration-200 text-gray-400 group-hover:text-amber-500"
+                                           :class="{ 'rotate-180': open }"></i>
+                                    </button>
+
+                                    <!-- Dropdown Menu -->
+                                    <div x-show="open"
+                                         x-transition:enter="transition ease-out duration-200"
+                                         x-transition:enter-start="opacity-0 scale-95"
+                                         x-transition:enter-end="opacity-100 scale-100"
+                                         x-transition:leave="transition ease-in duration-150"
+                                         x-transition:leave-start="opacity-100 scale-100"
+                                         x-transition:leave-end="opacity-0 scale-95"
+                                         class="absolute z-50 w-full mt-2 bg-white border-2 border-gray-100 rounded-xl shadow-xl overflow-hidden">
+
+                                        @if($driverStatuses && $driverStatuses->isNotEmpty())
+                                            <div class="max-h-80 overflow-y-auto">
+                                                <template x-for="status in statuses" :key="status.id">
+                                                    <button type="button" @click="selectedStatus = status; selectedId = status.id; open = false"
+                                                            class="w-full px-4 py-4 text-left hover:bg-gradient-to-r hover:from-amber-50 hover:to-orange-50 transition-all duration-200 border-b border-gray-50 last:border-0 group"
+                                                            :class="{ 'bg-amber-50 border-l-4 border-l-amber-500': selectedId == status.id }">
+
+                                                        <div class="flex items-center gap-4">
+                                                            <div class="w-10 h-10 rounded-full flex items-center justify-center text-white font-medium shadow-md group-hover:shadow-lg transition-shadow"
+                                                                 :style="`background-color: ${status.color}`">
+                                                                <i :class="status.icon" class="text-sm"></i>
+                                                            </div>
+                                                            <div class="flex-1">
+                                                                <div class="font-semibold text-gray-900" x-text="status.name"></div>
+                                                                <div class="text-sm text-gray-600" x-text="status.description" x-show="status.description"></div>
+                                                                <div class="flex gap-2 mt-2">
+                                                                    <span x-show="status.can_drive" class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                                                        <i class="fas fa-car text-green-600 mr-1"></i> Conduite
+                                                                    </span>
+                                                                    <span x-show="status.can_assign" class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                                                        <i class="fas fa-tasks text-blue-600 mr-1"></i> Missions
+                                                                    </span>
+                                                                    <span x-show="!status.can_drive || !status.can_assign" class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                                                                        <i class="fas fa-exclamation-triangle text-yellow-600 mr-1"></i> Limité
+                                                                    </span>
+                                                                    <span x-show="status.id == '{{ $driver->status_id }}'" class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                                                                        <i class="fas fa-crown text-purple-600 mr-1"></i> Actuel
+                                                                    </span>
+                                                                </div>
+                                                            </div>
+                                                            <i class="fas fa-check text-amber-500 opacity-0 group-hover:opacity-100 transition-opacity"
+                                                               :class="{ 'opacity-100': selectedId == status.id }"></i>
+                                                        </div>
+                                                    </button>
+                                                </template>
+                                            </div>
+                                        @else
+                                            <div class="px-4 py-8 text-center">
+                                                <div class="w-16 h-16 mx-auto bg-gray-100 rounded-full flex items-center justify-center mb-4">
+                                                    <i class="fas fa-exclamation-circle text-gray-400 text-2xl"></i>
+                                                </div>
+                                                <p class="text-gray-500 font-medium">Aucun statut disponible</p>
+                                                <p class="text-gray-400 text-sm mt-1">Contactez votre administrateur</p>
+                                            </div>
+                                        @endif
+                                    </div>
+
+                                    <!-- Validation Error -->
                                     @error('status_id')
-                                        <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                                        <div class="mt-2 p-3 bg-red-50 border border-red-200 rounded-lg">
+                                            <p class="text-sm text-red-600 flex items-center">
+                                                <i class="fas fa-exclamation-triangle mr-2"></i>
+                                                {{ $message }}
+                                            </p>
+                                        </div>
                                     @enderror
+
+                                    <!-- Info Helper for Edit -->
+                                    <div class="mt-2 p-3 bg-amber-50 border border-amber-200 rounded-lg">
+                                        <p class="text-xs text-amber-700 flex items-center">
+                                            <i class="fas fa-info-circle mr-2"></i>
+                                            Modifier le statut affectera les permissions et affectations du chauffeur.
+                                            @if($driver->driverStatus)
+                                                Statut actuel: <strong>{{ $driver->driverStatus->name }}</strong>
+                                            @endif
+                                        </p>
+                                    </div>
                                 </div>
 
                                 <div>
@@ -544,6 +681,15 @@
                 </div>
             </div>
         </div>
+    </div>
+
+    <!-- Bouton d'enregistrement flottant pour une meilleure UX -->
+    <div class="fixed bottom-6 right-6 z-50">
+        <button type="submit" form="driverEditForm"
+                class="inline-flex items-center gap-3 px-6 py-4 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white rounded-2xl font-semibold transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105">
+            <i class="fas fa-save text-lg"></i>
+            <span>Enregistrer</span>
+        </button>
     </div>
 </div>
 

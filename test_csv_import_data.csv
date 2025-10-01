@@ -1,0 +1,7 @@
+# Instructions d'importation CSV - ZenFleet
+# Remplissez les colonnes ci-dessous avec vos données
+nom,prenom,date_naissance,matricule,statut,telephone,email_personnel,groupe_sanguin,adresse
+# Exemple de données - Supprimez cette ligne
+Benali,Ahmed,1985-03-15,EMP-IMPORT-001,Disponible,0550111111,ahmed.benali@zenfleet.dz,O+,123 Rue Didouche Mourad Alger
+Kaddour,Amina,1990-07-22,EMP-IMPORT-002,En mission,0550222222,amina.kaddour@zenfleet.dz,A+,456 Avenue de l'Indépendance Oran
+Martin,Pierre,1988-12-10,EMP-IMPORT-003,En congé,0550333333,pierre.martin@zenfleet.dz,B+,789 Boulevard Mohamed V Constantine

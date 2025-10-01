@@ -52,11 +52,11 @@ class StoreOrganizationAlgeriaRequest extends FormRequest
                 'max:20',
                 'regex:/^(\+213|0)[0-9]{8,9}$/' // Algeria phone format
             ],
-            'primary_email' => [
+            'email' => [
                 'required',
                 'email',
                 'max:255',
-                'unique:organizations,primary_email'
+                'unique:organizations,email'
             ],
             'status' => [
                 'nullable',
@@ -199,7 +199,7 @@ class StoreOrganizationAlgeriaRequest extends FormRequest
         return [
             'name.required' => 'Le nom de l\'organisation est obligatoire.',
             'name.unique' => 'Ce nom d\'organisation existe déjà.',
-            'primary_email.unique' => 'Cette adresse email est déjà utilisée.',
+            'email.unique' => 'Cette adresse email est déjà utilisée.',
             'phone_number.regex' => 'Le numéro de téléphone doit être au format Algeria (+213 ou 0).',
             'nif.required' => 'Le NIF est obligatoire.',
             'nif.unique' => 'Ce NIF existe déjà.',

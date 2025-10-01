@@ -26,10 +26,23 @@ class RoleController extends Controller
      */
     public function edit(Role $role): View
     {
-        // Récupère toutes les permissions disponibles pour les afficher
-        $permissions = Permission::all();
+        // Récupère toutes les permissions disponibles
+        $allPermissions = Permission::orderBy('name')->get();
 
-        return view('admin.roles.edit', compact('role', 'permissions'));
+        // Grouper les permissions par catégorie (basé sur le préfixe du nom)
+        $permissionsByCategory = $allPermissions->groupBy(function ($permission) {
+            // Extraire la première partie du nom comme catégorie
+            $parts = explode(' ', $permission->name);
+            return $parts[0] ?? 'autres'; // ex: "view users" → "view", "create drivers" → "create"
+        });
+
+        // Ordre des catégories pour affichage logique
+        $categoryOrder = ['view', 'create', 'edit', 'delete', 'import', 'export', 'manage', 'autres'];
+        $orderedCategories = collect($categoryOrder)->mapWithKeys(function ($category) use ($permissionsByCategory) {
+            return [$category => $permissionsByCategory->get($category, collect())];
+        })->filter(fn($perms) => $perms->isNotEmpty());
+
+        return view('admin.roles.edit', compact('role', 'allPermissions', 'orderedCategories'));
     }
 
     /**

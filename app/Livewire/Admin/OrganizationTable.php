@@ -120,7 +120,12 @@ class OrganizationTable extends Component
 
     public function getOrganizationsProperty()
     {
-        $query = Organization::withCount(['users', 'vehicles', 'drivers']);
+        $query = Organization::query()
+            ->withCount([
+                'activeUsers as users_count',
+                'vehicles',
+                'driversModel as drivers_count'
+            ]);
 
         // Filtres
         if ($this->search) {
@@ -145,7 +150,7 @@ class OrganizationTable extends Component
         }
 
         // Tri sécurisé
-        $allowedSorts = ['name', 'status', 'created_at', 'users_count', 'vehicles_count'];
+        $allowedSorts = ['name', 'status', 'created_at', 'users_count', 'vehicles_count', 'drivers_count'];
         if (in_array($this->sortField, $allowedSorts)) {
             $query->orderBy($this->sortField, $this->sortDirection);
         }

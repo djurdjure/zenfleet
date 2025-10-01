@@ -32,7 +32,10 @@ class DriverController extends Controller
     public function __construct(DriverService $driverService, ImportExportService $importExportService)
     {
         $this->middleware('auth');
-        $this->middleware('role:Super Admin');
+
+        // ✅ Utiliser authorizeResource pour appliquer automatiquement DriverPolicy
+        $this->authorizeResource(Driver::class, 'driver');
+
         $this->driverService = $driverService;
         $this->importExportService = $importExportService;
     }
@@ -47,36 +50,53 @@ class DriverController extends Controller
         try {
             $filters = $request->only(['search', 'status_id', 'per_page', 'view_deleted']);
             $drivers = $this->driverService->getFilteredDrivers($filters);
-            $driverStatuses = DriverStatus::orderBy('name')->get();
+            $driverStatuses = $this->getDriverStatuses();
 
             return view('admin.drivers.index', compact('drivers', 'driverStatuses', 'filters'));
 
         } catch (\Exception $e) {
-            Log::error('Drivers index error: ' . $e->getMessage());
+            Log::error('Drivers index error: ' . $e->getMessage(), [
+                'error' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'user_id' => auth()->id()
+            ]);
 
-            $drivers = Driver::with(['driverStatus', 'organization', 'user'])
-                ->when(auth()->user()->hasRole('Super Admin') === false, function ($query) {
-                    return $query->where('organization_id', auth()->user()->organization_id);
-                })
-                ->paginate(15);
+            // Fallback en cas d'erreur avec gestion sécurisée
+            try {
+                $drivers = Driver::with(['organization', 'user'])
+                    ->when(auth()->user()->hasRole('Super Admin') === false, function ($query) {
+                        return $query->where('organization_id', auth()->user()->organization_id);
+                    })
+                    ->paginate(15);
 
-            $driverStatuses = DriverStatus::orderBy('name')->get();
-            $filters = [];
+                $driverStatuses = $this->getDriverStatuses();
+                $filters = [];
 
-            return view('admin.drivers.index', compact('drivers', 'driverStatuses', 'filters'))
-                ->withErrors(['error' => 'Erreur lors du chargement des chauffeurs.']);
+                return view('admin.drivers.index', compact('drivers', 'driverStatuses', 'filters'))
+                    ->with('warning', 'Chargement en mode dégradé. Certaines fonctionnalités peuvent être limitées.');
+
+            } catch (\Exception $fallbackError) {
+                Log::error('Drivers fallback failed: ' . $fallbackError->getMessage());
+
+                return view('admin.drivers.index', [
+                    'drivers' => collect(),
+                    'driverStatuses' => collect(),
+                    'filters' => []
+                ])->withErrors(['error' => 'Service temporairement indisponible. Veuillez contacter l\'administrateur.']);
+            }
         }
     }
 
     /**
      * 📝 Formulaire de création d'un chauffeur
      */
-    public function create(): View
+    public function create()
     {
         $this->authorize('create drivers');
 
         try {
-            $driverStatuses = DriverStatus::orderBy('name')->get();
+            $driverStatuses = $this->getDriverStatuses();
 
             // Récupération des utilisateurs non liés à un chauffeur
             $assignedUserIds = Driver::whereNotNull('user_id')->pluck('user_id');
@@ -127,7 +147,7 @@ class DriverController extends Controller
     /**
      * ✏️ Formulaire d'édition d'un chauffeur
      */
-    public function edit(Driver $driver): View
+    public function edit(Driver $driver)
     {
         $this->authorize('edit drivers');
 
@@ -137,7 +157,7 @@ class DriverController extends Controller
                 abort(403, 'Vous n\'avez pas l\'autorisation de modifier ce chauffeur.');
             }
 
-            $driverStatuses = DriverStatus::orderBy('name')->get();
+            $driverStatuses = $this->getDriverStatuses();
 
             // Récupération des utilisateurs non liés à un chauffeur (excluant l'utilisateur actuel du chauffeur)
             $assignedUserIds = Driver::whereNotNull('user_id')
@@ -154,10 +174,14 @@ class DriverController extends Controller
             return view('admin.drivers.edit', compact('driver', 'driverStatuses', 'linkableUsers'));
 
         } catch (\Exception $e) {
-            Log::error('Driver edit form error: ' . $e->getMessage());
+            Log::error('Driver edit form error: ' . $e->getMessage(), [
+                'driver_id' => $driver->id,
+                'user_id' => auth()->id(),
+                'error' => $e->getMessage()
+            ]);
 
             return redirect()->route('admin.drivers.index')
-                ->withErrors(['error' => 'Erreur lors du chargement du formulaire d\'édition.']);
+                ->with('error', 'Erreur lors du chargement du formulaire d\'édition: ' . $e->getMessage());
         }
     }
 
@@ -335,7 +359,7 @@ class DriverController extends Controller
     /**
      * 👁️ Affichage détaillé d'un chauffeur
      */
-    public function show(Driver $driver): View
+    public function show(Driver $driver)
     {
         $this->authorize('view drivers');
 
@@ -1214,50 +1238,170 @@ class DriverController extends Controller
      */
     private function prepareDataForValidation(array $record): array
     {
+        // 🎯 Mapping CSV -> Base de données - GESTION DE FLOTTE ENTERPRISE
         $map = [
-            'nom' => 'last_name', 
-            'prenom' => 'first_name', 
+            // Informations personnelles essentielles
+            'nom' => 'last_name',
+            'prenom' => 'first_name',
             'date_naissance' => 'birth_date',
-            'statut' => 'statut', 
-            'matricule' => 'employee_number', 
-            'telephone' => 'personal_phone',
-            'email_personnel' => 'personal_email', 
-            'adresse' => 'address', 
-            'numero_permis' => 'license_number',
-            'categorie_permis' => 'license_category', 
-            'date_delivrance_permis' => 'license_issue_date',
-            'autorite_delivrance' => 'license_authority', 
-            'date_recrutement' => 'recruitment_date',
-            'date_fin_contrat' => 'contract_end_date', 
-            'contact_urgence_nom' => 'emergency_contact_name',
-            'contact_urgence_telephone' => 'emergency_contact_phone', 
+            'matricule' => 'employee_number',
             'groupe_sanguin' => 'blood_type',
+
+            // Contact et localisation
+            'telephone' => 'personal_phone',
+            'email_personnel' => 'personal_email',
+            'adresse' => 'full_address',
+            'ville' => 'city',
+            'code_postal' => 'postal_code',
+
+            // Emploi et dates importantes
+            'statut' => 'status',
+            'date_recrutement' => 'recruitment_date',
+            'date_fin_contrat' => 'contract_end_date',
+            'date_embauche' => 'hire_date',
+
+            // Permis de conduire (mapping vers nouveaux champs)
+            'numero_permis' => 'license_number',
+            'categorie_permis' => 'license_category',
+            'date_delivrance_permis' => 'license_issue_date',
+            'date_expiration_permis' => 'driver_license_expiry_date',
+            'autorite_delivrance' => 'license_authority',
+
+            // Contact d'urgence
+            'contact_urgence_nom' => 'emergency_contact_name',
+            'contact_urgence_telephone' => 'emergency_contact_phone',
+            'urgence_nom' => 'emergency_contact_name', // Alias
+            'urgence_tel' => 'emergency_contact_phone', // Alias
+
+            // Champs additionnels
+            'notes' => 'notes',
+            'remarques' => 'notes',
         ];
         
         $dataToValidate = [];
         
         foreach ($map as $csvHeader => $dbField) {
             if (array_key_exists($csvHeader, $record)) {
-                $value = $record[$csvHeader];
+                $value = trim((string)$record[$csvHeader]);
 
-                // Convert empty strings to null so they pass 'nullable' validation
-                // and are correctly stored in the database.
-                if ($value === '') {
+                // Conversion des chaînes vides en null
+                if ($value === '' || $value === 'null' || $value === 'NULL') {
                     $value = null;
                 }
-                
-                // Traitement spécifique pour les dates
-                if (in_array($dbField, ['birth_date', 'license_issue_date', 'recruitment_date', 'contract_end_date']) && $value) {
+
+                // 🗓️ Traitement spécifique pour les dates
+                if (in_array($dbField, [
+                    'birth_date', 'license_issue_date', 'recruitment_date',
+                    'contract_end_date', 'hire_date', 'driver_license_expiry_date'
+                ]) && $value) {
                     $value = $this->formatDate($value);
                 }
-                
-                $dataToValidate[$dbField] = $value;
+
+                // 🎯 Traitement spécifique pour le statut (résolution texte -> ID)
+                if ($dbField === 'status' && $value) {
+                    $statusId = $this->resolveDriverStatusFromText($value);
+                    if ($statusId) {
+                        $dataToValidate['status_id'] = $statusId;
+                    }
+                    $dataToValidate['status'] = $value; // Garder aussi le texte
+                } else {
+                    $dataToValidate[$dbField] = $value;
+                }
             }
         }
-        
+
+        // 🏢 Ajouter l'organisation automatiquement
+        $dataToValidate['organization_id'] = auth()->user()->organization_id;
+
         return $dataToValidate;
     }
-    
+
+    /**
+     * 🎯 Résolution du statut texte vers ID - GESTION DE FLOTTE EXPERT
+     */
+    private function resolveDriverStatusFromText(string $statusText): ?int
+    {
+        if (empty($statusText)) {
+            return null;
+        }
+
+        // 📋 Mapping texte -> nom du statut (gestion multi-langues)
+        $statusMapping = [
+            // Français standard
+            'disponible' => 'Disponible',
+            'en mission' => 'En mission',
+            'en congé' => 'En congé',
+            'en conge' => 'En congé',
+            'sanctionné' => 'Sanctionné',
+            'sanctionne' => 'Sanctionné',
+            'maladie' => 'Maladie',
+            'suspendu' => 'Suspendu',
+            'inactif' => 'Inactif',
+            'en formation' => 'En formation',
+            'en pause' => 'En pause',
+
+            // Variations acceptées
+            'actif' => 'Disponible',
+            'libre' => 'Disponible',
+            'occupé' => 'En mission',
+            'occupe' => 'En mission',
+            'mission' => 'En mission',
+            'vacances' => 'En congé',
+            'congés' => 'En congé',
+            'conges' => 'En congé',
+            'malade' => 'Maladie',
+            'absent' => 'Maladie',
+            'formation' => 'En formation',
+            'pause' => 'En pause',
+            'repos' => 'En pause',
+
+            // Anglais (si nécessaire)
+            'available' => 'Disponible',
+            'on mission' => 'En mission',
+            'on leave' => 'En congé',
+            'sick' => 'Maladie',
+            'suspended' => 'Suspendu',
+            'inactive' => 'Inactif',
+            'training' => 'En formation',
+        ];
+
+        $normalizedText = strtolower(trim($statusText));
+
+        // Rechercher dans le mapping
+        $statusName = $statusMapping[$normalizedText] ?? null;
+
+        if (!$statusName) {
+            // Recherche directe si pas de mapping trouvé
+            $statusName = $statusText;
+        }
+
+        // Rechercher le statut dans la base
+        $status = \App\Models\DriverStatus::where('organization_id', auth()->user()->organization_id)
+            ->where(function($query) use ($statusName, $normalizedText) {
+                $query->whereRaw('LOWER(name) = ?', [strtolower($statusName)])
+                      ->orWhereRaw('LOWER(name) = ?', [$normalizedText]);
+            })
+            ->first();
+
+        if ($status) {
+            Log::info("✅ Statut résolu: '{$statusText}' -> '{$status->name}' (ID: {$status->id})");
+            return $status->id;
+        }
+
+        // Si aucun statut trouvé, utiliser le statut par défaut 'Disponible'
+        $defaultStatus = \App\Models\DriverStatus::where('organization_id', auth()->user()->organization_id)
+            ->where('name', 'Disponible')
+            ->first();
+
+        if ($defaultStatus) {
+            Log::warning("⚠️ Statut '{$statusText}' non trouvé, utilisation du statut par défaut: Disponible");
+            return $defaultStatus->id;
+        }
+
+        Log::error("❌ Aucun statut trouvé pour '{$statusText}' et pas de statut par défaut");
+        return null;
+    }
+
     /**
      * Formate une date en format YYYY-MM-DD.
      */
@@ -1364,7 +1508,8 @@ class DriverController extends Controller
     }
 
     /**
-     * 🧹 Nettoie le contenu CSV des caractères problématiques
+     * 🧹 Nettoie le contenu CSV des caractères problématiques et des lignes de commentaires
+     * Version Enterprise avec filtrage intelligent des métadonnées
      */
     private function cleanCsvContent(string $content): string
     {
@@ -1379,7 +1524,99 @@ class DriverController extends Controller
         // Suppression des caractères de contrôle dangereux
         $content = preg_replace('/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/', '', $content);
 
-        return trim($content);
+        // 🎯 NOUVELLE FONCTIONNALITÉ: Filtrage intelligent des lignes de commentaires et métadonnées
+        $lines = explode("\n", $content);
+        $cleanLines = [];
+        $headerFound = false;
+
+        foreach ($lines as $lineNumber => $line) {
+            $trimmedLine = trim($line);
+
+            // Ignorer les lignes vides
+            if (empty($trimmedLine)) {
+                continue;
+            }
+
+            // Ignorer les lignes de commentaires (commencent par #)
+            if (str_starts_with($trimmedLine, '#')) {
+                Log::info('CSV comment line filtered', [
+                    'line_number' => $lineNumber + 1,
+                    'content' => substr($trimmedLine, 0, 100)
+                ]);
+                continue;
+            }
+
+            // Ignorer les lignes de métadonnées spécifiques
+            $metadataPatterns = [
+                '/^Généré le:/',
+                '/^Par:/',
+                '/^Organisation:/',
+                '/^INFORMATIONS IMPORTANTES/',
+                '/^1\. Encodage:/',
+                '/^2\. Séparateur:/',
+                '/^3\. Taille max:/',
+                '/^4\. Extensions:/',
+                '/^5\. Supprimez toutes/',
+            ];
+
+            $isMetadata = false;
+            foreach ($metadataPatterns as $pattern) {
+                if (preg_match($pattern, $trimmedLine)) {
+                    $isMetadata = true;
+                    Log::info('CSV metadata line filtered', [
+                        'line_number' => $lineNumber + 1,
+                        'pattern' => $pattern,
+                        'content' => substr($trimmedLine, 0, 100)
+                    ]);
+                    break;
+                }
+            }
+
+            if ($isMetadata) {
+                continue;
+            }
+
+            // Détecter la ligne d'en-têtes (contient les colonnes attendues)
+            if (!$headerFound && $this->isHeaderLine($trimmedLine)) {
+                $headerFound = true;
+                Log::info('CSV header line detected', [
+                    'line_number' => $lineNumber + 1,
+                    'content' => $trimmedLine
+                ]);
+            }
+
+            // Conserver les lignes valides
+            $cleanLines[] = $line;
+        }
+
+        $cleanedContent = implode("\n", $cleanLines);
+
+        Log::info('CSV content cleaning completed', [
+            'original_lines' => count($lines),
+            'cleaned_lines' => count($cleanLines),
+            'header_found' => $headerFound
+        ]);
+
+        return trim($cleanedContent);
+    }
+
+    /**
+     * 🎯 Détecte si une ligne est probablement une ligne d'en-têtes
+     */
+    private function isHeaderLine(string $line): bool
+    {
+        $expectedHeaders = ['nom', 'prenom', 'date_naissance', 'matricule', 'statut'];
+        $lineLower = strtolower($line);
+
+        $matchCount = 0;
+        foreach ($expectedHeaders as $header) {
+            if (strpos($lineLower, $header) !== false) {
+                $matchCount++;
+            }
+        }
+
+        // Considérer comme en-tête si au moins 3 des 5 colonnes principales sont présentes
+        return $matchCount >= 3;
     }
 
     /**
@@ -1540,5 +1777,89 @@ class DriverController extends Controller
             'required_headers' => $requiredHeaders,
             'found_headers' => $cleanCsvHeaders
         ]);
+    }
+
+    /**
+     * 🛡️ Méthode sécurisée pour récupérer les statuts de chauffeurs
+     * Enterprise-grade avec gestion multi-tenant et fallback robuste
+     */
+    private function getDriverStatuses()
+    {
+        try {
+            // Vérifier si la table existe
+            if (!\Schema::hasTable('driver_statuses')) {
+                Log::warning('Table driver_statuses does not exist - returning empty collection', [
+                    'user_id' => auth()->id(),
+                    'method' => 'getDriverStatuses',
+                    'timestamp' => now()->toISOString()
+                ]);
+                return collect();
+            }
+
+            // Récupérer les statuts avec logique multi-tenant enterprise
+            $organizationId = auth()->user()->organization_id;
+
+            Log::info('Fetching driver statuses', [
+                'organization_id' => $organizationId,
+                'user_id' => auth()->id(),
+                'method' => 'getDriverStatuses'
+            ]);
+
+            // Requête optimisée avec les bons scopes
+            $statuses = DriverStatus::active()
+                ->forOrganization($organizationId)
+                ->ordered()
+                ->get();
+
+            Log::info('Driver statuses fetched successfully', [
+                'count' => $statuses->count(),
+                'statuses' => $statuses->pluck('name')->toArray(),
+                'organization_id' => $organizationId
+            ]);
+
+            return $statuses;
+
+        } catch (\Exception $e) {
+            Log::error('Error fetching driver statuses - using fallback', [
+                'error_message' => $e->getMessage(),
+                'error_file' => $e->getFile(),
+                'error_line' => $e->getLine(),
+                'user_id' => auth()->id(),
+                'organization_id' => auth()->user()->organization_id ?? null,
+                'method' => 'getDriverStatuses',
+                'timestamp' => now()->toISOString()
+            ]);
+
+            // Fallback: essayer une requête simple
+            try {
+                $fallbackStatuses = DriverStatus::where('is_active', true)
+                    ->where(function ($query) {
+                        $orgId = auth()->user()->organization_id;
+                        $query->whereNull('organization_id')
+                              ->orWhere('organization_id', $orgId);
+                    })
+                    ->orderBy('sort_order')
+                    ->orderBy('name')
+                    ->get();
+
+                Log::info('Fallback driver statuses retrieved', [
+                    'count' => $fallbackStatuses->count(),
+                    'method' => 'getDriverStatuses_fallback'
+                ]);
+
+                return $fallbackStatuses;
+
+            } catch (\Exception $fallbackError) {
+                Log::critical('Complete failure in getDriverStatuses', [
+                    'fallback_error' => $fallbackError->getMessage(),
+                    'original_error' => $e->getMessage(),
+                    'user_id' => auth()->id(),
+                    'timestamp' => now()->toISOString()
+                ]);
+
+                // Retourner une collection vide en dernier recours
+                return collect();
+            }
+        }
     }
 }

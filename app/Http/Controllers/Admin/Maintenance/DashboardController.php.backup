@@ -94,8 +94,8 @@ class DashboardController extends Controller
             })
             ->where(function ($query) {
                 // Échéance par date dans les 45 prochains jours ou dépassée
-                $query->where('next_due_date', '<=', Carbon::now()->addDays(45))
-                      ->whereNotNull('next_due_date');
+                $query->where('maintenance_plans.next_due_date', '<=', Carbon::now()->addDays(45))
+                      ->whereNotNull('maintenance_plans.next_due_date');
             })
             ->orWhere(function ($query) use ($organizationId) {
                 // Échéance par kilométrage proche (2000 km ou moins) ou dépassée
@@ -105,21 +105,21 @@ class DashboardController extends Controller
                               $vehicleQuery->where('organization_id', $organizationId);
                           }
                           $vehicleQuery->whereRaw('maintenance_plans.next_due_mileage - vehicles.current_mileage <= 2000')
-                                      ->whereNull('deleted_at');
+                                      ->whereNull('vehicles.deleted_at');
                       });
             })
             ->orderByRaw('
-                CASE 
-                    WHEN next_due_date IS NOT NULL AND next_due_date < NOW() THEN 1
-                    WHEN next_due_mileage IS NOT NULL AND EXISTS (
-                        SELECT 1 FROM vehicles v 
-                        WHERE v.id = maintenance_plans.vehicle_id 
+                CASE
+                    WHEN maintenance_plans.next_due_date IS NOT NULL AND maintenance_plans.next_due_date < NOW() THEN 1
+                    WHEN maintenance_plans.next_due_mileage IS NOT NULL AND EXISTS (
+                        SELECT 1 FROM vehicles v
+                        WHERE v.id = maintenance_plans.vehicle_id
                         AND maintenance_plans.next_due_mileage <= v.current_mileage
                     ) THEN 2
-                    ELSE 3 
+                    ELSE 3
                 END
             ')
-            ->orderBy('next_due_date', 'asc')
+            ->orderBy('maintenance_plans.next_due_date', 'asc')
             ->limit(8)
             ->get()
             ->map(function ($plan) {
@@ -146,9 +146,9 @@ class DashboardController extends Controller
                 }
                 $query->whereNull('deleted_at');
             })
-            ->where('next_due_date', '>=', now())
-            ->where('next_due_date', '<=', now()->addDays(7))
-            ->orderBy('next_due_date')
+            ->where('maintenance_plans.next_due_date', '>=', now())
+            ->where('maintenance_plans.next_due_date', '<=', now()->addDays(7))
+            ->orderBy('maintenance_plans.next_due_date')
             ->limit(10)
             ->get();
 
@@ -310,9 +310,9 @@ class DashboardController extends Controller
                 }
                 $query->whereNull('deleted_at');
             })
-            ->whereNotNull('next_due_date')
-            ->where('next_due_date', '>=', now()->subMonth())
-            ->where('next_due_date', '<=', now()->addMonths(3))
+            ->whereNotNull('maintenance_plans.next_due_date')
+            ->where('maintenance_plans.next_due_date', '>=', now()->subMonth())
+            ->where('maintenance_plans.next_due_date', '<=', now()->addMonths(3))
             ->get()
             ->map(function ($plan) {
                 return [
@@ -352,9 +352,9 @@ class DashboardController extends Controller
                 $query->whereNull('deleted_at');
             })
             ->where(function ($query) {
-                $query->where('next_due_date', '<', now())
-                      ->orWhereRaw('next_due_mileage < (
-                          SELECT current_mileage FROM vehicles 
+                $query->where('maintenance_plans.next_due_date', '<', now())
+                      ->orWhereRaw('maintenance_plans.next_due_mileage < (
+                          SELECT current_mileage FROM vehicles
                           WHERE vehicles.id = maintenance_plans.vehicle_id
                       )');
             })
@@ -368,8 +368,8 @@ class DashboardController extends Controller
                 }
                 $query->whereNull('deleted_at');
             })
-            ->where('next_due_date', '>=', now())
-            ->where('next_due_date', '<=', now()->addDays(7))
+            ->where('maintenance_plans.next_due_date', '>=', now())
+            ->where('maintenance_plans.next_due_date', '<=', now()->addDays(7))
             ->get();
         
         return view('admin.maintenance.alerts', compact('criticalAlerts', 'importantAlerts'));

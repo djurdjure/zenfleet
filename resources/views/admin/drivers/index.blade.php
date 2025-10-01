@@ -127,6 +127,44 @@
 
 @section('content')
 <div class="fade-in">
+    {{-- Messages de notification --}}
+    @if(session('success'))
+        <div id="success-alert" class="bg-green-50 border-l-4 border-green-400 p-4 rounded-lg shadow-sm fade-in mb-6">
+            <div class="flex items-center">
+                <div class="flex-shrink-0">
+                    <i class="fas fa-check-circle text-green-400 text-lg"></i>
+                </div>
+                <div class="ml-3">
+                    <p class="text-green-700 font-medium">{{ session('success') }}</p>
+                </div>
+                <div class="ml-auto pl-3">
+                    <button onclick="document.getElementById('success-alert').remove()"
+                            class="text-green-400 hover:text-green-600 transition-colors">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    @endif
+
+    @if(session('error'))
+        <div id="error-alert" class="bg-red-50 border-l-4 border-red-400 p-4 rounded-lg shadow-sm fade-in mb-6">
+            <div class="flex items-center">
+                <div class="flex-shrink-0">
+                    <i class="fas fa-exclamation-circle text-red-400 text-lg"></i>
+                </div>
+                <div class="ml-3">
+                    <p class="text-red-700 font-medium">{{ session('error') }}</p>
+                </div>
+                <div class="ml-auto pl-3">
+                    <button onclick="document.getElementById('error-alert').remove()"
+                            class="text-red-400 hover:text-red-600 transition-colors">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    @endif
     {{-- En-tête compact --}}
     <div class="mb-8">
         <div class="md:flex md:items-center md:justify-between">
@@ -339,9 +377,9 @@
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="flex items-center">
                                     <div class="flex-shrink-0 h-10 w-10">
-                                        @if($driver->photo_path)
+                                        @if($driver->photo)
                                             <img class="h-10 w-10 rounded-full object-cover"
-                                                 src="{{ asset('storage/' . $driver->photo_path) }}"
+                                                 src="{{ asset('storage/' . $driver->photo) }}"
                                                  alt="Photo de {{ $driver->first_name }}">
                                         @else
                                             <div class="h-10 w-10 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center">
@@ -370,8 +408,17 @@
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="text-sm text-gray-900">
-                                    @if($driver->birth_date)
-                                        Âge: {{ $driver->birth_date->age }} ans
+                                    @if($driver->birth_date && $driver->birth_date instanceof \Carbon\Carbon)
+                                        <span class="inline-flex items-center">
+                                            <svg class="w-4 h-4 text-gray-400 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                                <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"></path>
+                                            </svg>
+                                            {{ $driver->birth_date->age }} ans
+                                        </span>
+                                    @elseif($driver->birth_date)
+                                        <span class="text-gray-500 text-xs">{{ $driver->birth_date }}</span>
+                                    @else
+                                        <span class="text-gray-400 text-xs italic">Non renseigné</span>
                                     @endif
                                 </div>
                                 <div class="text-sm text-gray-500">
@@ -798,6 +845,20 @@ function closeModal() {
         setTimeout(() => modal.remove(), 300);
     }
 }
+
+// Auto-hide success messages after 5 seconds
+document.addEventListener('DOMContentLoaded', function() {
+    const successAlert = document.getElementById('success-alert');
+    if (successAlert) {
+        setTimeout(function() {
+            successAlert.style.transition = 'opacity 0.5s ease-out';
+            successAlert.style.opacity = '0';
+            setTimeout(function() {
+                successAlert.remove();
+            }, 500);
+        }, 5000);
+    }
+});
 </script>
 @endpush
 @endsection

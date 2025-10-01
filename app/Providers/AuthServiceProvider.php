@@ -6,11 +6,19 @@ use App\Models\Document;
 use App\Models\DocumentCategory;
 use App\Models\User;
 use App\Models\Organization;
+use App\Models\Vehicle;
+use App\Models\Driver;
+use App\Models\Supplier;
+use App\Models\Assignment;
 use App\Policies\DocumentPolicy;
 use App\Policies\DocumentCategoryPolicy;
 use App\Policies\UserPolicy;
 use App\Policies\RolePolicy;
 use App\Policies\OrganizationPolicy;
+use App\Policies\VehiclePolicy;
+use App\Policies\DriverPolicy;
+use App\Policies\SupplierPolicy;
+use App\Policies\AssignmentPolicy;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\Gate;
 use Spatie\Permission\Models\Role;
@@ -22,14 +30,18 @@ class AuthServiceProvider extends ServiceProvider
      * Chaque modèle sensible a sa propre policy pour un contrôle granulaire
      */
     protected $policies = [
-        // Policies existantes
+        // Policies système
         Document::class => DocumentPolicy::class,
         DocumentCategory::class => DocumentCategoryPolicy::class,
-        
-        // 🛡️ NOUVELLES POLICIES DE SÉCURITÉ
         User::class => UserPolicy::class,
         Role::class => RolePolicy::class,
         Organization::class => OrganizationPolicy::class,
+
+        // 🛡️ POLICIES GESTION DE FLOTTE (Enterprise-Grade)
+        Vehicle::class => VehiclePolicy::class,
+        Driver::class => DriverPolicy::class,
+        Supplier::class => SupplierPolicy::class,
+        Assignment::class => AssignmentPolicy::class,
     ];
 
     /**

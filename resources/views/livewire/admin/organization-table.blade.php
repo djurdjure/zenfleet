@@ -40,11 +40,12 @@
                             'status' => ['label' => 'Statut', 'icon' => 'fa-circle'],
                             'users_count' => ['label' => 'Utilisateurs', 'icon' => 'fa-users'],
                             'vehicles_count' => ['label' => 'Véhicules', 'icon' => 'fa-car'],
+                            'drivers_count' => ['label' => 'Chauffeurs', 'icon' => 'fa-user-tie'],
                             'created_at' => ['label' => 'Création', 'icon' => 'fa-calendar']
                         ] as $field => $config)
                             <th
                                 wire:click="sortBy('{{ $field }}')"
-                                class="p-3 text-left cursor-pointer hover:bg-gray-100/60 transition-all duration-200 group {{ $field === 'name' ? 'w-1/3' : ($field === 'status' ? 'w-24' : ($field === 'users_count' || $field === 'vehicles_count' ? 'w-20' : 'w-28')) }}"
+                                class="p-3 text-left cursor-pointer hover:bg-gray-100/60 transition-all duration-200 group {{ $field === 'name' ? 'w-1/4' : ($field === 'status' ? 'w-24' : ($field === 'users_count' || $field === 'vehicles_count' || $field === 'drivers_count' ? 'w-20' : 'w-28')) }}"
                             >
                                 <div class="flex items-center gap-2"
                                      wire:loading.class="opacity-50"
@@ -171,6 +172,14 @@
                                 <div class="text-center">
                                     <div class="font-semibold text-gray-900 text-sm">{{ number_format($org->vehicles_count) }}</div>
                                     <div class="text-xs text-gray-500">véhicules</div>
+                                </div>
+                            </td>
+
+                            <!-- Drivers Count -->
+                            <td class="p-3">
+                                <div class="text-center">
+                                    <div class="font-semibold text-gray-900 text-sm">{{ number_format($org->drivers_count) }}</div>
+                                    <div class="text-xs text-gray-500">chauffeurs</div>
                                 </div>
                             </td>
 

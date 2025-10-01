@@ -249,9 +249,9 @@
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="flex items-center">
                                     <div class="flex-shrink-0 h-12 w-12">
-                                        @if($driver->photo_path)
+                                        @if($driver->photo)
                                             <img class="h-12 w-12 rounded-full object-cover shadow-lg"
-                                                 src="{{ Storage::url($driver->photo_path) }}"
+                                                 src="{{ Storage::url($driver->photo) }}"
                                                  alt="{{ $driver->full_name }}">
                                         @else
                                             <div class="h-12 w-12 rounded-full bg-gradient-to-br from-emerald-500 to-green-600 flex items-center justify-center shadow-lg">
@@ -269,8 +269,12 @@
                                             @endif
                                         </div>
                                         <div class="text-xs text-gray-400">
-                                            @if($driver->birth_date)
+                                            @if($driver->birth_date && $driver->birth_date instanceof \Carbon\Carbon)
                                                 {{ $driver->birth_date->age }} ans
+                                            @elseif($driver->birth_date)
+                                                <span class="text-orange-400">Date invalide</span>
+                                            @else
+                                                <span class="text-gray-400">Âge non renseigné</span>
                                             @endif
                                         </div>
                                     </div>

@@ -16,6 +16,16 @@
                 <p class="text-xl text-gray-600 mt-2">
                     Vue d'ensemble globale du système ZenFleet
                 </p>
+
+                {{-- Message d'erreur si mode dégradé --}}
+                @if(isset($fallbackMode) && $fallbackMode)
+                    <div class="mt-3 px-4 py-2 bg-yellow-100 border border-yellow-300 rounded-lg">
+                        <div class="flex items-center">
+                            <i class="fas fa-exclamation-triangle text-yellow-600 mr-2"></i>
+                            <span class="text-sm text-yellow-800">{{ $error ?? 'Mode dégradé activé - Données partielles' }}</span>
+                        </div>
+                    </div>
+                @endif
             </div>
             <div class="text-right">
                 <div class="text-sm text-gray-500">Dernière mise à jour</div>
@@ -35,10 +45,10 @@
                             Organisations
                         </p>
                         <p class="text-4xl font-bold mt-2">
-                            {{ number_format($stats['totalOrganizations']) }}
+                            {{ number_format($stats['totalOrganizations'] ?? 0) }}
                         </p>
                         <p class="text-blue-100 text-sm mt-1">
-                            {{ number_format($stats['activeOrganizations']) }} actives
+                            {{ number_format($stats['activeOrganizations'] ?? 0) }} actives
                         </p>
                     </div>
                     <div class="p-4 bg-blue-400 bg-opacity-30 rounded-full">
@@ -57,10 +67,10 @@
                             Utilisateurs
                         </p>
                         <p class="text-4xl font-bold mt-2">
-                            {{ number_format($stats['totalUsers']) }}
+                            {{ number_format($stats['totalUsers'] ?? 0) }}
                         </p>
                         <p class="text-green-100 text-sm mt-1">
-                            {{ number_format($stats['activeUsers']) }} actifs
+                            {{ number_format($stats['activeUsers'] ?? 0) }} actifs
                         </p>
                     </div>
                     <div class="p-4 bg-green-400 bg-opacity-30 rounded-full">
@@ -79,7 +89,7 @@
                             Véhicules
                         </p>
                         <p class="text-4xl font-bold mt-2">
-                            {{ number_format($stats['totalVehicles']) }}
+                            {{ number_format($stats['totalVehicles'] ?? 0) }}
                         </p>
                         <p class="text-yellow-100 text-sm mt-1">
                             Toutes organisations

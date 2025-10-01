@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\Vehicle\UpdateVehicleRequest;
+use App\Http\Requests\Admin\Vehicle\StoreVehicleRequest;
 use App\Models\Vehicle;
 use App\Models\VehicleType;
 use App\Models\VehicleStatus;
@@ -75,10 +77,10 @@ class VehicleController extends Controller
     private const CACHE_TTL_LONG = 7200;    // 2 heures - données statiques
 
     /**
-     * 📁 Configuration pagination enterprise avec adaptation responsive
+     * 📁 Configuration pagination enterprise avec adaptation responsive (20/50/100)
      */
-    private const PAGINATION_SIZE_MOBILE = 15;
-    private const PAGINATION_SIZE_DESKTOP = 25;
+    private const PAGINATION_SIZE_MOBILE = 20;
+    private const PAGINATION_SIZE_DESKTOP = 20;
     private const PAGINATION_SIZE_ENTERPRISE = 50;
 
     /**
@@ -166,9 +168,9 @@ class VehicleController extends Controller
         // Middlewares de sécurité enterprise
         $this->middleware(['auth', 'verified']);
         $this->middleware('throttle:api')->only(['handleImport', 'preValidateImportFile']);
-        $this->middleware('permission:manage_vehicles')->except(['index', 'show']);
 
-        // Autorisation resource-based avec contrôle granulaire
+        // ✅ Utiliser uniquement authorizeResource qui gère les policies
+        // Les permissions sont vérifiées dans VehiclePolicy
         $this->authorizeResource(Vehicle::class, 'vehicle');
 
         // Configuration cache tags pour invalidation intelligente
@@ -235,7 +237,7 @@ class VehicleController extends Controller
             // Données de référence pour les filtres
             $referenceData = $this->getReferenceData();
 
-            return view('admin.vehicles.enterprise-index', compact(
+            return view('admin.vehicles.index', compact(
                 'vehicles',
                 'analytics',
                 'referenceData'
@@ -272,13 +274,13 @@ class VehicleController extends Controller
     /**
      * 💾 Stockage sécurisé avec validation enterprise
      */
-    public function store(Request $request): RedirectResponse
+    public function store(StoreVehicleRequest $request): RedirectResponse
     {
         $this->logUserAction('vehicle.store.attempted', $request);
 
         try {
-            // Validation enterprise avec règles contextuelles
-            $validatedData = $this->validateVehicleData($request);
+            // Utilisation des données validées par StoreVehicleRequest
+            $validatedData = $request->validated();
 
             // Enrichissement automatique des données
             $vehicleData = $this->enrichVehicleCreationData($validatedData);
@@ -320,7 +322,7 @@ class VehicleController extends Controller
     /**
      * 👁️ Visualisation détaillée avec analytics
      */
-    public function show(Vehicle $vehicle): View
+    public function show(Vehicle $vehicle): View|\Illuminate\Http\RedirectResponse
     {
         $this->logUserAction('vehicle.show.accessed', null, ['vehicle_id' => $vehicle->id]);
 
@@ -379,7 +381,7 @@ class VehicleController extends Controller
     /**
      * 🔄 Mise à jour avec audit trail
      */
-    public function update(Request $request, Vehicle $vehicle): RedirectResponse
+    public function update(UpdateVehicleRequest $request, Vehicle $vehicle): RedirectResponse
     {
         $this->logUserAction('vehicle.update.attempted', $request, ['vehicle_id' => $vehicle->id]);
 
@@ -387,8 +389,8 @@ class VehicleController extends Controller
             // Capture de l'état avant modification pour audit
             $originalData = $vehicle->toArray();
 
-            // Validation avec règles contextuelles pour update
-            $validatedData = $this->validateVehicleData($request, $vehicle);
+            // Utilisation des données validées par UpdateVehicleRequest (règles d'unicité correctes)
+            $validatedData = $request->validated();
 
             // Transaction sécurisée avec audit
             $updatedVehicle = DB::transaction(function () use ($vehicle, $validatedData, $originalData) {
@@ -584,12 +586,25 @@ class VehicleController extends Controller
 
             return [
                 'total_vehicles' => $query->count(),
-                'available_vehicles' => $query->whereHas('vehicleStatus', fn($q) => $q->where('name', 'Disponible'))->count(),
-                'assigned_vehicles' => $query->whereHas('vehicleStatus', fn($q) => $q->where('name', 'Affecté'))->count(),
-                'maintenance_vehicles' => $query->whereHas('vehicleStatus', fn($q) => $q->where('name', 'Maintenance'))->count(),
-                'avg_age_years' => round($query->avg(DB::raw('EXTRACT(YEAR FROM AGE(NOW(), acquisition_date))')), 1),
-                'total_value' => $query->sum('current_value'),
-                'avg_mileage' => round($query->avg('current_mileage')),
+                'available_vehicles' => (clone $query)->whereHas('vehicleStatus', fn($q) =>
+                    $q->where('name', 'ILIKE', '%disponible%')
+                      ->orWhere('name', 'ILIKE', '%available%')
+                )->count(),
+                'assigned_vehicles' => (clone $query)->whereHas('vehicleStatus', fn($q) =>
+                    $q->where('name', 'ILIKE', '%affecté%')
+                      ->orWhere('name', 'ILIKE', '%affectée%')
+                      ->orWhere('name', 'ILIKE', '%assigned%')
+                )->count(),
+                'maintenance_vehicles' => (clone $query)->whereHas('vehicleStatus', fn($q) =>
+                    $q->where('name', 'ILIKE', '%maintenance%')
+                      ->orWhere('name', 'ILIKE', '%réparation%')
+                      ->orWhere('name', 'ILIKE', '%repair%')
+                      ->orWhere('name', 'ILIKE', '%révision%')
+                      ->orWhere('name', 'ILIKE', '%service%')
+                )->count(),
+                'avg_age_years' => round((clone $query)->avg(DB::raw('EXTRACT(YEAR FROM AGE(NOW(), acquisition_date))')) ?? 0, 1),
+                'total_value' => (clone $query)->sum('current_value'),
+                'avg_mileage' => round((clone $query)->avg('current_mileage') ?? 0),
                 'fuel_distribution' => $this->getFuelDistribution(),
                 'type_distribution' => $this->getTypeDistribution(),
                 'monthly_acquisitions' => $this->getMonthlyAcquisitions(),
@@ -728,6 +743,15 @@ class VehicleController extends Controller
     private function validateVinFormat(string $vin): bool { return strlen($vin) === 17; }
     private function enrichVehicleCreationData(array $data): array {
         $data['organization_id'] = Auth::user()->organization_id;
+
+        // Définir le statut par défaut si non spécifié
+        if (empty($data['status_id'])) {
+            $defaultStatus = \App\Models\VehicleStatus::where('name', 'Disponible')->first();
+            if ($defaultStatus) {
+                $data['status_id'] = $defaultStatus->id;
+            }
+        }
+
         return $data;
     }
     private function performPostCreationActions(Vehicle $vehicle): void {}
@@ -2686,12 +2710,12 @@ class VehicleController extends Controller
     private function getOptimalPaginationSize(Request $request): int
     {
         // Détection du type d'appareil via User-Agent
-        $userAgent = $request->userAgent();
+        $userAgent = $request->userAgent() ?? '';
         $isMobile = preg_match('/(Mobile|Android|iPhone|iPad)/', $userAgent);
 
-        // Vérification des préférences utilisateur (si implémentées)
+        // Vérification des préférences utilisateur (pagination enterprise: 20/50/100)
         $userPreference = $request->get('per_page');
-        if ($userPreference && in_array($userPreference, [10, 15, 25, 50, 100])) {
+        if ($userPreference && in_array($userPreference, [20, 50, 100])) {
             return (int) $userPreference;
         }
 

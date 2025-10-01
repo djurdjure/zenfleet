@@ -136,6 +136,9 @@
         </div>
     </div>
 
+    {{-- Résumé des erreurs --}}
+    <x-form-error-summary />
+
     {{-- Formulaire --}}
     <form action="{{ route('admin.vehicles.store') }}" method="POST" id="vehicle-form" class="space-y-8">
         @csrf
@@ -152,84 +155,49 @@
             </div>
 
             <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                <div>
-                    <label for="registration_plate" class="block text-sm font-medium text-gray-700 mb-1">
-                        Plaque d'immatriculation <span class="text-red-500">*</span>
-                    </label>
-                    <input type="text" name="registration_plate" id="registration_plate" value="{{ old('registration_plate') }}"
-                           placeholder="Ex: 123 ABC 01"
-                           class="form-input block w-full rounded-md text-sm px-3 py-2 focus:outline-none @error('registration_plate') border-red-500 @enderror"
-                           required>
-                    @error('registration_plate')
-                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                    @enderror
-                </div>
+                <x-vehicle-form-field
+                    name="registration_plate"
+                    label="Plaque d'immatriculation"
+                    type="text"
+                    placeholder="Ex: 123 ABC 01"
+                    required="true"
+                    icon="fas fa-id-card" />
 
-                <div>
-                    <label for="vin" class="block text-sm font-medium text-gray-700 mb-1">
-                        Numéro VIN <span class="text-red-500">*</span>
-                    </label>
-                    <input type="text" name="vin" id="vin" value="{{ old('vin') }}"
-                           placeholder="17 caractères"
-                           maxlength="17"
-                           class="form-input block w-full rounded-md text-sm px-3 py-2 focus:outline-none @error('vin') border-red-500 @enderror"
-                           required>
-                    @error('vin')
-                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                    @enderror
-                </div>
+                <x-vehicle-form-field
+                    name="vin"
+                    label="Numéro VIN"
+                    type="text"
+                    placeholder="17 caractères (optionnel)"
+                    help="Numéro d'identification unique du véhicule"
+                    icon="fas fa-barcode" />
 
-                <div>
-                    <label for="brand" class="block text-sm font-medium text-gray-700 mb-1">
-                        Marque <span class="text-red-500">*</span>
-                    </label>
-                    <input type="text" name="brand" id="brand" value="{{ old('brand') }}"
-                           placeholder="Ex: Toyota, Renault..."
-                           class="form-input block w-full rounded-md text-sm px-3 py-2 focus:outline-none @error('brand') border-red-500 @enderror"
-                           required>
-                    @error('brand')
-                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                    @enderror
-                </div>
+                <x-vehicle-form-field
+                    name="brand"
+                    label="Marque"
+                    type="text"
+                    placeholder="Ex: Toyota, Renault..."
+                    icon="fas fa-trademark" />
 
-                <div>
-                    <label for="model" class="block text-sm font-medium text-gray-700 mb-1">
-                        Modèle <span class="text-red-500">*</span>
-                    </label>
-                    <input type="text" name="model" id="model" value="{{ old('model') }}"
-                           placeholder="Ex: Corolla, Clio..."
-                           class="form-input block w-full rounded-md text-sm px-3 py-2 focus:outline-none @error('model') border-red-500 @enderror"
-                           required>
-                    @error('model')
-                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                    @enderror
-                </div>
+                <x-vehicle-form-field
+                    name="model"
+                    label="Modèle"
+                    type="text"
+                    placeholder="Ex: Corolla, Clio..."
+                    icon="fas fa-car" />
 
-                <div>
-                    <label for="color" class="block text-sm font-medium text-gray-700 mb-1">
-                        Couleur <span class="text-red-500">*</span>
-                    </label>
-                    <input type="text" name="color" id="color" value="{{ old('color') }}"
-                           placeholder="Ex: Blanc, Noir..."
-                           class="form-input block w-full rounded-md text-sm px-3 py-2 focus:outline-none @error('color') border-red-500 @enderror"
-                           required>
-                    @error('color')
-                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                    @enderror
-                </div>
+                <x-vehicle-form-field
+                    name="color"
+                    label="Couleur"
+                    type="text"
+                    placeholder="Ex: Blanc, Noir..."
+                    icon="fas fa-palette" />
 
-                <div>
-                    <label for="manufacturing_year" class="block text-sm font-medium text-gray-700 mb-1">
-                        Année de fabrication <span class="text-red-500">*</span>
-                    </label>
-                    <input type="number" name="manufacturing_year" id="manufacturing_year" value="{{ old('manufacturing_year') }}"
-                           min="1990" max="2030" placeholder="{{ date('Y') }}"
-                           class="form-input block w-full rounded-md text-sm px-3 py-2 focus:outline-none @error('manufacturing_year') border-red-500 @enderror"
-                           required>
-                    @error('manufacturing_year')
-                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                    @enderror
-                </div>
+                <x-vehicle-form-field
+                    name="manufacturing_year"
+                    label="Année de fabrication"
+                    type="number"
+                    placeholder="{{ date('Y') }}"
+                    icon="fas fa-calendar-alt" />
             </div>
         </div>
 
@@ -245,112 +213,59 @@
             </div>
 
             <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-                <div>
-                    <label for="vehicle_type_id" class="block text-sm font-medium text-gray-700 mb-1">
-                        Type de véhicule <span class="text-red-500">*</span>
-                    </label>
-                    <select name="vehicle_type_id" id="vehicle_type_id" class="tom-select-type w-full" required>
-                        <option value="">Sélectionner un type</option>
-                        @foreach($referenceData['vehicle_types'] ?? [] as $type)
-                            <option value="{{ $type->id }}" {{ old('vehicle_type_id') == $type->id ? 'selected' : '' }}>
-                                {{ $type->name }}
-                            </option>
-                        @endforeach
-                    </select>
-                    @error('vehicle_type_id')
-                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                    @enderror
-                </div>
+                <x-vehicle-form-field
+                    name="vehicle_type_id"
+                    label="Type de véhicule"
+                    type="select"
+                    placeholder="Sélectionner un type..."
+                    :options="collect($referenceData['vehicle_types'] ?? [])->pluck('name', 'id')->toArray()"
+                    icon="fas fa-truck" />
 
-                <div>
-                    <label for="fuel_type_id" class="block text-sm font-medium text-gray-700 mb-1">
-                        Type de carburant <span class="text-red-500">*</span>
-                    </label>
-                    <select name="fuel_type_id" id="fuel_type_id" class="tom-select-fuel w-full" required>
-                        <option value="">Sélectionner un carburant</option>
-                        @foreach($referenceData['fuel_types'] ?? [] as $fuel)
-                            <option value="{{ $fuel->id }}" {{ old('fuel_type_id') == $fuel->id ? 'selected' : '' }}>
-                                {{ $fuel->name }}
-                            </option>
-                        @endforeach
-                    </select>
-                    @error('fuel_type_id')
-                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                    @enderror
-                </div>
+                <x-vehicle-form-field
+                    name="fuel_type_id"
+                    label="Type de carburant"
+                    type="select"
+                    placeholder="Sélectionner un carburant..."
+                    :options="collect($referenceData['fuel_types'] ?? [])->pluck('name', 'id')->toArray()"
+                    icon="fas fa-gas-pump" />
 
-                <div>
-                    <label for="transmission_type_id" class="block text-sm font-medium text-gray-700 mb-1">
-                        Transmission <span class="text-red-500">*</span>
-                    </label>
-                    <select name="transmission_type_id" id="transmission_type_id" class="tom-select-transmission w-full" required>
-                        <option value="">Sélectionner une transmission</option>
-                        @foreach($referenceData['transmission_types'] ?? [] as $transmission)
-                            <option value="{{ $transmission->id }}" {{ old('transmission_type_id') == $transmission->id ? 'selected' : '' }}>
-                                {{ $transmission->name }}
-                            </option>
-                        @endforeach
-                    </select>
-                    @error('transmission_type_id')
-                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                    @enderror
-                </div>
+                <x-vehicle-form-field
+                    name="transmission_type_id"
+                    label="Transmission"
+                    type="select"
+                    placeholder="Sélectionner une transmission..."
+                    :options="collect($referenceData['transmission_types'] ?? [])->pluck('name', 'id')->toArray()"
+                    icon="fas fa-cogs" />
 
-                <div>
-                    <label for="status_id" class="block text-sm font-medium text-gray-700 mb-1">
-                        Statut <span class="text-red-500">*</span>
-                    </label>
-                    <select name="status_id" id="status_id" class="tom-select-status w-full" required>
-                        <option value="">Sélectionner un statut</option>
-                        @foreach($referenceData['vehicle_statuses'] ?? [] as $status)
-                            <option value="{{ $status->id }}" {{ old('status_id') == $status->id ? 'selected' : '' }}>
-                                {{ $status->name }}
-                            </option>
-                        @endforeach
-                    </select>
-                    @error('status_id')
-                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                    @enderror
-                </div>
+                <x-vehicle-form-field
+                    name="status_id"
+                    label="Statut"
+                    type="select"
+                    placeholder="Sélectionner un statut..."
+                    :options="collect($referenceData['vehicle_statuses'] ?? [])->pluck('name', 'id')->toArray()"
+                    help="Par défaut: Disponible"
+                    icon="fas fa-info-circle" />
 
-                <div>
-                    <label for="engine_displacement_cc" class="block text-sm font-medium text-gray-700 mb-1">
-                        Cylindrée (cc) <span class="text-red-500">*</span>
-                    </label>
-                    <input type="number" name="engine_displacement_cc" id="engine_displacement_cc" value="{{ old('engine_displacement_cc') }}"
-                           min="50" max="10000" placeholder="Ex: 1600"
-                           class="form-input block w-full rounded-md text-sm px-3 py-2 focus:outline-none @error('engine_displacement_cc') border-red-500 @enderror"
-                           required>
-                    @error('engine_displacement_cc')
-                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                    @enderror
-                </div>
+                <x-vehicle-form-field
+                    name="engine_displacement_cc"
+                    label="Cylindrée (cc)"
+                    type="number"
+                    placeholder="Ex: 1600"
+                    icon="fas fa-engine" />
 
-                <div>
-                    <label for="power_hp" class="block text-sm font-medium text-gray-700 mb-1">
-                        Puissance (HP) <span class="text-red-500">*</span>
-                    </label>
-                    <input type="number" name="power_hp" id="power_hp" value="{{ old('power_hp') }}"
-                           min="1" max="2000" placeholder="Ex: 120"
-                           class="form-input block w-full rounded-md text-sm px-3 py-2 focus:outline-none @error('power_hp') border-red-500 @enderror"
-                           required>
-                    @error('power_hp')
-                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                    @enderror
-                </div>
+                <x-vehicle-form-field
+                    name="power_hp"
+                    label="Puissance (HP)"
+                    type="number"
+                    placeholder="Ex: 120"
+                    icon="fas fa-tachometer-alt" />
 
-                <div>
-                    <label for="seats" class="block text-sm font-medium text-gray-700 mb-1">
-                        Nombre de places <span class="text-red-500">*</span>
-                    </label>
-                    <input type="number" name="seats" id="seats" value="{{ old('seats') }}"
-                           min="1" max="100" placeholder="Ex: 5"
-                           class="form-input block w-full rounded-md text-sm px-3 py-2 focus:outline-none @error('seats') border-red-500 @enderror"
-                           required>
-                    @error('seats')
-                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                    @enderror
-                </div>
+                <x-vehicle-form-field
+                    name="seats"
+                    label="Nombre de places"
+                    type="number"
+                    placeholder="Ex: 5"
+                    icon="fas fa-user-friends" />
             </div>
         </div>
 
@@ -366,69 +281,40 @@
             </div>
 
             <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                <div>
-                    <label for="acquisition_date" class="block text-sm font-medium text-gray-700 mb-1">
-                        Date d'acquisition <span class="text-red-500">*</span>
-                    </label>
-                    <input type="date" name="acquisition_date" id="acquisition_date" value="{{ old('acquisition_date') }}"
-                           max="{{ date('Y-m-d') }}"
-                           class="form-input block w-full rounded-md text-sm px-3 py-2 focus:outline-none @error('acquisition_date') border-red-500 @enderror"
-                           required>
-                    @error('acquisition_date')
-                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                    @enderror
-                </div>
+                <x-vehicle-form-field
+                    name="acquisition_date"
+                    label="Date d'acquisition"
+                    type="date"
+                    icon="fas fa-calendar" />
 
-                <div>
-                    <label for="purchase_price" class="block text-sm font-medium text-gray-700 mb-1">
-                        Prix d'achat (€) <span class="text-red-500">*</span>
-                    </label>
-                    <input type="number" name="purchase_price" id="purchase_price" value="{{ old('purchase_price') }}"
-                           min="0" step="0.01" placeholder="Ex: 25000.00"
-                           class="form-input block w-full rounded-md text-sm px-3 py-2 focus:outline-none @error('purchase_price') border-red-500 @enderror"
-                           required>
-                    @error('purchase_price')
-                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                    @enderror
-                </div>
+                <x-vehicle-form-field
+                    name="purchase_price"
+                    label="Prix d'achat (€)"
+                    type="number"
+                    placeholder="Ex: 25000.00"
+                    icon="fas fa-euro-sign" />
 
-                <div>
-                    <label for="current_value" class="block text-sm font-medium text-gray-700 mb-1">
-                        Valeur actuelle (€)
-                    </label>
-                    <input type="number" name="current_value" id="current_value" value="{{ old('current_value') }}"
-                           min="0" step="0.01" placeholder="Ex: 20000.00"
-                           class="form-input block w-full rounded-md text-sm px-3 py-2 focus:outline-none @error('current_value') border-red-500 @enderror">
-                    @error('current_value')
-                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                    @enderror
-                </div>
+                <x-vehicle-form-field
+                    name="current_value"
+                    label="Valeur actuelle (€)"
+                    type="number"
+                    placeholder="Ex: 20000.00"
+                    help="Valeur estimée actuelle du véhicule"
+                    icon="fas fa-chart-line" />
 
-                <div>
-                    <label for="initial_mileage" class="block text-sm font-medium text-gray-700 mb-1">
-                        Kilométrage initial <span class="text-red-500">*</span>
-                    </label>
-                    <input type="number" name="initial_mileage" id="initial_mileage" value="{{ old('initial_mileage') }}"
-                           min="0" placeholder="Ex: 10000"
-                           class="form-input block w-full rounded-md text-sm px-3 py-2 focus:outline-none @error('initial_mileage') border-red-500 @enderror"
-                           required>
-                    @error('initial_mileage')
-                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                    @enderror
-                </div>
+                <x-vehicle-form-field
+                    name="initial_mileage"
+                    label="Kilométrage initial"
+                    type="number"
+                    placeholder="Ex: 10000"
+                    icon="fas fa-road" />
 
-                <div>
-                    <label for="current_mileage" class="block text-sm font-medium text-gray-700 mb-1">
-                        Kilométrage actuel <span class="text-red-500">*</span>
-                    </label>
-                    <input type="number" name="current_mileage" id="current_mileage" value="{{ old('current_mileage') }}"
-                           min="0" placeholder="Ex: 15000"
-                           class="form-input block w-full rounded-md text-sm px-3 py-2 focus:outline-none @error('current_mileage') border-red-500 @enderror"
-                           required>
-                    @error('current_mileage')
-                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                    @enderror
-                </div>
+                <x-vehicle-form-field
+                    name="current_mileage"
+                    label="Kilométrage actuel"
+                    type="number"
+                    placeholder="Ex: 15000"
+                    icon="fas fa-tachometer-alt" />
             </div>
         </div>
 
@@ -443,17 +329,13 @@
                 <h3 class="text-lg font-medium text-gray-900">Notes et observations</h3>
             </div>
 
-            <div>
-                <label for="notes" class="block text-sm font-medium text-gray-700 mb-1">
-                    Notes (optionnel)
-                </label>
-                <textarea name="notes" id="notes" rows="4"
-                          placeholder="Informations complémentaires, observations, etc..."
-                          class="form-input block w-full rounded-md text-sm px-3 py-2 focus:outline-none @error('notes') border-red-500 @enderror">{{ old('notes') }}</textarea>
-                @error('notes')
-                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                @enderror
-            </div>
+            <x-vehicle-form-field
+                name="notes"
+                label="Notes"
+                type="textarea"
+                placeholder="Informations complémentaires, observations, etc..."
+                help="Champ optionnel pour des informations supplémentaires"
+                icon="fas fa-sticky-note" />
         </div>
 
         {{-- Actions --}}

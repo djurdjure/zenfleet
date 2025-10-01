@@ -202,7 +202,7 @@ class OrganizationController extends Controller
             $organization = Organization::create($validated);
 
             return redirect()
-                ->route('admin.organizations.show', $organization)
+                ->route('admin.organizations.index')
                 ->with('success', 'Organisation créée avec succès.');
 
         } catch (\Exception $e) {
@@ -247,7 +247,7 @@ class OrganizationController extends Controller
                 'description' => 'nullable|string',
                 'website' => 'nullable|url|max:255',
                 'phone_number' => 'required|string|max:255',
-                'primary_email' => 'required|email|max:255|unique:organizations,primary_email,'.$organization->id,
+                'email' => 'required|email|max:255|unique:organizations,email,'.$organization->id,
                 'status' => 'required|in:active,inactive,suspended',
 
                 // Informations légales

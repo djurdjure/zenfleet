@@ -38,6 +38,36 @@ class Vehicle extends Model
     public function assignments(): HasMany { return $this->hasMany(Assignment::class); }
     public function maintenancePlans(): HasMany { return $this->hasMany(MaintenancePlan::class); }
     public function maintenanceLogs(): HasMany { return $this->hasMany(MaintenanceLog::class); }
+
+    /**
+     * 🔧 Relation avec les opérations de maintenance - ENTERPRISE GRADE
+     */
+    public function maintenanceOperations(): HasMany
+    {
+        return $this->hasMany(MaintenanceOperation::class);
+    }
+
+    /**
+     * 🔧 Relation avec les opérations de maintenance actives
+     */
+    public function activeMaintenanceOperations(): HasMany
+    {
+        return $this->hasMany(MaintenanceOperation::class)
+                    ->whereIn('status', [
+                        MaintenanceOperation::STATUS_PLANNED,
+                        MaintenanceOperation::STATUS_IN_PROGRESS
+                    ]);
+    }
+
+    /**
+     * 🔧 Relation avec les opérations de maintenance récentes (30 derniers jours)
+     */
+    public function recentMaintenanceOperations(): HasMany
+    {
+        return $this->hasMany(MaintenanceOperation::class)
+                    ->where('created_at', '>=', now()->subDays(30))
+                    ->orderBy('created_at', 'desc');
+    }
     
     /**
      * Vérifie si le véhicule a une affectation actuellement en cours.
@@ -45,6 +75,79 @@ class Vehicle extends Model
     public function isCurrentlyAssigned(): bool
     {
        return $this->assignments()->whereNull('end_datetime')->exists();
+    }
+
+    /**
+     * 🔧 Vérifie si le véhicule est actuellement en maintenance - ENTERPRISE GRADE
+     */
+    public function isUnderMaintenance(): bool
+    {
+        return $this->activeMaintenanceOperations()->exists();
+    }
+
+    /**
+     * 🔧 Obtient la prochaine maintenance planifiée - ENTERPRISE GRADE
+     */
+    public function getNextMaintenance()
+    {
+        return $this->maintenanceOperations()
+                    ->where('status', MaintenanceOperation::STATUS_PLANNED)
+                    ->whereDate('scheduled_date', '>=', now()->toDateString())
+                    ->orderBy('scheduled_date')
+                    ->first();
+    }
+
+    /**
+     * 🔧 Obtient le coût total de maintenance pour une période - ENTERPRISE GRADE
+     */
+    public function getMaintenanceCost($startDate = null, $endDate = null): float
+    {
+        $query = $this->maintenanceOperations()
+                      ->where('status', MaintenanceOperation::STATUS_COMPLETED);
+
+        if ($startDate) {
+            $query->whereDate('completed_date', '>=', $startDate);
+        }
+
+        if ($endDate) {
+            $query->whereDate('completed_date', '<=', $endDate);
+        }
+
+        return $query->sum('total_cost') ?? 0.0;
+    }
+
+    /**
+     * 🔧 Obtient les statistiques de maintenance enterprise - ENTERPRISE GRADE
+     */
+    public function getMaintenanceStats(): array
+    {
+        $totalOperations = $this->maintenanceOperations()->count();
+        $completedOperations = $this->maintenanceOperations()
+            ->where('status', MaintenanceOperation::STATUS_COMPLETED)
+            ->count();
+
+        $averageCost = $this->maintenanceOperations()
+            ->where('status', MaintenanceOperation::STATUS_COMPLETED)
+            ->avg('total_cost') ?? 0;
+
+        $lastMaintenance = $this->maintenanceOperations()
+            ->where('status', MaintenanceOperation::STATUS_COMPLETED)
+            ->orderBy('completed_date', 'desc')
+            ->first();
+
+        return [
+            'total_operations' => $totalOperations,
+            'completed_operations' => $completedOperations,
+            'completion_rate' => $totalOperations > 0 ? ($completedOperations / $totalOperations) * 100 : 0,
+            'average_cost' => round($averageCost, 2),
+            'total_cost_ytd' => $this->getMaintenanceCost(now()->startOfYear()),
+            'last_maintenance_date' => $lastMaintenance?->completed_date,
+            'days_since_last_maintenance' => $lastMaintenance
+                ? now()->diffInDays($lastMaintenance->completed_date)
+                : null,
+            'is_under_maintenance' => $this->isUnderMaintenance(),
+            'next_maintenance' => $this->getNextMaintenance()?->scheduled_date,
+        ];
     }
 
     /**

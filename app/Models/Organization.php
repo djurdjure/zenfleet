@@ -26,7 +26,7 @@ class Organization extends Model
         'description',
         'website',
         'phone_number',
-        'primary_email',
+        'email',
         'logo_path',
         'status',
 
@@ -78,12 +78,17 @@ class Organization extends Model
 
     public function users(): HasMany
     {
-        return $this->hasMany(User::class)->where('is_active', true);
+        return $this->hasMany(User::class)->where('status', 'active');
     }
 
     public function allUsers(): HasMany
     {
         return $this->hasMany(User::class);
+    }
+
+    public function activeUsers(): HasMany
+    {
+        return $this->hasMany(User::class)->where('status', 'active');
     }
 
     public function admins(): HasMany
@@ -146,6 +151,11 @@ class Organization extends Model
     public function vehicles(): HasMany
     {
         return $this->hasMany(Vehicle::class);
+    }
+
+    public function driversModel(): HasMany
+    {
+        return $this->hasMany(Driver::class);
     }
 
     public function activeVehicles(): HasMany

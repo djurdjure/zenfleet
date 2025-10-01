@@ -186,7 +186,7 @@ class DashboardController extends Controller
                     'activeOrganizations' => Organization::where('status', 'active')->count(),
                     'pendingOrganizations' => Organization::where('status', 'pending')->count(),
                     'totalUsers' => User::count(),
-                    'activeUsers' => User::where('is_active', true)->count(),
+                    'activeUsers' => User::where('status', 'active')->count(),
                     'totalVehicles' => Vehicle::count(),
                     'totalDrivers' => Driver::count(),
                     'systemUptime' => $this->getSystemUptime(),
@@ -241,7 +241,7 @@ class DashboardController extends Controller
 
                 $organizationStats = [
                     'organizationUsers' => User::where('organization_id', $orgId)->count(),
-                    'activeUsers' => User::where('organization_id', $orgId)->where('is_active', true)->count(),
+                    'activeUsers' => User::where('organization_id', $orgId)->where('status', 'active')->count(),
                     'organizationVehicles' => Vehicle::where('organization_id', $orgId)->count(),
                     'availableVehicles' => Vehicle::where('organization_id', $orgId)
                         ->whereHas('vehicleStatus', function ($q) {
@@ -449,17 +449,47 @@ class DashboardController extends Controller
      */
     private function getFallbackDashboardData(User $user, string $role): array
     {
+        $baseStats = [
+            'totalOrganizations' => 0,
+            'activeOrganizations' => 0,
+            'pendingOrganizations' => 0,
+            'totalUsers' => 0,
+            'activeUsers' => 0,
+            'totalVehicles' => 0,
+            'totalDrivers' => 0,
+            'systemUptime' => '0%',
+        ];
+
+        // Essayer de récupérer des statistiques basiques
+        try {
+            $baseStats['totalOrganizations'] = Organization::count();
+            $baseStats['activeOrganizations'] = Organization::where('status', 'active')->count();
+            $baseStats['totalUsers'] = User::count();
+            $baseStats['activeUsers'] = User::where('status', 'active')->count();
+            $baseStats['totalVehicles'] = Vehicle::count();
+
+            // Essayer de compter les drivers
+            if (\Schema::hasTable('drivers')) {
+                $baseStats['totalDrivers'] = Driver::count();
+            }
+        } catch (\Exception $e) {
+            Log::warning('Fallback stats generation partially failed', ['error' => $e->getMessage()]);
+        }
+
         return [
             'user' => $user,
-            'stats' => [
-                'total_organizations' => 0,
-                'active_users' => 0,
-                'total_vehicles' => 0,
-                'total_drivers' => 0,
-            ],
+            'stats' => $baseStats,
             'recentActivity' => [],
+            'monthlyAnalytics' => [],
             'systemHealth' => ['overall' => 'unknown'],
-            'dashboardType' => strtolower(str_replace(' ', '-', $role)),
+            'topOrganizations' => [],
+            'dashboardType' => match($role) {
+                'Super Admin' => 'super-admin',
+                'Admin' => 'admin',
+                'Gestionnaire Flotte' => 'fleet-manager',
+                'Supervisor' => 'supervisor',
+                default => 'driver'
+            },
             'error' => 'Données partiellement indisponibles - Mode dégradé activé',
             'fallbackMode' => true,
             'timestamp' => now()->toISOString()

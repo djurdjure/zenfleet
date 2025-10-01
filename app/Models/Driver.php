@@ -15,20 +15,53 @@ class Driver extends Model
     use HasFactory, SoftDeletes, BelongsToOrganization;
 
     protected $fillable = [
-        'user_id', 'employee_number', 'first_name', 'last_name', 'photo_path', 'birth_date',
-        'blood_type', 'address', 'personal_phone', 'personal_email', 'license_number',
-        'license_category', 'license_issue_date', 'license_authority', 'license_expiry_date',
-        'recruitment_date', 'contract_end_date', 'status_id', 'emergency_contact_name',
-        'emergency_contact_phone', 'organization_id',
+        // Champs de base
+        'user_id', 'organization_id', 'first_name', 'last_name', 'email',
+
+        // Informations personnelles
+        'employee_number', 'birth_date', 'blood_type',
+        'personal_phone', 'personal_email', 'address', 'city', 'postal_code',
+
+        // Permis de conduire
+        'license_number', 'license_category',
+        'driver_license_expiry_date', 'license_issue_date', 'license_authority',
+
+        // Emploi et statut
+        'recruitment_date', 'contract_end_date', 'status_id',
+
+        // Contact d'urgence
+        'emergency_contact_name', 'emergency_contact_phone',
+
+        // Photo et documents
+        'photo', 'notes',
     ];
 
     protected $casts = [
         'birth_date' => 'date',
-        'license_issue_date' => 'date',
-        'license_expiry_date' => 'date',
         'recruitment_date' => 'date',
         'contract_end_date' => 'date',
+        'driver_license_expiry_date' => 'date',
+        'license_issue_date' => 'date',
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
+        'deleted_at' => 'datetime',
     ];
+
+    /**
+     * 🔄 Accessors pour gérer la compatibilité entre champs dupliqués
+     */
+
+    // Gestion de la date de naissance
+    public function getBirthDateAttribute()
+    {
+        $dateValue = $this->attributes['birth_date'] ?? null;
+
+        if (!$dateValue) {
+            return null;
+        }
+
+        return $this->asDate($dateValue);
+    }
 
     // CORRECTION : Ajout des bons types de retour
     public function user(): BelongsTo

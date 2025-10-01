@@ -23,12 +23,30 @@ class StoreSupplierRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => ['required', 'string', 'max:255'],
-            'contact_name' => ['nullable', 'string', 'max:255'],
-            'phone' => ['nullable', 'string', 'regex:/^[\+\d\s\(\)-]{8,20}$/'],
-            'email' => ['nullable', 'email:rfc,dns', 'max:255', Rule::unique('suppliers', 'email')],
-            'address' => ['nullable', 'string'],
-            'supplier_category_id' => ['nullable', 'exists:supplier_categories,id'],
+            // Informations générales
+            'company_name' => ['required', 'string', 'max:255'],
+            'supplier_type' => ['required', 'string', 'max:255'],
+            'trade_register' => ['nullable', 'string', 'max:255'],
+            'nif' => ['nullable', 'string', 'size:15', 'regex:/^[0-9]{15}$/'],
+
+            // Contact principal
+            'contact_first_name' => ['required', 'string', 'max:255'],
+            'contact_last_name' => ['required', 'string', 'max:255'],
+            'contact_phone' => ['required', 'string', 'regex:/^[\+\d\s\(\)-]{8,20}$/'],
+            'contact_email' => ['nullable', 'email', 'max:255'],
+
+            // Localisation
+            'address' => ['required', 'string'],
+            'wilaya' => ['required', 'string', 'max:2'],
+            'city' => ['required', 'string', 'max:255'],
+            'commune' => ['nullable', 'string', 'max:255'],
+
+            // Paramètres
+            'rating' => ['nullable', 'numeric', 'between:0,10'],
+            'is_active' => ['nullable', 'boolean'],
+            'is_preferred' => ['nullable', 'boolean'],
+            'is_certified' => ['nullable', 'boolean'],
+            'notes' => ['nullable', 'string'],
         ];
     }
 }

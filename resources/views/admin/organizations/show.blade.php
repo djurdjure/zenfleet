@@ -536,7 +536,7 @@
                             </div>
                             <div>
                                 <p class="text-sm font-medium text-gray-500">Email principal</p>
-                                <p class="text-base text-gray-900">{{ $organization->primary_email }}</p>
+                                <p class="text-base text-gray-900">{{ $organization->email }}</p>
                             </div>
                         </div>
 

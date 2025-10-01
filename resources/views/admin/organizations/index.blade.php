@@ -132,6 +132,44 @@
 
 @section('content')
 <div class="space-y-8 fade-in">
+    {{-- Messages de notification --}}
+    @if(session('success'))
+        <div id="success-alert" class="bg-green-50 border-l-4 border-green-400 p-4 rounded-lg shadow-sm fade-in">
+            <div class="flex items-center">
+                <div class="flex-shrink-0">
+                    <i class="fas fa-check-circle text-green-400 text-lg"></i>
+                </div>
+                <div class="ml-3">
+                    <p class="text-green-700 font-medium">{{ session('success') }}</p>
+                </div>
+                <div class="ml-auto pl-3">
+                    <button onclick="document.getElementById('success-alert').remove()"
+                            class="text-green-400 hover:text-green-600 transition-colors">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    @endif
+
+    @if(session('error'))
+        <div id="error-alert" class="bg-red-50 border-l-4 border-red-400 p-4 rounded-lg shadow-sm fade-in">
+            <div class="flex items-center">
+                <div class="flex-shrink-0">
+                    <i class="fas fa-exclamation-circle text-red-400 text-lg"></i>
+                </div>
+                <div class="ml-3">
+                    <p class="text-red-700 font-medium">{{ session('error') }}</p>
+                </div>
+                <div class="ml-auto pl-3">
+                    <button onclick="document.getElementById('error-alert').remove()"
+                            class="text-red-400 hover:text-red-600 transition-colors">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    @endif
     {{-- Header Section --}}
     <div class="bg-gradient-to-r from-gray-50 to-gray-100 rounded-xl p-6 border border-gray-200">
         <div class="flex items-center justify-between">
@@ -519,6 +557,20 @@ document.addEventListener('DOMContentLoaded', function() {
                 row.style.display = text.includes(searchTerm) ? '' : 'none';
             });
         });
+    }
+});
+
+// Auto-hide success messages after 5 seconds
+document.addEventListener('DOMContentLoaded', function() {
+    const successAlert = document.getElementById('success-alert');
+    if (successAlert) {
+        setTimeout(function() {
+            successAlert.style.transition = 'opacity 0.5s ease-out';
+            successAlert.style.opacity = '0';
+            setTimeout(function() {
+                successAlert.remove();
+            }, 500);
+        }, 5000);
     }
 });
 </script>

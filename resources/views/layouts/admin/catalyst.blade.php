@@ -46,12 +46,8 @@
                         {{-- Dashboard --}}
                         <li class="flex">
                             <a href="{{ route('admin.dashboard') }}"
-                               class="flex items-center w-full h-10 px-4 py-2 rounded-lg text-sm font-normal transition-all duration-200 {{ request()->routeIs('admin.dashboard') ? 'bg-blue-50 text-blue-700 shadow-sm' : 'text-slate-600 hover:bg-white/60 hover:text-slate-800' }}">
-                                <div class="relative mr-3">
-                                    <div class="w-8 h-8 rounded-full border-2 border-white flex items-center justify-center">
-                                        <i class="fas fa-tachometer-alt text-sm {{ request()->routeIs('admin.dashboard') ? 'text-blue-600' : 'text-slate-500' }}"></i>
-                                    </div>
-                                </div>
+                               class="flex items-center w-full h-10 px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 {{ request()->routeIs('admin.dashboard') ? 'bg-blue-50 text-blue-700 shadow-sm' : 'text-slate-600 hover:bg-white/60 hover:text-slate-800' }}">
+                                <i class="fas fa-tachometer-alt text-base mr-3 {{ request()->routeIs('admin.dashboard') ? 'text-blue-600' : 'text-slate-500' }}"></i>
                                 <span class="flex-1">Dashboard</span>
                             </a>
                         </li>
@@ -60,12 +56,8 @@
                         @hasrole('Super Admin')
                         <li class="flex">
                             <a href="{{ route('admin.organizations.index') }}"
-                               class="flex items-center w-full h-10 px-4 py-2 rounded-lg text-sm font-normal transition-all duration-200 {{ request()->routeIs('admin.organizations.*') ? 'bg-blue-50 text-blue-700 shadow-sm' : 'text-slate-600 hover:bg-white/60 hover:text-slate-800' }}">
-                                <div class="relative mr-3">
-                                    <div class="w-8 h-8 rounded-full border-2 border-white flex items-center justify-center">
-                                        <i class="fas fa-building text-sm {{ request()->routeIs('admin.organizations.*') ? 'text-blue-600' : 'text-slate-500' }}"></i>
-                                    </div>
-                                </div>
+                               class="flex items-center w-full h-10 px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 {{ request()->routeIs('admin.organizations.*') ? 'bg-blue-50 text-blue-700 shadow-sm' : 'text-slate-600 hover:bg-white/60 hover:text-slate-800' }}">
+                                <i class="fas fa-building text-base mr-3 {{ request()->routeIs('admin.organizations.*') ? 'text-blue-600' : 'text-slate-500' }}"></i>
                                 <span class="flex-1">Organisations</span>
                             </a>
                         </li>
@@ -75,32 +67,28 @@
                         @hasanyrole('Super Admin|Admin|Gestionnaire Flotte')
                         <li class="flex flex-col" x-data="{ open: {{ request()->routeIs('admin.vehicles.*', 'admin.assignments.*') ? 'true' : 'false' }} }">
                             <button @click="open = !open"
-                                    class="flex items-center w-full h-10 px-4 py-2 rounded-lg text-sm font-normal transition-all duration-200 {{ request()->routeIs('admin.vehicles.*', 'admin.assignments.*') ? 'bg-blue-50 text-blue-700 shadow-sm' : 'text-slate-600 hover:bg-white/60 hover:text-slate-800' }}">
-                                <div class="relative mr-3">
-                                    <div class="w-8 h-8 rounded-full border-2 border-white flex items-center justify-center">
-                                        <i class="fas fa-car text-sm {{ request()->routeIs('admin.vehicles.*', 'admin.assignments.*') ? 'text-blue-600' : 'text-slate-500' }}"></i>
-                                    </div>
-                                </div>
+                                    class="flex items-center w-full h-10 px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 {{ request()->routeIs('admin.vehicles.*', 'admin.assignments.*') ? 'bg-blue-50 text-blue-700 shadow-sm' : 'text-slate-600 hover:bg-white/60 hover:text-slate-800' }}">
+                                <i class="fas fa-car text-base mr-3 {{ request()->routeIs('admin.vehicles.*', 'admin.assignments.*') ? 'text-blue-600' : 'text-slate-500' }}"></i>
                                 <span class="flex-1 text-left">Véhicules</span>
                                 <i class="fas fa-chevron-down text-xs transition-transform duration-200" :class="{ 'rotate-180': !open }"></i>
                             </button>
                             <div x-show="open" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 max-h-0" x-transition:enter-end="opacity-100 max-h-96" x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100 max-h-96" x-transition:leave-end="opacity-0 max-h-0" class="overflow-hidden">
-                                <div class="flex w-full mt-2 pl-6">
-                                    <div class="mr-3">
-                                        <div class="px-3 py-2 h-full relative">
+                                <div class="flex w-full mt-2 pl-3">
+                                    <div class="mr-1">
+                                        <div class="px-1 py-2 h-full relative">
                                             <div class="bg-slate-300/40 w-0.5 h-full rounded-full"></div>
                                             <div class="absolute w-0.5 rounded-full bg-blue-500 transition-all duration-300" style="height: {{ request()->routeIs('admin.vehicles.index') ? '50' : (request()->routeIs('admin.assignments.*') ? '50' : '0') }}%; top: {{ request()->routeIs('admin.assignments.*') ? '50' : '0' }}%;"></div>
                                         </div>
                                     </div>
                                     <div class="flex-1 min-w-0 space-y-1">
                                         <a href="{{ route('admin.vehicles.index') }}"
-                                           class="flex items-center w-full h-8 px-3 py-1 rounded-md text-sm font-normal transition-all duration-200 {{ request()->routeIs('admin.vehicles.index') ? 'bg-blue-50/80 text-blue-700' : 'text-slate-600 hover:bg-white/40 hover:text-slate-800' }}">
-                                            <i class="fas fa-list-ul text-sm mr-2 {{ request()->routeIs('admin.vehicles.index') ? 'text-blue-600' : 'text-slate-500' }}"></i>
+                                           class="flex items-center w-full h-8 px-1 py-1 rounded-md text-sm font-semibold transition-all duration-200 {{ request()->routeIs('admin.vehicles.index') ? 'bg-blue-50/80 text-blue-700' : 'text-slate-600 hover:bg-white/40 hover:text-slate-800' }}">
+                                            <i class="fas fa-list-ul text-xs mr-3 {{ request()->routeIs('admin.vehicles.index') ? 'text-blue-600' : 'text-slate-500' }}"></i>
                                             Gestion Véhicules
                                         </a>
                                         <a href="{{ route('admin.assignments.index') }}"
-                                           class="flex items-center w-full h-8 px-3 py-1 rounded-md text-sm font-normal transition-all duration-200 {{ request()->routeIs('admin.assignments.*') ? 'bg-blue-50/80 text-blue-700' : 'text-slate-600 hover:bg-white/40 hover:text-slate-800' }}">
-                                            <i class="fas fa-clipboard-list text-sm mr-2 {{ request()->routeIs('admin.assignments.*') ? 'text-blue-600' : 'text-slate-500' }}"></i>
+                                           class="flex items-center w-full h-8 px-1 py-1 rounded-md text-sm font-semibold transition-all duration-200 {{ request()->routeIs('admin.assignments.*') ? 'bg-blue-50/80 text-blue-700' : 'text-slate-600 hover:bg-white/40 hover:text-slate-800' }}">
+                                            <i class="fas fa-clipboard-list text-xs mr-3 {{ request()->routeIs('admin.assignments.*') ? 'text-blue-600' : 'text-slate-500' }}"></i>
                                             Affectations
                                         </a>
                                     </div>
@@ -113,43 +101,64 @@
                         @hasanyrole('Super Admin|Admin|Gestionnaire Flotte')
                         <li class="flex">
                             <a href="{{ route('admin.drivers.index') }}"
-                               class="flex items-center w-full h-10 px-4 py-2 rounded-lg text-sm font-normal transition-all duration-200 {{ request()->routeIs('admin.drivers.*') ? 'bg-blue-50 text-blue-700 shadow-sm' : 'text-slate-600 hover:bg-white/60 hover:text-slate-800' }}">
-                                <div class="relative mr-3">
-                                    <div class="w-8 h-8 rounded-full border-2 border-white flex items-center justify-center">
-                                        <i class="fas fa-user-tie text-sm {{ request()->routeIs('admin.drivers.*') ? 'text-blue-600' : 'text-slate-500' }}"></i>
-                                    </div>
-                                </div>
+                               class="flex items-center w-full h-10 px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 {{ request()->routeIs('admin.drivers.*') ? 'bg-blue-50 text-blue-700 shadow-sm' : 'text-slate-600 hover:bg-white/60 hover:text-slate-800' }}">
+                                <i class="fas fa-user-tie text-base mr-3 {{ request()->routeIs('admin.drivers.*') ? 'text-blue-600' : 'text-slate-500' }}"></i>
                                 <span class="flex-1">Chauffeurs</span>
                             </a>
                         </li>
                         @endhasanyrole
 
-                        {{-- Maintenance --}}
+                        {{-- Maintenance avec sous-menus --}}
                         @hasanyrole('Super Admin|Admin|Gestionnaire Flotte|Supervisor')
-                        <li class="flex">
-                            <a href="{{ route('admin.maintenance.dashboard') }}"
-                               class="flex items-center w-full h-10 px-4 py-2 rounded-lg text-sm font-normal transition-all duration-200 {{ request()->routeIs('admin.maintenance.*') ? 'bg-blue-50 text-blue-700 shadow-sm' : 'text-slate-600 hover:bg-white/60 hover:text-slate-800' }}">
-                                <div class="relative mr-3">
-                                    <div class="w-8 h-8 rounded-full border-2 border-white flex items-center justify-center">
-                                        <i class="fas fa-wrench text-sm {{ request()->routeIs('admin.maintenance.*') ? 'text-blue-600' : 'text-slate-500' }}"></i>
+                        <li class="flex flex-col" x-data="{ open: {{ request()->routeIs('admin.maintenance.*', 'admin.repair-requests.*') ? 'true' : 'false' }} }">
+                            <button @click="open = !open"
+                                    class="flex items-center w-full h-10 px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 {{ request()->routeIs('admin.maintenance.*', 'admin.repair-requests.*') ? 'bg-blue-50 text-blue-700 shadow-sm' : 'text-slate-600 hover:bg-white/60 hover:text-slate-800' }}">
+                                <i class="fas fa-wrench text-base mr-3 {{ request()->routeIs('admin.maintenance.*', 'admin.repair-requests.*') ? 'text-blue-600' : 'text-slate-500' }}"></i>
+                                <span class="flex-1 text-left">Maintenance</span>
+                                <i class="fas fa-chevron-down text-xs transition-transform duration-200" :class="{ 'rotate-180': !open }"></i>
+                            </button>
+                            <div x-show="open" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 max-h-0" x-transition:enter-end="opacity-100 max-h-96" x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100 max-h-96" x-transition:leave-end="opacity-0 max-h-0" class="overflow-hidden">
+                                <div class="flex w-full mt-2 pl-3">
+                                    <div class="mr-1">
+                                        <div class="px-1 py-2 h-full relative">
+                                            <div class="bg-slate-300/40 w-0.5 h-full rounded-full"></div>
+                                            <div class="absolute w-0.5 rounded-full bg-blue-500 transition-all duration-300" style="height: {{ request()->routeIs('admin.maintenance.surveillance.*') ? '25' : (request()->routeIs('admin.maintenance.schedules.*') ? '25' : (request()->routeIs('admin.repair-requests.*') ? '25' : (request()->routeIs('admin.maintenance.operations.*') ? '25' : '0'))) }}%; top: {{ request()->routeIs('admin.maintenance.schedules.*') ? '25' : (request()->routeIs('admin.repair-requests.*') ? '50' : (request()->routeIs('admin.maintenance.operations.*') ? '75' : '0')) }}%;"></div>
+                                        </div>
+                                    </div>
+                                    <div class="flex-1 min-w-0 space-y-1">
+                                        <a href="{{ route('admin.maintenance.surveillance.index') }}"
+                                           class="flex items-center w-full h-8 px-1 py-1 rounded-md text-sm font-semibold transition-all duration-200 {{ request()->routeIs('admin.maintenance.surveillance.*') ? 'bg-blue-50/80 text-blue-700' : 'text-slate-600 hover:bg-white/40 hover:text-slate-800' }}">
+                                            <i class="fas fa-desktop text-xs mr-3 {{ request()->routeIs('admin.maintenance.surveillance.*') ? 'text-blue-600' : 'text-slate-500' }}"></i>
+                                            Surveillance
+                                        </a>
+                                        <a href="{{ route('admin.maintenance.schedules.index') }}"
+                                           class="flex items-center w-full h-8 px-1 py-1 rounded-md text-sm font-semibold transition-all duration-200 {{ request()->routeIs('admin.maintenance.schedules.*') ? 'bg-blue-50/80 text-blue-700' : 'text-slate-600 hover:bg-white/40 hover:text-slate-800' }}">
+                                            <i class="fas fa-calendar-alt text-xs mr-3 {{ request()->routeIs('admin.maintenance.schedules.*') ? 'text-blue-600' : 'text-slate-500' }}"></i>
+                                            Planifications
+                                        </a>
+                                        <a href="{{ route('admin.repair-requests.index') }}"
+                                           class="flex items-center w-full h-8 px-1 py-1 rounded-md text-sm font-semibold transition-all duration-200 {{ request()->routeIs('admin.repair-requests.*') ? 'bg-blue-50/80 text-blue-700' : 'text-slate-600 hover:bg-white/40 hover:text-slate-800' }}">
+                                            <i class="fas fa-tools text-xs mr-3 {{ request()->routeIs('admin.repair-requests.*') ? 'text-blue-600' : 'text-slate-500' }}"></i>
+                                            Demandes réparation
+                                        </a>
+                                        <a href="{{ route('admin.maintenance.operations.index') }}"
+                                           class="flex items-center w-full h-8 px-1 py-1 rounded-md text-sm font-semibold transition-all duration-200 {{ request()->routeIs('admin.maintenance.operations.*') ? 'bg-blue-50/80 text-blue-700' : 'text-slate-600 hover:bg-white/40 hover:text-slate-800' }}">
+                                            <i class="fas fa-cog text-xs mr-3 {{ request()->routeIs('admin.maintenance.operations.*') ? 'text-blue-600' : 'text-slate-500' }}"></i>
+                                            Opérations
+                                        </a>
                                     </div>
                                 </div>
-                                <span class="flex-1">Maintenance</span>
-                            </a>
+                            </div>
                         </li>
                         @endhasanyrole
 
-                        {{-- Planning --}}
+                        {{-- Alertes --}}
                         @hasanyrole('Super Admin|Admin|Gestionnaire Flotte|Supervisor')
                         <li class="flex">
-                            <a href="{{ route('admin.planning.index') }}"
-                               class="flex items-center w-full h-10 px-4 py-2 rounded-lg text-sm font-normal transition-all duration-200 {{ request()->routeIs('admin.planning.*') ? 'bg-blue-50 text-blue-700 shadow-sm' : 'text-slate-600 hover:bg-white/60 hover:text-slate-800' }}">
-                                <div class="relative mr-3">
-                                    <div class="w-8 h-8 rounded-full border-2 border-white flex items-center justify-center">
-                                        <i class="fas fa-calendar-alt text-sm {{ request()->routeIs('admin.planning.*') ? 'text-blue-600' : 'text-slate-500' }}"></i>
-                                    </div>
-                                </div>
-                                <span class="flex-1">Planning</span>
+                            <a href="{{ route('admin.alerts.index') }}"
+                               class="flex items-center w-full h-10 px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 {{ request()->routeIs('admin.alerts.*') ? 'bg-blue-50 text-blue-700 shadow-sm' : 'text-slate-600 hover:bg-white/60 hover:text-slate-800' }}">
+                                <i class="fas fa-bell text-base mr-3 {{ request()->routeIs('admin.alerts.*') ? 'text-blue-600' : 'text-slate-500' }}"></i>
+                                <span class="flex-1">Alertes</span>
                             </a>
                         </li>
                         @endhasanyrole
@@ -158,12 +167,8 @@
                         @hasanyrole('Super Admin|Admin|Gestionnaire Flotte')
                         <li class="flex">
                             <a href="{{ route('admin.documents.index') }}"
-                               class="flex items-center w-full h-10 px-4 py-2 rounded-lg text-sm font-normal transition-all duration-200 {{ request()->routeIs('admin.documents.*') ? 'bg-blue-50 text-blue-700 shadow-sm' : 'text-slate-600 hover:bg-white/60 hover:text-slate-800' }}">
-                                <div class="relative mr-3">
-                                    <div class="w-8 h-8 rounded-full border-2 border-white flex items-center justify-center">
-                                        <i class="fas fa-file-alt text-sm {{ request()->routeIs('admin.documents.*') ? 'text-blue-600' : 'text-slate-500' }}"></i>
-                                    </div>
-                                </div>
+                               class="flex items-center w-full h-10 px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 {{ request()->routeIs('admin.documents.*') ? 'bg-blue-50 text-blue-700 shadow-sm' : 'text-slate-600 hover:bg-white/60 hover:text-slate-800' }}">
+                                <i class="fas fa-file-alt text-base mr-3 {{ request()->routeIs('admin.documents.*') ? 'text-blue-600' : 'text-slate-500' }}"></i>
                                 <span class="flex-1">Documents</span>
                             </a>
                         </li>
@@ -173,12 +178,8 @@
                         @hasanyrole('Super Admin|Admin|Gestionnaire Flotte')
                         <li class="flex">
                             <a href="{{ route('admin.suppliers.index') }}"
-                               class="flex items-center w-full h-10 px-4 py-2 rounded-lg text-sm font-normal transition-all duration-200 {{ request()->routeIs('admin.suppliers.*') ? 'bg-blue-50 text-blue-700 shadow-sm' : 'text-slate-600 hover:bg-white/60 hover:text-slate-800' }}">
-                                <div class="relative mr-3">
-                                    <div class="w-8 h-8 rounded-full border-2 border-white flex items-center justify-center">
-                                        <i class="fas fa-handshake text-sm {{ request()->routeIs('admin.suppliers.*') ? 'text-blue-600' : 'text-slate-500' }}"></i>
-                                    </div>
-                                </div>
+                               class="flex items-center w-full h-10 px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 {{ request()->routeIs('admin.suppliers.*') ? 'bg-blue-50 text-blue-700 shadow-sm' : 'text-slate-600 hover:bg-white/60 hover:text-slate-800' }}">
+                                <i class="fas fa-handshake text-base mr-3 {{ request()->routeIs('admin.suppliers.*') ? 'text-blue-600' : 'text-slate-500' }}"></i>
                                 <span class="flex-1">Fournisseurs</span>
                             </a>
                         </li>
@@ -188,12 +189,8 @@
                         @hasanyrole('Super Admin|Admin|Gestionnaire Flotte')
                         <li class="flex">
                             <a href="{{ route('admin.reports.index') }}"
-                               class="flex items-center w-full h-10 px-4 py-2 rounded-lg text-sm font-normal transition-all duration-200 {{ request()->routeIs('admin.reports.*') ? 'bg-blue-50 text-blue-700 shadow-sm' : 'text-slate-600 hover:bg-white/60 hover:text-slate-800' }}">
-                                <div class="relative mr-3">
-                                    <div class="w-8 h-8 rounded-full border-2 border-white flex items-center justify-center">
-                                        <i class="fas fa-chart-bar text-sm {{ request()->routeIs('admin.reports.*') ? 'text-blue-600' : 'text-slate-500' }}"></i>
-                                    </div>
-                                </div>
+                               class="flex items-center w-full h-10 px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 {{ request()->routeIs('admin.reports.*') ? 'bg-blue-50 text-blue-700 shadow-sm' : 'text-slate-600 hover:bg-white/60 hover:text-slate-800' }}">
+                                <i class="fas fa-chart-bar text-base mr-3 {{ request()->routeIs('admin.reports.*') ? 'text-blue-600' : 'text-slate-500' }}"></i>
                                 <span class="flex-1">Rapports</span>
                             </a>
                         </li>
@@ -203,38 +200,34 @@
                         @hasanyrole('Super Admin|Admin')
                         <li class="flex flex-col" x-data="{ open: {{ request()->routeIs('admin.users.*', 'admin.roles.*', 'admin.audit.*') ? 'true' : 'false' }} }">
                             <button @click="open = !open"
-                                    class="flex items-center w-full h-10 px-4 py-2 rounded-lg text-sm font-normal transition-all duration-200 {{ request()->routeIs('admin.users.*', 'admin.roles.*', 'admin.audit.*') ? 'bg-blue-50 text-blue-700 shadow-sm' : 'text-slate-600 hover:bg-white/60 hover:text-slate-800' }}">
-                                <div class="relative mr-3">
-                                    <div class="w-8 h-8 rounded-full border-2 border-white flex items-center justify-center">
-                                        <i class="fas fa-cogs text-sm {{ request()->routeIs('admin.users.*', 'admin.roles.*', 'admin.audit.*') ? 'text-blue-600' : 'text-slate-500' }}"></i>
-                                    </div>
-                                </div>
+                                    class="flex items-center w-full h-10 px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 {{ request()->routeIs('admin.users.*', 'admin.roles.*', 'admin.audit.*') ? 'bg-blue-50 text-blue-700 shadow-sm' : 'text-slate-600 hover:bg-white/60 hover:text-slate-800' }}">
+                                <i class="fas fa-cogs text-base mr-3 {{ request()->routeIs('admin.users.*', 'admin.roles.*', 'admin.audit.*') ? 'text-blue-600' : 'text-slate-500' }}"></i>
                                 <span class="flex-1 text-left">Administration</span>
                                 <i class="fas fa-chevron-down text-xs transition-transform duration-200" :class="{ 'rotate-180': !open }"></i>
                             </button>
                             <div x-show="open" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 max-h-0" x-transition:enter-end="opacity-100 max-h-96" x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100 max-h-96" x-transition:leave-end="opacity-0 max-h-0" class="overflow-hidden">
-                                <div class="flex w-full mt-2 pl-6">
-                                    <div class="mr-3">
-                                        <div class="px-3 py-2 h-full relative">
+                                <div class="flex w-full mt-2 pl-3">
+                                    <div class="mr-1">
+                                        <div class="px-1 py-2 h-full relative">
                                             <div class="bg-slate-300/40 w-0.5 h-full rounded-full"></div>
                                             <div class="absolute w-0.5 rounded-full bg-blue-500 transition-all duration-300" style="height: {{ request()->routeIs('admin.users.*') ? '33.33' : (request()->routeIs('admin.roles.*') ? '33.33' : (request()->routeIs('admin.audit.*') ? '33.33' : '0')) }}%; top: {{ request()->routeIs('admin.roles.*') ? '33.33' : (request()->routeIs('admin.audit.*') ? '66.66' : '0') }}%;"></div>
                                         </div>
                                     </div>
                                     <div class="flex-1 min-w-0 space-y-1">
                                         <a href="{{ route('admin.users.index') }}"
-                                           class="flex items-center w-full h-8 px-3 py-1 rounded-md text-sm font-normal transition-all duration-200 {{ request()->routeIs('admin.users.*') ? 'bg-blue-50/80 text-blue-700' : 'text-slate-600 hover:bg-white/40 hover:text-slate-800' }}">
-                                            <i class="fas fa-users text-sm mr-2 {{ request()->routeIs('admin.users.*') ? 'text-blue-600' : 'text-slate-500' }}"></i>
+                                           class="flex items-center w-full h-8 px-1 py-1 rounded-md text-sm font-semibold transition-all duration-200 {{ request()->routeIs('admin.users.*') ? 'bg-blue-50/80 text-blue-700' : 'text-slate-600 hover:bg-white/40 hover:text-slate-800' }}">
+                                            <i class="fas fa-users text-xs mr-3 {{ request()->routeIs('admin.users.*') ? 'text-blue-600' : 'text-slate-500' }}"></i>
                                             Utilisateurs
                                         </a>
                                         <a href="{{ route('admin.roles.index') }}"
-                                           class="flex items-center w-full h-8 px-3 py-1 rounded-md text-sm font-normal transition-all duration-200 {{ request()->routeIs('admin.roles.*') ? 'bg-blue-50/80 text-blue-700' : 'text-slate-600 hover:bg-white/40 hover:text-slate-800' }}">
-                                            <i class="fas fa-user-shield text-sm mr-2 {{ request()->routeIs('admin.roles.*') ? 'text-blue-600' : 'text-slate-500' }}"></i>
+                                           class="flex items-center w-full h-8 px-1 py-1 rounded-md text-sm font-semibold transition-all duration-200 {{ request()->routeIs('admin.roles.*') ? 'bg-blue-50/80 text-blue-700' : 'text-slate-600 hover:bg-white/40 hover:text-slate-800' }}">
+                                            <i class="fas fa-user-shield text-xs mr-3 {{ request()->routeIs('admin.roles.*') ? 'text-blue-600' : 'text-slate-500' }}"></i>
                                             Rôles & Permissions
                                         </a>
                                         @hasrole('Super Admin')
                                         <a href="{{ route('admin.audit.index') }}"
-                                           class="flex items-center w-full h-8 px-3 py-1 rounded-md text-sm font-normal transition-all duration-200 {{ request()->routeIs('admin.audit.*') ? 'bg-blue-50/80 text-blue-700' : 'text-slate-600 hover:bg-white/40 hover:text-slate-800' }}">
-                                            <i class="fas fa-shield-alt text-sm mr-2 {{ request()->routeIs('admin.audit.*') ? 'text-blue-600' : 'text-slate-500' }}"></i>
+                                           class="flex items-center w-full h-8 px-1 py-1 rounded-md text-sm font-semibold transition-all duration-200 {{ request()->routeIs('admin.audit.*') ? 'bg-blue-50/80 text-blue-700' : 'text-slate-600 hover:bg-white/40 hover:text-slate-800' }}">
+                                            <i class="fas fa-shield-alt text-xs mr-3 {{ request()->routeIs('admin.audit.*') ? 'text-blue-600' : 'text-slate-500' }}"></i>
                                             Audit & Sécurité
                                         </a>
                                         @endhasrole

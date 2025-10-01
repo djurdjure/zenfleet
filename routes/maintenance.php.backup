@@ -1,0 +1,260 @@
+<?php
+
+use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Admin\MaintenanceController;
+use App\Http\Controllers\Admin\MaintenanceTypeController;
+use App\Http\Controllers\Admin\MaintenanceProviderController;
+use App\Http\Controllers\Admin\MaintenanceScheduleController;
+use App\Http\Controllers\Admin\MaintenanceOperationController;
+use App\Http\Controllers\Admin\MaintenanceAlertController;
+use App\Http\Controllers\Admin\MaintenanceReportController;
+
+/*
+|--------------------------------------------------------------------------
+| Routes du Module Maintenance Enterprise-Grade
+|--------------------------------------------------------------------------
+|
+| Routes pour la gestion complète du module maintenance avec architecture
+| RESTful et permissions granulaires. Compatible multi-tenant strict.
+|
+*/
+
+Route::middleware(['auth', 'verified'])->group(function () {
+
+    // 🔧 Dashboard Maintenance Principal
+    Route::prefix('maintenance')->name('maintenance.')->group(function () {
+
+        // Dashboard principal et overview
+        Route::get('/', [MaintenanceController::class, 'dashboard'])->name('dashboard');
+        Route::get('/overview', [MaintenanceController::class, 'overview'])->name('overview');
+
+        // 📋 Gestion des Types de Maintenance
+        Route::prefix('types')->name('types.')->group(function () {
+            Route::get('/', [MaintenanceTypeController::class, 'index'])->name('index');
+            Route::get('/create', [MaintenanceTypeController::class, 'create'])->name('create');
+            Route::post('/', [MaintenanceTypeController::class, 'store'])->name('store');
+            Route::get('/{maintenanceType}', [MaintenanceTypeController::class, 'show'])->name('show');
+            Route::get('/{maintenanceType}/edit', [MaintenanceTypeController::class, 'edit'])->name('edit');
+            Route::put('/{maintenanceType}', [MaintenanceTypeController::class, 'update'])->name('update');
+            Route::delete('/{maintenanceType}', [MaintenanceTypeController::class, 'destroy'])->name('destroy');
+
+            // Actions en lot
+            Route::post('/bulk-activate', [MaintenanceTypeController::class, 'bulkActivate'])->name('bulk.activate');
+            Route::post('/bulk-deactivate', [MaintenanceTypeController::class, 'bulkDeactivate'])->name('bulk.deactivate');
+            Route::post('/bulk-delete', [MaintenanceTypeController::class, 'bulkDelete'])->name('bulk.delete');
+
+            // Export/Import
+            Route::get('/export', [MaintenanceTypeController::class, 'export'])->name('export');
+            Route::post('/import', [MaintenanceTypeController::class, 'import'])->name('import');
+        });
+
+        // 🏢 Gestion des Fournisseurs de Maintenance
+        Route::prefix('providers')->name('providers.')->group(function () {
+            Route::get('/', [MaintenanceProviderController::class, 'index'])->name('index');
+            Route::get('/create', [MaintenanceProviderController::class, 'create'])->name('create');
+            Route::post('/', [MaintenanceProviderController::class, 'store'])->name('store');
+            Route::get('/{provider}', [MaintenanceProviderController::class, 'show'])->name('show');
+            Route::get('/{provider}/edit', [MaintenanceProviderController::class, 'edit'])->name('edit');
+            Route::put('/{provider}', [MaintenanceProviderController::class, 'update'])->name('update');
+            Route::delete('/{provider}', [MaintenanceProviderController::class, 'destroy'])->name('destroy');
+
+            // Statistiques et évaluations
+            Route::get('/{provider}/stats', [MaintenanceProviderController::class, 'stats'])->name('stats');
+            Route::post('/{provider}/rate', [MaintenanceProviderController::class, 'rate'])->name('rate');
+
+            // Actions en lot
+            Route::post('/bulk-activate', [MaintenanceProviderController::class, 'bulkActivate'])->name('bulk.activate');
+            Route::post('/bulk-deactivate', [MaintenanceProviderController::class, 'bulkDeactivate'])->name('bulk.deactivate');
+            Route::post('/bulk-delete', [MaintenanceProviderController::class, 'bulkDelete'])->name('bulk.delete');
+
+            // Export
+            Route::get('/export', [MaintenanceProviderController::class, 'export'])->name('export');
+        });
+
+        // 📅 Gestion des Planifications de Maintenance
+        Route::prefix('schedules')->name('schedules.')->group(function () {
+            Route::get('/', [MaintenanceScheduleController::class, 'index'])->name('index');
+            Route::get('/create', [MaintenanceScheduleController::class, 'create'])->name('create');
+            Route::post('/', [MaintenanceScheduleController::class, 'store'])->name('store');
+            Route::get('/{schedule}', [MaintenanceScheduleController::class, 'show'])->name('show');
+            Route::get('/{schedule}/edit', [MaintenanceScheduleController::class, 'edit'])->name('edit');
+            Route::put('/{schedule}', [MaintenanceScheduleController::class, 'update'])->name('update');
+            Route::delete('/{schedule}', [MaintenanceScheduleController::class, 'destroy'])->name('destroy');
+
+            // Vue calendrier
+            Route::get('/calendar', [MaintenanceScheduleController::class, 'calendar'])->name('calendar');
+            Route::get('/calendar/data', [MaintenanceScheduleController::class, 'calendarData'])->name('calendar.data');
+
+            // Gestion des alertes
+            Route::post('/{schedule}/create-alert', [MaintenanceScheduleController::class, 'createAlert'])->name('create-alert');
+            Route::post('/{schedule}/toggle-status', [MaintenanceScheduleController::class, 'toggleStatus'])->name('toggle-status');
+
+            // Actions en lot
+            Route::post('/bulk-activate', [MaintenanceScheduleController::class, 'bulkActivate'])->name('bulk.activate');
+            Route::post('/bulk-deactivate', [MaintenanceScheduleController::class, 'bulkDeactivate'])->name('bulk.deactivate');
+            Route::post('/bulk-create-alerts', [MaintenanceScheduleController::class, 'bulkCreateAlerts'])->name('bulk.create-alerts');
+            Route::post('/bulk-delete', [MaintenanceScheduleController::class, 'bulkDelete'])->name('bulk.delete');
+
+            // Export
+            Route::get('/export', [MaintenanceScheduleController::class, 'export'])->name('export');
+        });
+
+        // 🔧 Gestion des Opérations de Maintenance
+        Route::prefix('operations')->name('operations.')->group(function () {
+            Route::get('/', [MaintenanceOperationController::class, 'index'])->name('index');
+            Route::get('/create', [MaintenanceOperationController::class, 'create'])->name('create');
+            Route::post('/', [MaintenanceOperationController::class, 'store'])->name('store');
+            Route::get('/{operation}', [MaintenanceOperationController::class, 'show'])->name('show');
+            Route::get('/{operation}/edit', [MaintenanceOperationController::class, 'edit'])->name('edit');
+            Route::put('/{operation}', [MaintenanceOperationController::class, 'update'])->name('update');
+            Route::delete('/{operation}', [MaintenanceOperationController::class, 'destroy'])->name('destroy');
+
+            // Workflow d'opération
+            Route::post('/{operation}/start', [MaintenanceOperationController::class, 'start'])->name('start');
+            Route::post('/{operation}/complete', [MaintenanceOperationController::class, 'complete'])->name('complete');
+            Route::post('/{operation}/cancel', [MaintenanceOperationController::class, 'cancel'])->name('cancel');
+
+            // Gestion des documents
+            Route::post('/{operation}/documents', [MaintenanceOperationController::class, 'uploadDocument'])->name('upload-document');
+            Route::delete('/documents/{document}', [MaintenanceOperationController::class, 'deleteDocument'])->name('delete-document');
+            Route::get('/documents/{document}/download', [MaintenanceOperationController::class, 'downloadDocument'])->name('download-document');
+
+            // Actions en lot
+            Route::post('/bulk-start', [MaintenanceOperationController::class, 'bulkStart'])->name('bulk.start');
+            Route::post('/bulk-complete', [MaintenanceOperationController::class, 'bulkComplete'])->name('bulk.complete');
+            Route::post('/bulk-cancel', [MaintenanceOperationController::class, 'bulkCancel'])->name('bulk.cancel');
+            Route::post('/bulk-delete', [MaintenanceOperationController::class, 'bulkDelete'])->name('bulk.delete');
+
+            // Export
+            Route::get('/export', [MaintenanceOperationController::class, 'export'])->name('export');
+        });
+
+        // 🚨 Gestion des Alertes de Maintenance
+        Route::prefix('alerts')->name('alerts.')->group(function () {
+            Route::get('/', [MaintenanceAlertController::class, 'index'])->name('index');
+            Route::get('/dashboard', [MaintenanceAlertController::class, 'dashboard'])->name('dashboard');
+            Route::get('/{alert}', [MaintenanceAlertController::class, 'show'])->name('show');
+            Route::delete('/{alert}', [MaintenanceAlertController::class, 'destroy'])->name('destroy');
+
+            // Gestion des acquittements
+            Route::post('/{alert}/acknowledge', [MaintenanceAlertController::class, 'acknowledge'])->name('acknowledge');
+            Route::post('/{alert}/unacknowledge', [MaintenanceAlertController::class, 'unacknowledge'])->name('unacknowledge');
+
+            // Création d'opération depuis alerte
+            Route::post('/{alert}/create-operation', [MaintenanceAlertController::class, 'createOperation'])->name('create-operation');
+
+            // Actions en lot
+            Route::post('/bulk-acknowledge', [MaintenanceAlertController::class, 'bulkAcknowledge'])->name('bulk.acknowledge');
+            Route::post('/bulk-unacknowledge', [MaintenanceAlertController::class, 'bulkUnacknowledge'])->name('bulk.unacknowledge');
+            Route::post('/bulk-delete', [MaintenanceAlertController::class, 'bulkDelete'])->name('bulk.delete');
+            Route::post('/bulk-set-priority', [MaintenanceAlertController::class, 'bulkSetPriority'])->name('bulk.set-priority');
+
+            // API pour actualisation temps réel
+            Route::get('/api/stats', [MaintenanceAlertController::class, 'apiStats'])->name('api.stats');
+            Route::get('/api/latest', [MaintenanceAlertController::class, 'apiLatest'])->name('api.latest');
+
+            // Export
+            Route::get('/export', [MaintenanceAlertController::class, 'export'])->name('export');
+        });
+
+        // 📊 Rapports et Analytiques de Maintenance
+        Route::prefix('reports')->name('reports.')->group(function () {
+            Route::get('/', [MaintenanceReportController::class, 'index'])->name('index');
+
+            // Rapports de performance
+            Route::get('/performance', [MaintenanceReportController::class, 'performance'])->name('performance');
+            Route::get('/performance/export', [MaintenanceReportController::class, 'exportPerformance'])->name('performance.export');
+
+            // Analyse des coûts
+            Route::get('/costs', [MaintenanceReportController::class, 'costs'])->name('costs');
+            Route::get('/costs/export', [MaintenanceReportController::class, 'exportCosts'])->name('costs.export');
+
+            // KPIs maintenance
+            Route::get('/kpis', [MaintenanceReportController::class, 'kpis'])->name('kpis');
+            Route::get('/kpis/export', [MaintenanceReportController::class, 'exportKpis'])->name('kpis.export');
+
+            // Rapport de conformité
+            Route::get('/compliance', [MaintenanceReportController::class, 'compliance'])->name('compliance');
+            Route::get('/compliance/export', [MaintenanceReportController::class, 'exportCompliance'])->name('compliance.export');
+
+            // Analyse des fournisseurs
+            Route::get('/providers-analysis', [MaintenanceReportController::class, 'providersAnalysis'])->name('providers-analysis');
+            Route::get('/providers-analysis/export', [MaintenanceReportController::class, 'exportProvidersAnalysis'])->name('providers-analysis.export');
+
+            // Rapport custom
+            Route::get('/custom', [MaintenanceReportController::class, 'custom'])->name('custom');
+            Route::post('/custom/generate', [MaintenanceReportController::class, 'generateCustom'])->name('custom.generate');
+
+            // API pour graphiques temps réel
+            Route::get('/api/charts/costs-trend', [MaintenanceReportController::class, 'apiCostsTrend'])->name('api.costs-trend');
+            Route::get('/api/charts/operations-status', [MaintenanceReportController::class, 'apiOperationsStatus'])->name('api.operations-status');
+            Route::get('/api/charts/preventive-vs-corrective', [MaintenanceReportController::class, 'apiPreventiveVsCorrective'])->name('api.preventive-vs-corrective');
+        });
+
+        // 🔄 Automatisation et Jobs
+        Route::prefix('automation')->name('automation.')->group(function () {
+            // Déclenchement manuel des vérifications
+            Route::post('/check-schedules', [MaintenanceController::class, 'triggerScheduleCheck'])->name('check-schedules');
+            Route::post('/generate-alerts', [MaintenanceController::class, 'generateAlerts'])->name('generate-alerts');
+
+            // Configuration des notifications
+            Route::get('/notifications-config', [MaintenanceController::class, 'notificationsConfig'])->name('notifications-config');
+            Route::post('/notifications-config', [MaintenanceController::class, 'updateNotificationsConfig'])->name('update-notifications-config');
+
+            // Logs et monitoring
+            Route::get('/logs', [MaintenanceController::class, 'logs'])->name('logs');
+            Route::get('/system-health', [MaintenanceController::class, 'systemHealth'])->name('system-health');
+        });
+
+        // 📱 API Mobile (si applicable)
+        Route::prefix('mobile-api')->name('mobile-api.')->group(function () {
+            Route::get('/alerts/count', [MaintenanceAlertController::class, 'mobileAlertsCount'])->name('alerts.count');
+            Route::get('/operations/today', [MaintenanceOperationController::class, 'mobileTodayOperations'])->name('operations.today');
+            Route::get('/schedules/upcoming', [MaintenanceScheduleController::class, 'mobileUpcomingSchedules'])->name('schedules.upcoming');
+        });
+
+        // 🔧 Utilitaires et outils de maintenance
+        Route::prefix('tools')->name('tools.')->group(function () {
+            // Calculateur de coûts
+            Route::get('/cost-calculator', [MaintenanceController::class, 'costCalculator'])->name('cost-calculator');
+            Route::post('/cost-calculator/estimate', [MaintenanceController::class, 'calculateCostEstimate'])->name('cost-calculator.estimate');
+
+            // Planificateur automatique
+            Route::get('/auto-scheduler', [MaintenanceController::class, 'autoScheduler'])->name('auto-scheduler');
+            Route::post('/auto-scheduler/generate', [MaintenanceController::class, 'generateAutoSchedule'])->name('auto-scheduler.generate');
+
+            // Outil de diagnostic
+            Route::get('/diagnostic', [MaintenanceController::class, 'diagnostic'])->name('diagnostic');
+            Route::post('/diagnostic/run', [MaintenanceController::class, 'runDiagnostic'])->name('diagnostic.run');
+        });
+    });
+
+    // 📊 Widgets et composants pour le dashboard principal
+    Route::prefix('widgets/maintenance')->name('widgets.maintenance.')->group(function () {
+        Route::get('/alerts-summary', [MaintenanceController::class, 'widgetAlertsSummary'])->name('alerts-summary');
+        Route::get('/upcoming-maintenance', [MaintenanceController::class, 'widgetUpcomingMaintenance'])->name('upcoming-maintenance');
+        Route::get('/costs-overview', [MaintenanceController::class, 'widgetCostsOverview'])->name('costs-overview');
+        Route::get('/fleet-health', [MaintenanceController::class, 'widgetFleetHealth'])->name('fleet-health');
+    });
+});
+
+/*
+|--------------------------------------------------------------------------
+| API Routes pour intégrations externes
+|--------------------------------------------------------------------------
+*/
+
+Route::prefix('api/v1/maintenance')->name('api.maintenance.')->middleware(['api', 'auth:sanctum'])->group(function () {
+
+    // Endpoints pour intégrations tierces
+    Route::get('/alerts', [MaintenanceAlertController::class, 'apiIndex'])->name('alerts.index');
+    Route::get('/operations', [MaintenanceOperationController::class, 'apiIndex'])->name('operations.index');
+    Route::get('/schedules', [MaintenanceScheduleController::class, 'apiIndex'])->name('schedules.index');
+
+    // Webhooks
+    Route::post('/webhooks/alert-created', [MaintenanceController::class, 'webhookAlertCreated'])->name('webhooks.alert-created');
+    Route::post('/webhooks/operation-completed', [MaintenanceController::class, 'webhookOperationCompleted'])->name('webhooks.operation-completed');
+
+    // Health check
+    Route::get('/health', [MaintenanceController::class, 'apiHealth'])->name('health');
+});
