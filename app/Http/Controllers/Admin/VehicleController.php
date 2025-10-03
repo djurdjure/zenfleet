@@ -733,6 +733,73 @@ class VehicleController extends Controller
             ->with('error_trace', config('app.debug') ? $e->getTraceAsString() : null);
     }
 
+    /**
+     * 🔧 Convertit les erreurs DB PostgreSQL en messages user-friendly
+     *
+     * @param \Illuminate\Database\QueryException $e
+     * @return string
+     */
+    private function getFriendlyDatabaseError(\Illuminate\Database\QueryException $e): string
+    {
+        $message = $e->getMessage();
+
+        // Erreurs de contrainte unique
+        if (str_contains($message, 'unique constraint') || str_contains($message, 'Unique violation')) {
+            if (str_contains($message, 'registration_plate')) {
+                return 'Cette plaque d\'immatriculation existe déjà dans votre organisation';
+            } elseif (str_contains($message, 'vin')) {
+                return 'Ce numéro VIN existe déjà dans votre organisation';
+            }
+            return 'Cette valeur existe déjà dans le système';
+        }
+
+        // Erreurs de clé étrangère
+        if (str_contains($message, 'foreign key constraint') || str_contains($message, 'violates foreign key')) {
+            if (str_contains($message, 'vehicle_type_id')) {
+                return 'Type de véhicule invalide';
+            } elseif (str_contains($message, 'fuel_type_id')) {
+                return 'Type de carburant invalide';
+            } elseif (str_contains($message, 'transmission_type_id')) {
+                return 'Type de transmission invalide';
+            } elseif (str_contains($message, 'status_id')) {
+                return 'Statut de véhicule invalide';
+            } elseif (str_contains($message, 'organization_id')) {
+                return 'Organisation invalide';
+            }
+            return 'Référence invalide dans les données';
+        }
+
+        // Erreurs de valeur NULL
+        if (str_contains($message, 'not null constraint') || str_contains($message, 'null value')) {
+            if (str_contains($message, 'registration_plate')) {
+                return 'La plaque d\'immatriculation est obligatoire';
+            } elseif (str_contains($message, 'organization_id')) {
+                return 'L\'organisation est obligatoire';
+            }
+            return 'Un champ obligatoire est manquant';
+        }
+
+        // Erreurs de format/type de données
+        if (str_contains($message, 'invalid input syntax')) {
+            if (str_contains($message, 'integer')) {
+                return 'Format de nombre invalide';
+            } elseif (str_contains($message, 'date')) {
+                return 'Format de date invalide';
+            } elseif (str_contains($message, 'numeric')) {
+                return 'Format de prix/valeur invalide';
+            }
+            return 'Format de données invalide';
+        }
+
+        // Erreur de dépassement de taille
+        if (str_contains($message, 'value too long')) {
+            return 'Une valeur dépasse la taille maximale autorisée';
+        }
+
+        // Message générique pour les autres erreurs
+        return 'Erreur de base de données: veuillez vérifier vos données';
+    }
+
     // Méthodes utilitaires (simplifiées pour l'exemple)
     private function calculateDepreciation(Vehicle $vehicle): float { return 0.15; }
     private function calculateUtilization(Vehicle $vehicle): float { return 0.75; }
@@ -971,7 +1038,7 @@ class VehicleController extends Controller
      */
     public function showImportForm(): View
     {
-        $this->authorize('import_vehicles');
+        $this->authorize('create vehicles');
         $this->logUserAction('vehicle.import.form_accessed');
 
         try {
@@ -1006,7 +1073,7 @@ class VehicleController extends Controller
      */
     public function handleImport(Request $request): RedirectResponse
     {
-        $this->authorize('import_vehicles');
+        $this->authorize('create vehicles');
         $this->logUserAction('vehicle.import.started', $request);
 
         try {
@@ -1074,7 +1141,7 @@ class VehicleController extends Controller
      */
     public function showImportResults(): View
     {
-        $this->authorize('import_vehicles');
+        $this->authorize('create vehicles');
         $this->logUserAction('vehicle.import.results_viewed');
 
         try {
@@ -1107,7 +1174,7 @@ class VehicleController extends Controller
      */
     public function downloadTemplate(): \Symfony\Component\HttpFoundation\BinaryFileResponse
     {
-        $this->authorize('import_vehicles');
+        $this->authorize('create vehicles');
         $this->logUserAction('vehicle.import.template_downloaded');
 
         try {
@@ -1134,7 +1201,7 @@ class VehicleController extends Controller
      */
     public function preValidateImportFile(Request $request): \Illuminate\Http\JsonResponse
     {
-        $this->authorize('import_vehicles');
+        $this->authorize('create vehicles');
         $this->logUserAction('vehicle.import.prevalidation', $request);
 
         try {
@@ -1435,26 +1502,65 @@ class VehicleController extends Controller
         // Nettoyage et validation des données
         $vehicleData = $this->prepareVehicleDataFromRow($row, $rowNumber);
 
-        // Vérification des doublons
-        $existingVehicle = Vehicle::where('registration_plate', $vehicleData['registration_plate'])
-            ->orWhere('vin', $vehicleData['vin'])
+        // ✅ CORRECTION MULTI-TENANT: Vérification des doublons SCOPED par organisation
+        // Un véhicule peut exister dans plusieurs organisations (cas: vente entre orgs)
+        // Mais on empêche les doublons au sein de la MÊME organisation
+        $organizationId = Auth::user()->organization_id;
+
+        $existingVehicle = Vehicle::where('organization_id', $organizationId)
+            ->where(function($query) use ($vehicleData) {
+                $query->where('registration_plate', $vehicleData['registration_plate']);
+
+                // Si VIN fourni, vérifier aussi le VIN dans la même organisation
+                if (!empty($vehicleData['vin'])) {
+                    $query->orWhere('vin', $vehicleData['vin']);
+                }
+            })
             ->first();
 
         if ($existingVehicle) {
+            // Déterminer quel champ est en doublon pour message clair
+            $duplicateField = 'plaque';
+            $duplicateValue = $vehicleData['registration_plate'];
+
+            if ($existingVehicle->vin === $vehicleData['vin'] && !empty($vehicleData['vin'])) {
+                $duplicateField = 'VIN';
+                $duplicateValue = $vehicleData['vin'];
+            }
+
             if ($options['skip_duplicates']) {
                 return ['action' => 'skipped'];
             } elseif ($options['update_existing']) {
                 $existingVehicle->update($vehicleData);
                 return ['action' => 'updated', 'vehicle_id' => $existingVehicle->id];
             } else {
-                throw new \Exception('Véhicule déjà existant (plaque: ' . $vehicleData['registration_plate'] . ')');
+                // Message d'erreur clair et user-friendly
+                throw new \Exception("Véhicule déjà existant dans votre organisation ({$duplicateField}: {$duplicateValue})");
             }
         }
 
-        // Création du nouveau véhicule
-        $vehicle = Vehicle::create($vehicleData);
+        // ✅ Création du nouveau véhicule avec gestion d'erreur DB améliorée
+        try {
+            $vehicle = Vehicle::create($vehicleData);
+            return ['action' => 'imported', 'vehicle_id' => $vehicle->id];
 
-        return ['action' => 'imported', 'vehicle_id' => $vehicle->id];
+        } catch (\Illuminate\Database\QueryException $e) {
+            // Capturer les erreurs de contrainte unique PostgreSQL pour messages clairs
+            if (str_contains($e->getMessage(), 'vehicles_registration_plate_organization_unique')) {
+                throw new \Exception("Véhicule déjà existant dans votre organisation (plaque: {$vehicleData['registration_plate']})");
+            } elseif (str_contains($e->getMessage(), 'vehicles_vin_organization_unique')) {
+                throw new \Exception("Véhicule déjà existant dans votre organisation (VIN: {$vehicleData['vin']})");
+            }
+
+            // Autre erreur DB - message générique mais log détaillé
+            Log::error('Erreur création véhicule import', [
+                'error' => $e->getMessage(),
+                'vehicle_data' => $vehicleData,
+                'row_number' => $rowNumber
+            ]);
+
+            throw new \Exception("Erreur lors de la création du véhicule (ligne {$rowNumber}): " . $this->getFriendlyDatabaseError($e));
+        }
     }
 
     /**

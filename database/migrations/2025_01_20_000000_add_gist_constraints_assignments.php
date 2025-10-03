@@ -17,6 +17,11 @@ use Illuminate\Support\Facades\DB;
 return new class extends Migration
 {
     /**
+     * Disable transactions for this migration (required for CREATE INDEX CONCURRENTLY)
+     */
+    public $withinTransaction = false;
+
+    /**
      * Run the migrations.
      */
     public function up(): void
@@ -71,29 +76,62 @@ return new class extends Migration
         // Contrainte d'exclusion pour véhicules
         // Empêche deux affectations du même véhicule qui se chevauchent
         DB::statement("
-            ALTER TABLE assignments
-            ADD CONSTRAINT assignments_vehicle_no_overlap
-            EXCLUDE USING GIST (
-                organization_id WITH =,
-                vehicle_id WITH =,
-                assignment_interval(start_datetime, end_datetime) WITH &&
-            )
-            WHERE (deleted_at IS NULL)
-            DEFERRABLE INITIALLY DEFERRED;
+            DO \$\$
+            BEGIN
+                IF NOT EXISTS (
+                    SELECT 1 FROM pg_constraint WHERE conname = 'assignments_vehicle_no_overlap'
+                ) THEN
+                    ALTER TABLE assignments
+                    ADD CONSTRAINT assignments_vehicle_no_overlap
+                    EXCLUDE USING GIST (
+                        organization_id WITH =,
+                        vehicle_id WITH =,
+                        assignment_interval(start_datetime, end_datetime) WITH &&
+                    )
+                    WHERE (deleted_at IS NULL)
+                    DEFERRABLE INITIALLY DEFERRED;
+                END IF;
+            END \$\$;
         ");
 
         // Contrainte d'exclusion pour chauffeurs
         // Empêche deux affectations du même chauffeur qui se chevauchent
         DB::statement("
-            ALTER TABLE assignments
-            ADD CONSTRAINT assignments_driver_no_overlap
-            EXCLUDE USING GIST (
-                organization_id WITH =,
-                driver_id WITH =,
-                assignment_interval(start_datetime, end_datetime) WITH &&
-            )
-            WHERE (deleted_at IS NULL)
-            DEFERRABLE INITIALLY DEFERRED;
+            DO \$\$
+            BEGIN
+                IF NOT EXISTS (
+                    SELECT 1 FROM pg_constraint WHERE conname = 'assignments_driver_no_overlap'
+                ) THEN
+                    ALTER TABLE assignments
+                    ADD CONSTRAINT assignments_driver_no_overlap
+                    EXCLUDE USING GIST (
+                        organization_id WITH =,
+                        driver_id WITH =,
+                        assignment_interval(start_datetime, end_datetime) WITH &&
+                    )
+                    WHERE (deleted_at IS NULL)
+                    DEFERRABLE INITIALLY DEFERRED;
+                END IF;
+            END \$\$;
+        ");
+
+        // Fonction pour calculer le statut (requis pour index)
+        DB::statement("
+            CREATE OR REPLACE FUNCTION assignment_computed_status(start_dt timestamp, end_dt timestamp)
+            RETURNS text
+            LANGUAGE plpgsql
+            IMMUTABLE
+            AS \$\$
+            BEGIN
+                IF start_dt > NOW() THEN
+                    RETURN 'scheduled';
+                ELSIF end_dt IS NULL OR end_dt > NOW() THEN
+                    RETURN 'active';
+                ELSE
+                    RETURN 'completed';
+                END IF;
+            END;
+            \$\$;
         ");
 
         // Index pour performance des requêtes courantes
@@ -101,11 +139,7 @@ return new class extends Migration
             CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_assignments_status_computed
             ON assignments (
                 organization_id,
-                CASE
-                    WHEN start_datetime > NOW() THEN 'scheduled'
-                    WHEN end_datetime IS NULL OR end_datetime > NOW() THEN 'active'
-                    ELSE 'completed'
-                END
+                assignment_computed_status(start_datetime, end_datetime)
             )
             WHERE deleted_at IS NULL;
         ");
@@ -149,8 +183,9 @@ return new class extends Migration
             \$\$ LANGUAGE plpgsql;
         ");
 
+        DB::statement("DROP TRIGGER IF EXISTS assignment_stats_refresh ON assignments;");
+
         DB::statement("
-            DROP TRIGGER IF EXISTS assignment_stats_refresh ON assignments;
             CREATE TRIGGER assignment_stats_refresh
             AFTER INSERT OR UPDATE OR DELETE ON assignments
             FOR EACH STATEMENT
@@ -178,8 +213,9 @@ return new class extends Migration
         DB::statement("DROP FUNCTION IF EXISTS refresh_assignment_stats();");
         DB::statement("DROP MATERIALIZED VIEW IF EXISTS assignment_stats_daily;");
 
-        // Supprimer la fonction
+        // Supprimer les fonctions
         DB::statement("DROP FUNCTION IF EXISTS assignment_interval(timestamp, timestamp);");
+        DB::statement("DROP FUNCTION IF EXISTS assignment_computed_status(timestamp, timestamp);");
 
         // Note: On ne supprime pas l'extension btree_gist car elle peut être utilisée ailleurs
     }

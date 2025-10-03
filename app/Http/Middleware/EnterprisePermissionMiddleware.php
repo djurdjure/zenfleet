@@ -25,94 +25,100 @@ class EnterprisePermissionMiddleware
 {
     /**
      * Mapping des routes vers les permissions requises
+     *
+     * ⚠️ IMPORTANT: Utilise le format Spatie avec ESPACES (ex: 'view vehicles')
+     * Les permissions Spatie sont définies avec des espaces, pas des underscores
      */
     private array $routePermissionMap = [
         // Véhicules
-        'admin.vehicles.index' => 'view_vehicles',
-        'admin.vehicles.create' => 'create_vehicles',
-        'admin.vehicles.store' => 'create_vehicles',
-        'admin.vehicles.show' => 'view_vehicles',
-        'admin.vehicles.edit' => 'edit_vehicles',
-        'admin.vehicles.update' => 'edit_vehicles',
-        'admin.vehicles.destroy' => 'delete_vehicles',
-        'admin.vehicles.export' => 'export_vehicles',
-        'admin.vehicles.import.*' => 'import_vehicles',
+        'admin.vehicles.index' => 'view vehicles',
+        'admin.vehicles.create' => 'create vehicles',
+        'admin.vehicles.store' => 'create vehicles',
+        'admin.vehicles.show' => 'view vehicles',
+        'admin.vehicles.edit' => 'edit vehicles',
+        'admin.vehicles.update' => 'edit vehicles',
+        'admin.vehicles.destroy' => 'delete vehicles',
+        'admin.vehicles.restore' => 'restore vehicles',
+        'admin.vehicles.export' => 'view vehicles', // Basé sur view
+        'admin.vehicles.import.*' => 'create vehicles', // Basé sur create
 
         // Chauffeurs
-        'admin.drivers.index' => 'view_drivers',
-        'admin.drivers.create' => 'create_drivers',
-        'admin.drivers.store' => 'create_drivers',
-        'admin.drivers.show' => 'view_drivers',
-        'admin.drivers.edit' => 'edit_drivers',
-        'admin.drivers.update' => 'edit_drivers',
-        'admin.drivers.destroy' => 'delete_drivers',
-        'admin.drivers.export' => 'export_drivers',
-        'admin.drivers.import.*' => 'import_drivers',
+        'admin.drivers.index' => 'view drivers',
+        'admin.drivers.create' => 'create drivers',
+        'admin.drivers.store' => 'create drivers',
+        'admin.drivers.show' => 'view drivers',
+        'admin.drivers.edit' => 'edit drivers',
+        'admin.drivers.update' => 'edit drivers',
+        'admin.drivers.destroy' => 'delete drivers',
+        'admin.drivers.restore' => 'restore drivers',
+        'admin.drivers.export' => 'view drivers', // Basé sur view
+        'admin.drivers.import.*' => 'create drivers', // Basé sur create
 
         // Affectations
-        'admin.assignments.index' => 'view_assignments',
-        'admin.assignments.create' => 'create_assignments',
-        'admin.assignments.store' => 'create_assignments',
-        'admin.assignments.show' => 'view_assignments',
-        'admin.assignments.edit' => 'edit_assignments',
-        'admin.assignments.update' => 'edit_assignments',
-        'admin.assignments.destroy' => 'delete_assignments',
-        'admin.assignments.export' => 'export_assignments',
+        'admin.assignments.index' => 'view assignments',
+        'admin.assignments.create' => 'create assignments',
+        'admin.assignments.store' => 'create assignments',
+        'admin.assignments.show' => 'view assignments',
+        'admin.assignments.edit' => 'edit assignments',
+        'admin.assignments.update' => 'edit assignments',
+        'admin.assignments.destroy' => 'view assignments', // Pas de delete assignment
+        'admin.assignments.end' => 'end assignments',
+        'admin.assignments.export' => 'view assignments',
 
         // Utilisateurs
-        'admin.users.index' => 'view_users',
-        'admin.users.create' => 'create_users',
-        'admin.users.store' => 'create_users',
-        'admin.users.show' => 'view_users',
-        'admin.users.edit' => 'edit_users',
-        'admin.users.update' => 'edit_users',
-        'admin.users.destroy' => 'delete_users',
-        'admin.users.export' => 'export_users',
+        'admin.users.index' => 'view users',
+        'admin.users.create' => 'create users',
+        'admin.users.store' => 'create users',
+        'admin.users.show' => 'view users',
+        'admin.users.edit' => 'edit users',
+        'admin.users.update' => 'edit users',
+        'admin.users.destroy' => 'delete users',
+        'admin.users.export' => 'view users',
 
         // Rôles et Permissions
-        'admin.roles.index' => 'view_roles',
-        'admin.roles.show' => 'view_roles',
-        'admin.roles.edit' => 'edit_roles',
-        'admin.roles.update' => 'edit_roles',
-        'admin.permissions.index' => 'manage_permissions',
+        'admin.roles.index' => 'manage roles',
+        'admin.roles.show' => 'manage roles',
+        'admin.roles.edit' => 'manage roles',
+        'admin.roles.update' => 'manage roles',
+        'admin.permissions.index' => 'manage roles',
 
         // Documents
-        'admin.documents.index' => 'view_documents',
-        'admin.documents.create' => 'create_documents',
-        'admin.documents.store' => 'create_documents',
-        'admin.documents.show' => 'view_documents',
-        'admin.documents.edit' => 'edit_documents',
-        'admin.documents.update' => 'edit_documents',
-        'admin.documents.destroy' => 'delete_documents',
+        'admin.documents.index' => 'view documents',
+        'admin.documents.create' => 'create documents',
+        'admin.documents.store' => 'create documents',
+        'admin.documents.show' => 'view documents',
+        'admin.documents.edit' => 'edit documents',
+        'admin.documents.update' => 'edit documents',
+        'admin.documents.destroy' => 'delete documents',
 
         // Fournisseurs
-        'admin.suppliers.index' => 'view_suppliers',
-        'admin.suppliers.create' => 'create_suppliers',
-        'admin.suppliers.store' => 'create_suppliers',
-        'admin.suppliers.show' => 'view_suppliers',
-        'admin.suppliers.edit' => 'edit_suppliers',
-        'admin.suppliers.update' => 'edit_suppliers',
-        'admin.suppliers.destroy' => 'delete_suppliers',
+        'admin.suppliers.index' => 'view suppliers',
+        'admin.suppliers.create' => 'create suppliers',
+        'admin.suppliers.store' => 'create suppliers',
+        'admin.suppliers.show' => 'view suppliers',
+        'admin.suppliers.edit' => 'edit suppliers',
+        'admin.suppliers.update' => 'edit suppliers',
+        'admin.suppliers.destroy' => 'delete suppliers',
 
         // Maintenance
-        'admin.maintenance.*' => 'view_maintenance',
-        'admin.maintenance.create' => 'create_maintenance_plans',
-        'admin.maintenance.store' => 'create_maintenance_plans',
-        'admin.maintenance.edit' => 'edit_maintenance_plans',
-        'admin.maintenance.update' => 'edit_maintenance_plans',
-        'admin.maintenance.destroy' => 'delete_maintenance_plans',
+        'admin.maintenance.*' => 'view maintenance',
+        'admin.maintenance.create' => 'manage maintenance plans',
+        'admin.maintenance.store' => 'manage maintenance plans',
+        'admin.maintenance.edit' => 'manage maintenance plans',
+        'admin.maintenance.update' => 'manage maintenance plans',
+        'admin.maintenance.destroy' => 'manage maintenance plans',
 
         // Organisations (Super Admin seulement)
-        'admin.organizations.*' => 'view_organizations',
-        'admin.organizations.create' => 'create_organizations',
-        'admin.organizations.store' => 'create_organizations',
-        'admin.organizations.edit' => 'edit_organizations',
-        'admin.organizations.update' => 'edit_organizations',
-        'admin.organizations.destroy' => 'delete_organizations',
+        'admin.organizations.*' => 'view organizations',
+        'admin.organizations.create' => 'create organizations',
+        'admin.organizations.store' => 'create organizations',
+        'admin.organizations.edit' => 'edit organizations',
+        'admin.organizations.update' => 'edit organizations',
+        'admin.organizations.destroy' => 'delete organizations',
 
         // Système (Super Admin seulement)
-        'admin.system.*' => 'view_system_analytics',
-        'admin.audit.*' => 'view_audit_logs',
+        'admin.system.*' => 'view organizations', // Super Admin only
+        'admin.audit.*' => 'view organizations', // Super Admin only
     ];
 
     /**
@@ -264,16 +270,30 @@ class EnterprisePermissionMiddleware
     private function getContextualErrorMessage(?string $permission): string
     {
         $messages = [
-            'view_vehicles' => 'Vous n\'avez pas l\'autorisation de consulter les véhicules.',
-            'create_vehicles' => 'Vous n\'avez pas l\'autorisation de créer des véhicules.',
-            'edit_vehicles' => 'Vous n\'avez pas l\'autorisation de modifier les véhicules.',
-            'delete_vehicles' => 'Vous n\'avez pas l\'autorisation de supprimer des véhicules.',
-            'view_drivers' => 'Vous n\'avez pas l\'autorisation de consulter les chauffeurs.',
-            'create_drivers' => 'Vous n\'avez pas l\'autorisation de créer des chauffeurs.',
-            'edit_drivers' => 'Vous n\'avez pas l\'autorisation de modifier les chauffeurs.',
-            'delete_drivers' => 'Vous n\'avez pas l\'autorisation de supprimer des chauffeurs.',
-            'view_users' => 'Vous n\'avez pas l\'autorisation de consulter les utilisateurs.',
-            'manage_permissions' => 'Vous n\'avez pas l\'autorisation de gérer les permissions.',
+            'view vehicles' => 'Vous n\'avez pas l\'autorisation de consulter les véhicules.',
+            'create vehicles' => 'Vous n\'avez pas l\'autorisation de créer des véhicules.',
+            'edit vehicles' => 'Vous n\'avez pas l\'autorisation de modifier les véhicules.',
+            'delete vehicles' => 'Vous n\'avez pas l\'autorisation de supprimer des véhicules.',
+            'restore vehicles' => 'Vous n\'avez pas l\'autorisation de restaurer des véhicules.',
+            'view drivers' => 'Vous n\'avez pas l\'autorisation de consulter les chauffeurs.',
+            'create drivers' => 'Vous n\'avez pas l\'autorisation de créer des chauffeurs.',
+            'edit drivers' => 'Vous n\'avez pas l\'autorisation de modifier les chauffeurs.',
+            'delete drivers' => 'Vous n\'avez pas l\'autorisation de supprimer des chauffeurs.',
+            'restore drivers' => 'Vous n\'avez pas l\'autorisation de restaurer des chauffeurs.',
+            'view users' => 'Vous n\'avez pas l\'autorisation de consulter les utilisateurs.',
+            'create users' => 'Vous n\'avez pas l\'autorisation de créer des utilisateurs.',
+            'edit users' => 'Vous n\'avez pas l\'autorisation de modifier les utilisateurs.',
+            'delete users' => 'Vous n\'avez pas l\'autorisation de supprimer des utilisateurs.',
+            'manage roles' => 'Vous n\'avez pas l\'autorisation de gérer les rôles et permissions.',
+            'view assignments' => 'Vous n\'avez pas l\'autorisation de consulter les affectations.',
+            'create assignments' => 'Vous n\'avez pas l\'autorisation de créer des affectations.',
+            'edit assignments' => 'Vous n\'avez pas l\'autorisation de modifier les affectations.',
+            'end assignments' => 'Vous n\'avez pas l\'autorisation de terminer des affectations.',
+            'view maintenance' => 'Vous n\'avez pas l\'autorisation de consulter la maintenance.',
+            'manage maintenance plans' => 'Vous n\'avez pas l\'autorisation de gérer les plans de maintenance.',
+            'view suppliers' => 'Vous n\'avez pas l\'autorisation de consulter les fournisseurs.',
+            'view documents' => 'Vous n\'avez pas l\'autorisation de consulter les documents.',
+            'view organizations' => 'Vous n\'avez pas l\'autorisation d\'accéder aux organisations (Super Admin uniquement).',
         ];
 
         return $messages[$permission] ?? 'Vous n\'avez pas les autorisations nécessaires pour accéder à cette ressource.';

@@ -137,3 +137,45 @@
 2025-10-01 22:23:46,791 INFO success: php-fpm entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
 2025-10-01 22:23:46,791 INFO success: laravel-worker_00 entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
 2025-10-01 22:23:46,791 INFO success: laravel-worker_01 entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-10-01 23:08:56,319 WARN received SIGQUIT indicating exit request
+2025-10-01 23:08:56,322 INFO waiting for php-fpm, laravel-worker_00, laravel-worker_01 to die
+2025-10-01 23:08:56,330 WARN stopped: laravel-worker_00 (terminated by SIGTERM)
+2025-10-01 23:08:56,332 WARN stopped: laravel-worker_01 (terminated by SIGTERM)
+2025-10-01 23:08:56,376 INFO stopped: php-fpm (exit status 0)
+2025-10-01 23:08:57,353 INFO Set uid to user 1000 succeeded
+2025-10-01 23:08:57,358 INFO supervisord started with pid 1
+2025-10-01 23:08:58,361 INFO spawned: 'php-fpm' with pid 7
+2025-10-01 23:08:58,363 INFO spawned: 'laravel-worker_00' with pid 8
+2025-10-01 23:08:58,365 INFO spawned: 'laravel-worker_01' with pid 9
+2025-10-01 23:08:59,414 INFO success: php-fpm entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-10-01 23:08:59,414 INFO success: laravel-worker_00 entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-10-01 23:08:59,414 INFO success: laravel-worker_01 entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-10-01 23:10:29,672 WARN received SIGQUIT indicating exit request
+2025-10-01 23:10:29,673 INFO waiting for php-fpm, laravel-worker_00, laravel-worker_01 to die
+2025-10-01 23:10:29,678 WARN stopped: laravel-worker_01 (terminated by SIGTERM)
+2025-10-01 23:10:29,679 WARN stopped: laravel-worker_00 (terminated by SIGTERM)
+2025-10-01 23:10:29,698 INFO stopped: php-fpm (exit status 0)
+2025-10-01 23:10:30,809 INFO Set uid to user 1000 succeeded
+2025-10-01 23:10:30,818 INFO supervisord started with pid 1
+2025-10-01 23:10:31,828 INFO spawned: 'php-fpm' with pid 7
+2025-10-01 23:10:31,832 INFO spawned: 'laravel-worker_00' with pid 8
+2025-10-01 23:10:31,835 INFO spawned: 'laravel-worker_01' with pid 9
+2025-10-01 23:10:32,938 INFO success: php-fpm entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-10-01 23:10:32,938 INFO success: laravel-worker_00 entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-10-01 23:10:32,938 INFO success: laravel-worker_01 entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-10-01 23:22:12,893 INFO Set uid to user 1000 succeeded
+2025-10-01 23:22:12,931 INFO supervisord started with pid 1
+2025-10-01 23:22:13,940 INFO spawned: 'php-fpm' with pid 7
+2025-10-01 23:22:13,948 INFO spawned: 'laravel-worker_00' with pid 8
+2025-10-01 23:22:13,952 INFO spawned: 'laravel-worker_01' with pid 9
+2025-10-01 23:22:15,363 INFO success: php-fpm entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-10-01 23:22:15,363 INFO success: laravel-worker_00 entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-10-01 23:22:15,364 INFO success: laravel-worker_01 entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-10-02 22:41:35,618 INFO Set uid to user 1000 succeeded
+2025-10-02 22:41:35,666 INFO supervisord started with pid 1
+2025-10-02 22:41:36,672 INFO spawned: 'php-fpm' with pid 7
+2025-10-02 22:41:36,680 INFO spawned: 'laravel-worker_00' with pid 8
+2025-10-02 22:41:36,684 INFO spawned: 'laravel-worker_01' with pid 9
+2025-10-02 22:41:38,255 INFO success: php-fpm entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-10-02 22:41:38,255 INFO success: laravel-worker_00 entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-10-02 22:41:38,255 INFO success: laravel-worker_01 entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)

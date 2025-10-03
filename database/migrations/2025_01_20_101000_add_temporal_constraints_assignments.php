@@ -61,28 +61,42 @@ return new class extends Migration
     private function addTemporalExclusionConstraints(): void
     {
         // ===== ANTI-CHEVAUCHEMENT PAR VÉHICULE =====
-        DB::statement('
-            ALTER TABLE assignments
-            ADD CONSTRAINT ex_vehicle_period
-            EXCLUDE USING GIST (
-                vehicle_id WITH =,
-                organization_id WITH =,
-                tsrange(start_datetime, COALESCE(end_datetime, \'infinity\'::timestamp), \'[)\') WITH &&
-            )
-            WHERE (deleted_at IS NULL)
-        ');
+        DB::statement("
+            DO \$\$
+            BEGIN
+                IF NOT EXISTS (
+                    SELECT 1 FROM pg_constraint WHERE conname = 'ex_vehicle_period'
+                ) THEN
+                    ALTER TABLE assignments
+                    ADD CONSTRAINT ex_vehicle_period
+                    EXCLUDE USING GIST (
+                        vehicle_id WITH =,
+                        organization_id WITH =,
+                        tsrange(start_datetime, COALESCE(end_datetime, 'infinity'::timestamp), '[)') WITH &&
+                    )
+                    WHERE (deleted_at IS NULL);
+                END IF;
+            END \$\$;
+        ");
 
         // ===== ANTI-CHEVAUCHEMENT PAR CHAUFFEUR =====
-        DB::statement('
-            ALTER TABLE assignments
-            ADD CONSTRAINT ex_driver_period
-            EXCLUDE USING GIST (
-                driver_id WITH =,
-                organization_id WITH =,
-                tsrange(start_datetime, COALESCE(end_datetime, \'infinity\'::timestamp), \'[)\') WITH &&
-            )
-            WHERE (deleted_at IS NULL AND driver_id IS NOT NULL)
-        ');
+        DB::statement("
+            DO \$\$
+            BEGIN
+                IF NOT EXISTS (
+                    SELECT 1 FROM pg_constraint WHERE conname = 'ex_driver_period'
+                ) THEN
+                    ALTER TABLE assignments
+                    ADD CONSTRAINT ex_driver_period
+                    EXCLUDE USING GIST (
+                        driver_id WITH =,
+                        organization_id WITH =,
+                        tsrange(start_datetime, COALESCE(end_datetime, 'infinity'::timestamp), '[)') WITH &&
+                    )
+                    WHERE (deleted_at IS NULL AND driver_id IS NOT NULL);
+                END IF;
+            END \$\$;
+        ");
 
         echo "✅ Contraintes d\'exclusion temporales créées\n";
     }
@@ -94,20 +108,20 @@ return new class extends Migration
     {
         $indexes = [
             // Index de recherche temporelle optimisé
-            'CREATE INDEX idx_assignments_vehicle_temporal ON assignments (vehicle_id, start_datetime, end_datetime) WHERE deleted_at IS NULL',
-            'CREATE INDEX idx_assignments_driver_temporal ON assignments (driver_id, start_datetime, end_datetime) WHERE deleted_at IS NULL AND driver_id IS NOT NULL',
+            'CREATE INDEX IF NOT EXISTS idx_assignments_vehicle_temporal ON assignments (vehicle_id, start_datetime, end_datetime) WHERE deleted_at IS NULL',
+            'CREATE INDEX IF NOT EXISTS idx_assignments_driver_temporal ON assignments (driver_id, start_datetime, end_datetime) WHERE deleted_at IS NULL AND driver_id IS NOT NULL',
 
             // Index pour organisation
-            'CREATE INDEX idx_assignments_org_temporal ON assignments (organization_id, start_datetime DESC)',
+            'CREATE INDEX IF NOT EXISTS idx_assignments_org_temporal ON assignments (organization_id, start_datetime DESC)',
 
             // Index pour recherches actives
-            'CREATE INDEX idx_assignments_active ON assignments (vehicle_id, driver_id) WHERE end_datetime IS NULL AND deleted_at IS NULL',
+            'CREATE INDEX IF NOT EXISTS idx_assignments_active ON assignments (vehicle_id, driver_id) WHERE end_datetime IS NULL AND deleted_at IS NULL',
 
             // Index pour reporting
-            'CREATE INDEX idx_assignments_period_reporting ON assignments (start_datetime, end_datetime) WHERE deleted_at IS NULL',
+            'CREATE INDEX IF NOT EXISTS idx_assignments_period_reporting ON assignments (start_datetime, end_datetime) WHERE deleted_at IS NULL',
 
             // Index composite optimisé
-            'CREATE INDEX idx_assignments_composite ON assignments (organization_id, vehicle_id, start_datetime, end_datetime) WHERE deleted_at IS NULL'
+            'CREATE INDEX IF NOT EXISTS idx_assignments_composite ON assignments (organization_id, vehicle_id, start_datetime, end_datetime) WHERE deleted_at IS NULL'
         ];
 
         foreach ($indexes as $indexSql) {
