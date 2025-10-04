@@ -3,515 +3,371 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Admin\RepairRequest\StoreRepairRequestRequest;
-use App\Http\Requests\Admin\RepairRequest\UpdateRepairRequestRequest;
-use App\Http\Requests\Admin\RepairRequest\ApprovalDecisionRequest;
+use App\Http\Requests\ApproveRepairRequestRequest;
+use App\Http\Requests\RejectRepairRequestRequest;
+use App\Http\Requests\StoreRepairRequestRequest;
+use App\Models\Driver;
 use App\Models\RepairRequest;
 use App\Models\Vehicle;
-use App\Models\Supplier;
-use Illuminate\Http\Request;
+use App\Models\VehicleCategory;
+use App\Models\VehicleDepot;
+use App\Services\RepairRequestService;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\View\View;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Inertia\Inertia;
+use Inertia\Response;
 
+/**
+ * RepairRequestController - Gestion des demandes de réparation
+ *
+ * Workflow:
+ * 1. Driver creates request → pending_supervisor
+ * 2. Supervisor approves/rejects → pending_fleet_manager OR rejected_supervisor
+ * 3. Fleet Manager approves/rejects → approved_final OR rejected_final
+ *
+ * Features:
+ * - Multi-tenant isolation (organization_id)
+ * - Policy-based authorization
+ * - RepairRequestService injection for business logic
+ * - Inertia responses for Vue.js frontend
+ * - Auto-history and notifications
+ *
+ * @version 1.0-Enterprise
+ */
 class RepairRequestController extends Controller
 {
-    public function __construct()
-    {
-        $this->middleware(['auth', 'verified']);
-        $this->authorizeResource(RepairRequest::class, 'repair_request');
+    /**
+     * Constructor with dependency injection.
+     */
+    public function __construct(
+        protected RepairRequestService $repairService
+    ) {
     }
 
-    public function index(Request $request): View
+    /**
+     * Display a listing of repair requests.
+     *
+     * Filters based on user role:
+     * - Super Admin / Admin / Fleet Manager: all in organization
+     * - Supervisor: team requests only
+     * - Driver: own requests only
+     */
+    public function index(Request $request): Response
     {
-        $query = RepairRequest::with(['vehicle', 'requester', 'supervisor', 'manager', 'assignedSupplier'])
-                              ->forOrganization(auth()->user()->organization_id)
-                              ->latest('requested_at');
+        $this->authorize('viewAny', RepairRequest::class);
 
-        // Filtres
+        $user = $request->user();
+        $query = RepairRequest::with([
+            'driver.user',
+            'vehicle',
+            'supervisor',
+            'fleetManager',
+            'category',
+            'depot',
+        ])
+            ->where('organization_id', $user->organization_id);
+
+        // 🔐 FILTRAGE PAR RÔLE
+        if ($user->hasRole('Chauffeur')) {
+            // Driver: own requests only
+            $query->whereHas('driver', function ($q) use ($user) {
+                $q->where('user_id', $user->id);
+            });
+        } elseif ($user->hasRole('Supervisor')) {
+            // Supervisor: team requests only
+            $query->whereHas('driver', function ($q) use ($user) {
+                $q->where('supervisor_id', $user->id);
+            });
+        }
+        // Admin/Fleet Manager/Super Admin: all in organization (no filter)
+
+        // 🔍 FILTRES DE RECHERCHE
         if ($request->filled('status')) {
-            $query->where('status', $request->get('status'));
+            $query->where('status', $request->status);
         }
 
-        if ($request->filled('priority')) {
-            $query->where('priority', $request->get('priority'));
+        if ($request->filled('urgency')) {
+            $query->where('urgency', $request->urgency);
+        }
+
+        if ($request->filled('driver_id')) {
+            $query->where('driver_id', $request->driver_id);
         }
 
         if ($request->filled('vehicle_id')) {
-            $query->where('vehicle_id', $request->get('vehicle_id'));
+            $query->where('vehicle_id', $request->vehicle_id);
         }
 
         if ($request->filled('search')) {
-            $search = $request->get('search');
+            $search = $request->search;
             $query->where(function ($q) use ($search) {
-                $q->where('description', 'like', "%{$search}%")
-                  ->orWhereHas('vehicle', function ($vq) use ($search) {
-                      $vq->where('registration_plate', 'like', "%{$search}%");
-                  });
+                $q->where('title', 'ilike', "%{$search}%")
+                    ->orWhere('description', 'ilike', "%{$search}%")
+                    ->orWhere('uuid', 'ilike', "%{$search}%");
             });
         }
 
-        // Filtrage par rôle
-        $user = Auth::user();
-        if ($user->hasRole('driver')) {
-            $query->where('requested_by', $user->id);
-        } elseif ($user->hasRole('supervisor')) {
-            // Superviseurs voient toutes les demandes en attente + celles qu'ils ont traitées
-            $query->where(function ($q) use ($user) {
-                $q->where('status', RepairRequest::STATUS_PENDING)
-                  ->orWhere('supervisor_id', $user->id);
-            });
-        }
+        // 📊 TRI
+        $sortField = $request->input('sort_field', 'created_at');
+        $sortDirection = $request->input('sort_direction', 'desc');
+        $query->orderBy($sortField, $sortDirection);
 
-        $repairRequests = $query->paginate(15);
+        // 📄 PAGINATION
+        $repairRequests = $query->paginate(
+            $request->input('per_page', 15)
+        )->withQueryString();
 
-        $stats = $this->getRepairStats();
-        $vehicles = Vehicle::where('organization_id', auth()->user()->organization_id)->get();
-
-        return view('admin.repair-requests.index', compact('repairRequests', 'stats', 'vehicles'));
+        return Inertia::render('RepairRequests/Index', [
+            'repairRequests' => $repairRequests,
+            'filters' => $request->only(['status', 'urgency', 'driver_id', 'vehicle_id', 'search']),
+            'sort' => [
+                'field' => $sortField,
+                'direction' => $sortDirection,
+            ],
+            'can' => [
+                'create' => $request->user()->can('create repair requests'),
+                'approveLevel1' => $request->user()->can('approve repair requests level 1'),
+                'approveLevel2' => $request->user()->can('approve repair requests level 2'),
+                'export' => $request->user()->can('export repair requests'),
+            ],
+        ]);
     }
 
-    public function create(): View
+    /**
+     * Show the form for creating a new repair request.
+     */
+    public function create(Request $request): Response
     {
-        $vehicles = Vehicle::where('organization_id', auth()->user()->organization_id)
-                          ->where('status_id', '!=', 3) // Exclure véhicules hors service
-                          ->orderBy('registration_plate')
-                          ->get();
+        $this->authorize('create', RepairRequest::class);
 
-        return view('admin.repair-requests.create', compact('vehicles'));
+        $user = $request->user();
+
+        // 📋 DONNÉES POUR LE FORMULAIRE
+        $drivers = Driver::with('user')
+            ->where('organization_id', $user->organization_id)
+            ->whereNull('deleted_at')
+            ->get()
+            ->map(fn($driver) => [
+                'id' => $driver->id,
+                'name' => $driver->user->name ?? 'N/A',
+                'license_number' => $driver->license_number,
+                'supervisor_id' => $driver->supervisor_id,
+            ]);
+
+        $vehicles = Vehicle::where('organization_id', $user->organization_id)
+            ->whereNull('deleted_at')
+            ->get()
+            ->map(fn($vehicle) => [
+                'id' => $vehicle->id,
+                'name' => $vehicle->vehicle_name ?? $vehicle->license_plate,
+                'license_plate' => $vehicle->license_plate,
+                'brand' => $vehicle->brand,
+                'model' => $vehicle->model,
+            ]);
+
+        $categories = VehicleCategory::where('organization_id', $user->organization_id)
+            ->where('is_active', true)
+            ->ordered()
+            ->get();
+
+        $depots = VehicleDepot::where('organization_id', $user->organization_id)
+            ->where('is_active', true)
+            ->ordered()
+            ->get();
+
+        return Inertia::render('RepairRequests/Create', [
+            'drivers' => $drivers,
+            'vehicles' => $vehicles,
+            'categories' => $categories,
+            'depots' => $depots,
+            'urgencyLevels' => [
+                RepairRequest::URGENCY_LOW => 'Faible',
+                RepairRequest::URGENCY_NORMAL => 'Normal',
+                RepairRequest::URGENCY_HIGH => 'Élevé',
+                RepairRequest::URGENCY_CRITICAL => 'Critique',
+            ],
+        ]);
     }
 
+    /**
+     * Store a newly created repair request in storage.
+     */
     public function store(StoreRepairRequestRequest $request): RedirectResponse
     {
-        $data = $request->validated();
-        $data['organization_id'] = auth()->user()->organization_id;
-        $data['requested_by'] = auth()->id();
-        $data['requested_at'] = now();
+        $this->authorize('create', RepairRequest::class);
 
-        // Gérer l'upload des photos
-        if ($request->hasFile('photos')) {
-            $photos = [];
-            foreach ($request->file('photos') as $photo) {
-                $path = $photo->store('repair-requests/photos', 'public');
-                $photos[] = $path;
-            }
-            $data['photos'] = $photos;
-        }
-
-        // Gérer les attachments
-        if ($request->hasFile('attachments')) {
-            $attachments = [];
-            foreach ($request->file('attachments') as $file) {
-                $path = $file->store('repair-requests/attachments', 'public');
-                $attachments[] = [
-                    'name' => $file->getClientOriginalName(),
-                    'path' => $path,
-                    'size' => $file->getSize(),
-                    'type' => $file->getClientMimeType()
-                ];
-            }
-            $data['attachments'] = $attachments;
-        }
-
-        $repairRequest = RepairRequest::create($data);
-
-        // Notifications automatiques pour les demandes urgentes
-        if ($repairRequest->isUrgent()) {
-            // TODO: Notifier immédiatement les superviseurs
-        }
-
-        return redirect()->route('admin.repair-requests.index')
-                        ->with('success', 'Demande de réparation créée avec succès.');
-    }
-
-    public function show(RepairRequest $repairRequest): View
-    {
-        $repairRequest->load(['vehicle', 'requester', 'supervisor', 'manager', 'assignedSupplier']);
-
-        return view('admin.repair-requests.show', compact('repairRequest'));
-    }
-
-    public function edit(RepairRequest $repairRequest): View
-    {
-        // Seules les demandes en attente peuvent être modifiées
-        if ($repairRequest->status !== RepairRequest::STATUS_PENDING) {
-            abort(403, 'Cette demande ne peut plus être modifiée.');
-        }
-
-        $vehicles = Vehicle::where('organization_id', auth()->user()->organization_id)
-                          ->orderBy('registration_plate')
-                          ->get();
-
-        return view('admin.repair-requests.edit', compact('repairRequest', 'vehicles'));
-    }
-
-    public function update(UpdateRepairRequestRequest $request, RepairRequest $repairRequest): RedirectResponse
-    {
-        if ($repairRequest->status !== RepairRequest::STATUS_PENDING) {
-            return redirect()->back()->with('error', 'Cette demande ne peut plus être modifiée.');
-        }
-
-        $data = $request->validated();
-
-        // Gérer l'upload des nouvelles photos
-        if ($request->hasFile('photos')) {
-            // Supprimer les anciennes photos
-            if ($repairRequest->photos) {
-                foreach ($repairRequest->photos as $photo) {
-                    Storage::disk('public')->delete($photo);
-                }
-            }
-
-            $photos = [];
-            foreach ($request->file('photos') as $photo) {
-                $path = $photo->store('repair-requests/photos', 'public');
-                $photos[] = $path;
-            }
-            $data['photos'] = $photos;
-        }
-
-        $repairRequest->update($data);
-
-        return redirect()->route('admin.repair-requests.show', $repairRequest)
-                        ->with('success', 'Demande de réparation mise à jour avec succès.');
-    }
-
-    public function destroy(RepairRequest $repairRequest): RedirectResponse
-    {
-        if (!in_array($repairRequest->status, [RepairRequest::STATUS_PENDING, RepairRequest::STATUS_REJECTED])) {
-            return redirect()->back()->with('error', 'Cette demande ne peut pas être supprimée.');
-        }
-
-        // Supprimer les fichiers associés
-        if ($repairRequest->photos) {
-            foreach ($repairRequest->photos as $photo) {
-                Storage::disk('public')->delete($photo);
-            }
-        }
-
-        if ($repairRequest->attachments) {
-            foreach ($repairRequest->attachments as $attachment) {
-                Storage::disk('public')->delete($attachment['path']);
-            }
-        }
-
-        $repairRequest->delete();
-
-        return redirect()->route('admin.repair-requests.index')
-                        ->with('success', 'Demande de réparation supprimée avec succès.');
-    }
-
-    // Méthodes de workflow
-
-    public function approve(ApprovalDecisionRequest $request, RepairRequest $repairRequest): JsonResponse
-    {
         try {
-            $user = Auth::user();
+            $repairRequest = $this->repairService->createRequest($request->validated());
 
-            if (!$repairRequest->canBeApprovedBy($user)) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Vous n\'êtes pas autorisé à approuver cette demande.'
-                ], 403);
-            }
-
-            $success = $repairRequest->approveBySupervisor($user, $request->get('comments'));
-
-            return response()->json([
-                'success' => $success,
-                'message' => $success ? 'Demande approuvée avec succès.' : 'Erreur lors de l\'approbation.',
-                'status' => $repairRequest->fresh()->status_label
-            ]);
-
+            return redirect()
+                ->route('repair-requests.show', $repairRequest)
+                ->with('success', 'Demande de réparation créée avec succès. Le superviseur a été notifié.');
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Erreur: ' . $e->getMessage()
-            ], 500);
+            return redirect()
+                ->back()
+                ->withInput()
+                ->with('error', 'Erreur lors de la création de la demande: ' . $e->getMessage());
         }
     }
 
-    public function reject(ApprovalDecisionRequest $request, RepairRequest $repairRequest): JsonResponse
+    /**
+     * Display the specified repair request.
+     */
+    public function show(Request $request, RepairRequest $repairRequest): Response
     {
-        try {
-            $user = Auth::user();
+        $this->authorize('view', $repairRequest);
 
-            if (!$repairRequest->canBeApprovedBy($user)) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Vous n\'êtes pas autorisé à rejeter cette demande.'
-                ], 403);
-            }
-
-            $comments = $request->get('comments');
-            if (empty($comments)) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Un commentaire est requis pour rejeter une demande.'
-                ], 422);
-            }
-
-            $success = $repairRequest->rejectBySupervisor($user, $comments);
-
-            return response()->json([
-                'success' => $success,
-                'message' => $success ? 'Demande rejetée.' : 'Erreur lors du rejet.',
-                'status' => $repairRequest->fresh()->status_label
-            ]);
-
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Erreur: ' . $e->getMessage()
-            ], 500);
-        }
-    }
-
-    public function validateRepairRequest(ApprovalDecisionRequest $request, RepairRequest $repairRequest): JsonResponse
-    {
-        try {
-            $user = Auth::user();
-
-            if (!$repairRequest->canBeValidatedBy($user)) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Vous n\'êtes pas autorisé à valider cette demande.'
-                ], 403);
-            }
-
-            $success = $repairRequest->validateByManager($user, $request->get('comments'));
-
-            return response()->json([
-                'success' => $success,
-                'message' => $success ? 'Demande validée avec succès.' : 'Erreur lors de la validation.',
-                'status' => $repairRequest->fresh()->status_label
-            ]);
-
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Erreur: ' . $e->getMessage()
-            ], 500);
-        }
-    }
-
-    public function rejectByManager(ApprovalDecisionRequest $request, RepairRequest $repairRequest): JsonResponse
-    {
-        try {
-            $user = Auth::user();
-
-            if (!$repairRequest->canBeValidatedBy($user)) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Vous n\'êtes pas autorisé à rejeter cette demande.'
-                ], 403);
-            }
-
-            $comments = $request->get('comments');
-            if (empty($comments)) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Un commentaire est requis pour rejeter une demande.'
-                ], 422);
-            }
-
-            $success = $repairRequest->rejectByManager($user, $comments);
-
-            return response()->json([
-                'success' => $success,
-                'message' => $success ? 'Demande rejetée par le manager.' : 'Erreur lors du rejet.',
-                'status' => $repairRequest->fresh()->status_label
-            ]);
-
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Erreur: ' . $e->getMessage()
-            ], 500);
-        }
-    }
-
-    public function assignSupplier(Request $request, RepairRequest $repairRequest): JsonResponse
-    {
-        $request->validate([
-            'supplier_id' => 'required|exists:suppliers,id'
+        // 🔄 CHARGER TOUTES LES RELATIONS
+        $repairRequest->load([
+            'driver.user',
+            'driver.supervisor',
+            'vehicle.category',
+            'vehicle.depot',
+            'supervisor',
+            'fleetManager',
+            'category',
+            'depot',
+            'maintenanceOperation',
+            'history.user',
+            'notifications.user',
         ]);
 
-        try {
-            $success = $repairRequest->assignToSupplier($request->get('supplier_id'));
-
-            return response()->json([
-                'success' => $success,
-                'message' => $success ? 'Fournisseur assigné avec succès.' : 'Erreur lors de l\'assignation.'
-            ]);
-
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Erreur: ' . $e->getMessage()
-            ], 500);
-        }
-    }
-
-    public function startWork(RepairRequest $repairRequest): JsonResponse
-    {
-        try {
-            $success = $repairRequest->startWork();
-
-            return response()->json([
-                'success' => $success,
-                'message' => $success ? 'Travaux démarrés.' : 'Erreur lors du démarrage.',
-                'status' => $repairRequest->fresh()->status_label
-            ]);
-
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Erreur: ' . $e->getMessage()
-            ], 500);
-        }
-    }
-
-    public function completeWork(Request $request, RepairRequest $repairRequest): JsonResponse
-    {
-        $request->validate([
-            'actual_cost' => 'required|numeric|min:0',
-            'completion_notes' => 'nullable|string|max:1000',
-            'final_rating' => 'nullable|numeric|between:1,10',
-            'work_photos' => 'nullable|array',
-            'work_photos.*' => 'image|mimes:jpeg,png,jpg,gif|max:2048'
+        return Inertia::render('RepairRequests/Show', [
+            'repairRequest' => $repairRequest,
+            'can' => [
+                'update' => $request->user()->can('update', $repairRequest),
+                'delete' => $request->user()->can('delete', $repairRequest),
+                'approveLevel1' => $request->user()->can('approveLevelOne', $repairRequest),
+                'rejectLevel1' => $request->user()->can('rejectLevelOne', $repairRequest),
+                'approveLevel2' => $request->user()->can('approveLevelTwo', $repairRequest),
+                'rejectLevel2' => $request->user()->can('rejectLevelTwo', $repairRequest),
+                'viewHistory' => $request->user()->can('viewHistory', $repairRequest),
+            ],
         ]);
+    }
+
+    /**
+     * Approve repair request by supervisor (Level 1).
+     */
+    public function approveSupervisor(
+        ApproveRepairRequestRequest $request,
+        RepairRequest $repairRequest
+    ): RedirectResponse {
+        $this->authorize('approveLevelOne', $repairRequest);
 
         try {
-            $workPhotos = null;
-            if ($request->hasFile('work_photos')) {
-                $workPhotos = [];
-                foreach ($request->file('work_photos') as $photo) {
-                    $path = $photo->store('repair-requests/work-photos', 'public');
-                    $workPhotos[] = $path;
-                }
-            }
-
-            $success = $repairRequest->completeWork(
-                $request->get('actual_cost'),
-                $request->get('completion_notes'),
-                $workPhotos,
-                $request->get('final_rating')
+            $approved = $this->repairService->approveBySupervisor(
+                $repairRequest,
+                $request->user(),
+                $request->input('comment')
             );
 
-            return response()->json([
-                'success' => $success,
-                'message' => $success ? 'Travaux complétés avec succès.' : 'Erreur lors de la complétion.',
-                'status' => $repairRequest->fresh()->status_label
-            ]);
-
+            return redirect()
+                ->route('repair-requests.show', $approved)
+                ->with('success', 'Demande approuvée avec succès. Les gestionnaires de flotte ont été notifiés.');
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Erreur: ' . $e->getMessage()
-            ], 500);
+            return redirect()
+                ->back()
+                ->with('error', 'Erreur lors de l\'approbation: ' . $e->getMessage());
         }
     }
 
-    public function cancel(Request $request, RepairRequest $repairRequest): JsonResponse
-    {
+    /**
+     * Reject repair request by supervisor (Level 1).
+     */
+    public function rejectSupervisor(
+        RejectRepairRequestRequest $request,
+        RepairRequest $repairRequest
+    ): RedirectResponse {
+        $this->authorize('rejectLevelOne', $repairRequest);
+
         try {
-            $success = $repairRequest->cancel($request->get('reason'));
+            $rejected = $this->repairService->rejectBySupervisor(
+                $repairRequest,
+                $request->user(),
+                $request->input('reason')
+            );
 
-            return response()->json([
-                'success' => $success,
-                'message' => $success ? 'Demande annulée.' : 'Erreur lors de l\'annulation.',
-                'status' => $repairRequest->fresh()->status_label
-            ]);
-
+            return redirect()
+                ->route('repair-requests.show', $rejected)
+                ->with('warning', 'Demande rejetée. Le chauffeur a été notifié.');
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Erreur: ' . $e->getMessage()
-            ], 500);
+            return redirect()
+                ->back()
+                ->with('error', 'Erreur lors du rejet: ' . $e->getMessage());
         }
     }
 
-    // Dashboard et statistiques
-    public function dashboard(): View
-    {
-        $user = Auth::user();
-        $organizationId = $user->organization_id;
+    /**
+     * Approve repair request by fleet manager (Level 2).
+     */
+    public function approveFleetManager(
+        ApproveRepairRequestRequest $request,
+        RepairRequest $repairRequest
+    ): RedirectResponse {
+        $this->authorize('approveLevelTwo', $repairRequest);
 
-        // Statistiques générales
-        $stats = $this->getRepairStats();
+        try {
+            $approved = $this->repairService->approveByFleetManager(
+                $repairRequest,
+                $request->user(),
+                $request->input('comment')
+            );
 
-        // Demandes récentes
-        $recentRequests = RepairRequest::with(['vehicle', 'requester'])
-                                     ->forOrganization($organizationId)
-                                     ->latest('requested_at')
-                                     ->limit(5)
-                                     ->get();
-
-        // Demandes en attente de traitement selon le rôle
-        $pendingRequests = collect();
-        if ($user->hasRole('supervisor')) {
-            $pendingRequests = RepairRequest::awaitingSupervisorApproval()
-                                          ->forOrganization($organizationId)
-                                          ->with(['vehicle', 'requester'])
-                                          ->get();
-        } elseif ($user->hasRole('fleet_manager')) {
-            $pendingRequests = RepairRequest::awaitingManagerValidation()
-                                          ->forOrganization($organizationId)
-                                          ->with(['vehicle', 'requester'])
-                                          ->get();
+            return redirect()
+                ->route('repair-requests.show', $approved)
+                ->with('success', 'Demande approuvée définitivement. Une opération de maintenance a été créée automatiquement.');
+        } catch (\Exception $e) {
+            return redirect()
+                ->back()
+                ->with('error', 'Erreur lors de l\'approbation finale: ' . $e->getMessage());
         }
-
-        // Coûts par mois (6 derniers mois)
-        $monthlyCosts = $this->getMonthlyCosts($organizationId);
-
-        return view('admin.repair-requests.dashboard', compact(
-            'stats',
-            'recentRequests',
-            'pendingRequests',
-            'monthlyCosts'
-        ));
     }
 
-    // Méthodes utilitaires privées
+    /**
+     * Reject repair request by fleet manager (Level 2).
+     */
+    public function rejectFleetManager(
+        RejectRepairRequestRequest $request,
+        RepairRequest $repairRequest
+    ): RedirectResponse {
+        $this->authorize('rejectLevelTwo', $repairRequest);
 
-    private function getRepairStats(): array
-    {
-        $organizationId = auth()->user()->organization_id;
+        try {
+            $rejected = $this->repairService->rejectByFleetManager(
+                $repairRequest,
+                $request->user(),
+                $request->input('reason')
+            );
 
-        return [
-            'total' => RepairRequest::forOrganization($organizationId)->count(),
-            'pending' => RepairRequest::pending()->forOrganization($organizationId)->count(),
-            'urgent' => RepairRequest::urgent()->forOrganization($organizationId)->count(),
-            'in_progress' => RepairRequest::inProgress()->forOrganization($organizationId)->count(),
-            'completed_this_month' => RepairRequest::completed()
-                                               ->forOrganization($organizationId)
-                                               ->whereMonth('work_completed_at', now()->month)
-                                               ->count(),
-            'avg_cost' => RepairRequest::completed()
-                                     ->forOrganization($organizationId)
-                                     ->whereNotNull('actual_cost')
-                                     ->avg('actual_cost') ?? 0,
-            'total_cost_this_year' => RepairRequest::completed()
-                                               ->forOrganization($organizationId)
-                                               ->whereYear('work_completed_at', now()->year)
-                                               ->sum('actual_cost') ?? 0
-        ];
+            return redirect()
+                ->route('repair-requests.show', $rejected)
+                ->with('warning', 'Demande rejetée définitivement. Le superviseur et le chauffeur ont été notifiés.');
+        } catch (\Exception $e) {
+            return redirect()
+                ->back()
+                ->with('error', 'Erreur lors du rejet final: ' . $e->getMessage());
+        }
     }
 
-    private function getMonthlyCosts(int $organizationId): array
+    /**
+     * Remove the specified repair request from storage.
+     */
+    public function destroy(Request $request, RepairRequest $repairRequest): RedirectResponse
     {
-        $costs = [];
-        for ($i = 5; $i >= 0; $i--) {
-            $date = now()->subMonths($i);
-            $costs[$date->format('Y-m')] = RepairRequest::completed()
-                                                      ->forOrganization($organizationId)
-                                                      ->whereYear('work_completed_at', $date->year)
-                                                      ->whereMonth('work_completed_at', $date->month)
-                                                      ->sum('actual_cost') ?? 0;
+        $this->authorize('delete', $repairRequest);
+
+        try {
+            // 🗑️ SOFT DELETE
+            $repairRequest->delete();
+
+            return redirect()
+                ->route('repair-requests.index')
+                ->with('success', 'Demande de réparation supprimée avec succès.');
+        } catch (\Exception $e) {
+            return redirect()
+                ->back()
+                ->with('error', 'Erreur lors de la suppression: ' . $e->getMessage());
         }
-        return $costs;
     }
 }

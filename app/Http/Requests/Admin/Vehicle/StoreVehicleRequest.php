@@ -39,6 +39,26 @@ class StoreVehicleRequest extends FormRequest
                     ->where('organization_id', $organizationId)
                     ->whereNull('deleted_at')
             ],
+            'vehicle_name' => [
+                'nullable',
+                'string',
+                'max:150',
+                Rule::unique('vehicles')
+                    ->where('organization_id', $organizationId)
+                    ->whereNull('deleted_at')
+            ],
+            'category_id' => [
+                'nullable',
+                Rule::exists('vehicle_categories', 'id')
+                    ->where('organization_id', $organizationId)
+                    ->whereNull('deleted_at')
+            ],
+            'depot_id' => [
+                'nullable',
+                Rule::exists('vehicle_depots', 'id')
+                    ->where('organization_id', $organizationId)
+                    ->whereNull('deleted_at')
+            ],
             'brand' => ['nullable', 'string', 'max:100'],
             'model' => ['nullable', 'string', 'max:100'],
             'color' => ['nullable', 'string', 'max:50'],
@@ -51,7 +71,7 @@ class StoreVehicleRequest extends FormRequest
             'purchase_price' => ['nullable', 'numeric', 'min:0'],
             'current_value' => ['nullable', 'numeric', 'min:0'],
             'initial_mileage' => ['nullable', 'integer', 'min:0'],
-            'current_mileage' => ['nullable', 'integer', 'min:0', 'gte:initial_mileage'], // This rule is for creation, should be initial_mileage
+            'current_mileage' => ['nullable', 'integer', 'min:0', 'gte:initial_mileage'],
             'engine_displacement_cc' => ['nullable', 'integer', 'min:0'],
             'power_hp' => ['nullable', 'integer', 'min:0'],
             'seats' => ['nullable', 'integer', 'min:1'],

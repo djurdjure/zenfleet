@@ -172,6 +172,52 @@
                     icon="fas fa-barcode" />
 
                 <x-vehicle-form-field
+                    name="vehicle_name"
+                    label="Nom du véhicule"
+                    type="text"
+                    placeholder="Ex: Camion Livraison 1"
+                    help="Nom unique pour identifier facilement ce véhicule"
+                    icon="fas fa-tag" />
+
+                {{-- Category Select --}}
+                <div>
+                    <label for="category_id" class="block text-sm font-medium text-gray-700 mb-2">
+                        <i class="fas fa-layer-group mr-1 text-gray-500"></i>
+                        Catégorie
+                    </label>
+                    <select name="category_id" id="category_id" class="form-input w-full rounded-lg">
+                        <option value="">-- Sélectionner une catégorie --</option>
+                        @foreach($referenceData['categories'] ?? [] as $category)
+                            <option value="{{ $category->id }}" {{ old('category_id') == $category->id ? 'selected' : '' }}>
+                                {{ $category->name }} ({{ $category->code }})
+                            </option>
+                        @endforeach
+                    </select>
+                    @error('category_id')
+                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                {{-- Depot Select --}}
+                <div>
+                    <label for="depot_id" class="block text-sm font-medium text-gray-700 mb-2">
+                        <i class="fas fa-warehouse mr-1 text-gray-500"></i>
+                        Dépôt
+                    </label>
+                    <select name="depot_id" id="depot_id" class="form-input w-full rounded-lg">
+                        <option value="">-- Sélectionner un dépôt --</option>
+                        @foreach($referenceData['depots'] ?? [] as $depot)
+                            <option value="{{ $depot->id }}" {{ old('depot_id') == $depot->id ? 'selected' : '' }}>
+                                {{ $depot->name }} - {{ $depot->city }}
+                            </option>
+                        @endforeach
+                    </select>
+                    @error('depot_id')
+                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <x-vehicle-form-field
                     name="brand"
                     label="Marque"
                     type="text"

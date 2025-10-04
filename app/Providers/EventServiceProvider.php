@@ -2,10 +2,12 @@
 
 namespace App\Providers;
 
-use App\Models\User;                // <--- AJOUTEZ CETTE LIGNE
-use App\Observers\UserObserver;    // <--- AJOUTEZ CETTE LIGNE
-use App\Models\Driver; // <-- Ajouter
-use App\Observers\DriverObserver; // <-- Ajouter
+use App\Models\User;
+use App\Observers\UserObserver;
+use App\Models\Driver;
+use App\Observers\DriverObserver;
+use App\Events\RepairRequestStatusChanged;
+use App\Listeners\SendRepairRequestNotifications;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
@@ -21,6 +23,11 @@ class EventServiceProvider extends ServiceProvider
     protected $listen = [
         Registered::class => [
             SendEmailVerificationNotification::class,
+        ],
+
+        // 🔧 REPAIR REQUEST EVENTS
+        RepairRequestStatusChanged::class => [
+            SendRepairRequestNotifications::class,
         ],
     ];
 

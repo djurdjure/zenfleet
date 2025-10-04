@@ -36,6 +36,27 @@ class UpdateVehicleRequest extends FormRequest
                     ->where('organization_id', $organizationId)
                     ->whereNull('deleted_at')
             ],
+            'vehicle_name' => [
+                'nullable',
+                'string',
+                'max:150',
+                Rule::unique('vehicles')
+                    ->ignore($vehicleId)
+                    ->where('organization_id', $organizationId)
+                    ->whereNull('deleted_at')
+            ],
+            'category_id' => [
+                'nullable',
+                Rule::exists('vehicle_categories', 'id')
+                    ->where('organization_id', $organizationId)
+                    ->whereNull('deleted_at')
+            ],
+            'depot_id' => [
+                'nullable',
+                Rule::exists('vehicle_depots', 'id')
+                    ->where('organization_id', $organizationId)
+                    ->whereNull('deleted_at')
+            ],
             'brand' => ['nullable', 'string', 'max:100'],
             'model' => ['nullable', 'string', 'max:100'],
             'color' => ['nullable', 'string', 'max:50'],

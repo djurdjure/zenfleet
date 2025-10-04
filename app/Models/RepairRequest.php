@@ -2,427 +2,507 @@
 
 namespace App\Models;
 
-use App\Models\Concerns\BelongsToOrganization;
-use App\Notifications\RepairRequestApproved;
-use App\Notifications\RepairRequestRejected;
-use App\Notifications\RepairRequestValidated;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Str;
 
+/**
+ * RepairRequest Model - Main model for repair workflow
+ *
+ * @property int $id
+ * @property string $uuid
+ * @property int $organization_id
+ * @property int $vehicle_id
+ * @property int $driver_id
+ * @property string $status
+ * @property string $title
+ * @property string $description
+ * @property string $urgency
+ * @property float|null $estimated_cost
+ * @property int|null $current_mileage
+ * @property string|null $current_location
+ * @property int|null $supervisor_id
+ * @property string|null $supervisor_status
+ * @property string|null $supervisor_comment
+ * @property \Illuminate\Support\Carbon|null $supervisor_approved_at
+ * @property int|null $fleet_manager_id
+ * @property string|null $fleet_manager_status
+ * @property string|null $fleet_manager_comment
+ * @property \Illuminate\Support\Carbon|null $fleet_manager_approved_at
+ * @property string|null $rejection_reason
+ * @property int|null $rejected_by
+ * @property \Illuminate\Support\Carbon|null $rejected_at
+ * @property int|null $final_approved_by
+ * @property \Illuminate\Support\Carbon|null $final_approved_at
+ * @property int|null $maintenance_operation_id
+ * @property array|null $photos
+ * @property array|null $attachments
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property \Illuminate\Support\Carbon|null $deleted_at
+ *
+ * @property-read Organization $organization
+ * @property-read Vehicle $vehicle
+ * @property-read Driver $driver
+ * @property-read User|null $supervisor
+ * @property-read User|null $fleetManager
+ * @property-read User|null $rejectedBy
+ * @property-read User|null $finalApprovedBy
+ * @property-read MaintenanceOperation|null $maintenanceOperation
+ * @property-read \Illuminate\Database\Eloquent\Collection<RepairRequestHistory> $history
+ * @property-read \Illuminate\Database\Eloquent\Collection<RepairNotification> $notifications
+ */
 class RepairRequest extends Model
 {
-    use HasFactory, SoftDeletes, BelongsToOrganization;
+    use HasFactory, SoftDeletes;
 
-    // Constantes pour les énumérations
-    public const PRIORITY_URGENT = 'urgente';
-    public const PRIORITY_SCHEDULED = 'a_prevoir';
-    public const PRIORITY_NON_URGENT = 'non_urgente';
+    /**
+     * The table associated with the model.
+     *
+     * @var string
+     */
+    protected $table = 'repair_requests';
 
-    public const STATUS_PENDING = 'en_attente';
-    public const STATUS_INITIAL_APPROVAL = 'accord_initial';
-    public const STATUS_APPROVED = 'accordee';
-    public const STATUS_REJECTED = 'refusee';
-    public const STATUS_IN_PROGRESS = 'en_cours';
-    public const STATUS_COMPLETED = 'terminee';
-    public const STATUS_CANCELLED = 'annulee';
+    /**
+     * Status constants
+     */
+    public const STATUS_PENDING_SUPERVISOR = 'pending_supervisor';
+    public const STATUS_APPROVED_SUPERVISOR = 'approved_supervisor';
+    public const STATUS_REJECTED_SUPERVISOR = 'rejected_supervisor';
+    public const STATUS_PENDING_FLEET_MANAGER = 'pending_fleet_manager';
+    public const STATUS_APPROVED_FINAL = 'approved_final';
+    public const STATUS_REJECTED_FINAL = 'rejected_final';
 
-    public const SUPERVISOR_ACCEPT = 'accepte';
-    public const SUPERVISOR_REJECT = 'refuse';
+    /**
+     * Urgency levels
+     */
+    public const URGENCY_LOW = 'low';
+    public const URGENCY_NORMAL = 'normal';
+    public const URGENCY_HIGH = 'high';
+    public const URGENCY_CRITICAL = 'critical';
 
-    public const MANAGER_VALIDATE = 'valide';
-    public const MANAGER_REJECT = 'refuse';
-
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array<int, string>
+     */
     protected $fillable = [
+        'uuid',
         'organization_id',
         'vehicle_id',
-        'requested_by',
-        'priority',
+        'driver_id',
+        'status',
+        'title',
         'description',
-        'location_description',
-        'photos',
+        'urgency',
         'estimated_cost',
-        'actual_cost',
-        'assigned_supplier_id',
+        'current_mileage',
+        'current_location',
+        'supervisor_id',
+        'supervisor_status',
+        'supervisor_comment',
+        'supervisor_approved_at',
+        'fleet_manager_id',
+        'fleet_manager_status',
+        'fleet_manager_comment',
+        'fleet_manager_approved_at',
+        'rejection_reason',
+        'rejected_by',
+        'rejected_at',
+        'final_approved_by',
+        'final_approved_at',
+        'maintenance_operation_id',
+        'photos',
         'attachments',
-        'work_photos',
-        'completion_notes',
-        'final_rating'
     ];
 
+    /**
+     * The attributes that should be cast.
+     *
+     * @var array<string, string>
+     */
     protected $casts = [
+        'organization_id' => 'integer',
+        'vehicle_id' => 'integer',
+        'driver_id' => 'integer',
+        'supervisor_id' => 'integer',
+        'fleet_manager_id' => 'integer',
+        'rejected_by' => 'integer',
+        'final_approved_by' => 'integer',
+        'maintenance_operation_id' => 'integer',
+        'estimated_cost' => 'decimal:2',
+        'current_mileage' => 'integer',
         'photos' => 'array',
         'attachments' => 'array',
-        'work_photos' => 'array',
-        'estimated_cost' => 'decimal:2',
-        'actual_cost' => 'decimal:2',
-        'final_rating' => 'decimal:2',
-        'requested_at' => 'datetime',
-        'supervisor_decided_at' => 'datetime',
-        'manager_decided_at' => 'datetime',
-        'work_started_at' => 'datetime',
-        'work_completed_at' => 'datetime'
+        'supervisor_approved_at' => 'datetime',
+        'fleet_manager_approved_at' => 'datetime',
+        'rejected_at' => 'datetime',
+        'final_approved_at' => 'datetime',
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
+        'deleted_at' => 'datetime',
     ];
 
-    protected $dates = [
-        'requested_at',
-        'supervisor_decided_at',
-        'manager_decided_at',
-        'work_started_at',
-        'work_completed_at'
-    ];
+    /**
+     * The "booted" method of the model.
+     */
+    protected static function booted(): void
+    {
+        static::creating(function (RepairRequest $request) {
+            if (empty($request->uuid)) {
+                $request->uuid = (string) Str::uuid();
+            }
+        });
+    }
 
-    // Relations
+    /**
+     * Get the organization that owns the repair request.
+     */
+    public function organization(): BelongsTo
+    {
+        return $this->belongsTo(Organization::class);
+    }
+
+    /**
+     * Get the vehicle for this repair request.
+     */
     public function vehicle(): BelongsTo
     {
         return $this->belongsTo(Vehicle::class);
     }
 
-    public function requester(): BelongsTo
+    /**
+     * Get the driver who created this repair request.
+     */
+    public function driver(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'requested_by');
+        return $this->belongsTo(Driver::class);
     }
 
+    /**
+     * Get the supervisor who reviewed this request.
+     */
     public function supervisor(): BelongsTo
     {
         return $this->belongsTo(User::class, 'supervisor_id');
     }
 
-    public function manager(): BelongsTo
+    /**
+     * Get the fleet manager who reviewed this request.
+     */
+    public function fleetManager(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'manager_id');
+        return $this->belongsTo(User::class, 'fleet_manager_id');
     }
 
-    public function assignedSupplier(): BelongsTo
+    /**
+     * Get the user who rejected this request.
+     */
+    public function rejectedBy(): BelongsTo
     {
-        return $this->belongsTo(Supplier::class, 'assigned_supplier_id');
+        return $this->belongsTo(User::class, 'rejected_by');
     }
 
-    // Scopes pour filtrer les demandes
-    public function scopePending($query)
+    /**
+     * Get the user who gave final approval.
+     */
+    public function finalApprovedBy(): BelongsTo
     {
-        return $query->where('status', self::STATUS_PENDING);
+        return $this->belongsTo(User::class, 'final_approved_by');
     }
 
-    public function scopeUrgent($query)
+    /**
+     * Get the associated maintenance operation.
+     */
+    public function maintenanceOperation(): BelongsTo
     {
-        return $query->where('priority', self::PRIORITY_URGENT);
+        return $this->belongsTo(MaintenanceOperation::class);
     }
 
-    public function scopeAwaitingSupervisorApproval($query)
+    /**
+     * Get all history entries for this request.
+     */
+    public function history(): HasMany
     {
-        return $query->where('status', self::STATUS_PENDING)
-                    ->whereNull('supervisor_decision');
+        return $this->hasMany(RepairRequestHistory::class)->orderBy('created_at', 'desc');
     }
 
-    public function scopeAwaitingManagerValidation($query)
+    /**
+     * Get all notifications for this request.
+     */
+    public function notifications(): HasMany
     {
-        return $query->where('status', self::STATUS_INITIAL_APPROVAL)
-                    ->whereNull('manager_decision');
+        return $this->hasMany(RepairNotification::class);
     }
 
-    public function scopeApproved($query)
+    /**
+     * Scope: Pending supervisor approval
+     */
+    public function scopePendingSupervisor(Builder $query): Builder
     {
-        return $query->where('status', self::STATUS_APPROVED);
+        return $query->where('status', self::STATUS_PENDING_SUPERVISOR);
     }
 
-    public function scopeInProgress($query)
+    /**
+     * Scope: Pending fleet manager approval
+     */
+    public function scopePendingFleetManager(Builder $query): Builder
     {
-        return $query->where('status', self::STATUS_IN_PROGRESS);
+        return $query->where('status', self::STATUS_PENDING_FLEET_MANAGER);
     }
 
-    public function scopeCompleted($query)
+    /**
+     * Scope: Approved requests
+     */
+    public function scopeApproved(Builder $query): Builder
     {
-        return $query->where('status', self::STATUS_COMPLETED);
+        return $query->where('status', self::STATUS_APPROVED_FINAL);
     }
 
-    public function scopeForOrganization($query, $organizationId)
+    /**
+     * Scope: Rejected requests
+     */
+    public function scopeRejected(Builder $query): Builder
+    {
+        return $query->whereIn('status', [
+            self::STATUS_REJECTED_SUPERVISOR,
+            self::STATUS_REJECTED_FINAL,
+        ]);
+    }
+
+    /**
+     * Scope: By urgency level
+     */
+    public function scopeByUrgency(Builder $query, string $urgency): Builder
+    {
+        return $query->where('urgency', $urgency);
+    }
+
+    /**
+     * Scope: Critical urgency
+     */
+    public function scopeCritical(Builder $query): Builder
+    {
+        return $query->where('urgency', self::URGENCY_CRITICAL);
+    }
+
+    /**
+     * Scope: For specific organization
+     */
+    public function scopeForOrganization(Builder $query, int $organizationId): Builder
     {
         return $query->where('organization_id', $organizationId);
     }
 
-    // Méthodes de workflow - Niveau 1 : Superviseur
-    public function approveBySupervisor(User $supervisor, ?string $comments = null): bool
+    /**
+     * Scope: For specific vehicle
+     */
+    public function scopeForVehicle(Builder $query, int $vehicleId): Builder
     {
-        if ($this->status !== self::STATUS_PENDING) {
-            throw new \InvalidArgumentException('Cette demande ne peut plus être approuvée par un superviseur');
-        }
-
-        DB::beginTransaction();
-        try {
-            $this->update([
-                'supervisor_decision' => self::SUPERVISOR_ACCEPT,
-                'supervisor_id' => $supervisor->id,
-                'supervisor_comments' => $comments,
-                'supervisor_decided_at' => now(),
-                'status' => self::STATUS_INITIAL_APPROVAL
-            ]);
-
-            // Notifier le manager pour validation
-            $this->notifyManagerForValidation();
-
-            // Notifier le demandeur
-            $this->requester->notify(new RepairRequestApproved($this));
-
-            DB::commit();
-            return true;
-        } catch (\Exception $e) {
-            DB::rollback();
-            throw $e;
-        }
+        return $query->where('vehicle_id', $vehicleId);
     }
 
-    public function rejectBySupervisor(User $supervisor, string $comments): bool
+    /**
+     * Scope: For specific driver
+     */
+    public function scopeForDriver(Builder $query, int $driverId): Builder
     {
-        if ($this->status !== self::STATUS_PENDING) {
-            throw new \InvalidArgumentException('Cette demande ne peut plus être rejetée par un superviseur');
-        }
-
-        DB::beginTransaction();
-        try {
-            $this->update([
-                'supervisor_decision' => self::SUPERVISOR_REJECT,
-                'supervisor_id' => $supervisor->id,
-                'supervisor_comments' => $comments,
-                'supervisor_decided_at' => now(),
-                'status' => self::STATUS_REJECTED
-            ]);
-
-            // Notifier le demandeur
-            $this->requester->notify(new RepairRequestRejected($this));
-
-            DB::commit();
-            return true;
-        } catch (\Exception $e) {
-            DB::rollback();
-            throw $e;
-        }
+        return $query->where('driver_id', $driverId);
     }
 
-    // Méthodes de workflow - Niveau 2 : Manager
-    public function validateByManager(User $manager, ?string $comments = null): bool
+    /**
+     * Scope: For specific supervisor
+     */
+    public function scopeForSupervisor(Builder $query, int $supervisorId): Builder
     {
-        if ($this->status !== self::STATUS_INITIAL_APPROVAL) {
-            throw new \InvalidArgumentException('Cette demande ne peut pas être validée par un manager');
-        }
-
-        DB::beginTransaction();
-        try {
-            $this->update([
-                'manager_decision' => self::MANAGER_VALIDATE,
-                'manager_id' => $manager->id,
-                'manager_comments' => $comments,
-                'manager_decided_at' => now(),
-                'status' => self::STATUS_APPROVED
-            ]);
-
-            // Déclencher le processus de réparation
-            $this->startRepairProcess();
-
-            // Notifier le demandeur
-            $this->requester->notify(new RepairRequestValidated($this));
-
-            DB::commit();
-            return true;
-        } catch (\Exception $e) {
-            DB::rollback();
-            throw $e;
-        }
+        return $query->where('supervisor_id', $supervisorId);
     }
 
-    public function rejectByManager(User $manager, string $comments): bool
-    {
-        if ($this->status !== self::STATUS_INITIAL_APPROVAL) {
-            throw new \InvalidArgumentException('Cette demande ne peut pas être rejetée par un manager');
-        }
-
-        DB::beginTransaction();
-        try {
-            $this->update([
-                'manager_decision' => self::MANAGER_REJECT,
-                'manager_id' => $manager->id,
-                'manager_comments' => $comments,
-                'manager_decided_at' => now(),
-                'status' => self::STATUS_REJECTED
-            ]);
-
-            // Notifier le demandeur
-            $this->requester->notify(new RepairRequestRejected($this));
-
-            DB::commit();
-            return true;
-        } catch (\Exception $e) {
-            DB::rollback();
-            throw $e;
-        }
-    }
-
-    // Méthodes de gestion des travaux
-    public function assignToSupplier($supplierId): bool
-    {
-        if ($this->status !== self::STATUS_APPROVED) {
-            throw new \InvalidArgumentException('Cette demande doit être approuvée avant assignation');
-        }
-
-        return $this->update([
-            'assigned_supplier_id' => $supplierId
-        ]);
-    }
-
-    public function startWork(): bool
-    {
-        if ($this->status !== self::STATUS_APPROVED) {
-            throw new \InvalidArgumentException('Les travaux ne peuvent commencer que sur une demande approuvée');
-        }
-
-        return $this->update([
-            'status' => self::STATUS_IN_PROGRESS,
-            'work_started_at' => now()
-        ]);
-    }
-
-    public function completeWork(float $actualCost, ?string $completionNotes = null, ?array $workPhotos = null, ?float $rating = null): bool
-    {
-        if ($this->status !== self::STATUS_IN_PROGRESS) {
-            throw new \InvalidArgumentException('Les travaux doivent être en cours pour être complétés');
-        }
-
-        return $this->update([
-            'status' => self::STATUS_COMPLETED,
-            'work_completed_at' => now(),
-            'actual_cost' => $actualCost,
-            'completion_notes' => $completionNotes,
-            'work_photos' => $workPhotos,
-            'final_rating' => $rating
-        ]);
-    }
-
-    public function cancel(?string $reason = null): bool
-    {
-        if (in_array($this->status, [self::STATUS_COMPLETED, self::STATUS_CANCELLED])) {
-            throw new \InvalidArgumentException('Cette demande ne peut plus être annulée');
-        }
-
-        return $this->update([
-            'status' => self::STATUS_CANCELLED,
-            'supervisor_comments' => $reason ? "Annulé: {$reason}" : 'Demande annulée'
-        ]);
-    }
-
-    // Méthodes utilitaires
-    public function canBeApprovedBy(User $user): bool
-    {
-        return $this->status === self::STATUS_PENDING &&
-               $user->hasRole(['supervisor', 'fleet_manager']);
-    }
-
-    public function canBeValidatedBy(User $user): bool
-    {
-        return $this->status === self::STATUS_INITIAL_APPROVAL &&
-               $user->hasRole('fleet_manager');
-    }
-
-    public function isUrgent(): bool
-    {
-        return $this->priority === self::PRIORITY_URGENT;
-    }
-
+    /**
+     * Check if request is pending
+     */
     public function isPending(): bool
     {
-        return $this->status === self::STATUS_PENDING;
+        return in_array($this->status, [
+            self::STATUS_PENDING_SUPERVISOR,
+            self::STATUS_PENDING_FLEET_MANAGER,
+        ]);
     }
 
+    /**
+     * Check if request is approved
+     */
     public function isApproved(): bool
     {
-        return $this->status === self::STATUS_APPROVED;
+        return $this->status === self::STATUS_APPROVED_FINAL;
     }
 
-    public function isCompleted(): bool
+    /**
+     * Check if request is rejected
+     */
+    public function isRejected(): bool
     {
-        return $this->status === self::STATUS_COMPLETED;
+        return in_array($this->status, [
+            self::STATUS_REJECTED_SUPERVISOR,
+            self::STATUS_REJECTED_FINAL,
+        ]);
     }
 
-    public function getDurationInHours(): ?int
+    /**
+     * Approve by supervisor
+     */
+    public function approveBySupervisor(User $supervisor, ?string $comment = null): bool
     {
-        if (!$this->work_started_at || !$this->work_completed_at) {
-            return null;
+        $this->supervisor_id = $supervisor->id;
+        $this->supervisor_status = 'approved';
+        $this->supervisor_comment = $comment;
+        $this->supervisor_approved_at = now();
+        $this->status = self::STATUS_PENDING_FLEET_MANAGER;
+
+        if ($this->save()) {
+            $this->logHistory('supervisor_approved', self::STATUS_PENDING_SUPERVISOR, self::STATUS_PENDING_FLEET_MANAGER, $supervisor, $comment);
+            return true;
         }
 
-        return $this->work_started_at->diffInHours($this->work_completed_at);
+        return false;
     }
 
-    public function getCostVariation(): ?float
+    /**
+     * Reject by supervisor
+     */
+    public function rejectBySupervisor(User $supervisor, string $reason): bool
     {
-        if (!$this->estimated_cost || !$this->actual_cost) {
-            return null;
+        $this->supervisor_id = $supervisor->id;
+        $this->supervisor_status = 'rejected';
+        $this->supervisor_comment = $reason;
+        $this->status = self::STATUS_REJECTED_SUPERVISOR;
+        $this->rejection_reason = $reason;
+        $this->rejected_by = $supervisor->id;
+        $this->rejected_at = now();
+
+        if ($this->save()) {
+            $this->logHistory('supervisor_rejected', self::STATUS_PENDING_SUPERVISOR, self::STATUS_REJECTED_SUPERVISOR, $supervisor, $reason);
+            return true;
         }
 
-        return (($this->actual_cost - $this->estimated_cost) / $this->estimated_cost) * 100;
+        return false;
     }
 
-    // Méthodes privées
-    private function notifyManagerForValidation(): void
+    /**
+     * Approve by fleet manager (final approval)
+     */
+    public function approveByFleetManager(User $fleetManager, ?string $comment = null): bool
     {
-        // Récupérer tous les managers de l'organisation
-        $managers = User::where('organization_id', $this->organization_id)
-                       ->whereHas('roles', function ($query) {
-                           $query->where('name', 'fleet_manager');
-                       })
-                       ->get();
+        $this->fleet_manager_id = $fleetManager->id;
+        $this->fleet_manager_status = 'approved';
+        $this->fleet_manager_comment = $comment;
+        $this->fleet_manager_approved_at = now();
+        $this->status = self::STATUS_APPROVED_FINAL;
+        $this->final_approved_by = $fleetManager->id;
+        $this->final_approved_at = now();
 
-        foreach ($managers as $manager) {
-            // TODO: Implémenter la notification manager
+        if ($this->save()) {
+            $this->logHistory('fleet_manager_approved', self::STATUS_PENDING_FLEET_MANAGER, self::STATUS_APPROVED_FINAL, $fleetManager, $comment);
+            return true;
         }
+
+        return false;
     }
 
-    private function startRepairProcess(): void
+    /**
+     * Reject by fleet manager
+     */
+    public function rejectByFleetManager(User $fleetManager, string $reason): bool
     {
-        // Logique pour démarrer automatiquement le processus de réparation
-        // selon la priorité et les fournisseurs disponibles
-        if ($this->isUrgent() && $this->assigned_supplier_id) {
-            $this->startWork();
+        $this->fleet_manager_id = $fleetManager->id;
+        $this->fleet_manager_status = 'rejected';
+        $this->fleet_manager_comment = $reason;
+        $this->status = self::STATUS_REJECTED_FINAL;
+        $this->rejection_reason = $reason;
+        $this->rejected_by = $fleetManager->id;
+        $this->rejected_at = now();
+
+        if ($this->save()) {
+            $this->logHistory('fleet_manager_rejected', self::STATUS_PENDING_FLEET_MANAGER, self::STATUS_REJECTED_FINAL, $fleetManager, $reason);
+            return true;
         }
+
+        return false;
     }
 
-    // Accesseurs
-    public function getPriorityLabelAttribute(): string
+    /**
+     * Log action to history
+     */
+    protected function logHistory(string $action, ?string $fromStatus, string $toStatus, ?User $user = null, ?string $comment = null): void
     {
-        return match($this->priority) {
-            self::PRIORITY_URGENT => 'Urgente',
-            self::PRIORITY_SCHEDULED => 'À prévoir',
-            self::PRIORITY_NON_URGENT => 'Non urgente',
-            default => 'Non définie'
+        $this->history()->create([
+            'user_id' => $user?->id,
+            'action' => $action,
+            'from_status' => $fromStatus,
+            'to_status' => $toStatus,
+            'comment' => $comment,
+        ]);
+    }
+
+    /**
+     * Get urgency badge color
+     */
+    public function getUrgencyColorAttribute(): string
+    {
+        return match ($this->urgency) {
+            self::URGENCY_CRITICAL => 'red',
+            self::URGENCY_HIGH => 'orange',
+            self::URGENCY_NORMAL => 'blue',
+            self::URGENCY_LOW => 'gray',
+            default => 'gray',
         };
     }
 
-    public function getStatusLabelAttribute(): string
-    {
-        return match($this->status) {
-            self::STATUS_PENDING => 'En attente',
-            self::STATUS_INITIAL_APPROVAL => 'Accord initial',
-            self::STATUS_APPROVED => 'Accordée',
-            self::STATUS_REJECTED => 'Refusée',
-            self::STATUS_IN_PROGRESS => 'En cours',
-            self::STATUS_COMPLETED => 'Terminée',
-            self::STATUS_CANCELLED => 'Annulée',
-            default => 'Statut inconnu'
-        };
-    }
-
+    /**
+     * Get status badge color
+     */
     public function getStatusColorAttribute(): string
     {
-        return match($this->status) {
-            self::STATUS_PENDING => 'yellow',
-            self::STATUS_INITIAL_APPROVAL => 'blue',
-            self::STATUS_APPROVED => 'green',
-            self::STATUS_REJECTED => 'red',
-            self::STATUS_IN_PROGRESS => 'purple',
-            self::STATUS_COMPLETED => 'emerald',
-            self::STATUS_CANCELLED => 'gray',
-            default => 'gray'
+        return match ($this->status) {
+            self::STATUS_APPROVED_FINAL => 'green',
+            self::STATUS_REJECTED_SUPERVISOR, self::STATUS_REJECTED_FINAL => 'red',
+            self::STATUS_PENDING_SUPERVISOR, self::STATUS_PENDING_FLEET_MANAGER => 'yellow',
+            self::STATUS_APPROVED_SUPERVISOR => 'blue',
+            default => 'gray',
+        };
+    }
+
+    /**
+     * Get human-readable status
+     */
+    public function getStatusLabelAttribute(): string
+    {
+        return match ($this->status) {
+            self::STATUS_PENDING_SUPERVISOR => 'En attente superviseur',
+            self::STATUS_APPROVED_SUPERVISOR => 'Approuvé par superviseur',
+            self::STATUS_REJECTED_SUPERVISOR => 'Rejeté par superviseur',
+            self::STATUS_PENDING_FLEET_MANAGER => 'En attente gestionnaire',
+            self::STATUS_APPROVED_FINAL => 'Approuvé',
+            self::STATUS_REJECTED_FINAL => 'Rejeté',
+            default => 'Inconnu',
+        };
+    }
+
+    /**
+     * Get human-readable urgency
+     */
+    public function getUrgencyLabelAttribute(): string
+    {
+        return match ($this->urgency) {
+            self::URGENCY_CRITICAL => 'Critique',
+            self::URGENCY_HIGH => 'Haute',
+            self::URGENCY_NORMAL => 'Normale',
+            self::URGENCY_LOW => 'Basse',
+            default => 'Normale',
         };
     }
 }

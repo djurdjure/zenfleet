@@ -22,6 +22,7 @@ class Vehicle extends Model
         'fuel_type_id', 'transmission_type_id', 'status_id', 'manufacturing_year',
         'acquisition_date', 'purchase_price', 'current_value', 'initial_mileage',
         'current_mileage', 'engine_displacement_cc', 'power_hp', 'seats', 'status_reason', 'notes', 'organization_id',
+        'vehicle_name', 'category_id', 'depot_id',
     ];
 
     protected $casts = [
@@ -33,11 +34,14 @@ class Vehicle extends Model
     public function fuelType(): BelongsTo { return $this->belongsTo(FuelType::class); }
     public function transmissionType(): BelongsTo { return $this->belongsTo(TransmissionType::class); }
     public function vehicleStatus(): BelongsTo { return $this->belongsTo(VehicleStatus::class, 'status_id'); }
+    public function category(): BelongsTo { return $this->belongsTo(VehicleCategory::class); }
+    public function depot(): BelongsTo { return $this->belongsTo(VehicleDepot::class); }
 
     // CORRECTION : Ajout du bon type de retour (HasMany)
     public function assignments(): HasMany { return $this->hasMany(Assignment::class); }
     public function maintenancePlans(): HasMany { return $this->hasMany(MaintenancePlan::class); }
     public function maintenanceLogs(): HasMany { return $this->hasMany(MaintenanceLog::class); }
+    public function repairRequests(): HasMany { return $this->hasMany(RepairRequest::class); }
 
     /**
      * 🔧 Relation avec les opérations de maintenance - ENTERPRISE GRADE

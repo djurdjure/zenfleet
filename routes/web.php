@@ -265,31 +265,20 @@ Route::middleware(['auth', 'verified'])
 
         // 🔧 MODULE RÉPARATIONS - Workflow Validation 2 Niveaux
         Route::prefix('repair-requests')->name('repair-requests.')->group(function () {
-            // Dashboard principal avec vue Kanban
-            Route::get('/', [\App\Http\Controllers\Admin\RepairRequestController::class, 'index'])->name('index');
-            Route::get('/dashboard', [\App\Http\Controllers\Admin\RepairRequestController::class, 'dashboard'])->name('dashboard');
-
             // CRUD operations
+            Route::get('/', [\App\Http\Controllers\Admin\RepairRequestController::class, 'index'])->name('index');
             Route::get('/create', [\App\Http\Controllers\Admin\RepairRequestController::class, 'create'])->name('create');
             Route::post('/', [\App\Http\Controllers\Admin\RepairRequestController::class, 'store'])->name('store');
             Route::get('/{repairRequest}', [\App\Http\Controllers\Admin\RepairRequestController::class, 'show'])->name('show');
-            Route::get('/{repairRequest}/edit', [\App\Http\Controllers\Admin\RepairRequestController::class, 'edit'])->name('edit');
-            Route::put('/{repairRequest}', [\App\Http\Controllers\Admin\RepairRequestController::class, 'update'])->name('update');
             Route::delete('/{repairRequest}', [\App\Http\Controllers\Admin\RepairRequestController::class, 'destroy'])->name('destroy');
 
             // Workflow actions - Niveau 1 : Superviseur
-            Route::post('/{repairRequest}/approve', [\App\Http\Controllers\Admin\RepairRequestController::class, 'approve'])->name('approve');
-            Route::post('/{repairRequest}/reject', [\App\Http\Controllers\Admin\RepairRequestController::class, 'reject'])->name('reject');
+            Route::post('/{repairRequest}/approve-supervisor', [\App\Http\Controllers\Admin\RepairRequestController::class, 'approveSupervisor'])->name('approve-supervisor');
+            Route::post('/{repairRequest}/reject-supervisor', [\App\Http\Controllers\Admin\RepairRequestController::class, 'rejectSupervisor'])->name('reject-supervisor');
 
-            // Workflow actions - Niveau 2 : Manager
-            Route::post('/{repairRequest}/validate', [\App\Http\Controllers\Admin\RepairRequestController::class, 'validateRepairRequest'])->name('validate');
-            Route::post('/{repairRequest}/reject-manager', [\App\Http\Controllers\Admin\RepairRequestController::class, 'rejectByManager'])->name('reject-manager');
-
-            // Gestion des travaux
-            Route::post('/{repairRequest}/assign-supplier', [\App\Http\Controllers\Admin\RepairRequestController::class, 'assignSupplier'])->name('assign-supplier');
-            Route::post('/{repairRequest}/start-work', [\App\Http\Controllers\Admin\RepairRequestController::class, 'startWork'])->name('start-work');
-            Route::post('/{repairRequest}/complete-work', [\App\Http\Controllers\Admin\RepairRequestController::class, 'completeWork'])->name('complete-work');
-            Route::post('/{repairRequest}/cancel', [\App\Http\Controllers\Admin\RepairRequestController::class, 'cancel'])->name('cancel');
+            // Workflow actions - Niveau 2 : Fleet Manager
+            Route::post('/{repairRequest}/approve-fleet-manager', [\App\Http\Controllers\Admin\RepairRequestController::class, 'approveFleetManager'])->name('approve-fleet-manager');
+            Route::post('/{repairRequest}/reject-fleet-manager', [\App\Http\Controllers\Admin\RepairRequestController::class, 'rejectFleetManager'])->name('reject-fleet-manager');
         });
 
         // 🏢 MODULE FOURNISSEURS ENTERPRISE - Conformité DZ Totale

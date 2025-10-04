@@ -617,12 +617,22 @@ class VehicleController extends Controller
      */
     private function getReferenceData(): array
     {
-        return Cache::remember('vehicle_reference_data', self::CACHE_TTL_LONG, function () {
+        $organizationId = Auth::user()->organization_id;
+
+        return Cache::remember("vehicle_reference_data_{$organizationId}", self::CACHE_TTL_LONG, function () use ($organizationId) {
             return [
                 'vehicle_types' => VehicleType::orderBy('name')->get(),
                 'vehicle_statuses' => VehicleStatus::orderBy('name')->get(),
                 'fuel_types' => FuelType::orderBy('name')->get(),
                 'transmission_types' => TransmissionType::orderBy('name')->get(),
+                'categories' => \App\Models\VehicleCategory::forOrganization($organizationId)
+                    ->active()
+                    ->orderBy('sort_order')
+                    ->get(),
+                'depots' => \App\Models\VehicleDepot::forOrganization($organizationId)
+                    ->active()
+                    ->orderBy('name')
+                    ->get(),
                 'organizations' => Auth::user()->hasRole('Super Admin')
                     ? Organization::orderBy('name')->get()
                     : collect([Auth::user()->organization]),

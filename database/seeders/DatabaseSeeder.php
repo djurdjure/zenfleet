@@ -34,6 +34,20 @@ class DatabaseSeeder extends Seeder
             ]);
         }
 
+        // 4. Seed Repair Request system data
+        $this->call([
+            VehicleCategorySeeder::class,
+            VehicleDepotSeeder::class,
+            RepairPermissionsSeeder::class,
+        ]);
+
+        // 5. Seed demo repair requests (development only)
+        if (app()->environment('local', 'development')) {
+            $this->call([
+                DemoRepairRequestSeeder::class,
+            ]);
+        }
+
         $this->command->info('✅ Seeding ZenFleet terminé avec succès!');
     }
 

@@ -34,6 +34,9 @@ class Driver extends Model
 
         // Photo et documents
         'photo', 'notes',
+
+        // Superviseur
+        'supervisor_id',
     ];
 
     protected $casts = [
@@ -77,6 +80,16 @@ class Driver extends Model
     public function assignments(): HasMany
     {
         return $this->hasMany(Assignment::class);
+    }
+
+    public function supervisor(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'supervisor_id');
+    }
+
+    public function repairRequests(): HasMany
+    {
+        return $this->hasMany(RepairRequest::class);
     }
 
     /**
