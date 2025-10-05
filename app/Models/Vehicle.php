@@ -27,6 +27,14 @@ class Vehicle extends Model
 
     protected $casts = [
         'acquisition_date' => 'date',
+        'current_mileage' => 'integer',
+        'initial_mileage' => 'integer',
+        'manufacturing_year' => 'integer',
+        'purchase_price' => 'decimal:2',
+        'current_value' => 'decimal:2',
+        'engine_displacement_cc' => 'integer',
+        'power_hp' => 'integer',
+        'seats' => 'integer',
     ];
 
     // CORRECTION : Ajout du bon type de retour (BelongsTo)
@@ -42,6 +50,152 @@ class Vehicle extends Model
     public function maintenancePlans(): HasMany { return $this->hasMany(MaintenancePlan::class); }
     public function maintenanceLogs(): HasMany { return $this->hasMany(MaintenanceLog::class); }
     public function repairRequests(): HasMany { return $this->hasMany(RepairRequest::class); }
+    public function mileageReadings(): HasMany { return $this->hasMany(VehicleMileageReading::class); }
+
+    // =========================================================================
+    // MILEAGE MANAGEMENT METHODS
+    // =========================================================================
+
+    /**
+     * Obtient le dernier relevé kilométrique enregistré.
+     *
+     * @return VehicleMileageReading|null
+     */
+    public function getLatestMileageReading(): ?VehicleMileageReading
+    {
+        return $this->mileageReadings()
+            ->latest('recorded_at')
+            ->first();
+    }
+
+    /**
+     * Obtient le kilométrage total parcouru depuis l'acquisition.
+     *
+     * @return int
+     */
+    public function getTotalMileageDriven(): int
+    {
+        if (!$this->current_mileage || !$this->initial_mileage) {
+            return 0;
+        }
+
+        return max(0, $this->current_mileage - $this->initial_mileage);
+    }
+
+    /**
+     * Accesseur: Kilométrage formaté avec séparateur de milliers.
+     *
+     * @return string
+     */
+    public function getFormattedCurrentMileageAttribute(): string
+    {
+        return number_format($this->current_mileage ?? 0, 0, ',', ' ') . ' km';
+    }
+
+    /**
+     * Accesseur: Kilométrage initial formaté avec séparateur de milliers.
+     *
+     * @return string
+     */
+    public function getFormattedInitialMileageAttribute(): string
+    {
+        return number_format($this->initial_mileage ?? 0, 0, ',', ' ') . ' km';
+    }
+
+    /**
+     * Accesseur: Kilométrage total parcouru formaté.
+     *
+     * @return string
+     */
+    public function getFormattedTotalMileageAttribute(): string
+    {
+        return number_format($this->getTotalMileageDriven(), 0, ',', ' ') . ' km';
+    }
+
+    /**
+     * Vérifie si le véhicule nécessite un relevé kilométrique.
+     * Recommandé si aucun relevé depuis plus de 30 jours.
+     *
+     * @return bool
+     */
+    public function needsMileageReading(): bool
+    {
+        $latestReading = $this->getLatestMileageReading();
+
+        if (!$latestReading) {
+            return true;
+        }
+
+        return $latestReading->recorded_at->diffInDays(now()) > 30;
+    }
+
+    /**
+     * Calcule le kilométrage moyen journalier sur une période.
+     *
+     * @param \Carbon\Carbon|null $startDate
+     * @param \Carbon\Carbon|null $endDate
+     * @return float
+     */
+    public function getAverageDailyMileage($startDate = null, $endDate = null): float
+    {
+        return VehicleMileageReading::calculateAverageDailyMileage(
+            $this->id,
+            $startDate ?? now()->subDays(30),
+            $endDate ?? now()
+        );
+    }
+
+    /**
+     * Met à jour manuellement le current_mileage.
+     *
+     * ⚠️ ATTENTION: Cette méthode est publique mais devrait être utilisée avec précaution.
+     * L'Observer VehicleMileageReadingObserver gère automatiquement les mises à jour
+     * lors de la création/modification de relevés kilométriques.
+     *
+     * Utilisez cette méthode UNIQUEMENT pour:
+     * - Corrections administratives exceptionnelles
+     * - Migrations de données
+     * - Opérations de maintenance système
+     *
+     * @param int $newMileage
+     * @param bool $skipValidation Ne pas valider si nouveau kilométrage > actuel
+     * @return bool
+     * @throws \InvalidArgumentException
+     */
+    public function updateMileage(int $newMileage, bool $skipValidation = false): bool
+    {
+        if ($newMileage < 0) {
+            throw new \InvalidArgumentException("Le kilométrage ne peut pas être négatif");
+        }
+
+        if (!$skipValidation && $newMileage < $this->current_mileage) {
+            throw new \InvalidArgumentException(
+                "Le nouveau kilométrage ({$newMileage} km) ne peut pas être inférieur au kilométrage actuel ({$this->current_mileage} km)"
+            );
+        }
+
+        $this->current_mileage = $newMileage;
+        return $this->save();
+    }
+
+    /**
+     * Synchronise le current_mileage avec le dernier relevé enregistré.
+     *
+     * Utilisé par VehicleMileageReadingObserver pour maintenir la cohérence.
+     * Cette méthode est appelée automatiquement, ne pas appeler manuellement.
+     *
+     * @internal Utilisé uniquement par VehicleMileageReadingObserver
+     * @param int $mileage
+     * @return void
+     */
+    public function syncCurrentMileageFromReading(int $mileage): void
+    {
+        // Mise à jour sans déclencher les événements ni les timestamps
+        $this->timestamps = false;
+        $this->current_mileage = $mileage;
+        $this->save();
+        $this->timestamps = true;
+    }
 
     /**
      * 🔧 Relation avec les opérations de maintenance - ENTERPRISE GRADE

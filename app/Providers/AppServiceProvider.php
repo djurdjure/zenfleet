@@ -5,6 +5,8 @@ namespace App\Providers;
 use Illuminate\Support\ServiceProvider;
 use Spatie\Permission\Contracts\PermissionsTeamResolver;
 use App\Services\OrganizationTeamResolver;
+use App\Models\VehicleMileageReading;
+use App\Observers\VehicleMileageReadingObserver;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -22,6 +24,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        // Register Observers
+        VehicleMileageReading::observe(VehicleMileageReadingObserver::class);
     }
 }

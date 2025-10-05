@@ -121,6 +121,17 @@ class EnterprisePermissionMiddleware
         'admin.repair-requests.approve-level-two' => 'approve repair requests level 2',
         'admin.repair-requests.reject-level-two' => 'approve repair requests level 2',
 
+        // Relevés Kilométriques
+        'admin.mileage-readings.index' => 'view own mileage readings', // Minimum permission
+        'admin.mileage-readings.create' => 'create mileage readings',
+        'admin.mileage-readings.store' => 'create mileage readings',
+        'admin.mileage-readings.show' => 'view own mileage readings',
+        'admin.mileage-readings.edit' => 'update own mileage readings',
+        'admin.mileage-readings.update' => 'update own mileage readings',
+        'admin.mileage-readings.destroy' => 'delete mileage readings',
+        'admin.mileage-readings.export' => 'export mileage readings',
+        'admin.mileage-readings.statistics' => 'view mileage statistics',
+
         // Organisations (Super Admin seulement)
         'admin.organizations.*' => 'view organizations',
         'admin.organizations.create' => 'create organizations',

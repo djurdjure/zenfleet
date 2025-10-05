@@ -108,6 +108,17 @@
                         </li>
                         @endhasanyrole
 
+                        {{-- Kilométrage --}}
+                        @can('view own mileage readings')
+                        <li class="flex">
+                            <a href="{{ route('admin.mileage-readings.index') }}"
+                               class="flex items-center w-full h-10 px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 {{ request()->routeIs('admin.mileage-readings.*') ? 'bg-blue-50 text-blue-700 shadow-sm' : 'text-slate-600 hover:bg-white/60 hover:text-slate-800' }}">
+                                <i class="fas fa-tachometer-alt text-base mr-3 {{ request()->routeIs('admin.mileage-readings.*') ? 'text-blue-600' : 'text-slate-500' }}"></i>
+                                <span class="flex-1">Kilométrage</span>
+                            </a>
+                        </li>
+                        @endcan
+
                         {{-- Maintenance avec sous-menus --}}
                         @hasanyrole('Super Admin|Admin|Gestionnaire Flotte|Supervisor')
                         <li class="flex flex-col" x-data="{ open: {{ request()->routeIs('admin.maintenance.*', 'admin.repair-requests.*') ? 'true' : 'false' }} }">

@@ -41,7 +41,12 @@ class DatabaseSeeder extends Seeder
             RepairPermissionsSeeder::class,
         ]);
 
-        // 5. Seed demo repair requests (development only)
+        // 5. Seed Vehicle Mileage Reading permissions
+        $this->call([
+            VehicleMileagePermissionsSeeder::class,
+        ]);
+
+        // 6. Seed demo repair requests (development only)
         if (app()->environment('local', 'development')) {
             $this->call([
                 DemoRepairRequestSeeder::class,

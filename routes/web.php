@@ -166,7 +166,12 @@ Route::middleware(['auth', 'verified'])
     |--------------------------------------------------------------------------
     */
     Route::middleware(['auth', 'verified', 'enterprise.permission'])->group(function () {
-        
+
+        // 📊 Relevés Kilométriques - Vue Globale
+        Route::get('mileage-readings', \App\Livewire\Admin\MileageReadingsIndex::class)
+            ->name('mileage-readings.index')
+            ->middleware('can:view own mileage readings');
+
         // 🚙 Véhicules avec Import/Export Avancé - Configuration Enterprise
         Route::prefix('vehicles')->name('vehicles.')->group(function () {
             // CORRECTION MAJEURE: Routes spécifiques AVANT les routes avec paramètres
@@ -201,6 +206,9 @@ Route::middleware(['auth', 'verified'])
             Route::get('{vehicle}/history', [VehicleController::class, 'history'])->name('history');
             Route::get('{vehicle}/maintenance', [VehicleController::class, 'maintenance'])->name('maintenance');
             Route::get('{vehicle}/documents', [VehicleController::class, 'documents'])->name('documents');
+
+            // Historique kilométrique - Livewire Component
+            Route::get('{vehicle}/mileage-history', \App\Livewire\Admin\VehicleMileageHistory::class)->name('mileage-history');
         });
 
         // 👨‍💼 Chauffeurs avec Import/Export

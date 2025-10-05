@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\V1\MaintenanceApiController;
+use App\Http\Controllers\Api\VehicleMileageReadingController;
 
 /*
 |--------------------------------------------------------------------------
@@ -35,6 +36,46 @@ Route::middleware(['auth:sanctum', 'can:view assignments'])->prefix('admin')->na
 */
 
 Route::prefix('v1')->name('api.v1.')->middleware(['auth:sanctum'])->group(function () {
+
+    // 📊 Module Relevés Kilométriques API
+    Route::prefix('mileage-readings')->name('mileage-readings.')->group(function () {
+
+        // RESTful Resource Routes
+        Route::get('/', [VehicleMileageReadingController::class, 'index'])
+            ->name('index')
+            ->middleware('can:view own mileage readings');
+
+        Route::post('/', [VehicleMileageReadingController::class, 'store'])
+            ->name('store')
+            ->middleware('can:create mileage readings');
+
+        Route::get('/{mileageReading}', [VehicleMileageReadingController::class, 'show'])
+            ->name('show');
+
+        Route::put('/{mileageReading}', [VehicleMileageReadingController::class, 'update'])
+            ->name('update');
+
+        Route::patch('/{mileageReading}', [VehicleMileageReadingController::class, 'update'])
+            ->name('patch');
+
+        Route::delete('/{mileageReading}', [VehicleMileageReadingController::class, 'destroy'])
+            ->name('destroy');
+
+        // Additional Routes - Statistics & Export
+        Route::get('/statistics/summary', [VehicleMileageReadingController::class, 'statistics'])
+            ->name('statistics')
+            ->middleware('can:view mileage statistics');
+
+        Route::get('/export/{format}', [VehicleMileageReadingController::class, 'export'])
+            ->name('export')
+            ->middleware('can:export mileage readings')
+            ->where('format', 'csv|xlsx|pdf');
+
+        // Bulk Operations
+        Route::post('/bulk-delete', [VehicleMileageReadingController::class, 'bulkDelete'])
+            ->name('bulk-delete')
+            ->middleware('can:delete mileage readings');
+    });
 
     // 🔧 Module Maintenance API
     Route::prefix('maintenance')->name('maintenance.')->group(function () {

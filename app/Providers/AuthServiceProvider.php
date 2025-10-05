@@ -11,6 +11,7 @@ use App\Models\Driver;
 use App\Models\Supplier;
 use App\Models\Assignment;
 use App\Models\RepairRequest;
+use App\Models\VehicleMileageReading;
 use App\Policies\DocumentPolicy;
 use App\Policies\DocumentCategoryPolicy;
 use App\Policies\UserPolicy;
@@ -21,6 +22,7 @@ use App\Policies\DriverPolicy;
 use App\Policies\SupplierPolicy;
 use App\Policies\AssignmentPolicy;
 use App\Policies\RepairRequestPolicy;
+use App\Policies\VehicleMileageReadingPolicy;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\Gate;
 use Spatie\Permission\Models\Role;
@@ -47,6 +49,9 @@ class AuthServiceProvider extends ServiceProvider
 
         // 🔧 POLICIES SYSTÈME DE RÉPARATION
         RepairRequest::class => RepairRequestPolicy::class,
+
+        // 📊 POLICIES GESTION DU KILOMÉTRAGE
+        VehicleMileageReading::class => VehicleMileageReadingPolicy::class,
     ];
 
     /**
