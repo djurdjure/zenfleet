@@ -40,8 +40,7 @@ class RepairRequestPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->can('view repair requests')
-            || $user->can('view all repair requests')
+        return $user->can('view all repair requests')
             || $user->can('view team repair requests')
             || $user->can('view own repair requests');
     }

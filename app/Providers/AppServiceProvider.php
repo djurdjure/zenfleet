@@ -3,6 +3,8 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
+use Spatie\Permission\Contracts\PermissionsTeamResolver;
+use App\Services\OrganizationTeamResolver;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -11,7 +13,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        // Register Organization Team Resolver for Spatie Permissions
+        $this->app->singleton(PermissionsTeamResolver::class, OrganizationTeamResolver::class);
     }
 
     /**

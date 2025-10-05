@@ -137,6 +137,67 @@
             </li>
             @endcan
 
+            {{-- Demandes de Réparation --}}
+            @canany(['view own repair requests', 'view team repair requests', 'view all repair requests'])
+            <li class="nav-item has-submenu {{ $isActive(['admin.repair-requests']) ? 'active open' : '' }}">
+                <a href="#" class="nav-link submenu-toggle" data-target="repair-requests">
+                    <div class="nav-icon-circle">
+                        <i class="nav-icon fas fa-wrench"></i>
+                    </div>
+                    <span class="nav-text">Réparations</span>
+                    @php
+                        $pendingCount = \App\Models\RepairRequest::where('organization_id', auth()->user()->organization_id)
+                            ->whereIn('status', ['pending_supervisor', 'pending_fleet_manager'])
+                            ->when(auth()->user()->hasRole('Chauffeur'), function($q) {
+                                $q->whereHas('driver', fn($q2) => $q2->where('user_id', auth()->id()));
+                            })
+                            ->when(auth()->user()->hasRole('Supervisor'), function($q) {
+                                $q->where('status', 'pending_supervisor')
+                                  ->whereHas('driver', fn($q2) => $q2->where('supervisor_id', auth()->id()));
+                            })
+                            ->when(auth()->user()->hasRole('Gestionnaire Flotte'), function($q) {
+                                $q->where('status', 'pending_fleet_manager');
+                            })
+                            ->count();
+                    @endphp
+                    @if($pendingCount > 0)
+                        <span class="nav-badge">{{ $pendingCount }}</span>
+                    @endif
+                    <i class="submenu-arrow fas fa-chevron-right"></i>
+                </a>
+                <ul class="nav-submenu" id="submenu-repair-requests">
+                    <li class="{{ $isActive('admin.repair-requests.index') ? 'active' : '' }}">
+                        <a href="{{ route('admin.repair-requests.index') }}" class="nav-sublink">
+                            <div class="nav-subicon-circle">
+                                <i class="fas fa-list"></i>
+                            </div>
+                            <span>Toutes les demandes</span>
+                        </a>
+                    </li>
+                    @can('create repair requests')
+                    <li class="{{ $isActive('admin.repair-requests.create') ? 'active' : '' }}">
+                        <a href="{{ route('admin.repair-requests.create') }}" class="nav-sublink">
+                            <div class="nav-subicon-circle">
+                                <i class="fas fa-plus-circle"></i>
+                            </div>
+                            <span>Nouvelle demande</span>
+                        </a>
+                    </li>
+                    @endcan
+                    @can('export repair requests')
+                    <li class="{{ $isActive('admin.repair-requests.stats') ? 'active' : '' }}">
+                        <a href="{{ route('admin.repair-requests.index', ['filter' => 'stats']) }}" class="nav-sublink">
+                            <div class="nav-subicon-circle">
+                                <i class="fas fa-chart-pie"></i>
+                            </div>
+                            <span>Statistiques</span>
+                        </a>
+                    </li>
+                    @endcan
+                </ul>
+            </li>
+            @endcan
+
             {{-- Maintenance --}}
             @can('view-maintenance')
             <li class="nav-item has-submenu {{ $isActive(['admin.maintenance']) ? 'active open' : '' }}">

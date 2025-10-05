@@ -108,6 +108,19 @@ class EnterprisePermissionMiddleware
         'admin.maintenance.update' => 'manage maintenance plans',
         'admin.maintenance.destroy' => 'manage maintenance plans',
 
+        // Demandes de Réparation
+        'admin.repair-requests.index' => 'view own repair requests', // Minimum permission
+        'admin.repair-requests.create' => 'create repair requests',
+        'admin.repair-requests.store' => 'create repair requests',
+        'admin.repair-requests.show' => 'view own repair requests',
+        'admin.repair-requests.edit' => 'update own repair requests',
+        'admin.repair-requests.update' => 'update own repair requests',
+        'admin.repair-requests.destroy' => 'delete repair requests',
+        'admin.repair-requests.approve-level-one' => 'approve repair requests level 1',
+        'admin.repair-requests.reject-level-one' => 'approve repair requests level 1',
+        'admin.repair-requests.approve-level-two' => 'approve repair requests level 2',
+        'admin.repair-requests.reject-level-two' => 'approve repair requests level 2',
+
         // Organisations (Super Admin seulement)
         'admin.organizations.*' => 'view organizations',
         'admin.organizations.create' => 'create organizations',

@@ -8,6 +8,7 @@ use App\Models\User;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Rules;
@@ -255,21 +256,53 @@ class UserController extends Controller
 
     /**
      * 🛡️ SÉCURITÉ: Assignation sécurisée des rôles avec vérifications
+     *
+     * ENTERPRISE-GRADE: Gestion multi-tenant avec nettoyage des anciennes assignations
      */
     private function secureRoleAssignment(User $user, array $roleIds): void
     {
-        if (empty($roleIds)) {
-            $user->syncRoles([]);
-            return;
-        }
-
         // Double vérification avant assignation
-        if (!$this->canAssignRoles($roleIds, $user)) {
+        if (!empty($roleIds) && !$this->canAssignRoles($roleIds, $user)) {
             throw new AuthorizationException('Permission insuffisante pour assigner ces rôles');
         }
 
+        // CORRECTIF MULTI-TENANT:
+        // Supprimer TOUTES les anciennes assignations de rôles pour cet utilisateur
+        // pour éviter les conflits de clé primaire (role_id, model_id, model_type)
+        // quand organization_id change
+        DB::table('model_has_roles')
+            ->where('model_id', $user->id)
+            ->where('model_type', get_class($user))
+            ->delete();
+
+        // Si aucun rôle à assigner, on s'arrête ici (utilisateur sans rôle)
+        if (empty($roleIds)) {
+            return;
+        }
+
+        // Récupérer les rôles à assigner
         $rolesToSync = Role::whereIn('id', $roleIds)->get();
-        $user->syncRoles($rolesToSync);
+
+        // ASSIGNATION MANUELLE avec organization_id correct
+        // On ne peut pas utiliser syncRoles() car il ne gère pas bien organization_id
+        foreach ($rolesToSync as $role) {
+            // Déterminer l'organization_id pour cette assignation
+            // Super Admin est global (NULL), les autres sont scoped
+            $organizationId = ($role->name === 'Super Admin') ? null : $user->organization_id;
+
+            DB::table('model_has_roles')->insert([
+                'role_id' => $role->id,
+                'model_type' => get_class($user),
+                'model_id' => $user->id,
+                'organization_id' => $organizationId,
+            ]);
+        }
+
+        // Invalider le cache des permissions pour cet utilisateur
+        app(\Spatie\Permission\PermissionRegistrar::class)->forgetCachedPermissions();
+
+        // Recharger les relations
+        $user->load('roles');
     }
 
     /**
