@@ -90,20 +90,13 @@ class RepairRequestManager extends Component
     {
         $repairRequests = $this->getFilteredRequests();
         $stats = $this->getRepairStats();
+        $kanbanData = $this->getKanbanData();
 
-        if ($this->viewType === 'kanban') {
-            $kanbanData = $this->getKanbanData();
-            return view('livewire.admin.repair-request-manager-kanban', [
-                'repairRequests' => $repairRequests,
-                'kanbanData' => $kanbanData,
-                'stats' => $stats
-            ]);
-        }
-
-        return view('livewire.admin.repair-request-manager', [
+        return view('livewire.admin.repair-request-manager-kanban', [
             'repairRequests' => $repairRequests,
+            'kanbanData' => $kanbanData,
             'stats' => $stats
-        ]);
+        ])->layout('layouts.admin.catalyst');
     }
 
     // Méthodes de filtrage
@@ -221,7 +214,6 @@ class RepairRequestManager extends Component
                 'description' => $this->description,
                 'location_description' => $this->location_description,
                 'estimated_cost' => $this->estimated_cost ?: null,
-                'requested_at' => now()
             ];
 
             // Gérer l'upload des photos
@@ -449,7 +441,7 @@ class RepairRequestManager extends Component
     // Méthodes utilitaires privées
     private function getFilteredRequests()
     {
-        $query = RepairRequest::with(['vehicle', 'requester', 'supervisor', 'manager', 'assignedSupplier'])
+        $query = RepairRequest::with(['vehicle', 'driver', 'requester', 'supervisor', 'fleetManager', 'rejectedBy'])
                               ->forOrganization(Auth::user()->organization_id);
 
         // Filtres de base
@@ -476,11 +468,11 @@ class RepairRequestManager extends Component
 
         // Filtres par date
         if ($this->dateFrom) {
-            $query->whereDate('requested_at', '>=', $this->dateFrom);
+            $query->whereDate('created_at', '>=', $this->dateFrom);
         }
 
         if ($this->dateTo) {
-            $query->whereDate('requested_at', '<=', $this->dateTo);
+            $query->whereDate('created_at', '<=', $this->dateTo);
         }
 
         // Filtrage par rôle utilisateur
@@ -489,7 +481,7 @@ class RepairRequestManager extends Component
             $query->where('requested_by', $user->id);
         }
 
-        return $query->latest('requested_at')->paginate(15);
+        return $query->latest('created_at')->paginate(15);
     }
 
     private function getKanbanData()
@@ -497,30 +489,31 @@ class RepairRequestManager extends Component
         $organizationId = Auth::user()->organization_id;
 
         return [
-            'pending' => RepairRequest::pending()
+            'pending_supervisor' => RepairRequest::where('status', RepairRequest::STATUS_PENDING_SUPERVISOR)
                                     ->forOrganization($organizationId)
-                                    ->with(['vehicle', 'requester'])
-                                    ->latest('requested_at')
+                                    ->with(['vehicle', 'driver', 'requester'])
+                                    ->latest('created_at')
                                     ->get(),
-            'initial_approval' => RepairRequest::where('status', RepairRequest::STATUS_INITIAL_APPROVAL)
+            'approved_supervisor' => RepairRequest::where('status', RepairRequest::STATUS_APPROVED_SUPERVISOR)
                                              ->forOrganization($organizationId)
-                                             ->with(['vehicle', 'requester'])
-                                             ->latest('supervisor_decided_at')
+                                             ->with(['vehicle', 'driver', 'requester', 'supervisor'])
+                                             ->latest('supervisor_approved_at')
                                              ->get(),
-            'approved' => RepairRequest::where('status', RepairRequest::STATUS_APPROVED)
+            'pending_fleet_manager' => RepairRequest::where('status', RepairRequest::STATUS_PENDING_FLEET_MANAGER)
                                      ->forOrganization($organizationId)
-                                     ->with(['vehicle', 'requester', 'assignedSupplier'])
-                                     ->latest('manager_decided_at')
+                                     ->with(['vehicle', 'driver', 'requester', 'supervisor'])
+                                     ->latest('supervisor_approved_at')
                                      ->get(),
-            'in_progress' => RepairRequest::inProgress()
+            'approved_final' => RepairRequest::where('status', RepairRequest::STATUS_APPROVED_FINAL)
                                         ->forOrganization($organizationId)
-                                        ->with(['vehicle', 'requester', 'assignedSupplier'])
-                                        ->latest('work_started_at')
+                                        ->with(['vehicle', 'driver', 'requester', 'supervisor', 'fleetManager'])
+                                        ->latest('final_approved_at')
+                                        ->limit(20)
                                         ->get(),
-            'completed' => RepairRequest::completed()
+            'rejected' => RepairRequest::rejected()
                                       ->forOrganization($organizationId)
-                                      ->with(['vehicle', 'requester', 'assignedSupplier'])
-                                      ->latest('work_completed_at')
+                                      ->with(['vehicle', 'driver', 'requester', 'rejectedBy'])
+                                      ->latest('rejected_at')
                                       ->limit(10)
                                       ->get()
         ];
@@ -534,19 +527,19 @@ class RepairRequestManager extends Component
             'total' => RepairRequest::forOrganization($organizationId)->count(),
             'pending' => RepairRequest::pending()->forOrganization($organizationId)->count(),
             'urgent' => RepairRequest::urgent()->forOrganization($organizationId)->count(),
-            'in_progress' => RepairRequest::inProgress()->forOrganization($organizationId)->count(),
-            'completed_this_month' => RepairRequest::completed()
+            'approved' => RepairRequest::approved()->forOrganization($organizationId)->count(),
+            'rejected' => RepairRequest::rejected()->forOrganization($organizationId)->count(),
+            'approved_this_month' => RepairRequest::approved()
                                                ->forOrganization($organizationId)
-                                               ->whereMonth('work_completed_at', now()->month)
+                                               ->whereMonth('final_approved_at', now()->month)
                                                ->count(),
-            'avg_cost' => RepairRequest::completed()
-                                     ->forOrganization($organizationId)
-                                     ->whereNotNull('actual_cost')
-                                     ->avg('actual_cost') ?? 0,
-            'total_cost_this_year' => RepairRequest::completed()
+            'avg_estimated_cost' => RepairRequest::forOrganization($organizationId)
+                                     ->whereNotNull('estimated_cost')
+                                     ->avg('estimated_cost') ?? 0,
+            'total_estimated_cost' => RepairRequest::approved()
                                                ->forOrganization($organizationId)
-                                               ->whereYear('work_completed_at', now()->year)
-                                               ->sum('actual_cost') ?? 0
+                                               ->whereYear('final_approved_at', now()->year)
+                                               ->sum('estimated_cost') ?? 0
         ];
     }
 

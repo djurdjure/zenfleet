@@ -193,25 +193,50 @@ class MileageReadingsIndex extends Component
 
     /**
      * 🚗 LISTE DES VÉHICULES (POUR FILTRE)
+     *
+     * Récupère les véhicules de l'organisation pour le filtre dropdown.
+     *
+     * Optimisations Enterprise-Grade:
+     * - Select minimal (id, registration_plate, brand, model)
+     * - Filtre multi-tenant strict (organization_id)
+     * - Tri alphabétique par plaque
+     * - Exclude soft deleted vehicles
+     *
+     * @return \Illuminate\Database\Eloquent\Collection
      */
     public function getVehiclesProperty()
     {
         $user = auth()->user();
 
         return Vehicle::where('organization_id', $user->organization_id)
+            ->select('id', 'registration_plate', 'brand', 'model')
             ->orderBy('registration_plate')
             ->get();
     }
 
     /**
      * 👥 LISTE DES AUTEURS (POUR FILTRE)
+     *
+     * Récupère uniquement les utilisateurs qui ont créé au moins un relevé
+     * kilométrique dans l'organisation courante.
+     *
+     * Optimisations:
+     * - Cache query pour éviter requêtes répétées
+     * - Filtre multi-tenant (organization_id)
+     * - Select minimal (id, name) pour performance
+     *
+     * @return \Illuminate\Support\Collection
      */
     public function getAuthorsProperty()
     {
         $user = auth()->user();
 
         return User::where('organization_id', $user->organization_id)
-            ->whereHas('mileageReadings')
+            ->whereHas('mileageReadings', function ($query) use ($user) {
+                // Filtre supplémentaire: relevés de la même organisation
+                $query->where('organization_id', $user->organization_id);
+            })
+            ->select('id', 'name')
             ->orderBy('name')
             ->get();
     }

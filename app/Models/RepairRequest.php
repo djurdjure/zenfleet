@@ -240,6 +240,25 @@ class RepairRequest extends Model
     }
 
     /**
+     * Get the user who created this request (driver's user account).
+     * Alias for better readability in views.
+     */
+    public function requester(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'driver_id');
+    }
+
+    /**
+     * Get the assigned supplier for this repair.
+     * Note: Currently there's no supplier assignment in the schema.
+     * This will return null until supplier assignment feature is implemented.
+     */
+    public function assignedSupplier(): BelongsTo
+    {
+        return $this->belongsTo(Supplier::class, 'supplier_id');
+    }
+
+    /**
      * Scope: Pending supervisor approval
      */
     public function scopePendingSupervisor(Builder $query): Builder
@@ -320,6 +339,48 @@ class RepairRequest extends Model
     public function scopeForSupervisor(Builder $query, int $supervisorId): Builder
     {
         return $query->where('supervisor_id', $supervisorId);
+    }
+
+    /**
+     * Scope: All pending requests (supervisor + fleet manager)
+     */
+    public function scopePending(Builder $query): Builder
+    {
+        return $query->whereIn('status', [
+            self::STATUS_PENDING_SUPERVISOR,
+            self::STATUS_PENDING_FLEET_MANAGER,
+        ]);
+    }
+
+    /**
+     * Scope: Urgent requests (high + critical)
+     */
+    public function scopeUrgent(Builder $query): Builder
+    {
+        return $query->whereIn('urgency', [
+            self::URGENCY_HIGH,
+            self::URGENCY_CRITICAL,
+        ]);
+    }
+
+    /**
+     * Scope: In progress requests (approved and linked to maintenance)
+     */
+    public function scopeInProgress(Builder $query): Builder
+    {
+        return $query->where('status', self::STATUS_APPROVED_FINAL)
+                     ->whereNotNull('maintenance_operation_id');
+    }
+
+    /**
+     * Scope: Completed requests (approved with completed maintenance)
+     */
+    public function scopeCompleted(Builder $query): Builder
+    {
+        return $query->where('status', self::STATUS_APPROVED_FINAL)
+                     ->whereHas('maintenanceOperation', function ($q) {
+                         $q->where('status', 'completed');
+                     });
     }
 
     /**

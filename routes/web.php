@@ -61,6 +61,22 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+    /*
+    |--------------------------------------------------------------------------
+    | 🚗 ESPACE CHAUFFEUR - Routes Simplifiées
+    |--------------------------------------------------------------------------
+    | Les chauffeurs ont accès à leurs propres demandes de réparation
+    | via le même component admin mais avec scope automatique
+    */
+    Route::prefix('driver')->name('driver.')->group(function () {
+        // Dashboard chauffeur (redirige vers /dashboard)
+        Route::redirect('dashboard', '/dashboard')->name('dashboard');
+
+        // Demandes de réparation (même component que admin mais scopé par user)
+        Route::get('/repair-requests', \App\Livewire\Admin\RepairRequestManager::class)
+            ->name('repair-requests.index');
+    });
 });
 
 /*
@@ -273,18 +289,12 @@ Route::middleware(['auth', 'verified'])
 
         // 🔧 MODULE RÉPARATIONS - Workflow Validation 2 Niveaux
         Route::prefix('repair-requests')->name('repair-requests.')->group(function () {
-            // CRUD operations
-            Route::get('/', [\App\Http\Controllers\Admin\RepairRequestController::class, 'index'])->name('index');
-            Route::get('/create', [\App\Http\Controllers\Admin\RepairRequestController::class, 'create'])->name('create');
-            Route::post('/', [\App\Http\Controllers\Admin\RepairRequestController::class, 'store'])->name('store');
-            Route::get('/{repairRequest}', [\App\Http\Controllers\Admin\RepairRequestController::class, 'show'])->name('show');
-            Route::delete('/{repairRequest}', [\App\Http\Controllers\Admin\RepairRequestController::class, 'destroy'])->name('destroy');
+            // CRUD operations - Utilisation de Livewire pour l'interface
+            Route::get('/', \App\Livewire\Admin\RepairRequestManager::class)->name('index');
 
-            // Workflow actions - Niveau 1 : Superviseur
+            // Actions API pour le workflow (utilisées par Livewire)
             Route::post('/{repairRequest}/approve-supervisor', [\App\Http\Controllers\Admin\RepairRequestController::class, 'approveSupervisor'])->name('approve-supervisor');
             Route::post('/{repairRequest}/reject-supervisor', [\App\Http\Controllers\Admin\RepairRequestController::class, 'rejectSupervisor'])->name('reject-supervisor');
-
-            // Workflow actions - Niveau 2 : Fleet Manager
             Route::post('/{repairRequest}/approve-fleet-manager', [\App\Http\Controllers\Admin\RepairRequestController::class, 'approveFleetManager'])->name('approve-fleet-manager');
             Route::post('/{repairRequest}/reject-fleet-manager', [\App\Http\Controllers\Admin\RepairRequestController::class, 'rejectFleetManager'])->name('reject-fleet-manager');
         });

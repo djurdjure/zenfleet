@@ -45,9 +45,15 @@
                     <ul class="grow overflow-x-hidden overflow-y-auto w-full p-4 mb-0" role="tree" style="scrollbar-color: rgba(156, 163, 175, 0.3) transparent; scrollbar-width: thin;">
                         {{-- Dashboard --}}
                         <li class="flex">
-                            <a href="{{ route('admin.dashboard') }}"
-                               class="flex items-center w-full h-10 px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 {{ request()->routeIs('admin.dashboard') ? 'bg-blue-50 text-blue-700 shadow-sm' : 'text-slate-600 hover:bg-white/60 hover:text-slate-800' }}">
-                                <i class="fas fa-tachometer-alt text-base mr-3 {{ request()->routeIs('admin.dashboard') ? 'text-blue-600' : 'text-slate-500' }}"></i>
+                            @php
+                                $dashboardRoute = auth()->user()->hasAnyRole(['Super Admin', 'Admin', 'Gestionnaire Flotte', 'Supervisor'])
+                                    ? route('admin.dashboard')
+                                    : route('driver.dashboard');
+                                $isDashboardActive = request()->routeIs('admin.dashboard', 'driver.dashboard', 'dashboard');
+                            @endphp
+                            <a href="{{ $dashboardRoute }}"
+                               class="flex items-center w-full h-10 px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 {{ $isDashboardActive ? 'bg-blue-50 text-blue-700 shadow-sm' : 'text-slate-600 hover:bg-white/60 hover:text-slate-800' }}">
+                                <i class="fas fa-tachometer-alt text-base mr-3 {{ $isDashboardActive ? 'text-blue-600' : 'text-slate-500' }}"></i>
                                 <span class="flex-1">Dashboard</span>
                             </a>
                         </li>
@@ -108,8 +114,25 @@
                         </li>
                         @endhasanyrole
 
-                        {{-- Kilométrage --}}
-                        @can('view own mileage readings')
+                        {{-- Demandes de Réparation - Accessible à tous les rôles avec permission --}}
+                        @canany(['view own repair requests', 'view team repair requests', 'view all repair requests'])
+                        <li class="flex">
+                            @php
+                                $repairRoute = auth()->user()->hasAnyRole(['Super Admin', 'Admin', 'Gestionnaire Flotte', 'Supervisor'])
+                                    ? route('admin.repair-requests.index')
+                                    : route('driver.repair-requests.index');
+                                $isRepairActive = request()->routeIs('admin.repair-requests.*', 'driver.repair-requests.*');
+                            @endphp
+                            <a href="{{ $repairRoute }}"
+                               class="flex items-center w-full h-10 px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 {{ $isRepairActive ? 'bg-blue-50 text-blue-700 shadow-sm' : 'text-slate-600 hover:bg-white/60 hover:text-slate-800' }}">
+                                <i class="fas fa-tools text-base mr-3 {{ $isRepairActive ? 'text-blue-600' : 'text-slate-500' }}"></i>
+                                <span class="flex-1">Demandes Réparation</span>
+                            </a>
+                        </li>
+                        @endcanany
+
+                        {{-- Kilométrage - Accessible à tous les rôles avec permission --}}
+                        @canany(['view own mileage readings', 'view team mileage readings', 'view all mileage readings'])
                         <li class="flex">
                             <a href="{{ route('admin.mileage-readings.index') }}"
                                class="flex items-center w-full h-10 px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 {{ request()->routeIs('admin.mileage-readings.*') ? 'bg-blue-50 text-blue-700 shadow-sm' : 'text-slate-600 hover:bg-white/60 hover:text-slate-800' }}">
@@ -147,11 +170,13 @@
                                             <i class="fas fa-calendar-alt text-xs mr-3 {{ request()->routeIs('admin.maintenance.schedules.*') ? 'text-blue-600' : 'text-slate-500' }}"></i>
                                             Planifications
                                         </a>
+                                        @canany(['view team repair requests', 'view all repair requests'])
                                         <a href="{{ route('admin.repair-requests.index') }}"
-                                           class="flex items-center w-full h-8 px-1 py-1 rounded-md text-sm font-semibold transition-all duration-200 {{ request()->routeIs('admin.repair-requests.*') ? 'bg-blue-50/80 text-blue-700' : 'text-slate-600 hover:bg-white/40 hover:text-slate-800' }}">
-                                            <i class="fas fa-tools text-xs mr-3 {{ request()->routeIs('admin.repair-requests.*') ? 'text-blue-600' : 'text-slate-500' }}"></i>
+                                           class="flex items-center w-full h-8 px-1 py-1 rounded-md text-sm font-semibold transition-all duration-200 {{ request()->routeIs('admin.repair-requests.*', 'driver.repair-requests.*') ? 'bg-blue-50/80 text-blue-700' : 'text-slate-600 hover:bg-white/40 hover:text-slate-800' }}">
+                                            <i class="fas fa-tools text-xs mr-3 {{ request()->routeIs('admin.repair-requests.*', 'driver.repair-requests.*') ? 'text-blue-600' : 'text-slate-500' }}"></i>
                                             Demandes réparation
                                         </a>
+                                        @endcanany
                                         <a href="{{ route('admin.maintenance.operations.index') }}"
                                            class="flex items-center w-full h-8 px-1 py-1 rounded-md text-sm font-semibold transition-all duration-200 {{ request()->routeIs('admin.maintenance.operations.*') ? 'bg-blue-50/80 text-blue-700' : 'text-slate-600 hover:bg-white/40 hover:text-slate-800' }}">
                                             <i class="fas fa-cog text-xs mr-3 {{ request()->routeIs('admin.maintenance.operations.*') ? 'text-blue-600' : 'text-slate-500' }}"></i>
@@ -293,8 +318,14 @@
                                         <ul role="list" class="-mx-2 space-y-1">
                                             {{-- Dashboard --}}
                                             <li>
-                                                <a href="{{ route('admin.dashboard') }}"
-                                                   class="group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold {{ request()->routeIs('admin.dashboard') ? 'bg-zinc-950 text-white' : 'text-zinc-700 hover:text-zinc-950 hover:bg-zinc-100' }}">
+                                                @php
+                                                    $dashboardRouteMobile = auth()->user()->hasAnyRole(['Super Admin', 'Admin', 'Gestionnaire Flotte', 'Supervisor'])
+                                                        ? route('admin.dashboard')
+                                                        : route('driver.dashboard');
+                                                    $isDashboardActiveMobile = request()->routeIs('admin.dashboard', 'driver.dashboard', 'dashboard');
+                                                @endphp
+                                                <a href="{{ $dashboardRouteMobile }}"
+                                                   class="group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold {{ $isDashboardActiveMobile ? 'bg-zinc-950 text-white' : 'text-zinc-700 hover:text-zinc-950 hover:bg-zinc-100' }}">
                                                     <i class="fas fa-home h-5 w-5 shrink-0"></i>
                                                     Dashboard
                                                 </a>

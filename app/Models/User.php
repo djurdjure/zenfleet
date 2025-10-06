@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -67,5 +68,20 @@ class User extends Authenticatable
     public function vehicles(): BelongsToMany
     {
         return $this->belongsToMany(Vehicle::class, 'user_vehicle');
+    }
+
+    /**
+     * 📊 RELATION: Relevés Kilométriques Enregistrés par l'Utilisateur
+     *
+     * Un utilisateur peut enregistrer plusieurs relevés kilométriques.
+     * Cette relation lie les relevés créés manuellement par l'utilisateur
+     * (recorded_by_id) aux relevés kilométriques.
+     *
+     * @return HasMany
+     * @version 1.0-Enterprise
+     */
+    public function mileageReadings(): HasMany
+    {
+        return $this->hasMany(VehicleMileageReading::class, 'recorded_by_id');
     }
 }
