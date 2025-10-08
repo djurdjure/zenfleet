@@ -1782,39 +1782,82 @@ class DriverController extends Controller
     /**
      * 🛡️ Méthode sécurisée pour récupérer les statuts de chauffeurs
      * Enterprise-grade avec gestion multi-tenant et fallback robuste
+     * 
+     * IMPORTANT: Cette méthode garantit l'accès aux statuts pour tous les utilisateurs
+     * autorisés, indépendamment de leur rôle (Admin, Super Admin, etc.)
      */
     private function getDriverStatuses()
     {
         try {
             // Vérifier si la table existe
             if (!\Schema::hasTable('driver_statuses')) {
-                Log::warning('Table driver_statuses does not exist - returning empty collection', [
+                Log::warning('Table driver_statuses does not exist - creating default statuses', [
                     'user_id' => auth()->id(),
                     'method' => 'getDriverStatuses',
                     'timestamp' => now()->toISOString()
                 ]);
-                return collect();
+                
+                // Tenter de créer les statuts par défaut
+                $this->createDefaultDriverStatuses();
             }
 
-            // Récupérer les statuts avec logique multi-tenant enterprise
-            $organizationId = auth()->user()->organization_id;
+            $user = auth()->user();
+            $organizationId = $user->organization_id;
 
-            Log::info('Fetching driver statuses', [
+            Log::info('Fetching driver statuses for user', [
+                'user_id' => $user->id,
+                'user_email' => $user->email,
+                'user_roles' => $user->getRoleNames()->toArray(),
                 'organization_id' => $organizationId,
-                'user_id' => auth()->id(),
-                'method' => 'getDriverStatuses'
+                'method' => 'getDriverStatuses',
+                'is_super_admin' => $user->hasRole('Super Admin')
             ]);
 
-            // Requête optimisée avec les bons scopes
-            $statuses = DriverStatus::active()
-                ->forOrganization($organizationId)
-                ->ordered()
-                ->get();
+            // Stratégie de récupération basée sur le rôle et les permissions
+            if ($user->hasRole('Super Admin')) {
+                // Super Admin voit tous les statuts
+                $statuses = DriverStatus::where('is_active', true)
+                    ->orderBy('sort_order')
+                    ->orderBy('name')
+                    ->get();
+            } else {
+                // Autres utilisateurs voient les statuts de leur organisation + globaux
+                $statuses = DriverStatus::where('is_active', true)
+                    ->where(function ($query) use ($organizationId) {
+                        $query->whereNull('organization_id')  // Statuts globaux
+                              ->orWhere('organization_id', $organizationId); // Statuts de l'organisation
+                    })
+                    ->orderBy('sort_order')
+                    ->orderBy('name')
+                    ->get();
+            }
+
+            // Si aucun statut n'est trouvé, créer les statuts par défaut
+            if ($statuses->isEmpty()) {
+                Log::warning('No driver statuses found - creating defaults', [
+                    'organization_id' => $organizationId,
+                    'user_id' => $user->id
+                ]);
+                
+                $this->createDefaultDriverStatuses($organizationId);
+                
+                // Recharger les statuts après création
+                $statuses = DriverStatus::where('is_active', true)
+                    ->where(function ($query) use ($organizationId) {
+                        $query->whereNull('organization_id')
+                              ->orWhere('organization_id', $organizationId);
+                    })
+                    ->orderBy('sort_order')
+                    ->orderBy('name')
+                    ->get();
+            }
 
             Log::info('Driver statuses fetched successfully', [
                 'count' => $statuses->count(),
                 'statuses' => $statuses->pluck('name')->toArray(),
-                'organization_id' => $organizationId
+                'organization_id' => $organizationId,
+                'has_global' => $statuses->whereNull('organization_id')->isNotEmpty(),
+                'has_org_specific' => $statuses->where('organization_id', $organizationId)->isNotEmpty()
             ]);
 
             return $statuses;
@@ -1830,36 +1873,129 @@ class DriverController extends Controller
                 'timestamp' => now()->toISOString()
             ]);
 
-            // Fallback: essayer une requête simple
-            try {
-                $fallbackStatuses = DriverStatus::where('is_active', true)
-                    ->where(function ($query) {
-                        $orgId = auth()->user()->organization_id;
-                        $query->whereNull('organization_id')
-                              ->orWhere('organization_id', $orgId);
-                    })
-                    ->orderBy('sort_order')
-                    ->orderBy('name')
-                    ->get();
-
-                Log::info('Fallback driver statuses retrieved', [
-                    'count' => $fallbackStatuses->count(),
-                    'method' => 'getDriverStatuses_fallback'
-                ]);
-
-                return $fallbackStatuses;
-
-            } catch (\Exception $fallbackError) {
-                Log::critical('Complete failure in getDriverStatuses', [
-                    'fallback_error' => $fallbackError->getMessage(),
-                    'original_error' => $e->getMessage(),
-                    'user_id' => auth()->id(),
-                    'timestamp' => now()->toISOString()
-                ]);
-
-                // Retourner une collection vide en dernier recours
-                return collect();
-            }
+            // Fallback: créer et retourner les statuts minimums
+            return $this->getMinimalDriverStatuses();
         }
+    }
+
+    /**
+     * Créer les statuts de chauffeur par défaut pour une organisation
+     */
+    private function createDefaultDriverStatuses(?int $organizationId = null): void
+    {
+        try {
+            $defaultStatuses = [
+                [
+                    'name' => 'Disponible',
+                    'slug' => 'disponible',
+                    'description' => 'Chauffeur disponible pour les missions',
+                    'color' => '#10B981',
+                    'icon' => 'fa-check-circle',
+                    'is_active' => true,
+                    'sort_order' => 1,
+                    'can_drive' => true,
+                    'can_assign' => true,
+                    'requires_validation' => false,
+                    'organization_id' => $organizationId,
+                ],
+                [
+                    'name' => 'En mission',
+                    'slug' => 'en-mission',
+                    'description' => 'Chauffeur actuellement en mission',
+                    'color' => '#3B82F6',
+                    'icon' => 'fa-truck',
+                    'is_active' => true,
+                    'sort_order' => 2,
+                    'can_drive' => true,
+                    'can_assign' => false,
+                    'requires_validation' => false,
+                    'organization_id' => $organizationId,
+                ],
+                [
+                    'name' => 'En congé',
+                    'slug' => 'en-conge',
+                    'description' => 'Chauffeur en congé',
+                    'color' => '#8B5CF6',
+                    'icon' => 'fa-plane',
+                    'is_active' => true,
+                    'sort_order' => 3,
+                    'can_drive' => false,
+                    'can_assign' => false,
+                    'requires_validation' => false,
+                    'organization_id' => $organizationId,
+                ],
+                [
+                    'name' => 'Inactif',
+                    'slug' => 'inactif',
+                    'description' => 'Chauffeur inactif',
+                    'color' => '#6B7280',
+                    'icon' => 'fa-user-slash',
+                    'is_active' => true,
+                    'sort_order' => 4,
+                    'can_drive' => false,
+                    'can_assign' => false,
+                    'requires_validation' => false,
+                    'organization_id' => $organizationId,
+                ],
+            ];
+
+            foreach ($defaultStatuses as $statusData) {
+                DriverStatus::firstOrCreate(
+                    [
+                        'slug' => $statusData['slug'],
+                        'organization_id' => $statusData['organization_id'],
+                    ],
+                    $statusData
+                );
+            }
+
+            Log::info('Default driver statuses created', [
+                'organization_id' => $organizationId,
+                'count' => count($defaultStatuses)
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Failed to create default driver statuses', [
+                'error' => $e->getMessage(),
+                'organization_id' => $organizationId
+            ]);
+        }
+    }
+
+    /**
+     * Obtenir les statuts minimaux en cas d'échec complet
+     */
+    private function getMinimalDriverStatuses()
+    {
+        // Créer une collection de statuts minimaux en mémoire
+        return collect([
+            (object) [
+                'id' => 1,
+                'name' => 'Disponible',
+                'description' => 'Chauffeur disponible',
+                'color' => '#10B981',
+                'icon' => 'fa-check-circle',
+                'can_drive' => true,
+                'can_assign' => true,
+            ],
+            (object) [
+                'id' => 2,
+                'name' => 'En mission',
+                'description' => 'En mission',
+                'color' => '#3B82F6',
+                'icon' => 'fa-truck',
+                'can_drive' => true,
+                'can_assign' => false,
+            ],
+            (object) [
+                'id' => 3,
+                'name' => 'Inactif',
+                'description' => 'Inactif',
+                'color' => '#6B7280',
+                'icon' => 'fa-user-slash',
+                'can_drive' => false,
+                'can_assign' => false,
+            ],
+        ]);
     }
 }

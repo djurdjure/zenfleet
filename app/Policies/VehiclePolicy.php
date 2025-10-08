@@ -93,5 +93,56 @@ class VehiclePolicy
 
         return $user->can("force delete vehicles") && $vehicle->organization_id === $user->organization_id;
     }
+
+    /**
+     * Determine whether the user can view the vehicle's mileage history.
+     *
+     * Permissions hiérarchiques:
+     * - Chauffeur: peut voir l'historique de son véhicule assigné
+     * - Superviseur/Chef de Parc: peut voir l'historique des véhicules de son dépôt
+     * - Admin/Gestionnaire: peut voir l'historique de tous les véhicules de l'organisation
+     * - Super Admin: accès global
+     *
+     * @param User $user L'utilisateur tentant d'accéder à l'historique
+     * @param Vehicle $vehicle Le véhicule dont on veut voir l'historique
+     * @return bool True si l'accès est autorisé
+     */
+    public function mileageHistory(User $user, Vehicle $vehicle): bool
+    {
+        // Super Admin bypass
+        if ($user->hasRole('Super Admin')) {
+            return true;
+        }
+
+        // Vérifier que le véhicule appartient à la même organisation
+        if ($vehicle->organization_id !== $user->organization_id) {
+            return false;
+        }
+
+        // Vérifier les permissions kilométrage de manière hiérarchique
+        // view all > view team > view own
+        if ($user->can('view all mileage readings')) {
+            return true;
+        }
+
+        // Superviseur/Chef de Parc: véhicules de son dépôt uniquement
+        if ($user->can('view team mileage readings')) {
+            if ($user->depot_id && $vehicle->depot_id === $user->depot_id) {
+                return true;
+            }
+        }
+
+        // Chauffeur: uniquement son véhicule assigné
+        if ($user->can('view own mileage readings')) {
+            if ($user->driver_id) {
+                // Vérifier si le véhicule est assigné à ce chauffeur
+                return $vehicle->currentAssignments()
+                    ->where('driver_id', $user->driver_id)
+                    ->exists();
+            }
+        }
+
+        return false;
+    }
 }
 

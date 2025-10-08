@@ -326,17 +326,20 @@
                                 </div>
 
                                 @php
-                                    $statusesData = $driverStatuses ? $driverStatuses->map(function($status) {
-                                        return [
-                                            'id' => $status->id,
-                                            'name' => $status->name,
-                                            'description' => $status->description ?? '',
-                                            'color' => $status->color,
-                                            'icon' => $status->icon ?? 'fa-circle',
-                                            'can_drive' => $status->can_drive ?? true,
-                                            'can_assign' => $status->can_assign ?? true
-                                        ];
-                                    })->toArray() : [];
+                                    $statusesData = [];
+                                    if (isset($driverStatuses) && $driverStatuses && $driverStatuses->isNotEmpty()) {
+                                        $statusesData = $driverStatuses->map(function($status) {
+                                            return [
+                                                'id' => (int) $status->id,
+                                                'name' => (string) $status->name,
+                                                'description' => (string) ($status->description ?? ''),
+                                                'color' => (string) ($status->color ?? '#6B7280'),
+                                                'icon' => (string) ($status->icon ?? 'fa-circle'),
+                                                'can_drive' => (bool) ($status->can_drive ?? true),
+                                                'can_assign' => (bool) ($status->can_assign ?? true)
+                                            ];
+                                        })->values()->toArray();
+                                    }
                                 @endphp
 
                                 <!-- 🎯 Statut Chauffeur - Design Enterprise Ultra Moderne -->
@@ -344,10 +347,12 @@
                                     open: false,
                                     selectedStatus: null,
                                     selectedId: '{{ old('status_id') }}',
-                                    statuses: {{ json_encode($statusesData) }}
+                                    statuses: @js($statusesData)
                                 }" x-init="
+                                    console.log('Statuses available:', statuses.length, statuses);
                                     if (selectedId && statuses.length > 0) {
                                         selectedStatus = statuses.find(s => s.id == selectedId);
+                                        console.log('Pre-selected status:', selectedStatus);
                                     }
                                 " class="relative">
 

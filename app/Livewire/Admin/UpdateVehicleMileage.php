@@ -294,11 +294,16 @@ class UpdateVehicleMileage extends Component
                 number_format($this->newMileage) . " km (+{$difference} km)"
             );
 
+            // CORRECTIF ENTERPRISE-GRADE: Sauvegarder le vehicleId AVANT resetForm()
+            // pour éviter "Attempt to read property 'id' on null" lors du dispatch
+            $savedVehicleId = $this->selectedVehicle->id;
+
             // Réinitialiser le formulaire
             $this->resetForm();
 
             // Émettre un événement pour rafraîchir d'autres composants
-            $this->dispatch('mileage-updated', vehicleId: $this->selectedVehicle->id);
+            // Utilise le vehicleId sauvegardé au lieu de $this->selectedVehicle->id
+            $this->dispatch('mileage-updated', vehicleId: $savedVehicleId);
 
         } catch (\Exception $e) {
             DB::rollBack();

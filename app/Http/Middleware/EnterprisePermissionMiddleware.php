@@ -126,11 +126,11 @@ class EnterprisePermissionMiddleware
         'admin.mileage-readings.create' => 'create mileage readings',
         'admin.mileage-readings.store' => 'create mileage readings',
         'admin.mileage-readings.show' => 'view own mileage readings',
-        'admin.mileage-readings.edit' => 'update own mileage readings',
-        'admin.mileage-readings.update' => 'update own mileage readings',
+        'admin.mileage-readings.edit' => 'edit mileage readings',
+        'admin.mileage-readings.update' => 'edit mileage readings', // Corrigé: edit au lieu de update
         'admin.mileage-readings.destroy' => 'delete mileage readings',
         'admin.mileage-readings.export' => 'export mileage readings',
-        'admin.mileage-readings.statistics' => 'view mileage statistics',
+        'admin.mileage-readings.statistics' => 'view all mileage readings', // Corrigé: view all au lieu de view statistics
 
         // Organisations (Super Admin seulement)
         'admin.organizations.*' => 'view organizations',
@@ -211,7 +211,8 @@ class EnterprisePermissionMiddleware
             return $next($request);
         }
 
-        if (!$user->can($requiredPermission)) {
+        // Vérifier la permission avec support hiérarchique
+        if (!$this->hasPermissionHierarchical($user, $requiredPermission)) {
             return $this->handleUnauthorized(
                 $request,
                 "Accès refusé à la route: {$routeName}",
@@ -220,6 +221,41 @@ class EnterprisePermissionMiddleware
         }
 
         return $next($request);
+    }
+
+    /**
+     * Vérifier les permissions de manière hiérarchique
+     *
+     * Si une permission de niveau supérieur existe, elle donne accès aux niveaux inférieurs
+     * Exemple: "view all mileage readings" inclut "view team" et "view own"
+     */
+    private function hasPermissionHierarchical($user, string $permission): bool
+    {
+        // Vérification directe
+        if ($user->can($permission)) {
+            return true;
+        }
+
+        // Permissions hiérarchiques pour les relevés kilométriques
+        if ($permission === 'view own mileage readings') {
+            return $user->can('view team mileage readings') || $user->can('view all mileage readings');
+        }
+
+        if ($permission === 'view team mileage readings') {
+            return $user->can('view all mileage readings');
+        }
+
+        // Permissions hiérarchiques pour les demandes de réparation
+        if ($permission === 'view own repair requests') {
+            return $user->can('view team repair requests') || $user->can('view all repair requests');
+        }
+
+        if ($permission === 'view team repair requests') {
+            return $user->can('view all repair requests');
+        }
+
+        // Aucune permission hiérarchique trouvée
+        return false;
     }
 
     /**
@@ -318,6 +354,13 @@ class EnterprisePermissionMiddleware
             'view suppliers' => 'Vous n\'avez pas l\'autorisation de consulter les fournisseurs.',
             'view documents' => 'Vous n\'avez pas l\'autorisation de consulter les documents.',
             'view organizations' => 'Vous n\'avez pas l\'autorisation d\'accéder aux organisations (Super Admin uniquement).',
+            'view own mileage readings' => 'Vous n\'avez pas l\'autorisation de consulter les relevés kilométriques.',
+            'view team mileage readings' => 'Vous n\'avez pas l\'autorisation de consulter les relevés kilométriques de votre équipe.',
+            'view all mileage readings' => 'Vous n\'avez pas l\'autorisation de consulter tous les relevés kilométriques.',
+            'create mileage readings' => 'Vous n\'avez pas l\'autorisation de créer des relevés kilométriques.',
+            'edit mileage readings' => 'Vous n\'avez pas l\'autorisation de modifier les relevés kilométriques.',
+            'delete mileage readings' => 'Vous n\'avez pas l\'autorisation de supprimer des relevés kilométriques.',
+            'export mileage readings' => 'Vous n\'avez pas l\'autorisation d\'exporter les relevés kilométriques.',
         ];
 
         return $messages[$permission] ?? 'Vous n\'avez pas les autorisations nécessaires pour accéder à cette ressource.';
