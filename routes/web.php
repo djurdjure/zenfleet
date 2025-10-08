@@ -73,9 +73,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
         // Dashboard chauffeur (redirige vers /dashboard)
         Route::redirect('dashboard', '/dashboard')->name('dashboard');
 
-        // Demandes de réparation (même component que admin mais scopé par user)
-        Route::get('/repair-requests', \App\Livewire\Admin\RepairRequestManager::class)
+        // Demandes de réparation - ENTERPRISE: Contrôleur avec layout approprié
+        Route::get('/repair-requests', [\App\Http\Controllers\Driver\RepairRequestController::class, 'index'])
             ->name('repair-requests.index');
+
+        // Mise à jour du kilométrage - Chauffeur peut mettre à jour son véhicule
+        Route::get('/mileage/update', [\App\Http\Controllers\Admin\MileageReadingController::class, 'update'])
+            ->name('mileage.update')
+            ->middleware('can:create mileage readings');
     });
 });
 
@@ -183,10 +188,18 @@ Route::middleware(['auth', 'verified'])
     */
     Route::middleware(['auth', 'verified', 'enterprise.permission'])->group(function () {
 
-        // 📊 Relevés Kilométriques - Vue Globale
-        Route::get('mileage-readings', \App\Livewire\Admin\MileageReadingsIndex::class)
-            ->name('mileage-readings.index')
-            ->middleware('can:view own mileage readings');
+        // 📊 Relevés Kilométriques - Module Complet (Livewire 3 Pattern)
+        Route::prefix('mileage-readings')->name('mileage-readings.')->group(function () {
+            // Vue globale des relevés
+            Route::get('/', [\App\Http\Controllers\Admin\MileageReadingController::class, 'index'])
+                ->name('index')
+                ->middleware('can:view own mileage readings');
+
+            // Mise à jour du kilométrage (tous les rôles selon permissions)
+            Route::get('/update/{vehicle?}', [\App\Http\Controllers\Admin\MileageReadingController::class, 'update'])
+                ->name('update')
+                ->middleware('can:create mileage readings');
+        });
 
         // 🚙 Véhicules avec Import/Export Avancé - Configuration Enterprise
         Route::prefix('vehicles')->name('vehicles.')->group(function () {
@@ -223,8 +236,8 @@ Route::middleware(['auth', 'verified'])
             Route::get('{vehicle}/maintenance', [VehicleController::class, 'maintenance'])->name('maintenance');
             Route::get('{vehicle}/documents', [VehicleController::class, 'documents'])->name('documents');
 
-            // Historique kilométrique - Livewire Component
-            Route::get('{vehicle}/mileage-history', \App\Livewire\Admin\VehicleMileageHistory::class)->name('mileage-history');
+            // Historique kilométrique - Livewire Component via Controller
+            Route::get('{vehicle}/mileage-history', [\App\Http\Controllers\Admin\MileageReadingController::class, 'history'])->name('mileage-history');
         });
 
         // 👨‍💼 Chauffeurs avec Import/Export
@@ -289,8 +302,8 @@ Route::middleware(['auth', 'verified'])
 
         // 🔧 MODULE RÉPARATIONS - Workflow Validation 2 Niveaux
         Route::prefix('repair-requests')->name('repair-requests.')->group(function () {
-            // CRUD operations - Utilisation de Livewire pour l'interface
-            Route::get('/', \App\Livewire\Admin\RepairRequestManager::class)->name('index');
+            // CRUD operations - Utilisation de Livewire Kanban avec layout
+            Route::get('/', [\App\Http\Controllers\Admin\RepairRequestLivewireController::class, 'index'])->name('index');
 
             // Actions API pour le workflow (utilisées par Livewire)
             Route::post('/{repairRequest}/approve-supervisor', [\App\Http\Controllers\Admin\RepairRequestController::class, 'approveSupervisor'])->name('approve-supervisor');

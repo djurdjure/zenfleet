@@ -1,9 +1,20 @@
-{{-- Modal de création de demande --}}
-<x-modal wire:model="showCreateModal" max-width="4xl">
-    <div class="p-6">
-        <div class="flex items-center justify-between mb-4">
-            <h3 class="text-lg font-medium text-gray-900">Nouvelle Demande de Réparation</h3>
-            <button wire:click="closeCreateModal" class="text-gray-400 hover:text-gray-600">
+{{-- 🔧 Modal de création de demande - ENTERPRISE GRADE --}}
+<x-modal wire:model="showCreateModal" max-width="5xl">
+    <div class="p-6 bg-gradient-to-br from-white to-gray-50">
+        {{-- Header Ultra-Pro --}}
+        <div class="flex items-center justify-between mb-6 pb-4 border-b-2 border-blue-100">
+            <div class="flex items-center space-x-3">
+                <div class="p-2 bg-blue-600 rounded-lg">
+                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                    </svg>
+                </div>
+                <div>
+                    <h3 class="text-xl font-bold text-gray-900">Nouvelle Demande de Réparation</h3>
+                    <p class="text-sm text-gray-500 mt-0.5">Créez une demande qui sera validée par votre superviseur</p>
+                </div>
+            </div>
+            <button wire:click="closeCreateModal" class="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                 </svg>
@@ -11,51 +22,148 @@
         </div>
 
         <form wire:submit.prevent="createRequest" class="space-y-6">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {{-- Véhicule --}}
-                <div>
-                    <label for="vehicle_id" class="block text-sm font-medium text-gray-700">Véhicule *</label>
-                    <select wire:model="vehicle_id" id="vehicle_id" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
-                        <option value="">Sélectionner un véhicule</option>
-                        @foreach($vehicles as $vehicle)
-                            <option value="{{ $vehicle->id }}">{{ $vehicle->registration_plate }} - {{ $vehicle->brand }} {{ $vehicle->model }}</option>
-                        @endforeach
-                    </select>
-                    @error('vehicle_id') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
-                </div>
+            {{-- 🚗 Informations Véhicule & Urgence --}}
+            <div class="bg-white rounded-xl border-2 border-gray-200 p-5 space-y-4">
+                <h4 class="text-sm font-bold text-gray-700 uppercase tracking-wide flex items-center">
+                    <svg class="w-5 h-5 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                    </svg>
+                    Véhicule & Urgence
+                </h4>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {{-- Véhicule --}}
+                    <div>
+                        <label for="vehicle_id" class="block text-sm font-semibold text-gray-700 mb-2">
+                            🚗 Véhicule concerné <span class="text-red-500">*</span>
+                        </label>
+                        <select wire:model="vehicle_id" id="vehicle_id"
+                                class="block w-full px-4 py-2.5 rounded-lg border-2 border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all text-sm">
+                            <option value="">-- Sélectionner un véhicule --</option>
+                            @foreach($vehicles as $vehicle)
+                                <option value="{{ $vehicle->id }}">
+                                    {{ $vehicle->registration_plate }} - {{ $vehicle->brand }} {{ $vehicle->model }}
+                                </option>
+                            @endforeach
+                        </select>
+                        @error('vehicle_id')
+                            <p class="mt-1.5 text-sm text-red-600 flex items-center">
+                                <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                                </svg>
+                                {{ $message }}
+                            </p>
+                        @enderror
+                    </div>
 
-                {{-- Priorité --}}
-                <div>
-                    <label for="priority" class="block text-sm font-medium text-gray-700">Priorité *</label>
-                    <select wire:model="priority" id="priority" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
-                        <option value="non_urgente">Non urgente</option>
-                        <option value="a_prevoir">À prévoir</option>
-                        <option value="urgente">Urgente</option>
-                    </select>
-                    @error('priority') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
+                    {{-- Priorité --}}
+                    <div>
+                        <label for="priority" class="block text-sm font-semibold text-gray-700 mb-2">
+                            ⚡ Niveau d'urgence <span class="text-red-500">*</span>
+                        </label>
+                        <select wire:model="priority" id="priority"
+                                class="block w-full px-4 py-2.5 rounded-lg border-2 border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all text-sm">
+                            <option value="non_urgente">🟢 Non urgente - Peut attendre</option>
+                            <option value="a_prevoir">🟡 À prévoir - Dans les prochains jours</option>
+                            <option value="urgente">🔴 Urgente - Intervention rapide</option>
+                        </select>
+                        @error('priority')
+                            <p class="mt-1.5 text-sm text-red-600 flex items-center">
+                                <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                                </svg>
+                                {{ $message }}
+                            </p>
+                        @enderror
+                    </div>
                 </div>
             </div>
 
-            {{-- Description --}}
-            <div>
-                <label for="description" class="block text-sm font-medium text-gray-700">Description de la panne/réparation *</label>
-                <textarea wire:model="description" id="description" rows="4" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" placeholder="Décrivez en détail le problème constaté, les symptômes, etc."></textarea>
-                @error('description') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
+            {{-- 📝 Description Détaillée --}}
+            <div class="bg-white rounded-xl border-2 border-gray-200 p-5 space-y-4">
+                <h4 class="text-sm font-bold text-gray-700 uppercase tracking-wide flex items-center">
+                    <svg class="w-5 h-5 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                    </svg>
+                    Description du Problème
+                </h4>
+                <div>
+                    <label for="description" class="block text-sm font-semibold text-gray-700 mb-2">
+                        📋 Décrivez en détail le problème constaté <span class="text-red-500">*</span>
+                    </label>
+                    <textarea wire:model="description" id="description" rows="5"
+                              class="block w-full px-4 py-3 rounded-lg border-2 border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all text-sm"
+                              placeholder="Exemples: Bruits anormaux au freinage, fumée noire à l'échappement, voyant moteur allumé...
+
+Soyez le plus précis possible sur:
+• Les symptômes observés
+• Le moment où cela se produit
+• La fréquence du problème"></textarea>
+                    <div class="mt-1 flex items-center justify-between text-xs">
+                        <span class="text-gray-500">Minimum 10 caractères requis</span>
+                        <span class="text-gray-400" x-data="{ count: $wire.entangle('description').length }">
+                            <span x-text="count || 0"></span>/2000
+                        </span>
+                    </div>
+                    @error('description')
+                        <p class="mt-1.5 text-sm text-red-600 flex items-center">
+                            <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                            </svg>
+                            {{ $message }}
+                        </p>
+                    @enderror
+                </div>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {{-- Localisation --}}
-                <div>
-                    <label for="location_description" class="block text-sm font-medium text-gray-700">Localisation du véhicule</label>
-                    <input wire:model="location_description" type="text" id="location_description" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" placeholder="Ex: Parking bureau, Garage Alger-Centre, etc.">
-                    @error('location_description') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
-                </div>
+            {{-- 📍 Informations Complémentaires --}}
+            <div class="bg-white rounded-xl border-2 border-gray-200 p-5 space-y-4">
+                <h4 class="text-sm font-bold text-gray-700 uppercase tracking-wide flex items-center">
+                    <svg class="w-5 h-5 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    Informations Complémentaires
+                </h4>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {{-- Localisation --}}
+                    <div>
+                        <label for="location_description" class="block text-sm font-semibold text-gray-700 mb-2">
+                            📍 Localisation du véhicule
+                        </label>
+                        <input wire:model="location_description" type="text" id="location_description"
+                               class="block w-full px-4 py-2.5 rounded-lg border-2 border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all text-sm"
+                               placeholder="Ex: Parking bureau, Garage Alger-Centre...">
+                        @error('location_description')
+                            <p class="mt-1.5 text-sm text-red-600 flex items-center">
+                                <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                                </svg>
+                                {{ $message }}
+                            </p>
+                        @enderror
+                    </div>
 
-                {{-- Coût estimé --}}
-                <div>
-                    <label for="estimated_cost" class="block text-sm font-medium text-gray-700">Coût estimé (DA)</label>
-                    <input wire:model="estimated_cost" type="number" step="0.01" min="0" id="estimated_cost" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" placeholder="0.00">
-                    @error('estimated_cost') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
+                    {{-- Coût estimé --}}
+                    <div>
+                        <label for="estimated_cost" class="block text-sm font-semibold text-gray-700 mb-2">
+                            💰 Coût estimé (DA) <span class="text-gray-400 text-xs font-normal">(optionnel)</span>
+                        </label>
+                        <div class="relative">
+                            <input wire:model="estimated_cost" type="number" step="0.01" min="0" id="estimated_cost"
+                                   class="block w-full px-4 py-2.5 rounded-lg border-2 border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all text-sm"
+                                   placeholder="0.00">
+                            <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                                <span class="text-gray-400 text-sm font-medium">DA</span>
+                            </div>
+                        </div>
+                        @error('estimated_cost')
+                            <p class="mt-1.5 text-sm text-red-600 flex items-center">
+                                <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                                </svg>
+                                {{ $message }}
+                            </p>
+                        @enderror
+                    </div>
                 </div>
             </div>
 
@@ -98,98 +206,248 @@
                 @error('attachments.*') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
             </div>
 
-            <div class="flex justify-end space-x-3 pt-4">
-                <button type="button" wire:click="closeCreateModal" class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50">
-                    Annuler
-                </button>
-                <button type="submit" class="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700">
-                    Créer la demande
-                </button>
+            {{-- 🎯 Actions Finales --}}
+            <div class="flex items-center justify-between pt-6 border-t-2 border-gray-200">
+                <p class="text-sm text-gray-500 flex items-center">
+                    <svg class="w-5 h-5 mr-2 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    Votre demande sera envoyée à votre superviseur
+                </p>
+                <div class="flex space-x-3">
+                    <button type="button" wire:click="closeCreateModal"
+                            class="px-6 py-2.5 text-sm font-semibold text-gray-700 bg-white border-2 border-gray-300 rounded-lg hover:bg-gray-50 hover:border-gray-400 transition-all">
+                        ✖ Annuler
+                    </button>
+                    <button type="submit"
+                            class="px-6 py-2.5 text-sm font-semibold text-white bg-gradient-to-r from-blue-600 to-blue-700 border border-transparent rounded-lg hover:from-blue-700 hover:to-blue-800 shadow-lg hover:shadow-xl transition-all transform hover:scale-105"
+                            wire:loading.attr="disabled"
+                            wire:loading.class="opacity-75 cursor-not-allowed">
+                        <span wire:loading.remove wire:target="createRequest">
+                            ✓ Créer la demande
+                        </span>
+                        <span wire:loading wire:target="createRequest" class="flex items-center">
+                            <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                            Création en cours...
+                        </span>
+                    </button>
+                </div>
             </div>
         </form>
     </div>
 </x-modal>
 
-{{-- Modal d'approbation/validation --}}
-<x-modal wire:model="showApprovalModal" max-width="2xl">
+{{-- 🎯 Modal d'approbation/validation ENTERPRISE GRADE --}}
+<x-modal wire:model="showApprovalModal" max-width="4xl">
     @if($selectedRequest)
-    <div class="p-6">
-        <div class="flex items-center justify-between mb-4">
-            <h3 class="text-lg font-medium text-gray-900">
-                @if($selectedRequest->status === 'en_attente')
-                    Traitement de la demande
-                @else
-                    Validation managériale
-                @endif
-            </h3>
-            <button wire:click="closeApprovalModal" class="text-gray-400 hover:text-gray-600">
+    <div class="p-6 bg-gradient-to-br from-white to-gray-50">
+        {{-- Header Ultra-Pro --}}
+        <div class="flex items-center justify-between mb-6 pb-4 border-b-2 border-blue-100">
+            <div class="flex items-center space-x-3">
+                <div class="p-3 rounded-lg {{ $selectedRequest->status === 'pending_supervisor' ? 'bg-blue-600' : 'bg-purple-600' }}">
+                    <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        @if($selectedRequest->status === 'pending_supervisor')
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        @else
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+                        @endif
+                    </svg>
+                </div>
+                <div>
+                    <h3 class="text-xl font-bold text-gray-900">
+                        @if($selectedRequest->status === 'pending_supervisor')
+                            Approbation Superviseur (Niveau 1)
+                        @elseif($selectedRequest->status === 'approved_supervisor')
+                            Validation Gestionnaire Flotte (Niveau 2)
+                        @else
+                            Traitement de la Demande
+                        @endif
+                    </h3>
+                    <p class="text-sm text-gray-500 mt-0.5">
+                        Demande #{{ $selectedRequest->id }} •
+                        @if($selectedRequest->status === 'pending_supervisor')
+                            Niveau 1 - Approbation initiale
+                        @else
+                            Niveau 2 - Validation finale
+                        @endif
+                    </p>
+                </div>
+            </div>
+            <button wire:click="closeApprovalModal" class="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                 </svg>
             </button>
         </div>
 
-        {{-- Détails de la demande --}}
-        <div class="bg-gray-50 rounded-lg p-4 mb-6">
-            <div class="grid grid-cols-2 gap-4">
-                <div>
-                    <p class="text-sm font-medium text-gray-700">Véhicule</p>
-                    <p class="text-sm text-gray-900">{{ $selectedRequest->vehicle->registration_plate }}</p>
+        {{-- 📋 Détails de la Demande --}}
+        <div class="bg-white rounded-xl border-2 border-gray-200 p-5 mb-6 space-y-4">
+            <h4 class="text-sm font-bold text-gray-700 uppercase tracking-wide flex items-center">
+                <svg class="w-5 h-5 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                </svg>
+                Informations de la Demande
+            </h4>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="bg-gray-50 rounded-lg p-3">
+                    <p class="text-xs font-medium text-gray-500 uppercase mb-1">🚗 Véhicule</p>
+                    <p class="text-sm font-bold text-gray-900">{{ $selectedRequest->vehicle->registration_plate }}</p>
+                    <p class="text-xs text-gray-600">{{ $selectedRequest->vehicle->brand }} {{ $selectedRequest->vehicle->model }}</p>
                 </div>
-                <div>
-                    <p class="text-sm font-medium text-gray-700">Priorité</p>
-                    <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium
-                        @if($selectedRequest->priority === 'urgente') bg-red-100 text-red-800
-                        @elseif($selectedRequest->priority === 'a_prevoir') bg-orange-100 text-orange-800
+                <div class="bg-gray-50 rounded-lg p-3">
+                    <p class="text-xs font-medium text-gray-500 uppercase mb-1">⚡ Urgence</p>
+                    <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold
+                        @if($selectedRequest->urgency === 'critical') bg-red-100 text-red-800
+                        @elseif($selectedRequest->urgency === 'high') bg-orange-100 text-orange-800
+                        @elseif($selectedRequest->urgency === 'normal') bg-yellow-100 text-yellow-800
                         @else bg-gray-100 text-gray-800 @endif">
-                        {{ $selectedRequest->priority_label }}
+                        @if($selectedRequest->urgency === 'critical') 🔴 CRITIQUE
+                        @elseif($selectedRequest->urgency === 'high') 🟠 HAUTE
+                        @elseif($selectedRequest->urgency === 'normal') 🟡 NORMALE
+                        @else 🟢 BASSE
+                        @endif
                     </span>
                 </div>
-                <div class="col-span-2">
-                    <p class="text-sm font-medium text-gray-700">Description</p>
-                    <p class="text-sm text-gray-900">{{ $selectedRequest->description }}</p>
+                <div class="bg-gray-50 rounded-lg p-3">
+                    <p class="text-xs font-medium text-gray-500 uppercase mb-1">👤 Demandeur</p>
+                    <p class="text-sm font-bold text-gray-900">{{ $selectedRequest->driver->name ?? 'N/A' }}</p>
+                    <p class="text-xs text-gray-600">{{ $selectedRequest->created_at->diffForHumans() }}</p>
                 </div>
+            </div>
+
+            <div class="bg-blue-50 rounded-lg p-4 border-l-4 border-blue-600">
+                <p class="text-xs font-medium text-blue-700 uppercase mb-2">📝 Description du Problème</p>
+                <p class="text-sm text-gray-900 leading-relaxed">{{ $selectedRequest->description }}</p>
+            </div>
+
+            @if($selectedRequest->location_description || $selectedRequest->estimated_cost)
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                @if($selectedRequest->location_description)
+                <div class="bg-gray-50 rounded-lg p-3">
+                    <p class="text-xs font-medium text-gray-500 uppercase mb-1">📍 Localisation</p>
+                    <p class="text-sm text-gray-900">{{ $selectedRequest->location_description }}</p>
+                </div>
+                @endif
                 @if($selectedRequest->estimated_cost)
-                <div>
-                    <p class="text-sm font-medium text-gray-700">Coût estimé</p>
-                    <p class="text-sm text-gray-900">{{ number_format($selectedRequest->estimated_cost, 2) }} DA</p>
+                <div class="bg-gray-50 rounded-lg p-3">
+                    <p class="text-xs font-medium text-gray-500 uppercase mb-1">💰 Coût Estimé</p>
+                    <p class="text-lg font-bold text-blue-900">{{ number_format($selectedRequest->estimated_cost, 2) }} DA</p>
                 </div>
                 @endif
             </div>
+            @endif
         </div>
 
-        {{-- Formulaire de décision --}}
-        <div class="space-y-4">
+        {{-- 💬 Formulaire de Décision --}}
+        <div class="bg-white rounded-xl border-2 border-gray-200 p-5 space-y-5">
+            <h4 class="text-sm font-bold text-gray-700 uppercase tracking-wide flex items-center">
+                <svg class="w-5 h-5 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path>
+                </svg>
+                Votre Décision
+            </h4>
+
             <div>
-                <label for="approval_comments" class="block text-sm font-medium text-gray-700">
-                    Commentaires @if($selectedRequest->status === 'en_attente')(optionnels)@endif
+                <label for="approval_comments" class="block text-sm font-semibold text-gray-700 mb-2">
+                    💬 Commentaires & Justification
+                    @if($selectedRequest->status === 'pending_supervisor')
+                        <span class="text-gray-400 text-xs font-normal">(optionnels pour approbation, requis pour rejet)</span>
+                    @else
+                        <span class="text-gray-400 text-xs font-normal">(optionnels pour validation, requis pour rejet)</span>
+                    @endif
                 </label>
-                <textarea wire:model="approvalComments" id="approval_comments" rows="3" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" placeholder="Ajoutez vos commentaires..."></textarea>
-                @error('approvalComments') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
+                <textarea wire:model="approvalComments" id="approval_comments" rows="4"
+                          class="block w-full px-4 py-3 rounded-lg border-2 border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all text-sm"
+                          placeholder="Ajoutez vos commentaires, remarques ou raisons de votre décision..."></textarea>
+                @error('approvalComments')
+                    <p class="mt-1.5 text-sm text-red-600 flex items-center">
+                        <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                        </svg>
+                        {{ $message }}
+                    </p>
+                @enderror
             </div>
 
-            <div class="flex justify-end space-x-3 pt-4">
-                <button type="button" wire:click="closeApprovalModal" class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50">
-                    Annuler
-                </button>
+            {{-- Actions selon le niveau --}}
+            <div class="flex items-center justify-between pt-4 border-t-2 border-gray-200">
+                <p class="text-sm text-gray-500 flex items-center">
+                    <svg class="w-5 h-5 mr-2 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    @if($selectedRequest->status === 'pending_supervisor')
+                        Cette décision passera au niveau 2 si approuvée
+                    @else
+                        Cette décision est FINALE et créera une opération maintenance
+                    @endif
+                </p>
+                <div class="flex space-x-3">
+                    <button type="button" wire:click="closeApprovalModal"
+                            class="px-5 py-2.5 text-sm font-semibold text-gray-700 bg-white border-2 border-gray-300 rounded-lg hover:bg-gray-50 hover:border-gray-400 transition-all">
+                        ✖ Annuler
+                    </button>
 
-                @if($selectedRequest->status === 'en_attente')
-                    {{-- Actions superviseur --}}
-                    <button wire:click="rejectRequest" class="px-4 py-2 text-sm font-medium text-white bg-red-600 border border-transparent rounded-md hover:bg-red-700">
-                        Rejeter
-                    </button>
-                    <button wire:click="approveRequest" class="px-4 py-2 text-sm font-medium text-white bg-green-600 border border-transparent rounded-md hover:bg-green-700">
-                        Approuver
-                    </button>
-                @elseif($selectedRequest->status === 'accord_initial')
-                    {{-- Actions manager --}}
-                    <button wire:click="rejectByManager" class="px-4 py-2 text-sm font-medium text-white bg-red-600 border border-transparent rounded-md hover:bg-red-700">
-                        Rejeter
-                    </button>
-                    <button wire:click="validateRequest" class="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700">
-                        Valider
-                    </button>
-                @endif
+                    @if($selectedRequest->status === 'pending_supervisor')
+                        {{-- Actions Niveau 1 - Superviseur --}}
+                        <button wire:click="rejectRequest"
+                                class="px-5 py-2.5 text-sm font-semibold text-white bg-gradient-to-r from-red-600 to-red-700 border border-transparent rounded-lg hover:from-red-700 hover:to-red-800 shadow-lg hover:shadow-xl transition-all transform hover:scale-105"
+                                wire:loading.attr="disabled"
+                                wire:loading.class="opacity-75">
+                            <span wire:loading.remove wire:target="rejectRequest">❌ Rejeter</span>
+                            <span wire:loading wire:target="rejectRequest" class="flex items-center">
+                                <svg class="animate-spin -ml-1 mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24">
+                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                </svg>
+                                Rejet...
+                            </span>
+                        </button>
+                        <button wire:click="approveRequest"
+                                class="px-5 py-2.5 text-sm font-semibold text-white bg-gradient-to-r from-green-600 to-green-700 border border-transparent rounded-lg hover:from-green-700 hover:to-green-800 shadow-lg hover:shadow-xl transition-all transform hover:scale-105"
+                                wire:loading.attr="disabled"
+                                wire:loading.class="opacity-75">
+                            <span wire:loading.remove wire:target="approveRequest">✓ Approuver</span>
+                            <span wire:loading wire:target="approveRequest" class="flex items-center">
+                                <svg class="animate-spin -ml-1 mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24">
+                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                </svg>
+                                Approbation...
+                            </span>
+                        </button>
+                    @elseif($selectedRequest->status === 'approved_supervisor')
+                        {{-- Actions Niveau 2 - Gestionnaire Flotte --}}
+                        <button wire:click="rejectByManager"
+                                class="px-5 py-2.5 text-sm font-semibold text-white bg-gradient-to-r from-red-600 to-red-700 border border-transparent rounded-lg hover:from-red-700 hover:to-red-800 shadow-lg hover:shadow-xl transition-all transform hover:scale-105"
+                                wire:loading.attr="disabled"
+                                wire:loading.class="opacity-75">
+                            <span wire:loading.remove wire:target="rejectByManager">❌ Rejeter Définitivement</span>
+                            <span wire:loading wire:target="rejectByManager" class="flex items-center">
+                                <svg class="animate-spin -ml-1 mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24">
+                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                </svg>
+                                Rejet...
+                            </span>
+                        </button>
+                        <button wire:click="validateRequest"
+                                class="px-5 py-2.5 text-sm font-semibold text-white bg-gradient-to-r from-blue-600 to-blue-700 border border-transparent rounded-lg hover:from-blue-700 hover:to-blue-800 shadow-lg hover:shadow-xl transition-all transform hover:scale-105"
+                                wire:loading.attr="disabled"
+                                wire:loading.class="opacity-75">
+                            <span wire:loading.remove wire:target="validateRequest">✓ Valider & Créer Opération</span>
+                            <span wire:loading wire:target="validateRequest" class="flex items-center">
+                                <svg class="animate-spin -ml-1 mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24">
+                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                </svg>
+                                Validation...
+                            </span>
+                        </button>
+                    @endif
+                </div>
             </div>
         </div>
     </div>

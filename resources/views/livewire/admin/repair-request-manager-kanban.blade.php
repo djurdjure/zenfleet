@@ -573,4 +573,7 @@
             </div>
         </div>
     </div>
+
+    {{-- 🔧 MODALS - Formulaires de gestion --}}
+    @include('livewire.admin.repair-request-modals')
 </div>

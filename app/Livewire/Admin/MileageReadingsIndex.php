@@ -286,6 +286,6 @@ class MileageReadingsIndex extends Component
             'vehicles' => $this->vehicles,
             'authors' => $this->authors,
             'stats' => $this->stats,
-        ])->layout('layouts.admin.catalyst');
+        ]);
     }
 }

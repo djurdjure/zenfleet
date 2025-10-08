@@ -114,33 +114,72 @@
                         </li>
                         @endhasanyrole
 
-                        {{-- Demandes de Réparation - Accessible à tous les rôles avec permission --}}
-                        @canany(['view own repair requests', 'view team repair requests', 'view all repair requests'])
+                        {{-- Demandes de Réparation - Chauffeurs uniquement (menu séparé) --}}
+                        @hasrole('Chauffeur')
+                        @can('view own repair requests')
                         <li class="flex">
-                            @php
-                                $repairRoute = auth()->user()->hasAnyRole(['Super Admin', 'Admin', 'Gestionnaire Flotte', 'Supervisor'])
-                                    ? route('admin.repair-requests.index')
-                                    : route('driver.repair-requests.index');
-                                $isRepairActive = request()->routeIs('admin.repair-requests.*', 'driver.repair-requests.*');
-                            @endphp
-                            <a href="{{ $repairRoute }}"
-                               class="flex items-center w-full h-10 px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 {{ $isRepairActive ? 'bg-blue-50 text-blue-700 shadow-sm' : 'text-slate-600 hover:bg-white/60 hover:text-slate-800' }}">
-                                <i class="fas fa-tools text-base mr-3 {{ $isRepairActive ? 'text-blue-600' : 'text-slate-500' }}"></i>
-                                <span class="flex-1">Demandes Réparation</span>
-                            </a>
-                        </li>
-                        @endcanany
-
-                        {{-- Kilométrage - Accessible à tous les rôles avec permission --}}
-                        @canany(['view own mileage readings', 'view team mileage readings', 'view all mileage readings'])
-                        <li class="flex">
-                            <a href="{{ route('admin.mileage-readings.index') }}"
-                               class="flex items-center w-full h-10 px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 {{ request()->routeIs('admin.mileage-readings.*') ? 'bg-blue-50 text-blue-700 shadow-sm' : 'text-slate-600 hover:bg-white/60 hover:text-slate-800' }}">
-                                <i class="fas fa-tachometer-alt text-base mr-3 {{ request()->routeIs('admin.mileage-readings.*') ? 'text-blue-600' : 'text-slate-500' }}"></i>
-                                <span class="flex-1">Kilométrage</span>
+                            <a href="{{ route('driver.repair-requests.index') }}"
+                               class="flex items-center w-full h-10 px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 {{ request()->routeIs('driver.repair-requests.*') ? 'bg-blue-50 text-blue-700 shadow-sm' : 'text-slate-600 hover:bg-white/60 hover:text-slate-800' }}">
+                                <i class="fas fa-tools text-base mr-3 {{ request()->routeIs('driver.repair-requests.*') ? 'text-blue-600' : 'text-slate-500' }}"></i>
+                                <span class="flex-1">Mes Demandes</span>
                             </a>
                         </li>
                         @endcan
+                        @endhasrole
+
+                        {{-- Kilométrage avec sous-menus - Accessible à tous les rôles avec permission --}}
+                        @canany(['view own mileage readings', 'view team mileage readings', 'view all mileage readings'])
+                        <li class="flex flex-col" x-data="{ open: {{ request()->routeIs('admin.mileage-readings.*', 'driver.mileage.*', 'admin.vehicles.*.mileage-history') ? 'true' : 'false' }} }">
+                            <button @click="open = !open"
+                                    class="flex items-center w-full h-10 px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 {{ request()->routeIs('admin.mileage-readings.*', 'driver.mileage.*', 'admin.vehicles.*.mileage-history') ? 'bg-blue-50 text-blue-700 shadow-sm' : 'text-slate-600 hover:bg-white/60 hover:text-slate-800' }}">
+                                <i class="fas fa-tachometer-alt text-base mr-3 {{ request()->routeIs('admin.mileage-readings.*', 'driver.mileage.*', 'admin.vehicles.*.mileage-history') ? 'text-blue-600' : 'text-slate-500' }}"></i>
+                                <span class="flex-1 text-left">Kilométrage</span>
+                                <i class="fas fa-chevron-down text-xs transition-transform duration-200" :class="{ 'rotate-180': !open }"></i>
+                            </button>
+                            <div x-show="open" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 max-h-0" x-transition:enter-end="opacity-100 max-h-96" x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100 max-h-96" x-transition:leave-end="opacity-0 max-h-0" class="overflow-hidden">
+                                <div class="flex w-full mt-2 pl-3">
+                                    <div class="mr-1">
+                                        <div class="px-1 py-2 h-full relative">
+                                            <div class="bg-slate-300/40 w-0.5 h-full rounded-full"></div>
+                                            <div class="absolute w-0.5 rounded-full bg-blue-500 transition-all duration-300" style="height: 50%; top: {{ request()->routeIs('admin.mileage-readings.update', 'driver.mileage.update') ? '50' : '0' }}%;"></div>
+                                        </div>
+                                    </div>
+                                    <ul class="flex-1 space-y-1 pb-2">
+                                        {{-- Historique --}}
+                                        <li>
+                                            @php
+                                                $mileageIndexRoute = auth()->user()->hasAnyRole(['Super Admin', 'Admin', 'Gestionnaire Flotte', 'Supervisor'])
+                                                    ? route('admin.mileage-readings.index')
+                                                    : route('admin.mileage-readings.index');
+                                                $isMileageIndexActive = request()->routeIs('admin.mileage-readings.index');
+                                            @endphp
+                                            <a href="{{ $mileageIndexRoute }}"
+                                               class="flex items-center h-9 px-3 py-1.5 rounded-lg text-sm font-medium transition-all duration-200 {{ $isMileageIndexActive ? 'bg-blue-100/70 text-blue-700' : 'text-slate-600 hover:bg-white/40 hover:text-slate-800' }}">
+                                                <i class="fas fa-history text-xs mr-2 {{ $isMileageIndexActive ? 'text-blue-600' : 'text-slate-400' }}"></i>
+                                                Historique
+                                            </a>
+                                        </li>
+                                        {{-- Mettre à jour --}}
+                                        @can('create mileage readings')
+                                        <li>
+                                            @php
+                                                $mileageUpdateRoute = auth()->user()->hasRole('Chauffeur')
+                                                    ? route('driver.mileage.update')
+                                                    : route('admin.mileage-readings.update');
+                                                $isMileageUpdateActive = request()->routeIs('admin.mileage-readings.update', 'driver.mileage.update');
+                                            @endphp
+                                            <a href="{{ $mileageUpdateRoute }}"
+                                               class="flex items-center h-9 px-3 py-1.5 rounded-lg text-sm font-medium transition-all duration-200 {{ $isMileageUpdateActive ? 'bg-blue-100/70 text-blue-700' : 'text-slate-600 hover:bg-white/40 hover:text-slate-800' }}">
+                                                <i class="fas fa-edit text-xs mr-2 {{ $isMileageUpdateActive ? 'text-blue-600' : 'text-slate-400' }}"></i>
+                                                Mettre à jour
+                                            </a>
+                                        </li>
+                                        @endcan
+                                    </ul>
+                                </div>
+                            </div>
+                        </li>
+                        @endcanany
 
                         {{-- Maintenance avec sous-menus --}}
                         @hasanyrole('Super Admin|Admin|Gestionnaire Flotte|Supervisor')

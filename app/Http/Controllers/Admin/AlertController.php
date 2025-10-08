@@ -74,8 +74,8 @@ class AlertController extends Controller
         // Alertes de maintenance en retard
         $overdueMaintenanceCount = DB::table('maintenance_schedules')
             ->where('organization_id', $organizationId)
-            ->where('next_maintenance_date', '<', now())
-            ->where('status', '!=', 'completed')
+            ->where('next_due_date', '<', now())
+            ->where('is_active', true)
             ->count();
 
         if ($overdueMaintenanceCount > 0) {
@@ -92,93 +92,117 @@ class AlertController extends Controller
             ]);
         }
 
-        // Alertes de budget dépassé
-        $budgetOverruns = DB::table('expense_budgets')
-            ->where('organization_id', $organizationId)
-            ->whereRaw('spent_amount > budgeted_amount')
-            ->where('status', 'active')
-            ->count();
+        // Alertes de budget dépassé - ENTERPRISE: Vérification existence table
+        try {
+            if (DB::getSchemaBuilder()->hasTable('expense_budgets')) {
+                $budgetOverruns = DB::table('expense_budgets')
+                    ->where('organization_id', $organizationId)
+                    ->whereRaw('spent_amount > budgeted_amount')
+                    ->where('status', 'active')
+                    ->count();
 
-        if ($budgetOverruns > 0) {
-            $alerts->push((object)[
-                'id' => 'budget_overrun',
-                'type' => 'budget',
-                'priority' => 'high',
-                'title' => 'Budgets dépassés',
-                'message' => "{$budgetOverruns} budget(s) dépassé(s)",
-                'count' => $budgetOverruns,
-                'icon' => 'wallet',
-                'color' => 'red',
-                'created_at' => now()
-            ]);
+                if ($budgetOverruns > 0) {
+                    $alerts->push((object)[
+                        'id' => 'budget_overrun',
+                        'type' => 'budget',
+                        'priority' => 'high',
+                        'title' => 'Budgets dépassés',
+                        'message' => "{$budgetOverruns} budget(s) dépassé(s)",
+                        'count' => $budgetOverruns,
+                        'icon' => 'wallet',
+                        'color' => 'red',
+                        'created_at' => now()
+                    ]);
+                }
+            }
+        } catch (\Exception $e) {
+            \Log::warning('Budget alerts unavailable', ['error' => $e->getMessage()]);
         }
 
-        // Alertes de paiements en retard
-        $overduePayments = DB::table('vehicle_expenses')
-            ->where('organization_id', $organizationId)
-            ->where('payment_due_date', '<', now())
-            ->where('payment_status', '!=', 'paid')
-            ->where('approval_status', 'approved')
-            ->count();
+        // Alertes de paiements en retard - ENTERPRISE: Vérification existence table
+        try {
+            if (DB::getSchemaBuilder()->hasTable('vehicle_expenses')) {
+                $overduePayments = DB::table('vehicle_expenses')
+                    ->where('organization_id', $organizationId)
+                    ->where('payment_due_date', '<', now())
+                    ->where('payment_status', '!=', 'paid')
+                    ->where('approval_status', 'approved')
+                    ->count();
 
-        if ($overduePayments > 0) {
-            $alerts->push((object)[
-                'id' => 'overdue_payments',
-                'type' => 'payment',
-                'priority' => 'high',
-                'title' => 'Paiements en retard',
-                'message' => "{$overduePayments} paiement(s) en retard",
-                'count' => $overduePayments,
-                'icon' => 'credit-card',
-                'color' => 'orange',
-                'created_at' => now()
-            ]);
+                if ($overduePayments > 0) {
+                    $alerts->push((object)[
+                        'id' => 'overdue_payments',
+                        'type' => 'payment',
+                        'priority' => 'high',
+                        'title' => 'Paiements en retard',
+                        'message' => "{$overduePayments} paiement(s) en retard",
+                        'count' => $overduePayments,
+                        'icon' => 'credit-card',
+                        'color' => 'orange',
+                        'created_at' => now()
+                    ]);
+                }
+            }
+        } catch (\Exception $e) {
+            \Log::warning('Payment alerts unavailable', ['error' => $e->getMessage()]);
         }
 
         return $alerts->sortByDesc('priority');
     }
 
     /**
-     * Alertes critiques nécessitant une action immédiate
+     * Alertes critiques nécessitant une action immédiate - ENTERPRISE: Colonnes optionnelles
      */
     private function getCriticalAlerts($organizationId)
     {
         $criticalAlerts = collect();
 
-        // Véhicules avec assurance expirée
-        $expiredInsurance = Vehicle::where('organization_id', $organizationId)
-            ->where('insurance_expiry_date', '<', now())
-            ->where('status', 'active')
-            ->count();
+        try {
+            // Véhicules avec assurance expirée - seulement si la colonne existe
+            if (DB::getSchemaBuilder()->hasColumn('vehicles', 'insurance_expiry_date')) {
+                $expiredInsurance = Vehicle::where('organization_id', $organizationId)
+                    ->where('insurance_expiry_date', '<', now())
+                    ->where('status', 'active')
+                    ->count();
 
-        if ($expiredInsurance > 0) {
-            $criticalAlerts->push((object)[
-                'id' => 'expired_insurance',
-                'type' => 'vehicle',
-                'priority' => 'critical',
-                'title' => 'Assurances expirées',
-                'message' => "{$expiredInsurance} véhicule(s) avec assurance expirée",
-                'action_required' => true,
-                'created_at' => now()
-            ]);
+                if ($expiredInsurance > 0) {
+                    $criticalAlerts->push((object)[
+                        'id' => 'expired_insurance',
+                        'type' => 'vehicle',
+                        'priority' => 'critical',
+                        'title' => 'Assurances expirées',
+                        'message' => "{$expiredInsurance} véhicule(s) avec assurance expirée",
+                        'action_required' => true,
+                        'created_at' => now()
+                    ]);
+                }
+            }
+        } catch (\Exception $e) {
+            \Log::warning('Insurance alerts unavailable', ['error' => $e->getMessage()]);
         }
 
-        // Véhicules avec contrôle technique expiré
-        $expiredInspection = Vehicle::where('organization_id', $organizationId)
-            ->where('technical_inspection_date', '<', now())
-            ->where('status', 'active')
-            ->count();
+        try {
+            // Véhicules avec contrôle technique expiré - seulement si la colonne existe
+            if (DB::getSchemaBuilder()->hasColumn('vehicles', 'technical_inspection_date')) {
+                $expiredInspection = Vehicle::where('organization_id', $organizationId)
+                    ->where('technical_inspection_date', '<', now())
+                    ->where('status', 'active')
+                    ->count();
 
-        if ($expiredInspection > 0) {
-            $criticalAlerts->push((object)[
-                'id' => 'expired_inspection',
-                'type' => 'vehicle',
-                'priority' => 'critical',
-                'title' => 'Contrôles techniques expirés',
-                'message' => "{$expiredInspection} véhicule(s) avec contrôle technique expiré",
-                'action_required' => true,
-                'created_at' => now()
-            ]);
+                if ($expiredInspection > 0) {
+                    $criticalAlerts->push((object)[
+                        'id' => 'expired_inspection',
+                        'type' => 'vehicle',
+                        'priority' => 'critical',
+                        'title' => 'Contrôles techniques expirés',
+                        'message' => "{$expiredInspection} véhicule(s) avec contrôle technique expiré",
+                        'action_required' => true,
+                        'created_at' => now()
+                    ]);
+                }
+            }
+        } catch (\Exception $e) {
+            \Log::warning('Technical inspection alerts unavailable', ['error' => $e->getMessage()]);
         }
 
         return $criticalAlerts;
@@ -191,87 +215,112 @@ class AlertController extends Controller
     {
         return DB::table('maintenance_schedules')
             ->join('vehicles', 'maintenance_schedules.vehicle_id', '=', 'vehicles.id')
+            ->join('maintenance_types', 'maintenance_schedules.maintenance_type_id', '=', 'maintenance_types.id')
             ->where('maintenance_schedules.organization_id', $organizationId)
-            ->where('maintenance_schedules.next_maintenance_date', '<=', now()->addDays(7))
-            ->where('maintenance_schedules.status', '!=', 'completed')
+            ->where('maintenance_schedules.next_due_date', '<=', now()->addDays(7))
+            ->where('maintenance_schedules.is_active', true)
             ->select([
                 'maintenance_schedules.id',
-                'maintenance_schedules.maintenance_type',
-                'maintenance_schedules.next_maintenance_date',
-                'maintenance_schedules.priority',
+                'maintenance_types.name as maintenance_type',
+                'maintenance_schedules.next_due_date',
                 'vehicles.registration_plate',
                 'vehicles.brand',
                 'vehicles.model',
                 DB::raw("CASE
-                    WHEN next_maintenance_date < NOW() THEN 'overdue'
-                    WHEN next_maintenance_date <= DATE_ADD(NOW(), INTERVAL 1 DAY) THEN 'urgent'
-                    WHEN next_maintenance_date <= DATE_ADD(NOW(), INTERVAL 3 DAY) THEN 'high'
+                    WHEN next_due_date < NOW() THEN 'overdue'
+                    WHEN next_due_date <= NOW() + INTERVAL '1 day' THEN 'urgent'
+                    WHEN next_due_date <= NOW() + INTERVAL '3 days' THEN 'high'
                     ELSE 'medium'
                 END as alert_priority"),
+                DB::raw("CASE
+                    WHEN next_due_date < NOW() THEN 'urgent'
+                    WHEN next_due_date <= NOW() + INTERVAL '1 day' THEN 'urgent'
+                    WHEN next_due_date <= NOW() + INTERVAL '3 days' THEN 'high'
+                    ELSE 'medium'
+                END as priority"),
                 DB::raw("'maintenance' as type"),
                 'maintenance_schedules.created_at'
             ])
-            ->orderByRaw("FIELD(alert_priority, 'overdue', 'urgent', 'high', 'medium')")
-            ->orderBy('maintenance_schedules.next_maintenance_date')
+            ->orderByRaw("CASE
+                WHEN next_due_date < NOW() THEN 1
+                WHEN next_due_date <= NOW() + INTERVAL '1 day' THEN 2
+                WHEN next_due_date <= NOW() + INTERVAL '3 days' THEN 3
+                ELSE 4
+            END")
+            ->orderBy('maintenance_schedules.next_due_date')
             ->get();
     }
 
     /**
-     * Alertes budgétaires
+     * Alertes budgétaires - ENTERPRISE: Avec gestion d'absence de table
      */
     private function getBudgetAlerts($organizationId)
     {
-        return DB::table('expense_budgets')
-            ->where('organization_id', $organizationId)
-            ->where('status', 'active')
-            ->whereRaw('(spent_amount / budgeted_amount) * 100 >= warning_threshold')
-            ->select([
-                'id',
-                'scope_type',
-                'scope_description',
-                'budgeted_amount',
-                'spent_amount',
-                'warning_threshold',
-                'critical_threshold',
-                DB::raw('(spent_amount / budgeted_amount) * 100 as utilization_percentage'),
-                DB::raw("CASE
-                    WHEN spent_amount > budgeted_amount THEN 'budget_overrun'
-                    WHEN (spent_amount / budgeted_amount) * 100 >= critical_threshold THEN 'budget_critical'
-                    ELSE 'budget_warning'
-                END as type"),
-                DB::raw("CASE
-                    WHEN spent_amount > budgeted_amount THEN 'urgent'
-                    WHEN (spent_amount / budgeted_amount) * 100 >= critical_threshold THEN 'high'
-                    ELSE 'medium'
-                END as priority"),
-                'created_at'
-            ])
-            ->orderByRaw("FIELD(priority, 'urgent', 'high', 'medium')")
-            ->get();
+        try {
+            if (!DB::getSchemaBuilder()->hasTable('expense_budgets')) {
+                return collect([]);
+            }
+
+            return DB::table('expense_budgets')
+                ->where('organization_id', $organizationId)
+                ->where('status', 'active')
+                ->whereRaw('(spent_amount / budgeted_amount) * 100 >= warning_threshold')
+                ->select([
+                    'id',
+                    'scope_type',
+                    'scope_description',
+                    'budgeted_amount',
+                    'spent_amount',
+                    'warning_threshold',
+                    'critical_threshold',
+                    DB::raw('(spent_amount / budgeted_amount) * 100 as utilization_percentage'),
+                    DB::raw("CASE
+                        WHEN spent_amount > budgeted_amount THEN 'budget_overrun'
+                        WHEN (spent_amount / budgeted_amount) * 100 >= critical_threshold THEN 'budget_critical'
+                        ELSE 'budget_warning'
+                    END as type"),
+                    DB::raw("CASE
+                        WHEN spent_amount > budgeted_amount THEN 'urgent'
+                        WHEN (spent_amount / budgeted_amount) * 100 >= critical_threshold THEN 'high'
+                        ELSE 'medium'
+                    END as priority"),
+                    'created_at'
+                ])
+                ->orderByRaw("CASE priority WHEN 'urgent' THEN 1 WHEN 'high' THEN 2 ELSE 3 END")
+                ->get();
+        } catch (\Exception $e) {
+            \Log::warning('Error fetching budget alerts', ['error' => $e->getMessage()]);
+            return collect([]);
+        }
     }
 
     /**
-     * Alertes de réparation
+     * Alertes de réparation - ENTERPRISE: PostgreSQL compatible
      */
     private function getRepairAlerts($organizationId)
     {
-        return RepairRequest::with(['vehicle', 'requestedBy'])
+        return RepairRequest::with(['vehicle', 'driver'])
             ->where('organization_id', $organizationId)
-            ->whereIn('status', ['en_attente', 'accord_initial'])
+            ->whereIn('status', ['pending', 'supervisor_review', 'fleet_manager_review'])
             ->where('created_at', '>=', now()->subDays(30)) // Derniers 30 jours
-            ->orderByRaw("FIELD(priority, 'urgent', 'high', 'medium', 'low')")
+            ->orderByRaw("CASE urgency
+                WHEN 'urgent' THEN 1
+                WHEN 'high' THEN 2
+                WHEN 'medium' THEN 3
+                WHEN 'low' THEN 4
+                ELSE 5 END")
             ->orderBy('created_at', 'desc')
             ->get()
             ->map(function($repair) {
                 return (object)[
                     'id' => $repair->id,
                     'type' => 'repair',
-                    'priority' => $repair->priority,
-                    'title' => "Demande de réparation #{$repair->id}",
+                    'priority' => $repair->urgency ?? 'medium',
+                    'title' => $repair->title ?? "Demande de réparation #{$repair->id}",
                     'message' => $repair->description,
-                    'vehicle' => $repair->vehicle->registration_plate,
+                    'vehicle' => $repair->vehicle?->registration_plate ?? 'N/A',
                     'status' => $repair->status,
-                    'requested_by' => $repair->requestedBy->name,
+                    'requested_by' => $repair->driver?->name ?? 'N/A',
                     'created_at' => $repair->created_at,
                     'days_pending' => $repair->created_at->diffInDays(now())
                 ];

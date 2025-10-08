@@ -88,6 +88,11 @@ class RepairRequestManager extends Component
 
     public function render()
     {
+        // Toujours recharger les données de référence pour s'assurer qu'elles sont disponibles
+        if (empty($this->vehicles)) {
+            $this->loadReferenceData();
+        }
+
         $repairRequests = $this->getFilteredRequests();
         $stats = $this->getRepairStats();
         $kanbanData = $this->getKanbanData();
@@ -95,7 +100,9 @@ class RepairRequestManager extends Component
         return view('livewire.admin.repair-request-manager-kanban', [
             'repairRequests' => $repairRequests,
             'kanbanData' => $kanbanData,
-            'stats' => $stats
+            'stats' => $stats,
+            'vehicles' => $this->vehicles,
+            'suppliers' => $this->suppliers
         ])->layout('layouts.admin.catalyst');
     }
 
