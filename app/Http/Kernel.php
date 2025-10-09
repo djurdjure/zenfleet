@@ -70,5 +70,8 @@ class Kernel extends HttpKernel
 
         // 🏢 MIDDLEWARE ENTERPRISE ULTRA-PROFESSIONNEL
         'enterprise.permission' => \App\Http\Middleware\EnterprisePermissionMiddleware::class,
+        
+        // 📊 MIDDLEWARE MODULE KILOMÉTRAGE ENTERPRISE-GRADE
+        'mileage.access' => \App\Http\Middleware\MileageAccessMiddleware::class,
     ];
 }

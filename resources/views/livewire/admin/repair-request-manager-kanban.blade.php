@@ -574,6 +574,6 @@
         </div>
     </div>
 
-    {{-- 🔧 MODALS - Formulaires de gestion --}}
-    @include('livewire.admin.repair-request-modals')
+    {{-- 🔧 MODALS - Formulaires de gestion ULTRA ENTERPRISE GRADE --}}
+    @include('livewire.admin.repair-request-modals-enterprise')
 </div>

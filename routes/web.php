@@ -189,11 +189,10 @@ Route::middleware(['auth', 'verified'])
     Route::middleware(['auth', 'verified', 'enterprise.permission'])->group(function () {
 
         // 📊 Relevés Kilométriques - Module Complet (Livewire 3 Pattern)
-        Route::prefix('mileage-readings')->name('mileage-readings.')->group(function () {
-            // Vue globale des relevés
+        Route::prefix('mileage-readings')->name('mileage-readings.')->middleware('mileage.access')->group(function () {
+            // Vue globale des relevés - Accès géré par middleware enterprise-grade
             Route::get('/', [\App\Http\Controllers\Admin\MileageReadingController::class, 'index'])
-                ->name('index')
-                ->middleware('can:view own mileage readings');
+                ->name('index');
 
             // Mise à jour du kilométrage (tous les rôles selon permissions)
             Route::get('/update/{vehicle?}', [\App\Http\Controllers\Admin\MileageReadingController::class, 'update'])
@@ -300,12 +299,23 @@ Route::middleware(['auth', 'verified'])
         | - Traçabilité maximale pour dépenses
         */
 
-        // 🔧 MODULE RÉPARATIONS - Workflow Validation 2 Niveaux
+        // 🔧 MODULE DEMANDES DE RÉPARATION ENTERPRISE-GRADE
         Route::prefix('repair-requests')->name('repair-requests.')->group(function () {
-            // CRUD operations - Utilisation de Livewire Kanban avec layout
-            Route::get('/', [\App\Http\Controllers\Admin\RepairRequestLivewireController::class, 'index'])->name('index');
-
-            // Actions API pour le workflow (utilisées par Livewire)
+            // Vue principale avec composant Livewire Ultra-Professionnel
+            Route::get('/', function() {
+                return view('admin.repair-requests.index');
+            })->name('index');
+            
+            // CRUD Operations
+            Route::get('/create', [\App\Http\Controllers\Admin\RepairRequestController::class, 'create'])->name('create');
+            Route::post('/', [\App\Http\Controllers\Admin\RepairRequestController::class, 'store'])->name('store');
+            Route::get('/export', [\App\Http\Controllers\Admin\RepairRequestController::class, 'export'])->name('export');
+            Route::get('/{repairRequest}', [\App\Http\Controllers\Admin\RepairRequestController::class, 'show'])->name('show');
+            Route::get('/{repairRequest}/edit', [\App\Http\Controllers\Admin\RepairRequestController::class, 'edit'])->name('edit');
+            Route::put('/{repairRequest}', [\App\Http\Controllers\Admin\RepairRequestController::class, 'update'])->name('update');
+            Route::delete('/{repairRequest}', [\App\Http\Controllers\Admin\RepairRequestController::class, 'destroy'])->name('destroy');
+            
+            // Workflow d'approbation à 2 niveaux
             Route::post('/{repairRequest}/approve-supervisor', [\App\Http\Controllers\Admin\RepairRequestController::class, 'approveSupervisor'])->name('approve-supervisor');
             Route::post('/{repairRequest}/reject-supervisor', [\App\Http\Controllers\Admin\RepairRequestController::class, 'rejectSupervisor'])->name('reject-supervisor');
             Route::post('/{repairRequest}/approve-fleet-manager', [\App\Http\Controllers\Admin\RepairRequestController::class, 'approveFleetManager'])->name('approve-fleet-manager');

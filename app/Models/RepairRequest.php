@@ -95,6 +95,7 @@ class RepairRequest extends Model
         'organization_id',
         'vehicle_id',
         'driver_id',
+        'category_id',
         'status',
         'title',
         'description',
@@ -129,6 +130,7 @@ class RepairRequest extends Model
         'organization_id' => 'integer',
         'vehicle_id' => 'integer',
         'driver_id' => 'integer',
+        'category_id' => 'integer',
         'supervisor_id' => 'integer',
         'fleet_manager_id' => 'integer',
         'rejected_by' => 'integer',
@@ -181,6 +183,14 @@ class RepairRequest extends Model
     public function driver(): BelongsTo
     {
         return $this->belongsTo(Driver::class);
+    }
+
+    /**
+     * Get the category of this repair request.
+     */
+    public function category(): BelongsTo
+    {
+        return $this->belongsTo(RepairCategory::class, 'category_id');
     }
 
     /**

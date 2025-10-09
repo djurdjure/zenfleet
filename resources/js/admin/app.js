@@ -6,6 +6,7 @@
 
 // ✅ CORRECTION: Import CSS admin en premier
 import '../../css/admin/app.css';
+import '../../css/enterprise-design-system.css';
 
 // Import des dépendances système (ESM)
 import axios from 'axios';

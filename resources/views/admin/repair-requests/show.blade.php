@@ -1,4 +1,4 @@
-@extends('layouts.admin')
+@extends('layouts.admin.catalyst-enterprise')
 
 @section('title', 'Demande de Réparation #' . $repairRequest->id)
 

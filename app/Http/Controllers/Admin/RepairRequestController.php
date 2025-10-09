@@ -8,12 +8,14 @@ use App\Http\Requests\RejectRepairRequestRequest;
 use App\Http\Requests\StoreRepairRequestRequest;
 use App\Models\Driver;
 use App\Models\RepairRequest;
+use App\Models\RepairCategory;
 use App\Models\Vehicle;
 use App\Models\VehicleCategory;
 use App\Models\VehicleDepot;
 use App\Services\RepairRequestService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\View\View as BladeView;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -63,7 +65,6 @@ class RepairRequestController extends Controller
             'supervisor',
             'fleetManager',
             'category',
-            'depot',
         ])
             ->where('organization_id', $user->organization_id);
 
@@ -136,7 +137,7 @@ class RepairRequestController extends Controller
     /**
      * Show the form for creating a new repair request.
      */
-    public function create(Request $request): Response
+    public function create(Request $request): BladeView|Response
     {
         $this->authorize('create', RepairRequest::class);
 
@@ -146,47 +147,49 @@ class RepairRequestController extends Controller
         $drivers = Driver::with('user')
             ->where('organization_id', $user->organization_id)
             ->whereNull('deleted_at')
-            ->get()
-            ->map(fn($driver) => [
-                'id' => $driver->id,
-                'name' => $driver->user->name ?? 'N/A',
-                'license_number' => $driver->license_number,
-                'supervisor_id' => $driver->supervisor_id,
-            ]);
+            ->get();
 
         $vehicles = Vehicle::where('organization_id', $user->organization_id)
+            ->where('status', 'active')
             ->whereNull('deleted_at')
-            ->get()
-            ->map(fn($vehicle) => [
-                'id' => $vehicle->id,
-                'name' => $vehicle->vehicle_name ?? $vehicle->license_plate,
-                'license_plate' => $vehicle->license_plate,
-                'brand' => $vehicle->brand,
-                'model' => $vehicle->model,
+            ->get();
+
+        // ✅ UTILISER RepairCategory au lieu de VehicleCategory
+        $categories = RepairCategory::where('organization_id', $user->organization_id)
+            ->where('is_active', true)
+            ->orderBy('sort_order')
+            ->orderBy('name')
+            ->get();
+
+        // 🎯 DÉTECTION: Blade ou Inertia
+        if ($request->wantsJson() || $request->header('X-Inertia')) {
+            // Format Inertia pour Vue.js
+            return Inertia::render('RepairRequests/Create', [
+                'drivers' => $drivers->map(fn($driver) => [
+                    'id' => $driver->id,
+                    'name' => $driver->user->name ?? 'N/A',
+                    'license_number' => $driver->license_number,
+                    'supervisor_id' => $driver->supervisor_id,
+                ]),
+                'vehicles' => $vehicles->map(fn($vehicle) => [
+                    'id' => $vehicle->id,
+                    'name' => $vehicle->vehicle_name ?? $vehicle->registration_plate,
+                    'registration_plate' => $vehicle->registration_plate,
+                    'brand' => $vehicle->brand,
+                    'model' => $vehicle->model,
+                ]),
+                'categories' => $categories,
+                'urgencyLevels' => [
+                    RepairRequest::URGENCY_LOW => 'Faible',
+                    RepairRequest::URGENCY_NORMAL => 'Normal',
+                    RepairRequest::URGENCY_HIGH => 'Élevé',
+                    RepairRequest::URGENCY_CRITICAL => 'Critique',
+                ],
             ]);
+        }
 
-        $categories = VehicleCategory::where('organization_id', $user->organization_id)
-            ->where('is_active', true)
-            ->ordered()
-            ->get();
-
-        $depots = VehicleDepot::where('organization_id', $user->organization_id)
-            ->where('is_active', true)
-            ->ordered()
-            ->get();
-
-        return Inertia::render('RepairRequests/Create', [
-            'drivers' => $drivers,
-            'vehicles' => $vehicles,
-            'categories' => $categories,
-            'depots' => $depots,
-            'urgencyLevels' => [
-                RepairRequest::URGENCY_LOW => 'Faible',
-                RepairRequest::URGENCY_NORMAL => 'Normal',
-                RepairRequest::URGENCY_HIGH => 'Élevé',
-                RepairRequest::URGENCY_CRITICAL => 'Critique',
-            ],
-        ]);
+        // 🎨 Vue Blade pour navigation standard
+        return view('admin.repair-requests.create', compact('drivers', 'vehicles', 'categories'));
     }
 
     /**
@@ -200,7 +203,7 @@ class RepairRequestController extends Controller
             $repairRequest = $this->repairService->createRequest($request->validated());
 
             return redirect()
-                ->route('repair-requests.show', $repairRequest)
+                ->route('admin.repair-requests.show', $repairRequest)
                 ->with('success', 'Demande de réparation créée avec succès. Le superviseur a été notifié.');
         } catch (\Exception $e) {
             return redirect()
@@ -213,7 +216,7 @@ class RepairRequestController extends Controller
     /**
      * Display the specified repair request.
      */
-    public function show(Request $request, RepairRequest $repairRequest): Response
+    public function show(Request $request, RepairRequest $repairRequest): BladeView|Response
     {
         $this->authorize('view', $repairRequest);
 
@@ -221,29 +224,31 @@ class RepairRequestController extends Controller
         $repairRequest->load([
             'driver.user',
             'driver.supervisor',
-            'vehicle.category',
-            'vehicle.depot',
+            'vehicle',
             'supervisor',
             'fleetManager',
             'category',
-            'depot',
             'maintenanceOperation',
-            'history.user',
-            'notifications.user',
         ]);
 
-        return Inertia::render('RepairRequests/Show', [
-            'repairRequest' => $repairRequest,
-            'can' => [
-                'update' => $request->user()->can('update', $repairRequest),
-                'delete' => $request->user()->can('delete', $repairRequest),
-                'approveLevel1' => $request->user()->can('approveLevelOne', $repairRequest),
-                'rejectLevel1' => $request->user()->can('rejectLevelOne', $repairRequest),
-                'approveLevel2' => $request->user()->can('approveLevelTwo', $repairRequest),
-                'rejectLevel2' => $request->user()->can('rejectLevelTwo', $repairRequest),
-                'viewHistory' => $request->user()->can('viewHistory', $repairRequest),
-            ],
-        ]);
+        // 🎯 DÉTECTION: Blade ou Inertia
+        if ($request->wantsJson() || $request->header('X-Inertia')) {
+            return Inertia::render('RepairRequests/Show', [
+                'repairRequest' => $repairRequest,
+                'can' => [
+                    'update' => $request->user()->can('update', $repairRequest),
+                    'delete' => $request->user()->can('delete', $repairRequest),
+                    'approveLevel1' => $request->user()->can('approveLevelOne', $repairRequest),
+                    'rejectLevel1' => $request->user()->can('rejectLevelOne', $repairRequest),
+                    'approveLevel2' => $request->user()->can('approveLevelTwo', $repairRequest),
+                    'rejectLevel2' => $request->user()->can('rejectLevelTwo', $repairRequest),
+                    'viewHistory' => $request->user()->can('viewHistory', $repairRequest),
+                ],
+            ]);
+        }
+
+        // 🎨 Vue Blade pour navigation standard
+        return view('admin.repair-requests.show', compact('repairRequest'));
     }
 
     /**

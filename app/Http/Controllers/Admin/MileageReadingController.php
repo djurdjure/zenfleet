@@ -21,11 +21,14 @@ class MileageReadingController extends Controller
      *
      * Cette méthode retourne une vue Blade qui charge le composant Livewire
      * MileageReadingsIndex pour une gestion interactive des relevés.
+     * 
+     * L'accès est géré par le middleware MileageAccessMiddleware de manière enterprise-grade.
      *
      * @return \Illuminate\View\View
      */
     public function index()
     {
+        // L'accès est déjà vérifié par le middleware mileage.access
         return view('admin.mileage-readings.index');
     }
 
