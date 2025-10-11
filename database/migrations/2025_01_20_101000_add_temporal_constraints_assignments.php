@@ -29,6 +29,12 @@ return new class extends Migration
             return;
         }
 
+        // Skip si la table assignments n'existe pas encore
+        if (!Schema::hasTable('assignments')) {
+            echo "⚠️  Table assignments n'existe pas encore, skip temporal constraints\n";
+            return;
+        }
+
         // ===== EXTENSION POSTGRESQL REQUISE =====
         DB::statement('CREATE EXTENSION IF NOT EXISTS "btree_gist"');
 

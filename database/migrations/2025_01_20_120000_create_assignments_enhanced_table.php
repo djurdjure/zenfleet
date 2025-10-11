@@ -24,6 +24,12 @@ return new class extends Migration
      */
     public function up(): void
     {
+        // Vérifier que les tables dépendantes existent
+        if (!Schema::hasTable('vehicles') || !Schema::hasTable('drivers')) {
+            echo "⚠️  Tables vehicles/drivers n'existent pas encore, skip assignments creation\n";
+            return;
+        }
+
         // Vérifier si la table existe déjà
         if (Schema::hasTable('assignments')) {
             echo "⚠️  Table assignments existe déjà, extension avec nouvelles colonnes\n";

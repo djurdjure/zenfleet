@@ -24,6 +24,12 @@ return new class extends Migration
      */
     public function up(): void
     {
+        // Vérifier que les tables essentielles existent
+        if (!Schema::hasTable('vehicles')) {
+            echo "⚠️  Table vehicles n'existe pas encore, skip work orders system\n";
+            return;
+        }
+
         // ===== SYSTÈME FOURNISSEURS ÉVOLUÉ =====
         $this->createAdvancedSuppliersSystem();
 

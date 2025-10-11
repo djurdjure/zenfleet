@@ -169,7 +169,11 @@ return new class extends Migration
             // Index pour performance
             $table->index(['parent_organization_id', 'hierarchy_depth']);
             $table->index(['is_tenant_root', 'status']);
-            $table->index(['subscription_tier', 'status']);
+
+            // Index subscription_tier seulement si la colonne existe
+            if (Schema::hasColumn('organizations', 'subscription_tier')) {
+                $table->index(['subscription_tier', 'status']);
+            }
         });
 
         echo "✅ Table organizations étendue\n";

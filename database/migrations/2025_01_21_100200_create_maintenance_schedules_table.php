@@ -11,6 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
+        // Skip si la table vehicles n'existe pas encore
+        if (!Schema::hasTable('vehicles')) {
+            echo "⚠️  Table vehicles n'existe pas encore, skip maintenance_schedules\n";
+            return;
+        }
+
         Schema::create('maintenance_schedules', function (Blueprint $table) {
             $table->id();
             $table->foreignId('organization_id')

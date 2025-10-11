@@ -13,6 +13,12 @@ return new class extends Migration
      */
     public function up(): void
     {
+        // Skip si la table assignments n'existe pas encore
+        if (!Schema::hasTable('assignments')) {
+            echo "⚠️  Table assignments n'existe pas encore, skip adding fields\n";
+            return;
+        }
+
         Schema::table('assignments', function (Blueprint $table) {
             // Champs multi-tenant enterprise
             $table->foreignId('organization_id')->after('id')->constrained('organizations')->onDelete('cascade');

@@ -236,23 +236,26 @@ return new class extends Migration
             )
         ');
 
-        // Policy pour Super Admins (accès complet)
-        DB::statement('
-            CREATE POLICY audit_super_admin_access
-            ON comprehensive_audit_logs
-            USING (
-                EXISTS (
-                    SELECT 1 FROM users u
-                    JOIN model_has_roles mhr ON u.id = mhr.model_id
-                    JOIN roles r ON mhr.role_id = r.id
-                    WHERE u.id = current_setting(\'app.current_user_id\', true)::BIGINT
-                    AND r.name = \'Super Admin\'
-                    AND mhr.model_type = \'App\\\\Models\\\\User\'
+        // Policy pour Super Admins (accès complet) - seulement si Spatie Permission est installé
+        if (Schema::hasTable('model_has_roles') && Schema::hasTable('roles')) {
+            DB::statement('
+                CREATE POLICY audit_super_admin_access
+                ON comprehensive_audit_logs
+                USING (
+                    EXISTS (
+                        SELECT 1 FROM users u
+                        JOIN model_has_roles mhr ON u.id = mhr.model_id
+                        JOIN roles r ON mhr.role_id = r.id
+                        WHERE u.id = current_setting(\'app.current_user_id\', true)::BIGINT
+                        AND r.name = \'Super Admin\'
+                        AND mhr.model_type = \'App\\\\Models\\\\User\'
+                    )
                 )
-            )
-        ');
-
-        echo "✅ Row Level Security configuré\n";
+            ');
+            echo "✅ Row Level Security configuré avec policy Super Admin\n";
+        } else {
+            echo "⚠️  Spatie Permission non installé, policy Super Admin skippée\n";
+        }
     }
 
     /**

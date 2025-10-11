@@ -45,6 +45,15 @@ return new class extends Migration
      */
     private function addCriticalIndexes(): void
     {
+        // Vérifier que les tables essentielles existent
+        $requiredTables = ['vehicles', 'drivers', 'assignments'];
+        foreach ($requiredTables as $table) {
+            if (!Schema::hasTable($table)) {
+                echo "⚠️  Table {$table} n'existe pas, skip index creation\n";
+                return;
+            }
+        }
+
         $indexes = [
             // Index véhicules essentiels
             'CREATE INDEX IF NOT EXISTS idx_vehicles_org_active ON vehicles (organization_id, status_id) WHERE deleted_at IS NULL',
