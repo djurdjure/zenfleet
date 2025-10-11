@@ -741,7 +741,14 @@ class DriverController extends Controller
             // Initialisation des compteurs et variables
             $successCount = 0;
             $errorRows = [];
-            $statuses = DriverStatus::pluck('id', 'name');
+            // 🔧 CORRECTION: Utiliser withoutGlobalScope pour accéder aux statuts globaux
+            $statuses = DriverStatus::withoutGlobalScope('organization')
+                ->where(function ($query) {
+                    $organizationId = auth()->user()->organization_id;
+                    $query->whereNull('organization_id')
+                          ->orWhere('organization_id', $organizationId);
+                })
+                ->pluck('id', 'name');
             $defaultStatusId = $statuses->get('Disponible');
 
             Log::info('Driver import validation passed', [
@@ -1376,7 +1383,13 @@ class DriverController extends Controller
         }
 
         // Rechercher le statut dans la base
-        $status = \App\Models\DriverStatus::where('organization_id', auth()->user()->organization_id)
+        // 🔧 CORRECTION: Utiliser withoutGlobalScope pour accéder aux statuts globaux
+        $status = \App\Models\DriverStatus::withoutGlobalScope('organization')
+            ->where(function($query) {
+                $organizationId = auth()->user()->organization_id;
+                $query->whereNull('organization_id')
+                      ->orWhere('organization_id', $organizationId);
+            })
             ->where(function($query) use ($statusName, $normalizedText) {
                 $query->whereRaw('LOWER(name) = ?', [strtolower($statusName)])
                       ->orWhereRaw('LOWER(name) = ?', [$normalizedText]);
@@ -1389,7 +1402,13 @@ class DriverController extends Controller
         }
 
         // Si aucun statut trouvé, utiliser le statut par défaut 'Disponible'
-        $defaultStatus = \App\Models\DriverStatus::where('organization_id', auth()->user()->organization_id)
+        // 🔧 CORRECTION: Utiliser withoutGlobalScope pour accéder aux statuts globaux
+        $defaultStatus = \App\Models\DriverStatus::withoutGlobalScope('organization')
+            ->where(function($query) {
+                $organizationId = auth()->user()->organization_id;
+                $query->whereNull('organization_id')
+                      ->orWhere('organization_id', $organizationId);
+            })
             ->where('name', 'Disponible')
             ->first();
 
@@ -1821,8 +1840,10 @@ class DriverController extends Controller
                     ->orderBy('name')
                     ->get();
             } else {
+                // 🔧 CORRECTION: Désactiver le global scope pour accéder aux statuts globaux
                 // Autres utilisateurs voient les statuts de leur organisation + globaux
-                $statuses = DriverStatus::where('is_active', true)
+                $statuses = DriverStatus::withoutGlobalScope('organization')
+                    ->where('is_active', true)
                     ->where(function ($query) use ($organizationId) {
                         $query->whereNull('organization_id')  // Statuts globaux
                               ->orWhere('organization_id', $organizationId); // Statuts de l'organisation
@@ -1842,7 +1863,8 @@ class DriverController extends Controller
                 $this->createDefaultDriverStatuses($organizationId);
                 
                 // Recharger les statuts après création
-                $statuses = DriverStatus::where('is_active', true)
+                $statuses = DriverStatus::withoutGlobalScope('organization')
+                    ->where('is_active', true)
                     ->where(function ($query) use ($organizationId) {
                         $query->whereNull('organization_id')
                               ->orWhere('organization_id', $organizationId);
