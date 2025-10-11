@@ -925,22 +925,26 @@ document.addEventListener('DOMContentLoaded', function() {
         }, index * 200);
     });
 
-    // Configuration Tom Select pour les véhicules
+    // 🚀 Configuration Tom Select ENTERPRISE pour les véhicules
     const vehicleSelect = new TomSelect('#select-vehicle', {
         create: false,
         sortField: 'text',
         placeholder: 'Recherchez par immatriculation, marque ou modèle...',
-        searchField: ['text', 'data-plate', 'data-brand', 'data-model'],
+        searchField: ['text'],
+        maxOptions: 100,
         render: {
             option: function(data, escape) {
-                const plate = data.dataset?.plate || '';
-                const brand = data.dataset?.brand || '';
-                const model = data.dataset?.model || '';
-                const mileage = data.dataset?.mileage || '0';
-                const type = data.dataset?.type || 'N/A';
-                const status = data.dataset?.status || 'N/A';
+                // ✅ CORRECTION ENTERPRISE : Accès correct aux attributs data-*
+                const plate = data['data-plate'] || data.text.split(' - ')[0] || '';
+                const brand = data['data-brand'] || '';
+                const model = data['data-model'] || '';
+                const mileage = data['data-mileage'] || '0';
+                const type = data['data-type'] || 'N/A';
+                const status = data['data-status'] || 'N/A';
 
-                return `<div class="py-3 px-4 hover:bg-blue-50 transition-colors duration-200">
+                console.log('🚗 Véhicule render:', { plate, brand, model, mileage, type, status });
+
+                return `<div class="py-3 px-4 hover:bg-blue-50 transition-colors duration-200 border-b border-gray-100 last:border-0">
                     <div class="flex items-center">
                         <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-700 rounded-xl flex items-center justify-center mr-4 shadow-lg">
                             <i class="fas fa-car text-white"></i>
@@ -958,55 +962,88 @@ document.addEventListener('DOMContentLoaded', function() {
                 </div>`;
             },
             item: function(data, escape) {
-                const plate = data.dataset?.plate || '';
-                const brand = data.dataset?.brand || '';
-                const model = data.dataset?.model || '';
+                // ✅ CORRECTION ENTERPRISE : Accès correct aux attributs
+                const plate = data['data-plate'] || data.text.split(' - ')[0] || '';
+                const brand = data['data-brand'] || '';
+                const model = data['data-model'] || '';
                 return `<div>${escape(plate)} - ${escape(brand)} ${escape(model)}</div>`;
+            },
+            no_results: function(data, escape) {
+                return '<div class="py-4 px-4 text-center text-gray-500"><i class="fas fa-search mr-2"></i>Aucun véhicule trouvé</div>';
             }
         },
         onChange: function(value) {
-            // Mise à jour du kilométrage suggéré
+            // ✅ Mise à jour du kilométrage suggéré avec fallback robuste
             const option = this.options[value];
-            if (option && option.dataset?.mileage) {
-                const mileage = option.dataset.mileage;
+            if (option) {
+                const mileage = option['data-mileage'] || '0';
                 document.getElementById('start_mileage').value = mileage;
                 document.getElementById('vehicle-mileage-hint').textContent =
                     `Kilométrage actuel: ${parseInt(mileage).toLocaleString('fr-FR')} km`;
+                console.log('✅ Véhicule sélectionné:', value, 'Kilométrage:', mileage);
             }
+        },
+        onInitialize: function() {
+            console.log('🚗 Tom Select Véhicules initialisé avec', Object.keys(this.options).length, 'options');
         }
     });
 
-    // Configuration Tom Select pour les chauffeurs
+    // 🚀 Configuration Tom Select ENTERPRISE pour les chauffeurs
     const driverSelect = new TomSelect('#select-driver', {
         create: false,
         sortField: 'text',
         placeholder: 'Recherchez par nom, téléphone ou n° de permis...',
-        searchField: ['text', 'data-name', 'data-phone', 'data-license'],
+        searchField: ['text'],
+        maxOptions: 100,
         render: {
             option: function(data, escape) {
-                const name = data.dataset?.name || '';
-                const phone = data.dataset?.phone || '';
-                const license = data.dataset?.license || '';
+                // ✅ CORRECTION ENTERPRISE : Accès correct aux attributs data-*
+                const name = data['data-name'] || data.text.split(' - ')[0] || '';
+                const phone = data['data-phone'] || '';
+                const license = data['data-license'] || '';
+                const email = data['data-email'] || '';
 
-                return `<div class="py-2 px-3">
+                console.log('👤 Chauffeur render:', { name, phone, license, email });
+
+                return `<div class="py-3 px-4 hover:bg-green-50 transition-colors duration-200 border-b border-gray-100 last:border-0">
                     <div class="flex items-center">
-                        <div class="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center mr-3">
-                            <i class="fas fa-user-tie text-green-600 text-sm"></i>
+                        <div class="w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl flex items-center justify-center mr-4 shadow-lg">
+                            <i class="fas fa-user-tie text-white"></i>
                         </div>
                         <div class="flex-1">
-                            <div class="font-semibold text-sm">${escape(name)}</div>
-                            <div class="text-xs text-gray-500">
-                                ${phone ? `<i class="fas fa-phone mr-1"></i>${escape(phone)}` : ''}
-                                ${license ? `<i class="fas fa-id-card ml-2 mr-1"></i>Permis: ${escape(license)}` : ''}
+                            <div class="font-bold text-sm text-gray-900">${escape(name)}</div>
+                            <div class="flex items-center space-x-3 text-xs text-gray-500 mt-1">
+                                ${phone ? `<span><i class="fas fa-phone mr-1 text-green-600"></i>${escape(phone)}</span>` : ''}
+                                ${license ? `<span><i class="fas fa-id-card mr-1 text-blue-600"></i>Permis: ${escape(license)}</span>` : ''}
                             </div>
+                            ${email ? `<div class="text-xs text-gray-400 mt-1"><i class="fas fa-envelope mr-1"></i>${escape(email)}</div>` : ''}
+                        </div>
+                        <div class="ml-2">
+                            <span class="px-2 py-1 bg-green-100 text-green-700 rounded-full text-xs font-medium">
+                                <i class="fas fa-check-circle mr-1"></i>Disponible
+                            </span>
                         </div>
                     </div>
                 </div>`;
             },
             item: function(data, escape) {
-                const name = data.dataset?.name || '';
-                return `<div>${escape(name)}</div>`;
+                // ✅ CORRECTION ENTERPRISE : Accès correct aux attributs
+                const name = data['data-name'] || data.text.split(' - ')[0] || '';
+                return `<div class="flex items-center">
+                    <i class="fas fa-user-tie text-green-600 mr-2"></i>
+                    ${escape(name)}
+                </div>`;
+            },
+            no_results: function(data, escape) {
+                return '<div class="py-4 px-4 text-center text-gray-500"><i class="fas fa-search mr-2"></i>Aucun chauffeur trouvé</div>';
             }
+        },
+        onInitialize: function() {
+            console.log('👤 Tom Select Chauffeurs initialisé avec', Object.keys(this.options).length, 'options');
+        },
+        onChange: function(value) {
+            console.log('✅ Chauffeur sélectionné:', value);
+            updateFormValidation();
         }
     });
 
