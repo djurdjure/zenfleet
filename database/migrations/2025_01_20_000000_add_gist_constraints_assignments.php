@@ -26,9 +26,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        // Vérifier que PostgreSQL est utilisé
+        // Skip si PostgreSQL n'est pas utilisé (ex: tests avec SQLite)
         if (DB::connection()->getDriverName() !== 'pgsql') {
-            throw new Exception('Les contraintes GIST nécessitent PostgreSQL. Driver actuel: ' . DB::connection()->getDriverName());
+            // Les contraintes GIST sont spécifiques à PostgreSQL
+            // En test SQLite, on s'appuie sur la validation Livewire uniquement
+            return;
         }
 
         // Activer l'extension btree_gist si pas déjà fait
@@ -198,6 +200,11 @@ return new class extends Migration
      */
     public function down(): void
     {
+        // Skip si PostgreSQL n'est pas utilisé
+        if (DB::connection()->getDriverName() !== 'pgsql') {
+            return;
+        }
+
         // Supprimer les contraintes d'exclusion
         DB::statement("ALTER TABLE assignments DROP CONSTRAINT IF EXISTS assignments_vehicle_no_overlap;");
         DB::statement("ALTER TABLE assignments DROP CONSTRAINT IF EXISTS assignments_driver_no_overlap;");

@@ -50,7 +50,11 @@ return new class extends Migration
      */
     private function createAdvancedSuppliersSystem(): void
     {
-        // Extension de la table suppliers existante
+        // Extension de la table suppliers existante (si elle existe)
+        if (!Schema::hasTable('suppliers')) {
+            return; // Skip si la table n'existe pas
+        }
+
         Schema::table('suppliers', function (Blueprint $table) {
             // Classification fournisseur
             $table->string('supplier_category')->default('parts'); // parts, service, fuel, insurance

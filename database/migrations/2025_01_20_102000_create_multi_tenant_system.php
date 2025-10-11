@@ -79,12 +79,14 @@ return new class extends Migration
             $table->index(['expires_at']);
         });
 
-        // ===== CONTRAINTES BUSINESS =====
-        DB::statement('
-            ALTER TABLE user_organizations
-            ADD CONSTRAINT chk_one_primary_per_user
-            EXCLUDE (user_id WITH =) WHERE (is_primary = true AND is_active = true)
-        ');
+        // ===== CONTRAINTES BUSINESS (PostgreSQL uniquement) =====
+        if (DB::connection()->getDriverName() === 'pgsql') {
+            DB::statement('
+                ALTER TABLE user_organizations
+                ADD CONSTRAINT chk_one_primary_per_user
+                EXCLUDE (user_id WITH =) WHERE (is_primary = true AND is_active = true)
+            ');
+        }
 
         echo "✅ Table user_organizations créée\n";
     }
@@ -178,6 +180,11 @@ return new class extends Migration
      */
     private function createOrganizationHierarchy(): void
     {
+        // Skip si PostgreSQL n'est pas utilisé
+        if (DB::connection()->getDriverName() !== 'pgsql') {
+            return;
+        }
+
         // ===== FONCTION DE MISE À JOUR DU CHEMIN HIÉRARCHIQUE =====
         DB::statement('
             CREATE OR REPLACE FUNCTION update_organization_hierarchy()
@@ -266,6 +273,11 @@ return new class extends Migration
      */
     private function enableGlobalRowLevelSecurity(): void
     {
+        // Skip si PostgreSQL n'est pas utilisé
+        if (DB::connection()->getDriverName() !== 'pgsql') {
+            return;
+        }
+
         $tables = [
             'vehicles', 'drivers', 'assignments', 'maintenance_plans',
             'maintenance_logs', 'documents', 'suppliers'
@@ -317,6 +329,11 @@ return new class extends Migration
      */
     private function createUtilityFunctions(): void
     {
+        // Skip si PostgreSQL n'est pas utilisé
+        if (DB::connection()->getDriverName() !== 'pgsql') {
+            return;
+        }
+
         // ===== FONCTION D'OBTENTION DES ORGANISATIONS ACCESSIBLES =====
         DB::statement('
             CREATE OR REPLACE FUNCTION get_user_accessible_organizations(p_user_id BIGINT)
@@ -385,23 +402,26 @@ return new class extends Migration
      */
     public function down(): void
     {
-        // Désactive RLS
-        $tables = ['vehicles', 'drivers', 'assignments', 'maintenance_plans', 'maintenance_logs', 'documents', 'suppliers'];
-        foreach ($tables as $table) {
-            if (Schema::hasTable($table)) {
-                DB::statement("ALTER TABLE {$table} DISABLE ROW LEVEL SECURITY");
-                DB::statement("DROP POLICY IF EXISTS {$table}_organization_isolation ON {$table}");
-                DB::statement("DROP POLICY IF EXISTS {$table}_super_admin_access ON {$table}");
+        // Skip PostgreSQL-specific cleanup si pas PostgreSQL
+        if (DB::connection()->getDriverName() === 'pgsql') {
+            // Désactive RLS
+            $tables = ['vehicles', 'drivers', 'assignments', 'maintenance_plans', 'maintenance_logs', 'documents', 'suppliers'];
+            foreach ($tables as $table) {
+                if (Schema::hasTable($table)) {
+                    DB::statement("ALTER TABLE {$table} DISABLE ROW LEVEL SECURITY");
+                    DB::statement("DROP POLICY IF EXISTS {$table}_organization_isolation ON {$table}");
+                    DB::statement("DROP POLICY IF EXISTS {$table}_super_admin_access ON {$table}");
+                }
             }
+
+            // Supprime fonctions
+            DB::statement('DROP FUNCTION IF EXISTS get_user_accessible_organizations(BIGINT)');
+            DB::statement('DROP FUNCTION IF EXISTS user_has_permission(BIGINT, BIGINT, TEXT)');
+            DB::statement('DROP FUNCTION IF EXISTS update_organization_hierarchy()');
+
+            // Supprime triggers
+            DB::statement('DROP TRIGGER IF EXISTS trg_organization_hierarchy ON organizations');
         }
-
-        // Supprime fonctions
-        DB::statement('DROP FUNCTION IF EXISTS get_user_accessible_organizations(BIGINT)');
-        DB::statement('DROP FUNCTION IF EXISTS user_has_permission(BIGINT, BIGINT, TEXT)');
-        DB::statement('DROP FUNCTION IF EXISTS update_organization_hierarchy()');
-
-        // Supprime triggers
-        DB::statement('DROP TRIGGER IF EXISTS trg_organization_hierarchy ON organizations');
 
         // Supprime tables
         Schema::dropIfExists('contextual_permissions');

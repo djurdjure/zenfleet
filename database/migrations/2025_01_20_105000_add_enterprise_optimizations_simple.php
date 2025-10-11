@@ -23,6 +23,11 @@ return new class extends Migration
      */
     public function up(): void
     {
+        // Skip si PostgreSQL n'est pas utilisé (ex: tests avec SQLite)
+        if (DB::connection()->getDriverName() !== 'pgsql') {
+            return;
+        }
+
         // ===== INDEX CRITIQUES PERFORMANCE =====
         $this->addCriticalIndexes();
 
@@ -199,6 +204,11 @@ return new class extends Migration
      */
     public function down(): void
     {
+        // Skip si PostgreSQL n'est pas utilisé
+        if (DB::connection()->getDriverName() !== 'pgsql') {
+            return;
+        }
+
         // Supprime les fonctions
         DB::statement('DROP FUNCTION IF EXISTS calculate_daily_metrics(DATE)');
         DB::statement('DROP FUNCTION IF EXISTS get_vehicle_stats(BIGINT)');

@@ -24,6 +24,11 @@ return new class extends Migration
      */
     public function up(): void
     {
+        // Skip si PostgreSQL n'est pas utilisé (ex: tests avec SQLite)
+        if (DB::connection()->getDriverName() !== 'pgsql') {
+            return;
+        }
+
         // ===== EXTENSION POSTGRESQL REQUISE =====
         DB::statement('CREATE EXTENSION IF NOT EXISTS "btree_gist"');
 
@@ -270,6 +275,11 @@ return new class extends Migration
      */
     public function down(): void
     {
+        // Skip si PostgreSQL n'est pas utilisé
+        if (DB::connection()->getDriverName() !== 'pgsql') {
+            return;
+        }
+
         // Supprime les triggers
         DB::statement('DROP TRIGGER IF EXISTS trg_validate_assignment_mileage ON assignments');
         DB::statement('DROP TRIGGER IF EXISTS trg_validate_assignment_business ON assignments');

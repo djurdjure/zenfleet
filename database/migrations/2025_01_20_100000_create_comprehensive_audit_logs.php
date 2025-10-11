@@ -24,6 +24,11 @@ return new class extends Migration
      */
     public function up(): void
     {
+        // Skip si PostgreSQL n'est pas utilisé (ex: tests avec SQLite)
+        if (DB::connection()->getDriverName() !== 'pgsql') {
+            return;
+        }
+
         // ===== EXTENSIONS POSTGRESQL REQUISES =====
         DB::statement('CREATE EXTENSION IF NOT EXISTS "btree_gist"');
 
@@ -255,6 +260,11 @@ return new class extends Migration
      */
     public function down(): void
     {
+        // Skip si PostgreSQL n'est pas utilisé
+        if (DB::connection()->getDriverName() !== 'pgsql') {
+            return;
+        }
+
         // Supprime les fonctions
         DB::statement('DROP FUNCTION IF EXISTS audit_cleanup_old_partitions()');
         DB::statement('DROP FUNCTION IF EXISTS audit_create_monthly_partition()');

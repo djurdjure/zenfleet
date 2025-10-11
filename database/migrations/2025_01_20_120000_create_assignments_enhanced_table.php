@@ -140,6 +140,11 @@ return new class extends Migration
      */
     private function addOverlapPrevention(): void
     {
+        // Skip si PostgreSQL n'est pas utilisé (ex: tests avec SQLite)
+        if (DB::connection()->getDriverName() !== 'pgsql') {
+            return;
+        }
+
         // Vérifier si btree_gist est disponible
         try {
             DB::statement('CREATE EXTENSION IF NOT EXISTS "btree_gist"');
@@ -297,13 +302,16 @@ return new class extends Migration
      */
     public function down(): void
     {
-        // Supprimer triggers et fonctions
-        DB::statement('DROP TRIGGER IF EXISTS assignments_overlap_check ON assignments');
-        DB::statement('DROP FUNCTION IF EXISTS check_assignment_overlaps()');
+        // Skip PostgreSQL-specific cleanup si pas PostgreSQL
+        if (DB::connection()->getDriverName() === 'pgsql') {
+            // Supprimer triggers et fonctions
+            DB::statement('DROP TRIGGER IF EXISTS assignments_overlap_check ON assignments');
+            DB::statement('DROP FUNCTION IF EXISTS check_assignment_overlaps()');
 
-        // Supprimer contraintes GIST
-        DB::statement('ALTER TABLE assignments DROP CONSTRAINT IF EXISTS assignments_vehicle_no_overlap');
-        DB::statement('ALTER TABLE assignments DROP CONSTRAINT IF EXISTS assignments_driver_no_overlap');
+            // Supprimer contraintes GIST
+            DB::statement('ALTER TABLE assignments DROP CONSTRAINT IF EXISTS assignments_vehicle_no_overlap');
+            DB::statement('ALTER TABLE assignments DROP CONSTRAINT IF EXISTS assignments_driver_no_overlap');
+        }
 
         // Si table créée par cette migration, la supprimer
         // Sinon, garder la table existante
