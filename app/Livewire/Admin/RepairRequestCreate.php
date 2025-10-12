@@ -67,13 +67,10 @@ class RepairRequestCreate extends Component
         $user = auth()->user();
         $organizationId = $user->organization_id;
 
-        // Charger les véhicules actifs (ou sans status défini)
+        // Charger les véhicules actifs uniquement
+        // CORRECTION ENTERPRISE: Utilisation du scope active() (status_id = 1)
         $this->vehicles = Vehicle::where('organization_id', $organizationId)
-            ->where(function($query) {
-                $query->where('status', 'active')
-                      ->orWhereNull('status')
-                      ->orWhere('status', '');
-            })
+            ->active() // Scope: filtre status_id = 1 (Actif)
             ->whereNull('deleted_at')
             ->orderBy('registration_plate')
             ->get(['id', 'registration_plate', 'brand', 'model', 'current_mileage'])

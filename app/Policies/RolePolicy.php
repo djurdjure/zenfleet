@@ -51,13 +51,23 @@ class RolePolicy
         if ($role->name === 'Super Admin') {
             return $user->hasRole('Super Admin');
         }
-        
+
         // Empêcher l'auto-promotion
         if ($user->id === $targetUser->id && $role->name === 'Super Admin') {
             return false;
         }
-        
+
         return $user->hasRole(['Super Admin', 'Admin']);
+    }
+
+    /**
+     * 🎭 GÉRER LA MATRICE DES PERMISSIONS
+     *
+     * Permission pour accéder à la console avancée de gestion des permissions
+     */
+    public function manage(User $user): bool
+    {
+        return $user->can('manage roles') || $user->hasRole(['Super Admin', 'Admin']);
     }
 }
 

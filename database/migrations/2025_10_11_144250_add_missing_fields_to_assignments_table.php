@@ -20,31 +20,48 @@ return new class extends Migration
         }
 
         Schema::table('assignments', function (Blueprint $table) {
-            // Champs multi-tenant enterprise
-            $table->foreignId('organization_id')->after('id')->constrained('organizations')->onDelete('cascade');
+            // Ajouter les colonnes uniquement si elles n'existent pas déjà
+            if (!Schema::hasColumn('assignments', 'organization_id')) {
+                $table->foreignId('organization_id')->after('id')->constrained('organizations')->onDelete('cascade');
+                echo "✅ organization_id ajoutée\n";
+            }
 
-            // Statut pour workflow enterprise
-            $table->string('status', 20)->after('notes')->default('active')->index();
+            if (!Schema::hasColumn('assignments', 'status')) {
+                $table->string('status', 20)->default('active')->index();
+                echo "✅ status ajoutée\n";
+            }
 
-            // Audit trail complet
-            $table->foreignId('created_by')->after('status')->nullable()->constrained('users')->onDelete('set null');
-            $table->foreignId('updated_by')->after('created_by')->nullable()->constrained('users')->onDelete('set null');
-            $table->foreignId('ended_by_user_id')->after('updated_by')->nullable()->constrained('users')->onDelete('set null');
-            $table->timestamp('ended_at')->after('ended_by_user_id')->nullable();
+            if (!Schema::hasColumn('assignments', 'created_by')) {
+                $table->foreignId('created_by')->nullable()->constrained('users')->onDelete('set null');
+                echo "✅ created_by ajoutée\n";
+            }
 
-            // 🔥 INDEXES CRITIQUES POUR PERFORMANCE ENTERPRISE
-            // Index pour détection de conflits véhicule (requêtes < 50ms)
-            $table->index(['vehicle_id', 'start_datetime', 'end_datetime'], 'idx_vehicle_period');
+            if (!Schema::hasColumn('assignments', 'updated_by')) {
+                $table->foreignId('updated_by')->nullable()->constrained('users')->onDelete('set null');
+                echo "✅ updated_by ajoutée\n";
+            }
 
-            // Index pour détection de conflits chauffeur (requêtes < 50ms)
-            $table->index(['driver_id', 'start_datetime', 'end_datetime'], 'idx_driver_period');
+            if (!Schema::hasColumn('assignments', 'ended_by_user_id')) {
+                $table->foreignId('ended_by_user_id')->nullable()->constrained('users')->onDelete('set null');
+                echo "✅ ended_by_user_id ajoutée\n";
+            }
 
-            // Index composite pour requêtes multi-tenant
-            $table->index(['organization_id', 'status', 'start_datetime'], 'idx_org_status_start');
-
-            // Index pour recherche par période (calendrier, gantt)
-            $table->index(['start_datetime', 'end_datetime'], 'idx_period_range');
+            if (!Schema::hasColumn('assignments', 'ended_at')) {
+                $table->timestamp('ended_at')->nullable();
+                echo "✅ ended_at ajoutée\n";
+            }
         });
+
+        // Ajouter les index de manière sûre
+        try {
+            DB::statement('CREATE INDEX IF NOT EXISTS idx_vehicle_period ON assignments (vehicle_id, start_datetime, end_datetime)');
+            DB::statement('CREATE INDEX IF NOT EXISTS idx_driver_period ON assignments (driver_id, start_datetime, end_datetime)');
+            DB::statement('CREATE INDEX IF NOT EXISTS idx_org_status_start ON assignments (organization_id, status, start_datetime)');
+            DB::statement('CREATE INDEX IF NOT EXISTS idx_period_range ON assignments (start_datetime, end_datetime)');
+            echo "✅ Index de performance créés\n";
+        } catch (\Exception $e) {
+            echo "⚠️  Certains index existent déjà\n";
+        }
     }
 
     /**

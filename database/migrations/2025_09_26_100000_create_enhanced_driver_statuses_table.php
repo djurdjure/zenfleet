@@ -11,12 +11,42 @@ return new class extends Migration
      */
     public function up(): void
     {
-        echo "🚛 Création de la table driver_statuses enterprise-grade...\n";
+        echo "🚛 Vérification de la table driver_statuses enterprise-grade...\n";
 
-        // Supprimer l'ancienne table si elle existe
-        Schema::dropIfExists('driver_statuses');
+        // Si la table existe déjà, vérifier et ajouter les colonnes manquantes
+        if (Schema::hasTable('driver_statuses')) {
+            echo "   ⚠️  Table driver_statuses existe déjà, mise à jour de la structure...\n";
 
-        // Créer la nouvelle table avec structure complète
+            Schema::table('driver_statuses', function (Blueprint $table) {
+                // Ajouter les colonnes manquantes si nécessaire
+                if (!Schema::hasColumn('driver_statuses', 'can_drive')) {
+                    $table->boolean('can_drive')->default(true)->after('sort_order');
+                }
+                if (!Schema::hasColumn('driver_statuses', 'can_assign')) {
+                    $table->boolean('can_assign')->default(true)->after('can_drive');
+                }
+                if (!Schema::hasColumn('driver_statuses', 'requires_validation')) {
+                    $table->boolean('requires_validation')->default(false)->after('can_assign');
+                }
+            });
+
+            // Ajouter les index manquants
+            try {
+                DB::statement('CREATE INDEX IF NOT EXISTS driver_statuses_slug_idx ON driver_statuses (slug)');
+                DB::statement('CREATE INDEX IF NOT EXISTS driver_statuses_sort_order_idx ON driver_statuses (sort_order)');
+            } catch (\Exception $e) {
+                echo "   ⚠️  Certains index existent déjà\n";
+            }
+
+            echo "   ✅ Structure driver_statuses mise à jour\n";
+
+            // Insérer les statuts par défaut s'ils n'existent pas déjà
+            $this->insertDefaultDriverStatuses();
+
+            return;
+        }
+
+        // Créer la nouvelle table avec structure complète si elle n'existe pas
         Schema::create('driver_statuses', function (Blueprint $table) {
             $table->id();
 
@@ -67,7 +97,14 @@ return new class extends Migration
      */
     private function insertDefaultDriverStatuses(): void
     {
-        echo "   📋 Insertion des statuts de chauffeurs par défaut...\n";
+        echo "   📋 Vérification et insertion des statuts de chauffeurs par défaut...\n";
+
+        // Compter les statuts existants
+        $existingCount = \DB::table('driver_statuses')->count();
+        if ($existingCount > 0) {
+            echo "   ⚠️  {$existingCount} statuts existent déjà, skip insertion par défaut\n";
+            return;
+        }
 
         $defaultStatuses = [
             [

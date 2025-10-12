@@ -8,12 +8,18 @@ return new class extends Migration
 {
     public function up()
     {
-        // Créer l'ENUM pour les types de fournisseurs
-        DB::statement("CREATE TYPE supplier_type_enum AS ENUM (
-            'mecanicien', 'assureur', 'station_service', 'pieces_detachees',
-            'peinture_carrosserie', 'pneumatiques', 'electricite_auto',
-            'controle_technique', 'transport_vehicules', 'autre'
-        )");
+        // Créer l'ENUM pour les types de fournisseurs (avec protection si existe déjà)
+        DB::statement("
+            DO $$ BEGIN
+                CREATE TYPE supplier_type_enum AS ENUM (
+                    'mecanicien', 'assureur', 'station_service', 'pieces_detachees',
+                    'peinture_carrosserie', 'pneumatiques', 'electricite_auto',
+                    'controle_technique', 'transport_vehicules', 'autre'
+                );
+            EXCEPTION
+                WHEN duplicate_object THEN null;
+            END $$;
+        ");
 
         Schema::create('suppliers', function (Blueprint $table) {
             $table->id();

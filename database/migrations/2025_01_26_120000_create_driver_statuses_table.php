@@ -7,11 +7,103 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration
 {
     /**
-     * 🚀 Création de la table driver_statuses Enterprise-Grade
+     * 🚀 Mise à jour de la table driver_statuses vers version Enterprise-Grade
      * Architecture multi-tenant avec gestion avancée des statuts chauffeurs
      */
     public function up(): void
     {
+        // Si la table existe déjà, on ajoute les colonnes manquantes
+        if (Schema::hasTable('driver_statuses')) {
+            echo "⚠️  Table driver_statuses existe déjà, ajout des colonnes manquantes\n";
+
+            Schema::table('driver_statuses', function (Blueprint $table) {
+                // Vérifier et ajouter chaque colonne individuellement
+                if (!Schema::hasColumn('driver_statuses', 'slug')) {
+                    $table->string('slug', 100)->nullable()->after('name');
+                }
+                if (!Schema::hasColumn('driver_statuses', 'description')) {
+                    $table->text('description')->nullable()->after('slug');
+                }
+                if (!Schema::hasColumn('driver_statuses', 'color')) {
+                    $table->string('color', 20)->default('blue')->after('description');
+                }
+                if (!Schema::hasColumn('driver_statuses', 'text_color')) {
+                    $table->string('text_color', 20)->default('white')->after('color');
+                }
+                if (!Schema::hasColumn('driver_statuses', 'icon')) {
+                    $table->string('icon', 50)->nullable()->after('text_color');
+                }
+                if (!Schema::hasColumn('driver_statuses', 'is_active')) {
+                    $table->boolean('is_active')->default(true)->after('icon');
+                }
+                if (!Schema::hasColumn('driver_statuses', 'is_default')) {
+                    $table->boolean('is_default')->default(false)->after('is_active');
+                }
+                if (!Schema::hasColumn('driver_statuses', 'allows_assignments')) {
+                    $table->boolean('allows_assignments')->default(true)->after('is_default');
+                }
+                if (!Schema::hasColumn('driver_statuses', 'is_available_for_work')) {
+                    $table->boolean('is_available_for_work')->default(true)->after('allows_assignments');
+                }
+                if (!Schema::hasColumn('driver_statuses', 'sort_order')) {
+                    $table->integer('sort_order')->default(0)->after('is_available_for_work');
+                }
+                if (!Schema::hasColumn('driver_statuses', 'priority_level')) {
+                    $table->tinyInteger('priority_level')->default(1)->after('sort_order');
+                }
+                if (!Schema::hasColumn('driver_statuses', 'organization_id')) {
+                    $table->unsignedBigInteger('organization_id')->nullable()->after('priority_level');
+                    $table->foreign('organization_id')->references('id')->on('organizations')->onDelete('cascade');
+                }
+                if (!Schema::hasColumn('driver_statuses', 'metadata')) {
+                    $table->json('metadata')->nullable()->after('organization_id');
+                }
+                if (!Schema::hasColumn('driver_statuses', 'valid_from')) {
+                    $table->timestamp('valid_from')->nullable()->after('metadata');
+                }
+                if (!Schema::hasColumn('driver_statuses', 'valid_until')) {
+                    $table->timestamp('valid_until')->nullable()->after('valid_from');
+                }
+                if (!Schema::hasColumn('driver_statuses', 'created_at')) {
+                    $table->timestamps();
+                }
+                if (!Schema::hasColumn('driver_statuses', 'deleted_at')) {
+                    $table->softDeletes();
+                }
+            });
+
+            // Ajouter les index
+            try {
+                DB::statement('CREATE INDEX IF NOT EXISTS driver_statuses_is_active_index ON driver_statuses (is_active)');
+                DB::statement('CREATE INDEX IF NOT EXISTS driver_statuses_is_default_index ON driver_statuses (is_default)');
+                DB::statement('CREATE INDEX IF NOT EXISTS driver_statuses_sort_order_index ON driver_statuses (sort_order)');
+                DB::statement('CREATE INDEX IF NOT EXISTS driver_statuses_organization_id_index ON driver_statuses (organization_id)');
+                DB::statement('CREATE INDEX IF NOT EXISTS driver_statuses_org_active_sort ON driver_statuses (organization_id, is_active, sort_order)');
+                DB::statement('CREATE INDEX IF NOT EXISTS driver_statuses_active_default ON driver_statuses (is_active, is_default)');
+                DB::statement('CREATE INDEX IF NOT EXISTS driver_statuses_assignments_available ON driver_statuses (allows_assignments, is_available_for_work)');
+            } catch (\Exception $e) {
+                echo "⚠️  Certains index existent déjà\n";
+            }
+
+            // Mettre à jour la contrainte unique sur name
+            try {
+                DB::statement('ALTER TABLE driver_statuses DROP CONSTRAINT IF EXISTS driver_statuses_name_unique');
+                DB::statement('ALTER TABLE driver_statuses ADD CONSTRAINT driver_statuses_name_org_unique UNIQUE (name, organization_id)');
+                DB::statement('ALTER TABLE driver_statuses ADD CONSTRAINT driver_statuses_slug_org_unique UNIQUE (slug, organization_id)');
+            } catch (\Exception $e) {
+                echo "⚠️  Contraintes unique déjà en place\n";
+            }
+
+            // Générer les slugs manquants
+            DB::statement("UPDATE driver_statuses SET slug = LOWER(REGEXP_REPLACE(name, '[^a-zA-Z0-9]+', '-', 'g')) WHERE slug IS NULL");
+
+            // Rendre slug non-nullable après avoir rempli les valeurs
+            DB::statement('ALTER TABLE driver_statuses ALTER COLUMN slug SET NOT NULL');
+
+            return;
+        }
+
+        // Sinon créer la table complète
         Schema::create('driver_statuses', function (Blueprint $table) {
             $table->id();
 

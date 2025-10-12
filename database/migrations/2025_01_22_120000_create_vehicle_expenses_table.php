@@ -8,13 +8,19 @@ return new class extends Migration
 {
     public function up()
     {
-        // Créer l'ENUM pour les catégories de dépenses
-        DB::statement("CREATE TYPE expense_category_enum AS ENUM (
-            'maintenance_preventive', 'reparation', 'pieces_detachees',
-            'carburant', 'assurance', 'controle_technique',
-            'vignette', 'amendes', 'peage', 'parking',
-            'lavage', 'transport', 'formation_chauffeur', 'autre'
-        )");
+        // Créer l'ENUM pour les catégories de dépenses (avec protection si existe déjà)
+        DB::statement("
+            DO $$ BEGIN
+                CREATE TYPE expense_category_enum AS ENUM (
+                    'maintenance_preventive', 'reparation', 'pieces_detachees',
+                    'carburant', 'assurance', 'controle_technique',
+                    'vignette', 'amendes', 'peage', 'parking',
+                    'lavage', 'transport', 'formation_chauffeur', 'autre'
+                );
+            EXCEPTION
+                WHEN duplicate_object THEN null;
+            END $$;
+        ");
 
         Schema::create('vehicle_expenses', function (Blueprint $table) {
             $table->id();
@@ -53,7 +59,8 @@ return new class extends Migration
             $table->string('fuel_type', 50)->nullable(); // Type carburant (essence, gasoil)
 
             // Géolocalisation
-            $table->point('expense_location')->nullable(); // Coordonnées GPS
+            $table->decimal('expense_latitude', 10, 8)->nullable(); // Latitude GPS
+            $table->decimal('expense_longitude', 11, 8)->nullable(); // Longitude GPS
             $table->string('expense_city', 100)->nullable()->index();
             $table->string('expense_wilaya', 50)->nullable()->index();
 
@@ -179,8 +186,8 @@ return new class extends Migration
             )
         ");
 
-        // Index géospatial si nécessaire
-        DB::statement("CREATE INDEX vehicle_expenses_location_idx ON vehicle_expenses USING gist(expense_location)");
+        // Index géospatial composite pour latitude/longitude
+        DB::statement("CREATE INDEX vehicle_expenses_location_idx ON vehicle_expenses (expense_latitude, expense_longitude) WHERE expense_latitude IS NOT NULL AND expense_longitude IS NOT NULL");
 
         // Index de recherche textuelle
         DB::statement("CREATE INDEX vehicle_expenses_search_idx ON vehicle_expenses USING gin(to_tsvector('french', description || ' ' || expense_type))");

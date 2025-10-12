@@ -331,14 +331,16 @@ class AssignmentForm extends Component
     {
         $organizationId = auth()->user()->organization_id;
 
+        // CORRECTION ENTERPRISE: Utilisation du scope active()
         $this->vehicleOptions = Vehicle::where('organization_id', $organizationId)
-            ->where('status', 'active')
+            ->active() // Scope: status_id = 1 (Actif)
             ->select('id', 'registration_plate', 'brand', 'model')
             ->orderBy('registration_plate')
             ->get();
 
+        // TODO: Créer scope active() pour Driver (status_id)
         $this->driverOptions = Driver::where('organization_id', $organizationId)
-            ->where('status', 'active')
+            ->where('status_id', 1) // CORRECTION TEMPORAIRE: utiliser status_id
             ->select('id', 'first_name', 'last_name', 'license_number')
             ->orderBy('last_name')
             ->get();

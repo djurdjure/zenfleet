@@ -9,6 +9,12 @@ return new class extends Migration
 {
     public function up(): void
     {
+        // Skip si la table existe déjà
+        if (Schema::hasTable('repair_requests')) {
+            echo "⚠️  Table repair_requests existe déjà, skip\n";
+            return;
+        }
+
         Schema::create('repair_requests', function (Blueprint $table) {
             $table->id();
             $table->uuid('uuid')->unique();

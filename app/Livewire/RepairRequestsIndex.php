@@ -392,13 +392,20 @@ class RepairRequestsIndex extends Component
 
     /**
      * 🚗 VÉHICULES DISPONIBLES
+     *
+     * Récupère les véhicules actifs pour l'organisation courante
+     * Si l'utilisateur est chauffeur, ne retourne que ses véhicules assignés
+     *
+     * @return \Illuminate\Database\Eloquent\Collection
      */
     public function getVehiclesProperty()
     {
         $user = auth()->user();
+
+        // Utilisation du scope 'active()' du modèle Vehicle (status_id = 1)
         $query = Vehicle::where('organization_id', $user->organization_id)
-            ->where('status', 'active');
-        
+            ->active(); // REFACTORED: utilisation du Query Scope
+
         if ($user->hasRole('Chauffeur')) {
             $query->whereHas('assignments', function($q) use ($user) {
                 $q->where('driver_id', function($subQ) use ($user) {
@@ -408,7 +415,7 @@ class RepairRequestsIndex extends Component
                 })->where('is_active', true);
             });
         }
-        
+
         return $query->orderBy('registration_plate')->get();
     }
 

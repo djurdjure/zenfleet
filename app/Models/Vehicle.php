@@ -315,4 +315,155 @@ class Vehicle extends Model
     {
         return $this->belongsToMany(User::class, 'user_vehicle');
     }
+
+    // =========================================================================
+    // QUERY SCOPES - ENTERPRISE GRADE
+    // =========================================================================
+
+    /**
+     * 🎯 SCOPE: Véhicules actifs uniquement
+     *
+     * Filtre les véhicules avec status_id = 1 (Actif)
+     *
+     * Usage: Vehicle::active()->get()
+     *
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeActive($query)
+    {
+        // Status ID 1 = "Actif" (voir table vehicle_statuses)
+        return $query->where('status_id', 1);
+    }
+
+    /**
+     * 🔧 SCOPE: Véhicules en maintenance
+     *
+     * Filtre les véhicules avec status_id = 2 (En maintenance)
+     *
+     * Usage: Vehicle::inMaintenance()->get()
+     *
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeInMaintenance($query)
+    {
+        // Status ID 2 = "En maintenance" (voir table vehicle_statuses)
+        return $query->where('status_id', 2);
+    }
+
+    /**
+     * ⛔ SCOPE: Véhicules inactifs
+     *
+     * Filtre les véhicules avec status_id = 3 (Inactif)
+     *
+     * Usage: Vehicle::inactive()->get()
+     *
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeInactive($query)
+    {
+        // Status ID 3 = "Inactif" (voir table vehicle_statuses)
+        return $query->where('status_id', 3);
+    }
+
+    /**
+     * 🎯 SCOPE: Véhicules par statut ID
+     *
+     * Filtre les véhicules par un statut spécifique
+     *
+     * Usage: Vehicle::byStatus(1)->get()
+     *
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @param int $statusId
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeByStatus($query, int $statusId)
+    {
+        return $query->where('status_id', $statusId);
+    }
+
+    /**
+     * 🏢 SCOPE: Véhicules disponibles pour affectation
+     *
+     * Retourne les véhicules actifs qui n'ont pas d'affectation en cours
+     *
+     * Usage: Vehicle::availableForAssignment()->get()
+     *
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeAvailableForAssignment($query)
+    {
+        return $query->active()
+            ->whereDoesntHave('assignments', function($q) {
+                $q->where('status', 'active')
+                  ->where('end_datetime', '>', now());
+            });
+    }
+
+    // =========================================================================
+    // HELPER METHODS - STATUS CHECKS
+    // =========================================================================
+
+    /**
+     * ✅ Vérifie si le véhicule est actif
+     *
+     * @return bool
+     */
+    public function isActive(): bool
+    {
+        return $this->status_id === 1;
+    }
+
+    /**
+     * 🔧 Vérifie si le véhicule est en maintenance
+     *
+     * @return bool
+     */
+    public function isInMaintenance(): bool
+    {
+        return $this->status_id === 2;
+    }
+
+    /**
+     * ⛔ Vérifie si le véhicule est inactif
+     *
+     * @return bool
+     */
+    public function isInactive(): bool
+    {
+        return $this->status_id === 3;
+    }
+
+    /**
+     * 🎨 Retourne le nom du statut
+     *
+     * @return string
+     */
+    public function getStatusName(): string
+    {
+        return match($this->status_id) {
+            1 => 'Actif',
+            2 => 'En maintenance',
+            3 => 'Inactif',
+            default => 'Inconnu'
+        };
+    }
+
+    /**
+     * 🎨 Retourne la classe CSS pour le badge de statut
+     *
+     * @return string
+     */
+    public function getStatusBadgeClass(): string
+    {
+        return match($this->status_id) {
+            1 => 'bg-green-100 text-green-800',
+            2 => 'bg-yellow-100 text-yellow-800',
+            3 => 'bg-red-100 text-red-800',
+            default => 'bg-gray-100 text-gray-800'
+        };
+    }
 }

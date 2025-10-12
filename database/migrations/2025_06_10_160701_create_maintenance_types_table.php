@@ -11,12 +11,18 @@ return new class extends Migration
      */
     public function up(): void
     {
+        // Skip si la table existe déjà (version enterprise créée par migration antérieure)
+        if (Schema::hasTable('maintenance_types')) {
+            echo "⚠️  Table maintenance_types existe déjà (version enterprise), skip\n";
+            return;
+        }
+
     	Schema::create('maintenance_types', function (Blueprint $table) {
     		$table->id();
     		$table->string('name', 150)->unique();
     		$table->text('description')->nullable();
 	});
-    
+
     }
 
     /**

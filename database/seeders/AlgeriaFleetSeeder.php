@@ -80,25 +80,31 @@ class AlgeriaFleetSeeder extends Seeder
             $brand = fake()->randomElement($brands);
             $year = fake()->numberBetween(2010, 2024);
 
+            $mileage = fake()->numberBetween(5000, 300000);
+
+            // Obtenir ou créer les IDs nécessaires
+            $fuelTypeId = \DB::table('fuel_types')->value('id') ?? 1;
+            $transmissionTypeId = \DB::table('transmission_types')->value('id') ?? 1;
+            $vehicleTypeId = \DB::table('vehicle_types')->value('id') ?? 1;
+            $statusId = \DB::table('vehicle_statuses')->value('id') ?? 1;
+
             $vehicleData = [
                 'organization_id' => $organization->id,
                 'brand' => $brand,
                 'model' => $this->getModelForBrand($brand),
-                'year' => $year,
-                'license_plate' => $this->generateLicensePlate($orgWilaya),
+                'manufacturing_year' => $year, // Corrigé: year → manufacturing_year
+                'registration_plate' => $this->generateLicensePlate($orgWilaya), // Corrigé: license_plate → registration_plate
                 'vin' => strtoupper(fake()->bothify('VF1#####?#?######')), // French VIN format common in Algeria
                 'color' => fake()->randomElement(['Blanc', 'Gris', 'Noir', 'Bleu', 'Rouge', 'Vert']),
-                'fuel_type' => fake()->randomElement(['Essence', 'Diesel', 'GPL']),
-                'transmission' => fake()->randomElement(['Manuelle', 'Automatique']),
+                'fuel_type_id' => $fuelTypeId, // Corrigé: fuel_type → fuel_type_id
+                'transmission_type_id' => $transmissionTypeId, // Corrigé: transmission → transmission_type_id
+                'vehicle_type_id' => $vehicleTypeId, // Ajouté
+                'status_id' => $statusId, // Corrigé: status → status_id
                 'seats' => fake()->randomElement([2, 5, 7, 9, 12, 20, 45]), // Various vehicle types
-                'mileage' => fake()->numberBetween(5000, 300000),
-                'purchase_date' => fake()->dateTimeBetween('-' . (2024 - $year) . ' years', 'now'),
+                'initial_mileage' => $mileage, // Ajouté
+                'current_mileage' => $mileage, // Corrigé: mileage → current_mileage
+                'acquisition_date' => fake()->dateTimeBetween('-' . (2024 - $year) . ' years', 'now'), // Corrigé: purchase_date → acquisition_date
                 'purchase_price' => fake()->numberBetween(800000, 5000000), // DZD prices
-                'status' => fake()->randomElement(['active', 'maintenance', 'inactive']),
-                'insurance_company' => fake()->randomElement(['SAA', 'CAAR', 'GAM', 'Alliance', 'TRUST']),
-                'insurance_policy' => fake()->numerify('POL-########'),
-                'insurance_expires_at' => fake()->dateTimeBetween('now', '+2 years'),
-                'technical_control_expires_at' => fake()->dateTimeBetween('now', '+1 year'),
                 'notes' => fake()->optional(0.3)->sentence(),
                 'created_at' => now()->subDays(fake()->numberBetween(1, 365)),
                 'updated_at' => now()->subDays(fake()->numberBetween(1, 30)),
@@ -147,26 +153,28 @@ class AlgeriaFleetSeeder extends Seeder
                 'updated_at' => now(),
             ]);
 
+            // Obtenir un status_id valide pour les chauffeurs
+            $driverStatusId = \DB::table('driver_statuses')->where('is_active', true)->value('id') ?? 1;
+
             // Create driver profile
+            $licenseIssueDate = fake()->dateTimeBetween($birthDate->format('Y-m-d') . ' +3 years', $hireDate);
+
             $driverData = [
                 'user_id' => $user->id,
-                'organization_id' => $organization->id,
                 'first_name' => $firstName,
                 'last_name' => $lastName,
-                'date_of_birth' => $birthDate,
-                'place_of_birth' => fake()->randomElement(['Alger', 'Oran', 'Constantine', 'Sétif', 'Blida', 'Annaba']),
-                'address' => fake()->streetAddress() . ', ' . $organization->city,
-                'phone' => '+213 ' . fake()->numerify('## ## ## ## ##'),
-                'emergency_contact' => fake()->name(),
-                'emergency_phone' => '+213 ' . fake()->numerify('## ## ## ## ##'),
-                'license_number' => $this->generateLicenseNumber($organization->wilaya),
+                'birth_date' => $birthDate, // Corrigé: date_of_birth → birth_date
+                'address' => fake()->streetAddress() . ', ' . ($organization->city ?? 'Alger'),
+                'personal_phone' => '+213 ' . fake()->numerify('## ## ## ## ##'), // Corrigé: phone → personal_phone
+                'emergency_contact_name' => fake()->name(), // Corrigé: emergency_contact → emergency_contact_name
+                'emergency_contact_phone' => '+213 ' . fake()->numerify('## ## ## ## ##'), // Corrigé: emergency_phone → emergency_contact_phone
+                'license_number' => $this->generateLicenseNumber($organization->wilaya ?? '16'),
                 'license_category' => fake()->randomElement(['B', 'C', 'D', 'C+E', 'D+E']),
-                'license_issued_date' => fake()->dateTimeBetween($birthDate->format('Y-m-d') . ' +3 years', $hireDate),
-                'license_expires_date' => fake()->dateTimeBetween('now', '+10 years'),
-                'hire_date' => $hireDate,
-                'status' => fake()->randomElement(['active', 'on_leave', 'suspended']),
-                'salary' => fake()->numberBetween(30000, 80000), // DZD monthly salary
-                'notes' => fake()->optional(0.2)->sentence(),
+                'license_issue_date' => $licenseIssueDate, // Corrigé: license_issued_date → license_issue_date
+                'license_expiry_date' => fake()->dateTimeBetween('now', '+10 years'), // Ajouté
+                'license_authority' => 'Wilaya de ' . ($organization->city ?? 'Alger'), // Ajouté
+                'recruitment_date' => $hireDate, // Corrigé: hire_date → recruitment_date
+                'status_id' => $driverStatusId, // Corrigé: status → status_id
                 'created_at' => $hireDate,
                 'updated_at' => now(),
             ];

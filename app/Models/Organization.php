@@ -158,9 +158,17 @@ class Organization extends Model
         return $this->hasMany(Driver::class);
     }
 
+    /**
+     * 🚗 VÉHICULES ACTIFS
+     *
+     * Retourne uniquement les véhicules actifs (utilise le scope active())
+     *
+     * @return HasMany
+     */
     public function activeVehicles(): HasMany
     {
-        return $this->vehicles()->where('status', 'active');
+        // REFACTORED: utilisation du Query Scope active() du modèle Vehicle
+        return $this->vehicles()->active();
     }
 
     public function suppliers(): HasMany

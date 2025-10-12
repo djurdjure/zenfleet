@@ -15,24 +15,59 @@ return new class extends Migration
      */
     public function up(): void
     {
-        // Supprimer l'ancienne contrainte unique (name, guard_name)
-        Schema::table('roles', function (Blueprint $table) {
-            $table->dropUnique('roles_name_guard_name_unique');
-        });
+        // Vérifier et supprimer l'ancienne contrainte unique si elle existe
+        $constraintExists = DB::select("
+            SELECT constraint_name
+            FROM information_schema.table_constraints
+            WHERE table_name = 'roles'
+            AND constraint_name = 'roles_name_guard_name_unique'
+        ");
 
-        // Ajouter la nouvelle contrainte unique (name, guard_name, organization_id)
-        DB::statement('
-            CREATE UNIQUE INDEX roles_name_guard_organization_unique
-            ON roles (name, guard_name, organization_id)
-        ');
+        if (!empty($constraintExists)) {
+            Schema::table('roles', function (Blueprint $table) {
+                $table->dropUnique('roles_name_guard_name_unique');
+            });
+            echo "✅ Ancienne contrainte roles_name_guard_name_unique supprimée\n";
+        } else {
+            echo "⚠️  Contrainte roles_name_guard_name_unique n'existe pas, skip\n";
+        }
+
+        // Ajouter la nouvelle contrainte unique (name, guard_name, organization_id) si elle n'existe pas
+        $indexExists = DB::select("
+            SELECT indexname
+            FROM pg_indexes
+            WHERE tablename = 'roles'
+            AND indexname = 'roles_name_guard_organization_unique'
+        ");
+
+        if (empty($indexExists)) {
+            DB::statement('
+                CREATE UNIQUE INDEX roles_name_guard_organization_unique
+                ON roles (name, guard_name, organization_id)
+            ');
+            echo "✅ Index roles_name_guard_organization_unique créé\n";
+        } else {
+            echo "⚠️  Index roles_name_guard_organization_unique existe déjà\n";
+        }
 
         // Pour les rôles globaux (Super Admin), organization_id est NULL
-        // On doit aussi créer un index partiel pour ces cas
-        DB::statement('
-            CREATE UNIQUE INDEX roles_name_guard_null_organization_unique
-            ON roles (name, guard_name)
-            WHERE organization_id IS NULL
-        ');
+        $partialIndexExists = DB::select("
+            SELECT indexname
+            FROM pg_indexes
+            WHERE tablename = 'roles'
+            AND indexname = 'roles_name_guard_null_organization_unique'
+        ");
+
+        if (empty($partialIndexExists)) {
+            DB::statement('
+                CREATE UNIQUE INDEX roles_name_guard_null_organization_unique
+                ON roles (name, guard_name)
+                WHERE organization_id IS NULL
+            ');
+            echo "✅ Index roles_name_guard_null_organization_unique créé\n";
+        } else {
+            echo "⚠️  Index roles_name_guard_null_organization_unique existe déjà\n";
+        }
     }
 
     /**

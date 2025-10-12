@@ -149,8 +149,9 @@ class RepairRequestController extends Controller
             ->whereNull('deleted_at')
             ->get();
 
+        // REFACTORED: Utilisation du scope active() au lieu de where('status', 'active')
         $vehicles = Vehicle::where('organization_id', $user->organization_id)
-            ->where('status', 'active')
+            ->active() // Scope: status_id = 1 (Actif)
             ->whereNull('deleted_at')
             ->get();
 

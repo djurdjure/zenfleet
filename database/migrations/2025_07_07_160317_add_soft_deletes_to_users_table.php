@@ -11,9 +11,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->softDeletes(); // Ajoute la colonne 'deleted_at' nullable
-        });
+        // Vérifier si la colonne existe déjà avant de l'ajouter
+        if (!Schema::hasColumn('users', 'deleted_at')) {
+            Schema::table('users', function (Blueprint $table) {
+                $table->softDeletes(); // Ajoute la colonne 'deleted_at' nullable
+            });
+            echo "✅ Colonne deleted_at ajoutée à users\n";
+        } else {
+            echo "⚠️  Colonne deleted_at existe déjà dans users, skip\n";
+        }
     }
 
     /**

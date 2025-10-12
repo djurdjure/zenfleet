@@ -419,12 +419,14 @@ class AssignmentGantt extends Component
     private function loadResources(int $organizationId): Collection
     {
         if ($this->resourceType === 'vehicles') {
+            // CORRECTION ENTERPRISE: Utilisation du scope active()
             $query = Vehicle::where('organization_id', $organizationId)
-                ->where('status', 'active')
+                ->active() // Scope: status_id = 1 (Actif)
                 ->select('id', 'registration_plate', 'brand', 'model');
         } else {
+            // TODO: Créer scope active() pour Driver (status_id)
             $query = Driver::where('organization_id', $organizationId)
-                ->where('status', 'active')
+                ->where('status_id', 1) // CORRECTION TEMPORAIRE: utiliser status_id
                 ->select('id', 'first_name', 'last_name', 'license_number');
         }
 
