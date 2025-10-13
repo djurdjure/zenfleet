@@ -21,6 +21,9 @@ class StoreDriverRequest extends FormRequest
     public function rules(): array
     {
         return [
+            // 🔒 SECURITY: Organization ID (ajouté automatiquement via prepareForValidation)
+            'organization_id' => ['required', 'integer', 'exists:organizations,id'],
+
             // Étape 1
             'first_name' => ['required', 'string', 'max:255'],
             'last_name' => ['required', 'string', 'max:255'],
@@ -43,8 +46,20 @@ class StoreDriverRequest extends FormRequest
             'license_category' => ['nullable', 'string', 'max:50'],
             'license_issue_date' => ['nullable', 'date'],
             'license_authority' => ['nullable', 'string', 'max:255'],
+
+            // Étape 4
             'emergency_contact_name' => ['nullable', 'string', 'max:255'],
             'emergency_contact_phone' => ['nullable', 'string', 'max:50'],
         ];
+    }
+
+    /**
+     * 🔧 CORRECTION ENTERPRISE: Ajouter organization_id automatiquement
+     */
+    protected function prepareForValidation(): void
+    {
+        $this->merge([
+            'organization_id' => $this->user()->organization_id,
+        ]);
     }
 }

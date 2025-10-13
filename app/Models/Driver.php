@@ -24,7 +24,8 @@ class Driver extends Model
 
         // Permis de conduire
         'license_number', 'license_category',
-        'driver_license_expiry_date', 'license_issue_date', 'license_authority',
+        'license_expiry_date', // ✅ CORRECTION: Nom de colonne réel dans la DB
+        'license_issue_date', 'license_authority',
 
         // Emploi et statut
         'recruitment_date', 'contract_end_date', 'status_id',
@@ -43,7 +44,7 @@ class Driver extends Model
         'birth_date' => 'date',
         'recruitment_date' => 'date',
         'contract_end_date' => 'date',
-        'driver_license_expiry_date' => 'date',
+        'license_expiry_date' => 'date', // ✅ CORRECTION: Nom de colonne réel dans la DB
         'license_issue_date' => 'date',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',

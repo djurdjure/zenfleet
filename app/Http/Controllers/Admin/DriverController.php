@@ -96,7 +96,8 @@ class DriverController extends Controller
         $this->authorize('create drivers');
 
         try {
-            $driverStatuses = $this->getDriverStatuses();
+            // 🎯 Mode arrays pour Alpine.js dans les formulaires
+            $driverStatuses = $this->getDriverStatuses($asArrays = true);
 
             // Récupération des utilisateurs non liés à un chauffeur
             $assignedUserIds = Driver::whereNotNull('user_id')->pluck('user_id');
@@ -118,25 +119,51 @@ class DriverController extends Controller
     }
 
     /**
-     * 💾 Enregistrement d'un nouveau chauffeur
+     * 🚀 CRÉATION ENTERPRISE DE CHAUFFEUR + USER
+     *
+     * Retourne les credentials générés pour affichage dans popup
+     *
+     * @param StoreDriverRequest $request
+     * @return RedirectResponse
      */
     public function store(StoreDriverRequest $request): RedirectResponse
     {
         try {
-            $driver = $this->driverService->createDriver($request->validated());
+            // ✅ DriverService retourne maintenant un tableau avec toutes les infos
+            $result = $this->driverService->createDriver($request->validated());
+
+            $driver = $result['driver'];
+            $user = $result['user'];
+            $password = $result['password'];
+            $userWasCreated = $result['was_created'];
 
             Log::info('Driver created successfully', [
                 'driver_id' => $driver->id,
                 'driver_name' => $driver->first_name . ' ' . $driver->last_name,
+                'user_id' => $user->id,
+                'user_created' => $userWasCreated,
                 'created_by' => auth()->id()
             ]);
 
+            // 📊 DONNÉES POUR LA POPUP DE CONFIRMATION
+            $sessionData = [
+                'driver_created' => true,
+                'driver_id' => $driver->id,
+                'driver_name' => $driver->first_name . ' ' . $driver->last_name,
+                'driver_employee_number' => $driver->employee_number,
+                'user_email' => $user->email,
+                'user_password' => $password, // NULL si user existant
+                'user_was_created' => $userWasCreated,
+            ];
+
             return redirect()
-                ->route('admin.drivers.index')
-                ->with('success', "Le chauffeur {$driver->first_name} {$driver->last_name} a été créé avec succès.");
+                ->route('admin.drivers.create') // ✅ RETOUR AU FORMULAIRE pour afficher popup
+                ->with('driver_success', $sessionData);
 
         } catch (\Exception $e) {
-            Log::error('Driver store error: ' . $e->getMessage());
+            Log::error('Driver store error: ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString()
+            ]);
 
             return back()
                 ->withInput()
@@ -157,7 +184,8 @@ class DriverController extends Controller
                 abort(403, 'Vous n\'avez pas l\'autorisation de modifier ce chauffeur.');
             }
 
-            $driverStatuses = $this->getDriverStatuses();
+            // 🎯 Mode arrays pour Alpine.js dans les formulaires
+            $driverStatuses = $this->getDriverStatuses($asArrays = true);
 
             // Récupération des utilisateurs non liés à un chauffeur (excluant l'utilisateur actuel du chauffeur)
             $assignedUserIds = Driver::whereNotNull('user_id')
@@ -1799,31 +1827,34 @@ class DriverController extends Controller
     }
 
     /**
-     * 🛡️ Méthode sécurisée pour récupérer les statuts de chauffeurs
-     * Enterprise-grade avec gestion multi-tenant et fallback robuste
-     * 
-     * IMPORTANT: Cette méthode garantit l'accès aux statuts pour tous les utilisateurs
-     * autorisés, indépendamment de leur rôle (Admin, Super Admin, etc.)
+     * 🚀 MÉTHODE ULTRA-ROBUSTESSE - Récupération des statuts de chauffeurs
+     * Enterprise-grade avec gestion multi-tenant et fallback intelligent
+     *
+     * GARANTIE: Cette méthode assure toujours l'accès aux statuts pour tous les utilisateurs
+     * Solution complète au problème d'affichage des statuts dans les formulaires
+     *
+     * @param bool $asArrays Retourner comme arrays (true) pour Alpine.js, ou objets (false) pour Blade
+     * @return \Illuminate\Support\Collection
      */
-    private function getDriverStatuses()
+    private function getDriverStatuses($asArrays = false)
     {
         try {
-            // Vérifier si la table existe
+            // 🔧 Étape 1: Vérification robuste de l'existence de la table
             if (!\Schema::hasTable('driver_statuses')) {
-                Log::warning('Table driver_statuses does not exist - creating default statuses', [
+                Log::warning('Table driver_statuses does not exist - running emergency seeder', [
                     'user_id' => auth()->id(),
                     'method' => 'getDriverStatuses',
                     'timestamp' => now()->toISOString()
                 ]);
                 
-                // Tenter de créer les statuts par défaut
-                $this->createDefaultDriverStatuses();
+                // Exécuter le seeder en urgence
+                $this->runEmergencyStatusSeeder();
             }
 
             $user = auth()->user();
             $organizationId = $user->organization_id;
 
-            Log::info('Fetching driver statuses for user', [
+            Log::info('🔍 Starting enhanced driver status retrieval', [
                 'user_id' => $user->id,
                 'user_email' => $user->email,
                 'user_roles' => $user->getRoleNames()->toArray(),
@@ -1832,32 +1863,30 @@ class DriverController extends Controller
                 'is_super_admin' => $user->hasRole('Super Admin')
             ]);
 
-            // Stratégie de récupération basée sur le rôle et les permissions
-            if ($user->hasRole('Super Admin')) {
-                // Super Admin voit tous les statuts
-                $statuses = DriverStatus::where('is_active', true)
-                    ->orderBy('sort_order')
-                    ->orderBy('name')
-                    ->get();
-            } else {
-                // 🔧 CORRECTION: Désactiver le global scope pour accéder aux statuts globaux
-                // Autres utilisateurs voient les statuts de leur organisation + globaux
-                $statuses = DriverStatus::withoutGlobalScope('organization')
-                    ->where('is_active', true)
-                    ->where(function ($query) use ($organizationId) {
-                        $query->whereNull('organization_id')  // Statuts globaux
-                              ->orWhere('organization_id', $organizationId); // Statuts de l'organisation
-                    })
-                    ->orderBy('sort_order')
-                    ->orderBy('name')
-                    ->get();
-            }
+            // 🚀 Étape 2: Stratégie AMÉLIORÉE - Toujours utiliser withoutGlobalScope
+            $statuses = DriverStatus::withoutGlobalScope('organization')
+                ->where('is_active', true)
+                ->where(function ($query) use ($organizationId, $user) {
+                    if ($user->hasRole('Super Admin')) {
+                        // Super Admin: tous les statuts (globaux + spécifiques)
+                        $query->whereNull('organization_id')
+                              ->orWhereNotNull('organization_id');
+                    } else {
+                        // Autres: globaux + spécifiques à leur organisation
+                        $query->whereNull('organization_id')
+                              ->orWhere('organization_id', $organizationId);
+                    }
+                })
+                ->orderBy('sort_order')
+                ->orderBy('name')
+                ->get();
 
-            // Si aucun statut n'est trouvé, créer les statuts par défaut
+            // 🔄 Étape 3: Auto-création si aucun statut trouvé
             if ($statuses->isEmpty()) {
-                Log::warning('No driver statuses found - creating defaults', [
+                Log::warning('📋 No driver statuses found - auto-creating defaults', [
                     'organization_id' => $organizationId,
-                    'user_id' => $user->id
+                    'user_id' => $user->id,
+                    'user_role' => $user->getRoleNames()->first()
                 ]);
                 
                 $this->createDefaultDriverStatuses($organizationId);
@@ -1865,38 +1894,91 @@ class DriverController extends Controller
                 // Recharger les statuts après création
                 $statuses = DriverStatus::withoutGlobalScope('organization')
                     ->where('is_active', true)
-                    ->where(function ($query) use ($organizationId) {
-                        $query->whereNull('organization_id')
-                              ->orWhere('organization_id', $organizationId);
+                    ->where(function ($query) use ($organizationId, $user) {
+                        if ($user->hasRole('Super Admin')) {
+                            $query->whereNull('organization_id')
+                                  ->orWhereNotNull('organization_id');
+                        } else {
+                            $query->whereNull('organization_id')
+                                  ->orWhere('organization_id', $organizationId);
+                        }
                     })
                     ->orderBy('sort_order')
                     ->orderBy('name')
                     ->get();
             }
 
-            Log::info('Driver statuses fetched successfully', [
-                'count' => $statuses->count(),
-                'statuses' => $statuses->pluck('name')->toArray(),
-                'organization_id' => $organizationId,
-                'has_global' => $statuses->whereNull('organization_id')->isNotEmpty(),
-                'has_org_specific' => $statuses->where('organization_id', $organizationId)->isNotEmpty()
-            ]);
+            // 🎯 Étape 4: Transformation conditionnelle selon le besoin
+            if ($asArrays) {
+                // Mode Alpine.js: transformation en arrays
+                $processedStatuses = $statuses->map(function ($status) {
+                    return [
+                        'id' => (int) $status->id,
+                        'name' => (string) $status->name,
+                        'description' => (string) ($status->description ?? ''),
+                        'color' => (string) ($status->color ?? '#6B7280'),
+                        'icon' => (string) ($status->icon ?? 'fa-circle'),
+                        'can_drive' => (bool) ($status->can_drive ?? true),
+                        'can_assign' => (bool) ($status->can_assign ?? true),
+                        'organization_id' => $status->organization_id,
+                        'is_global' => is_null($status->organization_id)
+                    ];
+                });
 
-            return $statuses;
+                Log::info('✅ Driver statuses processed as arrays (Alpine.js)', [
+                    'count' => $processedStatuses->count(),
+                    'statuses' => $processedStatuses->pluck('name')->toArray()
+                ]);
+
+                return $processedStatuses;
+            } else {
+                // Mode Blade: retourner les objets Eloquent directement
+                Log::info('✅ Driver statuses returned as objects (Blade)', [
+                    'count' => $statuses->count(),
+                    'statuses' => $statuses->pluck('name')->toArray(),
+                    'organization_id' => $organizationId
+                ]);
+
+                return $statuses;
+            }
 
         } catch (\Exception $e) {
-            Log::error('Error fetching driver statuses - using fallback', [
+            Log::error('❌ Critical error fetching driver statuses - using emergency fallback', [
                 'error_message' => $e->getMessage(),
                 'error_file' => $e->getFile(),
                 'error_line' => $e->getLine(),
+                'error_trace' => $e->getTraceAsString(),
                 'user_id' => auth()->id(),
                 'organization_id' => auth()->user()->organization_id ?? null,
                 'method' => 'getDriverStatuses',
                 'timestamp' => now()->toISOString()
             ]);
 
-            // Fallback: créer et retourner les statuts minimums
+            // Fallback d'urgence: retourner les statuts minimaux
             return $this->getMinimalDriverStatuses();
+        }
+    }
+
+    /**
+     * 🚀 Exécuter le seeder de statuts en urgence
+     */
+    private function runEmergencyStatusSeeder(): void
+    {
+        try {
+            Log::info('🚨 Running emergency DriverStatusesSeeder');
+            
+            $seeder = new \Database\Seeders\DriverStatusesSeeder();
+            $seeder->run();
+            
+            Log::info('✅ Emergency seeder completed successfully');
+            
+        } catch (\Exception $e) {
+            Log::error('❌ Emergency seeder failed', [
+                'error' => $e->getMessage()
+            ]);
+            
+            // Alternative: créer directement les statuts
+            $this->createDefaultDriverStatuses();
         }
     }
 
@@ -1986,37 +2068,60 @@ class DriverController extends Controller
 
     /**
      * Obtenir les statuts minimaux en cas d'échec complet
+     * Version compatible Alpine.js avec structure complete
      */
     private function getMinimalDriverStatuses()
     {
-        // Créer une collection de statuts minimaux en mémoire
+        Log::warning('⚠️ Using minimal driver statuses fallback', [
+            'user_id' => auth()->id(),
+            'timestamp' => now()->toISOString()
+        ]);
+        
+        // Créer une collection de statuts minimaux compatible avec Alpine.js
         return collect([
-            (object) [
+            [
                 'id' => 1,
                 'name' => 'Disponible',
-                'description' => 'Chauffeur disponible',
+                'description' => 'Chauffeur disponible pour les missions',
                 'color' => '#10B981',
                 'icon' => 'fa-check-circle',
                 'can_drive' => true,
                 'can_assign' => true,
+                'organization_id' => null,
+                'is_global' => true
             ],
-            (object) [
+            [
                 'id' => 2,
                 'name' => 'En mission',
-                'description' => 'En mission',
+                'description' => 'Chauffeur actuellement en mission',
                 'color' => '#3B82F6',
                 'icon' => 'fa-truck',
                 'can_drive' => true,
                 'can_assign' => false,
+                'organization_id' => null,
+                'is_global' => true
             ],
-            (object) [
+            [
                 'id' => 3,
-                'name' => 'Inactif',
-                'description' => 'Inactif',
-                'color' => '#6B7280',
-                'icon' => 'fa-user-slash',
+                'name' => 'En congé',
+                'description' => 'Chauffeur en congé ou indisponible',
+                'color' => '#F59E0B',
+                'icon' => 'fa-calendar-times',
                 'can_drive' => false,
                 'can_assign' => false,
+                'organization_id' => null,
+                'is_global' => true
+            ],
+            [
+                'id' => 4,
+                'name' => 'Suspendu',
+                'description' => 'Chauffeur suspendu temporairement',
+                'color' => '#EF4444',
+                'icon' => 'fa-ban',
+                'can_drive' => false,
+                'can_assign' => false,
+                'organization_id' => null,
+                'is_global' => true
             ],
         ]);
     }

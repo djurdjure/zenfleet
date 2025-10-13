@@ -47,13 +47,13 @@ class DriverObserver
     {
         // Calcul automatique de la date d'expiration du permis
         if ($driver->isDirty('license_issue_date') && !is_null($driver->license_issue_date)) {
-            $driver->driver_license_expiry_date = Carbon::parse($driver->license_issue_date)
+            $driver->license_expiry_date = Carbon::parse($driver->license_issue_date)
                 ->addYears(self::LICENSE_VALIDITY_YEARS);
-            
+
             Log::info('Driver license expiry date calculated', [
                 'driver_id' => $driver->id,
                 'issue_date' => $driver->license_issue_date,
-                'expiry_date' => $driver->driver_license_expiry_date,
+                'expiry_date' => $driver->license_expiry_date,
                 'validity_years' => self::LICENSE_VALIDITY_YEARS
             ]);
         }
@@ -71,33 +71,30 @@ class DriverObserver
 
     /**
      * Gère l'événement "created" du modèle Driver.
-     * Création automatique d'un compte utilisateur avec rôle Chauffeur
+     *
+     * ⚠️ NOTE IMPORTANTE: La création automatique du compte utilisateur est désormais
+     * gérée par DriverService::createDriver() pour garantir la compatibilité multi-tenant
+     * avec organization_id dans la table model_has_roles.
+     *
+     * Cet événement ne sert maintenant que pour le logging et l'audit trail.
      */
     public function created(Driver $driver): void
     {
         $startTime = microtime(true);
-        
+
         Log::info('=== DRIVER CREATED EVENT TRIGGERED ===', [
             'driver_id' => $driver->id,
             'driver_name' => $driver->first_name . ' ' . $driver->last_name,
             'has_user_id' => !empty($driver->user_id),
             'organization_id' => $driver->organization_id,
             'created_by' => auth()->id() ?? 'system',
-            'timestamp' => now()->toISOString()
+            'timestamp' => now()->toISOString(),
+            'processing_time_ms' => round((microtime(true) - $startTime) * 1000, 2)
         ]);
 
-        // Si le chauffeur a déjà un user_id, on ne fait rien
-        if ($driver->user_id) {
-            Log::info('Driver created with existing user account', [
-                'driver_id' => $driver->id,
-                'user_id' => $driver->user_id,
-                'processing_time_ms' => round((microtime(true) - $startTime) * 1000, 2)
-            ]);
-            return;
-        }
-
-        // Création automatique du compte utilisateur
-        $this->createUserAccountForDriver($driver);
+        // ✅ DÉSACTIVÉ: La création de user est maintenant gérée par DriverService
+        // pour garantir le support multi-tenant avec organization_id
+        // @see App\Services\DriverService::createDriver()
     }
 
     /**

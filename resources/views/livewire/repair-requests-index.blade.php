@@ -153,7 +153,7 @@
         </div>
 
         {{-- SECTION FILTRES --}}
-        <div class="bg-white rounded-xl shadow-sm" x-data="{ showFilters: @entangle('showFilters') }">
+        <div class="bg-white rounded-xl shadow-sm">
             {{-- Header des filtres --}}
             <div class="px-6 py-4 border-b border-gray-200">
                 <div class="flex items-center justify-between">
@@ -173,23 +173,27 @@
 
                         {{-- Bouton filtres avancés --}}
                         <button
-                            @click="showFilters = !showFilters"
+                            wire:click="$toggle('showFilters')"
+                            type="button"
                             class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
                         >
                             <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path>
                             </svg>
                             Filtres
-                            <span x-show="showFilters" class="ml-2">
+                            @if($showFilters)
+                            <span class="ml-2">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path>
                                 </svg>
                             </span>
-                            <span x-show="!showFilters" class="ml-2">
+                            @else
+                            <span class="ml-2">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
                                 </svg>
                             </span>
+                            @endif
                         </button>
 
                         {{-- Badge nombre de filtres actifs --}}
@@ -276,16 +280,8 @@
             </div>
 
             {{-- Panneau de filtres avancés --}}
-            <div
-                x-show="showFilters"
-                x-transition:enter="transition ease-out duration-200"
-                x-transition:enter-start="opacity-0 -translate-y-1"
-                x-transition:enter-end="opacity-100 translate-y-0"
-                x-transition:leave="transition ease-in duration-150"
-                x-transition:leave-start="opacity-100 translate-y-0"
-                x-transition:leave-end="opacity-0 -translate-y-1"
-                class="px-6 py-4 bg-gray-50 border-b border-gray-200"
-            >
+            @if($showFilters)
+            <div class="px-6 py-4 bg-gray-50 border-b border-gray-200">
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                     {{-- Statut --}}
                     <div>
@@ -378,6 +374,7 @@
                     </div>
                 </div>
             </div>
+            @endif
         </div>
 
         {{-- TABLEAU DES DEMANDES --}}

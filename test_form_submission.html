@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Form Submission</title>
+</head>
+<body>
+    <h1>Test Direct de Soumission</h1>
+
+    <form method="POST" action="http://localhost/admin/drivers">
+        <input type="hidden" name="_token" value="lhZ9wDYCtBzbfiNTu4PAeaulTxph65uTDUBJ5GnG">
+        <input type="hidden" name="organization_id" value="1">
+        <input type="hidden" name="current_step" value="4">
+
+        <label>Prénom *</label>
+        <input type="text" name="first_name" value="TestDirect" required><br><br>
+
+        <label>Nom *</label>
+        <input type="text" name="last_name" value="Soumission" required><br><br>
+
+        <label>Statut *</label>
+        <select name="status_id" required>
+            <option value="1">Actif</option>
+        </select><br><br>
+
+        <button type="submit">SOUMETTRE LE FORMULAIRE</button>
+    </form>
+
+    <script>
+        document.querySelector('form').addEventListener('submit', function(e) {
+            console.log('Form submitted!');
+            console.log('Form data:', new FormData(this));
+        });
+    </script>
+</body>
+</html>
