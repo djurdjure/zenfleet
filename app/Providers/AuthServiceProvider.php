@@ -8,6 +8,7 @@ use App\Models\User;
 use App\Models\Organization;
 use App\Models\Vehicle;
 use App\Models\Driver;
+use App\Models\DriverSanction;
 use App\Models\Supplier;
 use App\Models\Assignment;
 use App\Models\RepairRequest;
@@ -19,6 +20,7 @@ use App\Policies\RolePolicy;
 use App\Policies\OrganizationPolicy;
 use App\Policies\VehiclePolicy;
 use App\Policies\DriverPolicy;
+use App\Policies\DriverSanctionPolicy;
 use App\Policies\SupplierPolicy;
 use App\Policies\AssignmentPolicy;
 use App\Policies\RepairRequestPolicy;
@@ -44,6 +46,7 @@ class AuthServiceProvider extends ServiceProvider
         // 🛡️ POLICIES GESTION DE FLOTTE (Enterprise-Grade)
         Vehicle::class => VehiclePolicy::class,
         Driver::class => DriverPolicy::class,
+        DriverSanction::class => DriverSanctionPolicy::class,
         Supplier::class => SupplierPolicy::class,
         Assignment::class => AssignmentPolicy::class,
 

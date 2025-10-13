@@ -94,31 +94,50 @@
             </li>
             @endcan
 
-            {{-- Flotte --}}
+            {{-- Véhicules --}}
             @can('view-vehicles')
-            <li class="nav-item nav-dropdown {{ $isRouteActive(['admin.vehicles', 'admin.drivers', 'admin.assignments']) ? 'active' : '' }}">
-                <a href="#" class="nav-link dropdown-toggle" data-target="fleet">
+            <li class="nav-item nav-dropdown {{ $isRouteActive(['admin.vehicles']) ? 'active' : '' }}">
+                <a href="#" class="nav-link dropdown-toggle" data-target="vehicles">
                     <i class="nav-icon fas fa-car"></i>
-                    <span class="nav-label">Flotte</span>
+                    <span class="nav-label">Véhicules</span>
                     <i class="dropdown-arrow fas fa-chevron-right"></i>
                 </a>
-                <ul class="nav-dropdown-menu" id="dropdown-fleet">
+                <ul class="nav-dropdown-menu" id="dropdown-vehicles">
                     <li class="{{ $isRouteActive('admin.vehicles') ? 'active' : '' }}">
                         <a href="{{ route('admin.vehicles.index') }}" class="nav-sublink">
-                            <i class="fas fa-car"></i>
-                            <span>Véhicules</span>
-                        </a>
-                    </li>
-                    <li class="{{ $isRouteActive('admin.drivers') ? 'active' : '' }}">
-                        <a href="{{ route('admin.drivers.index') }}" class="nav-sublink">
-                            <i class="fas fa-users"></i>
-                            <span>Chauffeurs</span>
+                            <i class="fas fa-list"></i>
+                            <span>Gestion Véhicules</span>
                         </a>
                     </li>
                     <li class="{{ $isRouteActive('admin.assignments') ? 'active' : '' }}">
                         <a href="{{ route('admin.assignments.index') }}" class="nav-sublink">
                             <i class="fas fa-clipboard-list"></i>
                             <span>Affectations</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+            @endcan
+
+            {{-- Chauffeurs avec sous-menu --}}
+            @can('view-drivers')
+            <li class="nav-item nav-dropdown {{ $isRouteActive(['admin.drivers', 'admin.sanctions']) ? 'active' : '' }}">
+                <a href="#" class="nav-link dropdown-toggle" data-target="drivers">
+                    <i class="nav-icon fas fa-user-tie"></i>
+                    <span class="nav-label">Chauffeurs</span>
+                    <i class="dropdown-arrow fas fa-chevron-right"></i>
+                </a>
+                <ul class="nav-dropdown-menu" id="dropdown-drivers">
+                    <li class="{{ $isRouteActive('admin.drivers') ? 'active' : '' }}">
+                        <a href="{{ route('admin.drivers.index') }}" class="nav-sublink">
+                            <i class="fas fa-list"></i>
+                            <span>Liste</span>
+                        </a>
+                    </li>
+                    <li class="{{ $isRouteActive('admin.sanctions') ? 'active' : '' }}">
+                        <a href="{{ route('admin.sanctions.index') }}" class="nav-sublink">
+                            <i class="fas fa-gavel"></i>
+                            <span>Sanctions</span>
                         </a>
                     </li>
                 </ul>
@@ -324,40 +343,73 @@ window.ZenFleetSidebar = {
     },
 
     toggleDropdown(trigger) {
-        const dropdown = trigger.closest('.nav-dropdown');
-        const menu = dropdown.querySelector('.nav-dropdown-menu');
-        const arrow = trigger.querySelector('.dropdown-arrow');
-        
-        if (!menu || !arrow) return;
+        // Déterminer si c'est un dropdown principal ou imbriqué
+        const isNested = trigger.closest('.nav-dropdown-nested');
 
-        const isOpen = menu.style.maxHeight && menu.style.maxHeight !== '0px';
-        
-        // Fermer autres dropdowns
-        document.querySelectorAll('.nav-dropdown-menu').forEach(otherMenu => {
-            if (otherMenu !== menu) {
-                otherMenu.style.maxHeight = '0px';
-                const otherArrow = otherMenu.parentElement.querySelector('.dropdown-arrow');
-                if (otherArrow) {
-                    otherArrow.classList.remove('fa-chevron-down');
-                    otherArrow.classList.add('fa-chevron-right');
-                }
+        if (isNested) {
+            // Gestion des sous-menus imbriqués
+            const menu = isNested.querySelector('.nav-dropdown-menu-nested');
+            const arrow = trigger.querySelector('.dropdown-arrow-nested');
+
+            if (!menu || !arrow) return;
+
+            const isOpen = menu.style.maxHeight && menu.style.maxHeight !== '0px';
+
+            // Toggle current nested menu
+            if (isOpen) {
+                menu.style.maxHeight = '0px';
+                arrow.classList.remove('fa-chevron-down');
+                arrow.classList.add('fa-chevron-right');
+            } else {
+                menu.style.maxHeight = menu.scrollHeight + 'px';
+                arrow.classList.remove('fa-chevron-right');
+                arrow.classList.add('fa-chevron-down');
             }
-        });
 
-        // Toggle current
-        if (isOpen) {
-            menu.style.maxHeight = '0px';
-            arrow.classList.remove('fa-chevron-down');
-            arrow.classList.add('fa-chevron-right');
+            // Sauvegarder l'état
+            const target = trigger.dataset.target;
+            if (target) {
+                localStorage.setItem(`dropdown-${target}`, isOpen ? 'closed' : 'open');
+            }
         } else {
-            menu.style.maxHeight = menu.scrollHeight + 'px';
-            arrow.classList.remove('fa-chevron-right');
-            arrow.classList.add('fa-chevron-down');
-        }
+            // Gestion des dropdowns principaux
+            const dropdown = trigger.closest('.nav-dropdown');
+            const menu = dropdown.querySelector('.nav-dropdown-menu');
+            const arrow = trigger.querySelector('.dropdown-arrow');
 
-        // Sauvegarder l'état
-        const target = trigger.dataset.target;
-        localStorage.setItem(`dropdown-${target}`, isOpen ? 'closed' : 'open');
+            if (!menu || !arrow) return;
+
+            const isOpen = menu.style.maxHeight && menu.style.maxHeight !== '0px';
+
+            // Fermer autres dropdowns principaux (pas les imbriqués)
+            document.querySelectorAll('.nav-dropdown > .nav-dropdown-menu').forEach(otherMenu => {
+                if (otherMenu !== menu) {
+                    otherMenu.style.maxHeight = '0px';
+                    const otherArrow = otherMenu.parentElement.querySelector('.dropdown-arrow');
+                    if (otherArrow) {
+                        otherArrow.classList.remove('fa-chevron-down');
+                        otherArrow.classList.add('fa-chevron-right');
+                    }
+                }
+            });
+
+            // Toggle current
+            if (isOpen) {
+                menu.style.maxHeight = '0px';
+                arrow.classList.remove('fa-chevron-down');
+                arrow.classList.add('fa-chevron-right');
+            } else {
+                menu.style.maxHeight = menu.scrollHeight + 'px';
+                arrow.classList.remove('fa-chevron-right');
+                arrow.classList.add('fa-chevron-down');
+            }
+
+            // Sauvegarder l'état
+            const target = trigger.dataset.target;
+            if (target) {
+                localStorage.setItem(`dropdown-${target}`, isOpen ? 'closed' : 'open');
+            }
+        }
     },
 
     handleResponsive() {

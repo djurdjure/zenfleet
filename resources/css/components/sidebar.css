@@ -300,3 +300,73 @@ body.mobile-view {
 .sidebar-nav::-webkit-scrollbar-thumb:hover {
     background: rgba(148, 163, 184, 0.5);
 }
+
+/* 🎯 Nested Dropdown Menus (Sous-menus imbriqués) */
+.nav-dropdown-nested {
+    position: relative;
+}
+
+.nav-dropdown-nested .dropdown-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.dropdown-arrow-nested {
+    font-size: 0.65rem;
+    transition: all 0.3s ease;
+    margin-left: auto;
+}
+
+.nav-dropdown-menu-nested {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+    background-color: rgba(0, 0, 0, 0.3);
+    border-radius: 4px;
+    margin-top: 4px;
+    margin-left: 16px;
+}
+
+.nav-dropdown-menu-nested li {
+    margin: 0;
+}
+
+.nav-sublink-nested {
+    display: flex;
+    align-items: center;
+    padding: 8px 12px 8px 24px;
+    color: #94a3b8;
+    text-decoration: none;
+    font-size: 0.8125rem;
+    transition: all 0.2s ease;
+}
+
+.nav-sublink-nested:hover {
+    color: #3b82f6;
+    background-color: rgba(59, 130, 246, 0.08);
+}
+
+.nav-sublink-nested i {
+    width: 14px;
+    margin-right: 8px;
+    font-size: 0.8125rem;
+}
+
+.nav-dropdown-menu-nested li.active .nav-sublink-nested {
+    color: #60a5fa;
+    font-weight: 600;
+    background-color: rgba(59, 130, 246, 0.15);
+}
+
+/* Collapsed state - hide nested menus */
+.zenfleet-sidebar.collapsed .nav-dropdown-menu-nested {
+    display: none;
+}
+
+.zenfleet-sidebar.collapsed .dropdown-arrow-nested {
+    display: none;
+}

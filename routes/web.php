@@ -268,6 +268,9 @@ Route::middleware(['auth', 'verified'])
             // Route::get('{driver}/performance', [DriverController::class, 'performance'])->name('performance');
         });
 
+        // ⚖️ Sanctions Chauffeurs (Livewire)
+        Route::get('sanctions', \App\Livewire\Admin\DriverSanctionIndex::class)->name('sanctions.index');
+
         // 🔄 Affectations Enterprise-Grade
         Route::resource('assignments', AssignmentController::class);
         Route::prefix('assignments')->name('assignments.')->group(function () {

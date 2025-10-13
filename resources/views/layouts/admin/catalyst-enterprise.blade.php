@@ -224,19 +224,50 @@
                             </ul>
                         </li>
 
-                        {{-- Chauffeurs --}}
-                        <li>
-                            <a href="{{ route('admin.drivers.index') }}"
-                               class="menu-item group flex items-center gap-x-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-200
-                                      {{ request()->routeIs('admin.drivers.*') 
-                                         ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg shadow-blue-500/20' 
-                                         : 'text-gray-300 hover:text-white hover:bg-white/10' }}">
-                                <i class="fas fa-users text-lg {{ request()->routeIs('admin.drivers.*') ? 'text-white' : 'text-gray-400 group-hover:text-white' }}"></i>
+                        {{-- Chauffeurs avec sous-menu --}}
+                        <li x-data="{ open: {{ request()->routeIs(['admin.drivers.*', 'admin.sanctions.*']) ? 'true' : 'false' }} }">
+                            <button @click="open = !open"
+                                    class="menu-item group flex w-full items-center gap-x-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-200
+                                           {{ request()->routeIs(['admin.drivers.*', 'admin.sanctions.*']) 
+                                              ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg shadow-blue-500/20' 
+                                              : 'text-gray-300 hover:text-white hover:bg-white/10' }}">
+                                <i class="fas fa-user-tie text-lg {{ request()->routeIs(['admin.drivers.*', 'admin.sanctions.*']) ? 'text-white' : 'text-gray-400 group-hover:text-white' }}"></i>
                                 <span>Chauffeurs</span>
-                                @if(request()->routeIs('admin.drivers.*'))
-                                    <span class="ml-auto w-1 h-6 bg-white rounded-full"></span>
-                                @endif
-                            </a>
+                                <svg class="ml-auto h-4 w-4 transition-transform duration-200"
+                                     :class="{ 'rotate-90': open }"
+                                     xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                                </svg>
+                            </button>
+                            <ul x-show="open"
+                                x-transition:enter="transition ease-out duration-200"
+                                x-transition:enter-start="opacity-0 -translate-y-2"
+                                x-transition:enter-end="opacity-100 translate-y-0"
+                                x-transition:leave="transition ease-in duration-150"
+                                x-transition:leave-start="opacity-100 translate-y-0"
+                                x-transition:leave-end="opacity-0 -translate-y-2"
+                                class="mt-1 ml-8 space-y-1">
+                                <li>
+                                    <a href="{{ route('admin.drivers.index') }}"
+                                       class="group flex items-center gap-x-3 rounded-lg px-3 py-2 text-sm transition-all duration-200
+                                              {{ request()->routeIs('admin.drivers.index') 
+                                                 ? 'bg-white/10 text-white' 
+                                                 : 'text-gray-400 hover:text-white hover:bg-white/5' }}">
+                                        <div class="w-1.5 h-1.5 rounded-full {{ request()->routeIs('admin.drivers.index') ? 'bg-white' : 'bg-gray-500' }}"></div>
+                                        <span>Liste des chauffeurs</span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="{{ route('admin.sanctions.index') }}"
+                                       class="group flex items-center gap-x-3 rounded-lg px-3 py-2 text-sm transition-all duration-200
+                                              {{ request()->routeIs('admin.sanctions.*') 
+                                                 ? 'bg-white/10 text-white' 
+                                                 : 'text-gray-400 hover:text-white hover:bg-white/5' }}">
+                                        <div class="w-1.5 h-1.5 rounded-full {{ request()->routeIs('admin.sanctions.*') ? 'bg-white' : 'bg-gray-500' }}"></div>
+                                        <span>Sanctions</span>
+                                    </a>
+                                </li>
+                            </ul>
                         </li>
 
                         {{-- Maintenance --}}

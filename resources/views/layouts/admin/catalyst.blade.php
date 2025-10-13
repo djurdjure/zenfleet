@@ -103,14 +103,44 @@
                         </li>
                         @endhasanyrole
 
-                        {{-- Chauffeurs --}}
+                        {{-- Chauffeurs avec sous-menu --}}
                         @hasanyrole('Super Admin|Admin|Gestionnaire Flotte')
-                        <li class="flex">
-                            <a href="{{ route('admin.drivers.index') }}"
-                               class="flex items-center w-full h-10 px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 {{ request()->routeIs('admin.drivers.*') ? 'bg-blue-50 text-blue-700 shadow-sm' : 'text-slate-600 hover:bg-white/60 hover:text-slate-800' }}">
-                                <i class="fas fa-user-tie text-base mr-3 {{ request()->routeIs('admin.drivers.*') ? 'text-blue-600' : 'text-slate-500' }}"></i>
-                                <span class="flex-1">Chauffeurs</span>
-                            </a>
+                        <li class="flex flex-col" x-data="{ open: {{ request()->routeIs(['admin.drivers.*', 'admin.sanctions.*']) ? 'true' : 'false' }} }">
+                            <button @click="open = !open"
+                                    class="flex items-center w-full h-10 px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 {{ request()->routeIs(['admin.drivers.*', 'admin.sanctions.*']) ? 'bg-blue-50 text-blue-700 shadow-sm' : 'text-slate-600 hover:bg-white/60 hover:text-slate-800' }}">
+                                <i class="fas fa-user-tie text-base mr-3 {{ request()->routeIs(['admin.drivers.*', 'admin.sanctions.*']) ? 'text-blue-600' : 'text-slate-500' }}"></i>
+                                <span class="flex-1 text-left">Chauffeurs</span>
+                                <i class="fas fa-chevron-down text-xs transition-transform duration-200" :class="{ 'rotate-180': !open }"></i>
+                            </button>
+                            <div x-show="open" 
+                                 x-transition:enter="transition ease-out duration-300" 
+                                 x-transition:enter-start="opacity-0 max-h-0" 
+                                 x-transition:enter-end="opacity-100 max-h-96" 
+                                 x-transition:leave="transition ease-in duration-200" 
+                                 x-transition:leave-start="opacity-100 max-h-96" 
+                                 x-transition:leave-end="opacity-0 max-h-0" 
+                                 class="overflow-hidden">
+                                <div class="flex w-full mt-2 pl-3">
+                                    <div class="mr-1">
+                                        <div class="px-1 py-2 h-full relative">
+                                            <div class="bg-slate-300/40 w-0.5 h-full rounded-full"></div>
+                                            <div class="absolute w-0.5 rounded-full bg-blue-500 transition-all duration-300" style="height: {{ request()->routeIs('admin.drivers.index') ? '50' : (request()->routeIs('admin.sanctions.*') ? '50' : '0') }}%; top: {{ request()->routeIs('admin.sanctions.*') ? '50' : '0' }}%;"></div>
+                                        </div>
+                                    </div>
+                                    <div class="flex-1 min-w-0 space-y-1">
+                                        <a href="{{ route('admin.drivers.index') }}"
+                                           class="flex items-center w-full h-8 px-1 py-1 rounded-md text-sm font-semibold transition-all duration-200 {{ request()->routeIs('admin.drivers.index') ? 'bg-blue-50/80 text-blue-700' : 'text-slate-600 hover:bg-white/40 hover:text-slate-800' }}">
+                                            <i class="fas fa-list text-xs mr-3 {{ request()->routeIs('admin.drivers.index') ? 'text-blue-600' : 'text-slate-500' }}"></i>
+                                            Liste
+                                        </a>
+                                        <a href="{{ route('admin.sanctions.index') }}"
+                                           class="flex items-center w-full h-8 px-1 py-1 rounded-md text-sm font-semibold transition-all duration-200 {{ request()->routeIs('admin.sanctions.*') ? 'bg-blue-50/80 text-blue-700' : 'text-slate-600 hover:bg-white/40 hover:text-slate-800' }}">
+                                            <i class="fas fa-gavel text-xs mr-3 {{ request()->routeIs('admin.sanctions.*') ? 'text-blue-600' : 'text-slate-500' }}"></i>
+                                            Sanctions
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
                         </li>
                         @endhasanyrole
 
