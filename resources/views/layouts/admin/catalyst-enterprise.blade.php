@@ -112,7 +112,7 @@
     <div class="min-h-full" x-data="{ sidebarOpen: false, userMenuOpen: false, notificationsOpen: false }">
         
         {{-- Sidebar Desktop - Ultra Moderne --}}
-        <div class="hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-64 lg:flex-col">
+        <div class="hidden lg:fixed lg:inset-y-0 lg:left-0 lg:z-50 lg:flex lg:w-64 lg:flex-col">
             <div class="sidebar-enterprise flex grow flex-col overflow-y-auto">
                 
                 {{-- Logo Section --}}
