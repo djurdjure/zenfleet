@@ -4,7 +4,7 @@
     position: fixed;
     top: 0;
     left: 0;
-    width: 280px;
+    /* ✅ Largeur gérée par Tailwind (lg:w-64 = 256px) - Supprimé width: 280px */
     height: 100vh;
     background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
     color: #f1f5f9;
@@ -17,7 +17,7 @@
 }
 
 .zenfleet-sidebar.collapsed {
-    width: 70px;
+    /* ✅ Largeur collapsed gérée par Tailwind (lg:w-20 = 80px) - Supprimé width: 70px */
 }
 
 /* Header */
@@ -246,28 +246,21 @@
 }
 
 /* Body Adjustments */
-body:not(.mobile-view) {
-    padding-left: 280px;
-    transition: padding-left 0.3s ease;
-}
-
-body.sidebar-collapsed:not(.mobile-view) {
-    padding-left: 70px;
-}
-
-body.mobile-view {
-    padding-left: 0;
-}
+/* ✅ SUPPRIMÉ: padding-left sur body - Géré par Tailwind (lg:pl-64 dans les layouts) */
+/* Les layouts Blade utilisent déjà lg:pl-64 (256px) pour le contenu principal */
+/* body:not(.mobile-view) { padding-left: 280px; } */
+/* body.sidebar-collapsed:not(.mobile-view) { padding-left: 70px; } */
+/* body.mobile-view { padding-left: 0; } */
 
 /* Responsive */
-@media (max-width: 768px) {
+@media (max-width: 1024px) {
     .zenfleet-sidebar {
         transform: translateX(-100%);
     }
     
     .zenfleet-sidebar:not(.collapsed) {
         transform: translateX(0);
-        width: 280px;
+        /* ✅ Largeur mobile alignée avec Tailwind (max-w-xs = 320px) */
     }
     
     /* Overlay pour mobile */
@@ -275,7 +268,7 @@ body.mobile-view {
         content: '';
         position: fixed;
         top: 0;
-        left: 280px;
+        left: 320px;
         right: 0;
         bottom: 0;
         background-color: rgba(0, 0, 0, 0.5);

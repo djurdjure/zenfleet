@@ -100,9 +100,13 @@ class AssignmentController extends Controller
         // Chauffeurs disponibles avec logique enterprise améliorée
         $availableDrivers = Driver::where('organization_id', auth()->user()->organization_id)
             ->where(function($query) {
-                // Inclure chauffeurs actifs OU sans statut défini
-                $query->where('status', 'active')
-                      ->orWhereNull('status'); // Chauffeurs sans statut = actifs
+                // Inclure chauffeurs avec statut actif ET autorisés à conduire
+                $query->whereHas('driverStatus', function($statusQuery) {
+                    $statusQuery->where('is_active', true)
+                               ->where('can_drive', true)
+                               ->where('can_assign', true);
+                })
+                ->orWhereNull('status_id'); // Chauffeurs sans statut = actifs par défaut
             })
             ->whereDoesntHave('assignments', function($query) {
                 // Exclure chauffeurs avec affectation active
@@ -112,6 +116,7 @@ class AssignmentController extends Controller
                 })
                 ->where('start_datetime', '<=', now()); // Déjà commencée
             })
+            ->with('driverStatus') // Charger la relation pour l'affichage
             ->orderBy('last_name')
             ->orderBy('first_name')
             ->get();
@@ -125,7 +130,7 @@ class AssignmentController extends Controller
             'drivers' => $availableDrivers->pluck('first_name', 'last_name')
         ]);
 
-        return view('admin.assignments.create', compact('availableVehicles', 'availableDrivers'));
+        return view('admin.assignments.create-enterprise', compact('availableVehicles', 'availableDrivers'));
     }
 
     /**
@@ -494,15 +499,32 @@ class AssignmentController extends Controller
         $this->authorize('view assignments');
 
         $drivers = Driver::where('organization_id', auth()->user()->organization_id)
-            ->where('status', 'active')
+            ->whereHas('driverStatus', function($statusQuery) {
+                $statusQuery->where('is_active', true)
+                           ->where('can_drive', true)
+                           ->where('can_assign', true);
+            })
             ->whereDoesntHave('assignments', function($query) {
                 // Chauffeurs sans affectation en cours
                 $query->whereNull('end_datetime')
                       ->where('start_datetime', '<=', now());
             })
-            ->select('id', 'first_name', 'last_name', 'driver_license_number', 'personal_phone', 'status')
+            ->with('driverStatus')
+            ->select('id', 'first_name', 'last_name', 'license_number', 'personal_phone', 'status_id')
             ->orderBy('last_name')
-            ->get();
+            ->get()
+            ->map(function($driver) {
+                return [
+                    'id' => $driver->id,
+                    'full_name' => $driver->full_name,
+                    'first_name' => $driver->first_name,
+                    'last_name' => $driver->last_name,
+                    'license_number' => $driver->license_number,
+                    'personal_phone' => $driver->personal_phone,
+                    'status' => $driver->driverStatus?->name ?? 'Actif',
+                    'status_color' => $driver->driverStatus?->color ?? '#10b981'
+                ];
+            });
 
         return response()->json($drivers);
     }
