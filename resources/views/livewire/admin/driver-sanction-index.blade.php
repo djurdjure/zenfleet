@@ -1,7 +1,7 @@
 <div>
     {{-- Header avec titre et bouton d'ajout --}}
     <div class="bg-white border-b border-gray-200 sticky top-0 z-10">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <div class="px-4 sm:px-6 lg:px-8 py-6">
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 {{-- Titre --}}
                 <div>
@@ -28,7 +28,7 @@
         </div>
     </div>
 
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="px-4 sm:px-6 lg:px-8 py-8">
         {{-- Messages flash --}}
         @if (session()->has('success'))
         <div class="mb-6 bg-green-50 border-l-4 border-green-400 p-4 rounded-r-lg">

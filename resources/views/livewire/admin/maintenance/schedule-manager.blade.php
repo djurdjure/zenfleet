@@ -1,5 +1,5 @@
 <div class="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 -m-6 p-6">
-    <div class="max-w-7xl mx-auto">
+    <div>
 
         {{-- En-tête avec statistiques --}}
         <div class="mb-8">
