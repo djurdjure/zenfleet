@@ -23,8 +23,8 @@
 <body class="h-full">
     <div class="min-h-full">
         {{-- Sidebar pour desktop - Style FleetIO Enterprise --}}
-        <div class="hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-60 lg:flex-col">
-            <div class="flex grow flex-col overflow-hidden" style="background: linear-gradient(180deg, #ebf2f9 0%, #e3ecf6 100%); width: 240px; border-right: 1px solid rgba(0,0,0,0.1);">
+        <div class="hidden lg:fixed lg:inset-y-0 lg:left-0 lg:z-50 lg:flex lg:w-64 lg:flex-col">
+            <div class="flex grow flex-col overflow-hidden" style="background: linear-gradient(180deg, #ebf2f9 0%, #e3ecf6 100%); border-right: 1px solid rgba(0,0,0,0.1);">
                 {{-- En-tête avec logo --}}
                 <div class="w-full flex-none px-4 py-4 h-16 flex items-center border-b border-white/20">
                     <div class="flex items-center w-full">
@@ -512,7 +512,7 @@
         </div>
 
         {{-- Contenu principal --}}
-        <div class="lg:pl-60">
+        <div class="lg:pl-64">
             <div class="sticky top-0 z-40 flex h-16 shrink-0 items-center gap-x-4 border-b border-zinc-200 bg-white px-4 shadow-sm sm:gap-x-6 sm:px-6 lg:px-8">
                 <div class="h-6 w-px bg-zinc-200 lg:hidden" aria-hidden="true"></div>
 
