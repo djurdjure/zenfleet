@@ -447,6 +447,10 @@ class DriverSanctionIndex extends Component
 
     /**
      * Render du composant
+     * 
+     * Note : Ce composant est maintenant encapsulé dans une vue Blade standard
+     * via DriverSanctionController, donc nous ne spécifions plus de layout ici.
+     * Cela garantit une intégration correcte dans le layout principal de l'application.
      */
     public function render()
     {
@@ -457,6 +461,6 @@ class DriverSanctionIndex extends Component
             'sanctions' => $this->sanctions,
             'drivers' => $this->drivers,
             'sanctionTypes' => $this->sanctionTypes,
-        ])->layout('layouts.admin.catalyst-enterprise', ['title' => 'Sanctions Chauffeurs']);
+        ]);
     }
 }

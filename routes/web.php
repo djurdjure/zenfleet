@@ -8,6 +8,7 @@ use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\VehicleController;
 use App\Http\Controllers\Admin\DriverController;
+use App\Http\Controllers\Admin\DriverSanctionController;
 use App\Http\Controllers\Admin\AssignmentController;
 use App\Http\Controllers\Admin\SupplierController;
 use App\Http\Controllers\Admin\SupplierCategoryController;
@@ -268,8 +269,8 @@ Route::middleware(['auth', 'verified'])
             // Route::get('{driver}/performance', [DriverController::class, 'performance'])->name('performance');
         });
 
-        // ⚖️ Sanctions Chauffeurs (Livewire)
-        Route::get('sanctions', \App\Livewire\Admin\DriverSanctionIndex::class)->name('sanctions.index');
+        // ⚖️ Sanctions Chauffeurs (via Controller pour intégration layout)
+        Route::get('sanctions', [\App\Http\Controllers\Admin\DriverSanctionController::class, 'index'])->name('sanctions.index');
 
         // 🔄 Affectations Enterprise-Grade
         Route::resource('assignments', AssignmentController::class);
