@@ -1,5 +1,5 @@
 {{-- resources/views/admin/assignments/create-enterprise.blade.php --}}
-@extends('layouts.admin.catalyst-enterprise')
+@extends('layouts.admin.catalyst')
 @section('title', 'Nouvelle Affectation Enterprise - ZenFleet')
 
 @push('styles')

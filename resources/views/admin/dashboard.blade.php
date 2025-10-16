@@ -1,4 +1,4 @@
-@extends('layouts.admin.catalyst-enterprise')
+@extends('layouts.admin.catalyst')
 
 @section('title', 'Dashboard Enterprise')
 
