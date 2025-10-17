@@ -5,44 +5,38 @@ namespace App\View\Components;
 use Illuminate\View\Component;
 use Illuminate\View\View;
 
-class Input extends Component
+class Select extends Component
 {
-    public string $type;
     public string $name;
     public ?string $label;
-    public ?string $placeholder;
     public ?string $error;
     public ?string $helpText;
-    public ?string $icon;
     public bool $required;
     public bool $disabled;
-    public ?string $value;
+    public $options;
+    public $selected;
 
     /**
      * Create a new component instance.
      */
     public function __construct(
-        string $type = 'text',
         string $name = '',
         ?string $label = null,
-        ?string $placeholder = null,
         ?string $error = null,
         ?string $helpText = null,
-        ?string $icon = null,
         bool $required = false,
         bool $disabled = false,
-        ?string $value = null
+        $options = [],
+        $selected = null
     ) {
-        $this->type = $type;
         $this->name = $name;
         $this->label = $label;
-        $this->placeholder = $placeholder;
         $this->error = $error;
         $this->helpText = $helpText;
-        $this->icon = $icon;
         $this->required = $required;
         $this->disabled = $disabled;
-        $this->value = $value;
+        $this->options = $options;
+        $this->selected = $selected;
     }
 
     /**
@@ -50,11 +44,11 @@ class Input extends Component
      */
     public function render(): View
     {
-        return view('components.input');
+        return view('components.select');
     }
 
     /**
-     * Get input classes based on state (Flowbite-inspired)
+     * Get select classes based on state (Flowbite-inspired)
      */
     public function getClasses(): string
     {
@@ -68,14 +62,14 @@ class Input extends Component
             return "$baseClasses border-gray-300 bg-gray-100 text-gray-500 cursor-not-allowed opacity-60";
         }
 
-        return "$baseClasses border-gray-300 focus:ring-primary-600 focus:border-primary-600 dark:focus:ring-primary-500 dark:focus:border-primary-500";
+        return "$baseClasses border-gray-300 focus:ring-primary-500 focus:border-primary-500 dark:focus:ring-primary-500 dark:focus:border-primary-500";
     }
 
     /**
-     * Get ID for input
+     * Get ID for select
      */
     public function getId(): string
     {
-        return $this->name ?: 'input-' . uniqid();
+        return $this->name ?: 'select-' . uniqid();
     }
 }
