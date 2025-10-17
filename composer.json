@@ -1,6 +1,7 @@
 {
   "require": {
     "php": "^8.2",
+    "blade-ui-kit/blade-heroicons": "^2.4",
     "blade-ui-kit/blade-icons": "^1.5",
     "doctrine/dbal": "^3.9",
     "guzzlehttp/guzzle": "^7.8",
