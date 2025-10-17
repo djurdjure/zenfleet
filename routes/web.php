@@ -106,6 +106,15 @@ Route::middleware(['auth', 'verified'])
 
     /*
     |--------------------------------------------------------------------------
+    | 🎨 DESIGN SYSTEM - COMPOSANTS DEMO
+    |--------------------------------------------------------------------------
+    */
+    Route::get('/components-demo', function () {
+        return view('admin.components-demo');
+    })->name('components.demo')->middleware('role:Super Admin|Admin');
+
+    /*
+    |--------------------------------------------------------------------------
     | 👑 NIVEAU SUPER ADMIN - GESTION SYSTÈME GLOBALE
     |--------------------------------------------------------------------------
     */
