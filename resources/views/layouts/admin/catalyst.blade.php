@@ -73,7 +73,7 @@
                                     class="flex items-center w-full h-10 px-3 py-2 rounded-lg text-sm font-semibold transition-all duration-200 {{ request()->routeIs('admin.vehicles.*', 'admin.assignments.*') ? 'bg-blue-50 text-blue-700 shadow-sm' : 'text-slate-600 hover:bg-white/60 hover:text-slate-800' }}">
                                 <x-heroicon-o-truck class="w-4 h-4 mr-3 {{ request()->routeIs('admin.vehicles.*', 'admin.assignments.*') ? 'text-blue-600' : 'text-slate-500' }}" />
                                 <span class="flex-1 text-left">Véhicules</span>
-                                <x-heroicon-o-chevron-down class="w-3 h-3 transition-transform duration-200" :class="{ 'rotate-180': !open }" />
+                                <x-heroicon-o-chevron-down class="w-3 h-3 transition-transform duration-200" ::class="{ 'rotate-180': !open }" />
                             </button>
                             <div x-show="open" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 max-h-0" x-transition:enter-end="opacity-100 max-h-96" x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100 max-h-96" x-transition:leave-end="opacity-0 max-h-0" class="overflow-hidden">
                                 <div class="flex w-full mt-2 pl-3">
@@ -112,7 +112,7 @@
                                     class="flex items-center w-full h-10 px-3 py-2 rounded-lg text-sm font-semibold transition-all duration-200 {{ request()->routeIs(['admin.drivers.*', 'admin.sanctions.*']) ? 'bg-blue-50 text-blue-700 shadow-sm' : 'text-slate-600 hover:bg-white/60 hover:text-slate-800' }}">
                                 <x-heroicon-o-user class="w-4 h-4 mr-3 {{ request()->routeIs(['admin.drivers.*', 'admin.sanctions.*']) ? 'text-blue-600' : 'text-slate-500' }}" />
                                 <span class="flex-1 text-left">Chauffeurs</span>
-                                <x-heroicon-o-chevron-down class="w-3 h-3 transition-transform duration-200" :class="{ 'rotate-180': !open }" />
+                                <x-heroicon-o-chevron-down class="w-3 h-3 transition-transform duration-200" ::class="{ 'rotate-180': !open }" />
                             </button>
                             <div x-show="open" 
                                  x-transition:enter="transition ease-out duration-300" 
@@ -171,7 +171,7 @@
                                     class="flex items-center w-full h-10 px-3 py-2 rounded-lg text-sm font-semibold transition-all duration-200 {{ request()->routeIs('admin.mileage-readings.*', 'driver.mileage.*', 'admin.vehicles.*.mileage-history') ? 'bg-blue-50 text-blue-700 shadow-sm' : 'text-slate-600 hover:bg-white/60 hover:text-slate-800' }}">
                                 <x-heroicon-o-chart-bar-square class="w-4 h-4 mr-3 {{ request()->routeIs('admin.mileage-readings.*', 'driver.mileage.*', 'admin.vehicles.*.mileage-history') ? 'text-blue-600' : 'text-slate-500' }}" />
                                 <span class="flex-1 text-left">Kilométrage</span>
-                                <x-heroicon-o-chevron-down class="w-3 h-3 transition-transform duration-200" :class="{ 'rotate-180': !open }" />
+                                <x-heroicon-o-chevron-down class="w-3 h-3 transition-transform duration-200" ::class="{ 'rotate-180': !open }" />
                             </button>
                             <div x-show="open" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 max-h-0" x-transition:enter-end="opacity-100 max-h-96" x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100 max-h-96" x-transition:leave-end="opacity-0 max-h-0" class="overflow-hidden">
                                 <div class="flex w-full mt-2 pl-3">
@@ -229,7 +229,7 @@
                                     class="flex items-center w-full h-10 px-3 py-2 rounded-lg text-sm font-semibold transition-all duration-200 {{ request()->routeIs('admin.maintenance.*', 'admin.repair-requests.*') ? 'bg-blue-50 text-blue-700 shadow-sm' : 'text-slate-600 hover:bg-white/60 hover:text-slate-800' }}">
                                 <x-heroicon-o-wrench class="w-4 h-4 mr-3 {{ request()->routeIs('admin.maintenance.*', 'admin.repair-requests.*') ? 'text-blue-600' : 'text-slate-500' }}" />
                                 <span class="flex-1 text-left">Maintenance</span>
-                                <x-heroicon-o-chevron-down class="w-3 h-3 transition-transform duration-200" :class="{ 'rotate-180': !open }" />
+                                <x-heroicon-o-chevron-down class="w-3 h-3 transition-transform duration-200" ::class="{ 'rotate-180': !open }" />
                             </button>
                             <div x-show="open" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 max-h-0" x-transition:enter-end="opacity-100 max-h-96" x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100 max-h-96" x-transition:leave-end="opacity-0 max-h-0" class="overflow-hidden">
                                 <div class="flex w-full mt-2 pl-3">
@@ -333,7 +333,7 @@
                                     class="flex items-center w-full h-10 px-3 py-2 rounded-lg text-sm font-semibold transition-all duration-200 {{ request()->routeIs('admin.users.*', 'admin.roles.*', 'admin.audit.*') ? 'bg-blue-50 text-blue-700 shadow-sm' : 'text-slate-600 hover:bg-white/60 hover:text-slate-800' }}">
                                 <x-heroicon-o-cog-6-tooth class="w-4 h-4 mr-3 {{ request()->routeIs('admin.users.*', 'admin.roles.*', 'admin.audit.*') ? 'text-blue-600' : 'text-slate-500' }}" />
                                 <span class="flex-1 text-left">Administration</span>
-                                <x-heroicon-o-chevron-down class="w-3 h-3 transition-transform duration-200" :class="{ 'rotate-180': !open }" />
+                                <x-heroicon-o-chevron-down class="w-3 h-3 transition-transform duration-200" ::class="{ 'rotate-180': !open }" />
                             </button>
                             <div x-show="open" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 max-h-0" x-transition:enter-end="opacity-100 max-h-96" x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100 max-h-96" x-transition:leave-end="opacity-0 max-h-0" class="overflow-hidden">
                                 <div class="flex w-full mt-2 pl-3">
@@ -455,7 +455,7 @@
                                                         class="group flex w-full gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold {{ request()->routeIs('admin.vehicles.*', 'admin.assignments.*') ? 'bg-zinc-950 text-white' : 'text-zinc-700 hover:text-zinc-950 hover:bg-zinc-100' }}">
                                                     <x-heroicon-o-truck class="h-5 w-5 shrink-0" />
                                                     <span class="flex-1 text-left">Véhicules</span>
-                                                    <x-heroicon-o-chevron-right class="h-4 w-4 transition-transform" :class="{ 'rotate-90': open }" />
+                                                    <x-heroicon-o-chevron-right class="h-4 w-4 transition-transform" ::class="{ 'rotate-90': open }" />
                                                 </button>
                                                 <div x-show="open" x-transition class="mt-1">
                                                     <ul class="ml-6 space-y-1">
@@ -500,7 +500,7 @@
                                                         class="group flex w-full gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold {{ request()->routeIs('admin.users.*', 'admin.roles.*', 'admin.audit.*') ? 'bg-zinc-950 text-white' : 'text-zinc-700 hover:text-zinc-950 hover:bg-zinc-100' }}">
                                                     <x-heroicon-o-cog-6-tooth class="h-5 w-5 shrink-0" />
                                                     <span class="flex-1 text-left">Administration</span>
-                                                    <x-heroicon-o-chevron-right class="h-4 w-4 transition-transform" :class="{ 'rotate-90': open }" />
+                                                    <x-heroicon-o-chevron-right class="h-4 w-4 transition-transform" ::class="{ 'rotate-90': open }" />
                                                 </button>
                                                 <div x-show="open" x-transition class="mt-1">
                                                     <ul class="ml-6 space-y-1">
@@ -607,7 +607,7 @@
                                         <div class="text-sm font-semibold leading-5 text-zinc-900">{{ auth()->user()->name }}</div>
                                         <div class="text-xs leading-4 text-zinc-500">{{ auth()->user()->getRoleNames()->first() }}</div>
                                     </div>
-                                    <x-heroicon-o-chevron-down class="ml-2 h-4 w-4 text-zinc-500 transition-transform" :class="{ 'rotate-180': open }" />
+                                    <x-heroicon-o-chevron-down class="ml-2 h-4 w-4 text-zinc-500 transition-transform" ::class="{ 'rotate-180': open }" />
                                 </span>
                             </button>
 
