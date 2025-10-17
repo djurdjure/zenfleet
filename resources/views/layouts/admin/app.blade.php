@@ -1,9 +1,9 @@
-{{-- 
-    REDIRECTION VERS LE LAYOUT MODERNE CATALYST-ENTERPRISE
+{{--
+    REDIRECTION VERS LE LAYOUT MODERNE CATALYST
     Ce fichier est conservé pour compatibilité avec l'ancien code
-    Tous les nouveaux développements doivent utiliser layouts.admin.catalyst-enterprise
+    Tous les nouveaux développements doivent utiliser layouts.admin.catalyst
 --}}
-@extends('layouts.admin.catalyst-enterprise')
+@extends('layouts.admin.catalyst')
 
 @section('content')
     @yield('content')
