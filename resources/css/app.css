@@ -6,7 +6,6 @@
 /* ✅ Import des librairies tierces EN PREMIER */
 @import 'tom-select/dist/css/tom-select.css';
 @import 'flatpickr/dist/flatpickr.min.css';
-@import './zenfleet-ultra-pro.css';
 
 /* ✅ Import Tailwind CSS */
 @tailwind base;

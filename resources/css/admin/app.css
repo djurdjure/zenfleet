@@ -6,9 +6,6 @@
 /* ✅ CRITIQUE: Import des librairies EN PREMIER */
 @import 'tom-select/dist/css/tom-select.css';
 
-/* ✅ Import composants ZenFleet */
-@import '../components/sidebar.css';
-
 /* ✅ Import Tailwind CSS APRÈS les imports externes */
 @tailwind base;
 @tailwind components;
