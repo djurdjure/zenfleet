@@ -11,8 +11,111 @@
                 🎨 ZenFleet Design System
             </h1>
             <p class="text-gray-600 dark:text-gray-400">
-                Composants Flowbite-inspired avec Tailwind CSS et support dark mode
+                Composants Flowbite-inspired avec Tailwind CSS, Iconify et support dark mode
             </p>
+        </div>
+
+        {{-- Icons (Iconify) --}}
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 mb-6 border border-gray-200 dark:border-gray-700">
+            <h2 class="text-2xl font-semibold text-gray-900 dark:text-white mb-4">Icons (Iconify)</h2>
+
+            <div class="space-y-4">
+                {{-- Heroicons Collection --}}
+                <div>
+                    <h3 class="text-sm font-medium text-gray-900 dark:text-white mb-3">Heroicons (Collection par défaut)</h3>
+                    <div class="flex flex-wrap items-center gap-4">
+                        <div class="flex items-center gap-2">
+                            <x-icon icon="heroicons:truck" class="w-6 h-6 text-blue-600" />
+                            <span class="text-sm text-gray-600 dark:text-gray-400">truck</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <x-icon icon="heroicons:users" class="w-6 h-6 text-blue-600" />
+                            <span class="text-sm text-gray-600 dark:text-gray-400">users</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <x-icon icon="heroicons:calendar" class="w-6 h-6 text-blue-600" />
+                            <span class="text-sm text-gray-600 dark:text-gray-400">calendar</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <x-icon icon="heroicons:wrench-screwdriver" class="w-6 h-6 text-blue-600" />
+                            <span class="text-sm text-gray-600 dark:text-gray-400">wrench-screwdriver</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <x-icon icon="heroicons:check-circle" class="w-6 h-6 text-green-600" />
+                            <span class="text-sm text-gray-600 dark:text-gray-400">check-circle</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <x-icon icon="heroicons:exclamation-circle" class="w-6 h-6 text-red-600" />
+                            <span class="text-sm text-gray-600 dark:text-gray-400">exclamation-circle</span>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- Tailles --}}
+                <div>
+                    <h3 class="text-sm font-medium text-gray-900 dark:text-white mb-3">Tailles</h3>
+                    <div class="flex flex-wrap items-center gap-4">
+                        <div class="flex items-center gap-2">
+                            <x-icon icon="heroicons:truck" class="w-4 h-4 text-blue-600" />
+                            <span class="text-sm text-gray-600 dark:text-gray-400">w-4 h-4 (16px)</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <x-icon icon="heroicons:truck" class="w-5 h-5 text-blue-600" />
+                            <span class="text-sm text-gray-600 dark:text-gray-400">w-5 h-5 (20px)</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <x-icon icon="heroicons:truck" class="w-6 h-6 text-blue-600" />
+                            <span class="text-sm text-gray-600 dark:text-gray-400">w-6 h-6 (24px)</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <x-icon icon="heroicons:truck" class="w-8 h-8 text-blue-600" />
+                            <span class="text-sm text-gray-600 dark:text-gray-400">w-8 h-8 (32px)</span>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- Couleurs Sémantiques --}}
+                <div>
+                    <h3 class="text-sm font-medium text-gray-900 dark:text-white mb-3">Couleurs Sémantiques</h3>
+                    <div class="flex flex-wrap items-center gap-4">
+                        <div class="flex items-center gap-2">
+                            <x-icon icon="heroicons:check-circle" class="w-6 h-6 text-green-600" />
+                            <span class="text-sm text-gray-600 dark:text-gray-400">Success</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <x-icon icon="heroicons:x-circle" class="w-6 h-6 text-red-600" />
+                            <span class="text-sm text-gray-600 dark:text-gray-400">Error</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <x-icon icon="heroicons:exclamation-triangle" class="w-6 h-6 text-orange-600" />
+                            <span class="text-sm text-gray-600 dark:text-gray-400">Warning</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <x-icon icon="heroicons:information-circle" class="w-6 h-6 text-blue-600" />
+                            <span class="text-sm text-gray-600 dark:text-gray-400">Info</span>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- Autres Collections Disponibles --}}
+                <div>
+                    <h3 class="text-sm font-medium text-gray-900 dark:text-white mb-3">Autres Collections (Material Design Icons, Font Awesome, etc.)</h3>
+                    <div class="flex flex-wrap items-center gap-4">
+                        <div class="flex items-center gap-2">
+                            <x-icon icon="mdi:car" class="w-6 h-6 text-blue-600" />
+                            <span class="text-sm text-gray-600 dark:text-gray-400">mdi:car</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <x-icon icon="fa6-solid:truck" class="w-6 h-6 text-blue-600" />
+                            <span class="text-sm text-gray-600 dark:text-gray-400">fa6-solid:truck</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <x-icon icon="bi:gear" class="w-6 h-6 text-blue-600" />
+                            <span class="text-sm text-gray-600 dark:text-gray-400">bi:gear</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
 
         {{-- Buttons --}}

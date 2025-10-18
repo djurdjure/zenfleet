@@ -14,6 +14,9 @@
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=inter:300,400,500,600,700&display=swap" rel="stylesheet" />
 
+    <!-- Iconify CDN -->
+    <script src="https://code.iconify.design/3/3.1.0/iconify.min.js"></script>
+
     @vite(['resources/js/admin/app.js'])
     @stack('styles')
 </head>

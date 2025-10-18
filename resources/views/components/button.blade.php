@@ -17,30 +17,30 @@
 @if($href)
     <a href="{{ $href }}" class="{{ $classes }}" {{ $attributes }}>
         @if($icon && $iconPosition === 'left')
-            <x-dynamic-component :component="'heroicon-o-' . $icon" :class="$iconSize . ' ' . ($slot->isNotEmpty() ? 'mr-2' : '')" />
+            <x-icon :icon="'heroicons:' . $icon" :class="$iconSize . ' ' . ($slot->isNotEmpty() ? 'mr-2' : '')" />
         @endif
-        
+
         {{ $slot }}
-        
+
         @if($icon && $iconPosition === 'right')
-            <x-dynamic-component :component="'heroicon-o-' . $icon" :class="$iconSize . ' ' . ($slot->isNotEmpty() ? 'ml-2' : '')" />
+            <x-icon :icon="'heroicons:' . $icon" :class="$iconSize . ' ' . ($slot->isNotEmpty() ? 'ml-2' : '')" />
         @endif
     </a>
 @else
-    <button 
-        type="{{ $type }}" 
+    <button
+        type="{{ $type }}"
         class="{{ $classes }}"
         @if($disabled) disabled @endif
         {{ $attributes }}
     >
         @if($icon && $iconPosition === 'left')
-            <x-dynamic-component :component="'heroicon-o-' . $icon" :class="$iconSize . ' ' . ($slot->isNotEmpty() ? 'mr-2' : '')" />
+            <x-icon :icon="'heroicons:' . $icon" :class="$iconSize . ' ' . ($slot->isNotEmpty() ? 'mr-2' : '')" />
         @endif
-        
+
         {{ $slot }}
-        
+
         @if($icon && $iconPosition === 'right')
-            <x-dynamic-component :component="'heroicon-o-' . $icon" :class="$iconSize . ' ' . ($slot->isNotEmpty() ? 'ml-2' : '')" />
+            <x-icon :icon="'heroicons:' . $icon" :class="$iconSize . ' ' . ($slot->isNotEmpty() ? 'ml-2' : '')" />
         @endif
     </button>
 @endif
