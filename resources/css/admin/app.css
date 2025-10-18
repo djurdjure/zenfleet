@@ -252,6 +252,31 @@
     @apply bg-blue-900/30 text-blue-300;
 }
 
+/* ====================================
+   🔴 TOMSELECT ERROR STATE
+   ==================================== */
+
+/* État d'erreur - Bordure rouge persistante */
+.ts-wrapper.ts-error .ts-control {
+    @apply border-red-500 !important;
+}
+
+.ts-wrapper.ts-error.focus .ts-control,
+.ts-wrapper.ts-error.input-active .ts-control {
+    @apply border-red-500 !important;
+    box-shadow: 0 0 0 1px rgb(239 68 68) !important;
+}
+
+.dark .ts-wrapper.ts-error .ts-control {
+    @apply border-red-600 !important;
+}
+
+.dark .ts-wrapper.ts-error.focus .ts-control,
+.dark .ts-wrapper.ts-error.input-active .ts-control {
+    @apply border-red-600 !important;
+    box-shadow: 0 0 0 1px rgb(220 38 38) !important;
+}
+
 /* États responsifs */
 @media (max-width: 1024px) {
     .admin-sidebar {

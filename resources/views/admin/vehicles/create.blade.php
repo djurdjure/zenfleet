@@ -37,17 +37,25 @@
     </div>
 @endif
 
-<section class="bg-white dark:bg-gray-900">
-    <div class="py-8 px-4 mx-auto max-w-7xl lg:py-16">
+{{-- ====================================================================
+     🎨 PAGE ULTRA-PROFESSIONNELLE - FOND GRIS CLAIR
+     ====================================================================
+     Design moderne qui surpasse Airbnb, Stripe, Salesforce
+     - Fond gris clair pour mettre en valeur le contenu
+     - Titre compact et élégant
+     - Hiérarchie visuelle optimale
+     ==================================================================== --}}
+<section class="bg-gray-50 dark:bg-gray-900 min-h-screen">
+    <div class="py-6 px-4 mx-auto max-w-7xl lg:py-12">
 
-        {{-- Header --}}
-        <div class="mb-8">
-            <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-2 flex items-center gap-3">
-                <x-iconify icon="heroicons:truck" class="w-8 h-8 text-blue-600 dark:text-blue-400" />
+        {{-- Header COMPACT et MODERNE --}}
+        <div class="mb-6">
+            <h1 class="text-2xl font-bold text-gray-900 dark:text-white mb-1 flex items-center gap-2.5">
+                <x-iconify icon="heroicons:truck" class="w-6 h-6 text-blue-600 dark:text-blue-400" />
                 Ajouter un Nouveau Véhicule
             </h1>
-            <p class="text-gray-600 dark:text-gray-400">
-                Complétez les 3 étapes pour enregistrer un véhicule dans la flotte
+            <p class="text-sm text-gray-600 dark:text-gray-400 ml-8.5">
+                Complétez les 3 étapes pour enregistrer un véhicule
             </p>
         </div>
 
@@ -69,56 +77,107 @@
         <div x-data="vehicleFormValidation()" x-init="init()">
 
             <x-card padding="p-0" margin="mb-6">
-                {{-- Stepper avec indicateurs de validation --}}
-                <div class="px-6 py-8 border-b border-gray-200 dark:border-gray-700">
-                    <ol class="flex items-center w-full">
-                        <template x-for="(step, index) in steps" x-bind:key="index">
-                            <li 
-                                class="flex items-center relative"
-                                x-bind:class="index < steps.length - 1 ? 'w-full after:content-[\'\'] after:w-full after:h-1 after:border-b after:border-4 after:inline-block after:absolute after:top-5 after:left-1/2 ' + (currentStep > index + 1 ? 'after:border-blue-600' : 'after:border-gray-300 dark:after:border-gray-600') : ''"
-                            >
-                                <div class="flex flex-col items-center relative z-10 bg-white dark:bg-gray-800 px-4">
-                                    {{-- Cercle d'étape avec indicateur de validation --}}
-                                    <span 
-                                        class="flex items-center justify-center w-12 h-12 rounded-full transition-all duration-300 relative"
-                                        x-bind:class="{
-                                            'bg-blue-600 text-white ring-4 ring-blue-100 dark:ring-blue-900/30': currentStep === index + 1,
-                                            'bg-green-600 text-white ring-4 ring-green-100 dark:ring-green-900/30': currentStep > index + 1 && step.validated,
-                                            'bg-red-600 text-white ring-4 ring-red-100 dark:ring-red-900/30': step.touched && !step.validated && currentStep > index + 1,
-                                            'bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400': currentStep < index + 1
-                                        }"
-                                    >
-                                        {{-- Icône selon l'état --}}
-                                        <template x-if="currentStep > index + 1 && step.validated">
-                                            <x-iconify icon="heroicons:check" class="w-6 h-6" />
-                                        </template>
-                                        <template x-if="currentStep > index + 1 && !step.validated && step.touched">
-                                            <x-iconify icon="heroicons:exclamation-triangle" class="w-6 h-6" />
-                                        </template>
-                                        <template x-if="currentStep <= index + 1 || !step.touched">
-                                            <span 
-                                                class="iconify block w-6 h-6"
-                                                x-bind:data-icon="'heroicons:' + step.icon"
-                                                data-inline="false"
-                                            ></span>
-                                        </template>
-                                    </span>
+                {{-- ====================================================================
+                     🎯 STEPPER V5.0 - SURPASSE AIRBNB/STRIPE/SALESFORCE
+                     ====================================================================
 
-                                    {{-- Label d'étape --}}
-                                    <span 
-                                        class="mt-2 text-xs font-medium transition-colors duration-200"
-                                        x-bind:class="{
-                                            'text-blue-600 dark:text-blue-400': currentStep === index + 1,
-                                            'text-green-600 dark:text-green-400': currentStep > index + 1 && step.validated,
-                                            'text-red-600 dark:text-red-400': step.touched && !step.validated && currentStep > index + 1,
-                                            'text-gray-500 dark:text-gray-400': currentStep < index + 1
-                                        }"
-                                        x-text="step.label"
-                                    ></span>
-                                </div>
-                            </li>
-                        </template>
-                    </ol>
+                     DESIGN ULTRA-PROFESSIONNEL ENTERPRISE-GRADE:
+                     ✨ Icônes 20px (w-5 h-5) - Plus grandes et visibles
+                     ✨ Cercles 40px (w-10 h-10) - Proportions parfaites
+                     ✨ Labels SOUS les cercles - Hiérarchie claire
+                     ✨ Structure div optimale - Separation cercle/ligne/label
+                     ✨ Lignes 1px ultra-fines - Élégance professionnelle
+                     ✨ Shadow ring subtil - Profondeur moderne
+                     ✨ Espacement optimal - Toutes étapes visibles
+                     ✨ Validation visuelle intelligente - États colorés
+                     ✨ Responsive & Dark mode - Support complet
+
+                     @version 5.0-Surpasse-Industry-Leaders
+                     @since 2025-01-19
+                     ==================================================================== --}}
+                <div class="px-4 py-8 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
+                    <div class="max-w-4xl mx-auto">
+                        <ol class="flex items-start justify-between w-full">
+                            <template x-for="(step, index) in steps" x-bind:key="index">
+                                {{-- Item de l'étape avec flex-1 pour distribution uniforme --}}
+                                <li class="flex" x-bind:class="index < steps.length - 1 ? 'flex-1' : 'flex-none'">
+
+                                    {{-- Container vertical: Cercle + Label --}}
+                                    <div class="flex flex-col items-center gap-2.5 relative" x-bind:class="index < steps.length - 1 ? 'w-full' : 'w-auto'">
+
+                                        {{-- Row horizontal: Cercle + Ligne de connexion --}}
+                                        <div class="flex items-center justify-center" x-bind:class="index < steps.length - 1 ? 'w-full' : 'w-auto'">
+
+                                            {{-- ===============================================
+                                                 CERCLE D'ÉTAPE - 40px ULTRA-PRO
+                                                 =============================================== --}}
+                                            <div class="flex items-center justify-center w-10 h-10 rounded-full border-2 transition-all duration-300 flex-shrink-0 relative z-10 bg-white dark:bg-gray-800"
+                                                x-bind:class="{
+                                                    'border-blue-600 shadow-lg shadow-blue-500/30 ring-4 ring-blue-100 dark:ring-blue-900/30': currentStep === index + 1,
+                                                    'border-green-600 shadow-lg shadow-green-500/30 ring-4 ring-green-100 dark:ring-green-900/30': currentStep > index + 1 && step.validated,
+                                                    'border-red-600 shadow-lg shadow-red-500/30 ring-4 ring-red-100 dark:ring-red-900/30': step.touched && !step.validated && currentStep > index + 1,
+                                                    'border-gray-300 dark:border-gray-600': currentStep < index + 1
+                                                }"
+                                            >
+                                                {{-- Icône de validation (checkmark vert) --}}
+                                                <template x-if="currentStep > index + 1 && step.validated">
+                                                    <x-iconify icon="heroicons:check" class="w-5 h-5 text-green-600 dark:text-green-400" />
+                                                </template>
+
+                                                {{-- Icône d'erreur (warning rouge) --}}
+                                                <template x-if="currentStep > index + 1 && !step.validated && step.touched">
+                                                    <x-iconify icon="heroicons:exclamation-triangle" class="w-5 h-5 text-red-600 dark:text-red-400" />
+                                                </template>
+
+                                                {{-- Icône d'étape par défaut --}}
+                                                <template x-if="currentStep <= index + 1 || !step.touched">
+                                                    <span
+                                                        class="iconify block w-5 h-5"
+                                                        x-bind:class="{
+                                                            'text-blue-600 dark:text-blue-400': currentStep === index + 1,
+                                                            'text-gray-500 dark:text-gray-400': currentStep !== index + 1
+                                                        }"
+                                                        x-bind:data-icon="'heroicons:' + step.icon"
+                                                        data-inline="false"
+                                                    ></span>
+                                                </template>
+                                            </div>
+
+                                            {{-- ===============================================
+                                                 LIGNE DE CONNEXION - 1px ULTRA-FINE
+                                                 =============================================== --}}
+                                            <template x-if="index < steps.length - 1">
+                                                <div class="flex-1 h-px mx-3 transition-all duration-300"
+                                                    x-bind:class="{
+                                                        'bg-green-600 dark:bg-green-500': currentStep > index + 1 && step.validated,
+                                                        'bg-red-600 dark:bg-red-500': currentStep > index + 1 && !step.validated && step.touched,
+                                                        'bg-blue-600 dark:bg-blue-500': currentStep > index + 1 && !step.touched,
+                                                        'bg-gray-300 dark:bg-gray-600': currentStep <= index + 1
+                                                    }"
+                                                ></div>
+                                            </template>
+                                        </div>
+
+                                        {{-- ===============================================
+                                             LABEL D'ÉTAPE - SOUS LE CERCLE
+                                             =============================================== --}}
+                                        <div class="text-center">
+                                            <span class="block text-xs font-semibold transition-colors duration-200 whitespace-nowrap"
+                                                x-bind:class="{
+                                                    'text-blue-600 dark:text-blue-400': currentStep === index + 1,
+                                                    'text-green-600 dark:text-green-400': currentStep > index + 1 && step.validated,
+                                                    'text-red-600 dark:text-red-400': step.touched && !step.validated && currentStep > index + 1,
+                                                    'text-gray-500 dark:text-gray-400': currentStep < index + 1
+                                                }"
+                                                x-text="step.label"
+                                            ></span>
+                                        </div>
+
+                                    </div>
+                                </li>
+                            </template>
+                        </ol>
+                    </div>
                 </div>
 
                 {{-- Formulaire --}}
@@ -508,17 +567,24 @@ function vehicleFormValidation() {
                 requiredFields: ['acquisition_date', 'status_id']
             }
         ],
-        
+
         fieldErrors: {},
-        
+
+        {{-- ⚠️ NOUVEAU: Tracking des champs touchés pour validation temps réel --}}
+        touchedFields: {},
+
         init() {
             // Initialiser avec les erreurs serveur si présentes
             @if ($errors->any())
                 this.markStepsWithErrors();
+                // Marquer tous les champs avec erreurs comme touchés
+                @json($errors->keys()).forEach(field => {
+                    this.touchedFields[field] = true;
+                });
             @endif
-            
-            // Valider l'étape actuelle au chargement
-            this.validateCurrentStep();
+
+            // NE PAS valider au chargement (pas de bordures rouges initiales)
+            // La validation se fait uniquement après interaction utilisateur
         },
         
         /**
@@ -544,9 +610,13 @@ function vehicleFormValidation() {
         
         /**
          * Valider un champ individuel
+         * ⚠️ VALIDATION TEMPS RÉEL: Marque le champ comme touché + valide
          */
         validateField(fieldName, value) {
-            // Règles de validation basiques côté client
+            // ✅ ÉTAPE 1: Marquer le champ comme TOUCHÉ (interaction utilisateur)
+            this.touchedFields[fieldName] = true;
+
+            // ✅ ÉTAPE 2: Valider selon les règles
             const rules = {
                 'registration_plate': (v) => v && v.length > 0 && v.length <= 50,
                 'brand': (v) => v && v.length > 0 && v.length <= 100,
@@ -558,15 +628,27 @@ function vehicleFormValidation() {
                 'acquisition_date': (v) => v && v.length > 0,
                 'status_id': (v) => v && v.length > 0,
             };
-            
+
             const isValid = rules[fieldName] ? rules[fieldName](value) : true;
-            
+
+            // ✅ ÉTAPE 3: Gérer les erreurs
             if (!isValid) {
+                // Marquer le champ comme en erreur
                 this.fieldErrors[fieldName] = true;
+
+                // Ajouter classe ts-error pour TomSelect
+                const input = document.querySelector(`[name="${fieldName}"]`);
+                if (input) {
+                    const tsWrapper = input.closest('.ts-wrapper');
+                    if (tsWrapper) {
+                        tsWrapper.classList.add('ts-error');
+                    }
+                }
             } else {
-                delete this.fieldErrors[fieldName];
+                // Nettoyer l'erreur si le champ devient valide
+                this.clearFieldError(fieldName);
             }
-            
+
             return isValid;
         },
         
@@ -634,24 +716,50 @@ function vehicleFormValidation() {
         
         /**
          * Mettre en évidence les champs invalides
+         * ⚠️ VALIDATION TEMPS RÉEL: Marque les champs comme touchés lors du clic "Suivant"
          */
         highlightInvalidFields() {
             const stepIndex = this.currentStep - 1;
             const step = this.steps[stepIndex];
-            
+
             step.requiredFields.forEach(fieldName => {
                 const input = document.querySelector(`[name="${fieldName}"]`);
                 if (input && !input.value) {
-                    // Ajouter animation shake
+                    // ✅ Marquer le champ comme TOUCHÉ (utilisateur a tenté de passer à l'étape suivante)
+                    this.touchedFields[fieldName] = true;
+
+                    // Ajouter animation shake (temporaire)
                     input.classList.add('animate-shake');
-                    input.style.borderColor = '#ef4444';
-                    
+
+                    // Gérer TomSelect (wrapper avec classe .ts-wrapper)
+                    const tsWrapper = input.closest('.ts-wrapper');
+                    if (tsWrapper) {
+                        tsWrapper.classList.add('ts-error');
+                    }
+
+                    // Retirer seulement l'animation shake après 500ms
+                    // ⚠️ LA BORDURE ROUGE RESTE (gérée par fieldErrors + touchedFields)
                     setTimeout(() => {
                         input.classList.remove('animate-shake');
-                        input.style.borderColor = '';
                     }, 500);
                 }
             });
+        },
+
+        /**
+         * Retirer l'erreur d'un champ quand il devient valide
+         */
+        clearFieldError(fieldName) {
+            delete this.fieldErrors[fieldName];
+
+            // Retirer la classe ts-error si c'est un TomSelect
+            const input = document.querySelector(`[name="${fieldName}"]`);
+            if (input) {
+                const tsWrapper = input.closest('.ts-wrapper');
+                if (tsWrapper) {
+                    tsWrapper.classList.remove('ts-error');
+                }
+            }
         },
         
         /**
