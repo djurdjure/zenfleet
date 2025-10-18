@@ -16,7 +16,7 @@
         </div>
 
         {{-- Buttons --}}
-        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 mb-6 border border-gray-200 dark:border-gray-700">
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 mb-6 border border-gray-200 dark:border-gray-700">
             <h2 class="text-2xl font-semibold text-gray-900 dark:text-white mb-4">Buttons</h2>
             
             <div class="space-y-4">
@@ -83,7 +83,7 @@
         </div>
 
         {{-- Form Elements --}}
-        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 mb-6 border border-gray-200 dark:border-gray-700">
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 mb-6 border border-gray-200 dark:border-gray-700">
             <h2 class="text-2xl font-semibold text-gray-900 dark:text-white mb-4">Form Elements (Flowbite-inspired)</h2>
 
             <div class="space-y-8">
@@ -244,7 +244,7 @@
         </div>
 
         {{-- Alerts --}}
-        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 mb-6 border border-gray-200 dark:border-gray-700">
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 mb-6 border border-gray-200 dark:border-gray-700">
             <h2 class="text-2xl font-semibold text-gray-900 dark:text-white mb-4">Alerts</h2>
             
             <div class="space-y-4">
@@ -271,7 +271,7 @@
         </div>
 
         {{-- Badges --}}
-        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 mb-6 border border-gray-200 dark:border-gray-700">
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 mb-6 border border-gray-200 dark:border-gray-700">
             <h2 class="text-2xl font-semibold text-gray-900 dark:text-white mb-4">Badges</h2>
 
             <div class="space-y-4">
@@ -433,7 +433,7 @@
         </div>
 
         {{-- Tables --}}
-        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 mb-6 border border-gray-200 dark:border-gray-700">
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 mb-6 border border-gray-200 dark:border-gray-700">
             <h2 class="text-2xl font-semibold text-gray-900 dark:text-white mb-4">Tableaux (Style Kilométrage)</h2>
 
             <div class="space-y-6">
@@ -560,7 +560,7 @@
         </div>
 
         {{-- Modal Demo --}}
-        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 mb-6 border border-gray-200 dark:border-gray-700">
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 mb-6 border border-gray-200 dark:border-gray-700">
             <h2 class="text-2xl font-semibold text-gray-900 dark:text-white mb-4">Modal</h2>
             
             <div class="space-y-3">
@@ -577,7 +577,7 @@
         </div>
 
         {{-- Code Examples --}}
-        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 border border-gray-200 dark:border-gray-700">
             <h2 class="text-2xl font-semibold text-gray-900 dark:text-white mb-4">Exemples de Code</h2>
 
             <div class="space-y-6">
