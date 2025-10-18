@@ -258,11 +258,24 @@ class VehicleController extends Controller
 
         try {
             $referenceData = $this->getReferenceData();
-            $recommendations = $this->getCreationRecommendations();
+            
+            // Extraction des variables pour la vue conforme au design system
+            $vehicleTypes = $referenceData['vehicle_types'];
+            $vehicleStatuses = $referenceData['vehicle_statuses'];
+            $fuelTypes = $referenceData['fuel_types'];
+            $transmissionTypes = $referenceData['transmission_types'];
+            
+            // Récupération des utilisateurs de l'organisation
+            $users = \App\Models\User::where('organization_id', Auth::user()->organization_id)
+                ->orderBy('name')
+                ->get();
 
-            return view('admin.vehicles.enterprise-create', compact(
-                'referenceData',
-                'recommendations'
+            return view('admin.vehicles.create', compact(
+                'vehicleTypes',
+                'vehicleStatuses',
+                'fuelTypes',
+                'transmissionTypes',
+                'users'
             ));
 
         } catch (\Exception $e) {
