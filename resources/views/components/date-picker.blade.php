@@ -19,7 +19,7 @@
             class="mt-1 block w-full border-gray-300 focus:border-primary-500 focus:ring-primary-500 rounded-md shadow-sm"
         />
         <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-            <x-lucide-calendar class="h-5 w-5 text-gray-400" />
+            <x-icon icon="heroicons:calendar" class="h-5 w-5 text-gray-400" />
         </div>
     </div>
 </div>

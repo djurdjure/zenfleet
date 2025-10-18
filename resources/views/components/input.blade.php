@@ -30,7 +30,7 @@
     <div class="relative">
         @if($icon)
             <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <x-dynamic-component :component="'heroicon-o-' . $icon" class="w-5 h-5 text-gray-400" />
+                <x-icon :icon="'heroicons:' . $icon" class="w-5 h-5 text-gray-400" />
             </div>
         @endif
 
@@ -49,7 +49,7 @@
 
     @if($error)
         <p class="mt-2 text-sm text-red-600 flex items-start">
-            <x-heroicon-o-exclamation-circle class="w-4 h-4 mr-1 mt-0.5 flex-shrink-0" />
+            <x-icon icon="heroicons:exclamation-circle" class="w-4 h-4 mr-1 mt-0.5 flex-shrink-0" />
             <span>{{ $error }}</span>
         </p>
     @elseif($helpText)

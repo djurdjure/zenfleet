@@ -27,7 +27,7 @@
     <div class="flex items-start">
         @if($showIcon)
             <div class="flex-shrink-0">
-                <x-dynamic-component :component="'heroicon-o-' . $icon" class="w-5 h-5 {{ $iconColor }} mt-0.5" />
+                <x-icon :icon="'heroicons:' . $icon" class="w-5 h-5 {{ $iconColor }} mt-0.5" />
             </div>
         @endif
 
@@ -47,12 +47,12 @@
 
         @if($dismissible)
             <div class="ml-auto pl-3">
-                <button 
+                <button
                     @click="show = false"
                     class="-mx-1.5 -my-1.5 rounded-lg p-1.5 {{ $iconColor }} hover:bg-black/5 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-transparent inline-flex items-center justify-center"
                     aria-label="Fermer"
                 >
-                    <x-heroicon-o-x-mark class="w-5 h-5" />
+                    <x-icon icon="heroicons:x-mark" class="w-5 h-5" />
                 </button>
             </div>
         @endif
