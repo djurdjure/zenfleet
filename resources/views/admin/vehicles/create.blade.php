@@ -1,207 +1,484 @@
-<x-app-layout>
-    <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">{{ __('Ajouter un Nouveau Véhicule') }}</h2>
-    </x-slot>
+@extends('layouts.admin.catalyst')
 
-    <div class="py-12">
-        <div class="max-w-4xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-8 text-gray-900" x-data="{
-                    currentStep: {{ old('current_step', 1) }},
-                    initTomSelect() {
-                        new TomSelect(this.$refs.vehicle_type_id, { create: false, placeholder: 'Sélectionnez un type...' });
-                        new TomSelect(this.$refs.fuel_type_id, { create: false, placeholder: 'Sélectionnez un carburant...' });
-                        new TomSelect(this.$refs.transmission_type_id, { create: false, placeholder: 'Sélectionnez une transmission...' });
-                        new TomSelect(this.$refs.status_id, { create: false, placeholder: 'Sélectionnez un statut...' });
-                        
-                        // Configuration TomSelect pour les utilisateurs
-                        if (this.$refs.users && window.initUserTomSelect) {
-                            window.initUserTomSelect(this.$refs.users);
-                        }
-                    }
-                }" x-init="
-                    initTomSelect();
-                    @if ($errors->any())
-                        let errors = {{ json_encode($errors->messages()) }};
-                        let firstErrorStep = null;
-                        const fieldToStepMap = { 'registration_plate': 1, 'vin': 1, 'brand': 1, 'model': 1, 'color': 1, 'vehicle_type_id': 2, 'fuel_type_id': 2, 'transmission_type_id': 2, 'manufacturing_year': 2, 'seats': 2, 'power_hp': 2, 'engine_displacement_cc': 2, 'acquisition_date': 3, 'purchase_price': 3, 'current_value': 3, 'initial_mileage': 3, 'status_id': 3, 'notes': 3 };
-                        for (const field in fieldToStepMap) {
-                            if (errors.hasOwnProperty(field)) { firstErrorStep = fieldToStepMap[field]; break; }
-                        }
-                        if (firstErrorStep) { currentStep = firstErrorStep; }
-                    @endif
-                ">
+@section('title', 'Ajouter un Nouveau Véhicule')
 
-                    <ol class="flex items-center w-full mb-8">
-                        <li :class="currentStep >= 1 ? 'text-primary-600' : 'text-gray-500'" class="flex w-full items-center after:content-[''] after:w-full after:h-1 after:border-b after:border-4 after:inline-block" :class="currentStep > 1 ? 'after:border-primary-600' : 'after:border-gray-200'">
-                            <span class="flex items-center justify-center w-10 h-10 rounded-full shrink-0" :class="currentStep >= 1 ? 'bg-primary-100' : 'bg-gray-100'">
-                                <x-iconify icon="heroicons:identification" class="w-5 h-5"/ />
-                            </span>
-                        </li>
-                        <li :class="currentStep >= 2 ? 'text-primary-600' : 'text-gray-500'" class="flex w-full items-center after:content-[''] after:w-full after:h-1 after:border-b after:border-4 after:inline-block" :class="currentStep > 2 ? 'after:border-primary-600' : 'after:border-gray-200'">
-                            <span class="flex items-center justify-center w-10 h-10 rounded-full shrink-0" :class="currentStep >= 2 ? 'bg-primary-100' : 'bg-gray-100'">
-                                <x-iconify icon="heroicons:wrench" class="w-5 h-5"/ />
-                            </span>
-                        </li>
-                        <li :class="currentStep === 3 ? 'text-primary-600' : 'text-gray-500'" class="flex items-center">
-                            <span class="flex items-center justify-center w-10 h-10 rounded-full shrink-0" :class="currentStep === 3 ? 'bg-primary-100' : 'bg-gray-100'">
-                                <x-iconify icon="heroicons:key" class="w-5 h-5"/ />
-                            </span>
-                        </li>
-                    </ol>
-
-                    <form method="POST" action="{{ route('admin.vehicles.store') }}" enctype="multipart/form-data">
-                        @csrf
-                        <input type="hidden" name="current_step" x-model="currentStep">
-
-                        <fieldset x-show="currentStep === 1" class="border border-gray-200 p-6 rounded-lg">
-                            <legend class="text-lg font-semibold text-gray-800 px-2">Étape 1: Identification</legend>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
-                                <div>
-                                    <x-input-label for="registration_plate" value="Immatriculation" required />
-                                    <x-text-input id="registration_plate" name="registration_plate" :value="old('registration_plate')" class="mt-1 block w-full" />
-                                    <x-input-error :messages="$errors->get('registration_plate')" class="mt-2" />
-                                </div>
-                                <div>
-                                    <x-input-label for="vin" value="Numéro de série (VIN)" />
-                                    <x-text-input id="vin" name="vin" :value="old('vin')" class="mt-1 block w-full" />
-                                    <x-input-error :messages="$errors->get('vin')" class="mt-2" />
-                                </div>
-                                <div>
-                                    <x-input-label for="brand" value="Marque" required />
-                                    <x-text-input id="brand" name="brand" :value="old('brand')" class="mt-1 block w-full" />
-                                    <x-input-error :messages="$errors->get('brand')" class="mt-2" />
-                                </div>
-                                <div>
-                                    <x-input-label for="model" value="Modèle" required />
-                                    <x-text-input id="model" name="model" :value="old('model')" class="mt-1 block w-full" />
-                                    <x-input-error :messages="$errors->get('model')" class="mt-2" />
-                                </div>
-                                <div class="md:col-span-2">
-                                    <x-input-label for="color" value="Couleur" />
-                                    <x-text-input id="color" name="color" :value="old('color')" class="mt-1 block w-full" />
-                                    <x-input-error :messages="$errors->get('color')" class="mt-2" />
-                                </div>
-                            </div>
-                        </fieldset>
-
-                        <fieldset x-show="currentStep === 2" style="display: none;" class="border border-gray-200 p-6 rounded-lg">
-                            <legend class="text-lg font-semibold text-gray-800 px-2">Étape 2: Caractéristiques Techniques</legend>
-                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-4">
-                                <div>
-                                    <x-input-label for="vehicle_type_id" value="Type de Véhicule" required />
-                                    <select x-ref="vehicle_type_id" name="vehicle_type_id" id="vehicle_type_id">
-                                        @foreach($vehicleTypes as $type)<option value="{{ $type->id }}" @selected(old('vehicle_type_id') == $type->id)>{{ $type->name }}</option>@endforeach
-                                    </select>
-                                    <x-input-error :messages="$errors->get('vehicle_type_id')" class="mt-2" />
-                                </div>
-                                <div>
-                                    <x-input-label for="fuel_type_id" value="Type de Carburant" required />
-                                    <select x-ref="fuel_type_id" name="fuel_type_id" id="fuel_type_id">
-                                        @foreach($fuelTypes as $type)<option value="{{ $type->id }}" @selected(old('fuel_type_id') == $type->id)>{{ $type->name }}</option>@endforeach
-                                    </select>
-                                    <x-input-error :messages="$errors->get('fuel_type_id')" class="mt-2" />
-                                </div>
-                                <div>
-                                    <x-input-label for="transmission_type_id" value="Type de Transmission" required />
-                                    <select x-ref="transmission_type_id" name="transmission_type_id" id="transmission_type_id">
-                                        @foreach($transmissionTypes as $type)<option value="{{ $type->id }}" @selected(old('transmission_type_id') == $type->id)>{{ $type->name }}</option>@endforeach
-                                    </select>
-                                    <x-input-error :messages="$errors->get('transmission_type_id')" class="mt-2" />
-                                </div>
-                                <div>
-                                    <x-input-label for="manufacturing_year" value="Année de Fabrication" />
-                                    <x-text-input id="manufacturing_year" type="number" name="manufacturing_year" :value="old('manufacturing_year')" class="mt-1 block w-full" />
-                                    <x-input-error :messages="$errors->get('manufacturing_year')" class="mt-2" />
-                                </div>
-                                <div>
-                                    <x-input-label for="seats" value="Nombre de places" />
-                                    <x-text-input id="seats" type="number" name="seats" :value="old('seats')" class="mt-1 block w-full" />
-                                    <x-input-error :messages="$errors->get('seats')" class="mt-2" />
-                                </div>
-                                <div>
-                                    <x-input-label for="power_hp" value="Puissance (CV)" />
-                                    <x-text-input id="power_hp" type="number" name="power_hp" :value="old('power_hp')" class="mt-1 block w-full" />
-                                    <x-input-error :messages="$errors->get('power_hp')" class="mt-2" />
-                                </div>
-                                <div class="lg:col-span-3">
-                                    <x-input-label for="engine_displacement_cc" value="Cylindrée (cc)" />
-                                    <x-text-input id="engine_displacement_cc" type="number" name="engine_displacement_cc" :value="old('engine_displacement_cc')" class="mt-1 block w-full" />
-                                    <x-input-error :messages="$errors->get('engine_displacement_cc')" class="mt-2" />
-                                </div>
-                            </div>
-                        </fieldset>
-
-                        <fieldset x-show="currentStep === 3" style="display: none;" class="border border-gray-200 p-6 rounded-lg">
-                            <legend class="text-lg font-semibold text-gray-800 px-2">Étape 3: Acquisition & Statut</legend>
-                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
-                                <div>
-                                    <x-input-label for="acquisition_date" value="Date d'acquisition" />
-                                    <x-text-input id="acquisition_date" type="date" name="acquisition_date" :value="old('acquisition_date')" class="mt-1 block w-full" />
-                                    <x-input-error :messages="$errors->get('acquisition_date')" class="mt-2" />
-                                </div>
-                                <div>
-                                    <x-input-label for="purchase_price" value="Prix d'achat (DA)" />
-                                    <x-text-input id="purchase_price" type="number" step="0.01" name="purchase_price" :value="old('purchase_price')" class="mt-1 block w-full" />
-                                    <x-input-error :messages="$errors->get('purchase_price')" class="mt-2" />
-                                </div>
-                                <div>
-                                    <x-input-label for="current_value" value="Valeur actuelle (DA)" />
-                                    <x-text-input id="current_value" type="number" step="0.01" name="current_value" :value="old('current_value')" class="mt-1 block w-full" />
-                                    <x-input-error :messages="$errors->get('current_value')" class="mt-2" />
-                                </div>
-                                <div>
-                                    <x-input-label for="initial_mileage" value="Kilométrage Initial" />
-                                    <x-text-input id="initial_mileage" type="number" name="initial_mileage" :value="old('initial_mileage', 0)" class="mt-1 block w-full" />
-                                    <x-input-error :messages="$errors->get('initial_mileage')" class="mt-2" />
-                                </div>
-                                <div class="md:col-span-2">
-                                    <x-input-label for="status_id" value="Statut Initial" required />
-                                    <select x-ref="status_id" name="status_id" id="status_id">
-                                        @foreach($vehicleStatuses as $status)<option value="{{ $status->id }}" @selected(old('status_id') == $status->id)>{{ $status->name }}</option>@endforeach
-                                    </select>
-                                    <x-input-error :messages="$errors->get('status_id')" class="mt-2" />
-                                </div>
-                                {{-- --- CHAMP UTILISATEURS AMÉLIORÉ --- --}}
-                                <div class="md:col-span-2">
-                                    <x-input-label for="users" value="Utilisateurs Autorisés" />
-                                    <select name="users[]" id="users" multiple x-ref="users" class="tomselect-users">
-                                        @foreach($users as $user)
-                                            <option value="{{ $user->id }}" 
-                                                    data-name="{{ $user->name }}" 
-                                                    data-email="{{ $user->email }}"
-                                                    @selected(in_array($user->id, old('users', [])))>
-                                                {{ $user->name }} ({{ $user->email }})
-                                            </option>
-                                        @endforeach
-                                    </select>
-                                    <p class="mt-1 text-xs text-gray-500">
-                                        Recherchez et sélectionnez les utilisateurs autorisés à utiliser ce véhicule.
-                                    </p>
-                                    <x-input-error :messages="$errors->get('users')" class="mt-2" />
-                                </div>
-                                {{-- --- FIN CHAMP UTILISATEURS --- --}}
-                                <div class="md:col-span-2">
-                                    <x-input-label for="notes" value="Notes" />
-                                    <textarea id="notes" name="notes" rows="3" class="block mt-1 w-full border-gray-300 focus:border-primary-500 focus:ring-primary-500 rounded-md shadow-sm">{{ old('notes') }}</textarea>
-                                    <x-input-error :messages="$errors->get('notes')" class="mt-2" />
-                                </div>
-                             </div>
-                        </fieldset>
-
-                        <div class="mt-8 pt-6 border-t border-gray-200 flex items-center justify-between">
-                            <x-secondary-button type="button" x-show="currentStep > 1" @click="currentStep--">Précédent</x-secondary-button>
-                            <div class="flex-grow"></div> <div class="flex items-center gap-4">
-                                <a href="{{ route('admin.vehicles.index') }}" class="text-sm font-semibold text-gray-600 hover:text-gray-900">Annuler</a>
-                                <x-primary-button type="button" x-show="currentStep < 3" @click="currentStep++">Suivant</x-primary-button>
-                                <button type="submit" x-show="currentStep === 3" class="inline-flex items-center px-4 py-2 bg-green-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-green-700">
-                                    Enregistrer le Véhicule
-                                </button>
-                            </div>
-                        </div>
-                    </form>
-                </div>
+@section('content')
+<div class="max-w-5xl mx-auto space-y-6">
+    {{-- Header avec titre et icône --}}
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 border border-gray-200 dark:border-gray-700">
+        <div class="flex items-center gap-3">
+            <div class="p-3 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
+                <x-iconify icon="heroicons:truck" class="w-8 h-8 text-blue-600 dark:text-blue-400" />
+            </div>
+            <div>
+                <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Ajouter un Nouveau Véhicule</h1>
+                <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">Complétez les 3 étapes pour enregistrer un véhicule</p>
             </div>
         </div>
     </div>
-</x-app-layout>
+
+    {{-- Formulaire multi-étapes --}}
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700"
+         x-data="{
+            currentStep: {{ old('current_step', 1) }},
+            initTomSelect() {
+                new TomSelect(this.$refs.vehicle_type_id, {
+                    create: false,
+                    placeholder: 'Sélectionnez un type...',
+                    render: {
+                        option: function(data, escape) {
+                            return '<div class=\"py-2 px-3 hover:bg-gray-50 dark:hover:bg-gray-700\">' + escape(data.text) + '</div>';
+                        }
+                    }
+                });
+                new TomSelect(this.$refs.fuel_type_id, {
+                    create: false,
+                    placeholder: 'Sélectionnez un carburant...',
+                    render: {
+                        option: function(data, escape) {
+                            return '<div class=\"py-2 px-3 hover:bg-gray-50 dark:hover:bg-gray-700\">' + escape(data.text) + '</div>';
+                        }
+                    }
+                });
+                new TomSelect(this.$refs.transmission_type_id, {
+                    create: false,
+                    placeholder: 'Sélectionnez une transmission...',
+                    render: {
+                        option: function(data, escape) {
+                            return '<div class=\"py-2 px-3 hover:bg-gray-50 dark:hover:bg-gray-700\">' + escape(data.text) + '</div>';
+                        }
+                    }
+                });
+                new TomSelect(this.$refs.status_id, {
+                    create: false,
+                    placeholder: 'Sélectionnez un statut...',
+                    render: {
+                        option: function(data, escape) {
+                            return '<div class=\"py-2 px-3 hover:bg-gray-50 dark:hover:bg-gray-700\">' + escape(data.text) + '</div>';
+                        }
+                    }
+                });
+
+                // TomSelect pour les utilisateurs
+                if (this.$refs.users) {
+                    new TomSelect(this.$refs.users, {
+                        plugins: ['remove_button'],
+                        placeholder: 'Rechercher des utilisateurs...',
+                        render: {
+                            option: function(data, escape) {
+                                return '<div class=\"py-2 px-3 hover:bg-gray-50 dark:hover:bg-gray-700 border-b border-gray-100 dark:border-gray-700 last:border-0\">' +
+                                    '<div class=\"font-medium text-gray-900 dark:text-white\">' + escape(data['data-name'] || data.text.split(' (')[0]) + '</div>' +
+                                    '<div class=\"text-sm text-gray-500 dark:text-gray-400\">' + escape(data['data-email'] || '') + '</div>' +
+                                    '</div>';
+                            },
+                            item: function(data, escape) {
+                                return '<div class=\"flex items-center gap-2\">' +
+                                    '<span class=\"inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300\">' +
+                                    escape(data['data-name'] || data.text.split(' (')[0]) +
+                                    '</span>' +
+                                    '</div>';
+                            }
+                        },
+                        maxOptions: 100
+                    });
+                }
+            }
+        }"
+        x-init="
+            initTomSelect();
+            @if ($errors->any())
+                let errors = {{ json_encode($errors->messages()) }};
+                let firstErrorStep = null;
+                const fieldToStepMap = {
+                    'registration_plate': 1, 'vin': 1, 'brand': 1, 'model': 1, 'color': 1,
+                    'vehicle_type_id': 2, 'fuel_type_id': 2, 'transmission_type_id': 2, 'manufacturing_year': 2, 'seats': 2, 'power_hp': 2, 'engine_displacement_cc': 2,
+                    'acquisition_date': 3, 'purchase_price': 3, 'current_value': 3, 'initial_mileage': 3, 'status_id': 3, 'notes': 3
+                };
+                for (const field in fieldToStepMap) {
+                    if (errors.hasOwnProperty(field)) {
+                        firstErrorStep = fieldToStepMap[field];
+                        break;
+                    }
+                }
+                if (firstErrorStep) { currentStep = firstErrorStep; }
+            @endif
+        ">
+
+        {{-- Progress Stepper --}}
+        <div class="px-6 py-8 border-b border-gray-200 dark:border-gray-700">
+            <ol class="flex items-center w-full">
+                {{-- Étape 1: Identification --}}
+                <li class="flex w-full items-center relative" :class="currentStep > 1 ? 'after:border-blue-600' : 'after:border-gray-300 dark:after:border-gray-600'" class="after:content-[''] after:w-full after:h-1 after:border-b after:border-4 after:inline-block after:absolute after:top-5 after:left-1/2">
+                    <div class="flex flex-col items-center relative z-10 bg-white dark:bg-gray-800 px-4">
+                        <span class="flex items-center justify-center w-12 h-12 rounded-full transition-all duration-200" :class="currentStep >= 1 ? 'bg-blue-600 text-white ring-4 ring-blue-100 dark:ring-blue-900/30' : 'bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400'">
+                            <x-iconify icon="heroicons:identification" class="w-6 h-6" />
+                        </span>
+                        <span class="mt-2 text-xs font-medium text-gray-900 dark:text-white" :class="currentStep >= 1 ? 'text-blue-600 dark:text-blue-400' : 'text-gray-500 dark:text-gray-400'">Identification</span>
+                    </div>
+                </li>
+
+                {{-- Étape 2: Caractéristiques --}}
+                <li class="flex w-full items-center relative" :class="currentStep > 2 ? 'after:border-blue-600' : 'after:border-gray-300 dark:after:border-gray-600'" class="after:content-[''] after:w-full after:h-1 after:border-b after:border-4 after:inline-block after:absolute after:top-5 after:left-1/2">
+                    <div class="flex flex-col items-center relative z-10 bg-white dark:bg-gray-800 px-4">
+                        <span class="flex items-center justify-center w-12 h-12 rounded-full transition-all duration-200" :class="currentStep >= 2 ? 'bg-blue-600 text-white ring-4 ring-blue-100 dark:ring-blue-900/30' : 'bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400'">
+                            <x-iconify icon="heroicons:cog-6-tooth" class="w-6 h-6" />
+                        </span>
+                        <span class="mt-2 text-xs font-medium" :class="currentStep >= 2 ? 'text-blue-600 dark:text-blue-400' : 'text-gray-500 dark:text-gray-400'">Caractéristiques</span>
+                    </div>
+                </li>
+
+                {{-- Étape 3: Acquisition --}}
+                <li class="flex items-center">
+                    <div class="flex flex-col items-center relative z-10 bg-white dark:bg-gray-800 px-4">
+                        <span class="flex items-center justify-center w-12 h-12 rounded-full transition-all duration-200" :class="currentStep === 3 ? 'bg-blue-600 text-white ring-4 ring-blue-100 dark:ring-blue-900/30' : 'bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400'">
+                            <x-iconify icon="heroicons:currency-dollar" class="w-6 h-6" />
+                        </span>
+                        <span class="mt-2 text-xs font-medium" :class="currentStep === 3 ? 'text-blue-600 dark:text-blue-400' : 'text-gray-500 dark:text-gray-400'">Acquisition</span>
+                    </div>
+                </li>
+            </ol>
+        </div>
+
+        {{-- Formulaire --}}
+        <form method="POST" action="{{ route('admin.vehicles.store') }}" enctype="multipart/form-data" class="p-6">
+            @csrf
+            <input type="hidden" name="current_step" x-model="currentStep">
+
+            {{-- ÉTAPE 1: IDENTIFICATION --}}
+            <div x-show="currentStep === 1" class="space-y-6">
+                <div class="flex items-center gap-3 mb-6">
+                    <x-iconify icon="heroicons:identification" class="w-6 h-6 text-blue-600 dark:text-blue-400" />
+                    <h2 class="text-xl font-semibold text-gray-900 dark:text-white">Identification du Véhicule</h2>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <x-input
+                        name="registration_plate"
+                        label="Immatriculation"
+                        icon="identification"
+                        placeholder="Ex: 16-12345-23"
+                        :value="old('registration_plate')"
+                        required
+                        :error="$errors->first('registration_plate')"
+                        helpText="Numéro d'immatriculation officiel du véhicule"
+                    />
+
+                    <x-input
+                        name="vin"
+                        label="Numéro de série (VIN)"
+                        icon="finger-print"
+                        placeholder="Ex: 1HGBH41JXMN109186"
+                        :value="old('vin')"
+                        :error="$errors->first('vin')"
+                        helpText="Vehicle Identification Number - 17 caractères"
+                    />
+
+                    <x-input
+                        name="brand"
+                        label="Marque"
+                        icon="building-storefront"
+                        placeholder="Ex: Renault, Peugeot, Toyota..."
+                        :value="old('brand')"
+                        required
+                        :error="$errors->first('brand')"
+                    />
+
+                    <x-input
+                        name="model"
+                        label="Modèle"
+                        icon="truck"
+                        placeholder="Ex: Clio, 208, Corolla..."
+                        :value="old('model')"
+                        required
+                        :error="$errors->first('model')"
+                    />
+
+                    <div class="md:col-span-2">
+                        <x-input
+                            name="color"
+                            label="Couleur"
+                            icon="swatch"
+                            placeholder="Ex: Blanc, Noir, Gris métallisé..."
+                            :value="old('color')"
+                            :error="$errors->first('color')"
+                        />
+                    </div>
+                </div>
+            </div>
+
+            {{-- ÉTAPE 2: CARACTÉRISTIQUES TECHNIQUES --}}
+            <div x-show="currentStep === 2" style="display: none;" class="space-y-6">
+                <div class="flex items-center gap-3 mb-6">
+                    <x-iconify icon="heroicons:cog-6-tooth" class="w-6 h-6 text-blue-600 dark:text-blue-400" />
+                    <h2 class="text-xl font-semibold text-gray-900 dark:text-white">Caractéristiques Techniques</h2>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {{-- Type de Véhicule --}}
+                    <div>
+                        <label for="vehicle_type_id" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                            Type de Véhicule <span class="text-red-500">*</span>
+                        </label>
+                        <select x-ref="vehicle_type_id" name="vehicle_type_id" id="vehicle_type_id" required>
+                            <option value="">Sélectionnez un type</option>
+                            @foreach($vehicleTypes as $type)
+                                <option value="{{ $type->id }}" @selected(old('vehicle_type_id') == $type->id)>{{ $type->name }}</option>
+                            @endforeach
+                        </select>
+                        @if($errors->has('vehicle_type_id'))
+                            <div class="mt-2 flex items-start text-sm text-red-600 dark:text-red-400">
+                                <x-iconify icon="heroicons:exclamation-circle" class="w-4 h-4 mr-1 mt-0.5 flex-shrink-0" />
+                                <span>{{ $errors->first('vehicle_type_id') }}</span>
+                            </div>
+                        @endif
+                    </div>
+
+                    {{-- Type de Carburant --}}
+                    <div>
+                        <label for="fuel_type_id" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                            Type de Carburant <span class="text-red-500">*</span>
+                        </label>
+                        <select x-ref="fuel_type_id" name="fuel_type_id" id="fuel_type_id" required>
+                            <option value="">Sélectionnez un carburant</option>
+                            @foreach($fuelTypes as $type)
+                                <option value="{{ $type->id }}" @selected(old('fuel_type_id') == $type->id)>{{ $type->name }}</option>
+                            @endforeach
+                        </select>
+                        @if($errors->has('fuel_type_id'))
+                            <div class="mt-2 flex items-start text-sm text-red-600 dark:text-red-400">
+                                <x-iconify icon="heroicons:exclamation-circle" class="w-4 h-4 mr-1 mt-0.5 flex-shrink-0" />
+                                <span>{{ $errors->first('fuel_type_id') }}</span>
+                            </div>
+                        @endif
+                    </div>
+
+                    {{-- Type de Transmission --}}
+                    <div>
+                        <label for="transmission_type_id" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                            Type de Transmission <span class="text-red-500">*</span>
+                        </label>
+                        <select x-ref="transmission_type_id" name="transmission_type_id" id="transmission_type_id" required>
+                            <option value="">Sélectionnez une transmission</option>
+                            @foreach($transmissionTypes as $type)
+                                <option value="{{ $type->id }}" @selected(old('transmission_type_id') == $type->id)>{{ $type->name }}</option>
+                            @endforeach
+                        </select>
+                        @if($errors->has('transmission_type_id'))
+                            <div class="mt-2 flex items-start text-sm text-red-600 dark:text-red-400">
+                                <x-iconify icon="heroicons:exclamation-circle" class="w-4 h-4 mr-1 mt-0.5 flex-shrink-0" />
+                                <span>{{ $errors->first('transmission_type_id') }}</span>
+                            </div>
+                        @endif
+                    </div>
+
+                    <x-input
+                        type="number"
+                        name="manufacturing_year"
+                        label="Année de Fabrication"
+                        icon="calendar"
+                        placeholder="Ex: 2024"
+                        :value="old('manufacturing_year')"
+                        :error="$errors->first('manufacturing_year')"
+                        min="1900"
+                        max="2099"
+                    />
+
+                    <x-input
+                        type="number"
+                        name="seats"
+                        label="Nombre de places"
+                        icon="user-group"
+                        placeholder="Ex: 5"
+                        :value="old('seats')"
+                        :error="$errors->first('seats')"
+                        min="1"
+                        max="99"
+                    />
+
+                    <x-input
+                        type="number"
+                        name="power_hp"
+                        label="Puissance (CV)"
+                        icon="bolt"
+                        placeholder="Ex: 90"
+                        :value="old('power_hp')"
+                        :error="$errors->first('power_hp')"
+                        min="0"
+                    />
+
+                    <div class="lg:col-span-3">
+                        <x-input
+                            type="number"
+                            name="engine_displacement_cc"
+                            label="Cylindrée (cc)"
+                            icon="wrench-screwdriver"
+                            placeholder="Ex: 1500"
+                            :value="old('engine_displacement_cc')"
+                            :error="$errors->first('engine_displacement_cc')"
+                            helpText="Capacité du moteur en centimètres cubes"
+                            min="0"
+                        />
+                    </div>
+                </div>
+            </div>
+
+            {{-- ÉTAPE 3: ACQUISITION & STATUT --}}
+            <div x-show="currentStep === 3" style="display: none;" class="space-y-6">
+                <div class="flex items-center gap-3 mb-6">
+                    <x-iconify icon="heroicons:currency-dollar" class="w-6 h-6 text-blue-600 dark:text-blue-400" />
+                    <h2 class="text-xl font-semibold text-gray-900 dark:text-white">Acquisition & Statut</h2>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <x-datepicker
+                        name="acquisition_date"
+                        label="Date d'acquisition"
+                        :value="old('acquisition_date')"
+                        format="d/m/Y"
+                        :error="$errors->first('acquisition_date')"
+                    />
+
+                    <x-input
+                        type="number"
+                        name="purchase_price"
+                        label="Prix d'achat (DA)"
+                        icon="currency-dollar"
+                        placeholder="Ex: 2500000"
+                        :value="old('purchase_price')"
+                        :error="$errors->first('purchase_price')"
+                        step="0.01"
+                        min="0"
+                        helpText="Prix d'achat en Dinars Algériens"
+                    />
+
+                    <x-input
+                        type="number"
+                        name="current_value"
+                        label="Valeur actuelle (DA)"
+                        icon="currency-dollar"
+                        placeholder="Ex: 2000000"
+                        :value="old('current_value')"
+                        :error="$errors->first('current_value')"
+                        step="0.01"
+                        min="0"
+                        helpText="Valeur estimée actuelle"
+                    />
+
+                    <x-input
+                        type="number"
+                        name="initial_mileage"
+                        label="Kilométrage Initial"
+                        icon="chart-bar"
+                        placeholder="Ex: 0"
+                        :value="old('initial_mileage', 0)"
+                        :error="$errors->first('initial_mileage')"
+                        min="0"
+                        helpText="Kilométrage au moment de l'acquisition"
+                    />
+
+                    {{-- Statut Initial --}}
+                    <div class="md:col-span-2">
+                        <label for="status_id" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                            Statut Initial <span class="text-red-500">*</span>
+                        </label>
+                        <select x-ref="status_id" name="status_id" id="status_id" required>
+                            <option value="">Sélectionnez un statut</option>
+                            @foreach($vehicleStatuses as $status)
+                                <option value="{{ $status->id }}" @selected(old('status_id') == $status->id)>{{ $status->name }}</option>
+                            @endforeach
+                        </select>
+                        @if($errors->has('status_id'))
+                            <div class="mt-2 flex items-start text-sm text-red-600 dark:text-red-400">
+                                <x-iconify icon="heroicons:exclamation-circle" class="w-4 h-4 mr-1 mt-0.5 flex-shrink-0" />
+                                <span>{{ $errors->first('status_id') }}</span>
+                            </div>
+                        @endif
+                    </div>
+
+                    {{-- Utilisateurs Autorisés --}}
+                    <div class="md:col-span-2">
+                        <label for="users" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                            <x-iconify icon="heroicons:users" class="w-4 h-4 inline-block mr-1" />
+                            Utilisateurs Autorisés
+                        </label>
+                        <select name="users[]" id="users" multiple x-ref="users">
+                            @foreach($users as $user)
+                                <option value="{{ $user->id }}"
+                                        data-name="{{ $user->name }}"
+                                        data-email="{{ $user->email }}"
+                                        @selected(in_array($user->id, old('users', [])))>
+                                    {{ $user->name }} ({{ $user->email }})
+                                </option>
+                            @endforeach
+                        </select>
+                        <p class="mt-2 text-xs text-gray-500 dark:text-gray-400">
+                            <x-iconify icon="heroicons:information-circle" class="w-3.5 h-3.5 inline-block mr-1" />
+                            Recherchez et sélectionnez les utilisateurs autorisés à utiliser ce véhicule
+                        </p>
+                        @if($errors->has('users'))
+                            <div class="mt-2 flex items-start text-sm text-red-600 dark:text-red-400">
+                                <x-iconify icon="heroicons:exclamation-circle" class="w-4 h-4 mr-1 mt-0.5 flex-shrink-0" />
+                                <span>{{ $errors->first('users') }}</span>
+                            </div>
+                        @endif
+                    </div>
+
+                    {{-- Notes --}}
+                    <div class="md:col-span-2">
+                        <x-textarea
+                            name="notes"
+                            label="Notes"
+                            rows="4"
+                            placeholder="Informations complémentaires sur le véhicule..."
+                            :value="old('notes')"
+                            :error="$errors->first('notes')"
+                            helpText="Ajoutez toute information utile (état, équipements, historique...)"
+                        />
+                    </div>
+                </div>
+            </div>
+
+            {{-- Actions Footer --}}
+            <div class="mt-8 pt-6 border-t border-gray-200 dark:border-gray-700 flex items-center justify-between">
+                <div>
+                    <x-button
+                        type="button"
+                        variant="secondary"
+                        icon="arrow-left"
+                        x-show="currentStep > 1"
+                        @click="currentStep--"
+                    >
+                        Précédent
+                    </x-button>
+                </div>
+
+                <div class="flex items-center gap-3">
+                    <a href="{{ route('admin.vehicles.index') }}"
+                       class="text-sm font-semibold text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">
+                        Annuler
+                    </a>
+
+                    <x-button
+                        type="button"
+                        variant="primary"
+                        icon="arrow-right"
+                        x-show="currentStep < 3"
+                        @click="currentStep++"
+                    >
+                        Suivant
+                    </x-button>
+
+                    <x-button
+                        type="submit"
+                        variant="success"
+                        icon="check-circle"
+                        x-show="currentStep === 3"
+                    >
+                        Enregistrer le Véhicule
+                    </x-button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+@endsection
