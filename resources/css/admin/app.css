@@ -123,27 +123,133 @@
     }
 }
 
-/* Customisation TomSelect pour admin */
-.ts-control {
-    @apply border-gray-300 rounded-lg bg-white;
+/* ====================================
+   🎨 TOMSELECT FLOWBITE-INSPIRED STYLES
+   ==================================== */
+
+/* Wrapper - Pas de padding */
+.ts-wrapper {
+    padding: 0 !important;
 }
 
-.ts-control.focus,
-.ts-control.input-active {
-    @apply border-blue-500 ring-2 ring-blue-200;
+/* Control - Style Flowbite bg-gray-50 */
+.ts-wrapper .ts-control {
+    @apply bg-gray-50 border border-gray-300 rounded-lg text-gray-900 text-sm;
+    padding: 0.625rem; /* 10px */
+    box-shadow: none !important;
 }
 
-.ts-dropdown {
-    @apply border-gray-300 rounded-lg shadow-lg bg-white;
+.dark .ts-wrapper .ts-control {
+    @apply bg-gray-700 border-gray-600 text-white;
 }
 
-.ts-dropdown .option {
-    @apply px-3 py-2 text-gray-700;
+/* Focus state - Blue-500 comme Flowbite */
+.ts-wrapper.focus .ts-control,
+.ts-wrapper.input-active .ts-control {
+    @apply border-blue-500;
+    box-shadow: 0 0 0 1px rgb(59 130 246) !important;
+    outline: none;
 }
 
-.ts-dropdown .option:hover,
-.ts-dropdown .option.active {
+.dark .ts-wrapper.focus .ts-control,
+.dark .ts-wrapper.input-active .ts-control {
+    @apply border-blue-500;
+}
+
+/* Flèche dropdown */
+.ts-wrapper.single .ts-control::after {
+    border-color: rgb(107 114 128) transparent transparent transparent;
+    border-width: 5px 5px 0 5px;
+    right: 15px;
+    top: 50%;
+    margin-top: -2.5px;
+}
+
+.dark .ts-wrapper.single .ts-control::after {
+    border-color: rgb(156 163 175) transparent transparent transparent;
+}
+
+/* Dropdown */
+.ts-wrapper .ts-dropdown {
+    @apply bg-white border border-gray-200 rounded-lg shadow-lg;
+    margin-top: 0.25rem;
+}
+
+.dark .ts-wrapper .ts-dropdown {
+    @apply bg-gray-700 border-gray-600;
+}
+
+/* Options */
+.ts-wrapper .ts-dropdown .option {
+    @apply px-3 py-2 text-gray-900 cursor-pointer;
+    transition: background-color 150ms ease-in-out;
+}
+
+.dark .ts-wrapper .ts-dropdown .option {
+    @apply text-white;
+}
+
+.ts-wrapper .ts-dropdown .option:hover {
+    @apply bg-gray-50;
+}
+
+.dark .ts-wrapper .ts-dropdown .option:hover {
+    @apply bg-gray-600;
+}
+
+.ts-wrapper .ts-dropdown .option.active {
     @apply bg-blue-50 text-blue-700;
+}
+
+.dark .ts-wrapper .ts-dropdown .option.active {
+    @apply bg-blue-900/30 text-blue-300;
+}
+
+/* Input dans le control */
+.ts-wrapper .ts-control input {
+    @apply text-gray-900;
+}
+
+.dark .ts-wrapper .ts-control input {
+    @apply text-white;
+}
+
+.ts-wrapper .ts-control input::placeholder {
+    @apply text-gray-400;
+}
+
+.dark .ts-wrapper .ts-control input::placeholder {
+    @apply text-gray-400;
+}
+
+/* Clear button */
+.ts-wrapper .clear-button {
+    @apply text-gray-500 cursor-pointer;
+    transition: color 150ms ease-in-out;
+}
+
+.ts-wrapper .clear-button:hover {
+    @apply text-blue-500;
+}
+
+.dark .ts-wrapper .clear-button {
+    @apply text-gray-400;
+}
+
+.dark .ts-wrapper .clear-button:hover {
+    @apply text-blue-400;
+}
+
+/* Items (pour multiple select) - Badges bleus */
+.ts-wrapper .ts-control .item {
+    @apply bg-blue-100 text-blue-800 border-0 rounded-md;
+    padding: 0.125rem 0.5rem;
+    margin: 0.125rem;
+    font-size: 0.875rem;
+}
+
+.dark .ts-wrapper .ts-control .item {
+    @apply bg-blue-900/30 text-blue-300;
 }
 
 /* États responsifs */
