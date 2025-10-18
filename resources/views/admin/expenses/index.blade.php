@@ -138,7 +138,7 @@
                     <div class="flex-1 min-w-0">
                         <div class="flex items-center space-x-4">
                             <div class="p-4 bg-gradient-to-r from-green-500 to-emerald-600 rounded-2xl shadow-lg">
-                                <x-icon icon="heroicons:credit-card" class="h-12 w-12 text-white" stroke-width="2" / />
+                                <x-iconify icon="heroicons:credit-card" class="h-12 w-12 text-white" stroke-width="2" / />
                             </div>
                             <div>
                                 <h1 class="text-4xl font-bold text-white mb-2">Gestion des Dépenses Enterprise</h1>
@@ -147,15 +147,15 @@
                         </div>
                         <div class="mt-6 flex flex-col sm:flex-row sm:flex-wrap sm:space-x-8">
                             <div class="mt-2 flex items-center text-sm text-blue-100">
-                                <x-icon icon="heroicons:arrow-trending-up" class="mr-2 h-5 w-5 text-green-400" stroke-width="2" / />
+                                <x-iconify icon="heroicons:arrow-trending-up" class="mr-2 h-5 w-5 text-green-400" stroke-width="2" / />
                                 Suivi temps réel des coûts
                             </div>
                             <div class="mt-2 flex items-center text-sm text-blue-100">
-                                <x-icon icon="heroicons:shield-check" class="mr-2 h-5 w-5 text-cyan-400" stroke-width="2" / />
+                                <x-iconify icon="heroicons:shield-check" class="mr-2 h-5 w-5 text-cyan-400" stroke-width="2" / />
                                 Validation multi-niveaux
                             </div>
                             <div class="mt-2 flex items-center text-sm text-blue-100">
-                                <x-icon icon="heroicons:clock" class="mr-2 h-5 w-5 text-orange-400" stroke-width="2" / />
+                                <x-iconify icon="heroicons:clock" class="mr-2 h-5 w-5 text-orange-400" stroke-width="2" / />
                                 Dernière mise à jour: {{ now()->format('d/m/Y à H:i:s') }}
                             </div>
                         </div>
@@ -163,15 +163,15 @@
                     <div class="mt-6 md:mt-0 md:ml-6">
                         <div class="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-3">
                             <a href="{{ route('admin.expenses.create') }}" class="inline-flex items-center px-4 py-3 bg-gradient-to-r from-green-500 to-emerald-600 shadow-lg text-sm font-medium rounded-xl text-white hover:from-green-600 hover:to-emerald-700 focus:outline-none focus:ring-2 focus:ring-green-500 transition-all duration-300">
-                                <x-icon icon="heroicons:plus" class="mr-2 h-4 w-4" stroke-width="2" / />
+                                <x-iconify icon="heroicons:plus" class="mr-2 h-4 w-4" stroke-width="2" / />
                                 Nouvelle Dépense
                             </a>
                             <button onclick="exportExpenses()" class="inline-flex items-center px-4 py-3 bg-white/10 backdrop-blur-sm border border-white/20 shadow-sm text-sm font-medium rounded-xl text-white hover:bg-white/20 focus:outline-none focus:ring-2 focus:ring-white/50 transition-all duration-300">
-                                <x-icon icon="heroicons:arrow-down-tray" class="mr-2 h-4 w-4" stroke-width="2" / />
+                                <x-iconify icon="heroicons:arrow-down-tray" class="mr-2 h-4 w-4" stroke-width="2" / />
                                 Exporter
                             </button>
                             <a href="{{ route('admin.expenses.analytics') }}" class="inline-flex items-center px-4 py-3 bg-gradient-to-r from-purple-500 to-indigo-600 shadow-lg text-sm font-medium rounded-xl text-white hover:from-purple-600 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all duration-300">
-                                <x-icon icon="heroicons:chart-bar" class="mr-2 h-4 w-4" stroke-width="2" / />
+                                <x-iconify icon="heroicons:chart-bar" class="mr-2 h-4 w-4" stroke-width="2" / />
                                 Analytics
                             </a>
                         </div>
@@ -187,7 +187,7 @@
         <div class="metric-card relative bg-gradient-to-br from-blue-50 to-indigo-100 border-l-4 border-blue-500 p-6 shadow-xl">
             <div class="absolute top-4 right-4">
                 <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg">
-                    <x-icon icon="lucide:euro" class="w-6 h-6 text-white" stroke-width="2" / />
+                    <x-iconify icon="lucide:euro" class="w-6 h-6 text-white" stroke-width="2" / />
                 </div>
             </div>
             <div class="pb-2">
@@ -197,7 +197,7 @@
                     <span class="text-lg font-semibold text-blue-600">€</span>
                 </div>
                 <div class="mt-2 flex items-center text-xs text-blue-600">
-                    <x-icon icon="heroicons:arrow-trending-up" class="w-3 h-3 mr-1" / />
+                    <x-iconify icon="heroicons:arrow-trending-up" class="w-3 h-3 mr-1" / />
                     {{ $stats['total_count'] ?? 0 }} dépenses
                 </div>
             </div>
@@ -207,7 +207,7 @@
         <div class="metric-card relative bg-gradient-to-br from-yellow-50 to-orange-100 border-l-4 border-yellow-500 p-6 shadow-xl">
             <div class="absolute top-4 right-4">
                 <div class="w-12 h-12 bg-gradient-to-br from-yellow-500 to-orange-600 rounded-xl flex items-center justify-center shadow-lg">
-                    <x-icon icon="heroicons:clock" class="w-6 h-6 text-white" stroke-width="2" / />
+                    <x-iconify icon="heroicons:clock" class="w-6 h-6 text-white" stroke-width="2" / />
                 </div>
             </div>
             <div class="pb-2">
@@ -224,7 +224,7 @@
                     @endif
                 </div>
                 <div class="mt-2 flex items-center text-xs text-yellow-600">
-                    <x-icon icon="heroicons:user"-check class="w-3 h-3 mr-1" / />
+                    <x-iconify icon="heroicons:user"-check class="w-3 h-3 mr-1" / />
                     Validation en cours
                 </div>
             </div>
@@ -234,7 +234,7 @@
         <div class="metric-card relative bg-gradient-to-br from-green-50 to-emerald-100 border-l-4 border-green-500 p-6 shadow-xl">
             <div class="absolute top-4 right-4">
                 <div class="w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl flex items-center justify-center shadow-lg">
-                    <x-icon icon="heroicons:check-circle" class="w-6 h-6 text-white" stroke-width="2" / />
+                    <x-iconify icon="heroicons:check-circle" class="w-6 h-6 text-white" stroke-width="2" / />
                 </div>
             </div>
             <div class="pb-2">
@@ -244,7 +244,7 @@
                     <span class="text-xs text-gray-600">validées</span>
                 </div>
                 <div class="mt-2 flex items-center text-xs text-green-600">
-                    <x-icon icon="heroicons:shield-check" class="w-3 h-3 mr-1" / />
+                    <x-iconify icon="heroicons:shield-check" class="w-3 h-3 mr-1" / />
                     Conformes
                 </div>
             </div>
@@ -254,7 +254,7 @@
         <div class="metric-card relative bg-gradient-to-br from-red-50 to-rose-100 border-l-4 border-red-500 p-6 shadow-xl">
             <div class="absolute top-4 right-4">
                 <div class="w-12 h-12 bg-gradient-to-br from-red-500 to-red-600 rounded-xl flex items-center justify-center shadow-lg">
-                    <x-icon icon="heroicons:x-circle" class="w-6 h-6 text-white" stroke-width="2" / />
+                    <x-iconify icon="heroicons:x-circle" class="w-6 h-6 text-white" stroke-width="2" / />
                 </div>
             </div>
             <div class="pb-2">
@@ -264,7 +264,7 @@
                     <span class="text-xs text-gray-600">refusées</span>
                 </div>
                 <div class="mt-2 flex items-center text-xs text-red-600">
-                    <x-icon icon="heroicons:exclamation-triangle" class="w-3 h-3 mr-1" / />
+                    <x-iconify icon="heroicons:exclamation-triangle" class="w-3 h-3 mr-1" / />
                     Non conformes
                 </div>
             </div>
@@ -274,7 +274,7 @@
         <div class="metric-card relative bg-gradient-to-br from-purple-50 to-violet-100 border-l-4 border-purple-500 p-6 shadow-xl">
             <div class="absolute top-4 right-4">
                 <div class="w-12 h-12 bg-gradient-to-br from-purple-500 to-violet-600 rounded-xl flex items-center justify-center shadow-lg">
-                    <x-icon icon="heroicons:calendar" class="w-6 h-6 text-white" stroke-width="2" / />
+                    <x-iconify icon="heroicons:calendar" class="w-6 h-6 text-white" stroke-width="2" / />
                 </div>
             </div>
             <div class="pb-2">
@@ -284,7 +284,7 @@
                     <span class="text-lg font-semibold text-purple-600">€</span>
                 </div>
                 <div class="mt-2 flex items-center text-xs text-purple-600">
-                    <x-icon icon="heroicons:arrow-trending-up" class="w-3 h-3 mr-1" / />
+                    <x-iconify icon="heroicons:arrow-trending-up" class="w-3 h-3 mr-1" / />
                     {{ now()->format('F Y') }}
                 </div>
             </div>
@@ -294,7 +294,7 @@
         <div class="metric-card relative bg-gradient-to-br from-teal-50 to-cyan-100 border-l-4 border-teal-500 p-6 shadow-xl">
             <div class="absolute top-4 right-4">
                 <div class="w-12 h-12 bg-gradient-to-br from-teal-500 to-cyan-600 rounded-xl flex items-center justify-center shadow-lg">
-                    <x-icon icon="heroicons:chart-bar" class="w-6 h-6 text-white" stroke-width="2" / />
+                    <x-iconify icon="heroicons:chart-bar" class="w-6 h-6 text-white" stroke-width="2" / />
                 </div>
             </div>
             <div class="pb-2">
@@ -304,7 +304,7 @@
                     <span class="text-lg font-semibold text-teal-600">€</span>
                 </div>
                 <div class="mt-2 flex items-center text-xs text-teal-600">
-                    <x-icon icon="heroicons:calculator" class="w-3 h-3 mr-1" / />
+                    <x-iconify icon="heroicons:calculator" class="w-3 h-3 mr-1" / />
                     Par dépense
                 </div>
             </div>
@@ -314,7 +314,7 @@
         <div class="metric-card relative bg-gradient-to-br from-indigo-50 to-blue-100 border-l-4 border-indigo-500 p-6 shadow-xl">
             <div class="absolute top-4 right-4">
                 <div class="w-12 h-12 bg-gradient-to-br from-indigo-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg">
-                    <x-icon icon="heroicons:chart-pie" class="w-6 h-6 text-white" stroke-width="2" / />
+                    <x-iconify icon="heroicons:chart-pie" class="w-6 h-6 text-white" stroke-width="2" / />
                 </div>
             </div>
             <div class="pb-2">
@@ -324,7 +324,7 @@
                     <span class="text-xs text-gray-600">% utilisé</span>
                 </div>
                 <div class="mt-2 flex items-center text-xs text-indigo-600">
-                    <x-icon icon="lucide:target" class="w-3 h-3 mr-1" / />
+                    <x-iconify icon="lucide:target" class="w-3 h-3 mr-1" / />
                     Dans les limites
                 </div>
             </div>
@@ -336,7 +336,7 @@
         <div class="flex items-center justify-between mb-6">
             <div class="flex items-center space-x-3">
                 <div class="p-3 bg-blue-500 rounded-xl shadow-lg">
-                    <x-icon icon="heroicons:funnel" class="h-6 w-6 text-white" stroke-width="2" / />
+                    <x-iconify icon="heroicons:funnel" class="h-6 w-6 text-white" stroke-width="2" / />
                 </div>
                 <div>
                     <h3 class="text-lg font-semibold text-gray-900">Filtres Avancés</h3>
@@ -344,7 +344,7 @@
                 </div>
             </div>
             <button onclick="clearFilters()" class="text-sm text-blue-600 hover:text-blue-800 font-medium">
-                <x-icon icon="heroicons:x-mark" class="w-4 h-4 inline mr-1" / />
+                <x-iconify icon="heroicons:x-mark" class="w-4 h-4 inline mr-1" / />
                 Effacer
             </button>
         </div>
@@ -395,7 +395,7 @@
                         <input type="text" name="search" value="{{ $filters['search'] }}"
                                placeholder="Référence, description..."
                                class="w-full pl-10 rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
-                        <x-icon icon="heroicons:magnifying-glass" class="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" / />
+                        <x-iconify icon="heroicons:magnifying-glass" class="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" / />
                     </div>
                 </div>
             </div>
@@ -441,11 +441,11 @@
             <div class="flex items-center justify-between pt-4 border-t border-gray-200">
                 <div class="flex items-center space-x-3">
                     <button type="submit" class="filter-btn inline-flex items-center px-4 py-2 bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-medium rounded-lg hover:from-blue-600 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-300">
-                        <x-icon icon="heroicons:magnifying-glass" class="w-4 h-4 mr-2" / />
+                        <x-iconify icon="heroicons:magnifying-glass" class="w-4 h-4 mr-2" / />
                         Filtrer
                     </button>
                     <a href="{{ route('admin.expenses.index') }}" class="filter-btn inline-flex items-center px-4 py-2 bg-gray-100 text-gray-700 font-medium rounded-lg hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-500 transition-all duration-300">
-                        <x-icon icon="heroicons:arrow-path" class="w-4 h-4 mr-2" / />
+                        <x-iconify icon="heroicons:arrow-path" class="w-4 h-4 mr-2" / />
                         Réinitialiser
                     </a>
                 </div>
@@ -462,7 +462,7 @@
             <div class="flex items-center justify-between">
                 <div class="flex items-center space-x-3">
                     <div class="p-2 bg-blue-500 rounded-lg shadow-lg">
-                        <x-icon icon="heroicons:table-cells" class="h-5 w-5 text-white" stroke-width="2" / />
+                        <x-iconify icon="heroicons:table-cells" class="h-5 w-5 text-white" stroke-width="2" / />
                     </div>
                     <div>
                         <h3 class="text-lg font-semibold text-gray-900">Liste des Dépenses</h3>
@@ -494,7 +494,7 @@
                         <td class="px-6 py-4 whitespace-nowrap">
                             <div class="flex items-center">
                                 <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center mr-3">
-                                    <x-icon icon="heroicons:receipt-percent" class="w-5 h-5 text-blue-600" / />
+                                    <x-iconify icon="heroicons:receipt-percent" class="w-5 h-5 text-blue-600" / />
                                 </div>
                                 <div>
                                     <div class="text-sm font-medium text-gray-900">{{ $expense->reference_number ?? 'EXP-' . $expense->id }}</div>
@@ -505,7 +505,7 @@
                         <td class="px-6 py-4 whitespace-nowrap">
                             <div class="flex items-center">
                                 <div class="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center mr-3">
-                                    <x-icon icon="lucide:car" class="w-4 h-4 text-gray-600" / />
+                                    <x-iconify icon="lucide:car" class="w-4 h-4 text-gray-600" / />
                                 </div>
                                 <div>
                                     <div class="text-sm font-medium text-gray-900">{{ $expense->vehicle->registration_plate ?? 'N/A' }}</div>
@@ -545,18 +545,18 @@
                         <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                             <div class="flex items-center space-x-2">
                                 <a href="{{ route('admin.expenses.show', $expense) }}" class="text-blue-600 hover:text-blue-900 transition-colors">
-                                    <x-icon icon="heroicons:eye" class="w-4 h-4" / />
+                                    <x-iconify icon="heroicons:eye" class="w-4 h-4" / />
                                 </a>
                                 @if($expense->needs_approval && !$expense->approved)
                                     <button onclick="approveExpense({{ $expense->id }})" class="text-green-600 hover:text-green-900 transition-colors">
-                                        <x-icon icon="heroicons:check" class="w-4 h-4" / />
+                                        <x-iconify icon="heroicons:check" class="w-4 h-4" / />
                                     </button>
                                 @endif
                                 <a href="{{ route('admin.expenses.edit', $expense) }}" class="text-amber-600 hover:text-amber-900 transition-colors">
-                                    <x-icon icon="heroicons:pencil" class="w-4 h-4" / />
+                                    <x-iconify icon="heroicons:pencil" class="w-4 h-4" / />
                                 </a>
                                 <button onclick="deleteExpense({{ $expense->id }})" class="text-red-600 hover:text-red-900 transition-colors">
-                                    <x-icon icon="heroicons:trash" class="w-4 h-4" / />
+                                    <x-iconify icon="heroicons:trash" class="w-4 h-4" / />
                                 </button>
                             </div>
                         </td>
@@ -565,11 +565,11 @@
                     <tr>
                         <td colspan="7" class="px-6 py-12 text-center">
                             <div class="flex flex-col items-center">
-                                <x-icon icon="heroicons:inbox" class="h-12 w-12 text-gray-400 mb-4" / />
+                                <x-iconify icon="heroicons:inbox" class="h-12 w-12 text-gray-400 mb-4" / />
                                 <h3 class="text-lg font-medium text-gray-900 mb-2">Aucune dépense trouvée</h3>
                                 <p class="text-gray-600 mb-4">Commencez par ajouter une nouvelle dépense</p>
                                 <a href="{{ route('admin.expenses.create') }}" class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
-                                    <x-icon icon="heroicons:plus" class="w-4 h-4 mr-2" / />
+                                    <x-iconify icon="heroicons:plus" class="w-4 h-4 mr-2" / />
                                     Nouvelle dépense
                                 </a>
                             </div>

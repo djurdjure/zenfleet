@@ -5,7 +5,7 @@ namespace App\View\Components;
 use Illuminate\View\Component;
 use Illuminate\View\View;
 
-class Icon extends Component
+class Iconify extends Component
 {
     public string $icon;
     public bool $inline;
@@ -17,7 +17,7 @@ class Icon extends Component
      * @param bool $inline Mode inline (true) ou block (false)
      */
     public function __construct(
-        string $icon,
+        string $icon = '',
         bool $inline = false
     ) {
         $this->icon = $icon;
@@ -29,6 +29,6 @@ class Icon extends Component
      */
     public function render(): View
     {
-        return view('components.icon');
+        return view('components.iconify');
     }
 }

@@ -39,7 +39,7 @@
 
     @if($error)
         <p class="mt-2 text-sm text-red-600 flex items-start">
-            <x-icon icon="heroicons:exclamation-circle" class="w-4 h-4 mr-1 mt-0.5 flex-shrink-0" />
+            <x-iconify icon="heroicons:exclamation-circle" class="w-4 h-4 mr-1 mt-0.5 flex-shrink-0" />
             <span>{{ $error }}</span>
         </p>
     @elseif($helpText)

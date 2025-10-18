@@ -17,7 +17,7 @@
 
                             <div class="flex items-center space-x-4">
                                 <div class="flex-shrink-0">
-                                    <x-icon icon="heroicons:user"-circle-2 class="h-10 w-10 text-gray-400"/ />
+                                    <x-iconify icon="heroicons:user"-circle-2 class="h-10 w-10 text-gray-400"/ />
                                 </div>
                                 <div>
                                     <p class="text-gray-500">Chauffeur</p>
@@ -27,7 +27,7 @@
 
                             <div class="flex items-center space-x-4">
                                  <div class="flex-shrink-0">
-                                    <x-icon icon="heroicons:truck" class="h-10 w-10 text-gray-400"/ />
+                                    <x-iconify icon="heroicons:truck" class="h-10 w-10 text-gray-400"/ />
                                 </div>
                                 <div>
                                      <p class="text-gray-500">Véhicule</p>
@@ -67,7 +67,7 @@
                         <div class="mt-8 flex items-center justify-end gap-4 border-t pt-6">
                              <a href="{{ route('admin.assignments.index') }}" class="text-sm font-semibold text-gray-600 hover:text-gray-900">Retour à la liste</a>
                              <x-primary-button>
-                                 <x-icon icon="heroicons:check-circle" class="w-5 h-5 mr-2"/ />
+                                 <x-iconify icon="heroicons:check-circle" class="w-5 h-5 mr-2"/ />
                                  Enregistrer les Modifications
                              </x-primary-button>
                         </div>

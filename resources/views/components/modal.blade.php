@@ -68,7 +68,7 @@
                             class="text-gray-400 hover:text-gray-600 rounded-lg p-1.5 hover:bg-gray-100 transition-colors focus:outline-none focus:ring-2 focus:ring-gray-500/50"
                             aria-label="Fermer"
                         >
-                            <x-icon icon="heroicons:x-mark" class="w-5 h-5" />
+                            <x-iconify icon="heroicons:x-mark" class="w-5 h-5" />
                         </button>
                     @endif
                 </div>

@@ -30,7 +30,7 @@
                     <div class="flex items-center w-full">
                         <div class="relative mr-3">
                             <div class="w-8 h-8 bg-white rounded-full flex items-center justify-center shadow-sm">
-                                <x-icon icon="heroicons:truck" class="w-5 h-5 text-blue-600" />
+                                <x-iconify icon="heroicons:truck" class="w-5 h-5 text-blue-600" />
                             </div>
                         </div>
                         <div class="flex-1">
@@ -53,7 +53,7 @@
                             @endphp
                             <a href="{{ $dashboardRoute }}"
                                class="flex items-center w-full h-10 px-3 py-2 rounded-lg text-sm font-semibold transition-all duration-200 {{ $isDashboardActive ? 'bg-blue-50 text-blue-700 shadow-sm' : 'text-slate-600 hover:bg-white/60 hover:text-slate-800' }}">
-                                <x-icon icon="heroicons:chart-bar-square" class="w-4 h-4 mr-3 {{ $isDashboardActive ? 'text-blue-600' : 'text-slate-500' }}" />
+                                <x-iconify icon="heroicons:chart-bar-square" class="w-4 h-4 mr-3 {{ $isDashboardActive ? 'text-blue-600' : 'text-slate-500' }}" />
                                 <span class="flex-1">Dashboard</span>
                             </a>
                         </li>
@@ -63,7 +63,7 @@
                         <li class="flex">
                             <a href="{{ route('admin.organizations.index') }}"
                                class="flex items-center w-full h-10 px-3 py-2 rounded-lg text-sm font-semibold transition-all duration-200 {{ request()->routeIs('admin.organizations.*') ? 'bg-blue-50 text-blue-700 shadow-sm' : 'text-slate-600 hover:bg-white/60 hover:text-slate-800' }}">
-                                <x-icon icon="heroicons:building-office" class="w-4 h-4 mr-3 {{ request()->routeIs('admin.organizations.*') ? 'text-blue-600' : 'text-slate-500' }}" />
+                                <x-iconify icon="heroicons:building-office" class="w-4 h-4 mr-3 {{ request()->routeIs('admin.organizations.*') ? 'text-blue-600' : 'text-slate-500' }}" />
                                 <span class="flex-1">Organisations</span>
                             </a>
                         </li>
@@ -74,9 +74,9 @@
                         <li class="flex flex-col" x-data="{ open: {{ request()->routeIs('admin.vehicles.*', 'admin.assignments.*') ? 'true' : 'false' }} }">
                             <button @click="open = !open"
                                     class="flex items-center w-full h-10 px-3 py-2 rounded-lg text-sm font-semibold transition-all duration-200 {{ request()->routeIs('admin.vehicles.*', 'admin.assignments.*') ? 'bg-blue-50 text-blue-700 shadow-sm' : 'text-slate-600 hover:bg-white/60 hover:text-slate-800' }}">
-                                <x-icon icon="heroicons:truck" class="w-4 h-4 mr-3 {{ request()->routeIs('admin.vehicles.*', 'admin.assignments.*') ? 'text-blue-600' : 'text-slate-500' }}" />
+                                <x-iconify icon="heroicons:truck" class="w-4 h-4 mr-3 {{ request()->routeIs('admin.vehicles.*', 'admin.assignments.*') ? 'text-blue-600' : 'text-slate-500' }}" />
                                 <span class="flex-1 text-left">Véhicules</span>
-                                <x-icon icon="heroicons:chevron-down" class="w-3 h-3 transition-transform duration-200" ::class="{ 'rotate-180': !open }" />
+                                <x-iconify icon="heroicons:chevron-down" class="w-3 h-3 transition-transform duration-200" ::class="{ 'rotate-180': !open }" />
                             </button>
                             <div x-show="open" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 max-h-0" x-transition:enter-end="opacity-100 max-h-96" x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100 max-h-96" x-transition:leave-end="opacity-0 max-h-0" class="overflow-hidden">
                                 <div class="flex w-full mt-2 pl-3">
@@ -94,12 +94,12 @@
                                     <div class="flex-1 min-w-0 space-y-1">
                                         <a href="{{ route('admin.vehicles.index') }}"
                                            class="flex items-center w-full h-8 px-1 py-1 rounded-md text-sm font-semibold transition-all duration-200 {{ request()->routeIs('admin.vehicles.index') ? 'bg-blue-50/80 text-blue-700' : 'text-slate-600 hover:bg-white/40 hover:text-slate-800' }}">
-                                            <x-icon icon="heroicons:list-bullet" class="w-3 h-3 mr-3 {{ request()->routeIs('admin.vehicles.index') ? 'text-blue-600' : 'text-slate-500' }}" />
+                                            <x-iconify icon="heroicons:list-bullet" class="w-3 h-3 mr-3 {{ request()->routeIs('admin.vehicles.index') ? 'text-blue-600' : 'text-slate-500' }}" />
                                             Gestion Véhicules
                                         </a>
                                         <a href="{{ route('admin.assignments.index') }}"
                                            class="flex items-center w-full h-8 px-1 py-1 rounded-md text-sm font-semibold transition-all duration-200 {{ request()->routeIs('admin.assignments.*') ? 'bg-blue-50/80 text-blue-700' : 'text-slate-600 hover:bg-white/40 hover:text-slate-800' }}">
-                                            <x-icon icon="heroicons:clipboard-document-list" class="w-3 h-3 mr-3 {{ request()->routeIs('admin.assignments.*') ? 'text-blue-600' : 'text-slate-500' }}" />
+                                            <x-iconify icon="heroicons:clipboard-document-list" class="w-3 h-3 mr-3 {{ request()->routeIs('admin.assignments.*') ? 'text-blue-600' : 'text-slate-500' }}" />
                                             Affectations
                                         </a>
                                     </div>
@@ -113,9 +113,9 @@
                         <li class="flex flex-col" x-data="{ open: {{ request()->routeIs(['admin.drivers.*', 'admin.sanctions.*']) ? 'true' : 'false' }} }">
                             <button @click="open = !open"
                                     class="flex items-center w-full h-10 px-3 py-2 rounded-lg text-sm font-semibold transition-all duration-200 {{ request()->routeIs(['admin.drivers.*', 'admin.sanctions.*']) ? 'bg-blue-50 text-blue-700 shadow-sm' : 'text-slate-600 hover:bg-white/60 hover:text-slate-800' }}">
-                                <x-icon icon="heroicons:user" class="w-4 h-4 mr-3 {{ request()->routeIs(['admin.drivers.*', 'admin.sanctions.*']) ? 'text-blue-600' : 'text-slate-500' }}" />
+                                <x-iconify icon="heroicons:user" class="w-4 h-4 mr-3 {{ request()->routeIs(['admin.drivers.*', 'admin.sanctions.*']) ? 'text-blue-600' : 'text-slate-500' }}" />
                                 <span class="flex-1 text-left">Chauffeurs</span>
-                                <x-icon icon="heroicons:chevron-down" class="w-3 h-3 transition-transform duration-200" ::class="{ 'rotate-180': !open }" />
+                                <x-iconify icon="heroicons:chevron-down" class="w-3 h-3 transition-transform duration-200" ::class="{ 'rotate-180': !open }" />
                             </button>
                             <div x-show="open" 
                                  x-transition:enter="transition ease-out duration-300" 
@@ -140,12 +140,12 @@
                                     <div class="flex-1 min-w-0 space-y-1">
                                         <a href="{{ route('admin.drivers.index') }}"
                                            class="flex items-center w-full h-8 px-1 py-1 rounded-md text-sm font-semibold transition-all duration-200 {{ request()->routeIs('admin.drivers.index') ? 'bg-blue-50/80 text-blue-700' : 'text-slate-600 hover:bg-white/40 hover:text-slate-800' }}">
-                                            <x-icon icon="heroicons:list-bullet" class="w-3 h-3 mr-3 {{ request()->routeIs('admin.drivers.index') ? 'text-blue-600' : 'text-slate-500' }}" />
+                                            <x-iconify icon="heroicons:list-bullet" class="w-3 h-3 mr-3 {{ request()->routeIs('admin.drivers.index') ? 'text-blue-600' : 'text-slate-500' }}" />
                                             Liste
                                         </a>
                                         <a href="{{ route('admin.sanctions.index') }}"
                                            class="flex items-center w-full h-8 px-1 py-1 rounded-md text-sm font-semibold transition-all duration-200 {{ request()->routeIs('admin.sanctions.*') ? 'bg-blue-50/80 text-blue-700' : 'text-slate-600 hover:bg-white/40 hover:text-slate-800' }}">
-                                            <x-icon icon="heroicons:scale" class="w-3 h-3 mr-3 {{ request()->routeIs('admin.sanctions.*') ? 'text-blue-600' : 'text-slate-500' }}" />
+                                            <x-iconify icon="heroicons:scale" class="w-3 h-3 mr-3 {{ request()->routeIs('admin.sanctions.*') ? 'text-blue-600' : 'text-slate-500' }}" />
                                             Sanctions
                                         </a>
                                     </div>
@@ -160,7 +160,7 @@
                         <li class="flex">
                             <a href="{{ route('driver.repair-requests.index') }}"
                                class="flex items-center w-full h-10 px-3 py-2 rounded-lg text-sm font-semibold transition-all duration-200 {{ request()->routeIs('driver.repair-requests.*') ? 'bg-blue-50 text-blue-700 shadow-sm' : 'text-slate-600 hover:bg-white/60 hover:text-slate-800' }}">
-                                <x-icon icon="heroicons:wrench-screwdriver" class="w-4 h-4 mr-3 {{ request()->routeIs('driver.repair-requests.*') ? 'text-blue-600' : 'text-slate-500' }}" />
+                                <x-iconify icon="heroicons:wrench-screwdriver" class="w-4 h-4 mr-3 {{ request()->routeIs('driver.repair-requests.*') ? 'text-blue-600' : 'text-slate-500' }}" />
                                 <span class="flex-1">Mes Demandes</span>
                             </a>
                         </li>
@@ -172,9 +172,9 @@
                         <li class="flex flex-col" x-data="{ open: {{ request()->routeIs('admin.mileage-readings.*', 'driver.mileage.*', 'admin.vehicles.*.mileage-history') ? 'true' : 'false' }} }">
                             <button @click="open = !open"
                                     class="flex items-center w-full h-10 px-3 py-2 rounded-lg text-sm font-semibold transition-all duration-200 {{ request()->routeIs('admin.mileage-readings.*', 'driver.mileage.*', 'admin.vehicles.*.mileage-history') ? 'bg-blue-50 text-blue-700 shadow-sm' : 'text-slate-600 hover:bg-white/60 hover:text-slate-800' }}">
-                                <x-icon icon="heroicons:chart-bar-square" class="w-4 h-4 mr-3 {{ request()->routeIs('admin.mileage-readings.*', 'driver.mileage.*', 'admin.vehicles.*.mileage-history') ? 'text-blue-600' : 'text-slate-500' }}" />
+                                <x-iconify icon="heroicons:chart-bar-square" class="w-4 h-4 mr-3 {{ request()->routeIs('admin.mileage-readings.*', 'driver.mileage.*', 'admin.vehicles.*.mileage-history') ? 'text-blue-600' : 'text-slate-500' }}" />
                                 <span class="flex-1 text-left">Kilométrage</span>
-                                <x-icon icon="heroicons:chevron-down" class="w-3 h-3 transition-transform duration-200" ::class="{ 'rotate-180': !open }" />
+                                <x-iconify icon="heroicons:chevron-down" class="w-3 h-3 transition-transform duration-200" ::class="{ 'rotate-180': !open }" />
                             </button>
                             <div x-show="open" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 max-h-0" x-transition:enter-end="opacity-100 max-h-96" x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100 max-h-96" x-transition:leave-end="opacity-0 max-h-0" class="overflow-hidden">
                                 <div class="flex w-full mt-2 pl-3">
@@ -199,7 +199,7 @@
                                             @endphp
                                             <a href="{{ $mileageIndexRoute }}"
                                                class="flex items-center h-9 px-3 py-1.5 rounded-lg text-sm font-medium transition-all duration-200 {{ $isMileageIndexActive ? 'bg-blue-100/70 text-blue-700' : 'text-slate-600 hover:bg-white/40 hover:text-slate-800' }}">
-                                                <x-icon icon="heroicons:clock" class="w-3 h-3 mr-2 {{ $isMileageIndexActive ? 'text-blue-600' : 'text-slate-400' }}" />
+                                                <x-iconify icon="heroicons:clock" class="w-3 h-3 mr-2 {{ $isMileageIndexActive ? 'text-blue-600' : 'text-slate-400' }}" />
                                                 Historique
                                             </a>
                                         </li>
@@ -214,7 +214,7 @@
                                             @endphp
                                             <a href="{{ $mileageUpdateRoute }}"
                                                class="flex items-center h-9 px-3 py-1.5 rounded-lg text-sm font-medium transition-all duration-200 {{ $isMileageUpdateActive ? 'bg-blue-100/70 text-blue-700' : 'text-slate-600 hover:bg-white/40 hover:text-slate-800' }}">
-                                                <x-icon icon="heroicons:pencil" class="w-3 h-3 mr-2 {{ $isMileageUpdateActive ? 'text-blue-600' : 'text-slate-400' }}" />
+                                                <x-iconify icon="heroicons:pencil" class="w-3 h-3 mr-2 {{ $isMileageUpdateActive ? 'text-blue-600' : 'text-slate-400' }}" />
                                                 Mettre à jour
                                             </a>
                                         </li>
@@ -230,9 +230,9 @@
                         <li class="flex flex-col" x-data="{ open: {{ request()->routeIs('admin.maintenance.*', 'admin.repair-requests.*') ? 'true' : 'false' }} }">
                             <button @click="open = !open"
                                     class="flex items-center w-full h-10 px-3 py-2 rounded-lg text-sm font-semibold transition-all duration-200 {{ request()->routeIs('admin.maintenance.*', 'admin.repair-requests.*') ? 'bg-blue-50 text-blue-700 shadow-sm' : 'text-slate-600 hover:bg-white/60 hover:text-slate-800' }}">
-                                <x-icon icon="heroicons:wrench" class="w-4 h-4 mr-3 {{ request()->routeIs('admin.maintenance.*', 'admin.repair-requests.*') ? 'text-blue-600' : 'text-slate-500' }}" />
+                                <x-iconify icon="heroicons:wrench" class="w-4 h-4 mr-3 {{ request()->routeIs('admin.maintenance.*', 'admin.repair-requests.*') ? 'text-blue-600' : 'text-slate-500' }}" />
                                 <span class="flex-1 text-left">Maintenance</span>
-                                <x-icon icon="heroicons:chevron-down" class="w-3 h-3 transition-transform duration-200" ::class="{ 'rotate-180': !open }" />
+                                <x-iconify icon="heroicons:chevron-down" class="w-3 h-3 transition-transform duration-200" ::class="{ 'rotate-180': !open }" />
                             </button>
                             <div x-show="open" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 max-h-0" x-transition:enter-end="opacity-100 max-h-96" x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100 max-h-96" x-transition:leave-end="opacity-0 max-h-0" class="overflow-hidden">
                                 <div class="flex w-full mt-2 pl-3">
@@ -259,24 +259,24 @@
                                     <div class="flex-1 min-w-0 space-y-1">
                                         <a href="{{ route('admin.maintenance.surveillance.index') }}"
                                            class="flex items-center w-full h-8 px-1 py-1 rounded-md text-sm font-semibold transition-all duration-200 {{ request()->routeIs('admin.maintenance.surveillance.*') ? 'bg-blue-50/80 text-blue-700' : 'text-slate-600 hover:bg-white/40 hover:text-slate-800' }}">
-                                            <x-icon icon="heroicons:computer-desktop" class="w-3 h-3 mr-3 {{ request()->routeIs('admin.maintenance.surveillance.*') ? 'text-blue-600' : 'text-slate-500' }}" />
+                                            <x-iconify icon="heroicons:computer-desktop" class="w-3 h-3 mr-3 {{ request()->routeIs('admin.maintenance.surveillance.*') ? 'text-blue-600' : 'text-slate-500' }}" />
                                             Surveillance
                                         </a>
                                         <a href="{{ route('admin.maintenance.schedules.index') }}"
                                            class="flex items-center w-full h-8 px-1 py-1 rounded-md text-sm font-semibold transition-all duration-200 {{ request()->routeIs('admin.maintenance.schedules.*') ? 'bg-blue-50/80 text-blue-700' : 'text-slate-600 hover:bg-white/40 hover:text-slate-800' }}">
-                                            <x-icon icon="heroicons:calendar" class="w-3 h-3 mr-3 {{ request()->routeIs('admin.maintenance.schedules.*') ? 'text-blue-600' : 'text-slate-500' }}" />
+                                            <x-iconify icon="heroicons:calendar" class="w-3 h-3 mr-3 {{ request()->routeIs('admin.maintenance.schedules.*') ? 'text-blue-600' : 'text-slate-500' }}" />
                                             Planifications
                                         </a>
                                         @canany(['view team repair requests', 'view all repair requests'])
                                         <a href="{{ route('admin.repair-requests.index') }}"
                                            class="flex items-center w-full h-8 px-1 py-1 rounded-md text-sm font-semibold transition-all duration-200 {{ request()->routeIs('admin.repair-requests.*', 'driver.repair-requests.*') ? 'bg-blue-50/80 text-blue-700' : 'text-slate-600 hover:bg-white/40 hover:text-slate-800' }}">
-                                            <x-icon icon="heroicons:wrench-screwdriver" class="w-3 h-3 mr-3 {{ request()->routeIs('admin.repair-requests.*', 'driver.repair-requests.*') ? 'text-blue-600' : 'text-slate-500' }}" />
+                                            <x-iconify icon="heroicons:wrench-screwdriver" class="w-3 h-3 mr-3 {{ request()->routeIs('admin.repair-requests.*', 'driver.repair-requests.*') ? 'text-blue-600' : 'text-slate-500' }}" />
                                             Demandes réparation
                                         </a>
                                         @endcanany
                                         <a href="{{ route('admin.maintenance.operations.index') }}"
                                            class="flex items-center w-full h-8 px-1 py-1 rounded-md text-sm font-semibold transition-all duration-200 {{ request()->routeIs('admin.maintenance.operations.*') ? 'bg-blue-50/80 text-blue-700' : 'text-slate-600 hover:bg-white/40 hover:text-slate-800' }}">
-                                            <x-icon icon="heroicons:cog-6-tooth" class="w-3 h-3 mr-3 {{ request()->routeIs('admin.maintenance.operations.*') ? 'text-blue-600' : 'text-slate-500' }}" />
+                                            <x-iconify icon="heroicons:cog-6-tooth" class="w-3 h-3 mr-3 {{ request()->routeIs('admin.maintenance.operations.*') ? 'text-blue-600' : 'text-slate-500' }}" />
                                             Opérations
                                         </a>
                                     </div>
@@ -290,7 +290,7 @@
                         <li class="flex">
                             <a href="{{ route('admin.alerts.index') }}"
                                class="flex items-center w-full h-10 px-3 py-2 rounded-lg text-sm font-semibold transition-all duration-200 {{ request()->routeIs('admin.alerts.*') ? 'bg-blue-50 text-blue-700 shadow-sm' : 'text-slate-600 hover:bg-white/60 hover:text-slate-800' }}">
-                                <x-icon icon="heroicons:bell" class="w-4 h-4 mr-3 {{ request()->routeIs('admin.alerts.*') ? 'text-blue-600' : 'text-slate-500' }}" />
+                                <x-iconify icon="heroicons:bell" class="w-4 h-4 mr-3 {{ request()->routeIs('admin.alerts.*') ? 'text-blue-600' : 'text-slate-500' }}" />
                                 <span class="flex-1">Alertes</span>
                             </a>
                         </li>
@@ -301,7 +301,7 @@
                         <li class="flex">
                             <a href="{{ route('admin.documents.index') }}"
                                class="flex items-center w-full h-10 px-3 py-2 rounded-lg text-sm font-semibold transition-all duration-200 {{ request()->routeIs('admin.documents.*') ? 'bg-blue-50 text-blue-700 shadow-sm' : 'text-slate-600 hover:bg-white/60 hover:text-slate-800' }}">
-                                <x-icon icon="heroicons:document-text" class="w-4 h-4 mr-3 {{ request()->routeIs('admin.documents.*') ? 'text-blue-600' : 'text-slate-500' }}" />
+                                <x-iconify icon="heroicons:document-text" class="w-4 h-4 mr-3 {{ request()->routeIs('admin.documents.*') ? 'text-blue-600' : 'text-slate-500' }}" />
                                 <span class="flex-1">Documents</span>
                             </a>
                         </li>
@@ -312,7 +312,7 @@
                         <li class="flex">
                             <a href="{{ route('admin.suppliers.index') }}"
                                class="flex items-center w-full h-10 px-3 py-2 rounded-lg text-sm font-semibold transition-all duration-200 {{ request()->routeIs('admin.suppliers.*') ? 'bg-blue-50 text-blue-700 shadow-sm' : 'text-slate-600 hover:bg-white/60 hover:text-slate-800' }}">
-                                <x-icon icon="heroicons:hand-raised" class="w-4 h-4 mr-3 {{ request()->routeIs('admin.suppliers.*') ? 'text-blue-600' : 'text-slate-500' }}" />
+                                <x-iconify icon="heroicons:hand-raised" class="w-4 h-4 mr-3 {{ request()->routeIs('admin.suppliers.*') ? 'text-blue-600' : 'text-slate-500' }}" />
                                 <span class="flex-1">Fournisseurs</span>
                             </a>
                         </li>
@@ -323,7 +323,7 @@
                         <li class="flex">
                             <a href="{{ route('admin.reports.index') }}"
                                class="flex items-center w-full h-10 px-3 py-2 rounded-lg text-sm font-semibold transition-all duration-200 {{ request()->routeIs('admin.reports.*') ? 'bg-blue-50 text-blue-700 shadow-sm' : 'text-slate-600 hover:bg-white/60 hover:text-slate-800' }}">
-                                <x-icon icon="heroicons:chart-bar" class="w-4 h-4 mr-3 {{ request()->routeIs('admin.reports.*') ? 'text-blue-600' : 'text-slate-500' }}" />
+                                <x-iconify icon="heroicons:chart-bar" class="w-4 h-4 mr-3 {{ request()->routeIs('admin.reports.*') ? 'text-blue-600' : 'text-slate-500' }}" />
                                 <span class="flex-1">Rapports</span>
                             </a>
                         </li>
@@ -334,9 +334,9 @@
                         <li class="flex flex-col" x-data="{ open: {{ request()->routeIs('admin.users.*', 'admin.roles.*', 'admin.audit.*') ? 'true' : 'false' }} }">
                             <button @click="open = !open"
                                     class="flex items-center w-full h-10 px-3 py-2 rounded-lg text-sm font-semibold transition-all duration-200 {{ request()->routeIs('admin.users.*', 'admin.roles.*', 'admin.audit.*') ? 'bg-blue-50 text-blue-700 shadow-sm' : 'text-slate-600 hover:bg-white/60 hover:text-slate-800' }}">
-                                <x-icon icon="heroicons:cog-6-tooth" class="w-4 h-4 mr-3 {{ request()->routeIs('admin.users.*', 'admin.roles.*', 'admin.audit.*') ? 'text-blue-600' : 'text-slate-500' }}" />
+                                <x-iconify icon="heroicons:cog-6-tooth" class="w-4 h-4 mr-3 {{ request()->routeIs('admin.users.*', 'admin.roles.*', 'admin.audit.*') ? 'text-blue-600' : 'text-slate-500' }}" />
                                 <span class="flex-1 text-left">Administration</span>
-                                <x-icon icon="heroicons:chevron-down" class="w-3 h-3 transition-transform duration-200" ::class="{ 'rotate-180': !open }" />
+                                <x-iconify icon="heroicons:chevron-down" class="w-3 h-3 transition-transform duration-200" ::class="{ 'rotate-180': !open }" />
                             </button>
                             <div x-show="open" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 max-h-0" x-transition:enter-end="opacity-100 max-h-96" x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100 max-h-96" x-transition:leave-end="opacity-0 max-h-0" class="overflow-hidden">
                                 <div class="flex w-full mt-2 pl-3">
@@ -361,18 +361,18 @@
                                     <div class="flex-1 min-w-0 space-y-1">
                                         <a href="{{ route('admin.users.index') }}"
                                            class="flex items-center w-full h-8 px-1 py-1 rounded-md text-sm font-semibold transition-all duration-200 {{ request()->routeIs('admin.users.*') ? 'bg-blue-50/80 text-blue-700' : 'text-slate-600 hover:bg-white/40 hover:text-slate-800' }}">
-                                            <x-icon icon="heroicons:users" class="w-3 h-3 mr-3 {{ request()->routeIs('admin.users.*') ? 'text-blue-600' : 'text-slate-500' }}" />
+                                            <x-iconify icon="heroicons:users" class="w-3 h-3 mr-3 {{ request()->routeIs('admin.users.*') ? 'text-blue-600' : 'text-slate-500' }}" />
                                             Utilisateurs
                                         </a>
                                         <a href="{{ route('admin.roles.index') }}"
                                            class="flex items-center w-full h-8 px-1 py-1 rounded-md text-sm font-semibold transition-all duration-200 {{ request()->routeIs('admin.roles.*') ? 'bg-blue-50/80 text-blue-700' : 'text-slate-600 hover:bg-white/40 hover:text-slate-800' }}">
-                                            <x-icon icon="heroicons:shield-check" class="w-3 h-3 mr-3 {{ request()->routeIs('admin.roles.*') ? 'text-blue-600' : 'text-slate-500' }}" />
+                                            <x-iconify icon="heroicons:shield-check" class="w-3 h-3 mr-3 {{ request()->routeIs('admin.roles.*') ? 'text-blue-600' : 'text-slate-500' }}" />
                                             Rôles & Permissions
                                         </a>
                                         @hasrole('Super Admin')
                                         <a href="{{ route('admin.audit.index') }}"
                                            class="flex items-center w-full h-8 px-1 py-1 rounded-md text-sm font-semibold transition-all duration-200 {{ request()->routeIs('admin.audit.*') ? 'bg-blue-50/80 text-blue-700' : 'text-slate-600 hover:bg-white/40 hover:text-slate-800' }}">
-                                            <x-icon icon="heroicons:shield-exclamation" class="w-3 h-3 mr-3 {{ request()->routeIs('admin.audit.*') ? 'text-blue-600' : 'text-slate-500' }}" />
+                                            <x-iconify icon="heroicons:shield-exclamation" class="w-3 h-3 mr-3 {{ request()->routeIs('admin.audit.*') ? 'text-blue-600' : 'text-slate-500' }}" />
                                             Audit & Sécurité
                                         </a>
                                         @endhasrole
@@ -415,7 +415,7 @@
                             {{-- Logo --}}
                             <div class="flex h-16 shrink-0 items-center">
                                 <div class="flex items-center">
-                                    <x-icon icon="heroicons:truck" class="w-6 h-6 text-zinc-900 mr-3" />
+                                    <x-iconify icon="heroicons:truck" class="w-6 h-6 text-zinc-900 mr-3" />
                                     <span class="text-zinc-900 text-xl font-bold">ZenFleet</span>
                                 </div>
                             </div>
@@ -435,7 +435,7 @@
                                                 @endphp
                                                 <a href="{{ $dashboardRouteMobile }}"
                                                    class="group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold {{ $isDashboardActiveMobile ? 'bg-zinc-950 text-white' : 'text-zinc-700 hover:text-zinc-950 hover:bg-zinc-100' }}">
-                                                    <x-icon icon="heroicons:home" class="h-5 w-5 shrink-0" />
+                                                    <x-iconify icon="heroicons:home" class="h-5 w-5 shrink-0" />
                                                     Dashboard
                                                 </a>
                                             </li>
@@ -445,7 +445,7 @@
                                             <li>
                                                 <a href="{{ route('admin.organizations.index') }}"
                                                    class="group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold {{ request()->routeIs('admin.organizations.*') ? 'bg-zinc-950 text-white' : 'text-zinc-700 hover:text-zinc-950 hover:bg-zinc-100' }}">
-                                                    <x-icon icon="heroicons:building-office" class="h-5 w-5 shrink-0" />
+                                                    <x-iconify icon="heroicons:building-office" class="h-5 w-5 shrink-0" />
                                                     Organisations
                                                 </a>
                                             </li>
@@ -456,9 +456,9 @@
                                             <li x-data="{ open: {{ request()->routeIs('admin.vehicles.*', 'admin.assignments.*') ? 'true' : 'false' }} }">
                                                 <button @click="open = !open"
                                                         class="group flex w-full gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold {{ request()->routeIs('admin.vehicles.*', 'admin.assignments.*') ? 'bg-zinc-950 text-white' : 'text-zinc-700 hover:text-zinc-950 hover:bg-zinc-100' }}">
-                                                    <x-icon icon="heroicons:truck" class="h-5 w-5 shrink-0" />
+                                                    <x-iconify icon="heroicons:truck" class="h-5 w-5 shrink-0" />
                                                     <span class="flex-1 text-left">Véhicules</span>
-                                                    <x-icon icon="heroicons:chevron-right" class="h-4 w-4 transition-transform" ::class="{ 'rotate-90': open }" />
+                                                    <x-iconify icon="heroicons:chevron-right" class="h-4 w-4 transition-transform" ::class="{ 'rotate-90': open }" />
                                                 </button>
                                                 <div x-show="open" x-transition class="mt-1">
                                                     <ul class="ml-6 space-y-1">
@@ -467,7 +467,7 @@
                                                             <div class="absolute left-0 top-3 w-3 h-px bg-zinc-300"></div>
                                                             <a href="{{ route('admin.vehicles.index') }}"
                                                                class="group flex gap-x-3 rounded-md p-2 pl-4 text-sm leading-6 font-medium {{ request()->routeIs('admin.vehicles.*') ? 'bg-zinc-100 text-zinc-900' : 'text-zinc-600 hover:text-zinc-900 hover:bg-zinc-50' }}">
-                                                                <x-icon icon="heroicons:truck" class="h-4 w-4 shrink-0" />
+                                                                <x-iconify icon="heroicons:truck" class="h-4 w-4 shrink-0" />
                                                                 Gestion Véhicules
                                                             </a>
                                                         </li>
@@ -476,7 +476,7 @@
                                                             <div class="absolute left-0 top-3 w-3 h-px bg-zinc-300"></div>
                                                             <a href="{{ route('admin.assignments.index') }}"
                                                                class="group flex gap-x-3 rounded-md p-2 pl-4 text-sm leading-6 font-medium {{ request()->routeIs('admin.assignments.*') ? 'bg-zinc-100 text-zinc-900' : 'text-zinc-600 hover:text-zinc-900 hover:bg-zinc-50' }}">
-                                                                <x-icon icon="heroicons:clipboard-document-list" class="h-4 w-4 shrink-0" />
+                                                                <x-iconify icon="heroicons:clipboard-document-list" class="h-4 w-4 shrink-0" />
                                                                 Affectations
                                                             </a>
                                                         </li>
@@ -490,7 +490,7 @@
                                             <li>
                                                 <a href="{{ route('admin.drivers.index') }}"
                                                    class="group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold {{ request()->routeIs('admin.drivers.*') ? 'bg-zinc-950 text-white' : 'text-zinc-700 hover:text-zinc-950 hover:bg-zinc-100' }}">
-                                                    <x-icon icon="heroicons:user" class="h-5 w-5 shrink-0" />
+                                                    <x-iconify icon="heroicons:user" class="h-5 w-5 shrink-0" />
                                                     Chauffeurs
                                                 </a>
                                             </li>
@@ -501,9 +501,9 @@
                                             <li x-data="{ open: {{ request()->routeIs('admin.users.*', 'admin.roles.*', 'admin.audit.*') ? 'true' : 'false' }} }">
                                                 <button @click="open = !open"
                                                         class="group flex w-full gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold {{ request()->routeIs('admin.users.*', 'admin.roles.*', 'admin.audit.*') ? 'bg-zinc-950 text-white' : 'text-zinc-700 hover:text-zinc-950 hover:bg-zinc-100' }}">
-                                                    <x-icon icon="heroicons:cog-6-tooth" class="h-5 w-5 shrink-0" />
+                                                    <x-iconify icon="heroicons:cog-6-tooth" class="h-5 w-5 shrink-0" />
                                                     <span class="flex-1 text-left">Administration</span>
-                                                    <x-icon icon="heroicons:chevron-right" class="h-4 w-4 transition-transform" ::class="{ 'rotate-90': open }" />
+                                                    <x-iconify icon="heroicons:chevron-right" class="h-4 w-4 transition-transform" ::class="{ 'rotate-90': open }" />
                                                 </button>
                                                 <div x-show="open" x-transition class="mt-1">
                                                     <ul class="ml-6 space-y-1">
@@ -512,7 +512,7 @@
                                                             <div class="absolute left-0 top-3 w-3 h-px bg-zinc-300"></div>
                                                             <a href="{{ route('admin.users.index') }}"
                                                                class="group flex gap-x-3 rounded-md p-2 pl-4 text-sm leading-6 font-medium {{ request()->routeIs('admin.users.*') ? 'bg-zinc-100 text-zinc-900' : 'text-zinc-600 hover:text-zinc-900 hover:bg-zinc-50' }}">
-                                                                <x-icon icon="heroicons:users" class="h-4 w-4 shrink-0" />
+                                                                <x-iconify icon="heroicons:users" class="h-4 w-4 shrink-0" />
                                                                 Utilisateurs
                                                             </a>
                                                         </li>
@@ -521,7 +521,7 @@
                                                             <div class="absolute left-0 top-3 w-3 h-px bg-zinc-300"></div>
                                                             <a href="{{ route('admin.roles.index') }}"
                                                                class="group flex gap-x-3 rounded-md p-2 pl-4 text-sm leading-6 font-medium {{ request()->routeIs('admin.roles.*') ? 'bg-zinc-100 text-zinc-900' : 'text-zinc-600 hover:text-zinc-900 hover:bg-zinc-50' }}">
-                                                                <x-icon icon="heroicons:shield-check" class="h-4 w-4 shrink-0" />
+                                                                <x-iconify icon="heroicons:shield-check" class="h-4 w-4 shrink-0" />
                                                                 Rôles & Permissions
                                                             </a>
                                                         </li>
@@ -542,11 +542,11 @@
             <div class="sticky top-0 z-40 flex items-center gap-x-6 bg-white px-4 py-4 shadow-sm sm:px-6 lg:hidden">
                 <button type="button" @click="open = true" class="-m-2.5 p-2.5 text-zinc-500 lg:hidden">
                     <span class="sr-only">Ouvrir la sidebar</span>
-                    <x-icon icon="heroicons:bars-3" class="h-6 w-6" />
+                    <x-iconify icon="heroicons:bars-3" class="h-6 w-6" />
                 </button>
                 <div class="flex-1 text-sm font-semibold leading-6 text-zinc-900">ZenFleet</div>
                 <div class="h-8 w-8 bg-zinc-100 rounded-full flex items-center justify-center">
-                    <x-icon icon="heroicons:user" class="h-4 w-4 text-zinc-500" />
+                    <x-iconify icon="heroicons:user" class="h-4 w-4 text-zinc-500" />
                 </div>
             </div>
         </div>
@@ -564,7 +564,7 @@
                         {{-- Recherche rapide --}}
                         <div class="relative hidden lg:block">
                             <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                                <x-icon icon="heroicons:magnifying-glass" class="h-4 w-4 text-zinc-400" />
+                                <x-iconify icon="heroicons:magnifying-glass" class="h-4 w-4 text-zinc-400" />
                             </div>
                             <input type="search"
                                    placeholder="Rechercher..."
@@ -575,7 +575,7 @@
                         <div class="relative">
                             <button type="button" class="-m-2.5 p-2.5 text-zinc-500 hover:text-zinc-600 relative">
                                 <span class="sr-only">Voir les notifications</span>
-                                <x-icon icon="heroicons:bell" class="h-6 w-6" />
+                                <x-iconify icon="heroicons:bell" class="h-6 w-6" />
                                 <span class="absolute -top-1 -right-1 h-4 w-4 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">3</span>
                             </button>
                         </div>
@@ -584,7 +584,7 @@
                         <div class="relative">
                             <button type="button" class="-m-2.5 p-2.5 text-zinc-500 hover:text-zinc-600 relative">
                                 <span class="sr-only">Messages</span>
-                                <x-icon icon="heroicons:envelope" class="h-6 w-6" />
+                                <x-iconify icon="heroicons:envelope" class="h-6 w-6" />
                                 <span class="absolute -top-1 -right-1 h-4 w-4 bg-blue-500 text-white text-xs rounded-full flex items-center justify-center">2</span>
                             </button>
                         </div>
@@ -592,7 +592,7 @@
                         {{-- Mode sombre --}}
                         <button type="button" class="-m-2.5 p-2.5 text-zinc-500 hover:text-zinc-600">
                             <span class="sr-only">Basculer le mode sombre</span>
-                            <x-icon icon="heroicons:moon" class="h-6 w-6" />
+                            <x-iconify icon="heroicons:moon" class="h-6 w-6" />
                         </button>
 
                         {{-- Séparateur --}}
@@ -603,14 +603,14 @@
                             <button type="button" @click="open = !open" class="-m-1.5 flex items-center p-1.5 hover:bg-zinc-50 rounded-lg transition-colors">
                                 <span class="sr-only">Ouvrir le menu utilisateur</span>
                                 <div class="h-8 w-8 bg-gradient-to-br from-zinc-600 to-zinc-800 rounded-full flex items-center justify-center">
-                                    <x-icon icon="heroicons:user" class="text-white w-4 h-4" />
+                                    <x-iconify icon="heroicons:user" class="text-white w-4 h-4" />
                                 </div>
                                 <span class="hidden lg:flex lg:items-center">
                                     <div class="ml-3 text-left">
                                         <div class="text-sm font-semibold leading-5 text-zinc-900">{{ auth()->user()->name }}</div>
                                         <div class="text-xs leading-4 text-zinc-500">{{ auth()->user()->getRoleNames()->first() }}</div>
                                     </div>
-                                    <x-icon icon="heroicons:chevron-down" class="ml-2 h-4 w-4 text-zinc-500 transition-transform" ::class="{ 'rotate-180': open }" />
+                                    <x-iconify icon="heroicons:chevron-down" class="ml-2 h-4 w-4 text-zinc-500 transition-transform" ::class="{ 'rotate-180': open }" />
                                 </span>
                             </button>
 
@@ -628,7 +628,7 @@
                                 <div class="px-4 py-3 border-b border-zinc-100">
                                     <div class="flex items-center">
                                         <div class="h-10 w-10 bg-gradient-to-br from-zinc-600 to-zinc-800 rounded-full flex items-center justify-center">
-                                            <x-icon icon="heroicons:user" class="text-white w-5 h-5" />
+                                            <x-iconify icon="heroicons:user" class="text-white w-5 h-5" />
                                         </div>
                                         <div class="ml-3">
                                             <div class="text-sm font-medium text-zinc-900">{{ auth()->user()->name }}</div>
@@ -641,17 +641,17 @@
                                 <div class="py-1">
                                     <a href="{{ route('profile.edit') }}"
                                        class="group flex items-center px-4 py-2 text-sm text-zinc-700 hover:bg-zinc-50">
-                                        <x-icon icon="heroicons:user-circle" class="mr-3 h-4 w-4 text-zinc-400 group-hover:text-zinc-600" />
+                                        <x-iconify icon="heroicons:user-circle" class="mr-3 h-4 w-4 text-zinc-400 group-hover:text-zinc-600" />
                                         Mon Profil
                                     </a>
                                     <a href="#"
                                        class="group flex items-center px-4 py-2 text-sm text-zinc-700 hover:bg-zinc-50">
-                                        <x-icon icon="heroicons:cog-6-tooth" class="mr-3 h-4 w-4 text-zinc-400 group-hover:text-zinc-600" />
+                                        <x-iconify icon="heroicons:cog-6-tooth" class="mr-3 h-4 w-4 text-zinc-400 group-hover:text-zinc-600" />
                                         Paramètres
                                     </a>
                                     <a href="#"
                                        class="group flex items-center px-4 py-2 text-sm text-zinc-700 hover:bg-zinc-50">
-                                        <x-icon icon="heroicons:question-mark-circle" class="mr-3 h-4 w-4 text-zinc-400 group-hover:text-zinc-600" />
+                                        <x-iconify icon="heroicons:question-mark-circle" class="mr-3 h-4 w-4 text-zinc-400 group-hover:text-zinc-600" />
                                         Aide & Support
                                     </a>
                                     <div class="border-t border-zinc-100 my-1"></div>
@@ -659,7 +659,7 @@
                                         @csrf
                                         <button type="submit"
                                                 class="group flex w-full items-center px-4 py-2 text-sm text-zinc-700 hover:bg-zinc-50">
-                                            <x-icon icon="heroicons:arrow-right-on-rectangle" class="mr-3 h-4 w-4 text-zinc-400 group-hover:text-zinc-600" />
+                                            <x-iconify icon="heroicons:arrow-right-on-rectangle" class="mr-3 h-4 w-4 text-zinc-400 group-hover:text-zinc-600" />
                                             Se déconnecter
                                         </button>
                                     </form>

@@ -161,7 +161,7 @@
                 Annuler
             </a>
             <x-primary-button class="ml-4">
-                <x-icon icon="heroicons:arrow-up-tray" class="w-4 h-4 mr-2" / />
+                <x-iconify icon="heroicons:arrow-up-tray" class="w-4 h-4 mr-2" / />
                 {{ isset($document) ? __('Mettre à jour') : __('Importer le Document') }}
             </x-primary-button>
         </div>

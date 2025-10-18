@@ -13,18 +13,18 @@
                             <form action="{{ route('admin.planning.index') }}" method="GET" class="relative">
                                 <input type="hidden" name="view_mode" :value="viewMode">
                                 <input type="hidden" name="date" :value="baseDate">
-                                <x-icon icon="heroicons:magnifying-glass" class="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" / />
+                                <x-iconify icon="heroicons:magnifying-glass" class="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" / />
                                 <input type="text" name="search" value="{{ $filters['search'] ?? '' }}" placeholder="Rechercher un actif ou un chauffeur..." class="pl-10 pr-4 py-2 w-64 border-gray-300 focus:border-primary-500 focus:ring-primary-500 rounded-md shadow-sm text-sm">
                             </form>
                             <button @click="showFilterPanel = true" class="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">
-                                <x-icon icon="heroicons:adjustments-horizontal" class="h-5 w-5" / />
+                                <x-iconify icon="heroicons:adjustments-horizontal" class="h-5 w-5" / />
                                 <span>Filtres</span>
                             </button>
                         </div>
 
                         <!-- Center Controls -->
                         <div class="flex items-center gap-2 text-lg font-semibold text-gray-800">
-                            <button @click="previousPeriod()" class="p-2 rounded-md hover:bg-gray-100"><x-icon icon="heroicons:chevron-left" class="h-6 w-6" / /></button>
+                            <button @click="previousPeriod()" class="p-2 rounded-md hover:bg-gray-100"><x-iconify icon="heroicons:chevron-left" class="h-6 w-6" / /></button>
                             <h3 class="w-48 text-center">
                                 @if($viewMode === 'month') {{ $baseDate->isoFormat('MMMM YYYY') }}
                                 @elseif($viewMode === 'week') {{ $dateRange['start']->isoFormat('D MMM') }} - {{ $dateRange['end']->isoFormat('D MMM, YYYY') }}
@@ -32,7 +32,7 @@
                                 @else {{ $baseDate->isoFormat('YYYY') }}
                                 @endif
                             </h3>
-                            <button @click="nextPeriod()" class="p-2 rounded-md hover:bg-gray-100"><x-icon icon="heroicons:chevron-right" class="h-6 w-6" / /></button>
+                            <button @click="nextPeriod()" class="p-2 rounded-md hover:bg-gray-100"><x-iconify icon="heroicons:chevron-right" class="h-6 w-6" / /></button>
                         </div>
 
                         <!-- Right Controls -->
@@ -41,7 +41,7 @@
                             <div class="relative" x-data="{ open: false }">
                                 <button @click="open = !open" class="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">
                                     <span class="capitalize">{{ $viewMode }}</span>
-                                    <x-icon icon="heroicons:chevron-down" class="h-5 w-5" / />
+                                    <x-iconify icon="heroicons:chevron-down" class="h-5 w-5" / />
                                 </button>
                                 <div x-show="open" @click.away="open = false" class="absolute right-0 mt-2 w-32 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-20">
                                     <div class="py-1">
@@ -53,11 +53,11 @@
                                 </div>
                             </div>
                             <div class="p-1 bg-gray-200 rounded-lg flex items-center">
-                                <button @click="activeView = 'gantt'" :class="activeView === 'gantt' ? 'bg-white shadow' : ''" class="p-1.5 rounded-md text-gray-600 hover:bg-white"><x-icon icon="heroicons:squares-2x2" class="h-5 w-5" / /></button>
-                                <button @click="activeView = 'table'" :class="activeView === 'table' ? 'bg-white shadow' : ''" class="p-1.5 rounded-md text-gray-600 hover:bg-white"><x-icon icon="heroicons:list-bullet" class="h-5 w-5" / /></button>
+                                <button @click="activeView = 'gantt'" :class="activeView === 'gantt' ? 'bg-white shadow' : ''" class="p-1.5 rounded-md text-gray-600 hover:bg-white"><x-iconify icon="heroicons:squares-2x2" class="h-5 w-5" / /></button>
+                                <button @click="activeView = 'table'" :class="activeView === 'table' ? 'bg-white shadow' : ''" class="p-1.5 rounded-md text-gray-600 hover:bg-white"><x-iconify icon="heroicons:list-bullet" class="h-5 w-5" / /></button>
                             </div>
                             <button @click="openNewModal()" class="inline-flex items-center gap-2 px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700">
-                                <x-icon icon="heroicons:plus" class="h-5 w-5" / />
+                                <x-iconify icon="heroicons:plus" class="h-5 w-5" / />
                                 <span>Ajouter une Affectation</span>
                             </button>
                         </div>
@@ -85,7 +85,7 @@
                                 <span class="font-semibold text-gray-600 text-sm">Asset</span>
                                 <button @click="toggleSort('alpha_asc')" class="inline-flex items-center gap-1 text-xs font-medium text-gray-500 hover:text-gray-800" :class="{'text-primary-600': filters.sort === 'alpha_asc'}">
                                     A-Z
-                                    <x-icon icon="heroicons:bars-arrow-down" class="h-4 w-4" / />
+                                    <x-iconify icon="heroicons:bars-arrow-down" class="h-4 w-4" / />
                                 </button>
                             </div>
 

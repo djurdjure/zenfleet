@@ -37,7 +37,7 @@
                         <div class="flex space-x-2">
                             @can('manage document_categories')
                                 <a href="{{ route('admin.document-categories.create') }}" class="inline-flex items-center px-4 py-2 bg-primary-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-primary-700">
-                                    <x-icon icon="heroicons:plus"-circle class="w-4 h-4 mr-2" stroke-width="1.5"/ />
+                                    <x-iconify icon="heroicons:plus"-circle class="w-4 h-4 mr-2" stroke-width="1.5"/ />
                                     Ajouter
                                 </a>
                             @endcan
@@ -68,7 +68,7 @@
                                             <div class="flex items-center justify-end space-x-2">
                                                 @can('manage document_categories')
                                                     <a href="{{ route('admin.document-categories.edit', $category) }}" title="Modifier" class="p-2 rounded-full text-gray-400 hover:bg-primary-100 hover:text-primary-600">
-                                                        <x-icon icon="heroicons:document"-pen-line class="h-5 w-5" stroke-width="1.5"/ />
+                                                        <x-iconify icon="heroicons:document"-pen-line class="h-5 w-5" stroke-width="1.5"/ />
                                                     </a>
                                                     <button type="button" @click="openModal($event)" 
                                                             data-category='@json($category->only(['id', 'name']))' 
@@ -76,7 +76,7 @@
                                                             title="Supprimer" 
                                                             class="p-2 rounded-full text-gray-400 hover:bg-red-100 hover:text-red-600"
                                                             :disabled="$category->documents_count > 0">
-                                                        <x-icon icon="heroicons:trash" class="h-5 w-5" stroke-width="1.5"/ />
+                                                        <x-iconify icon="heroicons:trash" class="h-5 w-5" stroke-width="1.5"/ />
                                                     </button>
                                                 @endcan
                                             </div>
@@ -86,7 +86,7 @@
                                     <tr>
                                         <td colspan="4" class="px-6 py-12 text-center text-gray-500">
                                             <div class="flex flex-col items-center justify-center">
-                                                <x-icon icon="heroicons:folder-open" class="w-12 h-12 text-gray-400 mb-4" / />
+                                                <x-iconify icon="heroicons:folder-open" class="w-12 h-12 text-gray-400 mb-4" / />
                                                 <h3 class="text-lg font-semibold text-gray-800">Aucune catégorie trouvée</h3>
                                                 <p class="mt-1 text-sm">Commencez par ajouter une nouvelle catégorie de document.</p>
                                             </div>
@@ -111,7 +111,7 @@
             <div @click.away="showConfirmModal = false" class="bg-white rounded-lg shadow-xl p-6 w-full max-w-md mx-4">
                 <div class="sm:flex sm:items-start">
                     <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full sm:mx-0 sm:h-10 sm:w-10" :class="modalIconClass">
-                        <x-icon icon="heroicons:exclamation-triangle" class="h-6 w-6" stroke-width="1.5"/ />
+                        <x-iconify icon="heroicons:exclamation-triangle" class="h-6 w-6" stroke-width="1.5"/ />
                     </div>
                     <div class="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left">
                         <h3 class="text-base font-semibold leading-6 text-gray-900" x-text="modalTitle"></h3>

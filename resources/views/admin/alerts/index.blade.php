@@ -34,7 +34,7 @@
         <div class="flex items-center justify-between">
             <div class="flex items-center space-x-6">
                 <div class="p-4 bg-gradient-to-r from-red-500 to-orange-600 rounded-2xl shadow-lg">
-                    <x-icon icon="heroicons:exclamation-triangle" class="h-12 w-12 text-white" stroke-width="2" / />
+                    <x-iconify icon="heroicons:exclamation-triangle" class="h-12 w-12 text-white" stroke-width="2" / />
                 </div>
                 <div>
                     <h1 class="text-4xl font-bold text-white mb-2">Centre d'Alertes Enterprise</h1>
@@ -68,7 +68,7 @@
         <div class="bg-white rounded-xl shadow-lg p-6 border-l-4 border-red-500 hover:shadow-xl transition-shadow">
             <div class="flex items-center">
                 <div class="p-3 bg-red-100 rounded-full">
-                    <x-icon icon="heroicons:exclamation-triangle" class="h-6 w-6 text-red-600" / />
+                    <x-iconify icon="heroicons:exclamation-triangle" class="h-6 w-6 text-red-600" / />
                 </div>
                 <div class="ml-4">
                     <p class="text-sm font-medium text-gray-500">Critiques</p>
@@ -80,7 +80,7 @@
         <div class="bg-white rounded-xl shadow-lg p-6 border-l-4 border-indigo-500 hover:shadow-xl transition-shadow">
             <div class="flex items-center">
                 <div class="p-3 bg-indigo-100 rounded-full">
-                    <x-icon icon="heroicons:wrench" class="h-6 w-6 text-indigo-600" / />
+                    <x-iconify icon="heroicons:wrench" class="h-6 w-6 text-indigo-600" / />
                 </div>
                 <div class="ml-4">
                     <p class="text-sm font-medium text-gray-500">Maintenance</p>
@@ -92,7 +92,7 @@
         <div class="bg-white rounded-xl shadow-lg p-6 border-l-4 border-emerald-500 hover:shadow-xl transition-shadow">
             <div class="flex items-center">
                 <div class="p-3 bg-emerald-100 rounded-full">
-                    <x-icon icon="lucide:wallet" class="h-6 w-6 text-emerald-600" / />
+                    <x-iconify icon="lucide:wallet" class="h-6 w-6 text-emerald-600" / />
                 </div>
                 <div class="ml-4">
                     <p class="text-sm font-medium text-gray-500">Budget</p>
@@ -104,7 +104,7 @@
         <div class="bg-white rounded-xl shadow-lg p-6 border-l-4 border-orange-500 hover:shadow-xl transition-shadow">
             <div class="flex items-center">
                 <div class="p-3 bg-orange-100 rounded-full">
-                    <x-icon icon="lucide:wrench" class="h-6 w-6 text-orange-600" / />
+                    <x-iconify icon="lucide:wrench" class="h-6 w-6 text-orange-600" / />
                 </div>
                 <div class="ml-4">
                     <p class="text-sm font-medium text-gray-500">Réparations</p>
@@ -116,7 +116,7 @@
         <div class="bg-white rounded-xl shadow-lg p-6 border-l-4 border-yellow-500 hover:shadow-xl transition-shadow">
             <div class="flex items-center">
                 <div class="p-3 bg-yellow-100 rounded-full">
-                    <x-icon icon="heroicons:clock" class="h-6 w-6 text-yellow-600" / />
+                    <x-iconify icon="heroicons:clock" class="h-6 w-6 text-yellow-600" / />
                 </div>
                 <div class="ml-4">
                     <p class="text-sm font-medium text-gray-500">En retard</p>
@@ -128,7 +128,7 @@
         <div class="bg-white rounded-xl shadow-lg p-6 border-l-4 border-blue-500 hover:shadow-xl transition-shadow">
             <div class="flex items-center">
                 <div class="p-3 bg-blue-100 rounded-full">
-                    <x-icon icon="heroicons:arrow-trending-up" class="h-6 w-6 text-blue-600" / />
+                    <x-iconify icon="heroicons:arrow-trending-up" class="h-6 w-6 text-blue-600" / />
                 </div>
                 <div class="ml-4">
                     <p class="text-sm font-medium text-gray-500">Tendance</p>
@@ -168,12 +168,12 @@
             <div class="flex items-center space-x-3">
                 <button @click="refreshAlerts()"
                         class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-lg shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors">
-                    <x-icon icon="heroicons:arrow-path" class="h-4 w-4 mr-2" ::class="refreshing ? 'animate-spin' : ''" / />
+                    <x-iconify icon="heroicons:arrow-path" class="h-4 w-4 mr-2" ::class="refreshing ? 'animate-spin' : ''" / />
                     Actualiser
                 </button>
                 <button onclick="exportAlerts()"
                         class="inline-flex items-center px-4 py-2 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors">
-                    <x-icon icon="heroicons:arrow-down-tray" class="h-4 w-4 mr-2" / />
+                    <x-iconify icon="heroicons:arrow-down-tray" class="h-4 w-4 mr-2" / />
                     Exporter
                 </button>
             </div>
@@ -185,7 +185,7 @@
     <div class="bg-gradient-to-r from-red-50 to-red-100 border border-red-200 rounded-xl p-6">
         <div class="flex items-center mb-4">
             <div class="p-2 bg-red-500 rounded-full mr-3">
-                <x-icon icon="heroicons:exclamation-triangle" class="h-5 w-5 text-white" / />
+                <x-iconify icon="heroicons:exclamation-triangle" class="h-5 w-5 text-white" / />
             </div>
             <h3 class="text-xl font-bold text-red-900">Alertes Critiques - Action Immédiate Requise</h3>
         </div>
@@ -203,7 +203,7 @@
                         </div>
                     </div>
                     <button class="ml-4 text-red-600 hover:text-red-800 transition-colors">
-                        <x-icon icon="heroicons:arrow-right" class="h-5 w-5" / />
+                        <x-iconify icon="heroicons:arrow-right" class="h-5 w-5" / />
                     </button>
                 </div>
             </div>
@@ -218,7 +218,7 @@
             <div class="bg-gradient-to-r from-indigo-500 to-purple-600 p-6 text-white">
                 <div class="flex items-center justify-between">
                     <div class="flex items-center space-x-3">
-                        <x-icon icon="heroicons:wrench" class="h-6 w-6" / />
+                        <x-iconify icon="heroicons:wrench" class="h-6 w-6" / />
                         <h3 class="text-xl font-bold">Alertes Maintenance</h3>
                     </div>
                     <span class="bg-white/20 px-3 py-1 rounded-full text-sm font-medium">
@@ -251,14 +251,14 @@
                                 <div class="w-3 h-3 bg-red-500 rounded-full pulse-ring"></div>
                             @endif
                             <button class="text-indigo-600 hover:text-indigo-800 transition-colors">
-                                <x-icon icon="heroicons:arrow-top-right-on-square" class="h-4 w-4" / />
+                                <x-iconify icon="heroicons:arrow-top-right-on-square" class="h-4 w-4" / />
                             </button>
                         </div>
                     </div>
                 </div>
                 @empty
                 <div class="p-8 text-center text-gray-500">
-                    <x-icon icon="heroicons:check-circle" class="h-12 w-12 mx-auto mb-3 text-green-500" / />
+                    <x-iconify icon="heroicons:check-circle" class="h-12 w-12 mx-auto mb-3 text-green-500" / />
                     <p>Aucune alerte de maintenance</p>
                 </div>
                 @endforelse
@@ -270,7 +270,7 @@
             <div class="bg-gradient-to-r from-emerald-500 to-green-600 p-6 text-white">
                 <div class="flex items-center justify-between">
                     <div class="flex items-center space-x-3">
-                        <x-icon icon="lucide:wallet" class="h-6 w-6" / />
+                        <x-iconify icon="lucide:wallet" class="h-6 w-6" / />
                         <h3 class="text-xl font-bold">Alertes Budget</h3>
                     </div>
                     <span class="bg-white/20 px-3 py-1 rounded-full text-sm font-medium">
@@ -310,7 +310,7 @@
                 </div>
                 @empty
                 <div class="p-8 text-center text-gray-500">
-                    <x-icon icon="heroicons:check-circle" class="h-12 w-12 mx-auto mb-3 text-green-500" / />
+                    <x-iconify icon="heroicons:check-circle" class="h-12 w-12 mx-auto mb-3 text-green-500" / />
                     <p>Tous les budgets sont sous contrôle</p>
                 </div>
                 @endforelse
@@ -323,7 +323,7 @@
         <div class="bg-gradient-to-r from-orange-500 to-red-600 p-6 text-white">
             <div class="flex items-center justify-between">
                 <div class="flex items-center space-x-3">
-                    <x-icon icon="lucide:wrench" class="h-6 w-6" / />
+                    <x-iconify icon="lucide:wrench" class="h-6 w-6" / />
                     <h3 class="text-xl font-bold">Demandes de Réparation en Attente</h3>
                 </div>
                 <span class="bg-white/20 px-3 py-1 rounded-full text-sm font-medium">
@@ -385,7 +385,7 @@
             </table>
             @else
             <div class="p-12 text-center text-gray-500">
-                <x-icon icon="heroicons:check-circle" class="h-16 w-16 mx-auto mb-4 text-green-500" / />
+                <x-iconify icon="heroicons:check-circle" class="h-16 w-16 mx-auto mb-4 text-green-500" / />
                 <p class="text-lg">Aucune demande de réparation en attente</p>
                 <p class="text-sm">Toutes les demandes sont traitées</p>
             </div>

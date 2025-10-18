@@ -13,17 +13,17 @@
         <div class="mt-4 sm:mt-0 sm:flex sm:space-x-3">
             <a href="{{ route('admin.vehicle-expenses.export') }}"
                class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">
-                <x-icon icon="heroicons:arrow-down-tray" class="h-4 w-4 mr-2" / />
+                <x-iconify icon="heroicons:arrow-down-tray" class="h-4 w-4 mr-2" / />
                 Exporter
             </a>
             <a href="{{ route('admin.vehicle-expenses.reports') }}"
                class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">
-                <x-icon icon="heroicons:chart-bar"-3 class="h-4 w-4 mr-2" / />
+                <x-iconify icon="heroicons:chart-bar"-3 class="h-4 w-4 mr-2" / />
                 Rapports
             </a>
             <a href="{{ route('admin.vehicle-expenses.create') }}"
                class="inline-flex items-center justify-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700">
-                <x-icon icon="heroicons:plus" class="h-4 w-4 mr-2" / />
+                <x-iconify icon="heroicons:plus" class="h-4 w-4 mr-2" / />
                 Nouvelle dépense
             </a>
         </div>
@@ -35,7 +35,7 @@
             <div class="p-5">
                 <div class="flex items-center">
                     <div class="flex-shrink-0">
-                        <x-icon icon="heroicons:receipt-percent" class="h-8 w-8 text-blue-500" / />
+                        <x-iconify icon="heroicons:receipt-percent" class="h-8 w-8 text-blue-500" / />
                     </div>
                     <div class="ml-5 w-0 flex-1">
                         <dl>
@@ -51,7 +51,7 @@
             <div class="p-5">
                 <div class="flex items-center">
                     <div class="flex-shrink-0">
-                        <x-icon icon="heroicons:credit-card" class="h-8 w-8 text-green-500" / />
+                        <x-iconify icon="heroicons:credit-card" class="h-8 w-8 text-green-500" / />
                     </div>
                     <div class="ml-5 w-0 flex-1">
                         <dl>
@@ -67,7 +67,7 @@
             <div class="p-5">
                 <div class="flex items-center">
                     <div class="flex-shrink-0">
-                        <x-icon icon="heroicons:clock" class="h-8 w-8 text-yellow-500" / />
+                        <x-iconify icon="heroicons:clock" class="h-8 w-8 text-yellow-500" / />
                     </div>
                     <div class="ml-5 w-0 flex-1">
                         <dl>
@@ -83,7 +83,7 @@
             <div class="p-5">
                 <div class="flex items-center">
                     <div class="flex-shrink-0">
-                        <x-icon icon="heroicons:exclamation-circle" class="h-8 w-8 text-red-500" / />
+                        <x-iconify icon="heroicons:exclamation-circle" class="h-8 w-8 text-red-500" / />
                     </div>
                     <div class="ml-5 w-0 flex-1">
                         <dl>
@@ -159,7 +159,7 @@
                 {{-- Actions --}}
                 <div class="flex items-end space-x-3">
                     <button type="submit" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700">
-                        <x-icon icon="heroicons:magnifying-glass" class="h-4 w-4 mr-2" / />
+                        <x-iconify icon="heroicons:magnifying-glass" class="h-4 w-4 mr-2" / />
                         Filtrer
                     </button>
                     <a href="{{ route('admin.vehicle-expenses.index') }}" class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
@@ -180,7 +180,7 @@
                 <a href="{{ route('admin.vehicle-expenses.index', ['approval_status' => 'pending']) }}"
                    class="relative rounded-lg border border-gray-300 bg-white px-6 py-5 shadow-sm flex items-center space-x-3 hover:border-gray-400">
                     <div class="flex-shrink-0">
-                        <x-icon icon="heroicons:clock" class="h-8 w-8 text-yellow-500" / />
+                        <x-iconify icon="heroicons:clock" class="h-8 w-8 text-yellow-500" / />
                     </div>
                     <div class="flex-1 min-w-0">
                         <span class="absolute inset-0" aria-hidden="true"></span>
@@ -192,7 +192,7 @@
                 <a href="{{ route('admin.vehicle-expenses.payments-due') }}"
                    class="relative rounded-lg border border-gray-300 bg-white px-6 py-5 shadow-sm flex items-center space-x-3 hover:border-gray-400">
                     <div class="flex-shrink-0">
-                        <x-icon icon="heroicons:exclamation-circle" class="h-8 w-8 text-red-500" / />
+                        <x-iconify icon="heroicons:exclamation-circle" class="h-8 w-8 text-red-500" / />
                     </div>
                     <div class="flex-1 min-w-0">
                         <span class="absolute inset-0" aria-hidden="true"></span>
@@ -204,7 +204,7 @@
                 <a href="{{ route('admin.expense-budgets.index') }}"
                    class="relative rounded-lg border border-gray-300 bg-white px-6 py-5 shadow-sm flex items-center space-x-3 hover:border-gray-400">
                     <div class="flex-shrink-0">
-                        <x-icon icon="lucide:wallet" class="h-8 w-8 text-indigo-500" / />
+                        <x-iconify icon="lucide:wallet" class="h-8 w-8 text-indigo-500" / />
                     </div>
                     <div class="flex-1 min-w-0">
                         <span class="absolute inset-0" aria-hidden="true"></span>
@@ -216,7 +216,7 @@
                 <a href="{{ route('admin.vehicle-expenses.recurring') }}"
                    class="relative rounded-lg border border-gray-300 bg-white px-6 py-5 shadow-sm flex items-center space-x-3 hover:border-gray-400">
                     <div class="flex-shrink-0">
-                        <x-icon icon="heroicons:arrow-path" class="h-8 w-8 text-green-500" / />
+                        <x-iconify icon="heroicons:arrow-path" class="h-8 w-8 text-green-500" / />
                     </div>
                     <div class="flex-1 min-w-0">
                         <span class="absolute inset-0" aria-hidden="true"></span>

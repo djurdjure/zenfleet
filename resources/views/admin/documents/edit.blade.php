@@ -13,7 +13,7 @@
                     <div class="mb-6 pb-6 border-b border-gray-200">
                         <p class="block text-sm font-medium text-gray-700">Fichier Actuel</p>
                         <div class="flex items-center gap-2 mt-2 text-sm text-gray-600">
-                            <x-icon icon="heroicons:document" class="w-5 h-5 text-gray-400" stroke-width="1.5"/ />
+                            <x-iconify icon="heroicons:document" class="w-5 h-5 text-gray-400" stroke-width="1.5"/ />
                             <a href="#" class="text-primary-600 hover:underline" onclick="alert('TODO: Implement secure file download link.'); return false;">
                                 {{ $document->original_filename }}
                             </a>

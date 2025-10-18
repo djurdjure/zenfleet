@@ -17,13 +17,13 @@
 @if($href)
     <a href="{{ $href }}" class="{{ $classes }}" {{ $attributes }}>
         @if($icon && $iconPosition === 'left')
-            <x-icon :icon="'heroicons:' . $icon" :class="$iconSize . ' ' . ($slot->isNotEmpty() ? 'mr-2' : '')" />
+            <x-iconify :icon="'heroicons:' . $icon" :class="$iconSize . ' ' . ($slot->isNotEmpty() ? 'mr-2' : '')" />
         @endif
 
         {{ $slot }}
 
         @if($icon && $iconPosition === 'right')
-            <x-icon :icon="'heroicons:' . $icon" :class="$iconSize . ' ' . ($slot->isNotEmpty() ? 'ml-2' : '')" />
+            <x-iconify :icon="'heroicons:' . $icon" :class="$iconSize . ' ' . ($slot->isNotEmpty() ? 'ml-2' : '')" />
         @endif
     </a>
 @else
@@ -34,13 +34,13 @@
         {{ $attributes }}
     >
         @if($icon && $iconPosition === 'left')
-            <x-icon :icon="'heroicons:' . $icon" :class="$iconSize . ' ' . ($slot->isNotEmpty() ? 'mr-2' : '')" />
+            <x-iconify :icon="'heroicons:' . $icon" :class="$iconSize . ' ' . ($slot->isNotEmpty() ? 'mr-2' : '')" />
         @endif
 
         {{ $slot }}
 
         @if($icon && $iconPosition === 'right')
-            <x-icon :icon="'heroicons:' . $icon" :class="$iconSize . ' ' . ($slot->isNotEmpty() ? 'ml-2' : '')" />
+            <x-iconify :icon="'heroicons:' . $icon" :class="$iconSize . ' ' . ($slot->isNotEmpty() ? 'ml-2' : '')" />
         @endif
     </button>
 @endif
