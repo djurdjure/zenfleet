@@ -20,72 +20,9 @@
     {{-- Formulaire multi-étapes --}}
     <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700"
          x-data="{
-            currentStep: {{ old('current_step', 1) }},
-            initTomSelect() {
-                new TomSelect(this.$refs.vehicle_type_id, {
-                    create: false,
-                    placeholder: 'Sélectionnez un type...',
-                    render: {
-                        option: function(data, escape) {
-                            return '<div class=\"py-2 px-3 hover:bg-gray-50 dark:hover:bg-gray-700\">' + escape(data.text) + '</div>';
-                        }
-                    }
-                });
-                new TomSelect(this.$refs.fuel_type_id, {
-                    create: false,
-                    placeholder: 'Sélectionnez un carburant...',
-                    render: {
-                        option: function(data, escape) {
-                            return '<div class=\"py-2 px-3 hover:bg-gray-50 dark:hover:bg-gray-700\">' + escape(data.text) + '</div>';
-                        }
-                    }
-                });
-                new TomSelect(this.$refs.transmission_type_id, {
-                    create: false,
-                    placeholder: 'Sélectionnez une transmission...',
-                    render: {
-                        option: function(data, escape) {
-                            return '<div class=\"py-2 px-3 hover:bg-gray-50 dark:hover:bg-gray-700\">' + escape(data.text) + '</div>';
-                        }
-                    }
-                });
-                new TomSelect(this.$refs.status_id, {
-                    create: false,
-                    placeholder: 'Sélectionnez un statut...',
-                    render: {
-                        option: function(data, escape) {
-                            return '<div class=\"py-2 px-3 hover:bg-gray-50 dark:hover:bg-gray-700\">' + escape(data.text) + '</div>';
-                        }
-                    }
-                });
-
-                // TomSelect pour les utilisateurs
-                if (this.$refs.users) {
-                    new TomSelect(this.$refs.users, {
-                        plugins: ['remove_button'],
-                        placeholder: 'Rechercher des utilisateurs...',
-                        render: {
-                            option: function(data, escape) {
-                                return '<div class=\"py-2 px-3 hover:bg-gray-50 dark:hover:bg-gray-700 border-b border-gray-100 dark:border-gray-700 last:border-0\">' +
-                                    '<div class=\"font-medium text-gray-900 dark:text-white\">' + escape(data['data-name'] || data.text.split(' (')[0]) + '</div>' +
-                                    '<div class=\"text-sm text-gray-500 dark:text-gray-400\">' + escape(data['data-email'] || '') + '</div>' +
-                                    '</div>';
-                            },
-                            item: function(data, escape) {
-                                return '<div class=\"flex items-center gap-2\">' +
-                                    '<span class=\"inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300\">' +
-                                    escape(data['data-name'] || data.text.split(' (')[0]) +
-                                    '</span>' +
-                                    '</div>';
-                            }
-                        },
-                        maxOptions: 100
-                    });
-                }
-            }
+            currentStep: {{ old('current_step', 1) }}
         }"
         x-init="
-            initTomSelect();
             @if ($errors->any())
                 let errors = {{ json_encode($errors->messages()) }};
                 let firstErrorStep = null;
@@ -214,62 +151,38 @@
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {{-- Type de Véhicule --}}
-                    <div>
-                        <label for="vehicle_type_id" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                            Type de Véhicule <span class="text-red-500">*</span>
-                        </label>
-                        <select x-ref="vehicle_type_id" name="vehicle_type_id" id="vehicle_type_id" required>
-                            <option value="">Sélectionnez un type</option>
-                            @foreach($vehicleTypes as $type)
-                                <option value="{{ $type->id }}" @selected(old('vehicle_type_id') == $type->id)>{{ $type->name }}</option>
-                            @endforeach
-                        </select>
-                        @if($errors->has('vehicle_type_id'))
-                            <div class="mt-2 flex items-start text-sm text-red-600 dark:text-red-400">
-                                <x-iconify icon="heroicons:exclamation-circle" class="w-4 h-4 mr-1 mt-0.5 flex-shrink-0" />
-                                <span>{{ $errors->first('vehicle_type_id') }}</span>
-                            </div>
-                        @endif
-                    </div>
+                    {{-- Type de Véhicule avec TomSelect --}}
+                    <x-tom-select
+                        name="vehicle_type_id"
+                        label="Type de Véhicule"
+                        :options="$vehicleTypes->pluck('name', 'id')->toArray()"
+                        :selected="old('vehicle_type_id')"
+                        placeholder="Sélectionnez un type..."
+                        required
+                        :error="$errors->first('vehicle_type_id')"
+                    />
 
-                    {{-- Type de Carburant --}}
-                    <div>
-                        <label for="fuel_type_id" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                            Type de Carburant <span class="text-red-500">*</span>
-                        </label>
-                        <select x-ref="fuel_type_id" name="fuel_type_id" id="fuel_type_id" required>
-                            <option value="">Sélectionnez un carburant</option>
-                            @foreach($fuelTypes as $type)
-                                <option value="{{ $type->id }}" @selected(old('fuel_type_id') == $type->id)>{{ $type->name }}</option>
-                            @endforeach
-                        </select>
-                        @if($errors->has('fuel_type_id'))
-                            <div class="mt-2 flex items-start text-sm text-red-600 dark:text-red-400">
-                                <x-iconify icon="heroicons:exclamation-circle" class="w-4 h-4 mr-1 mt-0.5 flex-shrink-0" />
-                                <span>{{ $errors->first('fuel_type_id') }}</span>
-                            </div>
-                        @endif
-                    </div>
+                    {{-- Type de Carburant avec TomSelect --}}
+                    <x-tom-select
+                        name="fuel_type_id"
+                        label="Type de Carburant"
+                        :options="$fuelTypes->pluck('name', 'id')->toArray()"
+                        :selected="old('fuel_type_id')"
+                        placeholder="Sélectionnez un carburant..."
+                        required
+                        :error="$errors->first('fuel_type_id')"
+                    />
 
-                    {{-- Type de Transmission --}}
-                    <div>
-                        <label for="transmission_type_id" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                            Type de Transmission <span class="text-red-500">*</span>
-                        </label>
-                        <select x-ref="transmission_type_id" name="transmission_type_id" id="transmission_type_id" required>
-                            <option value="">Sélectionnez une transmission</option>
-                            @foreach($transmissionTypes as $type)
-                                <option value="{{ $type->id }}" @selected(old('transmission_type_id') == $type->id)>{{ $type->name }}</option>
-                            @endforeach
-                        </select>
-                        @if($errors->has('transmission_type_id'))
-                            <div class="mt-2 flex items-start text-sm text-red-600 dark:text-red-400">
-                                <x-iconify icon="heroicons:exclamation-circle" class="w-4 h-4 mr-1 mt-0.5 flex-shrink-0" />
-                                <span>{{ $errors->first('transmission_type_id') }}</span>
-                            </div>
-                        @endif
-                    </div>
+                    {{-- Type de Transmission avec TomSelect --}}
+                    <x-tom-select
+                        name="transmission_type_id"
+                        label="Type de Transmission"
+                        :options="$transmissionTypes->pluck('name', 'id')->toArray()"
+                        :selected="old('transmission_type_id')"
+                        placeholder="Sélectionnez une transmission..."
+                        required
+                        :error="$errors->first('transmission_type_id')"
+                    />
 
                     <x-input
                         type="number"
@@ -336,6 +249,7 @@
                         :value="old('acquisition_date')"
                         format="d/m/Y"
                         :error="$errors->first('acquisition_date')"
+                        placeholder="Choisir une date"
                     />
 
                     <x-input
@@ -376,51 +290,31 @@
                         helpText="Kilométrage au moment de l'acquisition"
                     />
 
-                    {{-- Statut Initial --}}
+                    {{-- Statut Initial avec TomSelect --}}
                     <div class="md:col-span-2">
-                        <label for="status_id" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                            Statut Initial <span class="text-red-500">*</span>
-                        </label>
-                        <select x-ref="status_id" name="status_id" id="status_id" required>
-                            <option value="">Sélectionnez un statut</option>
-                            @foreach($vehicleStatuses as $status)
-                                <option value="{{ $status->id }}" @selected(old('status_id') == $status->id)>{{ $status->name }}</option>
-                            @endforeach
-                        </select>
-                        @if($errors->has('status_id'))
-                            <div class="mt-2 flex items-start text-sm text-red-600 dark:text-red-400">
-                                <x-iconify icon="heroicons:exclamation-circle" class="w-4 h-4 mr-1 mt-0.5 flex-shrink-0" />
-                                <span>{{ $errors->first('status_id') }}</span>
-                            </div>
-                        @endif
+                        <x-tom-select
+                            name="status_id"
+                            label="Statut Initial"
+                            :options="$vehicleStatuses->pluck('name', 'id')->toArray()"
+                            :selected="old('status_id')"
+                            placeholder="Sélectionnez un statut..."
+                            required
+                            :error="$errors->first('status_id')"
+                        />
                     </div>
 
-                    {{-- Utilisateurs Autorisés --}}
+                    {{-- Utilisateurs Autorisés avec TomSelect Multiple --}}
                     <div class="md:col-span-2">
-                        <label for="users" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                            <x-iconify icon="heroicons:users" class="w-4 h-4 inline-block mr-1" />
-                            Utilisateurs Autorisés
-                        </label>
-                        <select name="users[]" id="users" multiple x-ref="users">
-                            @foreach($users as $user)
-                                <option value="{{ $user->id }}"
-                                        data-name="{{ $user->name }}"
-                                        data-email="{{ $user->email }}"
-                                        @selected(in_array($user->id, old('users', [])))>
-                                    {{ $user->name }} ({{ $user->email }})
-                                </option>
-                            @endforeach
-                        </select>
-                        <p class="mt-2 text-xs text-gray-500 dark:text-gray-400">
-                            <x-iconify icon="heroicons:information-circle" class="w-3.5 h-3.5 inline-block mr-1" />
-                            Recherchez et sélectionnez les utilisateurs autorisés à utiliser ce véhicule
-                        </p>
-                        @if($errors->has('users'))
-                            <div class="mt-2 flex items-start text-sm text-red-600 dark:text-red-400">
-                                <x-iconify icon="heroicons:exclamation-circle" class="w-4 h-4 mr-1 mt-0.5 flex-shrink-0" />
-                                <span>{{ $errors->first('users') }}</span>
-                            </div>
-                        @endif
+                        <x-tom-select
+                            name="users"
+                            label="Utilisateurs Autorisés"
+                            :options="$users->mapWithKeys(fn($user) => [$user->id => $user->name . ' (' . $user->email . ')'])->toArray()"
+                            :selected="old('users', [])"
+                            placeholder="Rechercher des utilisateurs..."
+                            :multiple="true"
+                            :error="$errors->first('users')"
+                            helpText="Recherchez et sélectionnez les utilisateurs autorisés à utiliser ce véhicule"
+                        />
                     </div>
 
                     {{-- Notes --}}
