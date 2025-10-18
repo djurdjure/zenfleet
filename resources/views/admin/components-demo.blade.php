@@ -240,6 +240,136 @@
                         />
                     </div>
                 </div>
+
+                {{-- TomSelect --}}
+                <div>
+                    <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">TomSelect (Liste déroulante avec recherche)</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        {{-- TomSelect simple --}}
+                        <x-tom-select
+                            name="vehicle_tomselect"
+                            label="Véhicule (avec recherche)"
+                            :options="[
+                                '1' => 'AA-123-BB - Toyota Corolla',
+                                '2' => 'CC-456-DD - Renault Master',
+                                '3' => 'EE-789-FF - Peugeot Partner',
+                                '4' => 'GG-012-HH - Citroën Berlingo',
+                                '5' => 'II-345-JJ - Ford Transit',
+                                '6' => 'KK-678-LL - Mercedes Sprinter',
+                                '7' => 'MM-901-NN - Volkswagen Caddy',
+                                '8' => 'OO-234-PP - Fiat Ducato'
+                            ]"
+                            placeholder="Rechercher un véhicule..."
+                        />
+
+                        {{-- TomSelect requis --}}
+                        <x-tom-select
+                            name="driver_tomselect"
+                            label="Chauffeur assigné"
+                            :options="[
+                                '1' => 'Jean Dupont',
+                                '2' => 'Marie Martin',
+                                '3' => 'Pierre Dubois',
+                                '4' => 'Sophie Bernard',
+                                '5' => 'Luc Petit'
+                            ]"
+                            placeholder="Sélectionner un chauffeur..."
+                            required
+                        />
+
+                        {{-- TomSelect avec erreur --}}
+                        <x-tom-select
+                            name="fuel_type_tomselect"
+                            label="Type de carburant"
+                            :options="[
+                                'diesel' => 'Diesel',
+                                'gasoline' => 'Essence',
+                                'electric' => 'Électrique',
+                                'hybrid' => 'Hybride'
+                            ]"
+                            error="Ce champ est requis"
+                        />
+
+                        {{-- TomSelect avec aide --}}
+                        <x-tom-select
+                            name="maintenance_type"
+                            label="Type de maintenance"
+                            :options="[
+                                'preventive' => 'Préventive',
+                                'corrective' => 'Corrective',
+                                'emergency' => 'Urgence',
+                                'inspection' => 'Inspection'
+                            ]"
+                            helpText="Sélectionnez le type de maintenance à effectuer"
+                        />
+                    </div>
+                </div>
+
+                {{-- Datepicker & TimePicker --}}
+                <div>
+                    <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Datepicker & TimePicker</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        {{-- Datepicker simple --}}
+                        <x-datepicker
+                            name="maintenance_date"
+                            label="Date de maintenance"
+                            placeholder="Choisir une date"
+                        />
+
+                        {{-- Datepicker requis --}}
+                        <x-datepicker
+                            name="assignment_date"
+                            label="Date d'affectation"
+                            placeholder="JJ/MM/AAAA"
+                            required
+                        />
+
+                        {{-- Datepicker avec contraintes --}}
+                        <x-datepicker
+                            name="start_date"
+                            label="Date de début"
+                            :minDate="date('Y-m-d')"
+                            placeholder="Sélectionner..."
+                            helpText="La date ne peut pas être dans le passé"
+                        />
+
+                        {{-- Datepicker avec erreur --}}
+                        <x-datepicker
+                            name="end_date"
+                            label="Date de fin"
+                            error="La date de fin doit être après la date de début"
+                        />
+
+                        {{-- TimePicker simple --}}
+                        <x-time-picker
+                            name="departure_time"
+                            label="Heure de départ"
+                            placeholder="HH:MM"
+                        />
+
+                        {{-- TimePicker requis --}}
+                        <x-time-picker
+                            name="arrival_time"
+                            label="Heure d'arrivée"
+                            placeholder="00:00"
+                            required
+                        />
+
+                        {{-- TimePicker avec valeur --}}
+                        <x-time-picker
+                            name="scheduled_time"
+                            label="Heure planifiée"
+                            value="09:00"
+                        />
+
+                        {{-- TimePicker avec aide --}}
+                        <x-time-picker
+                            name="maintenance_time"
+                            label="Heure de maintenance"
+                            helpText="Format 24 heures (HH:MM)"
+                        />
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -614,6 +744,37 @@
     name="description"
     label="Description"
     rows="4"
+/&gt;</code></pre>
+                </div>
+
+                <div>
+                    <h3 class="text-sm font-medium text-gray-900 dark:text-white mb-2">TomSelect (Recherche avancée)</h3>
+                    <pre class="bg-gray-900 text-gray-100 p-4 rounded-lg overflow-x-auto text-sm"><code>&lt;x-tom-select
+    name="vehicle"
+    label="Véhicule"
+    :options="['1' => 'AA-123-BB', '2' => 'CC-456-DD']"
+    placeholder="Rechercher..."
+    required
+/&gt;</code></pre>
+                </div>
+
+                <div>
+                    <h3 class="text-sm font-medium text-gray-900 dark:text-white mb-2">Datepicker</h3>
+                    <pre class="bg-gray-900 text-gray-100 p-4 rounded-lg overflow-x-auto text-sm"><code>&lt;x-datepicker
+    name="date"
+    label="Date de maintenance"
+    placeholder="JJ/MM/AAAA"
+    required
+/&gt;</code></pre>
+                </div>
+
+                <div>
+                    <h3 class="text-sm font-medium text-gray-900 dark:text-white mb-2">TimePicker</h3>
+                    <pre class="bg-gray-900 text-gray-100 p-4 rounded-lg overflow-x-auto text-sm"><code>&lt;x-time-picker
+    name="time"
+    label="Heure"
+    placeholder="HH:MM"
+    required
 /&gt;</code></pre>
                 </div>
 
