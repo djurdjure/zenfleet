@@ -67,8 +67,57 @@
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // Fonction de masque de saisie pour le format HH:MM
+            function applyTimeMask(input) {
+                input.addEventListener('input', function(e) {
+                    let value = e.target.value.replace(/\D/g, ''); // Garder seulement les chiffres
+
+                    if (value.length >= 2) {
+                        // Limiter les heures à 23
+                        let hours = parseInt(value.substring(0, 2));
+                        if (hours > 23) hours = 23;
+
+                        let formattedValue = String(hours).padStart(2, '0');
+
+                        if (value.length >= 3) {
+                            // Limiter les minutes à 59
+                            let minutes = parseInt(value.substring(2, 4));
+                            if (minutes > 59) minutes = 59;
+                            formattedValue += ':' + String(minutes).padStart(2, '0');
+                        } else if (value.length === 2) {
+                            formattedValue += ':';
+                        }
+
+                        e.target.value = formattedValue;
+                    }
+                });
+
+                // Empêcher la suppression du ':' et gérer le backspace
+                input.addEventListener('keydown', function(e) {
+                    if (e.key === 'Backspace') {
+                        const cursorPos = e.target.selectionStart;
+                        if (cursorPos === 3 && e.target.value.charAt(2) === ':') {
+                            e.preventDefault();
+                            e.target.value = e.target.value.substring(0, 2);
+                        }
+                    }
+                });
+
+                // Auto-focus sur les minutes après saisie des heures
+                input.addEventListener('input', function(e) {
+                    const value = e.target.value;
+                    if (value.length === 3 && value.includes(':')) {
+                        // Placer le curseur après le ':'
+                        e.target.setSelectionRange(3, 3);
+                    }
+                });
+            }
+
             document.querySelectorAll('.timepicker').forEach(function(el) {
                 const enableSeconds = el.getAttribute('data-enable-seconds') === 'true';
+
+                // Appliquer le masque de saisie
+                applyTimeMask(el);
 
                 flatpickr(el, {
                     enableTime: true,
