@@ -203,7 +203,7 @@ input:focus, select:focus {
         <div class="metric-card rounded-xl p-6">
             <div class="flex items-center">
                 <div class="w-12 h-12 icon-gradient-blue rounded-xl flex items-center justify-center">
-                    <x-lucide-car class="w-6 h-6 text-white" stroke-width="1.5"/>
+                    <x-icon icon="lucide:car" class="w-6 h-6 text-white" stroke-width="1.5"/ />
                 </div>
                 <div class="ml-4">
                     <p class="text-sm font-medium text-gray-500">Total véhicules</p>
@@ -215,7 +215,7 @@ input:focus, select:focus {
         <div class="metric-card rounded-xl p-6">
             <div class="flex items-center">
                 <div class="w-12 h-12 icon-gradient-green rounded-xl flex items-center justify-center">
-                    <x-lucide-check-circle class="w-6 h-6 text-white" stroke-width="1.5"/>
+                    <x-icon icon="heroicons:check-circle" class="w-6 h-6 text-white" stroke-width="1.5"/ />
                 </div>
                 <div class="ml-4">
                     <p class="text-sm font-medium text-gray-500">Disponibles</p>
@@ -227,7 +227,7 @@ input:focus, select:focus {
         <div class="metric-card rounded-xl p-6">
             <div class="flex items-center">
                 <div class="w-12 h-12 icon-gradient-orange rounded-xl flex items-center justify-center">
-                    <x-lucide-user-check class="w-6 h-6 text-white" stroke-width="1.5"/>
+                    <x-icon icon="heroicons:user"-check class="w-6 h-6 text-white" stroke-width="1.5"/ />
                 </div>
                 <div class="ml-4">
                     <p class="text-sm font-medium text-gray-500">Affectés</p>
@@ -239,7 +239,7 @@ input:focus, select:focus {
         <div class="metric-card rounded-xl p-6">
             <div class="flex items-center">
                 <div class="w-12 h-12 icon-gradient-red rounded-xl flex items-center justify-center">
-                    <x-lucide-wrench class="w-6 h-6 text-white" stroke-width="1.5"/>
+                    <x-icon icon="heroicons:wrench" class="w-6 h-6 text-white" stroke-width="1.5"/ />
                 </div>
                 <div class="ml-4">
                     <p class="text-sm font-medium text-gray-500">En maintenance</p>
@@ -338,7 +338,7 @@ input:focus, select:focus {
                             Réinitialiser
                         </a>
                         <button type="submit" class="btn-ultra inline-flex items-center px-6 py-3 border border-transparent text-sm font-semibold rounded-xl shadow-lg text-white bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800">
-                            <x-lucide-search class="w-4 h-4 mr-2" stroke-width="1.5"/>
+                            <x-icon icon="heroicons:magnifying-glass" class="w-4 h-4 mr-2" stroke-width="1.5"/ />
                             Filtrer
                         </button>
                     </div>
@@ -353,7 +353,7 @@ input:focus, select:focus {
                     <div class="flex items-center justify-between">
                         <div class="flex items-center gap-3">
                             <div class="w-10 h-10 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-xl flex items-center justify-center">
-                                <x-lucide-list class="w-5 h-5 text-white" stroke-width="1.5"/>
+                                <x-icon icon="heroicons:list-bullet" class="w-5 h-5 text-white" stroke-width="1.5"/ />
                             </div>
                             <h3 class="text-xl font-bold text-gray-900">
                                 Liste des véhicules ({{ $vehicles->total() ?? 0 }})
@@ -362,11 +362,11 @@ input:focus, select:focus {
                         <div class="flex space-x-2">
                             @can('create vehicles')
                                 <a href="{{ route('admin.vehicles.import.show') }}" class="btn-ultra inline-flex items-center px-4 py-3 border border-transparent text-sm font-semibold rounded-xl shadow-lg text-white bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700">
-                                    <x-lucide-upload class="w-4 h-4 mr-2" stroke-width="1.5"/>
+                                    <x-icon icon="heroicons:arrow-up-tray" class="w-4 h-4 mr-2" stroke-width="1.5"/ />
                                     Importer
                                 </a>
                                 <a href="{{ route('admin.vehicles.create') }}" class="btn-ultra inline-flex items-center px-6 py-3 border border-transparent text-sm font-semibold rounded-xl shadow-lg text-white bg-gradient-to-r from-primary-600 to-indigo-700 hover:from-primary-700 hover:to-indigo-800">
-                                    <x-lucide-plus-circle class="w-4 h-4 mr-2" stroke-width="1.5"/>
+                                    <x-icon icon="heroicons:plus"-circle class="w-4 h-4 mr-2" stroke-width="1.5"/ />
                                     Nouveau véhicule
                                 </a>
                             @endcan
@@ -393,7 +393,7 @@ input:focus, select:focus {
                                             <div class="flex items-center">
                                                 <div class="flex-shrink-0 h-8 w-8">
                                                     <div class="h-8 w-8 rounded-full bg-gray-100 flex items-center justify-center">
-                                                        <x-lucide-car class="h-4 w-4 text-gray-500" stroke-width="1.5"/>
+                                                        <x-icon icon="lucide:car" class="h-4 w-4 text-gray-500" stroke-width="1.5"/ />
                                                     </div>
                                                 </div>
                                                 <div class="ml-3">
@@ -428,17 +428,17 @@ input:focus, select:focus {
                                         <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
                                             @can('view vehicles')
                                                 <a href="{{ route('admin.vehicles.show', $vehicle) }}" class="text-indigo-600 hover:text-indigo-900 transition-colors">
-                                                    <x-lucide-eye class="h-4 w-4 inline" stroke-width="1.5"/>
+                                                    <x-icon icon="heroicons:eye" class="h-4 w-4 inline" stroke-width="1.5"/ />
                                                 </a>
                                             @endcan
                                             @can('edit vehicles')
                                                 <a href="{{ route('admin.vehicles.edit', $vehicle) }}" class="text-yellow-600 hover:text-yellow-900 transition-colors">
-                                                    <x-lucide-edit class="h-4 w-4 inline" stroke-width="1.5"/>
+                                                    <x-icon icon="heroicons:pencil" class="h-4 w-4 inline" stroke-width="1.5"/ />
                                                 </a>
                                             @endcan
                                             @can('delete vehicles')
                                                 <button onclick="deleteVehicle({{ $vehicle->id }})" class="text-red-600 hover:text-red-900 transition-colors">
-                                                    <x-lucide-archive class="h-4 w-4 inline" stroke-width="1.5"/>
+                                                    <x-icon icon="heroicons:archive-box" class="h-4 w-4 inline" stroke-width="1.5"/ />
                                                 </button>
                                             @endcan
                                         </td>
@@ -480,13 +480,13 @@ input:focus, select:focus {
                     </div>
                 @else
                     <div class="text-center py-12">
-                        <x-lucide-car class="mx-auto h-12 w-12 text-gray-400" stroke-width="1.5"/>
+                        <x-icon icon="lucide:car" class="mx-auto h-12 w-12 text-gray-400" stroke-width="1.5"/ />
                         <h3 class="mt-2 text-sm font-medium text-gray-900">Aucun véhicule</h3>
                         <p class="mt-1 text-sm text-gray-500">Commencez par ajouter un véhicule à votre flotte.</p>
                         @can('create vehicles')
                             <div class="mt-6">
                                 <a href="{{ route('admin.vehicles.create') }}" class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700">
-                                    <x-lucide-plus class="-ml-1 mr-2 h-5 w-5" stroke-width="1.5"/>
+                                    <x-icon icon="heroicons:plus" class="-ml-1 mr-2 h-5 w-5" stroke-width="1.5"/ />
                                     Nouveau véhicule
                                 </a>
                             </div>
@@ -629,7 +629,7 @@ function closeModal() {
             <div @click.away="showConfirmModal = false" class="bg-white rounded-lg shadow-xl p-6 w-full max-w-md mx-4">
                 <div class="sm:flex sm:items-start">
                     <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full sm:mx-0 sm:h-10 sm:w-10" :class="modalIconClass">
-                        <x-lucide-alert-triangle x-show="modalAction === 'archive' || modalAction === 'delete'" class="h-6 w-6" stroke-width="1.5"/>
+                        <x-icon icon="heroicons:exclamation-triangle" x-show="modalAction === 'archive' || modalAction === 'delete'" class="h-6 w-6" stroke-width="1.5"/ />
                     </div>
                     <div class="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left">
                         <h3 class="text-base font-semibold leading-6 text-gray-900" x-text="modalTitle"></h3>

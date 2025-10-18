@@ -13,13 +13,13 @@
         <div class="mt-4 sm:mt-0 sm:flex sm:space-x-3">
             <a href="{{ route('admin.repair-requests.index') }}"
                class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">
-                <x-lucide-arrow-left class="h-4 w-4 mr-2" />
+                <x-icon icon="heroicons:arrow-left" class="h-4 w-4 mr-2" / />
                 Retour à la liste
             </a>
             @if($repairRequest->canBeEdited())
                 <a href="{{ route('admin.repair-requests.edit', $repairRequest) }}"
                    class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700">
-                    <x-lucide-edit class="h-4 w-4 mr-2" />
+                    <x-icon icon="heroicons:pencil" class="h-4 w-4 mr-2" / />
                     Modifier
                 </a>
             @endif
@@ -122,11 +122,11 @@
                                 <div class="border border-gray-200 rounded-lg p-4">
                                     <div class="flex items-center space-x-3">
                                         @if(str_contains($attachment['mime_type'], 'image'))
-                                            <x-lucide-image class="h-8 w-8 text-green-500" />
+                                            <x-icon icon="heroicons:photo" class="h-8 w-8 text-green-500" / />
                                         @elseif(str_contains($attachment['mime_type'], 'pdf'))
-                                            <x-lucide-file-text class="h-8 w-8 text-red-500" />
+                                            <x-icon icon="heroicons:document"-text class="h-8 w-8 text-red-500" / />
                                         @else
-                                            <x-lucide-file class="h-8 w-8 text-gray-500" />
+                                            <x-icon icon="heroicons:document" class="h-8 w-8 text-gray-500" / />
                                         @endif
                                         <div class="flex-1 min-w-0">
                                             <p class="text-sm font-medium text-gray-900 truncate">{{ $attachment['original_name'] }}</p>
@@ -157,29 +157,29 @@
                 <div class="px-6 py-4 space-y-3">
                     @if($repairRequest->status === 'en_attente' && auth()->user()->hasRole(['Superviseur']))
                         <button onclick="approveRequest()" class="w-full inline-flex justify-center items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700">
-                            <x-lucide-check class="h-4 w-4 mr-2" />
+                            <x-icon icon="heroicons:check" class="h-4 w-4 mr-2" / />
                             Approuver
                         </button>
                         <button onclick="rejectRequest()" class="w-full inline-flex justify-center items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700">
-                            <x-lucide-x class="h-4 w-4 mr-2" />
+                            <x-icon icon="heroicons:x-mark" class="h-4 w-4 mr-2" / />
                             Rejeter
                         </button>
                     @endif
 
                     @if($repairRequest->status === 'accord_initial' && auth()->user()->hasRole(['Gestionnaire Flotte', 'Admin']))
                         <button onclick="validateRequest()" class="w-full inline-flex justify-center items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700">
-                            <x-lucide-check-circle class="h-4 w-4 mr-2" />
+                            <x-icon icon="heroicons:check-circle" class="h-4 w-4 mr-2" / />
                             Valider définitivement
                         </button>
                         <button onclick="rejectByManager()" class="w-full inline-flex justify-center items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700">
-                            <x-lucide-x-circle class="h-4 w-4 mr-2" />
+                            <x-icon icon="heroicons:x-circle" class="h-4 w-4 mr-2" / />
                             Refuser
                         </button>
                     @endif
 
                     @if(in_array($repairRequest->status, ['accordee', 'en_cours']) && auth()->user()->hasRole(['Gestionnaire Flotte', 'Admin']))
                         <button onclick="updateProgress()" class="w-full inline-flex justify-center items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
-                            <x-lucide-edit class="h-4 w-4 mr-2" />
+                            <x-icon icon="heroicons:pencil" class="h-4 w-4 mr-2" / />
                             Mettre à jour le statut
                         </button>
                     @endif
@@ -199,7 +199,7 @@
                                     <div class="relative flex space-x-3">
                                         <div>
                                             <span class="h-8 w-8 rounded-full bg-blue-500 flex items-center justify-center ring-8 ring-white">
-                                                <x-lucide-plus class="h-4 w-4 text-white" />
+                                                <x-icon icon="heroicons:plus" class="h-4 w-4 text-white" / />
                                             </span>
                                         </div>
                                         <div class="min-w-0 flex-1 pt-1.5 flex justify-between space-x-4">
@@ -221,9 +221,9 @@
                                             <div>
                                                 <span class="h-8 w-8 rounded-full {{ $repairRequest->supervisor_decision === 'accept' ? 'bg-green-500' : 'bg-red-500' }} flex items-center justify-center ring-8 ring-white">
                                                     @if($repairRequest->supervisor_decision === 'accept')
-                                                        <x-lucide-check class="h-4 w-4 text-white" />
+                                                        <x-icon icon="heroicons:check" class="h-4 w-4 text-white" / />
                                                     @else
-                                                        <x-lucide-x class="h-4 w-4 text-white" />
+                                                        <x-icon icon="heroicons:x-mark" class="h-4 w-4 text-white" / />
                                                     @endif
                                                 </span>
                                             </div>
@@ -253,9 +253,9 @@
                                             <div>
                                                 <span class="h-8 w-8 rounded-full {{ $repairRequest->manager_decision === 'validate' ? 'bg-indigo-500' : 'bg-red-500' }} flex items-center justify-center ring-8 ring-white">
                                                     @if($repairRequest->manager_decision === 'validate')
-                                                        <x-lucide-check-circle class="h-4 w-4 text-white" />
+                                                        <x-icon icon="heroicons:check-circle" class="h-4 w-4 text-white" / />
                                                     @else
-                                                        <x-lucide-x-circle class="h-4 w-4 text-white" />
+                                                        <x-icon icon="heroicons:x-circle" class="h-4 w-4 text-white" / />
                                                     @endif
                                                 </span>
                                             </div>

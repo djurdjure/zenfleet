@@ -13,7 +13,7 @@
     <div class="flex items-center justify-center h-20 border-b border-slate-700/50 shrink-0 px-6 bg-slate-800/30">
         <a href="{{ route('dashboard') }}" class="flex items-center space-x-3 group">
             <div class="p-2 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-lg shadow-lg group-hover:shadow-xl transition-all duration-300">
-                <x-lucide-truck class="h-8 w-8 text-white" stroke-width="2" />
+                <x-icon icon="heroicons:truck" class="h-8 w-8 text-white" stroke-width="2" / />
             </div>
             <div class="flex flex-col">
                 <span class="text-xl font-bold text-white group-hover:text-blue-300 transition-colors">ZenFleet</span>
@@ -26,7 +26,7 @@
     @if(auth()->user()->unreadNotifications->count() > 0)
     <div class="mx-4 mt-4 p-3 bg-gradient-to-r from-red-500/20 to-orange-500/20 border border-red-500/30 rounded-lg">
         <div class="flex items-center space-x-2">
-            <x-lucide-bell class="h-4 w-4 text-red-400 animate-pulse" />
+            <x-icon icon="heroicons:bell" class="h-4 w-4 text-red-400 animate-pulse" / />
             <span class="text-sm font-medium text-red-300">{{ auth()->user()->unreadNotifications->count() }} alertes actives</span>
         </div>
     </div>
@@ -48,7 +48,7 @@
         {{-- Barre de recherche Enterprise --}}
         <div class="relative mb-6">
             <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <x-lucide-search class="h-4 w-4 text-slate-400" />
+                <x-icon icon="heroicons:magnifying-glass" class="h-4 w-4 text-slate-400" / />
             </div>
             <input type="text" x-model="searchQuery"
                    placeholder="Rechercher dans le menu..."
@@ -59,7 +59,7 @@
         <a href="{{ route('dashboard') }}"
            class="nav-item flex items-center px-4 py-3 rounded-xl text-white/90 hover:text-white hover:bg-gradient-to-r hover:from-blue-500/20 hover:to-indigo-500/20 transition-all duration-300 group {{ request()->routeIs('dashboard') ? 'bg-gradient-to-r from-blue-500/30 to-indigo-500/30 text-white border border-blue-500/30' : '' }}">
             <div class="flex items-center justify-center w-10 h-10 rounded-lg {{ request()->routeIs('dashboard') ? 'bg-gradient-to-r from-blue-500 to-indigo-600' : 'bg-slate-700/50 group-hover:bg-slate-600/50' }} transition-all duration-300">
-                <x-lucide-layout-grid class="h-5 w-5" />
+                <x-icon icon="heroicons:squares-2x2" class="h-5 w-5" / />
             </div>
             <span class="ml-3 font-medium">Tableau de Bord</span>
             @if(request()->routeIs('dashboard'))
@@ -75,7 +75,7 @@
         <a href="{{ route('admin.alerts.index') }}"
            class="nav-item flex items-center px-4 py-3 rounded-xl text-white/90 hover:text-white hover:bg-gradient-to-r hover:from-red-500/20 hover:to-orange-500/20 transition-all duration-300 group {{ request()->routeIs('admin.alerts.*') ? 'bg-gradient-to-r from-red-500/30 to-orange-500/30 text-white border border-red-500/30' : '' }}">
             <div class="flex items-center justify-center w-10 h-10 rounded-lg {{ request()->routeIs('admin.alerts.*') ? 'bg-gradient-to-r from-red-500 to-orange-600' : 'bg-slate-700/50 group-hover:bg-slate-600/50' }} transition-all duration-300 relative">
-                <x-lucide-alert-triangle class="h-5 w-5" />
+                <x-icon icon="heroicons:exclamation-triangle" class="h-5 w-5" / />
                 @if(auth()->user()->unreadNotifications->where('type', 'like', '%Alert%')->count() > 0)
                     <span class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center animate-pulse">
                         {{ auth()->user()->unreadNotifications->where('type', 'like', '%Alert%')->count() }}
@@ -98,25 +98,25 @@
             <button @click="expanded = !expanded"
                     class="w-full flex items-center px-4 py-3 rounded-xl text-white/90 hover:text-white hover:bg-gradient-to-r hover:from-green-500/20 hover:to-emerald-500/20 transition-all duration-300 group">
                 <div class="flex items-center justify-center w-10 h-10 rounded-lg bg-slate-700/50 group-hover:bg-slate-600/50 transition-all duration-300">
-                    <x-lucide-truck class="h-5 w-5" />
+                    <x-icon icon="heroicons:truck" class="h-5 w-5" / />
                 </div>
                 <div class="ml-3 flex-1 text-left">
                     <span class="font-medium">Gestion Flotte</span>
                     <div class="text-xs text-slate-400">Véhicules • Affectations</div>
                 </div>
-                <x-lucide-chevron-down class="h-4 w-4 transition-transform duration-200" :class="expanded ? 'rotate-180' : ''" />
+                <x-icon icon="heroicons:chevron-down" class="h-4 w-4 transition-transform duration-200" :class="expanded ? 'rotate-180' : ''" / />
             </button>
             <div x-show="expanded" x-collapse class="mt-2 ml-6 space-y-1">
                 <a href="{{ route('admin.vehicles.index') }}" class="flex items-center px-4 py-2 rounded-lg text-slate-300 hover:text-white hover:bg-slate-700/50 transition-all duration-200 {{ request()->routeIs('admin.vehicles.*') ? 'text-white bg-slate-700/50' : '' }}">
-                    <x-lucide-truck class="h-4 w-4 mr-3" />
+                    <x-icon icon="heroicons:truck" class="h-4 w-4 mr-3" / />
                     Véhicules
                 </a>
                 <a href="{{ route('admin.assignments.index') }}" class="flex items-center px-4 py-2 rounded-lg text-slate-300 hover:text-white hover:bg-slate-700/50 transition-all duration-200 {{ request()->routeIs('admin.assignments.*') ? 'text-white bg-slate-700/50' : '' }}">
-                    <x-lucide-clipboard-list class="h-4 w-4 mr-3" />
+                    <x-icon icon="heroicons:clipboard-document-list" class="h-4 w-4 mr-3" / />
                     Affectations
                 </a>
                 <a href="{{ route('admin.planning.index') }}" class="flex items-center px-4 py-2 rounded-lg text-slate-300 hover:text-white hover:bg-slate-700/50 transition-all duration-200 {{ request()->routeIs('admin.planning.*') ? 'text-white bg-slate-700/50' : '' }}">
-                    <x-lucide-calendar-days class="h-4 w-4 mr-3" />
+                    <x-icon icon="heroicons:calendar"-days class="h-4 w-4 mr-3" / />
                     Planning
                 </a>
             </div>
@@ -127,21 +127,21 @@
             <button @click="expanded = !expanded"
                     class="w-full flex items-center px-4 py-3 rounded-xl text-white/90 hover:text-white hover:bg-gradient-to-r hover:from-purple-500/20 hover:to-violet-500/20 transition-all duration-300 group">
                 <div class="flex items-center justify-center w-10 h-10 rounded-lg bg-slate-700/50 group-hover:bg-slate-600/50 transition-all duration-300">
-                    <x-lucide-users class="h-5 w-5" />
+                    <x-icon icon="heroicons:user"s class="h-5 w-5" / />
                 </div>
                 <div class="ml-3 flex-1 text-left">
                     <span class="font-medium">Chauffeurs</span>
                     <div class="text-xs text-slate-400">Personnel • Import/Export</div>
                 </div>
-                <x-lucide-chevron-down class="h-4 w-4 transition-transform duration-200" :class="expanded ? 'rotate-180' : ''" />
+                <x-icon icon="heroicons:chevron-down" class="h-4 w-4 transition-transform duration-200" :class="expanded ? 'rotate-180' : ''" / />
             </button>
             <div x-show="expanded" x-collapse class="mt-2 ml-6 space-y-1">
                 <a href="{{ route('admin.drivers.index') }}" class="flex items-center px-4 py-2 rounded-lg text-slate-300 hover:text-white hover:bg-slate-700/50 transition-all duration-200 {{ request()->routeIs('admin.drivers.index') ? 'text-white bg-slate-700/50' : '' }}">
-                    <x-lucide-list class="h-4 w-4 mr-3" />
+                    <x-icon icon="heroicons:list-bullet" class="h-4 w-4 mr-3" / />
                     Liste des chauffeurs
                 </a>
                 <a href="{{ route('admin.drivers.import.show') }}" class="flex items-center px-4 py-2 rounded-lg text-slate-300 hover:text-white hover:bg-slate-700/50 transition-all duration-200 {{ request()->routeIs('admin.drivers.import.*') ? 'text-white bg-slate-700/50' : '' }}">
-                    <x-lucide-file-up class="h-4 w-4 mr-3" />
+                    <x-icon icon="heroicons:document"-up class="h-4 w-4 mr-3" / />
                     Importer chauffeurs
                 </a>
             </div>
@@ -152,7 +152,7 @@
         <a href="{{ route('admin.suppliers-enterprise.index') }}"
            class="nav-item flex items-center px-4 py-3 rounded-xl text-white/90 hover:text-white hover:bg-gradient-to-r hover:from-teal-500/20 hover:to-cyan-500/20 transition-all duration-300 group {{ request()->routeIs('admin.suppliers-enterprise.*') ? 'bg-gradient-to-r from-teal-500/30 to-cyan-500/30 text-white border border-teal-500/30' : '' }}">
             <div class="flex items-center justify-center w-10 h-10 rounded-lg {{ request()->routeIs('admin.suppliers-enterprise.*') ? 'bg-gradient-to-r from-teal-500 to-cyan-600' : 'bg-slate-700/50 group-hover:bg-slate-600/50' }} transition-all duration-300">
-                <x-lucide-building-2 class="h-5 w-5" />
+                <x-icon icon="heroicons:building-office" class="h-5 w-5" / />
             </div>
             <div class="ml-3 flex-1">
                 <span class="font-medium">Fournisseurs</span>
@@ -167,7 +167,7 @@
         <a href="{{ route('admin.vehicle-expenses.index') }}"
            class="nav-item flex items-center px-4 py-3 rounded-xl text-white/90 hover:text-white hover:bg-gradient-to-r hover:from-emerald-500/20 hover:to-green-500/20 transition-all duration-300 group {{ request()->routeIs('admin.vehicle-expenses.*', 'admin.expense-budgets.*') ? 'bg-gradient-to-r from-emerald-500/30 to-green-500/30 text-white border border-emerald-500/30' : '' }}">
             <div class="flex items-center justify-center w-10 h-10 rounded-lg {{ request()->routeIs('admin.vehicle-expenses.*', 'admin.expense-budgets.*') ? 'bg-gradient-to-r from-emerald-500 to-green-600' : 'bg-slate-700/50 group-hover:bg-slate-600/50' }} transition-all duration-300 relative">
-                <x-lucide-credit-card class="h-5 w-5" />
+                <x-icon icon="heroicons:credit-card" class="h-5 w-5" / />
                 @if(auth()->user()->unreadNotifications->where('type', 'like', '%Expense%')->count() > 0)
                     <span class="absolute -top-2 -right-2 bg-emerald-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
                         {{ auth()->user()->unreadNotifications->where('type', 'like', '%Expense%')->count() }}
@@ -188,7 +188,7 @@
             <button @click="expanded = !expanded"
                     class="w-full flex items-center px-4 py-3 rounded-xl text-white/90 hover:text-white hover:bg-gradient-to-r hover:from-indigo-500/20 hover:to-purple-500/20 transition-all duration-300 group {{ request()->routeIs('admin.maintenance.*') ? 'bg-gradient-to-r from-indigo-500/30 to-purple-500/30 text-white border border-indigo-500/30' : '' }}">
                 <div class="flex items-center justify-center w-10 h-10 rounded-lg {{ request()->routeIs('admin.maintenance.*') ? 'bg-gradient-to-r from-indigo-500 to-purple-600' : 'bg-slate-700/50 group-hover:bg-slate-600/50' }} transition-all duration-300 relative">
-                    <x-lucide-cog class="h-5 w-5" />
+                    <x-icon icon="heroicons:cog-6-tooth" class="h-5 w-5" / />
                     @if(auth()->user()->unreadNotifications->where('type', 'like', '%Maintenance%')->count() > 0)
                         <span class="absolute -top-2 -right-2 bg-indigo-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
                             {{ auth()->user()->unreadNotifications->where('type', 'like', '%Maintenance%')->count() }}
@@ -199,23 +199,23 @@
                     <span class="font-medium">Maintenance</span>
                     <div class="text-xs text-slate-400">Surveillance • Planification</div>
                 </div>
-                <x-lucide-chevron-down class="h-4 w-4 transition-transform duration-200" :class="expanded ? 'rotate-180' : ''" />
+                <x-icon icon="heroicons:chevron-down" class="h-4 w-4 transition-transform duration-200" :class="expanded ? 'rotate-180' : ''" / />
             </button>
             <div x-show="expanded" x-collapse class="mt-2 ml-6 space-y-1">
                 <a href="{{ route('admin.maintenance.surveillance.index') }}" class="flex items-center px-4 py-2 rounded-lg text-slate-300 hover:text-white hover:bg-slate-700/50 transition-all duration-200 {{ request()->routeIs('admin.maintenance.surveillance.*') ? 'text-white bg-slate-700/50' : '' }}">
-                    <x-lucide-monitor class="h-4 w-4 mr-3" />
+                    <x-icon icon="heroicons:computer-desktop" class="h-4 w-4 mr-3" / />
                     Surveillance
                 </a>
                 <a href="{{ route('admin.maintenance.schedules.index') }}" class="flex items-center px-4 py-2 rounded-lg text-slate-300 hover:text-white hover:bg-slate-700/50 transition-all duration-200 {{ request()->routeIs('admin.maintenance.schedules.*') ? 'text-white bg-slate-700/50' : '' }}">
-                    <x-lucide-calendar-check class="h-4 w-4 mr-3" />
+                    <x-icon icon="heroicons:calendar"-check class="h-4 w-4 mr-3" / />
                     Planifications
                 </a>
                 <a href="{{ route('admin.repair-requests.index') }}" class="flex items-center px-4 py-2 rounded-lg text-slate-300 hover:text-white hover:bg-slate-700/50 transition-all duration-200 {{ request()->routeIs('admin.repair-requests.*') ? 'text-white bg-slate-700/50' : '' }}">
-                    <x-lucide-wrench class="h-4 w-4 mr-3" />
+                    <x-icon icon="heroicons:wrench" class="h-4 w-4 mr-3" / />
                     Demandes de réparation
                 </a>
                 <a href="{{ route('admin.maintenance.operations.index') }}" class="flex items-center px-4 py-2 rounded-lg text-slate-300 hover:text-white hover:bg-slate-700/50 transition-all duration-200 {{ request()->routeIs('admin.maintenance.operations.*') ? 'text-white bg-slate-700/50' : '' }}">
-                    <x-lucide-tool class="h-4 w-4 mr-3" />
+                    <x-icon icon="lucide:wrench" class="h-4 w-4 mr-3" / />
                     Opérations
                 </a>
             </div>
@@ -231,21 +231,21 @@
             <button @click="expanded = !expanded"
                     class="w-full flex items-center px-4 py-3 rounded-xl text-white/90 hover:text-white hover:bg-gradient-to-r hover:from-slate-500/20 hover:to-gray-500/20 transition-all duration-300 group">
                 <div class="flex items-center justify-center w-10 h-10 rounded-lg bg-slate-700/50 group-hover:bg-slate-600/50 transition-all duration-300">
-                    <x-lucide-folder-open class="h-5 w-5" />
+                    <x-icon icon="heroicons:folder-open" class="h-5 w-5" / />
                 </div>
                 <div class="ml-3 flex-1 text-left">
                     <span class="font-medium">Documents</span>
                     <div class="text-xs text-slate-400">Fichiers • Catégories</div>
                 </div>
-                <x-lucide-chevron-down class="h-4 w-4 transition-transform duration-200" :class="expanded ? 'rotate-180' : ''" />
+                <x-icon icon="heroicons:chevron-down" class="h-4 w-4 transition-transform duration-200" :class="expanded ? 'rotate-180' : ''" / />
             </button>
             <div x-show="expanded" x-collapse class="mt-2 ml-6 space-y-1">
                 <a href="{{ route('admin.documents.index') }}" class="flex items-center px-4 py-2 rounded-lg text-slate-300 hover:text-white hover:bg-slate-700/50 transition-all duration-200 {{ request()->routeIs('admin.documents.*') ? 'text-white bg-slate-700/50' : '' }}">
-                    <x-lucide-file-text class="h-4 w-4 mr-3" />
+                    <x-icon icon="heroicons:document"-text class="h-4 w-4 mr-3" / />
                     Liste des Documents
                 </a>
                 <a href="{{ route('admin.document-categories.index') }}" class="flex items-center px-4 py-2 rounded-lg text-slate-300 hover:text-white hover:bg-slate-700/50 transition-all duration-200 {{ request()->routeIs('admin.document-categories.*') ? 'text-white bg-slate-700/50' : '' }}">
-                    <x-lucide-folder-cog class="h-4 w-4 mr-3" />
+                    <x-icon icon="heroicons:folder" class="h-4 w-4 mr-3" / />
                     Catégories
                 </a>
             </div>
@@ -257,27 +257,27 @@
             <button @click="expanded = !expanded"
                     class="w-full flex items-center px-4 py-3 rounded-xl text-white/90 hover:text-white hover:bg-gradient-to-r hover:from-rose-500/20 hover:to-pink-500/20 transition-all duration-300 group">
                 <div class="flex items-center justify-center w-10 h-10 rounded-lg bg-slate-700/50 group-hover:bg-slate-600/50 transition-all duration-300">
-                    <x-lucide-shield-check class="h-5 w-5" />
+                    <x-icon icon="heroicons:shield-check" class="h-5 w-5" / />
                 </div>
                 <div class="ml-3 flex-1 text-left">
                     <span class="font-medium">Administration</span>
                     <div class="text-xs text-slate-400">Utilisateurs • Permissions</div>
                 </div>
-                <x-lucide-chevron-down class="h-4 w-4 transition-transform duration-200" :class="expanded ? 'rotate-180' : ''" />
+                <x-icon icon="heroicons:chevron-down" class="h-4 w-4 transition-transform duration-200" :class="expanded ? 'rotate-180' : ''" / />
             </button>
             <div x-show="expanded" x-collapse class="mt-2 ml-6 space-y-1">
                 @role('Super Admin')
                 <a href="{{ route('admin.organizations.index') }}" class="flex items-center px-4 py-2 rounded-lg text-slate-300 hover:text-white hover:bg-slate-700/50 transition-all duration-200 {{ request()->routeIs('admin.organizations.*') ? 'text-white bg-slate-700/50' : '' }}">
-                    <x-lucide-building-2 class="h-4 w-4 mr-3" />
+                    <x-icon icon="heroicons:building-office" class="h-4 w-4 mr-3" / />
                     Organisations
                 </a>
                 @endrole
                 <a href="{{ route('admin.users.index') }}" class="flex items-center px-4 py-2 rounded-lg text-slate-300 hover:text-white hover:bg-slate-700/50 transition-all duration-200 {{ request()->routeIs('admin.users.*') ? 'text-white bg-slate-700/50' : '' }}">
-                    <x-lucide-user-cog class="h-4 w-4 mr-3" />
+                    <x-icon icon="heroicons:user"-cog class="h-4 w-4 mr-3" / />
                     Utilisateurs
                 </a>
                 <a href="{{ route('admin.roles.index') }}" class="flex items-center px-4 py-2 rounded-lg text-slate-300 hover:text-white hover:bg-slate-700/50 transition-all duration-200 {{ request()->routeIs('admin.roles.*') ? 'text-white bg-slate-700/50' : '' }}">
-                    <x-lucide-key-round class="h-4 w-4 mr-3" />
+                    <x-icon icon="heroicons:key" class="h-4 w-4 mr-3" / />
                     Rôles & Permissions
                 </a>
             </div>
@@ -305,7 +305,7 @@
                         @endif
                     </div>
                 </div>
-                <x-lucide-chevron-up class="h-4 w-4 text-slate-400 shrink-0 transition-transform duration-200" :class="open ? 'rotate-180' : ''" />
+                <x-icon icon="heroicons:chevron-up" class="h-4 w-4 text-slate-400 shrink-0 transition-transform duration-200" :class="open ? 'rotate-180' : ''" / />
             </button>
 
             <div x-show="open"
@@ -322,7 +322,7 @@
                         <a href="{{ route('profile.edit') }}"
                            class="flex items-center w-full px-4 py-3 text-sm text-slate-300 hover:text-white hover:bg-slate-700/50 rounded-lg transition-all duration-200 group">
                             <div class="flex items-center justify-center w-8 h-8 rounded-lg bg-slate-700/50 group-hover:bg-blue-500/20 transition-all duration-200 mr-3">
-                                <x-lucide-user class="h-4 w-4" />
+                                <x-icon icon="heroicons:user" class="h-4 w-4" / />
                             </div>
                             <div class="flex-1">
                                 <div class="font-medium">Mon Profil</div>
@@ -333,7 +333,7 @@
                         <a href="{{ route('admin.notifications.index') }}"
                            class="flex items-center w-full px-4 py-3 text-sm text-slate-300 hover:text-white hover:bg-slate-700/50 rounded-lg transition-all duration-200 group">
                             <div class="flex items-center justify-center w-8 h-8 rounded-lg bg-slate-700/50 group-hover:bg-yellow-500/20 transition-all duration-200 mr-3 relative">
-                                <x-lucide-bell class="h-4 w-4" />
+                                <x-icon icon="heroicons:bell" class="h-4 w-4" / />
                                 @if(auth()->user()->unreadNotifications->count() > 0)
                                     <span class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center">
                                         {{ auth()->user()->unreadNotifications->count() }}
@@ -353,7 +353,7 @@
                             <button type="submit"
                                     class="flex items-center w-full px-4 py-3 text-sm text-slate-300 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-all duration-200 group">
                                 <div class="flex items-center justify-center w-8 h-8 rounded-lg bg-slate-700/50 group-hover:bg-red-500/20 transition-all duration-200 mr-3">
-                                    <x-lucide-log-out class="h-4 w-4" />
+                                    <x-icon icon="heroicons:arrow-right-on-rectangle" class="h-4 w-4" / />
                                 </div>
                                 <div class="flex-1 text-left">
                                     <div class="font-medium">Déconnexion</div>

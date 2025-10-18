@@ -35,17 +35,17 @@
                     <ol class="flex items-center w-full mb-8">
                         <li :class="currentStep >= 1 ? 'text-primary-600' : 'text-gray-500'" class="flex w-full items-center after:content-[''] after:w-full after:h-1 after:border-b after:border-4 after:inline-block" :class="currentStep > 1 ? 'after:border-primary-600' : 'after:border-gray-200'">
                             <span class="flex items-center justify-center w-10 h-10 rounded-full shrink-0" :class="currentStep >= 1 ? 'bg-primary-100' : 'bg-gray-100'">
-                                <x-lucide-contact class="w-5 h-5"/>
+                                <x-icon icon="heroicons:identification" class="w-5 h-5"/ />
                             </span>
                         </li>
                         <li :class="currentStep >= 2 ? 'text-primary-600' : 'text-gray-500'" class="flex w-full items-center after:content-[''] after:w-full after:h-1 after:border-b after:border-4 after:inline-block" :class="currentStep > 2 ? 'after:border-primary-600' : 'after:border-gray-200'">
                             <span class="flex items-center justify-center w-10 h-10 rounded-full shrink-0" :class="currentStep >= 2 ? 'bg-primary-100' : 'bg-gray-100'">
-                                <x-lucide-wrench class="w-5 h-5"/>
+                                <x-icon icon="heroicons:wrench" class="w-5 h-5"/ />
                             </span>
                         </li>
                         <li :class="currentStep === 3 ? 'text-primary-600' : 'text-gray-500'" class="flex items-center">
                             <span class="flex items-center justify-center w-10 h-10 rounded-full shrink-0" :class="currentStep === 3 ? 'bg-primary-100' : 'bg-gray-100'">
-                                <x-lucide-key-round class="w-5 h-5"/>
+                                <x-icon icon="heroicons:key" class="w-5 h-5"/ />
                             </span>
                         </li>
                     </ol>

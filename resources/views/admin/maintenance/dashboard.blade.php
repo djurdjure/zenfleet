@@ -325,7 +325,7 @@
                     <div class="flex-1 min-w-0">
                         <div class="flex items-center space-x-4">
                             <div class="p-4 bg-gradient-to-r from-blue-500 to-cyan-600 rounded-2xl shadow-lg">
-                                <x-lucide-gauge class="h-12 w-12 text-white" stroke-width="2" />
+                                <x-icon icon="lucide:gauge" class="h-12 w-12 text-white" stroke-width="2" / />
                             </div>
                             <div>
                                 <h1 class="text-4xl font-bold text-white mb-2">Centre de Contrôle Maintenance</h1>
@@ -334,15 +334,15 @@
                         </div>
                         <div class="mt-6 flex flex-col sm:flex-row sm:flex-wrap sm:space-x-8">
                             <div class="mt-2 flex items-center text-sm text-blue-100">
-                                <x-lucide-activity class="mr-2 h-5 w-5 text-cyan-400" stroke-width="2" />
+                                <x-icon icon="lucide:activity" class="mr-2 h-5 w-5 text-cyan-400" stroke-width="2" / />
                                 Supervision temps réel des opérations
                             </div>
                             <div class="mt-2 flex items-center text-sm text-blue-100">
-                                <x-lucide-shield-check class="mr-2 h-5 w-5 text-green-400" stroke-width="2" />
+                                <x-icon icon="heroicons:shield-check" class="mr-2 h-5 w-5 text-green-400" stroke-width="2" / />
                                 Alertes intelligentes & préventives
                             </div>
                             <div class="mt-2 flex items-center text-sm text-blue-100">
-                                <x-lucide-clock class="mr-2 h-5 w-5 text-orange-400" stroke-width="2" />
+                                <x-icon icon="heroicons:clock" class="mr-2 h-5 w-5 text-orange-400" stroke-width="2" / />
                                 Dernière synchronisation: {{ now()->format('d/m/Y à H:i:s') }}
                             </div>
                         </div>
@@ -350,15 +350,15 @@
                     <div class="mt-6 md:mt-0 md:ml-6">
                         <div class="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-3">
                             <button onclick="refreshDashboard()" class="action-button inline-flex items-center px-4 py-3 bg-white/10 backdrop-blur-sm border border-white/20 shadow-sm text-sm font-medium rounded-xl text-white hover:bg-white/20 focus:outline-none focus:ring-2 focus:ring-white/50 transition-all duration-300">
-                                <x-lucide-refresh-cw class="mr-2 h-4 w-4" stroke-width="2" />
+                                <x-icon icon="heroicons:arrow-path" class="mr-2 h-4 w-4" stroke-width="2" / />
                                 Actualiser
                             </button>
                             <a href="{{ route('admin.maintenance.schedules.create') }}" class="action-button inline-flex items-center px-4 py-3 bg-gradient-to-r from-green-500 to-emerald-600 shadow-lg text-sm font-medium rounded-xl text-white hover:from-green-600 hover:to-emerald-700 focus:outline-none focus:ring-2 focus:ring-green-500 transition-all duration-300">
-                                <x-lucide-calendar-plus class="mr-2 h-4 w-4" stroke-width="2" />
+                                <x-icon icon="heroicons:calendar"-plus class="mr-2 h-4 w-4" stroke-width="2" / />
                                 Planifier
                             </a>
                             <a href="{{ route('admin.maintenance.operations.create') }}" class="action-button inline-flex items-center px-4 py-3 bg-gradient-to-r from-blue-500 to-purple-600 shadow-lg text-sm font-medium rounded-xl text-white hover:from-blue-600 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-300">
-                                <x-lucide-plus class="mr-2 h-4 w-4" stroke-width="2" />
+                                <x-icon icon="heroicons:plus" class="mr-2 h-4 w-4" stroke-width="2" / />
                                 Nouvelle opération
                             </a>
                         </div>
@@ -532,7 +532,7 @@
         <div class="metric-card relative bg-gradient-to-br from-red-50 to-rose-100 border-l-4 border-red-500 rounded-2xl p-6 shadow-xl hover:shadow-2xl transition-all duration-300 group">
             <div class="absolute top-4 right-4">
                 <div class="w-12 h-12 bg-gradient-to-br from-red-500 to-red-600 rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300">
-                    <x-lucide-alert-triangle class="w-6 h-6 text-white" stroke-width="2" />
+                    <x-icon icon="heroicons:exclamation-triangle" class="w-6 h-6 text-white" stroke-width="2" / />
                 </div>
             </div>
             <div class="pb-2">
@@ -549,7 +549,7 @@
                     @endif
                 </div>
                 <div class="mt-2 flex items-center text-xs text-red-600">
-                    <x-lucide-trending-up class="w-3 h-3 mr-1" />
+                    <x-icon icon="heroicons:arrow-trending-up" class="w-3 h-3 mr-1" / />
                     Surveillance active
                 </div>
             </div>
@@ -559,7 +559,7 @@
         <div class="metric-card relative bg-gradient-to-br from-orange-50 to-amber-100 border-l-4 border-orange-500 rounded-2xl p-6 shadow-xl hover:shadow-2xl transition-all duration-300 group">
             <div class="absolute top-4 right-4">
                 <div class="w-12 h-12 bg-gradient-to-br from-orange-500 to-amber-600 rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300">
-                    <x-lucide-bell class="w-6 h-6 text-white" stroke-width="2" />
+                    <x-icon icon="heroicons:bell" class="w-6 h-6 text-white" stroke-width="2" / />
                 </div>
             </div>
             <div class="pb-2">
@@ -569,7 +569,7 @@
                     <span class="text-xs text-gray-600">/ {{ $stats['total_alerts'] ?? 0 }}</span>
                 </div>
                 <div class="mt-2 flex items-center text-xs text-orange-600">
-                    <x-lucide-clock class="w-3 h-3 mr-1" />
+                    <x-icon icon="heroicons:clock" class="w-3 h-3 mr-1" / />
                     En attente
                 </div>
             </div>
@@ -579,7 +579,7 @@
         <div class="metric-card relative bg-gradient-to-br from-blue-50 to-indigo-100 border-l-4 border-blue-500 rounded-2xl p-6 shadow-xl hover:shadow-2xl transition-all duration-300 group">
             <div class="absolute top-4 right-4">
                 <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300">
-                    <x-lucide-calendar class="w-6 h-6 text-white" stroke-width="2" />
+                    <x-icon icon="heroicons:calendar" class="w-6 h-6 text-white" stroke-width="2" / />
                 </div>
             </div>
             <div class="pb-2">
@@ -593,7 +593,7 @@
                     @endif
                 </div>
                 <div class="mt-2 flex items-center text-xs text-blue-600">
-                    <x-lucide-calendar class="w-3 h-3 mr-1" />
+                    <x-icon icon="heroicons:calendar" class="w-3 h-3 mr-1" / />
                     Planning actif
                 </div>
             </div>
@@ -603,7 +603,7 @@
         <div class="metric-card relative bg-gradient-to-br from-green-50 to-emerald-100 border-l-4 border-green-500 rounded-2xl p-6 shadow-xl hover:shadow-2xl transition-all duration-300 group">
             <div class="absolute top-4 right-4">
                 <div class="w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300">
-                    <x-lucide-activity class="w-6 h-6 text-white" stroke-width="2" />
+                    <x-icon icon="lucide:activity" class="w-6 h-6 text-white" stroke-width="2" / />
                 </div>
             </div>
             <div class="pb-2">
@@ -613,7 +613,7 @@
                     <span class="text-xs text-gray-600">actives</span>
                 </div>
                 <div class="mt-2 flex items-center text-xs text-green-600">
-                    <x-lucide-check-circle class="w-3 h-3 mr-1" />
+                    <x-icon icon="heroicons:check-circle" class="w-3 h-3 mr-1" / />
                     {{ $stats['completed_this_month'] ?? 0 }} ce mois
                 </div>
             </div>
@@ -623,7 +623,7 @@
         <div class="metric-card relative bg-gradient-to-br from-purple-50 to-violet-100 border-l-4 border-purple-500 rounded-2xl p-6 shadow-xl hover:shadow-2xl transition-all duration-300 group">
             <div class="absolute top-4 right-4">
                 <div class="w-12 h-12 bg-gradient-to-br from-purple-500 to-violet-600 rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300">
-                    <x-lucide-euro class="w-6 h-6 text-white" stroke-width="2" />
+                    <x-icon icon="lucide:euro" class="w-6 h-6 text-white" stroke-width="2" / />
                 </div>
             </div>
             <div class="pb-2">
@@ -633,7 +633,7 @@
                     <span class="text-lg font-semibold text-purple-600">€</span>
                 </div>
                 <div class="mt-2 flex items-center text-xs text-purple-600">
-                    <x-lucide-trending-down class="w-3 h-3 mr-1" />
+                    <x-icon icon="heroicons:arrow-trending-down" class="w-3 h-3 mr-1" / />
                     Budget maîtrisé
                 </div>
             </div>
@@ -643,7 +643,7 @@
         <div class="metric-card relative bg-gradient-to-br from-teal-50 to-cyan-100 border-l-4 border-teal-500 rounded-2xl p-6 shadow-xl hover:shadow-2xl transition-all duration-300 group">
             <div class="absolute top-4 right-4">
                 <div class="w-12 h-12 bg-gradient-to-br from-teal-500 to-cyan-600 rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300">
-                    <x-lucide-car class="w-6 h-6 text-white" stroke-width="2" />
+                    <x-icon icon="lucide:car" class="w-6 h-6 text-white" stroke-width="2" / />
                 </div>
             </div>
             <div class="pb-2">
@@ -653,7 +653,7 @@
                     <span class="text-xs text-gray-600">suivis</span>
                 </div>
                 <div class="mt-2 flex items-center text-xs text-teal-600">
-                    <x-lucide-shield-check class="w-3 h-3 mr-1" />
+                    <x-icon icon="heroicons:shield-check" class="w-3 h-3 mr-1" / />
                     Surveillance 24/7
                 </div>
             </div>
@@ -666,7 +666,7 @@
             <div class="flex items-center justify-between">
                 <div class="flex items-center space-x-4">
                     <div class="p-3 bg-blue-500 rounded-xl shadow-lg">
-                        <x-lucide-monitor class="h-8 w-8 text-white" stroke-width="2" />
+                        <x-icon icon="heroicons:computer-desktop" class="h-8 w-8 text-white" stroke-width="2" / />
                     </div>
                     <div>
                         <h2 class="text-2xl font-bold text-white">Surveillance Opérationnelle</h2>
@@ -681,7 +681,7 @@
                         </div>
                     </div>
                     <button onclick="refreshOperations()" class="px-4 py-2 bg-white/10 backdrop-blur-sm rounded-lg border border-white/20 text-white hover:bg-white/20 transition-all duration-300">
-                        <x-lucide-refresh-cw class="w-4 h-4" stroke-width="2" />
+                        <x-icon icon="heroicons:arrow-path" class="w-4 h-4" stroke-width="2" / />
                     </button>
                 </div>
             </div>
@@ -692,23 +692,23 @@
             <div class="mb-6">
                 <div class="flex flex-wrap gap-3">
                     <button onclick="filterOperations('all')" class="px-4 py-2 bg-blue-100 text-blue-700 rounded-lg font-medium hover:bg-blue-200 transition-colors filter-btn active" data-filter="all">
-                        <x-lucide-list class="w-4 h-4 inline mr-2" />
+                        <x-icon icon="heroicons:list-bullet" class="w-4 h-4 inline mr-2" / />
                         Toutes ({{ ($stats['active_operations'] ?? 0) + ($stats['scheduled_maintenance'] ?? 0) + ($stats['completed_this_month'] ?? 0) }})
                     </button>
                     <button onclick="filterOperations('active')" class="px-4 py-2 bg-green-100 text-green-700 rounded-lg font-medium hover:bg-green-200 transition-colors filter-btn" data-filter="active">
-                        <x-lucide-play class="w-4 h-4 inline mr-2" />
+                        <x-icon icon="heroicons:play" class="w-4 h-4 inline mr-2" / />
                         En Cours ({{ $stats['active_operations'] ?? 0 }})
                     </button>
                     <button onclick="filterOperations('scheduled')" class="px-4 py-2 bg-orange-100 text-orange-700 rounded-lg font-medium hover:bg-orange-200 transition-colors filter-btn" data-filter="scheduled">
-                        <x-lucide-calendar class="w-4 h-4 inline mr-2" />
+                        <x-icon icon="heroicons:calendar" class="w-4 h-4 inline mr-2" / />
                         Planifiées ({{ $stats['scheduled_maintenance'] ?? 0 }})
                     </button>
                     <button onclick="filterOperations('completed')" class="px-4 py-2 bg-purple-100 text-purple-700 rounded-lg font-medium hover:bg-purple-200 transition-colors filter-btn" data-filter="completed">
-                        <x-lucide-check-circle class="w-4 h-4 inline mr-2" />
+                        <x-icon icon="heroicons:check-circle" class="w-4 h-4 inline mr-2" / />
                         Terminées ({{ $stats['completed_this_month'] ?? 0 }})
                     </button>
                     <button onclick="filterOperations('overdue')" class="px-4 py-2 bg-red-100 text-red-700 rounded-lg font-medium hover:bg-red-200 transition-colors filter-btn" data-filter="overdue">
-                        <x-lucide-alert-triangle class="w-4 h-4 inline mr-2" />
+                        <x-icon icon="heroicons:exclamation-triangle" class="w-4 h-4 inline mr-2" / />
                         En Retard ({{ $stats['overdue_maintenance'] ?? 0 }})
                     </button>
                 </div>
@@ -736,7 +736,7 @@
                                     <div class="flex items-center">
                                         <div class="w-3 h-3 bg-green-400 rounded-full animate-pulse mr-3"></div>
                                         <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                                            <x-lucide-activity class="w-3 h-3 mr-1" />
+                                            <x-icon icon="lucide:activity" class="w-3 h-3 mr-1" / />
                                             En cours
                                         </span>
                                     </div>
@@ -744,7 +744,7 @@
                                 <td class="px-6 py-4">
                                     <div class="flex items-center">
                                         <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center mr-3">
-                                            <x-lucide-car class="w-5 h-5 text-blue-600" />
+                                            <x-icon icon="lucide:car" class="w-5 h-5 text-blue-600" / />
                                         </div>
                                         <div>
                                             <div class="text-sm font-medium text-gray-900">{{ $operation->vehicle->registration_plate ?? 'N/A' }}</div>
@@ -774,10 +774,10 @@
                                 <td class="px-6 py-4">
                                     <div class="flex items-center space-x-2">
                                         <button class="text-blue-600 hover:text-blue-900 transition-colors">
-                                            <x-lucide-eye class="w-4 h-4" />
+                                            <x-icon icon="heroicons:eye" class="w-4 h-4" / />
                                         </button>
                                         <button class="text-green-600 hover:text-green-900 transition-colors">
-                                            <x-lucide-edit class="w-4 h-4" />
+                                            <x-icon icon="heroicons:pencil" class="w-4 h-4" / />
                                         </button>
                                     </div>
                                 </td>
@@ -801,19 +801,19 @@
                                         @if($isOverdue)
                                             <div class="w-3 h-3 bg-red-500 rounded-full animate-pulse mr-3"></div>
                                             <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">
-                                                <x-lucide-alert-triangle class="w-3 h-3 mr-1" />
+                                                <x-icon icon="heroicons:exclamation-triangle" class="w-3 h-3 mr-1" / />
                                                 Critique
                                             </span>
                                         @elseif($isUrgent)
                                             <div class="w-3 h-3 bg-orange-500 rounded-full animate-pulse mr-3"></div>
                                             <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-orange-100 text-orange-800">
-                                                <x-lucide-clock class="w-3 h-3 mr-1" />
+                                                <x-icon icon="heroicons:clock" class="w-3 h-3 mr-1" / />
                                                 Urgent
                                             </span>
                                         @else
                                             <div class="w-3 h-3 bg-blue-500 rounded-full mr-3"></div>
                                             <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                                                <x-lucide-calendar class="w-3 h-3 mr-1" />
+                                                <x-icon icon="heroicons:calendar" class="w-3 h-3 mr-1" / />
                                                 Planifié
                                             </span>
                                         @endif
@@ -822,7 +822,7 @@
                                 <td class="px-6 py-4">
                                     <div class="flex items-center">
                                         <div class="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center mr-3">
-                                            <x-lucide-car class="w-5 h-5 text-gray-600" />
+                                            <x-icon icon="lucide:car" class="w-5 h-5 text-gray-600" / />
                                         </div>
                                         <div>
                                             <div class="text-sm font-medium text-gray-900">{{ $maintenance->vehicle->registration_plate ?? 'N/A' }}</div>
@@ -870,10 +870,10 @@
                                 <td class="px-6 py-4">
                                     <div class="flex items-center space-x-2">
                                         <button class="text-blue-600 hover:text-blue-900 transition-colors">
-                                            <x-lucide-eye class="w-4 h-4" />
+                                            <x-icon icon="heroicons:eye" class="w-4 h-4" / />
                                         </button>
                                         <button class="text-green-600 hover:text-green-900 transition-colors">
-                                            <x-lucide-play class="w-4 h-4" />
+                                            <x-icon icon="heroicons:play" class="w-4 h-4" / />
                                         </button>
                                     </div>
                                 </td>
@@ -888,7 +888,7 @@
                                 <div class="flex items-center">
                                     <div class="w-3 h-3 bg-green-500 rounded-full mr-3"></div>
                                     <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                                        <x-lucide-check-circle class="w-3 h-3 mr-1" />
+                                        <x-icon icon="heroicons:check-circle" class="w-3 h-3 mr-1" / />
                                         Terminé
                                     </span>
                                 </div>
@@ -896,7 +896,7 @@
                             <td class="px-6 py-4">
                                 <div class="flex items-center">
                                     <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center mr-3">
-                                        <x-lucide-car class="w-5 h-5 text-green-600" />
+                                        <x-icon icon="lucide:car" class="w-5 h-5 text-green-600" / />
                                     </div>
                                     <div>
                                         <div class="text-sm font-medium text-gray-900">AB-{{ 123 + $i }}-CD</div>
@@ -926,10 +926,10 @@
                             <td class="px-6 py-4">
                                 <div class="flex items-center space-x-2">
                                     <button class="text-blue-600 hover:text-blue-900 transition-colors">
-                                        <x-lucide-file-text class="w-4 h-4" />
+                                        <x-icon icon="heroicons:document"-text class="w-4 h-4" / />
                                     </button>
                                     <button class="text-purple-600 hover:text-purple-900 transition-colors">
-                                        <x-lucide-download class="w-4 h-4" />
+                                        <x-icon icon="heroicons:arrow-down-tray" class="w-4 h-4" / />
                                     </button>
                                 </div>
                             </td>
