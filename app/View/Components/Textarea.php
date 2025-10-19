@@ -51,21 +51,22 @@ class Textarea extends Component
     }
 
     /**
-     * Get textarea classes based on state (Enterprise-grade Light Mode)
+     * Get textarea classes based on state (Enterprise-grade Light Mode - Fond gris clair)
      */
     public function getClasses(): string
     {
-        $baseClasses = 'block p-2.5 w-full text-sm text-gray-900 bg-white rounded-lg border transition-colors duration-200';
+        // Force light mode avec !important via classes pour éviter dark mode navigateur
+        $baseClasses = 'block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border transition-colors duration-200';
 
         if ($this->error) {
-            return "$baseClasses border-red-500 focus:ring-2 focus:ring-red-500 focus:border-red-500 bg-red-50";
+            return "$baseClasses border-red-500 focus:ring-2 focus:ring-red-500 focus:border-red-500 !bg-red-50";
         }
 
         if ($this->disabled) {
-            return "$baseClasses border-gray-300 bg-gray-100 text-gray-500 cursor-not-allowed opacity-60";
+            return "$baseClasses border-gray-300 !bg-gray-100 text-gray-500 cursor-not-allowed opacity-60";
         }
 
-        return "$baseClasses border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400";
+        return "$baseClasses border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 !bg-gray-50";
     }
 
     /**

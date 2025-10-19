@@ -95,79 +95,95 @@
                      @version 5.0-Surpasse-Industry-Leaders
                      @since 2025-01-19
                      ==================================================================== --}}
-                <div class="px-4 py-8 border-b border-gray-200 bg-white">
+                {{-- ====================================================================
+                     🎨 STEPPER ENTERPRISE-GRADE - Design Ultra-Pro Moderne
+                     ====================================================================
+                     • Cercles 48px avec contour bleu discret
+                     • Ligne de connexion 2px élégante
+                     • Icônes colorées selon progression
+                     • Effets subtils et professionnels
+                     • Aucun dark mode
+                     ==================================================================== --}}
+                <div class="px-4 py-10 border-b border-gray-200 !bg-white">
                     <div class="max-w-4xl mx-auto">
                         <ol class="flex items-start justify-between w-full">
                             <template x-for="(step, index) in steps" x-bind:key="index">
-                                {{-- Item de l'étape avec flex-1 pour distribution uniforme --}}
+                                {{-- Item de l'étape --}}
                                 <li class="flex" x-bind:class="index < steps.length - 1 ? 'flex-1' : 'flex-none'">
 
                                     {{-- Container vertical: Cercle + Label --}}
-                                    <div class="flex flex-col items-center gap-2.5 relative" x-bind:class="index < steps.length - 1 ? 'w-full' : 'w-auto'">
+                                    <div class="flex flex-col items-center gap-3 relative" x-bind:class="index < steps.length - 1 ? 'w-full' : 'w-auto'">
 
-                                        {{-- Row horizontal: Cercle + Ligne de connexion --}}
-                                        <div class="flex items-center justify-center" x-bind:class="index < steps.length - 1 ? 'w-full' : 'w-auto'">
+                                        {{-- Row horizontal: Cercle + Ligne --}}
+                                        <div class="flex items-center" x-bind:class="index < steps.length - 1 ? 'w-full' : 'w-auto'">
 
-                                            {{-- ===============================================
-                                                 CERCLE D'ÉTAPE - 40px ULTRA-PRO
-                                                 =============================================== --}}
-                                            <div class="flex items-center justify-center w-10 h-10 rounded-full border-2 transition-all duration-300 flex-shrink-0 relative z-10 bg-white"
+                                            {{-- =========================================
+                                                 CERCLE D'ÉTAPE - 48px Premium
+                                                 ========================================= --}}
+                                            <div class="flex items-center justify-center w-12 h-12 rounded-full border-2 transition-all duration-300 flex-shrink-0 relative z-10 !bg-white shadow-sm"
                                                 x-bind:class="{
-                                                    'border-blue-600 shadow-lg shadow-blue-500/30 ring-4 ring-blue-100 currentStep === index + 1,
-                                                    'border-green-600 shadow-lg shadow-green-500/30 ring-4 ring-green-100 currentStep > index + 1 && step.validated,
-                                                    'border-red-600 shadow-lg shadow-red-500/30 ring-4 ring-red-100 step.touched && !step.validated && currentStep > index + 1,
-                                                    'border-gray-300 currentStep < index + 1
+                                                    // Étape active (en cours)
+                                                    'border-blue-600 !bg-blue-50 shadow-md shadow-blue-200': currentStep === index + 1,
+
+                                                    // Étape validée (complétée)
+                                                    'border-green-500 !bg-green-50 shadow-md shadow-green-200': currentStep > index + 1 && step.validated,
+
+                                                    // Étape avec erreur
+                                                    'border-red-500 !bg-red-50 shadow-md shadow-red-200': step.touched && !step.validated && currentStep > index + 1,
+
+                                                    // Étape non atteinte
+                                                    'border-gray-300 !bg-gray-50': currentStep < index + 1
                                                 }"
                                             >
-                                                {{-- Icône de validation (checkmark vert) --}}
+                                                {{-- Icône checkmark (validé) --}}
                                                 <template x-if="currentStep > index + 1 && step.validated">
-                                                    <x-iconify icon="heroicons:check" class="w-5 h-5 text-green-600" />
+                                                    <x-iconify icon="lucide:check-circle-2" class="w-6 h-6 text-green-600" />
                                                 </template>
 
-                                                {{-- Icône d'erreur (warning rouge) --}}
+                                                {{-- Icône erreur --}}
                                                 <template x-if="currentStep > index + 1 && !step.validated && step.touched">
-                                                    <x-iconify icon="heroicons:exclamation-triangle" class="w-5 h-5 text-red-600" />
+                                                    <x-iconify icon="lucide:alert-circle" class="w-6 h-6 text-red-600" />
                                                 </template>
 
-                                                {{-- Icône d'étape par défaut --}}
+                                                {{-- Icône étape normale --}}
                                                 <template x-if="currentStep <= index + 1 || !step.touched">
                                                     <span
-                                                        class="iconify block w-5 h-5"
+                                                        class="iconify block w-6 h-6"
                                                         x-bind:class="{
-                                                            'text-blue-600 currentStep === index + 1,
-                                                            'text-gray-500 currentStep !== index + 1
+                                                            'text-blue-600': currentStep === index + 1,
+                                                            'text-gray-400': currentStep !== index + 1
                                                         }"
-                                                        x-bind:data-icon="'heroicons:' + step.icon"
+                                                        x-bind:data-icon="'lucide:' + step.icon"
                                                         data-inline="false"
                                                     ></span>
                                                 </template>
                                             </div>
 
-                                            {{-- ===============================================
-                                                 LIGNE DE CONNEXION - 1px ULTRA-FINE
-                                                 =============================================== --}}
+                                            {{-- =========================================
+                                                 LIGNE DE CONNEXION - 2px Élégante
+                                                 ========================================= --}}
                                             <template x-if="index < steps.length - 1">
-                                                <div class="flex-1 h-px mx-3 transition-all duration-300"
+                                                <div class="flex-1 h-0.5 mx-4 rounded-full transition-all duration-300"
                                                     x-bind:class="{
-                                                        'bg-green-600 currentStep > index + 1 && step.validated,
-                                                        'bg-red-600 currentStep > index + 1 && !step.validated && step.touched,
-                                                        'bg-blue-600 currentStep > index + 1 && !step.touched,
-                                                        'bg-gray-300 currentStep <= index + 1
+                                                        'bg-green-500': currentStep > index + 1 && step.validated,
+                                                        'bg-red-500': currentStep > index + 1 && !step.validated && step.touched,
+                                                        'bg-blue-500': currentStep > index + 1 && !step.touched,
+                                                        'bg-gray-300': currentStep <= index + 1
                                                     }"
                                                 ></div>
                                             </template>
                                         </div>
 
-                                        {{-- ===============================================
-                                             LABEL D'ÉTAPE - SOUS LE CERCLE
-                                             =============================================== --}}
+                                        {{-- =========================================
+                                             LABEL D'ÉTAPE - Typography Premium
+                                             ========================================= --}}
                                         <div class="text-center">
-                                            <span class="block text-xs font-semibold transition-colors duration-200 whitespace-nowrap"
+                                            <span class="block text-sm font-semibold transition-colors duration-200 whitespace-nowrap"
                                                 x-bind:class="{
-                                                    'text-blue-600 currentStep === index + 1,
-                                                    'text-green-600 currentStep > index + 1 && step.validated,
-                                                    'text-red-600 step.touched && !step.validated && currentStep > index + 1,
-                                                    'text-gray-500 currentStep < index + 1
+                                                    'text-blue-600': currentStep === index + 1,
+                                                    'text-green-600': currentStep > index + 1 && step.validated,
+                                                    'text-red-600': step.touched && !step.validated && currentStep > index + 1,
+                                                    'text-gray-500': currentStep < index + 1
                                                 }"
                                                 x-text="step.label"
                                             ></span>
