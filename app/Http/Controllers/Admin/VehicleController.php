@@ -377,11 +377,33 @@ class VehicleController extends Controller
 
         try {
             $referenceData = $this->getReferenceData();
+
+            // Extraction des variables individuelles pour compatibilité avec la vue enterprise-edit
+            $vehicleTypes = $referenceData['vehicle_types'];
+            $vehicleStatuses = $referenceData['vehicle_statuses'];
+            $fuelTypes = $referenceData['fuel_types'];
+            $transmissionTypes = $referenceData['transmission_types'];
+            $categories = $referenceData['categories'];
+            $depots = $referenceData['depots'];
+            $organizations = $referenceData['organizations'];
+
+            // Ajout de la collection users (manquante dans getReferenceData)
+            $users = \App\Models\User::where('organization_id', Auth::user()->organization_id)
+                ->orderBy('name')
+                ->get();
+
             $changeRecommendations = $this->getEditRecommendations($vehicle);
 
             return view('admin.vehicles.enterprise-edit', compact(
                 'vehicle',
-                'referenceData',
+                'vehicleTypes',
+                'vehicleStatuses',
+                'fuelTypes',
+                'transmissionTypes',
+                'categories',
+                'depots',
+                'organizations',
+                'users',
                 'changeRecommendations'
             ));
 

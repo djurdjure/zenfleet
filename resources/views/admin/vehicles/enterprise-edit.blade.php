@@ -1,571 +1,821 @@
-{{-- resources/views/admin/vehicles/enterprise-edit.blade.php --}}
 @extends('layouts.admin.catalyst')
-@section('title', 'Modifier Véhicule - ZenFleet')
 
-@push('styles')
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.min.css">
+@section('title', 'Modifier le Véhicule')
+
+@section('content')
+{{-- ====================================================================
+     🚗 FORMULAIRE ÉDITION VÉHICULE - ENTERPRISE GRADE
+     ====================================================================
+
+     FEATURES:
+     - Validation en temps réel à chaque phase
+     - Empêchement navigation si étape invalide
+     - Indicateurs visuels de validation
+     - Messages d'erreur clairs et contextuels
+     - Animation des transitions
+     - Support Dark Mode
+     - Données préchargées du véhicule
+
+     @version 3.0-Enterprise-Validated
+     @since 2025-01-19
+     ==================================================================== --}}
+
+{{-- Message de succès session --}}
+@if(session('success'))
+    <div x-data="{ show: true }"
+         x-show="show"
+         x-init="setTimeout(() => show = false, 5000)"
+         x-transition:enter="transition ease-out duration-300"
+         x-transition:enter-start="opacity-0 transform scale-90"
+         x-transition:enter-end="opacity-100 transform scale-100"
+         x-transition:leave="transition ease-in duration-300"
+         x-transition:leave-start="opacity-100 transform scale-100"
+         x-transition:leave-end="opacity-0 transform scale-90"
+         class="fixed top-4 right-4 z-50 max-w-md">
+        <x-alert type="success" title="Succès" dismissible>
+            {{ session('success') }}
+        </x-alert>
+    </div>
+@endif
+
+{{-- ====================================================================
+     🎨 PAGE ULTRA-PROFESSIONNELLE - FOND GRIS CLAIR
+     ====================================================================
+     Design moderne qui surpasse Airbnb, Stripe, Salesforce
+     - Fond gris clair pour mettre en valeur le contenu
+     - Titre compact et élégant
+     - Hiérarchie visuelle optimale
+     ==================================================================== --}}
+<section class="bg-gray-50 dark:bg-gray-900 min-h-screen">
+    <div class="py-6 px-4 mx-auto max-w-7xl lg:py-12">
+
+        {{-- Header COMPACT et MODERNE --}}
+        <div class="mb-6">
+            <h1 class="text-2xl font-bold text-gray-900 dark:text-white mb-1 flex items-center gap-2.5">
+                <x-iconify icon="lucide:car" class="w-6 h-6 text-blue-600 dark:text-blue-400" />
+                Modifier le Véhicule: {{ $vehicle->registration_plate }}
+            </h1>
+            <p class="text-sm text-gray-600 dark:text-gray-400 ml-8.5">
+                Complétez les 3 étapes pour mettre à jour le véhicule
+            </p>
+        </div>
+
+        {{-- Affichage des erreurs globales --}}
+        @if ($errors->any())
+            <x-alert type="error" title="Erreurs de validation" dismissible class="mb-6">
+                Veuillez corriger les erreurs suivantes avant de soumettre le formulaire :
+                <ul class="mt-2 ml-5 list-disc text-sm">
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </x-alert>
+        @endif
+
+        {{-- ====================================================================
+             FORMULAIRE MULTI-ÉTAPES AVEC VALIDATION ALPINE.JS
+             ==================================================================== --}}
+        <div x-data="vehicleFormValidation()" x-init="init()">
+
+            <x-card padding="p-0" margin="mb-6">
+                {{-- ====================================================================
+                     🎯 STEPPER V5.0 - SURPASSE AIRBNB/STRIPE/SALESFORCE
+                     ====================================================================
+
+                     DESIGN ULTRA-PROFESSIONNEL ENTERPRISE-GRADE:
+                     ✨ Icônes 20px (w-5 h-5) - Plus grandes et visibles
+                     ✨ Cercles 40px (w-10 h-10) - Proportions parfaites
+                     ✨ Labels SOUS les cercles - Hiérarchie claire
+                     ✨ Structure div optimale - Separation cercle/ligne/label
+                     ✨ Lignes 1px ultra-fines - Élégance professionnelle
+                     ✨ Shadow ring subtil - Profondeur moderne
+                     ✨ Espacement optimal - Toutes étapes visibles
+                     ✨ Validation visuelle intelligente - États colorés
+                     ✨ Responsive & Dark mode - Support complet
+
+                     @version 5.0-Surpasse-Industry-Leaders
+                     @since 2025-01-19
+                     ==================================================================== --}}
+                <div class="px-4 py-8 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
+                    <div class="max-w-4xl mx-auto">
+                        <ol class="flex items-start justify-between w-full">
+                            <template x-for="(step, index) in steps" x-bind:key="index">
+                                {{-- Item de l'étape avec flex-1 pour distribution uniforme --}}
+                                <li class="flex" x-bind:class="index < steps.length - 1 ? 'flex-1' : 'flex-none'">
+
+                                    {{-- Container vertical: Cercle + Label --}}
+                                    <div class="flex flex-col items-center gap-2.5 relative" x-bind:class="index < steps.length - 1 ? 'w-full' : 'w-auto'">
+
+                                        {{-- Row horizontal: Cercle + Ligne de connexion --}}
+                                        <div class="flex items-center justify-center" x-bind:class="index < steps.length - 1 ? 'w-full' : 'w-auto'">
+
+                                            {{-- ===============================================
+                                                 CERCLE D'ÉTAPE - 40px ULTRA-PRO
+                                                 =============================================== --}}
+                                            <div class="flex items-center justify-center w-10 h-10 rounded-full border-2 transition-all duration-300 flex-shrink-0 relative z-10 bg-white dark:bg-gray-800"
+                                                x-bind:class="{
+                                                    'border-blue-600 shadow-lg shadow-blue-500/30 ring-4 ring-blue-100 dark:ring-blue-900/30': currentStep === index + 1,
+                                                    'border-green-600 shadow-lg shadow-green-500/30 ring-4 ring-green-100 dark:ring-green-900/30': currentStep > index + 1 && step.validated,
+                                                    'border-red-600 shadow-lg shadow-red-500/30 ring-4 ring-red-100 dark:ring-red-900/30': step.touched && !step.validated && currentStep > index + 1,
+                                                    'border-gray-300 dark:border-gray-600': currentStep < index + 1
+                                                }"
+                                            >
+                                                {{-- Icône de validation (checkmark vert) --}}
+                                                <template x-if="currentStep > index + 1 && step.validated">
+                                                    <x-iconify icon="lucide:check" class="w-5 h-5 text-green-600 dark:text-green-400" />
+                                                </template>
+
+                                                {{-- Icône d'erreur (warning rouge) --}}
+                                                <template x-if="currentStep > index + 1 && !step.validated && step.touched">
+                                                    <x-iconify icon="lucide:alert-triangle" class="w-5 h-5 text-red-600 dark:text-red-400" />
+                                                </template>
+
+                                                {{-- Icône d'étape par défaut (Lucide) --}}
+                                                <template x-if="currentStep <= index + 1 || !step.touched">
+                                                    <span
+                                                        class="iconify block w-5 h-5"
+                                                        x-bind:class="{
+                                                            'text-blue-600 dark:text-blue-400': currentStep === index + 1,
+                                                            'text-gray-500 dark:text-gray-400': currentStep !== index + 1
+                                                        }"
+                                                        x-bind:data-icon="'lucide:' + step.icon"
+                                                        data-inline="false"
+                                                    ></span>
+                                                </template>
+                                            </div>
+
+                                            {{-- ===============================================
+                                                 LIGNE DE CONNEXION - 1px ULTRA-FINE
+                                                 =============================================== --}}
+                                            <template x-if="index < steps.length - 1">
+                                                <div class="flex-1 h-px mx-3 transition-all duration-300"
+                                                    x-bind:class="{
+                                                        'bg-green-600 dark:bg-green-500': currentStep > index + 1 && step.validated,
+                                                        'bg-red-600 dark:bg-red-500': currentStep > index + 1 && !step.validated && step.touched,
+                                                        'bg-blue-600 dark:bg-blue-500': currentStep > index + 1 && !step.touched,
+                                                        'bg-gray-300 dark:bg-gray-600': currentStep <= index + 1
+                                                    }"
+                                                ></div>
+                                            </template>
+                                        </div>
+
+                                        {{-- ===============================================
+                                             LABEL D'ÉTAPE - SOUS LE CERCLE
+                                             =============================================== --}}
+                                        <div class="text-center">
+                                            <span class="block text-xs font-semibold transition-colors duration-200 whitespace-nowrap"
+                                                x-bind:class="{
+                                                    'text-blue-600 dark:text-blue-400': currentStep === index + 1,
+                                                    'text-green-600 dark:text-green-400': currentStep > index + 1 && step.validated,
+                                                    'text-red-600 dark:text-red-400': step.touched && !step.validated && currentStep > index + 1,
+                                                    'text-gray-500 dark:text-gray-400': currentStep < index + 1
+                                                }"
+                                                x-text="step.label"
+                                            ></span>
+                                        </div>
+
+                                    </div>
+                                </li>
+                            </template>
+                        </ol>
+                    </div>
+                </div>
+
+                {{-- Formulaire --}}
+                <form method="POST" action="{{ route('admin.vehicles.update', $vehicle->id) }}" @submit="onSubmit" class="p-6">
+                    @csrf
+                    @method('PUT')
+                    <input type="hidden" name="current_step" x-model="currentStep">
+
+                    {{-- ===========================================
+                         PHASE 1: IDENTIFICATION
+                         =========================================== --}}
+                    <div x-show="currentStep === 1" x-transition:enter="transition ease-out duration-200"
+                         x-transition:enter-start="opacity-0 transform translate-x-4"
+                         x-transition:enter-end="opacity-100 transform translate-x-0">
+                        <div class="space-y-6">
+                            <div>
+                                <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+                                    <x-iconify icon="lucide:file-text" class="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                                    Informations d'Identification
+                                </h3>
+
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <x-input
+                                        name="registration_plate"
+                                        label="Immatriculation"
+                                        icon="identification"
+                                        placeholder="Ex: 16-12345-23"
+                                        :value="old('registration_plate', $vehicle->registration_plate)"
+                                        required
+                                        :error="$errors->first('registration_plate')"
+                                        helpText="Numéro d'immatriculation officiel du véhicule"
+                                        @blur="validateField('registration_plate', $event.target.value)"
+                                    />
+
+                                    <x-input
+                                        name="vin"
+                                        label="Numéro de série (VIN)"
+                                        icon="finger-print"
+                                        placeholder="Ex: 1HGBH41JXMN109186"
+                                        :value="old('vin', $vehicle->vin)"
+                                        :error="$errors->first('vin')"
+                                        helpText="17 caractères"
+                                        maxlength="17"
+                                        @blur="validateField('vin', $event.target.value)"
+                                    />
+
+                                    <x-input
+                                        name="brand"
+                                        label="Marque"
+                                        icon="building-storefront"
+                                        placeholder="Ex: Renault, Peugeot, Toyota..."
+                                        :value="old('brand', $vehicle->brand)"
+                                        required
+                                        :error="$errors->first('brand')"
+                                        @blur="validateField('brand', $event.target.value)"
+                                    />
+
+                                    <x-input
+                                        name="model"
+                                        label="Modèle"
+                                        icon="truck"
+                                        placeholder="Ex: Clio, 208, Corolla..."
+                                        :value="old('model', $vehicle->model)"
+                                        required
+                                        :error="$errors->first('model')"
+                                        @blur="validateField('model', $event.target.value)"
+                                    />
+
+                                    <div class="md:col-span-2">
+                                        <x-input
+                                            name="color"
+                                            label="Couleur"
+                                            icon="swatch"
+                                            placeholder="Ex: Blanc, Noir, Gris métallisé..."
+                                            :value="old('color', $vehicle->color)"
+                                            :error="$errors->first('color')"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- ===========================================
+                         PHASE 2: CARACTÉRISTIQUES TECHNIQUES
+                         =========================================== --}}
+                    <div x-show="currentStep === 2" x-transition:enter="transition ease-out duration-200"
+                         x-transition:enter-start="opacity-0 transform translate-x-4"
+                         x-transition:enter-end="opacity-100 transform translate-x-0"
+                         style="display: none;">
+                        <div class="space-y-6">
+                            <div>
+                                <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+                                    <x-iconify icon="lucide:settings" class="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                                    Caractéristiques Techniques
+                                </h3>
+
+                                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                    <x-tom-select
+                                        name="vehicle_type_id"
+                                        label="Type de Véhicule"
+                                        :options="$vehicleTypes->pluck('name', 'id')->toArray()"
+                                        :selected="old('vehicle_type_id', $vehicle->vehicle_type_id)"
+                                        placeholder="Sélectionnez un type..."
+                                        required
+                                        :error="$errors->first('vehicle_type_id')"
+                                        @change="validateField('vehicle_type_id', $event.target.value)"
+                                    />
+
+                                    <x-tom-select
+                                        name="fuel_type_id"
+                                        label="Type de Carburant"
+                                        :options="$fuelTypes->pluck('name', 'id')->toArray()"
+                                        :selected="old('fuel_type_id', $vehicle->fuel_type_id)"
+                                        placeholder="Sélectionnez un carburant..."
+                                        required
+                                        :error="$errors->first('fuel_type_id')"
+                                        @change="validateField('fuel_type_id', $event.target.value)"
+                                    />
+
+                                    <x-tom-select
+                                        name="transmission_type_id"
+                                        label="Type de Transmission"
+                                        :options="$transmissionTypes->pluck('name', 'id')->toArray()"
+                                        :selected="old('transmission_type_id', $vehicle->transmission_type_id)"
+                                        placeholder="Sélectionnez une transmission..."
+                                        required
+                                        :error="$errors->first('transmission_type_id')"
+                                        @change="validateField('transmission_type_id', $event.target.value)"
+                                    />
+
+                                    <x-input
+                                        type="number"
+                                        name="manufacturing_year"
+                                        label="Année de Fabrication"
+                                        icon="calendar"
+                                        placeholder="Ex: 2024"
+                                        :value="old('manufacturing_year', $vehicle->manufacturing_year)"
+                                        :error="$errors->first('manufacturing_year')"
+                                        min="1950"
+                                        :max="date('Y') + 1"
+                                    />
+
+                                    <x-input
+                                        type="number"
+                                        name="seats"
+                                        label="Nombre de places"
+                                        icon="user-group"
+                                        placeholder="Ex: 5"
+                                        :value="old('seats', $vehicle->seats)"
+                                        :error="$errors->first('seats')"
+                                        min="1"
+                                        max="99"
+                                    />
+
+                                    <x-input
+                                        type="number"
+                                        name="power_hp"
+                                        label="Puissance (CV)"
+                                        icon="bolt"
+                                        placeholder="Ex: 90"
+                                        :value="old('power_hp', $vehicle->power_hp)"
+                                        :error="$errors->first('power_hp')"
+                                        min="0"
+                                    />
+
+                                    <div class="lg:col-span-3">
+                                        <x-input
+                                            type="number"
+                                            name="engine_displacement_cc"
+                                            label="Cylindrée (cc)"
+                                            icon="wrench-screwdriver"
+                                            placeholder="Ex: 1500"
+                                            :value="old('engine_displacement_cc', $vehicle->engine_displacement_cc)"
+                                            :error="$errors->first('engine_displacement_cc')"
+                                            helpText="Capacité du moteur en centimètres cubes"
+                                            min="0"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- ===========================================
+                         PHASE 3: ACQUISITION & STATUT
+                         =========================================== --}}
+                    <div x-show="currentStep === 3" x-transition:enter="transition ease-out duration-200"
+                         x-transition:enter-start="opacity-0 transform translate-x-4"
+                         x-transition:enter-end="opacity-100 transform translate-x-0"
+                         style="display: none;">
+                        <div class="space-y-6">
+                            <div>
+                                <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+                                    <x-iconify icon="lucide:dollar-sign" class="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                                    Acquisition & Statut
+                                </h3>
+
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <x-datepicker
+                                        name="acquisition_date"
+                                        label="Date d'acquisition"
+                                        :value="old('acquisition_date', $vehicle->acquisition_date?->format('Y-m-d'))"
+                                        format="d/m/Y"
+                                        :error="$errors->first('acquisition_date')"
+                                        placeholder="Choisir une date"
+                                        required
+                                        :maxDate="date('Y-m-d')"
+                                        helpText="Date d'achat du véhicule"
+                                    />
+
+                                    <x-input
+                                        type="number"
+                                        name="purchase_price"
+                                        label="Prix d'achat (DA)"
+                                        icon="currency-dollar"
+                                        placeholder="Ex: 2500000"
+                                        :value="old('purchase_price', $vehicle->purchase_price)"
+                                        :error="$errors->first('purchase_price')"
+                                        step="0.01"
+                                        min="0"
+                                        helpText="Prix d'achat en Dinars Algériens"
+                                    />
+
+                                    <x-input
+                                        type="number"
+                                        name="current_value"
+                                        label="Valeur actuelle (DA)"
+                                        icon="currency-dollar"
+                                        placeholder="Ex: 2000000"
+                                        :value="old('current_value', $vehicle->current_value)"
+                                        :error="$errors->first('current_value')"
+                                        step="0.01"
+                                        min="0"
+                                        helpText="Valeur estimée actuelle"
+                                    />
+
+                                    <x-input
+                                        type="number"
+                                        name="current_mileage"
+                                        label="Kilométrage Actuel"
+                                        icon="chart-bar"
+                                        placeholder="Ex: 15000"
+                                        :value="old('current_mileage', $vehicle->current_mileage)"
+                                        :error="$errors->first('current_mileage')"
+                                        min="0"
+                                        helpText="Kilométrage actuel du véhicule"
+                                    />
+
+                                    <div class="md:col-span-2">
+                                        <x-tom-select
+                                            name="status_id"
+                                            label="Statut Initial"
+                                            :options="$vehicleStatuses->pluck('name', 'id')->toArray()"
+                                            :selected="old('status_id', $vehicle->status_id)"
+                                            placeholder="Sélectionnez un statut..."
+                                            required
+                                            :error="$errors->first('status_id')"
+                                            helpText="État opérationnel du véhicule"
+                                            @change="validateField('status_id', $event.target.value)"
+                                        />
+                                    </div>
+
+                                    <div class="md:col-span-2">
+                                        <x-tom-select
+                                            name="users"
+                                            label="Utilisateurs Autorisés"
+                                            :options="$users->mapWithKeys(fn($user) => [$user->id => $user->name . ' (' . $user->email . ')'])->toArray()"
+                                            :selected="old('users', $vehicle->users->pluck('id')->toArray())"
+                                            placeholder="Rechercher des utilisateurs..."
+                                            :multiple="true"
+                                            :error="$errors->first('users')"
+                                            helpText="Sélectionnez les utilisateurs autorisés à utiliser ce véhicule"
+                                        />
+                                    </div>
+
+                                    <div class="md:col-span-2">
+                                        <x-textarea
+                                            name="notes"
+                                            label="Notes"
+                                            rows="4"
+                                            placeholder="Informations complémentaires sur le véhicule..."
+                                            :value="old('notes', $vehicle->notes)"
+                                            :error="$errors->first('notes')"
+                                            helpText="Ajoutez toute information utile (état, équipements, historique...)"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- ===========================================
+                         ACTIONS FOOTER
+                         =========================================== --}}
+                    <div class="mt-8 pt-6 border-t border-gray-200 dark:border-gray-700 flex items-center justify-between">
+                        <div>
+                            <x-button
+                                type="button"
+                                variant="secondary"
+                                icon="arrow-left"
+                                x-show="currentStep > 1"
+                                @click="previousStep()"
+                            >
+                                Précédent
+                            </x-button>
+                        </div>
+
+                        <div class="flex items-center gap-3">
+                            <a href="{{ route('admin.vehicles.index') }}"
+                               class="text-sm font-semibold text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">
+                                Annuler
+                            </a>
+
+                            <x-button
+                                type="button"
+                                variant="primary"
+                                icon="arrow-right"
+                                iconPosition="right"
+                                x-show="currentStep < 3"
+                                @click="nextStep()"
+                            >
+                                Suivant
+                            </x-button>
+
+                            <x-button
+                                type="submit"
+                                variant="success"
+                                icon="check-circle"
+                                x-show="currentStep === 3"
+                            >
+                                Enregistrer les Modifications
+                            </x-button>
+                        </div>
+                    </div>
+                </form>
+            </x-card>
+
+        </div>
+
+    </div>
+</section>
+
+@push('scripts')
+<script>
+/**
+ * ====================================================================
+ * 🎯 ALPINE.JS VALIDATION SYSTEM - ENTERPRISE GRADE
+ * ====================================================================
+ *
+ * Système de validation en temps réel ultra-professionnel
+ *
+ * FEATURES:
+ * - Validation par phase avec état persistant
+ * - Empêchement navigation si étape invalide
+ * - Indicateurs visuels de validation
+ * - Messages d'erreur contextuels
+ * - Validation côté client synchronisée avec serveur
+ *
+ * @version 3.0-Enterprise
+ * @since 2025-01-19
+ * ====================================================================
+ */
+function vehicleFormValidation() {
+    return {
+        currentStep: {{ old('current_step', 1) }},
+
+        steps: [
+            {
+                label: 'Identification',
+                icon: 'file-text',
+                validated: false,
+                touched: false,
+                requiredFields: ['registration_plate', 'brand', 'model']
+            },
+            {
+                label: 'Caractéristiques',
+                icon: 'settings',
+                validated: false,
+                touched: false,
+                requiredFields: ['vehicle_type_id', 'fuel_type_id', 'transmission_type_id']
+            },
+            {
+                label: 'Acquisition',
+                icon: 'dollar-sign',
+                validated: false,
+                touched: false,
+                requiredFields: ['acquisition_date', 'status_id']
+            }
+        ],
+
+        fieldErrors: {},
+
+        {{-- ⚠️ NOUVEAU: Tracking des champs touchés pour validation temps réel --}}
+        touchedFields: {},
+
+        init() {
+            // Initialiser avec les erreurs serveur si présentes
+            @if ($errors->any())
+                this.markStepsWithErrors();
+                // Marquer tous les champs avec erreurs comme touchés
+                @json($errors->keys()).forEach(field => {
+                    this.touchedFields[field] = true;
+                });
+            @endif
+
+            // NE PAS valider au chargement (pas de bordures rouges initiales)
+            // La validation se fait uniquement après interaction utilisateur
+        },
+
+        /**
+         * Marquer les étapes ayant des erreurs serveur
+         */
+        markStepsWithErrors() {
+            const fieldToStepMap = {
+                'registration_plate': 0, 'vin': 0, 'brand': 0, 'model': 0, 'color': 0,
+                'vehicle_type_id': 1, 'fuel_type_id': 1, 'transmission_type_id': 1,
+                'manufacturing_year': 1, 'seats': 1, 'power_hp': 1, 'engine_displacement_cc': 1,
+                'acquisition_date': 2, 'purchase_price': 2, 'current_value': 2,
+                'current_mileage': 2, 'status_id': 2, 'notes': 2
+            };
+
+            @json($errors->keys()).forEach(field => {
+                const stepIndex = fieldToStepMap[field];
+                if (stepIndex !== undefined) {
+                    this.steps[stepIndex].touched = true;
+                    this.steps[stepIndex].validated = false;
+                }
+            });
+        },
+
+        /**
+         * Valider un champ individuel
+         * ⚠️ VALIDATION TEMPS RÉEL: Marque le champ comme touché + valide
+         */
+        validateField(fieldName, value) {
+            // ✅ ÉTAPE 1: Marquer le champ comme TOUCHÉ (interaction utilisateur)
+            this.touchedFields[fieldName] = true;
+
+            // ✅ ÉTAPE 2: Valider selon les règles
+            const rules = {
+                'registration_plate': (v) => v && v.length > 0 && v.length <= 50,
+                'brand': (v) => v && v.length > 0 && v.length <= 100,
+                'model': (v) => v && v.length > 0 && v.length <= 100,
+                'vin': (v) => !v || v.length === 17,
+                'vehicle_type_id': (v) => v && v.length > 0,
+                'fuel_type_id': (v) => v && v.length > 0,
+                'transmission_type_id': (v) => v && v.length > 0,
+                'acquisition_date': (v) => v && v.length > 0,
+                'status_id': (v) => v && v.length > 0,
+            };
+
+            const isValid = rules[fieldName] ? rules[fieldName](value) : true;
+
+            // ✅ ÉTAPE 3: Gérer les erreurs
+            if (!isValid) {
+                // Marquer le champ comme en erreur
+                this.fieldErrors[fieldName] = true;
+
+                // Ajouter classe ts-error pour TomSelect
+                const input = document.querySelector(`[name="${fieldName}"]`);
+                if (input) {
+                    const tsWrapper = input.closest('.ts-wrapper');
+                    if (tsWrapper) {
+                        tsWrapper.classList.add('ts-error');
+                    }
+                }
+            } else {
+                // Nettoyer l'erreur si le champ devient valide
+                this.clearFieldError(fieldName);
+            }
+
+            return isValid;
+        },
+
+        /**
+         * Valider l'étape actuelle
+         */
+        validateCurrentStep() {
+            const stepIndex = this.currentStep - 1;
+            const step = this.steps[stepIndex];
+
+            // Marquer comme touchée
+            step.touched = true;
+
+            // Valider tous les champs requis de l'étape
+            let allValid = true;
+
+            step.requiredFields.forEach(fieldName => {
+                const input = document.querySelector(`[name="${fieldName}"]`);
+                if (input) {
+                    const value = input.value;
+                    const isValid = this.validateField(fieldName, value);
+                    if (!isValid) {
+                        allValid = false;
+                    }
+                }
+            });
+
+            step.validated = allValid;
+            return allValid;
+        },
+
+        /**
+         * Passer à l'étape suivante (avec validation)
+         */
+        nextStep() {
+            // Valider l'étape actuelle
+            const isValid = this.validateCurrentStep();
+
+            if (!isValid) {
+                // Afficher message d'erreur
+                this.$dispatch('show-toast', {
+                    type: 'error',
+                    message: 'Veuillez remplir tous les champs obligatoires avant de continuer'
+                });
+
+                // Faire vibrer les champs invalides
+                this.highlightInvalidFields();
+                return;
+            }
+
+            // Passer à l'étape suivante
+            if (this.currentStep < 3) {
+                this.currentStep++;
+            }
+        },
+
+        /**
+         * Retourner à l'étape précédente
+         */
+        previousStep() {
+            if (this.currentStep > 1) {
+                this.currentStep--;
+            }
+        },
+
+        /**
+         * Mettre en évidence les champs invalides
+         * ⚠️ VALIDATION TEMPS RÉEL: Marque les champs comme touchés lors du clic "Suivant"
+         */
+        highlightInvalidFields() {
+            const stepIndex = this.currentStep - 1;
+            const step = this.steps[stepIndex];
+
+            step.requiredFields.forEach(fieldName => {
+                const input = document.querySelector(`[name="${fieldName}"]`);
+                if (input && !input.value) {
+                    // ✅ Marquer le champ comme TOUCHÉ (utilisateur a tenté de passer à l'étape suivante)
+                    this.touchedFields[fieldName] = true;
+
+                    // Ajouter animation shake (temporaire)
+                    input.classList.add('animate-shake');
+
+                    // Gérer TomSelect (wrapper avec classe .ts-wrapper)
+                    const tsWrapper = input.closest('.ts-wrapper');
+                    if (tsWrapper) {
+                        tsWrapper.classList.add('ts-error');
+                    }
+
+                    // Retirer seulement l'animation shake après 500ms
+                    // ⚠️ LA BORDURE ROUGE RESTE (gérée par fieldErrors + touchedFields)
+                    setTimeout(() => {
+                        input.classList.remove('animate-shake');
+                    }, 500);
+                }
+            });
+        },
+
+        /**
+         * Retirer l'erreur d'un champ quand il devient valide
+         */
+        clearFieldError(fieldName) {
+            delete this.fieldErrors[fieldName];
+
+            // Retirer la classe ts-error si c'est un TomSelect
+            const input = document.querySelector(`[name="${fieldName}"]`);
+            if (input) {
+                const tsWrapper = input.closest('.ts-wrapper');
+                if (tsWrapper) {
+                    tsWrapper.classList.remove('ts-error');
+                }
+            }
+        },
+
+        /**
+         * Validation finale avant soumission
+         */
+        onSubmit(e) {
+            // Valider toutes les étapes
+            let allValid = true;
+
+            this.steps.forEach((step, index) => {
+                const tempCurrent = this.currentStep;
+                this.currentStep = index + 1;
+                const isValid = this.validateCurrentStep();
+                this.currentStep = tempCurrent;
+
+                if (!isValid) {
+                    allValid = false;
+                }
+            });
+
+            if (!allValid) {
+                e.preventDefault();
+
+                // Aller à la première étape invalide
+                const firstInvalidStep = this.steps.findIndex(s => s.touched && !s.validated);
+                if (firstInvalidStep !== -1) {
+                    this.currentStep = firstInvalidStep + 1;
+                }
+
+                this.$dispatch('show-toast', {
+                    type: 'error',
+                    message: 'Veuillez corriger les erreurs avant d\'enregistrer'
+                });
+
+                return false;
+            }
+
+            return true;
+        }
+    };
+}
+</script>
+
 <style>
-/* Enterprise-grade animations et styles ultra-modernes */
-.fade-in {
-    animation: fadeIn 0.5s ease-in;
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    10%, 30%, 50%, 70%, 90% { transform: translateX(-4px); }
+    20%, 40%, 60%, 80% { transform: translateX(4px); }
 }
 
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-.form-section {
-    background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
-    border: 1px solid #e2e8f0;
-    transition: all 0.3s ease;
-}
-
-.form-section:hover {
-    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-    border-color: #cbd5e1;
-}
-
-.form-input {
-    background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
-    border: 2px solid #e2e8f0;
-    transition: all 0.3s ease;
-}
-
-.form-input:focus {
-    border-color: #6366f1;
-    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
-    background: white;
-}
-
-.tom-select .ts-control {
-    background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
-    border: 2px solid #e2e8f0;
-    border-radius: 8px;
-    transition: all 0.3s ease;
-}
-
-.tom-select.focus .ts-control {
-    border-color: #6366f1;
-    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
-}
-
-.section-header {
-    display: flex;
-    align-items: center;
-    margin-bottom: 1.5rem;
-    padding-bottom: 0.75rem;
-    border-bottom: 1px solid #e2e8f0;
-}
-
-.section-icon {
-    width: 2rem;
-    height: 2rem;
-    border-radius: 0.5rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-right: 0.75rem;
-}
-
-.btn-primary {
-    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
-    border: none;
-    color: white;
-    transition: all 0.2s ease;
-}
-
-.btn-primary:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 4px 8px rgba(99, 102, 241, 0.3);
-}
-
-.btn-secondary {
-    background: white;
-    border: 2px solid #e2e8f0;
-    color: #6b7280;
-    transition: all 0.2s ease;
-}
-
-.btn-secondary:hover {
-    border-color: #6366f1;
-    color: #6366f1;
-    transform: translateY(-1px);
-}
-
-.vehicle-info-badge {
-    background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
-    border: 1px solid #bae6fd;
+.animate-shake {
+    animation: shake 0.5s ease-in-out;
 }
 </style>
 @endpush
 
-@section('content')
-<div class="fade-in">
-    {{-- En-tête compact --}}
-    <div class="mb-8">
-        <nav class="flex items-center space-x-2 text-sm font-medium text-gray-600 mb-4">
-            <a href="{{ route('admin.vehicles.index') }}" class="hover:text-indigo-600 transition-colors">
-                <svg class="w-4 h-4 inline mr-1" fill="currentColor" viewBox="0 0 20 20">
-                    <path d="M8 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM15 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z"></path>
-                    <path d="M3 4a1 1 0 00-1 1v10a1 1 0 001 1h1.05a2.5 2.5 0 014.9 0H10a1 1 0 001-1V5a1 1 0 00-1-1H3zM14 7a1 1 0 00-1 1v6.05A2.5 2.5 0 0115.95 16H17a1 1 0 001-1V8a1 1 0 00-1-1h-3z"></path>
-                </svg>
-                Véhicules
-            </a>
-            <svg class="w-4 h-4 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
-            </svg>
-            <a href="{{ route('admin.vehicles.show', $vehicle) }}" class="hover:text-indigo-600 transition-colors">
-                {{ $vehicle->registration_plate }}
-            </a>
-            <svg class="w-4 h-4 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
-            </svg>
-            <span class="text-indigo-600 font-semibold">Modifier</span>
-        </nav>
-
-        <div class="md:flex md:items-center md:justify-between">
-            <div class="flex-1 min-w-0">
-                <h1 class="text-xl font-semibold leading-6 text-gray-900">Modifier {{ $vehicle->registration_plate }}</h1>
-                <div class="mt-1 flex flex-col sm:flex-row sm:flex-wrap sm:mt-0 sm:space-x-6">
-                    <div class="mt-2 flex items-center text-sm text-gray-500">
-                        <svg class="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-                            <path d="M8 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM15 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z"></path>
-                            <path d="M3 4a1 1 0 00-1 1v10a1 1 0 001 1h1.05a2.5 2.5 0 014.9 0H10a1 1 0 001-1V5a1 1 0 00-1-1H3zM14 7a1 1 0 00-1 1v6.05A2.5 2.5 0 0115.95 16H17a1 1 0 001-1V8a1 1 0 00-1-1h-3z"></path>
-                        </svg>
-                        {{ $vehicle->brand }} {{ $vehicle->model }} ({{ $vehicle->manufacturing_year }})
-                    </div>
-                </div>
-            </div>
-            <div class="mt-4 flex md:mt-0 md:ml-4 space-x-3">
-                <a href="{{ route('admin.vehicles.show', $vehicle) }}" class="btn-secondary inline-flex items-center px-3 py-2 text-sm font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                    <svg class="-ml-1 mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
-                    </svg>
-                    Voir détails
-                </a>
-                <a href="{{ route('admin.vehicles.index') }}" class="btn-secondary inline-flex items-center px-3 py-2 text-sm font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                    <svg class="-ml-1 mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                    </svg>
-                    Annuler
-                </a>
-            </div>
-        </div>
-    </div>
-
-    {{-- Informations véhicule --}}
-    <div class="vehicle-info-badge rounded-lg p-4 mb-8">
-        <div class="flex items-center justify-between">
-            <div class="flex items-center space-x-4">
-                <div class="flex-shrink-0">
-                    <div class="h-10 w-10 bg-blue-500 rounded-lg flex items-center justify-center">
-                        <svg class="h-6 w-6 text-white" fill="currentColor" viewBox="0 0 20 20">
-                            <path d="M8 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM15 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z"></path>
-                            <path d="M3 4a1 1 0 00-1 1v10a1 1 0 001 1h1.05a2.5 2.5 0 014.9 0H10a1 1 0 001-1V5a1 1 0 00-1-1H3zM14 7a1 1 0 00-1 1v6.05A2.5 2.5 0 0115.95 16H17a1 1 0 001-1V8a1 1 0 00-1-1h-3z"></path>
-                        </svg>
-                    </div>
-                </div>
-                <div>
-                    <h3 class="text-sm font-medium text-gray-900">Véhicule actuel</h3>
-                    <p class="text-sm text-gray-500">{{ $vehicle->brand }} {{ $vehicle->model }} • {{ number_format($vehicle->current_mileage) }} km</p>
-                </div>
-            </div>
-            <div class="text-right">
-                <p class="text-sm font-medium text-gray-900">VIN: {{ $vehicle->vin }}</p>
-                <p class="text-sm text-gray-500">Créé le {{ $vehicle->created_at->format('d/m/Y') }}</p>
-            </div>
-        </div>
-    </div>
-
-    {{-- Résumé des erreurs --}}
-    <x-form-error-summary />
-
-    {{-- Formulaire --}}
-    <form action="{{ route('admin.vehicles.update', $vehicle) }}" method="POST" id="vehicle-form" class="space-y-8">
-        @csrf
-        @method('PUT')
-
-        {{-- Section Informations principales --}}
-        <div class="form-section rounded-lg p-6">
-            <div class="section-header">
-                <div class="section-icon bg-blue-500 text-white">
-                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
-                    </svg>
-                </div>
-                <h3 class="text-lg font-medium text-gray-900">Informations principales</h3>
-            </div>
-
-            <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                <x-vehicle-form-field
-                    name="registration_plate"
-                    label="Plaque d'immatriculation"
-                    type="text"
-                    value="{{ $vehicle->registration_plate }}"
-                    placeholder="Ex: 123 ABC 01"
-                    required="true"
-                    icon="fas fa-id-card" />
-
-                <x-vehicle-form-field
-                    name="vin"
-                    label="Numéro VIN"
-                    type="text"
-                    value="{{ $vehicle->vin }}"
-                    placeholder="17 caractères (optionnel)"
-                    help="Numéro d'identification unique du véhicule"
-                    icon="fas fa-barcode" />
-
-                <x-vehicle-form-field
-                    name="vehicle_name"
-                    label="Nom du véhicule"
-                    type="text"
-                    value="{{ $vehicle->vehicle_name }}"
-                    placeholder="Ex: Camion Livraison 1"
-                    help="Nom unique pour identifier facilement ce véhicule"
-                    icon="fas fa-tag" />
-
-                {{-- Category Select --}}
-                <div>
-                    <label for="category_id" class="block text-sm font-medium text-gray-700 mb-2">
-                        <i class="fas fa-layer-group mr-1 text-gray-500"></i>
-                        Catégorie
-                    </label>
-                    <select name="category_id" id="category_id" class="form-input w-full rounded-lg">
-                        <option value="">-- Sélectionner une catégorie --</option>
-                        @foreach($referenceData['categories'] ?? [] as $category)
-                            <option value="{{ $category->id }}" {{ (old('category_id', $vehicle->category_id) == $category->id) ? 'selected' : '' }}>
-                                {{ $category->name }} ({{ $category->code }})
-                            </option>
-                        @endforeach
-                    </select>
-                    @error('category_id')
-                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                    @enderror
-                </div>
-
-                {{-- Depot Select --}}
-                <div>
-                    <label for="depot_id" class="block text-sm font-medium text-gray-700 mb-2">
-                        <i class="fas fa-warehouse mr-1 text-gray-500"></i>
-                        Dépôt
-                    </label>
-                    <select name="depot_id" id="depot_id" class="form-input w-full rounded-lg">
-                        <option value="">-- Sélectionner un dépôt --</option>
-                        @foreach($referenceData['depots'] ?? [] as $depot)
-                            <option value="{{ $depot->id }}" {{ (old('depot_id', $vehicle->depot_id) == $depot->id) ? 'selected' : '' }}>
-                                {{ $depot->name }} - {{ $depot->city }}
-                            </option>
-                        @endforeach
-                    </select>
-                    @error('depot_id')
-                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                    @enderror
-                </div>
-
-                <x-vehicle-form-field
-                    name="brand"
-                    label="Marque"
-                    type="text"
-                    value="{{ $vehicle->brand }}"
-                    placeholder="Ex: Toyota, Renault..."
-                    icon="fas fa-trademark" />
-
-                <x-vehicle-form-field
-                    name="model"
-                    label="Modèle"
-                    type="text"
-                    value="{{ $vehicle->model }}"
-                    placeholder="Ex: Corolla, Clio..."
-                    icon="fas fa-car" />
-
-                <x-vehicle-form-field
-                    name="color"
-                    label="Couleur"
-                    type="text"
-                    value="{{ $vehicle->color }}"
-                    placeholder="Ex: Blanc, Noir..."
-                    icon="fas fa-palette" />
-
-                <x-vehicle-form-field
-                    name="manufacturing_year"
-                    label="Année de fabrication"
-                    type="number"
-                    value="{{ $vehicle->manufacturing_year }}"
-                    placeholder="{{ date('Y') }}"
-                    icon="fas fa-calendar-alt" />
-            </div>
-        </div>
-
-        {{-- Section Configuration technique --}}
-        <div class="form-section rounded-lg p-6">
-            <div class="section-header">
-                <div class="section-icon bg-purple-500 text-white">
-                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                        <path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd"></path>
-                    </svg>
-                </div>
-                <h3 class="text-lg font-medium text-gray-900">Configuration technique</h3>
-            </div>
-
-            <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-                <x-vehicle-form-field
-                    name="vehicle_type_id"
-                    label="Type de véhicule"
-                    type="select"
-                    value="{{ $vehicle->vehicle_type_id }}"
-                    placeholder="Sélectionner un type..."
-                    :options="collect($referenceData['vehicle_types'] ?? [])->pluck('name', 'id')->toArray()"
-                    icon="fas fa-truck" />
-
-                <x-vehicle-form-field
-                    name="fuel_type_id"
-                    label="Type de carburant"
-                    type="select"
-                    value="{{ $vehicle->fuel_type_id }}"
-                    placeholder="Sélectionner un carburant..."
-                    :options="collect($referenceData['fuel_types'] ?? [])->pluck('name', 'id')->toArray()"
-                    icon="fas fa-gas-pump" />
-
-                <x-vehicle-form-field
-                    name="transmission_type_id"
-                    label="Transmission"
-                    type="select"
-                    value="{{ $vehicle->transmission_type_id }}"
-                    placeholder="Sélectionner une transmission..."
-                    :options="collect($referenceData['transmission_types'] ?? [])->pluck('name', 'id')->toArray()"
-                    icon="fas fa-cogs" />
-
-                <x-vehicle-form-field
-                    name="status_id"
-                    label="Statut"
-                    type="select"
-                    value="{{ $vehicle->status_id }}"
-                    placeholder="Sélectionner un statut..."
-                    :options="collect($referenceData['vehicle_statuses'] ?? [])->pluck('name', 'id')->toArray()"
-                    help="Par défaut: Disponible"
-                    icon="fas fa-info-circle" />
-
-                <x-vehicle-form-field
-                    name="engine_displacement_cc"
-                    label="Cylindrée (cc)"
-                    type="number"
-                    value="{{ $vehicle->engine_displacement_cc }}"
-                    placeholder="Ex: 1600"
-                    icon="fas fa-engine" />
-
-                <x-vehicle-form-field
-                    name="power_hp"
-                    label="Puissance (HP)"
-                    type="number"
-                    value="{{ $vehicle->power_hp }}"
-                    placeholder="Ex: 120"
-                    icon="fas fa-tachometer-alt" />
-
-                <x-vehicle-form-field
-                    name="seats"
-                    label="Nombre de places"
-                    type="number"
-                    value="{{ $vehicle->seats }}"
-                    placeholder="Ex: 5"
-                    icon="fas fa-user-friends" />
-            </div>
-        </div>
-
-        {{-- Section Informations financières --}}
-        <div class="form-section rounded-lg p-6">
-            <div class="section-header">
-                <div class="section-icon bg-green-500 text-white">
-                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                        <path d="M4 4a2 2 0 00-2 2v4a2 2 0 002 2V6h10a2 2 0 00-2-2H4zm2 6a2 2 0 012-2h8a2 2 0 012 2v4a2 2 0 01-2 2H8a2 2 0 01-2-2v-4zm6 4a2 2 0 100-4 2 2 0 000 4z"></path>
-                    </svg>
-                </div>
-                <h3 class="text-lg font-medium text-gray-900">Informations financières et kilométrage</h3>
-            </div>
-
-            <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                <x-vehicle-form-field
-                    name="acquisition_date"
-                    label="Date d'acquisition"
-                    type="date"
-                    value="{{ $vehicle->acquisition_date ? $vehicle->acquisition_date->format('Y-m-d') : '' }}"
-                    icon="fas fa-calendar" />
-
-                <x-vehicle-form-field
-                    name="purchase_price"
-                    label="Prix d'achat (€)"
-                    type="number"
-                    value="{{ $vehicle->purchase_price }}"
-                    placeholder="Ex: 25000.00"
-                    icon="fas fa-euro-sign" />
-
-                <x-vehicle-form-field
-                    name="current_value"
-                    label="Valeur actuelle (€)"
-                    type="number"
-                    value="{{ $vehicle->current_value }}"
-                    placeholder="Ex: 20000.00"
-                    help="Valeur estimée actuelle du véhicule"
-                    icon="fas fa-chart-line" />
-
-                <x-vehicle-form-field
-                    name="initial_mileage"
-                    label="Kilométrage initial"
-                    type="number"
-                    value="{{ $vehicle->initial_mileage }}"
-                    placeholder="Ex: 10000"
-                    icon="fas fa-road" />
-
-                <x-vehicle-form-field
-                    name="current_mileage"
-                    label="Kilométrage actuel"
-                    type="number"
-                    value="{{ $vehicle->current_mileage }}"
-                    placeholder="Ex: 15000"
-                    icon="fas fa-tachometer-alt" />
-            </div>
-        </div>
-
-        {{-- Section Notes --}}
-        <div class="form-section rounded-lg p-6">
-            <div class="section-header">
-                <div class="section-icon bg-yellow-500 text-white">
-                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                        <path fill-rule="evenodd" d="M18 13V5a2 2 0 00-2-2H4a2 2 0 00-2 2v8a2 2 0 002 2h3l3 3 3-3h3a2 2 0 002-2zM5 7a1 1 0 011-1h8a1 1 0 110 2H6a1 1 0 01-1-1zm1 3a1 1 0 100 2h3a1 1 0 100-2H6z" clip-rule="evenodd"></path>
-                    </svg>
-                </div>
-                <h3 class="text-lg font-medium text-gray-900">Notes et observations</h3>
-            </div>
-
-            <x-vehicle-form-field
-                name="notes"
-                label="Notes"
-                type="textarea"
-                value="{{ $vehicle->notes }}"
-                placeholder="Informations complémentaires, observations, etc..."
-                help="Champ optionnel pour des informations supplémentaires"
-                icon="fas fa-sticky-note" />
-        </div>
-
-        {{-- Actions --}}
-        <div class="flex items-center justify-end space-x-4 pt-6 border-t border-gray-200">
-            <a href="{{ route('admin.vehicles.show', $vehicle) }}" class="btn-secondary inline-flex items-center px-4 py-2 text-sm font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                Annuler
-            </a>
-            <button type="submit" class="btn-primary inline-flex items-center px-6 py-2 text-sm font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" id="submit-btn">
-                <svg class="-ml-1 mr-2 h-4 w-4" fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
-                </svg>
-                <span id="submit-text">Sauvegarder les modifications</span>
-            </button>
-        </div>
-    </form>
-
-    {{-- Recommandations --}}
-    @if(isset($changeRecommendations) && !empty($changeRecommendations))
-    <div class="mt-8 bg-orange-50 rounded-lg p-6 border border-orange-200">
-        <div class="flex items-center mb-4">
-            <div class="w-6 h-6 bg-orange-500 rounded-lg flex items-center justify-center mr-3">
-                <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
-                </svg>
-            </div>
-            <h4 class="text-lg font-medium text-gray-900">Recommandations de modification</h4>
-        </div>
-        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            @foreach($changeRecommendations as $recommendation)
-                <div class="bg-white rounded-lg p-4 border border-orange-100">
-                    <div class="flex items-start">
-                        <svg class="w-5 h-5 text-orange-500 mr-2 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
-                        </svg>
-                        <div>
-                            <p class="text-sm font-medium text-gray-900">{{ $recommendation['title'] }}</p>
-                            <p class="text-sm text-gray-600 mt-1">{{ $recommendation['description'] }}</p>
-                        </div>
-                    </div>
-                </div>
-            @endforeach
-        </div>
-    </div>
-    @endif
-</div>
 @endsection
-
-@push('scripts')
-<script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js"></script>
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Initialize TomSelect for all select elements
-    ['tom-select-type', 'tom-select-fuel', 'tom-select-transmission', 'tom-select-status'].forEach(className => {
-        const element = document.querySelector('.' + className);
-        if (element) {
-            new TomSelect(element, {
-                plugins: ['clear_button'],
-                placeholder: 'Sélectionner...',
-                allowEmptyOption: true,
-                searchField: ['text'],
-                render: {
-                    no_results: function() {
-                        return '<div class="no-results">Aucun résultat trouvé</div>';
-                    }
-                }
-            });
-        }
-    });
-
-    const form = document.getElementById('vehicle-form');
-    const submitBtn = document.getElementById('submit-btn');
-    const submitText = document.getElementById('submit-text');
-
-    // Form submission avec état de loading
-    form.addEventListener('submit', function() {
-        submitBtn.disabled = true;
-        submitText.textContent = 'Sauvegarde en cours...';
-    });
-
-    // Validation du VIN
-    const vinInput = document.getElementById('vin');
-    vinInput.addEventListener('input', function() {
-        this.value = this.value.toUpperCase();
-    });
-
-    // Validation des kilométrages
-    const initialMileage = document.getElementById('initial_mileage');
-    const currentMileage = document.getElementById('current_mileage');
-
-    function validateMileage() {
-        const initial = parseInt(initialMileage.value) || 0;
-        const current = parseInt(currentMileage.value) || 0;
-
-        if (current < initial) {
-            currentMileage.setCustomValidity('Le kilométrage actuel ne peut pas être inférieur au kilométrage initial');
-        } else {
-            currentMileage.setCustomValidity('');
-        }
-    }
-
-    initialMileage.addEventListener('input', validateMileage);
-    currentMileage.addEventListener('input', validateMileage);
-
-    // Validation du prix et valeur
-    const purchasePrice = document.getElementById('purchase_price');
-    const currentValue = document.getElementById('current_value');
-
-    function validatePrice() {
-        const purchase = parseFloat(purchasePrice.value) || 0;
-        const current = parseFloat(currentValue.value) || 0;
-
-        if (current > purchase && current > 0) {
-            currentValue.setCustomValidity('La valeur actuelle ne peut pas être supérieure au prix d\'achat');
-        } else {
-            currentValue.setCustomValidity('');
-        }
-    }
-
-    purchasePrice.addEventListener('input', validatePrice);
-    currentValue.addEventListener('input', validatePrice);
-});
-</script>
-@endpush

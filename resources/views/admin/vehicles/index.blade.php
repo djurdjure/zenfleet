@@ -28,7 +28,7 @@
              =============================================== --}}
         <div class="mb-4">
             <h1 class="text-2xl font-bold text-gray-900 flex items-center gap-2.5">
-                <x-iconify icon="heroicons:truck" class="w-6 h-6 text-blue-600" />
+                <x-iconify icon="lucide:car" class="w-6 h-6 text-blue-600" />
                 Gestion des Véhicules
                 <span class="ml-2 text-sm font-normal text-gray-500">
                     ({{ isset($vehicles) ? $vehicles->total() : 0 }})
@@ -50,7 +50,7 @@
                         </p>
                     </div>
                     <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                        <x-iconify icon="heroicons:truck" class="w-6 h-6 text-blue-600" />
+                        <x-iconify icon="lucide:car" class="w-6 h-6 text-blue-600" />
                     </div>
                 </div>
             </div>
@@ -65,7 +65,7 @@
                         </p>
                     </div>
                     <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-                        <x-iconify icon="heroicons:check-circle" class="w-6 h-6 text-green-600" />
+                        <x-iconify icon="lucide:check-circle-2" class="w-6 h-6 text-green-600" />
                     </div>
                 </div>
             </div>
@@ -80,7 +80,7 @@
                         </p>
                     </div>
                     <div class="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
-                        <x-iconify icon="heroicons:user-circle" class="w-6 h-6 text-orange-600" />
+                        <x-iconify icon="lucide:user-check" class="w-6 h-6 text-orange-600" />
                     </div>
                 </div>
             </div>
@@ -95,7 +95,7 @@
                         </p>
                     </div>
                     <div class="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center">
-                        <x-iconify icon="heroicons:wrench-screwdriver" class="w-6 h-6 text-red-600" />
+                        <x-iconify icon="lucide:wrench" class="w-6 h-6 text-red-600" />
                     </div>
                 </div>
             </div>
@@ -116,7 +116,7 @@
                         <p class="text-xs text-blue-700 mt-1">Depuis acquisition</p>
                     </div>
                     <div class="w-10 h-10 bg-blue-200 rounded-lg flex items-center justify-center">
-                        <x-iconify icon="heroicons:calendar-days" class="w-5 h-5 text-blue-700" />
+                        <x-iconify icon="lucide:calendar" class="w-5 h-5 text-blue-700" />
                     </div>
                 </div>
             </div>
@@ -132,7 +132,7 @@
                         <p class="text-xs text-purple-700 mt-1">Kilométrage par véhicule</p>
                     </div>
                     <div class="w-10 h-10 bg-purple-200 rounded-lg flex items-center justify-center">
-                        <x-iconify icon="heroicons:chart-bar" class="w-5 h-5 text-purple-700" />
+                        <x-iconify icon="lucide:bar-chart-3" class="w-5 h-5 text-purple-700" />
                     </div>
                 </div>
             </div>
@@ -148,7 +148,7 @@
                         <p class="text-xs text-emerald-700 mt-1">Estimation actuelle</p>
                     </div>
                     <div class="w-10 h-10 bg-emerald-200 rounded-lg flex items-center justify-center">
-                        <x-iconify icon="heroicons:banknotes" class="w-5 h-5 text-emerald-700" />
+                        <x-iconify icon="lucide:banknote" class="w-5 h-5 text-emerald-700" />
                     </div>
                 </div>
             </div>
@@ -165,7 +165,7 @@
                     <form action="{{ route('admin.vehicles.index') }}" method="GET" id="searchForm">
                         <div class="relative">
                             <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                <x-iconify icon="heroicons:magnifying-glass" class="w-5 h-5 text-gray-400" />
+                                <x-iconify icon="lucide:search" class="w-5 h-5 text-gray-400" />
                             </div>
                             <input
                                 type="text"
@@ -184,7 +184,7 @@
                     @click="showFilters = !showFilters"
                     type="button"
                     class="inline-flex items-center gap-2 px-4 py-2.5 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-all duration-200 shadow-sm hover:shadow-md">
-                    <x-iconify icon="heroicons:funnel" class="w-5 h-5 text-gray-500" />
+                    <x-iconify icon="lucide:filter" class="w-5 h-5 text-gray-500" />
                     <span class="font-medium text-gray-700">Filtres</span>
                     @php
                         $activeFiltersCount = count(request()->except(['page', 'per_page', 'search']));
@@ -206,12 +206,12 @@
                     @can('create vehicles')
                         <a href="{{ route('admin.vehicles.import.show') }}"
                            class="inline-flex items-center gap-2 px-4 py-2.5 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg transition-colors duration-200 text-sm shadow-sm hover:shadow-md">
-                            <x-iconify icon="heroicons:arrow-up-tray" class="w-5 h-5" />
+                            <x-iconify icon="lucide:upload" class="w-5 h-5" />
                             <span class="hidden sm:inline">Importer</span>
                         </a>
                         <a href="{{ route('admin.vehicles.create') }}"
                            class="inline-flex items-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors duration-200 text-sm shadow-sm hover:shadow-md">
-                            <x-iconify icon="heroicons:plus-circle" class="w-5 h-5" />
+                            <x-iconify icon="lucide:plus-circle" class="w-5 h-5" />
                             <span class="hidden sm:inline">Nouveau véhicule</span>
                         </a>
                     @endcan
@@ -310,13 +310,13 @@
                     <div class="mt-6 pt-4 border-t border-gray-200 flex items-center justify-between">
                         <a href="{{ route('admin.vehicles.index') }}"
                            class="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 transition-colors">
-                            <x-iconify icon="heroicons:arrow-path" class="w-4 h-4" />
+                            <x-iconify icon="lucide:refresh-cw" class="w-4 h-4" />
                             Réinitialiser
                         </a>
                         <button
                             type="submit"
                             class="inline-flex items-center gap-2 px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors duration-200 shadow-sm hover:shadow-md">
-                            <x-iconify icon="heroicons:magnifying-glass" class="w-4 h-4" />
+                            <x-iconify icon="lucide:search" class="w-4 h-4" />
                             Appliquer les filtres
                         </button>
                     </div>
@@ -361,7 +361,7 @@
                                         <div class="flex items-center">
                                             <div class="flex-shrink-0 h-10 w-10">
                                                 <div class="h-10 w-10 rounded-lg bg-gray-100 flex items-center justify-center">
-                                                    <x-iconify icon="heroicons:truck" class="h-5 w-5 text-gray-500" />
+                                                    <x-iconify icon="lucide:car" class="h-5 w-5 text-gray-500" />
                                                 </div>
                                             </div>
                                             <div class="ml-4">
@@ -406,14 +406,14 @@
                                                         {{ $user->name }} {{ $user->last_name ?? '' }}
                                                     </div>
                                                     <div class="flex items-center gap-1 text-xs text-gray-500">
-                                                        <x-iconify icon="heroicons:phone" class="w-3.5 h-3.5" />
+                                                        <x-iconify icon="lucide:phone" class="w-3.5 h-3.5" />
                                                         <span>{{ $driver->phone ?? $user->phone ?? 'N/A' }}</span>
                                                     </div>
                                                 </div>
                                             </div>
                                         @else
                                             <div class="flex items-center gap-2 text-sm text-gray-400">
-                                                <x-iconify icon="heroicons:user-circle" class="w-5 h-5" />
+                                                <x-iconify icon="lucide:user-check" class="w-5 h-5" />
                                                 <span class="italic">Non affecté</span>
                                             </div>
                                         @endif
@@ -448,14 +448,14 @@
                                                 <a href="{{ route('admin.vehicles.show', $vehicle) }}"
                                                    class="text-blue-600 hover:text-blue-900 transition-colors"
                                                    title="Voir les détails">
-                                                    <x-iconify icon="heroicons:eye" class="h-5 w-5" />
+                                                    <x-iconify icon="lucide:eye" class="h-5 w-5" />
                                                 </a>
                                             @endcan
                                             @can('edit vehicles')
                                                 <a href="{{ route('admin.vehicles.edit', $vehicle) }}"
                                                    class="text-yellow-600 hover:text-yellow-900 transition-colors"
                                                    title="Modifier">
-                                                    <x-iconify icon="heroicons:pencil-square" class="h-5 w-5" />
+                                                    <x-iconify icon="lucide:edit" class="h-5 w-5" />
                                                 </a>
                                             @endcan
                                             @can('delete vehicles')
@@ -463,7 +463,7 @@
                                                     onclick="deleteVehicle({{ $vehicle->id }}, '{{ $vehicle->registration_plate }}', '{{ $vehicle->brand }} {{ $vehicle->model }}')"
                                                     class="text-red-600 hover:text-red-900 transition-colors"
                                                     title="Archiver">
-                                                    <x-iconify icon="heroicons:archive-box" class="h-5 w-5" />
+                                                    <x-iconify icon="lucide:archive" class="h-5 w-5" />
                                                 </button>
                                             @endcan
                                         </div>
@@ -476,14 +476,14 @@
             @else
                 {{-- État vide --}}
                 <div class="text-center py-12">
-                    <x-iconify icon="heroicons:truck" class="mx-auto h-12 w-12 text-gray-400" />
+                    <x-iconify icon="lucide:car" class="mx-auto h-12 w-12 text-gray-400" />
                     <h3 class="mt-2 text-sm font-medium text-gray-900">Aucun véhicule</h3>
                     <p class="mt-1 text-sm text-gray-500">Commencez par ajouter un véhicule à votre flotte.</p>
                     @can('create vehicles')
                         <div class="mt-6">
                             <a href="{{ route('admin.vehicles.create') }}"
                                class="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors">
-                                <x-iconify icon="heroicons:plus" class="w-5 h-5" />
+                                <x-iconify icon="lucide:plus" class="w-5 h-5" />
                                 Nouveau véhicule
                             </a>
                         </div>
@@ -506,7 +506,7 @@
                         </div>
                         @if($vehicles->total() > 0)
                             <div class="hidden sm:flex items-center gap-1.5 px-2.5 py-1 bg-blue-50 border border-blue-200 rounded-md">
-                                <x-iconify icon="heroicons:clock" class="w-3.5 h-3.5 text-blue-600" />
+                                <x-iconify icon="lucide:clock" class="w-3.5 h-3.5 text-blue-600" />
                                 <span class="text-xs font-medium text-blue-700">
                                     Page {{ $vehicles->currentPage() }} / {{ $vehicles->lastPage() }}
                                 </span>
