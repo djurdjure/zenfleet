@@ -18,10 +18,10 @@
 
 <div {{ $attributes->merge(['class' => '']) }}>
     @if($label)
-        <label for="{{ $textareaId }}" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+        <label for="{{ $textareaId }}" class="block mb-2 text-sm font-medium text-gray-900">
             {{ $label }}
             @if($required)
-                <span class="text-red-500">*</span>
+                <span class="text-red-600">*</span>
             @endif
         </label>
     @endif
@@ -38,12 +38,12 @@
     >{{ old($name, $value) }}</textarea>
 
     @if($error)
-        <p class="mt-2 text-sm text-red-600 flex items-start">
-            <x-iconify icon="heroicons:exclamation-circle" class="w-4 h-4 mr-1 mt-0.5 flex-shrink-0" />
+        <p class="mt-2 text-sm text-red-600 flex items-start font-medium">
+            <x-iconify icon="lucide:circle-alert" class="w-4 h-4 mr-1.5 mt-0.5 flex-shrink-0" />
             <span>{{ $error }}</span>
         </p>
     @elseif($helpText)
-        <p class="mt-2 text-sm text-gray-500">
+        <p class="mt-2 text-sm text-gray-600">
             {{ $helpText }}
         </p>
     @endif

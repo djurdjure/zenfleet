@@ -15,27 +15,32 @@
 @php
     $component = new \App\View\Components\Datepicker($name, $label, $error, $helpText, $required, $disabled, $value, $minDate, $maxDate, $format, $placeholder);
     $inputId = $component->getId();
+
+    // Classes conditionnelles pour erreur
+    $inputClasses = $error
+        ? 'datepicker bg-red-50 border-red-500 text-gray-900 text-sm rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 block w-full pl-10 p-2.5 transition-colors duration-200'
+        : 'datepicker bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 block w-full pl-10 p-2.5 transition-colors duration-200';
 @endphp
 
 <div {{ $attributes->merge(['class' => '']) }}>
     @if($label)
-        <label for="{{ $inputId }}" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+        <label for="{{ $inputId }}" class="block mb-2 text-sm font-medium text-gray-900">
             {{ $label }}
             @if($required)
-                <span class="text-red-500">*</span>
+                <span class="text-red-600">*</span>
             @endif
         </label>
     @endif
 
     <div class="relative">
         <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-            <x-iconify icon="heroicons:calendar" class="w-4 h-4 text-gray-500 dark:text-gray-400" />
+            <x-iconify icon="lucide:calendar-days" class="w-4 h-4 {{ $error ? 'text-red-500' : 'text-gray-500' }}" />
         </div>
         <input
             type="text"
             name="{{ $name }}"
             id="{{ $inputId }}"
-            class="datepicker bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+            class="{{ $inputClasses }}"
             placeholder="{{ $placeholder }}"
             value="{{ old($name, $value) }}"
             @if($required) required @endif
@@ -49,12 +54,12 @@
     </div>
 
     @if($error)
-        <p class="mt-2 text-sm text-red-600 flex items-start">
-            <x-iconify icon="heroicons:exclamation-circle" class="w-4 h-4 mr-1 mt-0.5 flex-shrink-0" />
+        <p class="mt-2 text-sm text-red-600 flex items-start font-medium">
+            <x-iconify icon="lucide:circle-alert" class="w-4 h-4 mr-1.5 mt-0.5 flex-shrink-0" />
             <span>{{ $error }}</span>
         </p>
     @elseif($helpText)
-        <p class="mt-2 text-sm text-gray-500">
+        <p class="mt-2 text-sm text-gray-600">
             {{ $helpText }}
         </p>
     @endif
@@ -65,51 +70,94 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/light.css">
     <style>
+        /* 🎨 FLATPICKR ENTERPRISE-GRADE LIGHT MODE - ZenFleet */
         .flatpickr-calendar {
             background-color: white;
             border: 1px solid rgb(229 231 235);
-            border-radius: 0.5rem;
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            border-radius: 0.75rem;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            font-family: inherit;
         }
-        .dark .flatpickr-calendar {
-            background-color: rgb(55 65 81);
-            border-color: rgb(75 85 99);
-        }
+
+        /* En-tête (mois/année) - Bleu premium */
         .flatpickr-months {
-            background-color: rgb(59 130 246);
+            background: linear-gradient(135deg, rgb(59 130 246) 0%, rgb(37 99 235) 100%);
+            border-radius: 0.75rem 0.75rem 0 0;
+            padding: 0.75rem 0;
         }
+
         .flatpickr-months .flatpickr-month,
         .flatpickr-current-month .flatpickr-monthDropdown-months {
-            background-color: rgb(59 130 246);
+            background-color: transparent;
             color: white;
+            font-weight: 600;
+            font-size: 0.95rem;
         }
+
+        /* Boutons navigation */
+        .flatpickr-months .flatpickr-prev-month,
+        .flatpickr-months .flatpickr-next-month {
+            fill: white;
+            transition: all 0.2s;
+        }
+
+        .flatpickr-months .flatpickr-prev-month:hover,
+        .flatpickr-months .flatpickr-next-month:hover {
+            fill: rgb(219 234 254);
+            transform: scale(1.1);
+        }
+
+        /* Jours de la semaine */
         .flatpickr-weekdays {
             background-color: rgb(239 246 255);
+            padding: 0.5rem 0;
         }
-        .dark .flatpickr-weekdays {
-            background-color: rgb(30 58 138);
+
+        .flatpickr-weekday {
+            color: rgb(59 130 246);
+            font-weight: 600;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
         }
+
+        /* Jours du mois */
         .flatpickr-day {
             color: rgb(17 24 39);
+            border-radius: 0.5rem;
+            font-weight: 500;
+            transition: all 0.2s;
         }
-        .dark .flatpickr-day {
-            color: white;
-        }
+
         .flatpickr-day.today {
-            border-color: rgb(59 130 246);
+            border: 2px solid rgb(59 130 246);
+            font-weight: 700;
+            color: rgb(59 130 246);
         }
-        .flatpickr-day.selected {
-            background-color: rgb(59 130 246);
+
+        .flatpickr-day.selected,
+        .flatpickr-day.selected:hover {
+            background: linear-gradient(135deg, rgb(59 130 246) 0%, rgb(37 99 235) 100%);
             border-color: rgb(59 130 246);
             color: white;
+            font-weight: 700;
+            box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.3);
         }
-        .flatpickr-day:hover {
-            background-color: rgb(219 234 254);
-            border-color: rgb(219 234 254);
+
+        .flatpickr-day:hover:not(.selected):not(.flatpickr-disabled) {
+            background-color: rgb(239 246 255);
+            border-color: rgb(191 219 254);
+            color: rgb(37 99 235);
+            transform: scale(1.05);
         }
-        .dark .flatpickr-day:hover {
-            background-color: rgb(30 58 138);
-            border-color: rgb(30 58 138);
+
+        .flatpickr-day.flatpickr-disabled {
+            color: rgb(209 213 219);
+        }
+
+        /* Input avec bordure rouge si erreur */
+        input.datepicker.border-red-500 + .flatpickr-calendar {
+            border-color: rgb(239 68 68);
         }
     </style>
     @endpush

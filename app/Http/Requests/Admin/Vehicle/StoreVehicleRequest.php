@@ -71,7 +71,7 @@ class StoreVehicleRequest extends FormRequest
             // PHASE 3: ACQUISITION & STATUT (Champs Required)
             // ========================================
             'status_id' => ['required', 'exists:vehicle_statuses,id'],
-            'acquisition_date' => ['required', 'date', 'before_or_equal:today'],
+            'acquisition_date' => ['required', 'date_format:d/m/Y', 'before_or_equal:today'],
             'purchase_price' => ['nullable', 'numeric', 'min:0', 'max:999999999'],
             'current_value' => ['nullable', 'numeric', 'min:0', 'max:999999999'],
             'initial_mileage' => ['nullable', 'integer', 'min:0', 'max:9999999'],
@@ -124,6 +124,7 @@ class StoreVehicleRequest extends FormRequest
             // Phase 3 - Acquisition
             'status_id.required' => 'Le statut du véhicule est obligatoire',
             'acquisition_date.required' => 'La date d\'acquisition est obligatoire',
+            'acquisition_date.date_format' => 'La date d\'acquisition doit être au format JJ/MM/AAAA',
             'acquisition_date.before_or_equal' => 'La date d\'acquisition ne peut pas être dans le futur',
             'current_mileage.gte' => 'Le kilométrage actuel doit être supérieur ou égal au kilométrage initial',
         ];

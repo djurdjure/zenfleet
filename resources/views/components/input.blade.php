@@ -19,10 +19,10 @@
 
 <div {{ $attributes->merge(['class' => '']) }}>
     @if($label)
-        <label for="{{ $inputId }}" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+        <label for="{{ $inputId }}" class="block mb-2 text-sm font-medium text-gray-900">
             {{ $label }}
             @if($required)
-                <span class="text-red-500">*</span>
+                <span class="text-red-600">*</span>
             @endif
         </label>
     @endif
@@ -43,19 +43,19 @@
             value="{{ old($name, $value) }}"
             @if($required) required @endif
             @if($disabled) disabled @endif
-            {{-- ⚠️ VALIDATION TEMPS RÉEL: Bordure rouge SEULEMENT si champ touché ET invalide --}}
-            x-bind:class="(fieldErrors && fieldErrors['{{ $name }}'] && touchedFields && touchedFields['{{ $name }}']) ? '!border-red-500 !focus:border-red-500 !focus:ring-red-500 dark:!border-red-600' : ''"
+            {{-- ⚠️ VALIDATION TEMPS RÉEL: Bordure rouge vif SEULEMENT si champ touché ET invalide --}}
+            x-bind:class="(fieldErrors && fieldErrors['{{ $name }}'] && touchedFields && touchedFields['{{ $name }}']) ? '!border-red-500 !focus:ring-2 !focus:ring-red-500 !focus:border-red-500 !bg-red-50' : ''"
             {{ $attributes->except(['class']) }}
         />
     </div>
 
     @if($error)
-        <p class="mt-2 text-sm text-red-600 dark:text-red-400 flex items-start">
-            <x-iconify icon="heroicons:exclamation-circle" class="w-4 h-4 mr-1 mt-0.5 flex-shrink-0" />
+        <p class="mt-2 text-sm text-red-600 flex items-start font-medium">
+            <x-iconify icon="lucide:circle-alert" class="w-4 h-4 mr-1.5 mt-0.5 flex-shrink-0" />
             <span>{{ $error }}</span>
         </p>
     @elseif($helpText)
-        <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
+        <p class="mt-2 text-sm text-gray-600">
             {{ $helpText }}
         </p>
     @endif
@@ -65,9 +65,9 @@
        x-transition:enter="transition ease-out duration-200"
        x-transition:enter-start="opacity-0 transform -translate-y-1"
        x-transition:enter-end="opacity-100 transform translate-y-0"
-       class="mt-2 text-sm text-red-600 dark:text-red-400 flex items-start"
+       class="mt-2 text-sm text-red-600 flex items-start font-medium"
        style="display: none;">
-        <x-iconify icon="heroicons:exclamation-circle" class="w-4 h-4 mr-1 mt-0.5 flex-shrink-0" />
+        <x-iconify icon="lucide:circle-alert" class="w-4 h-4 mr-1.5 mt-0.5 flex-shrink-0" />
         <span>Ce champ est obligatoire et doit être correctement rempli</span>
     </p>
 </div>
