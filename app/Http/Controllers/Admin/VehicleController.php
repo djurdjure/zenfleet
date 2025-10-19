@@ -515,7 +515,18 @@ class VehicleController extends Controller
     {
         $query = Vehicle::with([
             'vehicleType', 'fuelType', 'transmissionType', 'vehicleStatus',
-            'organization'
+            'organization',
+            // Eager loading des affectations actives avec chauffeur et utilisateur (optimisation N+1)
+            'assignments' => function ($query) {
+                $query->where('status', 'active')
+                      ->where('start_datetime', '<=', now())
+                      ->where(function($q) {
+                          $q->whereNull('end_datetime')
+                            ->orWhere('end_datetime', '>=', now());
+                      })
+                      ->with('driver.user')
+                      ->limit(1);
+            }
         ]);
 
         // Filtre par organisation pour sécurité
