@@ -3,9 +3,9 @@
 
 @section('content')
 <x-organization-form-enterprise
-    :organization="null"
-    :isEdit="false"
-    :wilayas="$wilayas"
-    :organizationTypes="$organizationTypes"
+ :organization="null"
+ :isEdit="false"
+ :wilayas="$wilayas"
+ :organizationTypes="$organizationTypes"
 />
 @endsection

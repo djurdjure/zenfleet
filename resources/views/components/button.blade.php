@@ -1,46 +1,46 @@
 @props([
-    'variant' => 'primary',
-    'size' => 'md',
-    'icon' => null,
-    'iconPosition' => 'left',
-    'href' => null,
-    'type' => 'button',
-    'disabled' => false,
+ 'variant' => 'primary',
+ 'size' => 'md',
+ 'icon' => null,
+ 'iconPosition' => 'left',
+ 'href' => null,
+ 'type' => 'button',
+ 'disabled' => false,
 ])
 
 @php
-    $component = new \App\View\Components\Button($variant, $size, $icon, $iconPosition, $href, $type, $disabled);
-    $classes = $component->getClasses();
-    $iconSize = $component->getIconSize();
+ $component = new \App\View\Components\Button($variant, $size, $icon, $iconPosition, $href, $type, $disabled);
+ $classes = $component->getClasses();
+ $iconSize = $component->getIconSize();
 @endphp
 
 @if($href)
-    <a href="{{ $href }}" class="{{ $classes }}" {{ $attributes }}>
-        @if($icon && $iconPosition === 'left')
-            <x-iconify :icon="'heroicons:' . $icon" :class="$iconSize . ' ' . ($slot->isNotEmpty() ? 'mr-2' : '')" />
-        @endif
+ <a href="{{ $href }}" class="{{ $classes }}" {{ $attributes }}>
+ @if($icon && $iconPosition === 'left')
+ <x-iconify :icon="'heroicons:' . $icon" :class="$iconSize . ' ' . ($slot->isNotEmpty() ? 'mr-2' : '')" />
+ @endif
 
-        {{ $slot }}
+ {{ $slot }}
 
-        @if($icon && $iconPosition === 'right')
-            <x-iconify :icon="'heroicons:' . $icon" :class="$iconSize . ' ' . ($slot->isNotEmpty() ? 'ml-2' : '')" />
-        @endif
-    </a>
+ @if($icon && $iconPosition === 'right')
+ <x-iconify :icon="'heroicons:' . $icon" :class="$iconSize . ' ' . ($slot->isNotEmpty() ? 'ml-2' : '')" />
+ @endif
+ </a>
 @else
-    <button
-        type="{{ $type }}"
-        class="{{ $classes }}"
-        @if($disabled) disabled @endif
-        {{ $attributes }}
-    >
-        @if($icon && $iconPosition === 'left')
-            <x-iconify :icon="'heroicons:' . $icon" :class="$iconSize . ' ' . ($slot->isNotEmpty() ? 'mr-2' : '')" />
-        @endif
+ <button
+ type="{{ $type }}"
+ class="{{ $classes }}"
+ @if($disabled) disabled @endif
+ {{ $attributes }}
+ >
+ @if($icon && $iconPosition === 'left')
+ <x-iconify :icon="'heroicons:' . $icon" :class="$iconSize . ' ' . ($slot->isNotEmpty() ? 'mr-2' : '')" />
+ @endif
 
-        {{ $slot }}
+ {{ $slot }}
 
-        @if($icon && $iconPosition === 'right')
-            <x-iconify :icon="'heroicons:' . $icon" :class="$iconSize . ' ' . ($slot->isNotEmpty() ? 'ml-2' : '')" />
-        @endif
-    </button>
+ @if($icon && $iconPosition === 'right')
+ <x-iconify :icon="'heroicons:' . $icon" :class="$iconSize . ' ' . ($slot->isNotEmpty() ? 'ml-2' : '')" />
+ @endif
+ </button>
 @endif

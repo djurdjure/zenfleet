@@ -1,386 +1,386 @@
-<div class="min-h-screen bg-gray-50 dark:bg-gray-900">
-    <div class="px-4 sm:px-6 lg:px-8 py-8">
+<div class="min-h-screen bg-gray-50 ">
+ <div class="px-4 sm:px-6 lg:px-8 py-8">
 
-        {{-- 🎯 EN-TÊTE AVEC CONTRÔLES --}}
-        <div class="mb-8">
-            <div class="flex items-center justify-between">
-                <div>
-                    <h1 class="text-4xl font-bold text-gray-900 dark:text-white flex items-center">
-                        <svg class="w-10 h-10 mr-3 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
-                        </svg>
-                        Matrice des Permissions
-                    </h1>
-                    <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">
-                        Configuration avancée des rôles et permissions - Architecture enterprise-grade
-                    </p>
-                </div>
+ {{-- 🎯 EN-TÊTE AVEC CONTRÔLES --}}
+ <div class="mb-8">
+ <div class="flex items-center justify-between">
+ <div>
+ <h1 class="text-4xl font-bold text-gray-900 flex items-center">
+ <svg class="w-10 h-10 mr-3 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+ <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+ </svg>
+ Matrice des Permissions
+ </h1>
+ <p class="mt-2 text-sm text-gray-600 ">
+ Configuration avancée des rôles et permissions - Architecture enterprise-grade
+ </p>
+ </div>
 
-                <div class="flex items-center space-x-3">
-                    {{-- Bouton Historique --}}
-                    <button wire:click="$toggle('showHistory')"
-                            class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-700">
-                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                        </svg>
-                        Historique
-                    </button>
+ <div class="flex items-center space-x-3">
+ {{-- Bouton Historique --}}
+ <button wire:click="$toggle('showHistory')"
+ class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 :bg-gray-700">
+ <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+ <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+ </svg>
+ Historique
+ </button>
 
-                    {{-- Bouton Preview --}}
-                    <button wire:click="$toggle('showPreview')"
-                            class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-700">
-                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
-                        </svg>
-                        Aperçu
-                    </button>
-                </div>
-            </div>
-        </div>
+ {{-- Bouton Preview --}}
+ <button wire:click="$toggle('showPreview')"
+ class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 :bg-gray-700">
+ <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+ <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+ <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+ </svg>
+ Aperçu
+ </button>
+ </div>
+ </div>
+ </div>
 
-        {{-- 🎛️ PANNEAU DE CONTRÔLE --}}
-        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 mb-8">
-            <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+ {{-- 🎛️ PANNEAU DE CONTRÔLE --}}
+ <div class="bg-white rounded-lg shadow-lg p-6 mb-8">
+ <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
 
-                {{-- Sélecteur de Rôle --}}
-                <div class="lg:col-span-1">
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        🎭 Rôle à configurer
-                    </label>
-                    <select wire:model.live="selectedRoleId"
-                            class="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
-                        <option value="">-- Sélectionner un rôle --</option>
-                        @foreach($availableRoles as $role)
-                            <option value="{{ $role->id }}">
-                                {{ $role->name }} ({{ $role->permissions_count }} permissions)
-                            </option>
-                        @endforeach
-                    </select>
+ {{-- Sélecteur de Rôle --}}
+ <div class="lg:col-span-1">
+ <label class="block text-sm font-medium text-gray-700 mb-2">
+ 🎭 Rôle à configurer
+ </label>
+ <select wire:model.live="selectedRoleId"
+ class="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 ">
+ <option value="">-- Sélectionner un rôle --</option>
+ @foreach($availableRoles as $role)
+ <option value="{{ $role->id }}">
+ {{ $role->name }} ({{ $role->permissions_count }} permissions)
+ </option>
+ @endforeach
+ </select>
 
-                    @if($selectedRole)
-                        <div class="mt-4 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-md">
-                            <div class="flex items-center">
-                                <svg class="w-5 h-5 text-blue-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
-                                </svg>
-                                <div>
-                                    <p class="text-sm font-semibold text-blue-900 dark:text-blue-300">
-                                        {{ count($rolePermissions) }} / {{ count($permissionsMatrix) }}
-                                    </p>
-                                    <p class="text-xs text-blue-700 dark:text-blue-400">
-                                        permissions assignées
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                    @endif
-                </div>
+ @if($selectedRole)
+ <div class="mt-4 p-3 bg-blue-50 /20 rounded-md">
+ <div class="flex items-center">
+ <svg class="w-5 h-5 text-blue-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
+ <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+ </svg>
+ <div>
+ <p class="text-sm font-semibold text-blue-900 ">
+ {{ count($rolePermissions) }} / {{ count($permissionsMatrix) }}
+ </p>
+ <p class="text-xs text-blue-700 ">
+ permissions assignées
+ </p>
+ </div>
+ </div>
+ </div>
+ @endif
+ </div>
 
-                {{-- Barre de Recherche --}}
-                <div class="lg:col-span-1">
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        🔍 Recherche
-                    </label>
-                    <div class="relative">
-                        <input type="text"
-                               wire:model.live.debounce.300ms="search"
-                               placeholder="Rechercher une permission..."
-                               class="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white pl-10">
-                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                            <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-                            </svg>
-                        </div>
-                    </div>
-                </div>
+ {{-- Barre de Recherche --}}
+ <div class="lg:col-span-1">
+ <label class="block text-sm font-medium text-gray-700 mb-2">
+ 🔍 Recherche
+ </label>
+ <div class="relative">
+ <input type="text"
+ wire:model.live.debounce.300ms="search"
+ placeholder="Rechercher une permission..."
+ class="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 pl-10">
+ <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+ <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+ <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+ </svg>
+ </div>
+ </div>
+ </div>
 
-                {{-- Filtre par Ressource --}}
-                <div class="lg:col-span-1">
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        📦 Filtrer par ressource
-                    </label>
-                    <select wire:model.live="filterByResource"
-                            class="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
-                        <option value="">Toutes les ressources</option>
-                        @foreach($resources as $resource)
-                            <option value="{{ $resource }}">{{ $this->formatResourceName($resource) }}</option>
-                        @endforeach
-                    </select>
-                </div>
+ {{-- Filtre par Ressource --}}
+ <div class="lg:col-span-1">
+ <label class="block text-sm font-medium text-gray-700 mb-2">
+ 📦 Filtrer par ressource
+ </label>
+ <select wire:model.live="filterByResource"
+ class="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 ">
+ <option value="">Toutes les ressources</option>
+ @foreach($resources as $resource)
+ <option value="{{ $resource }}">{{ $this->formatResourceName($resource) }}</option>
+ @endforeach
+ </select>
+ </div>
 
-                {{-- Filtre par Action --}}
-                <div class="lg:col-span-1">
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        ⚡ Filtrer par action
-                    </label>
-                    <select wire:model.live="filterByAction"
-                            class="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
-                        <option value="">Toutes les actions</option>
-                        @foreach($actions as $action)
-                            <option value="{{ $action }}">{{ $this->formatActionName($action) }}</option>
-                        @endforeach
-                    </select>
-                </div>
+ {{-- Filtre par Action --}}
+ <div class="lg:col-span-1">
+ <label class="block text-sm font-medium text-gray-700 mb-2">
+ ⚡ Filtrer par action
+ </label>
+ <select wire:model.live="filterByAction"
+ class="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 ">
+ <option value="">Toutes les actions</option>
+ @foreach($actions as $action)
+ <option value="{{ $action }}">{{ $this->formatActionName($action) }}</option>
+ @endforeach
+ </select>
+ </div>
 
-            </div>
+ </div>
 
-            {{-- Options supplémentaires --}}
-            <div class="mt-4 flex items-center justify-between border-t border-gray-200 dark:border-gray-700 pt-4">
-                <div class="flex items-center space-x-4">
-                    <label class="inline-flex items-center cursor-pointer">
-                        <input type="checkbox" wire:model.live="showOnlyAssigned" class="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600">
-                        <span class="ml-2 text-sm text-gray-700 dark:text-gray-300">
-                            Afficher uniquement les permissions assignées
-                        </span>
-                    </label>
-                </div>
+ {{-- Options supplémentaires --}}
+ <div class="mt-4 flex items-center justify-between border-t border-gray-200 pt-4">
+ <div class="flex items-center space-x-4">
+ <label class="inline-flex items-center cursor-pointer">
+ <input type="checkbox" wire:model.live="showOnlyAssigned" class="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-500 focus:ring-blue-500 ">
+ <span class="ml-2 text-sm text-gray-700 ">
+ Afficher uniquement les permissions assignées
+ </span>
+ </label>
+ </div>
 
-                @if($hasPendingChanges)
-                    <div class="flex items-center text-sm">
-                        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300">
-                            <svg class="w-4 h-4 mr-1 animate-pulse" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
-                            </svg>
-                            {{ count($pendingChanges) }} modification(s) en attente
-                        </span>
-                    </div>
-                @endif
-            </div>
-        </div>
+ @if($hasPendingChanges)
+ <div class="flex items-center text-sm">
+ <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 /30 ">
+ <svg class="w-4 h-4 mr-1 animate-pulse" fill="currentColor" viewBox="0 0 20 20">
+ <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+ </svg>
+ {{ count($pendingChanges) }} modification(s) en attente
+ </span>
+ </div>
+ @endif
+ </div>
+ </div>
 
-        {{-- 📊 MATRICE DES PERMISSIONS --}}
-        @if(!$selectedRole)
-            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-12 text-center">
-                <svg class="w-24 h-24 mx-auto text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
-                </svg>
-                <h3 class="text-xl font-medium text-gray-900 dark:text-white mb-2">
-                    Veuillez sélectionner un rôle
-                </h3>
-                <p class="text-gray-600 dark:text-gray-400">
-                    Sélectionnez un rôle dans le panneau de contrôle ci-dessus pour configurer ses permissions
-                </p>
-            </div>
-        @else
-            {{-- Matrice par ressource --}}
-            <div class="space-y-6">
-                @forelse($groupedPermissions as $resource => $permissions)
-                    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden"
-                         x-data="{ expanded: true }">
+ {{-- 📊 MATRICE DES PERMISSIONS --}}
+ @if(!$selectedRole)
+ <div class="bg-white rounded-lg shadow-lg p-12 text-center">
+ <svg class="w-24 h-24 mx-auto text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+ <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+ </svg>
+ <h3 class="text-xl font-medium text-gray-900 mb-2">
+ Veuillez sélectionner un rôle
+ </h3>
+ <p class="text-gray-600 ">
+ Sélectionnez un rôle dans le panneau de contrôle ci-dessus pour configurer ses permissions
+ </p>
+ </div>
+ @else
+ {{-- Matrice par ressource --}}
+ <div class="space-y-6">
+ @forelse($groupedPermissions as $resource => $permissions)
+ <div class="bg-white rounded-lg shadow-lg overflow-hidden"
+ x-data="{ expanded: true }">
 
-                        {{-- En-tête de la ressource --}}
-                        <div class="bg-gradient-to-r from-blue-600 to-blue-500 px-6 py-4">
-                            <div class="flex items-center justify-between">
-                                <div class="flex items-center space-x-3">
-                                    <button @click="expanded = !expanded"
-                                            class="text-white hover:text-blue-100 transition-transform"
-                                            :class="{ 'rotate-180': !expanded }">
-                                        <svg class="w-6 h-6 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
-                                        </svg>
-                                    </button>
+ {{-- En-tête de la ressource --}}
+ <div class="bg-gradient-to-r from-blue-600 to-blue-500 px-6 py-4">
+ <div class="flex items-center justify-between">
+ <div class="flex items-center space-x-3">
+ <button @click="expanded = !expanded"
+ class="text-white hover:text-blue-100 transition-transform"
+ :class="{ 'rotate-180': !expanded }">
+ <svg class="w-6 h-6 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+ <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+ </svg>
+ </button>
 
-                                    <h3 class="text-xl font-bold text-white flex items-center">
-                                        {{ $this->formatResourceName($resource) }}
-                                        <span class="ml-3 px-3 py-1 bg-white/20 rounded-full text-sm">
-                                            {{ $permissions->whereIn('id', $rolePermissions)->count() }} / {{ $permissions->count() }}
-                                        </span>
-                                    </h3>
-                                </div>
+ <h3 class="text-xl font-bold text-white flex items-center">
+ {{ $this->formatResourceName($resource) }}
+ <span class="ml-3 px-3 py-1 bg-white/20 rounded-full text-sm">
+ {{ $permissions->whereIn('id', $rolePermissions)->count() }} / {{ $permissions->count() }}
+ </span>
+ </h3>
+ </div>
 
-                                <div class="flex items-center space-x-2">
-                                    <button wire:click="selectAllForResource('{{ $resource }}')"
-                                            class="px-4 py-2 bg-white/20 hover:bg-white/30 text-white rounded-md text-sm font-medium transition-colors">
-                                        ✅ Tout sélectionner
-                                    </button>
-                                    <button wire:click="deselectAllForResource('{{ $resource }}')"
-                                            class="px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-md text-sm font-medium transition-colors">
-                                        ❌ Tout désélectionner
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
+ <div class="flex items-center space-x-2">
+ <button wire:click="selectAllForResource('{{ $resource }}')"
+ class="px-4 py-2 bg-white/20 hover:bg-white/30 text-white rounded-md text-sm font-medium transition-colors">
+ ✅ Tout sélectionner
+ </button>
+ <button wire:click="deselectAllForResource('{{ $resource }}')"
+ class="px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-md text-sm font-medium transition-colors">
+ ❌ Tout désélectionner
+ </button>
+ </div>
+ </div>
+ </div>
 
-                        {{-- Grille des permissions --}}
-                        <div x-show="expanded"
-                             x-transition:enter="transition ease-out duration-200"
-                             x-transition:enter-start="opacity-0 transform scale-95"
-                             x-transition:enter-end="opacity-100 transform scale-100"
-                             class="p-6">
+ {{-- Grille des permissions --}}
+ <div x-show="expanded"
+ x-transition:enter="transition ease-out duration-200"
+ x-transition:enter-start="opacity-0 transform scale-95"
+ x-transition:enter-end="opacity-100 transform scale-100"
+ class="p-6">
 
-                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                                @foreach($permissions as $permission)
-                                    @php
-                                        $isAssigned = in_array($permission['id'], $rolePermissions);
-                                    @endphp
+ <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+ @foreach($permissions as $permission)
+ @php
+ $isAssigned = in_array($permission['id'], $rolePermissions);
+ @endphp
 
-                                    <div wire:key="permission-{{ $permission['id'] }}"
-                                         class="relative group">
-                                        <label class="flex items-center p-4 border-2 rounded-lg cursor-pointer transition-all
-                                            {{ $isAssigned
-                                                ? 'border-green-500 bg-green-50 dark:bg-green-900/20'
-                                                : 'border-gray-200 bg-white dark:bg-gray-700 dark:border-gray-600 hover:border-blue-300 hover:bg-blue-50 dark:hover:bg-blue-900/10' }}">
+ <div wire:key="permission-{{ $permission['id'] }}"
+ class="relative group">
+ <label class="flex items-center p-4 border-2 rounded-lg cursor-pointer transition-all
+ {{ $isAssigned
+ ? 'border-green-500 bg-green-50 /20'
+ : 'border-gray-200 bg-white hover:border-blue-300 hover:bg-blue-50 :bg-blue-900/10' }}">
 
-                                            <input type="checkbox"
-                                                   wire:click="togglePermission({{ $permission['id'] }})"
-                                                   {{ $isAssigned ? 'checked' : '' }}
-                                                   class="h-5 w-5 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+ <input type="checkbox"
+ wire:click="togglePermission({{ $permission['id'] }})"
+ {{ $isAssigned ? 'checked' : '' }}
+ class="h-5 w-5 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
 
-                                            <div class="ml-3 flex-1">
-                                                <p class="text-sm font-semibold {{ $isAssigned ? 'text-green-900 dark:text-green-300' : 'text-gray-900 dark:text-gray-100' }}">
-                                                    {{ $permission['display_action'] }}
-                                                </p>
-                                                <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                                                    {{ $permission['name'] }}
-                                                </p>
-                                            </div>
+ <div class="ml-3 flex-1">
+ <p class="text-sm font-semibold {{ $isAssigned ? 'text-green-900 ' : 'text-gray-900 ' }}">
+ {{ $permission['display_action'] }}
+ </p>
+ <p class="text-xs text-gray-500 mt-0.5">
+ {{ $permission['name'] }}
+ </p>
+ </div>
 
-                                            @if($isAssigned)
-                                                <svg class="w-5 h-5 text-green-600" fill="currentColor" viewBox="0 0 20 20">
-                                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-                                                </svg>
-                                            @endif
-                                        </label>
-                                    </div>
-                                @endforeach
-                            </div>
-                        </div>
-                    </div>
-                @empty
-                    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-12 text-center">
-                        <svg class="w-24 h-24 mx-auto text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                        </svg>
-                        <h3 class="text-xl font-medium text-gray-900 dark:text-white mb-2">
-                            Aucune permission trouvée
-                        </h3>
-                        <p class="text-gray-600 dark:text-gray-400">
-                            Essayez d'ajuster vos filtres de recherche
-                        </p>
-                    </div>
-                @endforelse
-            </div>
+ @if($isAssigned)
+ <svg class="w-5 h-5 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+ <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+ </svg>
+ @endif
+ </label>
+ </div>
+ @endforeach
+ </div>
+ </div>
+ </div>
+ @empty
+ <div class="bg-white rounded-lg shadow-lg p-12 text-center">
+ <svg class="w-24 h-24 mx-auto text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+ <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+ </svg>
+ <h3 class="text-xl font-medium text-gray-900 mb-2">
+ Aucune permission trouvée
+ </h3>
+ <p class="text-gray-600 ">
+ Essayez d'ajuster vos filtres de recherche
+ </p>
+ </div>
+ @endforelse
+ </div>
 
-            {{-- 💾 BARRE D'ACTIONS FLOTTANTE --}}
-            @if($hasPendingChanges)
-                <div class="fixed bottom-8 left-1/2 transform -translate-x-1/2 z-50"
-                     x-data="{ show: true }"
-                     x-show="show"
-                     x-transition:enter="transition ease-out duration-300"
-                     x-transition:enter-start="opacity-0 transform translate-y-4"
-                     x-transition:enter-end="opacity-100 transform translate-y-0">
+ {{-- 💾 BARRE D'ACTIONS FLOTTANTE --}}
+ @if($hasPendingChanges)
+ <div class="fixed bottom-8 left-1/2 transform -translate-x-1/2 z-50"
+ x-data="{ show: true }"
+ x-show="show"
+ x-transition:enter="transition ease-out duration-300"
+ x-transition:enter-start="opacity-0 transform translate-y-4"
+ x-transition:enter-end="opacity-100 transform translate-y-0">
 
-                    <div class="bg-gradient-to-r from-blue-600 to-blue-500 rounded-lg shadow-2xl p-6 flex items-center space-x-6">
-                        <div class="flex items-center text-white">
-                            <svg class="w-8 h-8 mr-3 animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
-                            </svg>
-                            <div>
-                                <p class="font-bold text-lg">{{ count($pendingChanges) }} modification(s) en attente</p>
-                                <p class="text-sm text-blue-100">Cliquez sur Enregistrer pour appliquer les changements</p>
-                            </div>
-                        </div>
+ <div class="bg-gradient-to-r from-blue-600 to-blue-500 rounded-lg shadow-2xl p-6 flex items-center space-x-6">
+ <div class="flex items-center text-white">
+ <svg class="w-8 h-8 mr-3 animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+ <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+ </svg>
+ <div>
+ <p class="font-bold text-lg">{{ count($pendingChanges) }} modification(s) en attente</p>
+ <p class="text-sm text-blue-100">Cliquez sur Enregistrer pour appliquer les changements</p>
+ </div>
+ </div>
 
-                        <div class="flex items-center space-x-3">
-                            <button wire:click="cancel"
-                                    class="px-6 py-3 bg-white/20 hover:bg-white/30 text-white rounded-lg font-semibold transition-colors">
-                                ❌ Annuler
-                            </button>
-                            <button wire:click="save"
-                                    class="px-8 py-3 bg-white text-blue-600 hover:bg-blue-50 rounded-lg font-bold shadow-lg transition-all transform hover:scale-105">
-                                ✅ Enregistrer
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            @endif
-        @endif
+ <div class="flex items-center space-x-3">
+ <button wire:click="cancel"
+ class="px-6 py-3 bg-white/20 hover:bg-white/30 text-white rounded-lg font-semibold transition-colors">
+ ❌ Annuler
+ </button>
+ <button wire:click="save"
+ class="px-8 py-3 bg-white text-blue-600 hover:bg-blue-50 rounded-lg font-bold shadow-lg transition-all transform hover:scale-105">
+ ✅ Enregistrer
+ </button>
+ </div>
+ </div>
+ </div>
+ @endif
+ @endif
 
-        {{-- 📊 MODAL APERÇU --}}
-        @if($showPreview && $selectedRole)
-            <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
-                 x-data="{ show: true }"
-                 x-show="show"
-                 x-transition:enter="transition ease-out duration-300"
-                 x-transition:enter-start="opacity-0"
-                 x-transition:enter-end="opacity-100"
-                 @click.self="$wire.set('showPreview', false)">
+ {{-- 📊 MODAL APERÇU --}}
+ @if($showPreview && $selectedRole)
+ <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+ x-data="{ show: true }"
+ x-show="show"
+ x-transition:enter="transition ease-out duration-300"
+ x-transition:enter-start="opacity-0"
+ x-transition:enter-end="opacity-100"
+ @click.self="$wire.set('showPreview', false)">
 
-                <div class="bg-white dark:bg-gray-800 rounded-lg shadow-2xl max-w-4xl w-full mx-4 max-h-[80vh] overflow-hidden"
-                     @click.stop>
-                    <div class="bg-gradient-to-r from-blue-600 to-blue-500 px-6 py-4">
-                        <div class="flex items-center justify-between">
-                            <h3 class="text-2xl font-bold text-white">
-                                Aperçu des Permissions - {{ $selectedRole->name }}
-                            </h3>
-                            <button wire:click="$set('showPreview', false)"
-                                    class="text-white hover:text-blue-100">
-                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                                </svg>
-                            </button>
-                        </div>
-                    </div>
+ <div class="bg-white rounded-lg shadow-2xl max-w-4xl w-full mx-4 max-h-[80vh] overflow-hidden"
+ @click.stop>
+ <div class="bg-gradient-to-r from-blue-600 to-blue-500 px-6 py-4">
+ <div class="flex items-center justify-between">
+ <h3 class="text-2xl font-bold text-white">
+ Aperçu des Permissions - {{ $selectedRole->name }}
+ </h3>
+ <button wire:click="$set('showPreview', false)"
+ class="text-white hover:text-blue-100">
+ <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+ <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+ </svg>
+ </button>
+ </div>
+ </div>
 
-                    <div class="p-6 overflow-y-auto max-h-[calc(80vh-80px)]">
-                        <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
-                            @foreach($permissionsMatrix as $perm)
-                                @if(in_array($perm['id'], $rolePermissions))
-                                    <div class="flex items-center p-3 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800">
-                                        <svg class="w-5 h-5 text-green-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-                                        </svg>
-                                        <div class="flex-1">
-                                            <p class="text-xs font-semibold text-green-900 dark:text-green-300">
-                                                {{ $perm['display_resource'] }}
-                                            </p>
-                                            <p class="text-xs text-green-700 dark:text-green-400">
-                                                {{ $perm['display_action'] }}
-                                            </p>
-                                        </div>
-                                    </div>
-                                @endif
-                            @endforeach
-                        </div>
+ <div class="p-6 overflow-y-auto max-h-[calc(80vh-80px)]">
+ <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+ @foreach($permissionsMatrix as $perm)
+ @if(in_array($perm['id'], $rolePermissions))
+ <div class="flex items-center p-3 bg-green-50 /20 rounded-lg border border-green-200 ">
+ <svg class="w-5 h-5 text-green-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
+ <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+ </svg>
+ <div class="flex-1">
+ <p class="text-xs font-semibold text-green-900 ">
+ {{ $perm['display_resource'] }}
+ </p>
+ <p class="text-xs text-green-700 ">
+ {{ $perm['display_action'] }}
+ </p>
+ </div>
+ </div>
+ @endif
+ @endforeach
+ </div>
 
-                        <div class="mt-6 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-                            <p class="text-sm text-blue-900 dark:text-blue-300">
-                                <strong>Total:</strong> {{ count($rolePermissions) }} permission(s) assignée(s)
-                            </p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        @endif
+ <div class="mt-6 p-4 bg-blue-50 /20 rounded-lg">
+ <p class="text-sm text-blue-900 ">
+ <strong>Total:</strong> {{ count($rolePermissions) }} permission(s) assignée(s)
+ </p>
+ </div>
+ </div>
+ </div>
+ </div>
+ @endif
 
-    </div>
+ </div>
 
-    {{-- 🔔 Notifications Toast --}}
-    <div x-data="{ notifications: [] }"
-         @notification.window="
-            const notification = $event.detail;
-            notifications.push({ ...notification, id: Date.now() });
-            setTimeout(() => notifications.shift(), 5000);
-         "
-         class="fixed top-4 right-4 z-50 space-y-2">
-        <template x-for="notification in notifications" :key="notification.id">
-            <div x-show="true"
-                 x-transition:enter="transition ease-out duration-300"
-                 x-transition:enter-start="opacity-0 transform translate-x-8"
-                 x-transition:enter-end="opacity-100 transform translate-x-0"
-                 x-transition:leave="transition ease-in duration-200"
-                 x-transition:leave-start="opacity-100"
-                 x-transition:leave-end="opacity-0"
-                 class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4 max-w-sm"
-                 :class="{
-                    'border-l-4 border-green-500': notification.type === 'success',
-                    'border-l-4 border-blue-500': notification.type === 'info',
-                    'border-l-4 border-yellow-500': notification.type === 'warning',
-                    'border-l-4 border-red-500': notification.type === 'error'
-                 }">
-                <p class="text-sm font-medium text-gray-900 dark:text-white" x-text="notification.message"></p>
-            </div>
-        </template>
-    </div>
+ {{-- 🔔 Notifications Toast --}}
+ <div x-data="{ notifications: [] }"
+ @notification.window="
+ const notification = $event.detail;
+ notifications.push({ ...notification, id: Date.now() });
+ setTimeout(() => notifications.shift(), 5000);
+ "
+ class="fixed top-4 right-4 z-50 space-y-2">
+ <template x-for="notification in notifications" :key="notification.id">
+ <div x-show="true"
+ x-transition:enter="transition ease-out duration-300"
+ x-transition:enter-start="opacity-0 transform translate-x-8"
+ x-transition:enter-end="opacity-100 transform translate-x-0"
+ x-transition:leave="transition ease-in duration-200"
+ x-transition:leave-start="opacity-100"
+ x-transition:leave-end="opacity-0"
+ class="bg-white rounded-lg shadow-lg p-4 max-w-sm"
+ :class="{
+ 'border-l-4 border-green-500': notification.type === 'success',
+ 'border-l-4 border-blue-500': notification.type === 'info',
+ 'border-l-4 border-yellow-500': notification.type === 'warning',
+ 'border-l-4 border-red-500': notification.type === 'error'
+ }">
+ <p class="text-sm font-medium text-gray-900 " x-text="notification.message"></p>
+ </div>
+ </template>
+ </div>
 </div>

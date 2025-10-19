@@ -3,6 +3,7 @@ import forms from '@tailwindcss/forms';
 
 /** @type {import('tailwindcss').Config} */
 export default {
+    darkMode: 'class', // Désactivation complète - nécessite classe .dark qui ne sera jamais ajoutée
     content: [
         './resources/views/**/*.blade.php',
         './resources/js/**/*.js',

@@ -139,9 +139,6 @@
     box-shadow: none !important;
 }
 
-.dark .ts-wrapper .ts-control {
-    @apply bg-gray-700 border-gray-600 text-white;
-}
 
 /* Focus state - Blue-500 comme Flowbite */
 .ts-wrapper.focus .ts-control,
@@ -151,10 +148,6 @@
     outline: none;
 }
 
-.dark .ts-wrapper.focus .ts-control,
-.dark .ts-wrapper.input-active .ts-control {
-    @apply border-blue-500;
-}
 
 /* Flèche dropdown */
 .ts-wrapper.single .ts-control::after {
@@ -165,9 +158,6 @@
     margin-top: -2.5px;
 }
 
-.dark .ts-wrapper.single .ts-control::after {
-    border-color: rgb(156 163 175) transparent transparent transparent;
-}
 
 /* Dropdown */
 .ts-wrapper .ts-dropdown {
@@ -175,9 +165,6 @@
     margin-top: 0.25rem;
 }
 
-.dark .ts-wrapper .ts-dropdown {
-    @apply bg-gray-700 border-gray-600;
-}
 
 /* Options */
 .ts-wrapper .ts-dropdown .option {
@@ -185,42 +172,27 @@
     transition: background-color 150ms ease-in-out;
 }
 
-.dark .ts-wrapper .ts-dropdown .option {
-    @apply text-white;
-}
 
 .ts-wrapper .ts-dropdown .option:hover {
     @apply bg-gray-50;
 }
 
-.dark .ts-wrapper .ts-dropdown .option:hover {
-    @apply bg-gray-600;
-}
 
 .ts-wrapper .ts-dropdown .option.active {
     @apply bg-blue-50 text-blue-700;
 }
 
-.dark .ts-wrapper .ts-dropdown .option.active {
-    @apply bg-blue-900/30 text-blue-300;
-}
 
 /* Input dans le control */
 .ts-wrapper .ts-control input {
     @apply text-gray-900;
 }
 
-.dark .ts-wrapper .ts-control input {
-    @apply text-white;
-}
 
 .ts-wrapper .ts-control input::placeholder {
     @apply text-gray-400;
 }
 
-.dark .ts-wrapper .ts-control input::placeholder {
-    @apply text-gray-400;
-}
 
 /* Clear button */
 .ts-wrapper .clear-button {
@@ -232,13 +204,7 @@
     @apply text-blue-500;
 }
 
-.dark .ts-wrapper .clear-button {
-    @apply text-gray-400;
-}
 
-.dark .ts-wrapper .clear-button:hover {
-    @apply text-blue-400;
-}
 
 /* Items (pour multiple select) - Badges bleus */
 .ts-wrapper .ts-control .item {
@@ -248,9 +214,6 @@
     font-size: 0.875rem;
 }
 
-.dark .ts-wrapper .ts-control .item {
-    @apply bg-blue-900/30 text-blue-300;
-}
 
 /* ====================================
    🔴 TOMSELECT ERROR STATE
@@ -267,15 +230,7 @@
     box-shadow: 0 0 0 1px rgb(239 68 68) !important;
 }
 
-.dark .ts-wrapper.ts-error .ts-control {
-    @apply border-red-600 !important;
-}
 
-.dark .ts-wrapper.ts-error.focus .ts-control,
-.dark .ts-wrapper.ts-error.input-active .ts-control {
-    @apply border-red-600 !important;
-    box-shadow: 0 0 0 1px rgb(220 38 38) !important;
-}
 
 /* États responsifs */
 @media (max-width: 1024px) {

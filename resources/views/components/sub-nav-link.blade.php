@@ -46,12 +46,12 @@ $iconAttributes = ['class' => $iconBaseClasses . ' ' . ($active ? $activeIconCol
 @endphp
 
 <a {{ $finalLinkClasses }}>
-    {{-- Le conteneur du cercle pour l'icône --}}
-    <span class="{{ $finalIconWrapperClasses }}">
-        {{-- On applique les classes dynamiques à l'icône passée dans le slot --}}
-        {{ $icon->withAttributes($iconAttributes) }}
-    </span>
+ {{-- Le conteneur du cercle pour l'icône --}}
+ <span class="{{ $finalIconWrapperClasses }}">
+ {{-- On applique les classes dynamiques à l'icône passée dans le slot --}}
+ {{ $icon->withAttributes($iconAttributes) }}
+ </span>
 
-    {{-- Le texte du lien --}}
-    <span>{{ $slot }}</span>
+ {{-- Le texte du lien --}}
+ <span>{{ $slot }}</span>
 </a>
