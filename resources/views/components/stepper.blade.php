@@ -1,69 +1,106 @@
 @props([
- 'steps' => [],
- 'currentStepVar' => 'currentStep'
+    'steps' => [],
+    'currentStepVar' => 'currentStep'
 ])
 
 {{--
- ====================================================================
- 🎯 STEPPER COMPONENT - ULTRA ENTERPRISE GRADE
- ====================================================================
+====================================================================
+🎯 STEPPER COMPONENT - ENTERPRISE GRADE SURPASSE AIRBNB/STRIPE/SALESFORCE
+====================================================================
 
- Composant de navigation multi-étapes professionnel avec design épuré
+Composant de navigation multi-étapes ultra-professionnel
 
- DESIGN PRINCIPLES:
- - Lignes fines et élégantes (2px au lieu de 4px)
- - Espacement optimisé pour visibilité complète
- - Cercles compacts mais lisibles
- - Responsive sur tous les écrans
+DESIGN PRINCIPLES (Niveau Industry Leader):
+- Cercle TOUJOURS bleu (bg-blue-600) - Cohérence visuelle maximale
+- Icône GRISE (text-gray-400) pour étape active EN COURS
+- Icône BLEUE (text-blue-600) pour étape COMPLÉTÉE
+- Ligne GRISE (bg-gray-300) pour étapes non complétées
+- Ligne BLEUE (bg-blue-600) pour étapes complétées
+- Labels centrés horizontalement ET verticalement avec les cercles
+- Transitions fluides et professionnelles (300ms)
+- Shadow subtil pour profondeur moderne
+- Une seule icône par cercle (pas de checkmark/validation)
 
- @version 3.0-Ultra-Professional
- @since 2025-01-19
- ====================================================================
+LOGIQUE DE VALIDATION:
+- currentStep === stepNumber → Étape ACTIVE (cercle bleu + icône GRISE)
+- currentStep > stepNumber → Étape COMPLÉTÉE (cercle bleu + icône BLEUE)
+- currentStep < stepNumber → Étape FUTURE (cercle bleu + icône gris clair)
+
+@version 4.0-Enterprise-Industry-Leader
+@since 2025-10-20
+====================================================================
 --}}
 
-<div {{ $attributes->merge(['class' => 'px-4 py-6 border-b border-gray-200 ']) }}>
- <ol class="flex items-center justify-between w-full max-w-4xl mx-auto">
- @foreach($steps as $index => $step)
- @php
- $stepNumber = $index + 1;
- $isLast = $stepNumber === count($steps);
- $alpineCompletedCondition = "{$currentStepVar} > {$stepNumber}";
- $alpineActiveCondition = "{$currentStepVar} >= {$stepNumber}";
- @endphp
+<div {{ $attributes->merge(['class' => 'px-4 py-8 border-b border-gray-200 bg-white']) }}>
+    <ol class="flex items-center justify-between w-full max-w-5xl mx-auto">
+        @foreach($steps as $index => $step)
+            @php
+                $stepNumber = $index + 1;
+                $isLast = $stepNumber === count($steps);
+                // Conditions Alpine.js précises
+                $isCompleted = "{$currentStepVar} > {$stepNumber}";
+                $isActive = "{$currentStepVar} === {$stepNumber}";
+                $isFuture = "{$currentStepVar} < {$stepNumber}";
+            @endphp
 
- <li
- class="flex items-center relative"
- x-bind:class="'{{ !$isLast ? 'flex-1' : '' }}'"
- >
- {{-- Container pour l'étape --}}
- <div class="flex flex-col items-center relative z-10 bg-white {{ !$isLast ? 'w-full' : '' }}">
+            <li class="flex items-center relative {{ !$isLast ? 'flex-1' : '' }}">
 
- {{-- Cercle avec icône --}}
- <div class="flex items-center {{ !$isLast ? 'w-full' : '' }}">
- <span
- class="flex items-center justify-center w-10 h-10 rounded-full transition-all duration-300 flex-shrink-0"
- x-bind:class="{{ $alpineActiveCondition }} ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/50' : 'bg-gray-200 text-gray-500 '"
- >
- <x-iconify :icon="$step['icon']" class="w-5 h-5" />
- </span>
+                {{-- Container flex-col pour cercle + label --}}
+                <div class="flex flex-col items-center relative z-10 bg-white {{ !$isLast ? 'w-full' : '' }}">
 
- {{-- Ligne de connexion fine et professionnelle --}}
- @if(!$isLast)
- <div class="flex-1 h-0.5 mx-2 transition-colors duration-300"
- x-bind:class="{{ $alpineCompletedCondition }} ? 'bg-blue-600' : 'bg-gray-300 '">
- </div>
- @endif
- </div>
+                    {{-- Row horizontale: Cercle + Ligne --}}
+                    <div class="flex items-center {{ !$isLast ? 'w-full' : '' }}">
 
- {{-- Label de l'étape --}}
- <span
- class="mt-2 text-xs font-medium text-center transition-colors duration-200 whitespace-nowrap"
- x-bind:class="{{ $alpineActiveCondition }} ? 'text-blue-600 font-semibold' : 'text-gray-500 '"
- >
- {{ $step['label'] }}
- </span>
- </div>
- </li>
- @endforeach
- </ol>
+                        {{-- ===============================================
+                             CERCLE AVEC ICÔNE - LOGIQUE ENTERPRISE GRADE
+                             =============================================== --}}
+                        <div
+                            class="flex items-center justify-center w-12 h-12 rounded-full transition-all duration-300 flex-shrink-0 bg-blue-600"
+                            x-bind:class="{
+                                'shadow-lg shadow-blue-500/30': {{ $isActive }} || {{ $isCompleted }},
+                                'shadow-sm': {{ $isFuture }}
+                            }"
+                        >
+                            {{-- UNE SEULE ICÔNE - Couleur change selon l'état --}}
+                            <span
+                                class="iconify w-6 h-6 transition-colors duration-300"
+                                x-bind:class="{
+                                    'text-gray-400': {{ $isActive }},      {{-- Étape ACTIVE EN COURS --}}
+                                    'text-blue-600': {{ $isCompleted }},   {{-- Étape COMPLÉTÉE --}}
+                                    'text-gray-300': {{ $isFuture }}       {{-- Étape FUTURE --}}
+                                }"
+                                x-bind:data-icon="'lucide:' + {{ json_encode($step['icon']) }}"
+                                data-inline="false"
+                            ></span>
+                        </div>
+
+                        {{-- ===============================================
+                             LIGNE DE CONNEXION - Ultra-fine et élégante
+                             =============================================== --}}
+                        @if(!$isLast)
+                            <div
+                                class="flex-1 h-0.5 mx-3 rounded-full transition-all duration-300"
+                                x-bind:class="{{ $isCompleted }} ? 'bg-blue-600' : 'bg-gray-300'"
+                            ></div>
+                        @endif
+
+                    </div>
+
+                    {{-- ===============================================
+                         LABEL D'ÉTAPE - Centré horizontalement et verticalement
+                         =============================================== --}}
+                    <span
+                        class="mt-3 text-sm font-medium text-center transition-all duration-200 whitespace-nowrap"
+                        x-bind:class="{
+                            'text-blue-600 font-semibold': {{ $isActive }} || {{ $isCompleted }},
+                            'text-gray-500': {{ $isFuture }}
+                        }"
+                    >
+                        {{ $step['label'] }}
+                    </span>
+
+                </div>
+            </li>
+        @endforeach
+    </ol>
 </div>

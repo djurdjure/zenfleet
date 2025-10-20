@@ -565,21 +565,21 @@ function vehicleFormValidation() {
  steps: [
  {
  label: 'Identification',
- icon: 'file-text',
+ icon: 'identification',
  validated: false,
  touched: false,
  requiredFields: ['registration_plate', 'brand', 'model']
  },
  {
  label: 'Caractéristiques',
- icon: 'settings',
+ icon: 'cog-6-tooth',
  validated: false,
  touched: false,
  requiredFields: ['vehicle_type_id', 'fuel_type_id', 'transmission_type_id']
  },
  {
  label: 'Acquisition',
- icon: 'dollar-sign',
+ icon: 'currency-dollar',
  validated: false,
  touched: false,
  requiredFields: ['acquisition_date', 'status_id']
