@@ -199,7 +199,7 @@
  @endphp
  <a href="{{ $mileageIndexRoute }}"
  class="flex items-center h-9 px-3 py-1.5 rounded-lg text-sm font-medium transition-all duration-200 {{ $isMileageIndexActive ? 'bg-blue-100/70 text-blue-700' : 'text-gray-700 hover:bg-white/70 hover:text-gray-900' }}">
- <x-iconify icon="mdi:history" class="w-3 h-3 mr-2 {{ $isMileageIndexActive ? 'text-blue-600' : 'text-slate-400' }}" />
+ <x-iconify icon="mdi:history" class="w-4 h-4 mr-2 {{ $isMileageIndexActive ? 'text-blue-600' : 'text-slate-400' }}" />
  Historique
  </a>
  </li>
@@ -214,7 +214,7 @@
  @endphp
  <a href="{{ $mileageUpdateRoute }}"
  class="flex items-center h-9 px-3 py-1.5 rounded-lg text-sm font-medium transition-all duration-200 {{ $isMileageUpdateActive ? 'bg-blue-100/70 text-blue-700' : 'text-gray-700 hover:bg-white/70 hover:text-gray-900' }}">
- <x-iconify icon="mdi:pencil" class="w-3 h-3 mr-2 {{ $isMileageUpdateActive ? 'text-blue-600' : 'text-slate-400' }}" />
+ <x-iconify icon="mdi:pencil" class="w-4 h-4 mr-2 {{ $isMileageUpdateActive ? 'text-blue-600' : 'text-slate-400' }}" />
  Mettre à jour
  </a>
  </li>

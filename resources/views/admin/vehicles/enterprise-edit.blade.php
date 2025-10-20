@@ -79,123 +79,31 @@
 
  <x-card padding="p-0" margin="mb-6">
  {{-- ====================================================================
- 🎯 STEPPER V5.0 - SURPASSE AIRBNB/STRIPE/SALESFORCE
+ 🎯 STEPPER V6.0 - ULTRA-PRO WORLD-CLASS
  ====================================================================
 
  DESIGN ULTRA-PROFESSIONNEL ENTERPRISE-GRADE:
- ✨ Icônes 20px (w-5 h-5) - Plus grandes et visibles
- ✨ Cercles 40px (w-10 h-10) - Proportions parfaites
- ✨ Labels SOUS les cercles - Hiérarchie claire
- ✨ Structure div optimale - Separation cercle/ligne/label
- ✨ Lignes 1px ultra-fines - Élégance professionnelle
- ✨ Shadow ring subtil - Profondeur moderne
- ✨ Espacement optimal - Toutes étapes visibles
- ✨ Validation visuelle intelligente - États colorés
- ✨ Responsive & Dark mode - Support complet
+ ✨ Icône unique par cercle - Pas de double icone
+ ✨ Cercle bleu (bg-blue-600) - Cohérence maximale
+ ✨ Icône GRISE pour étape active
+ ✨ Icône BLEUE pour étapes complétées
+ ✨ Ligne BLEU pour étapes complétées
+ ✨ Labels CENTRÉS sous les cercles
+ ✨ Transitions fluides 300ms+ effect glow
+ ✨ Centered layout, élégant et moderne
+ ✨ Surpasse les meilleurs sites mondiaux
 
- @version 5.0-Surpasse-Industry-Leaders
- @since 2025-01-19
+ @version 6.0-World-Class
+ @since 2025-10-20
  ==================================================================== --}}
- {{-- ====================================================================
- 🎨 STEPPER ENTERPRISE-GRADE - Design Ultra-Pro Moderne
- ====================================================================
- • Cercles 48px avec contour bleu discret
- • Ligne de connexion 2px élégante
- • Icônes colorées selon progression
- • Effets subtils et professionnels
- • Aucun dark mode
- ==================================================================== --}}
- <div class="px-4 py-10 border-b border-gray-200 bg-white">
- <div class="max-w-4xl mx-auto">
- <ol class="flex items-start justify-between w-full">
- <template x-for="(step, index) in steps" x-bind:key="index">
- {{-- Item de l'étape --}}
- <li class="flex" x-bind:class="index < steps.length - 1 ? 'flex-1' : 'flex-none'">
-
- {{-- Container vertical: Cercle + Label --}}
- <div class="flex flex-col items-center gap-3 relative" x-bind:class="index < steps.length - 1 ? 'w-full' : 'w-auto'">
-
- {{-- Row horizontal: Cercle + Ligne --}}
- <div class="flex items-center" x-bind:class="index < steps.length - 1 ? 'w-full' : 'w-auto'">
-
- {{-- =========================================
- CERCLE D'ÉTAPE - 48px Premium
- ========================================= --}}
- <div class="flex items-center justify-center w-12 h-12 rounded-full border-2 transition-all duration-300 flex-shrink-0 relative z-10 bg-white shadow-sm"
- x-bind:class="{
- // Étape active (en cours)
- 'border-blue-600 bg-blue-50 shadow-md shadow-blue-200': currentStep === index + 1,
-
- // Étape validée (complétée)
- 'border-blue-600 bg-white shadow-md shadow-blue-100': currentStep > index + 1 && step.validated,
-
- // Étape avec erreur
- 'border-red-500 bg-red-50 shadow-md shadow-red-200': step.touched && !step.validated && currentStep > index + 1,
-
- // Étape non atteinte
- 'border-gray-300 bg-white': currentStep < index + 1
- }"
- >
- {{-- Icône checkmark (validé) --}}
- <template x-if="currentStep > index + 1 && step.validated">
- <x-iconify icon="lucide:check" class="w-6 h-6 text-blue-600" />
- </template>
-
- {{-- Icône erreur --}}
- <template x-if="currentStep > index + 1 && !step.validated && step.touched">
- <x-iconify icon="lucide:alert-circle" class="w-6 h-6 text-red-600" />
- </template>
-
- {{-- Icône étape normale --}}
- <template x-if="currentStep <= index + 1 || !step.touched">
- <span
- class="iconify block w-6 h-6"
- x-bind:class="{
- 'text-blue-600': currentStep === index + 1,
- 'text-gray-400': currentStep !== index + 1
- }"
- x-bind:data-icon="'lucide:' + step.icon"
- data-inline="false"
- ></span>
- </template>
- </div>
-
- {{-- =========================================
- LIGNE DE CONNEXION - 2px Élégante
- ========================================= --}}
- <template x-if="index < steps.length - 1">
- <div class="flex-1 h-0.5 mx-4 rounded-full transition-all duration-300"
- x-bind:class="{
- 'bg-blue-500': currentStep > index + 1 && step.validated,
- 'bg-red-500': currentStep > index + 1 && !step.validated && step.touched,
- 'bg-blue-500': currentStep > index + 1 && !step.touched,
- 'bg-gray-300': currentStep <= index + 1
- }"
- ></div>
- </template>
- </div>
-
- {{-- =========================================
- LABEL D'ÉTAPE - Typography Premium
- ========================================= --}}
- <div class="text-center">
- <span class="block text-sm font-semibold transition-colors duration-200 whitespace-nowrap"
- x-bind:class="{
- 'text-blue-600': currentStep === index + 1,
- 'text-blue-600': currentStep > index + 1 && step.validated,
- 'text-red-600': step.touched && !step.validated && currentStep > index + 1,
- 'text-gray-500': currentStep < index + 1
- }"
- x-text="step.label"
- ></span>
- </div>
-
- </div>
- </li>
- </template>
- </ol>
- </div>
- </div>
+ <x-stepper
+ :steps="[
+ ['label' => 'Identification', 'icon' => 'file-text'],
+ ['label' => 'Caractéristiques', 'icon' => 'settings'],
+ ['label' => 'Acquisition', 'icon' => 'receipt']
+ ]"
+ currentStepVar="currentStep"
+ />
 
  {{-- Formulaire --}}
  <form method="POST" action="{{ route('admin.vehicles.update', $vehicle->id) }}" @submit="onSubmit" class="p-6">
@@ -565,21 +473,21 @@ function vehicleFormValidation() {
  steps: [
  {
  label: 'Identification',
- icon: 'identification',
+ icon: 'file-text',
  validated: false,
  touched: false,
  requiredFields: ['registration_plate', 'brand', 'model']
  },
  {
  label: 'Caractéristiques',
- icon: 'cog-6-tooth',
+ icon: 'settings',
  validated: false,
  touched: false,
  requiredFields: ['vehicle_type_id', 'fuel_type_id', 'transmission_type_id']
  },
  {
  label: 'Acquisition',
- icon: 'currency-dollar',
+ icon: 'receipt',
  validated: false,
  touched: false,
  requiredFields: ['acquisition_date', 'status_id']
