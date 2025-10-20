@@ -1,786 +1,574 @@
-{{-- resources/views/admin/assignments/create-enterprise.blade.php --}}
+{{-- resources/views/admin/assignments/create-refactored.blade.php --}}
 @extends('layouts.admin.catalyst')
-@section('title', 'Nouvelle Affectation Enterprise - ZenFleet')
 
-@push('styles')
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.min.css">
-<style>
-/* 🎨 ULTRA-PRO ENTERPRISE ASSIGNMENT INTERFACE */
-
-/* Animations globales avancées */
-@keyframes slideInUp {
- from {
- opacity: 0;
- transform: translateY(30px) scale(0.98);
- filter: blur(3px);
- }
- to {
- opacity: 1;
- transform: translateY(0) scale(1);
- filter: blur(0);
- }
-}
-
-@keyframes pulseSuccess {
- 0%, 100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.4); }
- 50% { box-shadow: 0 0 0 15px rgba(34, 197, 94, 0); }
-}
-
-.animate-slide-up {
- animation: slideInUp 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-/* Section cards ultra-moderne */
-.enterprise-card {
- background: linear-gradient(145deg, #ffffff 0%, #fafbfc 100%);
- border: 2px solid rgba(226, 232, 240, 0.6);
- border-radius: 24px;
- padding: 2rem;
- margin-bottom: 2rem;
- transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
- position: relative;
- overflow: hidden;
-}
-
-.enterprise-card::before {
- content: '';
- position: absolute;
- top: 0;
- left: -100%;
- width: 100%;
- height: 100%;
- background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
- transition: left 0.6s ease;
-}
-
-.enterprise-card:hover::before {
- left: 100%;
-}
-
-.enterprise-card:hover {
- transform: translateY(-4px);
- border-color: rgba(99, 102, 241, 0.3);
- box-shadow: 0 12px 40px rgba(0,0,0,0.08), 0 6px 20px rgba(0,0,0,0.06);
-}
-
-.enterprise-card-header {
- display: flex;
- align-items: center;
- gap: 1rem;
- margin-bottom: 2rem;
- padding-bottom: 1rem;
- border-bottom: 3px solid transparent;
- background: linear-gradient(90deg, rgba(99, 102, 241, 0.15) 0%, transparent 100%);
- background-size: 100% 3px;
- background-repeat: no-repeat;
- background-position: bottom;
-}
-
-.enterprise-card-icon {
- width: 48px;
- height: 48px;
- background: linear-gradient(135deg, #3b82f6 0%, #6366f1 100%);
- border-radius: 16px;
- display: flex;
- align-items: center;
- justify-center;
- box-shadow: 0 8px 25px rgba(59, 130, 246, 0.3);
-}
-
-.enterprise-input {
- width: 100%;
- padding: 1rem 1.25rem;
- border: 2px solid rgba(229, 231, 235, 0.8);
- border-radius: 16px;
- font-size: 0.875rem;
- transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
- background: linear-gradient(135deg, #ffffff 0%, #fafbfc 100%);
- backdrop-filter: blur(5px);
-}
-
-.enterprise-input:focus {
- transform: scale(1.01);
- border-color: #6366f1;
- box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1), 0 4px 20px rgba(0,0,0,0.08);
- background: white;
- outline: none;
-}
-
-.enterprise-input:hover:not(:focus) {
- border-color: rgba(156, 163, 175, 0.6);
-}
-
-/* Tom Select Enterprise Customization */
-.ts-control {
- border: 2px solid rgba(229, 231, 235, 0.8) !important;
- border-radius: 16px !important;
- background: linear-gradient(135deg, #ffffff 0%, #fafbfc 100%) !important;
- padding: 1rem 1.25rem !important;
- font-size: 0.875rem !important;
- transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
- min-height: 56px !important;
-}
-
-.ts-control.focus {
- transform: scale(1.01) !important;
- border-color: #6366f1 !important;
- box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1), 0 4px 20px rgba(0,0,0,0.08) !important;
- background: white !important;
-}
-
-.ts-dropdown {
- border: 2px solid rgba(229, 231, 235, 0.8) !important;
- border-radius: 16px !important;
- box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15) !important;
- backdrop-filter: blur(20px) !important;
-}
-
-.ts-dropdown .option {
- padding: 1rem !important;
- border-bottom: 1px solid rgba(229, 231, 235, 0.5) !important;
- transition: all 0.2s ease !important;
-}
-
-.ts-dropdown .option:hover {
- background: rgba(99, 102, 241, 0.08) !important;
- transform: translateX(4px) !important;
-}
-
-.ts-dropdown .option:last-child {
- border-bottom: none !important;
-}
-
-/* Assignment Type Cards */
-.assignment-type-card {
- background: linear-gradient(135deg, #ffffff 0%, #fafbfc 100%);
- border: 3px solid rgba(229, 231, 235, 0.8);
- border-radius: 20px;
- padding: 1.75rem;
- cursor: pointer;
- transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
- position: relative;
- overflow: hidden;
-}
-
-.assignment-type-card::after {
- content: '';
- position: absolute;
- top: 50%;
- left: 50%;
- width: 0;
- height: 0;
- border-radius: 50%;
- background: rgba(99, 102, 241, 0.1);
- transform: translate(-50%, -50%);
- transition: width 0.5s, height 0.5s;
-}
-
-.assignment-type-card:hover::after {
- width: 300px;
- height: 300px;
-}
-
-.assignment-type-card:hover {
- transform: translateY(-6px) scale(1.02);
- box-shadow: 0 12px 40px rgba(0,0,0,0.1);
-}
-
-.assignment-type-card.selected-open {
- background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
- border-color: #22c55e;
- box-shadow: 0 8px 30px rgba(34, 197, 94, 0.2), 0 4px 15px rgba(34, 197, 94, 0.1);
-}
-
-.assignment-type-card.selected-scheduled {
- background: linear-gradient(135deg, #faf5ff 0%, #f3e8ff 100%);
- border-color: #a855f7;
- box-shadow: 0 8px 30px rgba(168, 85, 247, 0.2), 0 4px 15px rgba(168, 85, 247, 0.1);
-}
-
-/* Buttons Enterprise */
-.btn-enterprise-primary {
- background: linear-gradient(135deg, #3b82f6 0%, #6366f1 50%, #8b5cf6 100%);
- color: white;
- padding: 1.25rem 3rem;
- border: none;
- border-radius: 18px;
- font-weight: 700;
- font-size: 0.875rem;
- cursor: pointer;
- transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
- box-shadow: 0 10px 35px rgba(59, 130, 246, 0.4);
- position: relative;
- overflow: hidden;
-}
-
-.btn-enterprise-primary::before {
- content: '';
- position: absolute;
- top: 0;
- left: -100%;
- width: 100%;
- height: 100%;
- background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
- transition: left 0.6s ease;
-}
-
-.btn-enterprise-primary:hover::before {
- left: 100%;
-}
-
-.btn-enterprise-primary:hover {
- transform: translateY(-3px) scale(1.03);
- box-shadow: 0 12px 45px rgba(59, 130, 246, 0.5), 0 6px 25px rgba(99, 102, 241, 0.3);
-}
-
-.btn-enterprise-secondary {
- background: white;
- color: #64748b;
- padding: 1rem 2.5rem;
- border: 2px solid rgba(226, 232, 240, 0.8);
- border-radius: 16px;
- font-weight: 600;
- font-size: 0.875rem;
- cursor: pointer;
- transition: all 0.3s ease;
-}
-
-.btn-enterprise-secondary:hover {
- border-color: #cbd5e1;
- background: #f8fafc;
- transform: translateY(-2px);
-}
-
-/* Alert Enterprise */
-.alert-enterprise {
- background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
- border: 2px solid #ef4444;
- border-radius: 16px;
- padding: 1.5rem;
- display: flex;
- align-items: center;
- gap: 1rem;
- animation: slideInUp 0.5s ease;
-}
-
-.alert-enterprise-icon {
- width: 48px;
- height: 48px;
- background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
- border-radius: 12px;
- display: flex;
- align-items: center;
- justify-content: center;
- box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);
- flex-shrink: 0;
-}
-
-/* Stats Dashboard */
-.stats-card {
- background: linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.7) 100%);
- backdrop-filter: blur(10px);
- border: 2px solid rgba(255, 255, 255, 0.5);
- border-radius: 18px;
- padding: 1.5rem;
- transition: all 0.3s ease;
-}
-
-.stats-card:hover {
- transform: translateY(-4px);
- box-shadow: 0 8px 30px rgba(0,0,0,0.1);
- border-color: rgba(99, 102, 241, 0.3);
-}
-
-/* Conditional Section Animation */
-#end-assignment-section {
- transform: translateY(20px);
- opacity: 0;
- max-height: 0;
- overflow: hidden;
- transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-#end-assignment-section.show {
- transform: translateY(0);
- opacity: 1;
- max-height: 1000px;
-}
-
-/* Responsive Design */
-@media (max-width: 768px) {
- .enterprise-card {
- padding: 1.5rem;
- border-radius: 18px;
- }
-
- .enterprise-card-icon {
- width: 40px;
- height: 40px;
- }
-
- .btn-enterprise-primary {
- padding: 1rem 2rem;
- font-size: 0.8125rem;
- }
-}
-
-/* Loading State */
-.loading-spinner {
- display: inline-block;
- width: 20px;
- height: 20px;
- border: 3px solid rgba(255,255,255,0.3);
- border-radius: 50%;
- border-top-color: white;
- animation: spin 0.8s linear infinite;
-}
-
-@keyframes spin {
- to { transform: rotate(360deg); }
-}
-</style>
-@endpush
+@section('title', 'Nouvelle Affectation')
 
 @section('content')
-<div class="space-y-8 animate-slide-up">
- {{-- HERO HEADER ULTRA-PRO --}}
- <div class="bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 rounded-3xl p-8 border-2 border-blue-200 shadow-2xl">
- <div class="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
- <div class="flex-1">
- <div class="flex items-center space-x-4 mb-6">
- <div class="w-20 h-20 bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-600 rounded-3xl flex items-center justify-center shadow-2xl transform hover:rotate-6 transition-transform duration-300">
- <i class="fas fa-exchange-alt text-white text-3xl"></i>
- </div>
- <div>
- <h1 class="text-3xl font-black text-gray-900 tracking-tight">
- Nouvelle Affectation Enterprise
+{{-- ====================================================================
+🚗 CRÉER AFFECTATION - ULTRA-PROFESSIONAL ENTERPRISE GRADE
+====================================================================
+
+DESIGN PRINCIPLES:
+✨ Fond gris clair (bg-gray-50) pour la page
+✨ Header avec icône + titre
+✨ Metric cards: 3 statistiques clés
+✨ Formulaire multi-sections avec x-card
+✨ Stepper V7.0 pour navigation
+✨ Validation en temps réel Alpine.js
+✨ Cohérence totale avec pages Véhicules
+
+@version 1.0-Ultra-Pro-Enterprise-Standard
+@since 2025-10-20
+==================================================================== --}}
+
+<section class="bg-gray-50 min-h-screen">
+ <div class="py-6 px-4 mx-auto max-w-7xl lg:py-12">
+
+ {{-- ====================================================================
+ HEADER - ULTRA-PRO DESIGN
+ ===================================================================== --}}
+ <div class="mb-6">
+ <h1 class="text-2xl font-bold text-gray-900 mb-1 flex items-center gap-2.5">
+ <x-iconify icon="lucide:plus-circle" class="w-6 h-6 text-blue-600" />
+ Nouvelle Affectation
  </h1>
- <p class="text-gray-600 mt-2 font-medium">
- Système intelligent d'assignation véhicule ↔ chauffeur
+ <p class="text-sm text-gray-600 ml-8.5">
+ Créez une nouvelle affectation entre un véhicule et un chauffeur
  </p>
  </div>
- </div>
 
- {{-- STATS REAL-TIME --}}
- <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
- <div class="stats-card group">
- <div class="flex items-center space-x-3">
- <div class="w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
- <i class="fas fa-car text-white text-lg"></i>
- </div>
+ {{-- ====================================================================
+ METRIC CARDS - KEY STATISTICS
+ ===================================================================== --}}
+ <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+ {{-- Véhicules Disponibles --}}
+ <div class="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-lg transition-shadow duration-300">
+ <div class="flex items-center justify-between">
  <div>
- <p class="text-xs font-semibold text-gray-600 uppercase tracking-wide">Véhicules</p>
- <p class="text-2xl font-black text-green-600">{{ count($availableVehicles) }}</p>
+ <p class="text-sm font-medium text-gray-600">Véhicules Disponibles</p>
+ <p class="text-2xl font-bold text-green-600 mt-1">{{ $availableVehicles->count() }}</p>
+ </div>
+ <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+ <x-iconify icon="lucide:car" class="w-6 h-6 text-green-600" />
  </div>
  </div>
  </div>
 
- <div class="stats-card group">
- <div class="flex items-center space-x-3">
- <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
- <i class="fas fa-user-tie text-white text-lg"></i>
- </div>
+ {{-- Chauffeurs Disponibles --}}
+ <div class="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-lg transition-shadow duration-300">
+ <div class="flex items-center justify-between">
  <div>
- <p class="text-xs font-semibold text-gray-600 uppercase tracking-wide">Chauffeurs</p>
- <p class="text-2xl font-black text-blue-600">{{ count($availableDrivers) }}</p>
+ <p class="text-sm font-medium text-gray-600">Chauffeurs Disponibles</p>
+ <p class="text-2xl font-bold text-blue-600 mt-1">{{ $availableDrivers->count() }}</p>
+ </div>
+ <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+ <x-iconify icon="lucide:user" class="w-6 h-6 text-blue-600" />
  </div>
  </div>
  </div>
 
- <div class="stats-card group">
- <div class="flex items-center space-x-3">
- <div class="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-600 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
- <i class="fas fa-clock text-white text-lg"></i>
- </div>
+ {{-- Affectations Actives --}}
+ <div class="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-lg transition-shadow duration-300">
+ <div class="flex items-center justify-between">
  <div>
- <p class="text-xs font-semibold text-gray-600 uppercase tracking-wide">Créée le</p>
- <p class="text-sm font-bold text-purple-600">{{ now()->format('d/m/Y H:i') }}</p>
+ <p class="text-sm font-medium text-gray-600">Affectations Actives</p>
+ <p class="text-2xl font-bold text-orange-600 mt-1">{{ $activeAssignments->count() }}</p>
  </div>
+ <div class="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
+ <x-iconify icon="lucide:clock" class="w-6 h-6 text-orange-600" />
  </div>
  </div>
  </div>
  </div>
 
- <div>
- <a href="{{ route('admin.assignments.index') }}" 
- class="btn-enterprise-secondary inline-flex items-center">
- <i class="fas fa-arrow-left mr-2"></i>
- Retour
- </a>
- </div>
- </div>
- </div>
+ {{-- ====================================================================
+ FORMULAIRE MULTI-ÉTAPES - ULTRA-PRO DESIGN
+ ===================================================================== --}}
+ <div x-data="assignmentFormValidation()" x-init="init()">
 
- {{-- ERREURS --}}
- @if ($errors->any())
- <div class="alert-enterprise">
- <div class="alert-enterprise-icon">
- <i class="fas fa-exclamation-triangle text-white text-xl"></i>
- </div>
- <div class="flex-1">
- <h3 class="text-lg font-bold text-red-900 mb-2">Erreurs de validation</h3>
- <ul class="space-y-1 text-sm text-red-700">
- @foreach ($errors->all() as $error)
- <li class="flex items-center">
- <i class="fas fa-times-circle mr-2"></i>
- {{ $error }}
- </li>
- @endforeach
- </ul>
- </div>
- </div>
- @endif
+ <x-card padding="p-0" margin="mb-6">
+ {{-- STEPPER V7.0 --}}
+ <x-stepper
+ :steps="[
+ ['label' => 'Véhicule', 'icon' => 'car'],
+ ['label' => 'Chauffeur', 'icon' => 'user'],
+ ['label' => 'Dates', 'icon' => 'calendar'],
+ ['label' => 'Confirmation', 'icon' => 'check-circle']
+ ]"
+ currentStepVar="currentStep"
+ />
 
- {{-- FORMULAIRE PRINCIPAL --}}
- <form method="POST" action="{{ route('admin.assignments.store') }}" id="assignment-form" class="space-y-6">
+ {{-- Formulaire --}}
+ <form method="POST" action="{{ route('admin.assignments.store') }}" @submit="onSubmit" class="p-6">
  @csrf
+ <input type="hidden" name="current_step" x-model="currentStep">
 
- {{-- SECTION VÉHICULE --}}
- <div class="enterprise-card">
- <div class="enterprise-card-header">
- <div class="enterprise-card-icon">
- <i class="fas fa-car text-white text-xl"></i>
- </div>
+ {{-- ===========================================
+ ÉTAPE 1: SÉLECTION VÉHICULE
+ =========================================== --}}
+ <div x-show="currentStep === 1" x-transition:enter="transition ease-out duration-200"
+ x-transition:enter-start="opacity-0 transform translate-x-4"
+ x-transition:enter-end="opacity-100 transform translate-x-0">
+ <div class="space-y-6">
  <div>
- <h3 class="text-xl font-bold text-gray-900">Sélection du Véhicule</h3>
- <p class="text-sm text-gray-600">Véhicules disponibles et prêts à l'assignation</p>
- </div>
- </div>
+ <h3 class="text-lg font-medium text-gray-900 mb-4 flex items-center gap-2">
+ <x-iconify icon="lucide:car" class="w-5 h-5 text-blue-600" />
+ Sélectionnez un Véhicule
+ </h3>
 
- @if(count($availableVehicles) == 0)
- <div class="alert-enterprise mb-6">
- <div class="alert-enterprise-icon">
- <i class="fas fa-car-crash text-white text-xl"></i>
- </div>
- <div>
- <p class="font-bold text-red-900 text-lg">Aucun véhicule disponible</p>
- <p class="text-red-700">Tous les véhicules sont affectés ou indisponibles</p>
- </div>
- </div>
- @endif
+ <x-tom-select
+ name="vehicle_id"
+ label="Véhicule"
+ :options="$availableVehicles->mapWithKeys(fn($v) => [
+ $v->id => $v->registration_plate . ' - ' . $v->brand . ' ' . $v->model
+ ])->toArray()"
+ placeholder="Rechercher un véhicule..."
+ required
+ :error="$errors->first('vehicle_id')"
+ @change="validateField('vehicle_id', $event.target.value)"
+ />
 
- <div>
- <label for="select-vehicle" class="block text-sm font-semibold text-gray-700 mb-2">
- <span class="text-red-500">*</span> Véhicule ({{ count($availableVehicles) }} disponible{{ count($availableVehicles) > 1 ? 's' : '' }})
- </label>
- <select name="vehicle_id" id="select-vehicle" required {{ count($availableVehicles) == 0 ? 'disabled' : '' }}>
- <option value="">{{ count($availableVehicles) > 0 ? 'Sélectionnez un véhicule' : 'Aucun disponible' }}</option>
+ {{-- Infos Véhicule Sélectionné --}}
+ @if($availableVehicles->count() > 0)
+ <div class="mt-6">
+ <h4 class="text-sm font-medium text-gray-700 mb-3">Véhicules Disponibles</h4>
+ <div class="space-y-2 max-h-96 overflow-y-auto">
  @foreach($availableVehicles as $vehicle)
- <option value="{{ $vehicle->id }}"
- data-plate="{{ $vehicle->registration_plate }}"
- data-brand="{{ $vehicle->brand }}"
- data-model="{{ $vehicle->model }}"
- data-mileage="{{ $vehicle->current_mileage ?? 0 }}"
- {{ old('vehicle_id') == $vehicle->id ? 'selected' : '' }}>
- {{ $vehicle->registration_plate }} - {{ $vehicle->brand }} {{ $vehicle->model }} ({{ number_format($vehicle->current_mileage ?? 0, 0, ',', ' ') }} km)
- </option>
+ <div class="bg-gray-50 border border-gray-200 rounded-lg p-4 hover:bg-gray-100 transition-colors cursor-pointer"
+ @click="document.querySelector('input[name=vehicle_id]').value = {{ $vehicle->id }}; $el.closest('form').dispatchEvent(new Event('change', { bubbles: true }))">
+ <div class="flex items-start justify-between">
+ <div>
+ <div class="font-medium text-gray-900">
+ {{ $vehicle->registration_plate }}
+ </div>
+ <div class="text-sm text-gray-600 mt-1">
+ {{ $vehicle->brand }} {{ $vehicle->model }} • Année: {{ $vehicle->manufacturing_year }}
+ </div>
+ <div class="text-xs text-gray-500 mt-2">
+ Type: {{ $vehicle->vehicleType?->name ?? 'N/A' }} | Carburant: {{ $vehicle->fuelType?->name ?? 'N/A' }}
+ </div>
+ </div>
+ <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+ Disponible
+ </span>
+ </div>
+ </div>
  @endforeach
- </select>
- @error('vehicle_id')
- <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
- @enderror
- </div>
- </div>
-
- {{-- SECTION CHAUFFEUR --}}
- <div class="enterprise-card">
- <div class="enterprise-card-header">
- <div class="enterprise-card-icon">
- <i class="fas fa-user-tie text-white text-xl"></i>
- </div>
- <div>
- <h3 class="text-xl font-bold text-gray-900">Sélection du Chauffeur</h3>
- <p class="text-sm text-gray-600">Chauffeurs actifs et disponibles</p>
- </div>
- </div>
-
- @if(count($availableDrivers) == 0)
- <div class="alert-enterprise mb-6">
- <div class="alert-enterprise-icon">
- <i class="fas fa-user-slash text-white text-xl"></i>
- </div>
- <div>
- <p class="font-bold text-red-900 text-lg">Aucun chauffeur disponible</p>
- <p class="text-red-700">Tous les chauffeurs sont affectés ou inactifs</p>
  </div>
  </div>
  @endif
+ </div>
+ </div>
+ </div>
 
+ {{-- ===========================================
+ ÉTAPE 2: SÉLECTION CHAUFFEUR
+ =========================================== --}}
+ <div x-show="currentStep === 2" x-transition:enter="transition ease-out duration-200"
+ x-transition:enter-start="opacity-0 transform translate-x-4"
+ x-transition:enter-end="opacity-100 transform translate-x-0"
+ style="display: none;">
+ <div class="space-y-6">
  <div>
- <label for="select-driver" class="block text-sm font-semibold text-gray-700 mb-2">
- <span class="text-red-500">*</span> Chauffeur ({{ count($availableDrivers) }} libre{{ count($availableDrivers) > 1 ? 's' : '' }})
- </label>
- <select name="driver_id" id="select-driver" required {{ count($availableDrivers) == 0 ? 'disabled' : '' }}>
- <option value="">{{ count($availableDrivers) > 0 ? 'Sélectionnez un chauffeur' : 'Aucun disponible' }}</option>
+ <h3 class="text-lg font-medium text-gray-900 mb-4 flex items-center gap-2">
+ <x-iconify icon="lucide:user" class="w-5 h-5 text-blue-600" />
+ Sélectionnez un Chauffeur
+ </h3>
+
+ <x-tom-select
+ name="driver_id"
+ label="Chauffeur"
+ :options="$availableDrivers->mapWithKeys(fn($d) => [
+ $d->id => $d->name . ' (' . $d->phone . ')'
+ ])->toArray()"
+ placeholder="Rechercher un chauffeur..."
+ required
+ :error="$errors->first('driver_id')"
+ @change="validateField('driver_id', $event.target.value)"
+ />
+
+ {{-- Infos Chauffeur Sélectionné --}}
+ @if($availableDrivers->count() > 0)
+ <div class="mt-6">
+ <h4 class="text-sm font-medium text-gray-700 mb-3">Chauffeurs Disponibles</h4>
+ <div class="space-y-2 max-h-96 overflow-y-auto">
  @foreach($availableDrivers as $driver)
- <option value="{{ $driver->id }}"
- data-name="{{ $driver->first_name }} {{ $driver->last_name }}"
- data-phone="{{ $driver->personal_phone }}"
- data-license="{{ $driver->license_number }}"
- {{ old('driver_id') == $driver->id ? 'selected' : '' }}>
- {{ $driver->first_name }} {{ $driver->last_name }}
- @if($driver->personal_phone) - {{ $driver->personal_phone }} @endif
- </option>
+ <div class="bg-gray-50 border border-gray-200 rounded-lg p-4 hover:bg-gray-100 transition-colors cursor-pointer"
+ @click="document.querySelector('input[name=driver_id]').value = {{ $driver->id }}; $el.closest('form').dispatchEvent(new Event('change', { bubbles: true }))">
+ <div class="flex items-start justify-between">
+ <div>
+ <div class="font-medium text-gray-900">
+ {{ $driver->name }}
+ </div>
+ <div class="text-sm text-gray-600 mt-1">
+ 📞 {{ $driver->phone ?? 'N/A' }} | 📧 {{ $driver->email ?? 'N/A' }}
+ </div>
+ <div class="text-xs text-gray-500 mt-2">
+ Permis: {{ $driver->license_number ?? 'N/A' }}
+ </div>
+ </div>
+ <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+ Libre
+ </span>
+ </div>
+ </div>
  @endforeach
- </select>
- @error('driver_id')
- <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
- @enderror
+ </div>
+ </div>
+ @endif
+ </div>
  </div>
  </div>
 
- {{-- SECTION PROGRAMMATION --}}
- <div class="enterprise-card">
- <div class="enterprise-card-header">
- <div class="enterprise-card-icon">
- <i class="fas fa-calendar-alt text-white text-xl"></i>
- </div>
+ {{-- ===========================================
+ ÉTAPE 3: SÉLECTION DATES
+ =========================================== --}}
+ <div x-show="currentStep === 3" x-transition:enter="transition ease-out duration-200"
+ x-transition:enter-start="opacity-0 transform translate-x-4"
+ x-transition:enter-end="opacity-100 transform translate-x-0"
+ style="display: none;">
+ <div class="space-y-6">
  <div>
- <h3 class="text-xl font-bold text-gray-900">Programmation</h3>
- <p class="text-sm text-gray-600">Dates et horaires de l'affectation</p>
- </div>
- </div>
+ <h3 class="text-lg font-medium text-gray-900 mb-4 flex items-center gap-2">
+ <x-iconify icon="lucide:calendar" class="w-5 h-5 text-blue-600" />
+ Définissez les Dates
+ </h3>
 
- {{-- DATE/HEURE DÉBUT --}}
- <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
- <div>
- <label class="block text-sm font-semibold text-gray-700 mb-2">
- <span class="text-red-500">*</span> Date de début
- </label>
- <input type="date"
- name="start_date"
- id="start_date"
- class="enterprise-input"
- value="{{ old('start_date', now()->format('Y-m-d')) }}"
- min="{{ now()->format('Y-m-d') }}"
- required>
- </div>
-
- <div>
- <label class="block text-sm font-semibold text-gray-700 mb-2">
- <span class="text-red-500">*</span> Heure de début
- </label>
- <input type="time"
- name="start_time"
- id="start_time"
- class="enterprise-input"
- value="{{ old('start_time', now()->format('H:i')) }}"
- required>
- </div>
-
- <div>
- <label class="block text-sm font-semibold text-gray-700 mb-2">
- <span class="text-red-500">*</span> Kilométrage initial
- </label>
- <input type="number"
- name="start_mileage"
- id="start_mileage"
- class="enterprise-input"
- value="{{ old('start_mileage') }}"
- min="0"
- required>
- <p class="mt-1 text-xs text-blue-600" id="mileage-hint">Sélectionnez d'abord un véhicule</p>
- </div>
- </div>
-
- {{-- TYPE D'AFFECTATION --}}
- <div class="mb-8">
- <label class="block text-sm font-semibold text-gray-700 mb-4">Type d'affectation</label>
  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
- <div class="assignment-type-card" id="open-card">
- <input type="radio" name="assignment_type" id="type-open" value="open" 
- class="sr-only" {{ old('assignment_type', 'open') === 'open' ? 'checked' : '' }}>
- <label for="type-open" class="cursor-pointer flex items-center space-x-4">
- <div class="w-14 h-14 bg-gradient-to-br from-green-500 to-emerald-600 rounded-2xl flex items-center justify-center">
- <i class="fas fa-infinity text-white text-2xl"></i>
- </div>
- <div>
- <h4 class="text-lg font-bold text-gray-900">Ouverte</h4>
- <p class="text-sm text-gray-600">Durée indéterminée</p>
- </div>
- </label>
- </div>
+ <x-datepicker
+ name="start_date"
+ label="Date de Début"
+ format="d/m/Y"
+ :minDate="date('Y-m-d')"
+ :value="old('start_date')"
+ placeholder="JJ/MM/AAAA"
+ required
+ :error="$errors->first('start_date')"
+ @change="validateField('start_date', $event.target.value)"
+ />
 
- <div class="assignment-type-card" id="scheduled-card">
- <input type="radio" name="assignment_type" id="type-scheduled" value="scheduled" 
- class="sr-only" {{ old('assignment_type') === 'scheduled' ? 'checked' : '' }}>
- <label for="type-scheduled" class="cursor-pointer flex items-center space-x-4">
- <div class="w-14 h-14 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-2xl flex items-center justify-center">
- <i class="fas fa-calendar-check text-white text-2xl"></i>
- </div>
- <div>
- <h4 class="text-lg font-bold text-gray-900">Programmée</h4>
- <p class="text-sm text-gray-600">Date de fin précise</p>
- </div>
- </label>
- </div>
- </div>
- </div>
-
- {{-- DATE/HEURE FIN (conditionnel) --}}
- <div id="end-assignment-section">
- <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
- <div>
- <label class="block text-sm font-semibold text-gray-700 mb-2">Date de fin</label>
- <input type="date"
+ <x-datepicker
  name="end_date"
- id="end_date"
- class="enterprise-input"
- value="{{ old('end_date') }}"
- min="{{ now()->format('Y-m-d') }}">
+ label="Date de Fin"
+ format="d/m/Y"
+ :value="old('end_date')"
+ placeholder="JJ/MM/AAAA"
+ :error="$errors->first('end_date')"
+ @change="validateField('end_date', $event.target.value)"
+ />
+ </div>
+
+ {{-- Notes Additionnelles --}}
+ <x-textarea
+ name="notes"
+ label="Notes (Optionnel)"
+ rows="4"
+ placeholder="Informations supplémentaires sur l'affectation..."
+ :value="old('notes')"
+ :error="$errors->first('notes')"
+ />
+ </div>
+ </div>
+ </div>
+
+ {{-- ===========================================
+ ÉTAPE 4: CONFIRMATION
+ =========================================== --}}
+ <div x-show="currentStep === 4" x-transition:enter="transition ease-out duration-200"
+ x-transition:enter-start="opacity-0 transform translate-x-4"
+ x-transition:enter-end="opacity-100 transform translate-x-0"
+ style="display: none;">
+ <div class="space-y-6">
+ <div>
+ <h3 class="text-lg font-medium text-gray-900 mb-4 flex items-center gap-2">
+ <x-iconify icon="lucide:check-circle" class="w-5 h-5 text-blue-600" />
+ Confirmez l'Affectation
+ </h3>
+
+ {{-- Résumé --}}
+ <div class="bg-gray-50 rounded-lg border border-gray-200 p-6 space-y-4">
+ <div>
+ <div class="text-sm font-medium text-gray-600">Véhicule</div>
+ <div id="summary-vehicle" class="text-lg font-semibold text-gray-900 mt-1">
+ À sélectionner...
+ </div>
  </div>
 
  <div>
- <label class="block text-sm font-semibold text-gray-700 mb-2">Heure de fin</label>
- <input type="time"
- name="end_time"
- id="end_time"
- class="enterprise-input"
- value="{{ old('end_time') }}">
- </div>
- </div>
+ <div class="text-sm font-medium text-gray-600">Chauffeur</div>
+ <div id="summary-driver" class="text-lg font-semibold text-gray-900 mt-1">
+ À sélectionner...
  </div>
  </div>
 
- {{-- SECTION INFORMATIONS COMPLÉMENTAIRES --}}
- <div class="enterprise-card">
- <div class="enterprise-card-header">
- <div class="enterprise-card-icon">
- <i class="fas fa-sticky-note text-white text-xl"></i>
+ <div class="grid grid-cols-2 gap-4">
+ <div>
+ <div class="text-sm font-medium text-gray-600">Date de Début</div>
+ <div id="summary-start-date" class="text-lg font-semibold text-gray-900 mt-1">
+ À sélectionner...
+ </div>
  </div>
  <div>
- <h3 class="text-xl font-bold text-gray-900">Informations complémentaires</h3>
- <p class="text-sm text-gray-600">Détails et observations</p>
+ <div class="text-sm font-medium text-gray-600">Date de Fin</div>
+ <div id="summary-end-date" class="text-lg font-semibold text-gray-900 mt-1">
+ À sélectionner...
+ </div>
+ </div>
  </div>
  </div>
 
- <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+ {{-- Info Alert --}}
+ <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+ <div class="flex items-start gap-3">
+ <x-iconify icon="lucide:info" class="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+ <div class="text-sm text-blue-700">
+ Veuillez vérifier les informations ci-dessus avant de confirmer. Cette action ne peut pas être annulée.
+ </div>
+ </div>
+ </div>
+ </div>
+ </div>
+ </div>
+
+ {{-- ===========================================
+ ACTIONS FOOTER
+ =========================================== --}}
+ <div class="mt-8 pt-6 border-t border-gray-200 flex items-center justify-between">
  <div>
- <label class="block text-sm font-semibold text-gray-700 mb-2">Motif</label>
- <select name="purpose" class="enterprise-input">
- <option value="">Sélectionnez (optionnel)</option>
- <option value="mission">Mission professionnelle</option>
- <option value="formation">Formation</option>
- <option value="maintenance">Maintenance</option>
- <option value="deplacement">Déplacement administratif</option>
- <option value="urgence">Urgence</option>
- <option value="autre">Autre</option>
- </select>
+ <x-button
+ type="button"
+ variant="secondary"
+ icon="arrow-left"
+ x-show="currentStep > 1"
+ @click="previousStep()"
+ >
+ Précédent
+ </x-button>
  </div>
 
- <div>
- <label class="block text-sm font-semibold text-gray-700 mb-2">Notes</label>
- <textarea name="notes"
- rows="3"
- class="enterprise-input resize-none"
- placeholder="Informations complémentaires...">{{ old('notes') }}</textarea>
- </div>
- </div>
- </div>
-
- {{-- ACTIONS --}}
- <div class="bg-gradient-to-r from-gray-50 to-gray-100 rounded-3xl p-8">
- <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
- <div class="flex items-center space-x-3">
- <div class="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
- <span class="text-sm font-medium text-gray-700">Formulaire prêt</span>
- </div>
-
- <div class="flex space-x-4">
- <a href="{{ route('admin.assignments.index') }}" 
- class="btn-enterprise-secondary">
- <i class="fas fa-times mr-2"></i>
+ <div class="flex items-center gap-3">
+ <a href="{{ route('admin.assignments.index') }}"
+ class="text-sm font-semibold text-gray-600 hover:text-gray-900 transition-colors">
  Annuler
  </a>
 
- <button type="submit" 
- class="btn-enterprise-primary"
- id="submit-btn">
- <i class="fas fa-rocket mr-2"></i>
- <span id="submit-text">Créer l'Affectation</span>
- </button>
- </div>
+ <x-button
+ type="button"
+ variant="primary"
+ icon="arrow-right"
+ iconPosition="right"
+ x-show="currentStep < 4"
+ @click="nextStep()"
+ >
+ Suivant
+ </x-button>
+
+ <x-button
+ type="submit"
+ variant="success"
+ icon="check-circle"
+ x-show="currentStep === 4"
+ >
+ Créer l'Affectation
+ </x-button>
  </div>
  </div>
  </form>
-</div>
-@endsection
+ </x-card>
+
+ </div>
+
+ </div>
+</section>
 
 @push('scripts')
-<script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js"></script>
 <script>
-document.addEventListener('DOMContentLoaded', function() {
- console.log('🚀 Initialisation Enterprise Assignment Form');
+function assignmentFormValidation() {
+ return {
+ currentStep: {{ old('current_step', 1) }},
 
- // TomSelect pour véhicules
- new TomSelect('#select-vehicle', {
- create: false,
- sortField: 'text',
- placeholder: 'Rechercher un véhicule...',
- onChange: function(value) {
- const option = this.options[value];
- if (option) {
- const mileage = option['data-mileage'] || 0;
- document.getElementById('start_mileage').value = mileage;
- document.getElementById('mileage-hint').textContent = 
- `Kilométrage actuel: ${parseInt(mileage).toLocaleString('fr-FR')} km`;
+ steps: [
+ {
+ label: 'Véhicule',
+ icon: 'car',
+ validated: false,
+ touched: false,
+ requiredFields: ['vehicle_id']
+ },
+ {
+ label: 'Chauffeur',
+ icon: 'user',
+ validated: false,
+ touched: false,
+ requiredFields: ['driver_id']
+ },
+ {
+ label: 'Dates',
+ icon: 'calendar',
+ validated: false,
+ touched: false,
+ requiredFields: ['start_date']
+ },
+ {
+ label: 'Confirmation',
+ icon: 'check-circle',
+ validated: false,
+ touched: false,
+ requiredFields: []
  }
+ ],
+
+ fieldErrors: {},
+ touchedFields: {},
+
+ init() {
+ @if ($errors->any())
+ this.markStepsWithErrors();
+ @json($errors->keys()).forEach(field => {
+ this.touchedFields[field] = true;
+ });
+ @endif
+ },
+
+ markStepsWithErrors() {
+ const fieldToStepMap = {
+ 'vehicle_id': 0, 'driver_id': 1, 'start_date': 2, 'end_date': 2, 'notes': 2
+ };
+
+ @json($errors->keys()).forEach(field => {
+ const stepIndex = fieldToStepMap[field];
+ if (stepIndex !== undefined) {
+ this.steps[stepIndex].touched = true;
+ this.steps[stepIndex].validated = false;
  }
  });
+ },
 
- // TomSelect pour chauffeurs
- new TomSelect('#select-driver', {
- create: false,
- sortField: 'text',
- placeholder: 'Rechercher un chauffeur...'
- });
+ validateField(fieldName, value) {
+ this.touchedFields[fieldName] = true;
 
- // Gestion du type d'affectation
- const openCard = document.getElementById('open-card');
- const scheduledCard = document.getElementById('scheduled-card');
- const openRadio = document.getElementById('type-open');
- const scheduledRadio = document.getElementById('type-scheduled');
- const endSection = document.getElementById('end-assignment-section');
+ const rules = {
+ 'vehicle_id': (v) => v && v.length > 0,
+ 'driver_id': (v) => v && v.length > 0,
+ 'start_date': (v) => v && v.length > 0,
+ };
 
- function updateAssignmentType() {
- const isScheduled = scheduledRadio.checked;
- 
- if (isScheduled) {
- endSection.classList.add('show');
- scheduledCard.classList.add('selected-scheduled');
- scheduledCard.classList.remove('selected-open');
- openCard.classList.remove('selected-open', 'selected-scheduled');
+ const isValid = rules[fieldName] ? rules[fieldName](value) : true;
+
+ if (!isValid) {
+ this.fieldErrors[fieldName] = true;
  } else {
- endSection.classList.remove('show');
- openCard.classList.add('selected-open');
- openCard.classList.remove('selected-scheduled');
- scheduledCard.classList.remove('selected-open', 'selected-scheduled');
- }
+ this.clearFieldError(fieldName);
  }
 
- openCard.addEventListener('click', () => {
- openRadio.checked = true;
- updateAssignmentType();
+ return isValid;
+ },
+
+ validateCurrentStep() {
+ const stepIndex = this.currentStep - 1;
+ const step = this.steps[stepIndex];
+
+ step.touched = true;
+
+ let allValid = true;
+
+ step.requiredFields.forEach(fieldName => {
+ const input = document.querySelector(`[name="${fieldName}"]`);
+ if (input) {
+ const value = input.value;
+ const isValid = this.validateField(fieldName, value);
+ if (!isValid) {
+ allValid = false;
+ }
+ }
  });
 
- scheduledCard.addEventListener('click', () => {
- scheduledRadio.checked = true;
- updateAssignmentType();
+ step.validated = allValid;
+ return allValid;
+ },
+
+ nextStep() {
+ const isValid = this.validateCurrentStep();
+
+ if (!isValid) {
+ this.$dispatch('show-toast', {
+ type: 'error',
+ message: 'Veuillez remplir tous les champs obligatoires'
+ });
+ return;
+ }
+
+ if (this.currentStep < 4) {
+ this.currentStep++;
+ this.updateSummary();
+ }
+ },
+
+ previousStep() {
+ if (this.currentStep > 1) {
+ this.currentStep--;
+ }
+ },
+
+ clearFieldError(fieldName) {
+ delete this.fieldErrors[fieldName];
+ },
+
+ updateSummary() {
+ const vehicle = document.querySelector('[name="vehicle_id"]')?.value;
+ const driver = document.querySelector('[name="driver_id"]')?.value;
+ const startDate = document.querySelector('[name="start_date"]')?.value;
+ const endDate = document.querySelector('[name="end_date"]')?.value;
+
+ if (vehicle) {
+ const option = document.querySelector(`[name="vehicle_id"] option[value="${vehicle}"]`);
+ document.getElementById('summary-vehicle').textContent = option?.textContent || 'À sélectionner...';
+ }
+
+ if (driver) {
+ const option = document.querySelector(`[name="driver_id"] option[value="${driver}"]`);
+ document.getElementById('summary-driver').textContent = option?.textContent || 'À sélectionner...';
+ }
+
+ document.getElementById('summary-start-date').textContent = startDate || 'À sélectionner...';
+ document.getElementById('summary-end-date').textContent = endDate || 'À sélectionner...';
+ },
+
+ onSubmit(e) {
+ let allValid = true;
+
+ this.steps.forEach((step, index) => {
+ const tempCurrent = this.currentStep;
+ this.currentStep = index + 1;
+ const isValid = this.validateCurrentStep();
+ this.currentStep = tempCurrent;
+
+ if (!isValid) {
+ allValid = false;
+ }
  });
 
- openRadio.addEventListener('change', updateAssignmentType);
- scheduledRadio.addEventListener('change', updateAssignmentType);
+ if (!allValid) {
+ e.preventDefault();
 
- // Initialiser
- updateAssignmentType();
+ const firstInvalidStep = this.steps.findIndex(s => s.touched && !s.validated);
+ if (firstInvalidStep !== -1) {
+ this.currentStep = firstInvalidStep + 1;
+ }
 
- // Animation de soumission
- document.getElementById('assignment-form').addEventListener('submit', function() {
- const submitBtn = document.getElementById('submit-btn');
- const submitText = document.getElementById('submit-text');
- submitText.innerHTML = '<span class="loading-spinner"></span> Création...';
- submitBtn.disabled = true;
+ this.$dispatch('show-toast', {
+ type: 'error',
+ message: 'Veuillez corriger les erreurs'
  });
-});
+
+ return false;
+ }
+
+ return true;
+ }
+ };
+}
 </script>
 @endpush
+
+@endsection
