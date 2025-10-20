@@ -59,10 +59,36 @@ class AssignmentController extends Controller
         $assignments = $query->orderBy('created_at', 'desc')
                             ->paginate($perPage);
 
-        return view('admin.assignments.index', [
-            'assignments' => $assignments,
-            'filters' => $request->only(['search', 'per_page'])
-        ]);
+        // ✅ Récupérer tous les véhicules et chauffeurs pour les filtres
+        $vehicles = Vehicle::where('organization_id', auth()->user()->organization_id)
+            ->orderBy('registration_plate')
+            ->get();
+
+        $drivers = Driver::where('organization_id', auth()->user()->organization_id)
+            ->orderBy('last_name')
+            ->orderBy('first_name')
+            ->get();
+
+        // Calculer les statistiques des affectations
+        $allAssignments = Assignment::where('organization_id', auth()->user()->organization_id);
+        $activeAssignments = (clone $allAssignments)
+            ->where('status', 'active')
+            ->count();
+        $inProgressAssignments = (clone $allAssignments)
+            ->where('status', 'in_progress')
+            ->count();
+        $scheduledAssignments = (clone $allAssignments)
+            ->where('status', 'scheduled')
+            ->count();
+
+        return view('admin.assignments.index', compact(
+            'assignments',
+            'vehicles',
+            'drivers',
+            'activeAssignments',
+            'inProgressAssignments',
+            'scheduledAssignments'
+        ));
     }
 
 
