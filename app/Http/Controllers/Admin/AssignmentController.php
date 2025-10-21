@@ -147,16 +147,24 @@ class AssignmentController extends Controller
             ->orderBy('first_name')
             ->get();
 
+        // Affectations actives pour les statistiques
+        $activeAssignments = Assignment::where('organization_id', auth()->user()->organization_id)
+            ->whereNull('end_datetime')
+            ->where('start_datetime', '<=', now())
+            ->with(['vehicle', 'driver'])
+            ->get();
+
         // Debug pour diagnostique (à retirer en production)
         \Log::info('Ressources disponibles pour affectation', [
             'user_org_id' => auth()->user()->organization_id,
             'vehicles_count' => $availableVehicles->count(),
             'drivers_count' => $availableDrivers->count(),
+            'active_assignments_count' => $activeAssignments->count(),
             'vehicles' => $availableVehicles->pluck('registration_plate'),
             'drivers' => $availableDrivers->pluck('first_name', 'last_name')
         ]);
 
-        return view('admin.assignments.create-enterprise', compact('availableVehicles', 'availableDrivers'));
+        return view('admin.assignments.create-enterprise', compact('availableVehicles', 'availableDrivers', 'activeAssignments'));
     }
 
     /**

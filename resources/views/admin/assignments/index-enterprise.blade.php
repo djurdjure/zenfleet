@@ -155,10 +155,9 @@
 <div class="fade-in" x-data="assignmentsPage()" x-init="init()">
  {{-- En-tête ultra-professionnel --}}
  <div class="mb-8">
- <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
- <div class="md:flex md:items-center md:justify-between">
- <div class="flex-1 min-w-0">
- <div class="flex items-center gap-4">
+ <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+ {{-- En-tête avec titre --}}
+ <div class="flex items-center gap-4 mb-6">
  <div class="w-12 h-12 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg">
  <i class="fas fa-exchange-alt text-white text-xl"></i>
  </div>
@@ -167,24 +166,60 @@
  <p class="text-gray-600 mt-1">Gestion des affectations ultra-moderne et professionnelle</p>
  </div>
  </div>
+
+ {{-- Barre d'actions sur une seule ligne --}}
+ <div class="flex items-center gap-3 flex-wrap">
+ {{-- Champ de recherche réduit --}}
+ <div class="flex-none w-64">
+ <div class="relative">
+ <input type="text" 
+ placeholder="Rechercher..." 
+ class="search-input w-full pl-10 pr-4 py-2 text-sm rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+ x-model="searchQuery"
+ @input="performSearch()">
+ <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+ <i class="fas fa-search text-gray-400"></i>
  </div>
- <div class="mt-6 md:mt-0 flex flex-wrap gap-3">
- <button type="button" class="action-button inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
- <i class="fas fa-download -ml-0.5 mr-2 h-4 w-4"></i>
- Exporter
- </button>
- <button type="button" class="action-button inline-flex items-center px-3 py-2 border border-amber-300 shadow-sm text-sm leading-4 font-medium rounded-md text-amber-700 bg-amber-50 hover:bg-amber-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500 transition-all duration-200">
- <i class="fas fa-chart-gantt -ml-0.5 mr-2 h-4 w-4"></i>
- Vue Gantt
- </button>
- <button type="button" class="action-button inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+ </div>
+ </div>
+
+ {{-- Boutons d'action groupés --}}
+ <div class="flex-1 flex items-center justify-end gap-2">
+ <button type="button" class="action-button inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-lg text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-200">
  <i class="fas fa-filter -ml-0.5 mr-2 h-4 w-4"></i>
- Filtres avancés
+ Filtres
  </button>
- <button @click="openCreateModal()" class="action-button inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+ 
+ <a href="{{ route('admin.assignments.create') }}" class="action-button inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-200">
  <i class="fas fa-plus -ml-1 mr-2 h-4 w-4"></i>
  Nouvelle affectation
+ </a>
+
+ {{-- Menu options supplémentaires --}}
+ <div class="relative" x-data="{ open: false }">
+ <button @click="open = !open" type="button" class="action-button inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-lg text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-200">
+ <i class="fas fa-ellipsis-v h-4 w-4"></i>
  </button>
+ 
+ <div x-show="open" 
+ @click.away="open = false"
+ x-transition:enter="transition ease-out duration-100"
+ x-transition:enter-start="transform opacity-0 scale-95"
+ x-transition:enter-end="transform opacity-100 scale-100"
+ class="origin-top-right absolute right-0 mt-2 w-48 rounded-lg shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-10"
+ style="display: none;">
+ <div class="py-1">
+ <a href="{{ route('admin.assignments.gantt') }}" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+ <i class="fas fa-chart-gantt mr-3 text-amber-500"></i>
+ Vue Gantt
+ </a>
+ <button type="button" class="w-full flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+ <i class="fas fa-download mr-3 text-gray-500"></i>
+ Exporter
+ </button>
+ </div>
+ </div>
+ </div>
  </div>
  </div>
  </div>

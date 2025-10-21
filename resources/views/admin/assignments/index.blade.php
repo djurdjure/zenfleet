@@ -119,9 +119,11 @@ DESIGN PRINCIPLES:
  {{-- ====================================================================
  SEARCH + FILTERS - PROFESSIONAL DESIGN
  ===================================================================== --}}
- <div class="mb-6 flex flex-col lg:flex-row gap-3 items-center">
- {{-- Search Bar --}}
- <form action="{{ route('admin.assignments.index') }}" method="GET" class="flex-1 w-full">
+ <div class="mb-6" x-data="{ showFilters: false }">
+ {{-- Barre d'actions sur une seule ligne --}}
+ <div class="flex flex-col md:flex-row gap-3 items-center mb-4">
+ {{-- Search Bar - Réduit --}}
+ <form action="{{ route('admin.assignments.index') }}" method="GET" class="w-full md:w-96">
  <div class="relative">
  <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
  <x-iconify icon="lucide:search" class="w-5 h-5 text-gray-400" />
@@ -130,30 +132,42 @@ DESIGN PRINCIPLES:
  type="text"
  name="search"
  value="{{ request('search') }}"
- placeholder="Rechercher par immatriculation, chauffeur, référence..."
+ placeholder="Rechercher..."
  class="pl-10 pr-4 py-2.5 block w-full border-gray-300 rounded-lg
  focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm shadow-sm"
  />
  </div>
  </form>
 
+ {{-- Boutons d'actions groupés --}}
+ <div class="flex gap-2 w-full md:w-auto md:ml-auto">
  {{-- Filter Button --}}
- <div x-data="{ showFilters: false }" class="w-full lg:w-auto">
  <button
  @click="showFilters = !showFilters"
  class="inline-flex items-center gap-2 px-4 py-2.5 bg-white border border-gray-300
- rounded-lg hover:bg-gray-50 transition-all duration-200 shadow-sm hover:shadow-md w-full lg:w-auto justify-center lg:justify-start">
+ rounded-lg hover:bg-gray-50 transition-all duration-200 shadow-sm hover:shadow-md flex-1 md:flex-none justify-center">
  <x-iconify icon="lucide:filter" class="w-5 h-5 text-gray-500" />
  <span class="font-medium text-gray-700">Filtres</span>
  </button>
 
+ {{-- Nouvelle Affectation Button --}}
+ <a href="{{ route('admin.assignments.create') }}"
+ class="inline-flex items-center gap-2 px-4 py-2.5 bg-blue-600 text-white
+ rounded-lg hover:bg-blue-700 transition-all duration-200 shadow-sm hover:shadow-md flex-1 md:flex-none justify-center font-medium">
+ <x-iconify icon="lucide:plus-circle" class="w-5 h-5" />
+ <span>Nouvelle affectation</span>
+ </a>
+ </div>
+ </div>
+
  {{-- Collapsible Filter Panel --}}
+ <div class="w-full">
  <div x-show="showFilters"
  x-collapse
  x-transition:enter="transition ease-out duration-300"
  x-transition:enter-start="opacity-0 max-h-0"
  x-transition:enter-end="opacity-100 max-h-96"
- class="mt-4 bg-white rounded-lg border border-gray-200 p-6 shadow-sm">
+ class="bg-white rounded-lg border border-gray-200 p-6 shadow-sm">
  <form action="{{ route('admin.assignments.index') }}" method="GET">
  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
  {{-- Status Filter --}}
