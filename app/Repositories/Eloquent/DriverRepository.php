@@ -12,12 +12,24 @@ class DriverRepository implements DriverRepositoryInterface
         $perPage = $filters['per_page'] ?? 15;
         $query = Driver::query()->with(['driverStatus', 'user', 'organization']);
 
-        if (!empty($filters['view_deleted'])) {
+        // Gestion de la visibilité (actifs/archivés/tous)
+        $visibility = $filters['visibility'] ?? 'active';
+        if ($visibility === 'archived') {
+            $query->onlyTrashed();
+        } elseif ($visibility === 'all') {
+            $query->withTrashed();
+        }
+        // sinon 'active' par défaut - seulement les non-supprimés
+
+        // Ancien filtre view_deleted pour compatibilité
+        if (!empty($filters['view_deleted']) && $visibility === 'active') {
             $query->onlyTrashed();
         }
+
         if (!empty($filters['status_id'])) {
             $query->where('status_id', $filters['status_id']);
         }
+
         if (!empty($filters['search'])) {
             $searchTerm = strtolower($filters['search']);
             $query->where(function ($q) use ($searchTerm) {
@@ -29,6 +41,7 @@ class DriverRepository implements DriverRepositoryInterface
                   });
             });
         }
+
         return $query->orderBy('id', 'desc')->paginate($perPage)->withQueryString();
     }
 

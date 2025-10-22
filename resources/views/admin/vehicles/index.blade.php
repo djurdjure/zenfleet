@@ -39,63 +39,78 @@
  {{-- ===============================================
  CARDS MÉTRIQUES ULTRA-PRO
  =============================================== --}}
- <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+ <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
  {{-- Total Véhicules --}}
- <div class="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-lg transition-shadow duration-300">
+ <div class="bg-white rounded-lg border border-gray-200 p-4 hover:shadow-lg transition-shadow duration-300">
  <div class="flex items-center justify-between">
  <div>
- <p class="text-sm font-medium text-gray-600">Total véhicules</p>
- <p class="text-2xl font-bold text-gray-900 mt-1">
+ <p class="text-xs font-medium text-gray-600">Total véhicules</p>
+ <p class="text-xl font-bold text-gray-900 mt-1">
  {{ $analytics['total_vehicles'] ?? 0 }}
  </p>
  </div>
- <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
- <x-iconify icon="lucide:car" class="w-6 h-6 text-blue-600" />
+ <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+ <x-iconify icon="lucide:car" class="w-5 h-5 text-blue-600" />
  </div>
  </div>
  </div>
 
  {{-- Disponibles --}}
- <div class="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-lg transition-shadow duration-300">
+ <div class="bg-white rounded-lg border border-gray-200 p-4 hover:shadow-lg transition-shadow duration-300">
  <div class="flex items-center justify-between">
  <div>
- <p class="text-sm font-medium text-gray-600">Disponibles</p>
- <p class="text-2xl font-bold text-green-600 mt-1">
+ <p class="text-xs font-medium text-gray-600">Disponibles</p>
+ <p class="text-xl font-bold text-green-600 mt-1">
  {{ $analytics['available_vehicles'] ?? 0 }}
  </p>
  </div>
- <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
- <x-iconify icon="lucide:check-circle-2" class="w-6 h-6 text-green-600" />
+ <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
+ <x-iconify icon="lucide:check-circle-2" class="w-5 h-5 text-green-600" />
  </div>
  </div>
  </div>
 
  {{-- Affectés --}}
- <div class="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-lg transition-shadow duration-300">
+ <div class="bg-white rounded-lg border border-gray-200 p-4 hover:shadow-lg transition-shadow duration-300">
  <div class="flex items-center justify-between">
  <div>
- <p class="text-sm font-medium text-gray-600">Affectés</p>
- <p class="text-2xl font-bold text-orange-600 mt-1">
+ <p class="text-xs font-medium text-gray-600">Affectés</p>
+ <p class="text-xl font-bold text-orange-600 mt-1">
  {{ $analytics['assigned_vehicles'] ?? 0 }}
  </p>
  </div>
- <div class="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
- <x-iconify icon="lucide:user-check" class="w-6 h-6 text-orange-600" />
+ <div class="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center">
+ <x-iconify icon="lucide:user-check" class="w-5 h-5 text-orange-600" />
  </div>
  </div>
  </div>
 
  {{-- En Maintenance --}}
- <div class="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-lg transition-shadow duration-300">
+ <div class="bg-white rounded-lg border border-gray-200 p-4 hover:shadow-lg transition-shadow duration-300">
  <div class="flex items-center justify-between">
  <div>
- <p class="text-sm font-medium text-gray-600">En maintenance</p>
- <p class="text-2xl font-bold text-red-600 mt-1">
+ <p class="text-xs font-medium text-gray-600">En maintenance</p>
+ <p class="text-xl font-bold text-red-600 mt-1">
  {{ $analytics['maintenance_vehicles'] ?? 0 }}
  </p>
  </div>
- <div class="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center">
- <x-iconify icon="lucide:wrench" class="w-6 h-6 text-red-600" />
+ <div class="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center">
+ <x-iconify icon="lucide:wrench" class="w-5 h-5 text-red-600" />
+ </div>
+ </div>
+ </div>
+
+ {{-- Archivés --}}
+ <div class="bg-white rounded-lg border border-gray-200 p-4 hover:shadow-lg transition-shadow duration-300">
+ <div class="flex items-center justify-between">
+ <div>
+ <p class="text-xs font-medium text-gray-600">Archivés</p>
+ <p class="text-xl font-bold text-gray-500 mt-1">
+ {{ $analytics['archived_vehicles'] ?? 0 }}
+ </p>
+ </div>
+ <div class="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center">
+ <x-iconify icon="lucide:archive" class="w-5 h-5 text-gray-500" />
  </div>
  </div>
  </div>
@@ -232,7 +247,22 @@
  <input type="hidden" name="search" value="{{ request('search') }}">
  @endif
 
- <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+ <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+
+ {{-- Visibilité (Archivé/Non archivé) --}}
+ <div>
+ <label for="archived" class="block text-sm font-medium text-gray-700 mb-1">
+ Visibilité
+ </label>
+ <select
+ name="archived"
+ id="archived"
+ class="block w-full border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-sm">
+ <option value="false" @selected(request('archived', 'false') == 'false')>Véhicules actifs</option>
+ <option value="true" @selected(request('archived') == 'true')>Véhicules archivés</option>
+ <option value="all" @selected(request('archived') == 'all')>Tous les véhicules</option>
+ </select>
+ </div>
 
  {{-- Statut --}}
  <div>
@@ -459,12 +489,21 @@
  </a>
  @endcan
  @can('delete vehicles')
+ @if(!$vehicle->is_archived)
  <button
- onclick="deleteVehicle({{ $vehicle->id }}, '{{ $vehicle->registration_plate }}', '{{ $vehicle->brand }} {{ $vehicle->model }}')"
- class="text-red-600 hover:text-red-900 transition-colors"
+ onclick="archiveVehicle({{ $vehicle->id }}, '{{ $vehicle->registration_plate }}', '{{ $vehicle->brand }} {{ $vehicle->model }}')"
+ class="text-orange-600 hover:text-orange-900 transition-colors"
  title="Archiver">
  <x-iconify icon="lucide:archive" class="h-5 w-5" />
  </button>
+ @else
+ <button
+ onclick="restoreVehicle({{ $vehicle->id }}, '{{ $vehicle->registration_plate }}', '{{ $vehicle->brand }} {{ $vehicle->model }}')"
+ class="text-green-600 hover:text-green-900 transition-colors"
+ title="Restaurer">
+ <x-iconify icon="lucide:package-open" class="h-5 w-5" />
+ </button>
+ @endif
  @endcan
  </div>
  </td>
@@ -526,8 +565,8 @@
 
 @push('scripts')
 <script>
-// Fonction de suppression/archivage avec modale
-function deleteVehicle(vehicleId, plate, brand) {
+// Fonction d'archivage avec modale
+function archiveVehicle(vehicleId, plate, brand) {
  // Créer modale de confirmation
  const modal = document.createElement('div');
  modal.className = 'fixed inset-0 z-50 overflow-y-auto';
@@ -541,9 +580,9 @@ function deleteVehicle(vehicleId, plate, brand) {
  <span class="hidden sm:inline-block sm:align-middle sm:h-screen">&#8203;</span>
  <div class="inline-block align-bottom bg-white rounded-2xl px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full sm:p-6">
  <div class="sm:flex sm:items-start">
- <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
- <svg class="h-6 w-6 text-red-600" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
- <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
+ <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-orange-100 sm:mx-0 sm:h-10 sm:w-10">
+ <svg class="h-6 w-6 text-orange-600" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+ <path stroke-linecap="round" stroke-linejoin="round" d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z" />
  </svg>
  </div>
  <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
@@ -552,7 +591,7 @@ function deleteVehicle(vehicleId, plate, brand) {
  </h3>
  <div class="mt-2">
  <p class="text-sm text-gray-500">
- Voulez-vous archiver ce véhicule ? Cette action peut être annulée.
+ Voulez-vous archiver ce véhicule ? Il sera déplacé vers les archives et pourra être restauré ultérieurement.
  </p>
  <div class="mt-4 bg-blue-50 border border-blue-200 rounded-lg p-4">
  <div class="flex items-center gap-3">
@@ -573,9 +612,9 @@ function deleteVehicle(vehicleId, plate, brand) {
  <div class="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse gap-3">
  <button
  type="button"
- onclick="confirmDelete(${vehicleId})"
- class="w-full inline-flex justify-center rounded-lg border border-transparent shadow-sm px-4 py-2 bg-red-600 hover:bg-red-700 text-base font-medium text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:ml-3 sm:w-auto sm:text-sm transition-colors">
- Archiver
+ onclick="confirmArchive(${vehicleId})"
+ class="w-full inline-flex justify-center rounded-lg border border-transparent shadow-sm px-4 py-2 bg-orange-600 hover:bg-orange-700 text-base font-medium text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 sm:ml-3 sm:w-auto sm:text-sm transition-colors">
+ Confirmer l'archivage
  </button>
  <button
  type="button"
@@ -591,13 +630,93 @@ function deleteVehicle(vehicleId, plate, brand) {
  document.body.appendChild(modal);
 }
 
-function confirmDelete(vehicleId) {
+function confirmArchive(vehicleId) {
  const form = document.createElement('form');
  form.method = 'POST';
- form.action = `/admin/vehicles/${vehicleId}`;
+ form.action = `/admin/vehicles/${vehicleId}/archive`;
  form.innerHTML = `
  @csrf
- @method('DELETE')
+ @method('PUT')
+ `;
+ document.body.appendChild(form);
+ closeModal();
+ setTimeout(() => form.submit(), 200);
+}
+
+// Fonction de restauration avec modale
+function restoreVehicle(vehicleId, plate, brand) {
+ const modal = document.createElement('div');
+ modal.className = 'fixed inset-0 z-50 overflow-y-auto';
+ modal.setAttribute('aria-labelledby', 'modal-title');
+ modal.setAttribute('role', 'dialog');
+ modal.setAttribute('aria-modal', 'true');
+
+ modal.innerHTML = `
+ <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+ <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity backdrop-blur-sm" onclick="closeModal()"></div>
+ <span class="hidden sm:inline-block sm:align-middle sm:h-screen">&#8203;</span>
+ <div class="inline-block align-bottom bg-white rounded-2xl px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full sm:p-6">
+ <div class="sm:flex sm:items-start">
+ <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-green-100 sm:mx-0 sm:h-10 sm:w-10">
+ <svg class="h-6 w-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+ <path stroke-linecap="round" stroke-linejoin="round" d="M9 8.25H7.5a2.25 2.25 0 00-2.25 2.25v9a2.25 2.25 0 002.25 2.25h9a2.25 2.25 0 002.25-2.25v-9a2.25 2.25 0 00-2.25-2.25H15m0-3l-3-3m0 0l-3 3m3-3V15" />
+ </svg>
+ </div>
+ <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+ <h3 class="text-lg font-semibold leading-6 text-gray-900" id="modal-title">
+ Restaurer le véhicule
+ </h3>
+ <div class="mt-2">
+ <p class="text-sm text-gray-500">
+ Voulez-vous restaurer ce véhicule ? Il sera de nouveau visible dans la liste des véhicules actifs.
+ </p>
+ <div class="mt-4 bg-blue-50 border border-blue-200 rounded-lg p-4">
+ <div class="flex items-center gap-3">
+ <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+ <svg class="h-6 w-6 text-blue-600" fill="currentColor" viewBox="0 0 24 24">
+ <path d="M18.92 6.01C18.72 5.42 18.16 5 17.5 5h-11c-.66 0-1.22.42-1.42 1.01L3 12v8c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h12v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-8l-2.08-5.99zM6.5 16c-.83 0-1.5-.67-1.5-1.5S5.67 13 6.5 13s1.5.67 1.5 1.5S7.33 16 6.5 16zm11 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zM5 11l1.5-4.5h11L19 11H5z"/>
+ </svg>
+ </div>
+ <div>
+ <p class="font-semibold text-blue-900">${plate}</p>
+ <p class="text-sm text-blue-700">${brand}</p>
+ </div>
+ </div>
+ </div>
+ </div>
+ </div>
+ </div>
+ </div>
+ </div>
+ </div>
+ <div class="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse gap-3">
+ <button
+ type="button"
+ onclick="confirmRestore(${vehicleId})"
+ class="w-full inline-flex justify-center rounded-lg border border-transparent shadow-sm px-4 py-2 bg-green-600 hover:bg-green-700 text-base font-medium text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 sm:ml-3 sm:w-auto sm:text-sm transition-colors">
+ Confirmer la restauration
+ </button>
+ <button
+ type="button"
+ onclick="closeModal()"
+ class="mt-3 w-full inline-flex justify-center rounded-lg border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:mt-0 sm:w-auto sm:text-sm transition-colors">
+ Annuler
+ </button>
+ </div>
+ </div>
+ </div>
+ `;
+
+ document.body.appendChild(modal);
+}
+
+function confirmRestore(vehicleId) {
+ const form = document.createElement('form');
+ form.method = 'POST';
+ form.action = `/admin/vehicles/${vehicleId}/unarchive`;
+ form.innerHTML = `
+ @csrf
+ @method('PUT')
  `;
  document.body.appendChild(form);
  closeModal();

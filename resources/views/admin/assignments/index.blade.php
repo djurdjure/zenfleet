@@ -229,20 +229,7 @@ DESIGN PRINCIPLES:
  </div>
  </div>
 
- {{-- ====================================================================
- ACTION BUTTONS - PROFESSIONAL LAYOUT
- ===================================================================== --}}
- <div class="mb-6 flex flex-col sm:flex-row gap-3 items-center justify-between">
- <div class="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
- <a href="{{ route('admin.assignments.create') }}"
- class="inline-flex items-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-700
- text-white font-medium rounded-lg transition-colors duration-200
- text-sm shadow-sm hover:shadow-md w-full sm:w-auto justify-center">
- <x-iconify icon="lucide:plus-circle" class="w-5 h-5" />
- <span>Nouvelle Affectation</span>
- </a>
- </div>
- </div>
+
 
  {{-- ====================================================================
  ASSIGNMENTS TABLE - ULTRA-PRO DESIGN

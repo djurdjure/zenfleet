@@ -239,7 +239,9 @@ Route::middleware(['auth', 'verified'])
             Route::delete('{vehicle}', [VehicleController::class, 'destroy'])->name('destroy');
 
             // Actions spécifiques avec paramètres
-            Route::patch('{vehicle}/restore', [VehicleController::class, 'restore'])->name('restore')->withTrashed();
+            Route::put('{vehicle}/archive', [VehicleController::class, 'archive'])->name('archive');
+            Route::put('{vehicle}/unarchive', [VehicleController::class, 'unarchive'])->name('unarchive');
+            Route::patch('{vehicle}/restore', [VehicleController::class, 'restore'])->name('restore.soft')->withTrashed();
             Route::delete('{vehicle}/force-delete', [VehicleController::class, 'forceDelete'])->name('force-delete')->withTrashed();
             Route::get('{vehicle}/history', [VehicleController::class, 'history'])->name('history');
             Route::get('{vehicle}/maintenance', [VehicleController::class, 'maintenance'])->name('maintenance');
@@ -253,12 +255,21 @@ Route::middleware(['auth', 'verified'])
         Route::prefix('drivers')->name('drivers.')->group(function () {
             // CORRECTION MAJEURE: Routes spécifiques AVANT les routes avec paramètres
             Route::get('statistics', [DriverController::class, 'statistics'])->name('statistics');
-            Route::get('import', [DriverController::class, 'showImportForm'])->name('import.show');
-            Route::post('import', [DriverController::class, 'handleImport'])->name('import.handle');
-            Route::get('import-template', [DriverController::class, 'downloadTemplate'])->name('import.template');
-            Route::get('import/results', [DriverController::class, 'showImportResults'])->name('import.results');
+            
+            // ✨ NOUVEAU: Import avec Livewire (World-Class Enterprise)
+            Route::get('import', function() {
+                return view('admin.drivers.import-livewire');
+            })->name('import.show');
+            
+            // ✨ NOUVEAU: Sanctions avec Livewire (World-Class Enterprise)
+            Route::get('sanctions', function() {
+                return view('admin.drivers.sanctions-livewire');
+            })->name('sanctions.index');
+            
             Route::get('export', [DriverController::class, 'export'])->name('export');
             Route::get('archived', [DriverController::class, 'archived'])->name('archived');
+            Route::get('archived/export', [DriverController::class, 'exportArchived'])->name('archived.export');
+            Route::post('archived/bulk-restore', [DriverController::class, 'bulkRestore'])->name('archived.bulk-restore');
             Route::get('create', [DriverController::class, 'create'])->name('create');
 
             // Routes CRUD principales
@@ -277,9 +288,6 @@ Route::middleware(['auth', 'verified'])
             // Route::get('{driver}/history', [DriverController::class, 'history'])->name('history');
             // Route::get('{driver}/performance', [DriverController::class, 'performance'])->name('performance');
         });
-
-        // ⚖️ Sanctions Chauffeurs (via Controller pour intégration layout)
-        Route::get('sanctions', [\App\Http\Controllers\Admin\DriverSanctionController::class, 'index'])->name('sanctions.index');
 
         // 🔄 Affectations Enterprise-Grade
         Route::resource('assignments', AssignmentController::class);

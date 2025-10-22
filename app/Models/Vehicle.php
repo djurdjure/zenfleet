@@ -22,7 +22,7 @@ class Vehicle extends Model
         'fuel_type_id', 'transmission_type_id', 'status_id', 'manufacturing_year',
         'acquisition_date', 'purchase_price', 'current_value', 'initial_mileage',
         'current_mileage', 'engine_displacement_cc', 'power_hp', 'seats', 'status_reason', 'notes', 'organization_id',
-        'vehicle_name', 'category_id', 'depot_id',
+        'vehicle_name', 'category_id', 'depot_id', 'is_archived',
     ];
 
     protected $casts = [
@@ -35,6 +35,7 @@ class Vehicle extends Model
         'engine_displacement_cc' => 'integer',
         'power_hp' => 'integer',
         'seats' => 'integer',
+        'is_archived' => 'boolean',
     ];
 
     // CORRECTION : Ajout du bon type de retour (BelongsTo)
@@ -401,6 +402,47 @@ class Vehicle extends Model
                 $q->where('status', 'active')
                   ->where('end_datetime', '>', now());
             });
+    }
+
+    // =========================================================================
+    // SCOPES - ARCHIVAGE
+    // =========================================================================
+
+    /**
+     * Scope pour récupérer uniquement les véhicules non archivés (visibles)
+     *
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeVisible($query)
+    {
+        return $query->where('is_archived', false);
+    }
+
+    /**
+     * Scope pour récupérer uniquement les véhicules archivés
+     *
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeArchived($query)
+    {
+        return $query->where('is_archived', true);
+    }
+
+    /**
+     * Scope pour inclure ou exclure les véhicules archivés selon le paramètre
+     *
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @param bool|null $include
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeWithArchived($query, $include = true)
+    {
+        if (!$include) {
+            return $query->where('is_archived', false);
+        }
+        return $query;
     }
 
     // =========================================================================

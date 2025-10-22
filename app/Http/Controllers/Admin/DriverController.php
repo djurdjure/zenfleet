@@ -48,11 +48,54 @@ class DriverController extends Controller
         $this->authorize('view drivers');
 
         try {
-            $filters = $request->only(['search', 'status_id', 'per_page', 'view_deleted']);
+            $filters = $request->only(['search', 'status_id', 'per_page', 'view_deleted', 'visibility', 'license_category', 'hired_after']);
             $drivers = $this->driverService->getFilteredDrivers($filters);
             $driverStatuses = $this->getDriverStatuses();
 
-            return view('admin.drivers.index', compact('drivers', 'driverStatuses', 'filters'));
+            // Calculer les analytics en fonction du filtre visibility
+            $visibility = $request->input('visibility', 'active');
+            $baseQuery = Driver::query();
+            
+            // Appliquer le filtre de visibilité aux analytics
+            if ($visibility === 'archived') {
+                $baseQuery->onlyTrashed();
+            } elseif ($visibility === 'all') {
+                $baseQuery->withTrashed();
+            }
+            // Sinon 'active' par défaut - seulement les non-supprimés
+            
+            // Déterminer la base de données pour utiliser les bonnes fonctions
+            $driver = config('database.default');
+            $isPostgres = $driver === 'pgsql';
+            
+            // Fonctions SQL pour calcul d'âge (compatible MySQL et PostgreSQL)
+            $ageFormula = $isPostgres 
+                ? 'EXTRACT(YEAR FROM AGE(CURRENT_DATE, birth_date))' 
+                : 'TIMESTAMPDIFF(YEAR, birth_date, CURDATE())';
+            $seniorityFormula = $isPostgres 
+                ? 'EXTRACT(YEAR FROM AGE(CURRENT_DATE, recruitment_date))' 
+                : 'TIMESTAMPDIFF(YEAR, recruitment_date, CURDATE())';
+            
+            $analytics = [
+                'total_drivers' => (clone $baseQuery)->count(),
+                'available_drivers' => (clone $baseQuery)->whereHas('driverStatus', function($q) {
+                    $q->where('name', 'Disponible');
+                })->count(),
+                'active_drivers' => (clone $baseQuery)->whereHas('driverStatus', function($q) {
+                    $q->where('name', 'En mission');
+                })->count(),
+                'resting_drivers' => (clone $baseQuery)->whereHas('driverStatus', function($q) {
+                    $q->where('name', 'En repos');
+                })->count(),
+                'avg_age' => (clone $baseQuery)->selectRaw("AVG({$ageFormula}) as avg")->value('avg') ?? 0,
+                'valid_licenses' => (clone $baseQuery)->where('license_expiry_date', '>', now())->count(),
+                'valid_licenses_percent' => (clone $baseQuery)->count() > 0 
+                    ? ((clone $baseQuery)->where('license_expiry_date', '>', now())->count() / (clone $baseQuery)->count() * 100) 
+                    : 0,
+                'avg_seniority' => (clone $baseQuery)->selectRaw("AVG({$seniorityFormula}) as avg")->value('avg') ?? 0,
+            ];
+
+            return view('admin.drivers.index', compact('drivers', 'driverStatuses', 'filters', 'analytics'));
 
         } catch (\Exception $e) {
             Log::error('Drivers index error: ' . $e->getMessage(), [
@@ -310,15 +353,25 @@ class DriverController extends Controller
                 abort(403, 'Vous n\'avez pas l\'autorisation de restaurer ce chauffeur.');
             }
 
+            // Sauvegarder les infos avant restauration
+            $driverName = $driver->first_name . ' ' . $driver->last_name;
+            $employeeNumber = $driver->employee_number;
+            $organizationId = $driver->organization_id;
+
+            // Restaurer le chauffeur
             $restoredDriver = $this->driverService->restoreDriver($driverId);
+
+            if (!$restoredDriver) {
+                throw new \Exception('La restauration du chauffeur a échoué.');
+            }
 
             // Traçabilité enterprise complète pour la restauration
             Log::info('Driver restored successfully', [
                 'operation' => 'driver_restore',
-                'driver_id' => $driver->id,
-                'driver_name' => $driver->first_name . ' ' . $driver->last_name,
-                'employee_number' => $driver->employee_number,
-                'organization_id' => $driver->organization_id,
+                'driver_id' => $restoredDriver->id,
+                'driver_name' => $driverName,
+                'employee_number' => $employeeNumber,
+                'organization_id' => $organizationId,
                 'restored_by_user_id' => auth()->id(),
                 'restored_by_user_email' => auth()->user()->email,
                 'restored_by_organization' => auth()->user()->organization_id,
@@ -328,12 +381,19 @@ class DriverController extends Controller
                 'reason' => 'Manual restore via admin interface'
             ]);
 
+            // Redirection vers la liste des actifs (pas des archivés)
             return redirect()
-                ->route('admin.drivers.index', ['view_deleted' => true])
-                ->with('success', "Le chauffeur {$restoredDriver->first_name} {$restoredDriver->last_name} a été restauré avec succès.");
+                ->route('admin.drivers.index')
+                ->with('success', "Le chauffeur {$driverName} a été restauré avec succès et est maintenant actif.");
 
         } catch (\Exception $e) {
-            Log::error('Driver restore error: ' . $e->getMessage());
+            Log::error('Driver restore error', [
+                'driver_id' => $driverId,
+                'error_message' => $e->getMessage(),
+                'error_trace' => $e->getTraceAsString(),
+                'user_id' => auth()->id(),
+                'timestamp' => now()->toISOString()
+            ]);
 
             return redirect()
                 ->back()
@@ -381,6 +441,113 @@ class DriverController extends Controller
             return redirect()
                 ->back()
                 ->with('error', 'Erreur lors de la suppression définitive: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * 📥 Export Excel des chauffeurs archivés
+     */
+    public function exportArchived(Request $request)
+    {
+        $this->authorize('view drivers');
+
+        try {
+            // Récupérer les filtres
+            $filters = $request->only(['archived_from', 'archived_to', 'status_id', 'search']);
+
+            // Log de l'export
+            Log::info('Archived drivers export', [
+                'user_id' => auth()->id(),
+                'user_email' => auth()->user()->email,
+                'filters' => $filters,
+                'timestamp' => now()->toISOString(),
+            ]);
+
+            // Générer le nom du fichier
+            $filename = 'chauffeurs_archives_' . now()->format('Y-m-d_His') . '.xlsx';
+
+            // Retourner l'export
+            return \Maatwebsite\Excel\Facades\Excel::download(
+                new \App\Exports\ArchivedDriversExport($filters),
+                $filename
+            );
+
+        } catch (\Exception $e) {
+            Log::error('Archived drivers export error: ' . $e->getMessage());
+
+            return redirect()
+                ->back()
+                ->with('error', 'Erreur lors de l\'export: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * 🔄 Restauration en masse des chauffeurs
+     */
+    public function bulkRestore(Request $request): RedirectResponse
+    {
+        $this->authorize('restore drivers');
+
+        try {
+            $driverIds = $request->input('driver_ids', []);
+
+            if (empty($driverIds)) {
+                return redirect()
+                    ->back()
+                    ->with('warning', 'Aucun chauffeur sélectionné.');
+            }
+
+            // Vérifier les permissions et restaurer
+            $restored = 0;
+            $errors = 0;
+
+            foreach ($driverIds as $driverId) {
+                try {
+                    $driver = Driver::withTrashed()->findOrFail($driverId);
+
+                    // Vérification des permissions pour l'organisation
+                    if (!auth()->user()->hasRole('Super Admin') && $driver->organization_id !== auth()->user()->organization_id) {
+                        $errors++;
+                        continue;
+                    }
+
+                    $driver->restore();
+                    $restored++;
+
+                    // Log
+                    Log::info('Driver bulk restored', [
+                        'driver_id' => $driver->id,
+                        'driver_name' => $driver->first_name . ' ' . $driver->last_name,
+                        'restored_by' => auth()->id(),
+                    ]);
+
+                } catch (\Exception $e) {
+                    Log::error("Driver bulk restore error for ID {$driverId}: " . $e->getMessage());
+                    $errors++;
+                }
+            }
+
+            // Message de résultat
+            if ($restored > 0) {
+                $message = "{$restored} chauffeur(s) restauré(s) avec succès.";
+                if ($errors > 0) {
+                    $message .= " {$errors} erreur(s) rencontrée(s).";
+                }
+                return redirect()
+                    ->route('admin.drivers.archived')
+                    ->with('success', $message);
+            }
+
+            return redirect()
+                ->back()
+                ->with('error', 'Impossible de restaurer les chauffeurs sélectionnés.');
+
+        } catch (\Exception $e) {
+            Log::error('Bulk restore error: ' . $e->getMessage());
+
+            return redirect()
+                ->back()
+                ->with('error', 'Erreur lors de la restauration en masse: ' . $e->getMessage());
         }
     }
 
@@ -1008,7 +1175,7 @@ class DriverController extends Controller
     /**
      * 🗄️ Affiche les chauffeurs archivés avec interface enterprise
      */
-    public function archived(Request $request): View
+    public function archived(Request $request): View|RedirectResponse
     {
         try {
             // Log de l'accès aux archives avec traçabilité complète
@@ -1031,21 +1198,61 @@ class DriverController extends Controller
                 $query->where('organization_id', auth()->user()->organization_id);
             }
 
+            // 🔍 FILTRES AVANCÉS
+            // Filtre par date d'archivage (début)
+            if ($request->filled('archived_from')) {
+                $query->whereDate('deleted_at', '>=', $request->archived_from);
+            }
+
+            // Filtre par date d'archivage (fin)
+            if ($request->filled('archived_to')) {
+                $query->whereDate('deleted_at', '<=', $request->archived_to);
+            }
+
+            // Filtre par statut
+            if ($request->filled('status_id')) {
+                $query->where('status_id', $request->status_id);
+            }
+
+            // Filtre par recherche
+            if ($request->filled('search')) {
+                $search = strtolower($request->search);
+                $query->where(function ($q) use ($search) {
+                    $q->whereRaw('LOWER(first_name) LIKE ?', ["%{$search}%"])
+                      ->orWhereRaw('LOWER(last_name) LIKE ?', ["%{$search}%"])
+                      ->orWhereRaw('LOWER(employee_number) LIKE ?', ["%{$search}%"]);
+                });
+            }
+
             $drivers = $query->orderBy('deleted_at', 'desc')->paginate(20);
 
             // Statistiques des archives avec traçabilité
+            $archivedQuery = Driver::onlyTrashed();
+            if (!auth()->user()->hasRole('Super Admin')) {
+                $archivedQuery->where('organization_id', auth()->user()->organization_id);
+            }
+
+            // Déterminer la base de données pour utiliser les bonnes fonctions
+            $driver = config('database.default');
+            $isPostgres = $driver === 'pgsql';
+            
+            // Formule SQL pour calcul d'ancienneté (compatible MySQL et PostgreSQL)
+            $seniorityFormula = $isPostgres 
+                ? 'EXTRACT(YEAR FROM AGE(CURRENT_DATE, recruitment_date))' 
+                : 'TIMESTAMPDIFF(YEAR, recruitment_date, CURDATE())';
+            
             $stats = [
-                'total_archived' => Driver::onlyTrashed()->count(),
-                'archived_this_month' => Driver::onlyTrashed()
+                'total_archived' => $archivedQuery->count(),
+                'archived_this_month' => (clone $archivedQuery)
                     ->whereMonth('deleted_at', now()->month)
                     ->whereYear('deleted_at', now()->year)
                     ->count(),
-                'archived_this_year' => Driver::onlyTrashed()
+                'archived_this_year' => (clone $archivedQuery)
                     ->whereYear('deleted_at', now()->year)
                     ->count(),
-                'organization_archived' => auth()->user()->hasRole('Super Admin')
-                    ? Driver::onlyTrashed()->count()
-                    : Driver::onlyTrashed()->where('organization_id', auth()->user()->organization_id)->count()
+                'avg_seniority' => (clone $archivedQuery)
+                    ->selectRaw("AVG({$seniorityFormula}) as avg")
+                    ->value('avg') ?? 0,
             ];
 
             // Log des statistiques consultées
@@ -1055,7 +1262,13 @@ class DriverController extends Controller
                 'timestamp' => now()->toISOString()
             ]);
 
-            return view('admin.drivers.archived', compact('drivers', 'stats'));
+            // Récupérer les statuts pour les filtres
+            $driverStatuses = $this->getDriverStatuses();
+
+            // Récupérer les filtres actifs
+            $filters = $request->only(['archived_from', 'archived_to', 'status_id', 'search']);
+
+            return view('admin.drivers.archived', compact('drivers', 'stats', 'driverStatuses', 'filters'));
 
         } catch (\Exception $e) {
             // Log d'erreur avec contexte complet
@@ -1063,12 +1276,24 @@ class DriverController extends Controller
                 'user_id' => auth()->id(),
                 'error_message' => $e->getMessage(),
                 'error_trace' => $e->getTraceAsString(),
+                'error_file' => $e->getFile(),
+                'error_line' => $e->getLine(),
                 'timestamp' => now()->toISOString()
             ]);
 
-            return redirect()
-                ->route('admin.drivers.index')
-                ->withErrors(['error' => 'Erreur lors de l\'accès aux archives des chauffeurs.']);
+            // Retourner une vue avec message d'erreur au lieu de rediriger
+            return view('admin.drivers.archived', [
+                'drivers' => new \Illuminate\Pagination\LengthAwarePaginator([], 0, 20),
+                'stats' => [
+                    'total_archived' => 0,
+                    'archived_this_month' => 0,
+                    'archived_this_year' => 0,
+                    'avg_seniority' => 0,
+                ],
+                'driverStatuses' => [],
+                'filters' => [],
+                'error' => 'Une erreur est survenue lors du chargement des archives: ' . $e->getMessage()
+            ]);
         }
     }
 

@@ -135,10 +135,13 @@ class DriverService
         return $this->driverRepository->delete($driver);
     }
 
-    public function restoreDriver(int $driverId): bool
+    public function restoreDriver(int $driverId): ?Driver
     {
         $driver = $this->driverRepository->findTrashed($driverId);
-        return $driver ? $this->driverRepository->restore($driver) : false;
+        if ($driver && $this->driverRepository->restore($driver)) {
+            return $driver->fresh(); // Retourne l'objet Driver restauré
+        }
+        return null;
     }
 
    public function forceDeleteDriver(int $driverId): bool
@@ -146,17 +149,58 @@ class DriverService
         $driver = $this->driverRepository->findTrashed($driverId);
 
         if ($driver) {
-            // RÈGLE MÉTIER : On vérifie si le chauffeur a des affectations
-            if ($driver->assignments()->exists()) {
-                // Si oui, on refuse la suppression
-                return false;
-            }
+            return DB::transaction(function () use ($driver) {
+                // ⚠️ SUPPRESSION EN CASCADE - TOUS LES ENREGISTREMENTS LIÉS
+                
+                // 1. Supprimer les affectations (assignments)
+                if ($driver->assignments()->exists()) {
+                    \Log::info('Deleting assignments for driver', [
+                        'driver_id' => $driver->id,
+                        'assignments_count' => $driver->assignments()->count()
+                    ]);
+                    $driver->assignments()->forceDelete();
+                }
 
-            // Si non, on procède à la suppression
-            if ($driver->photo) {
-                Storage::disk('public')->delete($driver->photo);
-            }
-            return $this->driverRepository->forceDelete($driver);
+                // 2. Supprimer les sanctions (driver_sanctions)
+                if (method_exists($driver, 'sanctions') && $driver->sanctions()->exists()) {
+                    \Log::info('Deleting sanctions for driver', [
+                        'driver_id' => $driver->id,
+                        'sanctions_count' => $driver->sanctions()->count()
+                    ]);
+                    $driver->sanctions()->forceDelete();
+                }
+
+                // 3. Supprimer les demandes de réparation (repair_requests)
+                if ($driver->repairRequests()->exists()) {
+                    \Log::info('Deleting repair requests for driver', [
+                        'driver_id' => $driver->id,
+                        'repair_requests_count' => $driver->repairRequests()->count()
+                    ]);
+                    $driver->repairRequests()->forceDelete();
+                }
+
+                // 4. Supprimer la photo si elle existe
+                if ($driver->photo) {
+                    Storage::disk('public')->delete($driver->photo);
+                    \Log::info('Photo deleted for driver', [
+                        'driver_id' => $driver->id,
+                        'photo_path' => $driver->photo
+                    ]);
+                }
+
+                // 5. Suppression définitive du chauffeur
+                $deleted = $this->driverRepository->forceDelete($driver);
+
+                if ($deleted) {
+                    \Log::warning('Driver force deleted with all related records', [
+                        'driver_id' => $driver->id,
+                        'driver_name' => $driver->first_name . ' ' . $driver->last_name,
+                        'deleted_by' => auth()->id()
+                    ]);
+                }
+
+                return $deleted;
+            });
         }
         return false;
     }

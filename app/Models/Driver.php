@@ -23,7 +23,7 @@ class Driver extends Model
         'personal_phone', 'personal_email', 'address', 'city', 'postal_code',
 
         // Permis de conduire
-        'license_number', 'license_category',
+        'license_number', 'license_category', 'license_categories',
         'license_expiry_date', // ✅ CORRECTION: Nom de colonne réel dans la DB
         'license_issue_date', 'license_authority',
 
@@ -31,7 +31,7 @@ class Driver extends Model
         'recruitment_date', 'contract_end_date', 'status_id',
 
         // Contact d'urgence
-        'emergency_contact_name', 'emergency_contact_phone',
+        'emergency_contact_name', 'emergency_contact_phone', 'emergency_contact_relationship',
 
         // Photo et documents
         'photo', 'notes',
@@ -46,6 +46,7 @@ class Driver extends Model
         'contract_end_date' => 'date',
         'license_expiry_date' => 'date', // ✅ CORRECTION: Nom de colonne réel dans la DB
         'license_issue_date' => 'date',
+        'license_categories' => 'array', // Cast JSON pour les catégories multiples
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
         'deleted_at' => 'datetime',
@@ -91,6 +92,11 @@ class Driver extends Model
     public function repairRequests(): HasMany
     {
         return $this->hasMany(RepairRequest::class);
+    }
+
+    public function sanctions(): HasMany
+    {
+        return $this->hasMany(DriverSanction::class);
     }
 
     /**

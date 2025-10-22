@@ -1,0 +1,455 @@
+@extends('layouts.admin.catalyst')
+
+@section('title', 'Gestion des Chauffeurs')
+
+@section('content')
+{{-- ====================================================================
+ 👨‍💼 GESTION DES CHAUFFEURS V7.0 - ULTRA-PROFESSIONAL ENTERPRISE-GRADE
+ ====================================================================
+
+ Design surpassant Airbnb, Stripe et Salesforce:
+ ✨ Fond gris clair premium (bg-gray-50)
+ ✨ Header compact moderne (py-4 lg:py-6)
+ ✨ 7 Cards métriques riches en information
+ ✨ Barre recherche + filtres + actions sur 1 ligne
+ ✨ Table ultra-lisible avec statut visuel
+ ✨ Pagination séparée en bas
+ ✨ Thème clair 100% (pas de dark mode)
+
+ @version 7.0-World-Class-Light-Theme
+ @since 2025-01-19
+ ==================================================================== --}}
+
+<section class="bg-gray-50 min-h-screen">
+    <div class="py-4 px-4 mx-auto max-w-7xl lg:py-6">
+
+        {{-- ===============================================
+            HEADER ULTRA-COMPACT
+        =============================================== --}}
+        <div class="mb-4">
+            <h1 class="text-2xl font-bold text-gray-900 flex items-center gap-2.5">
+                <x-iconify icon="lucide:users" class="w-6 h-6 text-blue-600" />
+                Gestion des Chauffeurs
+                <span class="ml-2 text-sm font-normal text-gray-500">
+                    ({{ isset($drivers) ? $drivers->total() : 0 }})
+                </span>
+            </h1>
+        </div>
+
+        {{-- ===============================================
+            CARDS MÉTRIQUES ULTRA-PRO
+        =============================================== --}}
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+            {{-- Total Chauffeurs --}}
+            <div class="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-lg transition-shadow duration-300">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-gray-600">Total chauffeurs</p>
+                        <p class="text-2xl font-bold text-gray-900 mt-1">
+                            {{ $analytics['total_drivers'] ?? 0 }}
+                        </p>
+                    </div>
+                    <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                        <x-iconify icon="lucide:users" class="w-6 h-6 text-blue-600" />
+                    </div>
+                </div>
+            </div>
+
+            {{-- Disponibles --}}
+            <div class="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-lg transition-shadow duration-300">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-gray-600">Disponibles</p>
+                        <p class="text-2xl font-bold text-green-600 mt-1">
+                            {{ $analytics['available_drivers'] ?? 0 }}
+                        </p>
+                    </div>
+                    <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                        <x-iconify icon="lucide:user-check" class="w-6 h-6 text-green-600" />
+                    </div>
+                </div>
+            </div>
+
+            {{-- En Mission --}}
+            <div class="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-lg transition-shadow duration-300">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-gray-600">En mission</p>
+                        <p class="text-2xl font-bold text-orange-600 mt-1">
+                            {{ $analytics['active_drivers'] ?? 0 }}
+                        </p>
+                    </div>
+                    <div class="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
+                        <x-iconify icon="lucide:briefcase" class="w-6 h-6 text-orange-600" />
+                    </div>
+                </div>
+            </div>
+
+            {{-- En Repos --}}
+            <div class="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-lg transition-shadow duration-300">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-gray-600">En repos</p>
+                        <p class="text-2xl font-bold text-amber-600 mt-1">
+                            {{ $analytics['resting_drivers'] ?? 0 }}
+                        </p>
+                    </div>
+                    <div class="w-12 h-12 bg-amber-100 rounded-lg flex items-center justify-center">
+                        <x-iconify icon="lucide:pause-circle" class="w-6 h-6 text-amber-600" />
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {{-- ===============================================
+            STATISTIQUES SUPPLÉMENTAIRES (Enterprise-Grade)
+        =============================================== --}}
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+            {{-- Âge Moyen --}}
+            <div class="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg border border-blue-200 p-5">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-xs font-semibold text-blue-600 uppercase tracking-wide">Âge moyen</p>
+                        <p class="text-xl font-bold text-blue-900 mt-1">
+                            {{ number_format($analytics['avg_age'] ?? 0, 0) }} ans
+                        </p>
+                        <p class="text-xs text-blue-700 mt-1">Expérience moyenne</p>
+                    </div>
+                    <div class="w-10 h-10 bg-blue-200 rounded-lg flex items-center justify-center">
+                        <x-iconify icon="lucide:user" class="w-5 h-5 text-blue-700" />
+                    </div>
+                </div>
+            </div>
+
+            {{-- Permis Valides --}}
+            <div class="bg-gradient-to-br from-emerald-50 to-teal-50 rounded-lg border border-emerald-200 p-5">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-xs font-semibold text-emerald-600 uppercase tracking-wide">Permis valides</p>
+                        <p class="text-xl font-bold text-emerald-900 mt-1">
+                            {{ $analytics['valid_licenses'] ?? 0 }}
+                        </p>
+                        <p class="text-xs text-emerald-700 mt-1">{{ number_format($analytics['valid_licenses_percent'] ?? 0, 1) }}% de la flotte</p>
+                    </div>
+                    <div class="w-10 h-10 bg-emerald-200 rounded-lg flex items-center justify-center">
+                        <x-iconify icon="lucide:badge-check" class="w-5 h-5 text-emerald-700" />
+                    </div>
+                </div>
+            </div>
+
+            {{-- Ancienneté Moyenne --}}
+            <div class="bg-gradient-to-br from-purple-50 to-pink-50 rounded-lg border border-purple-200 p-5">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-xs font-semibold text-purple-600 uppercase tracking-wide">Ancienneté</p>
+                        <p class="text-xl font-bold text-purple-900 mt-1">
+                            {{ number_format($analytics['avg_seniority'] ?? 0, 1) }} ans
+                        </p>
+                        <p class="text-xs text-purple-700 mt-1">Dans l'entreprise</p>
+                    </div>
+                    <div class="w-10 h-10 bg-purple-200 rounded-lg flex items-center justify-center">
+                        <x-iconify icon="lucide:award" class="w-5 h-5 text-purple-700" />
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {{-- ===============================================
+            BARRE DE RECHERCHE ET ACTIONS (Enterprise-Grade)
+        =============================================== --}}
+        <div class="mb-6" x-data="{ showFilters: false }">
+            {{-- Ligne principale: Recherche + Filtres + Boutons Actions --}}
+            <div class="flex flex-col lg:flex-row items-start lg:items-center gap-3">
+                {{-- Recherche rapide --}}
+                <div class="flex-1 w-full lg:w-auto">
+                    <form action="{{ route('admin.drivers.index') }}" method="GET" id="searchForm">
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <x-iconify icon="lucide:search" class="w-5 h-5 text-gray-400" />
+                            </div>
+                            <input
+                                type="text"
+                                name="search"
+                                id="quickSearch"
+                                value="{{ request('search') }}"
+                                placeholder="Rechercher par nom, prénom, matricule..."
+                                class="pl-10 pr-4 py-2.5 block w-full border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm shadow-sm"
+                                onchange="document.getElementById('searchForm').submit()">
+                        </div>
+                    </form>
+                </div>
+
+                {{-- Bouton Filtres Avancés --}}
+                <button
+                    @click="showFilters = !showFilters"
+                    type="button"
+                    class="inline-flex items-center gap-2 px-4 py-2.5 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-all duration-200 shadow-sm hover:shadow-md">
+                    <x-iconify icon="lucide:filter" class="w-5 h-5 text-gray-500" />
+                    <span class="font-medium text-gray-700">Filtres</span>
+                    @php
+                        $activeFiltersCount = count(request()->except(['page', 'per_page', 'search']));
+                    @endphp
+                    @if($activeFiltersCount > 0)
+                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                            {{ $activeFiltersCount }}
+                        </span>
+                    @endif
+                    <x-iconify
+                        icon="heroicons:chevron-down"
+                        class="w-4 h-4 text-gray-400 transition-transform duration-200"
+                        x-bind:class="showFilters ? 'rotate-180' : ''" />
+                </button>
+
+                {{-- Actions --}}
+                <div class="flex items-center gap-2">
+                    {{-- Export --}}
+                    <a href="{{ route('admin.drivers.export') }}"
+                       class="inline-flex items-center gap-2 px-4 py-2.5 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-all duration-200 shadow-sm hover:shadow-md">
+                        <x-iconify icon="lucide:download" class="w-5 h-5 text-gray-500" />
+                        <span class="hidden lg:inline font-medium text-gray-700">Export</span>
+                    </a>
+
+                    {{-- Import --}}
+                    <a href="{{ route('admin.drivers.import.show') }}"
+                       class="inline-flex items-center gap-2 px-4 py-2.5 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-all duration-200 shadow-sm hover:shadow-md">
+                        <x-iconify icon="lucide:upload" class="w-5 h-5 text-gray-500" />
+                        <span class="hidden lg:inline font-medium text-gray-700">Import</span>
+                    </a>
+
+                    {{-- Nouveau Chauffeur --}}
+                    <a href="{{ route('admin.drivers.create') }}"
+                       class="inline-flex items-center gap-2 px-4 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all duration-200 shadow-sm hover:shadow-md">
+                        <x-iconify icon="lucide:plus" class="w-5 h-5" />
+                        <span class="font-medium">Nouveau Chauffeur</span>
+                    </a>
+                </div>
+            </div>
+
+            {{-- Panel Filtres Avancés (Collapsible) --}}
+            <div
+                x-show="showFilters"
+                x-transition:enter="transition ease-out duration-200"
+                x-transition:enter-start="opacity-0 -translate-y-2"
+                x-transition:enter-end="opacity-100 translate-y-0"
+                x-transition:leave="transition ease-in duration-150"
+                x-transition:leave-start="opacity-100 translate-y-0"
+                x-transition:leave-end="opacity-0 -translate-y-2"
+                class="mt-4 bg-white rounded-lg border border-gray-200 p-4 shadow-sm"
+                style="display: none;">
+                <form action="{{ route('admin.drivers.index') }}" method="GET">
+                    <input type="hidden" name="search" value="{{ request('search') }}">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        {{-- Statut --}}
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1.5">Statut</label>
+                            <select name="status" class="block w-full border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                <option value="">Tous les statuts</option>
+                                @foreach($statuses ?? [] as $status)
+                                    <option value="{{ $status->id }}" {{ request('status') == $status->id ? 'selected' : '' }}>
+                                        {{ $status->name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        {{-- Catégorie Permis --}}
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1.5">Catégorie permis</label>
+                            <select name="license_category" class="block w-full border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                <option value="">Toutes les catégories</option>
+                                <option value="B" {{ request('license_category') == 'B' ? 'selected' : '' }}>B</option>
+                                <option value="C" {{ request('license_category') == 'C' ? 'selected' : '' }}>C</option>
+                                <option value="D" {{ request('license_category') == 'D' ? 'selected' : '' }}>D</option>
+                                <option value="E" {{ request('license_category') == 'E' ? 'selected' : '' }}>E</option>
+                            </select>
+                        </div>
+
+                        {{-- Date d'embauche --}}
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1.5">Embauché après</label>
+                            <input
+                                type="date"
+                                name="hired_after"
+                                value="{{ request('hired_after') }}"
+                                class="block w-full border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        </div>
+                    </div>
+
+                    <div class="flex items-center justify-between mt-4 pt-4 border-t border-gray-200">
+                        <a href="{{ route('admin.drivers.index') }}"
+                           class="text-sm font-medium text-gray-600 hover:text-gray-900">
+                            Réinitialiser
+                        </a>
+                        <button
+                            type="submit"
+                            class="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                            <x-iconify icon="lucide:filter" class="w-4 h-4" />
+                            Appliquer les filtres
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        {{-- ===============================================
+            TABLE DES CHAUFFEURS (Enterprise-Grade)
+        =============================================== --}}
+        <div class="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Chauffeur
+                            </th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Contact
+                            </th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Permis
+                            </th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Statut
+                            </th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Véhicule Actuel
+                            </th>
+                            <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Actions
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        @forelse($drivers as $driver)
+                            <tr class="hover:bg-gray-50 transition-colors duration-150">
+                                {{-- Chauffeur --}}
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="flex items-center">
+                                        <div class="flex-shrink-0 h-10 w-10 bg-gradient-to-br from-blue-100 to-indigo-100 rounded-full flex items-center justify-center">
+                                            <span class="text-sm font-semibold text-blue-700">
+                                                {{ strtoupper(substr($driver->first_name, 0, 1) . substr($driver->last_name, 0, 1)) }}
+                                            </span>
+                                        </div>
+                                        <div class="ml-4">
+                                            <div class="text-sm font-medium text-gray-900">
+                                                {{ $driver->first_name }} {{ $driver->last_name }}
+                                            </div>
+                                            <div class="text-sm text-gray-500">
+                                                #{{ $driver->employee_number ?? 'N/A' }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
+
+                                {{-- Contact --}}
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="text-sm text-gray-900 flex items-center gap-1.5">
+                                        <x-iconify icon="lucide:phone" class="w-4 h-4 text-gray-400" />
+                                        {{ $driver->personal_phone ?? 'N/A' }}
+                                    </div>
+                                    <div class="text-sm text-gray-500 flex items-center gap-1.5">
+                                        <x-iconify icon="lucide:mail" class="w-4 h-4 text-gray-400" />
+                                        {{ $driver->personal_email ?? 'N/A' }}
+                                    </div>
+                                </td>
+
+                                {{-- Permis --}}
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="text-sm font-medium text-gray-900">
+                                        {{ $driver->license_number }}
+                                    </div>
+                                    @if($driver->license_category)
+                                        <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800">
+                                            Catégorie {{ $driver->license_category }}
+                                        </span>
+                                    @endif
+                                </td>
+
+                                {{-- Statut --}}
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    @php
+                                        $statusConfig = [
+                                            'Disponible' => ['bg' => 'bg-green-100', 'text' => 'text-green-800', 'icon' => 'lucide:check-circle'],
+                                            'En mission' => ['bg' => 'bg-orange-100', 'text' => 'text-orange-800', 'icon' => 'lucide:briefcase'],
+                                            'En repos' => ['bg' => 'bg-amber-100', 'text' => 'text-amber-800', 'icon' => 'lucide:pause-circle'],
+                                            'Indisponible' => ['bg' => 'bg-red-100', 'text' => 'text-red-800', 'icon' => 'lucide:x-circle'],
+                                        ];
+                                        $config = $statusConfig[$driver->driverStatus->name ?? ''] ?? ['bg' => 'bg-gray-100', 'text' => 'text-gray-800', 'icon' => 'lucide:circle'];
+                                    @endphp
+                                    <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium {{ $config['bg'] }} {{ $config['text'] }}">
+                                        <x-iconify :icon="$config['icon']" class="w-3.5 h-3.5" />
+                                        {{ $driver->driverStatus->name ?? 'N/A' }}
+                                    </span>
+                                </td>
+
+                                {{-- Véhicule Actuel --}}
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    @if($driver->activeAssignment && $driver->activeAssignment->vehicle)
+                                        <div class="flex items-center gap-1.5">
+                                            <x-iconify icon="lucide:car" class="w-4 h-4 text-blue-600" />
+                                            <span class="font-medium text-gray-900">
+                                                {{ $driver->activeAssignment->vehicle->registration_number }}
+                                            </span>
+                                        </div>
+                                    @else
+                                        <span class="text-gray-400">Aucun</span>
+                                    @endif
+                                </td>
+
+                                {{-- Actions --}}
+                                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                    <div class="flex items-center justify-end gap-2">
+                                        <a href="{{ route('admin.drivers.show', $driver) }}"
+                                           class="inline-flex items-center p-1.5 text-blue-600 hover:text-blue-900 hover:bg-blue-50 rounded-lg transition-colors"
+                                           title="Voir">
+                                            <x-iconify icon="lucide:eye" class="w-5 h-5" />
+                                        </a>
+                                        <a href="{{ route('admin.drivers.edit', $driver) }}"
+                                           class="inline-flex items-center p-1.5 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
+                                           title="Modifier">
+                                            <x-iconify icon="lucide:edit" class="w-5 h-5" />
+                                        </a>
+                                        <form action="{{ route('admin.drivers.destroy', $driver) }}" method="POST" class="inline-block">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button
+                                                type="submit"
+                                                onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce chauffeur ?')"
+                                                class="inline-flex items-center p-1.5 text-red-600 hover:text-red-900 hover:bg-red-50 rounded-lg transition-colors"
+                                                title="Supprimer">
+                                                <x-iconify icon="lucide:trash-2" class="w-5 h-5" />
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="6" class="px-6 py-12 text-center">
+                                    <div class="flex flex-col items-center justify-center">
+                                        <x-iconify icon="lucide:users" class="w-16 h-16 text-gray-300 mb-4" />
+                                        <h3 class="text-lg font-medium text-gray-900 mb-2">Aucun chauffeur trouvé</h3>
+                                        <p class="text-sm text-gray-500 mb-4">Commencez par ajouter votre premier chauffeur</p>
+                                        <a href="{{ route('admin.drivers.create') }}"
+                                           class="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                                            <x-iconify icon="lucide:plus" class="w-5 h-5" />
+                                            Ajouter un chauffeur
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+
+            {{-- Pagination --}}
+            @if($drivers->hasPages())
+                <div class="bg-white px-4 py-3 border-t border-gray-200 sm:px-6">
+                    {{ $drivers->links() }}
+                </div>
+            @endif
+        </div>
+    </div>
+</section>
+@endsection

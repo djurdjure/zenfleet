@@ -32,11 +32,16 @@ class UpdateDriverRequest extends FormRequest
             'contract_end_date' => ['nullable', 'date', 'after_or_equal:recruitment_date'],
             'license_number' => ['nullable', 'string', 'max:100'],
             'license_category' => ['nullable', 'string', 'max:50'],
+            'license_categories' => ['nullable', 'array'],
+            'license_categories.*' => ['nullable', 'string', 'in:A1,A,B,BE,C1,C1E,C,CE,D,DE,F'],
             'license_issue_date' => ['nullable', 'date'],
+            'license_expiry_date' => ['nullable', 'date'],
             'license_authority' => ['nullable', 'string', 'max:255'],
             'emergency_contact_name' => ['nullable', 'string', 'max:255'],
             'emergency_contact_phone' => ['nullable', 'string', 'max:50'],
+            'emergency_contact_relationship' => ['nullable', 'string', 'max:100'],
             'personal_email' => ['nullable', 'string', 'email', 'max:255'],
+            'notes' => ['nullable', 'string', 'max:5000'],
 
 
         ];

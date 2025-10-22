@@ -66,9 +66,13 @@ class DriverSanction extends Model
         'driver_id',
         'supervisor_id',
         'sanction_type',
+        'severity',
         'reason',
         'sanction_date',
+        'duration_days',
         'attachment_path',
+        'status',
+        'notes',
         'archived_at',
     ];
 

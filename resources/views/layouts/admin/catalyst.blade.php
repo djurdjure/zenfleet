@@ -130,8 +130,8 @@
  <div class="px-1 py-2 h-full relative">
  <div class="bg-gray-400/30 w-0.5 h-full rounded-full"></div>
  @php
- $driverBarHeight = request()->routeIs('admin.drivers.index') ? '50%' : (request()->routeIs('admin.sanctions.*') ? '50%' : '0%');
- $driverBarTop = request()->routeIs('admin.sanctions.*') ? '50%' : '0%';
+ $driverBarHeight = request()->routeIs('admin.drivers.index') ? '50%' : (request()->routeIs('admin.drivers.sanctions.*') ? '50%' : '0%');
+ $driverBarTop = request()->routeIs('admin.drivers.sanctions.*') ? '50%' : '0%';
  @endphp
  <div class="absolute w-0.5 rounded-full bg-blue-600 transition-all duration-300"
  x-bind:style="`height: {{ $driverBarHeight }}; top: {{ $driverBarTop }};`"></div>
@@ -143,9 +143,9 @@
  <x-iconify icon="mdi:view-list" class="w-4 h-4 mr-2.5 {{ request()->routeIs('admin.drivers.index') ? 'text-blue-600' : 'text-gray-600' }}" />
  Liste
  </a>
- <a href="{{ route('admin.sanctions.index') }}"
- class="flex items-center w-full h-9 px-2.5 py-1.5 rounded-md text-sm font-semibold transition-all duration-200 {{ request()->routeIs('admin.sanctions.*') ? 'bg-blue-100 text-blue-700' : 'text-gray-700 hover:bg-white/70 hover:text-gray-900' }}">
- <x-iconify icon="mdi:gavel" class="w-4 h-4 mr-2.5 {{ request()->routeIs('admin.sanctions.*') ? 'text-blue-600' : 'text-gray-600' }}" />
+ <a href="{{ route('admin.drivers.sanctions.index') }}"
+ class="flex items-center w-full h-9 px-2.5 py-1.5 rounded-md text-sm font-semibold transition-all duration-200 {{ request()->routeIs('admin.drivers.sanctions.*') ? 'bg-blue-100 text-blue-700' : 'text-gray-700 hover:bg-white/70 hover:text-gray-900' }}">
+ <x-iconify icon="mdi:gavel" class="w-4 h-4 mr-2.5 {{ request()->routeIs('admin.drivers.sanctions.*') ? 'text-blue-600' : 'text-gray-600' }}" />
  Sanctions
  </a>
  </div>
@@ -242,9 +242,9 @@
  @php
  $maintenanceBarHeight = '0%';
  $maintenanceBarTop = '0%';
- if (request()->routeIs('admin.maintenance.surveillance.*')) {
+ if (request()->routeIs('admin.maintenance.overview*')) {
  $maintenanceBarHeight = '25%'; $maintenanceBarTop = '0%';
- } elseif (request()->routeIs('admin.maintenance.schedules.*')) {
+ } elseif (request()->routeIs('admin.maintenance.operations.*')) {
  $maintenanceBarHeight = '25%'; $maintenanceBarTop = '25%';
  } elseif (request()->routeIs('admin.repair-requests.*')) {
  $maintenanceBarHeight = '25%'; $maintenanceBarTop = '50%';
@@ -257,14 +257,14 @@
  </div>
  </div>
  <div class="flex-1 min-w-0 space-y-1">
- <a href="{{ route('admin.maintenance.surveillance.index') }}"
- class="flex items-center w-full h-9 px-2.5 py-1.5 rounded-md text-sm font-semibold transition-all duration-200 {{ request()->routeIs('admin.maintenance.surveillance.*') ? 'bg-blue-100 text-blue-700' : 'text-gray-700 hover:bg-white/70 hover:text-gray-900' }}">
- <x-iconify icon="mdi:monitor-dashboard" class="w-4 h-4 mr-2.5 {{ request()->routeIs('admin.maintenance.surveillance.*') ? 'text-blue-600' : 'text-gray-600' }}" />
+ <a href="{{ route('admin.maintenance.overview') }}"
+ class="flex items-center w-full h-9 px-2.5 py-1.5 rounded-md text-sm font-semibold transition-all duration-200 {{ request()->routeIs('admin.maintenance.overview*') ? 'bg-blue-100 text-blue-700' : 'text-gray-700 hover:bg-white/70 hover:text-gray-900' }}">
+ <x-iconify icon="mdi:monitor-dashboard" class="w-4 h-4 mr-2.5 {{ request()->routeIs('admin.maintenance.overview*') ? 'text-blue-600' : 'text-gray-600' }}" />
  Surveillance
  </a>
- <a href="{{ route('admin.maintenance.schedules.index') }}"
- class="flex items-center w-full h-9 px-2.5 py-1.5 rounded-md text-sm font-semibold transition-all duration-200 {{ request()->routeIs('admin.maintenance.schedules.*') ? 'bg-blue-100 text-blue-700' : 'text-gray-700 hover:bg-white/70 hover:text-gray-900' }}">
- <x-iconify icon="mdi:calendar-clock" class="w-4 h-4 mr-2.5 {{ request()->routeIs('admin.maintenance.schedules.*') ? 'text-blue-600' : 'text-gray-600' }}" />
+ <a href="{{ route('admin.maintenance.operations.index') }}"
+ class="flex items-center w-full h-9 px-2.5 py-1.5 rounded-md text-sm font-semibold transition-all duration-200 {{ request()->routeIs('admin.maintenance.operations.*') ? 'bg-blue-100 text-blue-700' : 'text-gray-700 hover:bg-white/70 hover:text-gray-900' }}">
+ <x-iconify icon="mdi:calendar-clock" class="w-4 h-4 mr-2.5 {{ request()->routeIs('admin.maintenance.operations.*') ? 'text-blue-600' : 'text-gray-600' }}" />
  Planifications
  </a>
  @canany(['view team repair requests', 'view all repair requests'])

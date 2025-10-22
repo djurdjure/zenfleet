@@ -515,6 +515,62 @@ class VehicleController extends Controller
     }
 
     /**
+     * 📦 Archive un véhicule (le rend invisible sans le supprimer)
+     */
+    public function archive(Vehicle $vehicle): RedirectResponse
+    {
+        $this->authorize('delete vehicles');
+        $this->logUserAction('vehicle.archive.attempted', null, ['vehicle_id' => $vehicle->id]);
+
+        try {
+            $vehicle->update(['is_archived' => true]);
+
+            $this->logUserAction('vehicle.archive.success', null, [
+                'vehicle_id' => $vehicle->id,
+                'registration_plate' => $vehicle->registration_plate
+            ]);
+
+            Cache::tags(['vehicles', 'analytics'])->flush();
+
+            return redirect()
+                ->back()
+                ->with('success', "Véhicule {$vehicle->registration_plate} archivé avec succès");
+
+        } catch (\Exception $e) {
+            $this->logError('vehicle.archive.error', $e, null, ['vehicle_id' => $vehicle->id]);
+            return redirect()->back()->with('error', 'Erreur lors de l\'archivage du véhicule');
+        }
+    }
+
+    /**
+     * 📤 Désarchive un véhicule (le rend visible)
+     */
+    public function unarchive(Vehicle $vehicle): RedirectResponse
+    {
+        $this->authorize('delete vehicles');
+        $this->logUserAction('vehicle.unarchive.attempted', null, ['vehicle_id' => $vehicle->id]);
+
+        try {
+            $vehicle->update(['is_archived' => false]);
+
+            $this->logUserAction('vehicle.unarchive.success', null, [
+                'vehicle_id' => $vehicle->id,
+                'registration_plate' => $vehicle->registration_plate
+            ]);
+
+            Cache::tags(['vehicles', 'analytics'])->flush();
+
+            return redirect()
+                ->back()
+                ->with('success', "Véhicule {$vehicle->registration_plate} désarchivé avec succès");
+
+        } catch (\Exception $e) {
+            $this->logError('vehicle.unarchive.error', $e, null, ['vehicle_id' => $vehicle->id]);
+            return redirect()->back()->with('error', 'Erreur lors du désarchivage du véhicule');
+        }
+    }
+
+    /**
      * 📊 Export enterprise avec formats multiples
      */
     public function export(Request $request): \Symfony\Component\HttpFoundation\BinaryFileResponse
@@ -570,6 +626,17 @@ class VehicleController extends Controller
         // Filtre par organisation pour sécurité
         if (!Auth::user()->hasRole('Super Admin')) {
             $query->where('organization_id', Auth::user()->organization_id);
+        }
+
+        // Filtre archivage - Par défaut, afficher uniquement les véhicules non archivés
+        $archived = $request->get('archived', 'false');
+        if ($archived === 'true') {
+            $query->where('is_archived', true);
+        } elseif ($archived === 'all') {
+            // Afficher tous les véhicules (archivés et non archivés)
+        } else {
+            // Par défaut, afficher uniquement les véhicules non archivés (visibles)
+            $query->where('is_archived', false);
         }
 
         // Filtres avancés
@@ -646,6 +713,9 @@ class VehicleController extends Controller
                 $query->where('organization_id', Auth::user()->organization_id);
             }
 
+            // Par défaut, exclure les véhicules archivés des statistiques
+            $query->where('is_archived', false);
+
             return [
                 'total_vehicles' => $query->count(),
                 'available_vehicles' => (clone $query)->whereHas('vehicleStatus', fn($q) =>
@@ -664,6 +734,10 @@ class VehicleController extends Controller
                       ->orWhere('name', 'ILIKE', '%révision%')
                       ->orWhere('name', 'ILIKE', '%service%')
                 )->count(),
+                'archived_vehicles' => Vehicle::where('is_archived', true)
+                    ->when(!Auth::user()->hasRole('Super Admin'), fn($q) =>
+                        $q->where('organization_id', Auth::user()->organization_id)
+                    )->count(),
                 'avg_age_years' => round((clone $query)->avg(DB::raw('EXTRACT(YEAR FROM AGE(NOW(), acquisition_date))')) ?? 0, 1),
                 'total_value' => (clone $query)->sum('current_value'),
                 'avg_mileage' => round((clone $query)->avg('current_mileage') ?? 0),
