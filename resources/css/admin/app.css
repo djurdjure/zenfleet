@@ -11,6 +11,11 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ✅ Alpine.js - Cache les éléments avec x-cloak jusqu'à ce qu'Alpine soit prêt */
+[x-cloak] {
+    display: none !important;
+}
+
 /* Variables CSS ZenFleet Admin */
 @layer base {
     :root {

@@ -12,6 +12,11 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Alpine.js - Hide elements with x-cloak until Alpine is ready */
+[x-cloak] {
+    display: none !important;
+}
+
 /* Variables globales ZenFleet */
 @layer base {
     :root {

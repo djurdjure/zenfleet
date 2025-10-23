@@ -23,13 +23,9 @@ class DocumentController extends Controller
 
     public function index()
     {
-        $organization_id = Auth::user()->organization_id;
-        $documents = Document::with(['category', 'uploader', 'vehicles', 'users', 'suppliers'])
-            ->where('organization_id', $organization_id)
-            ->latest()
-            ->paginate(20);
-
-        return view('admin.documents.index', compact('documents'));
+        // Route vers le nouveau composant Livewire DocumentManagerIndex
+        // Le composant gère la pagination, recherche Full-Text, et filtres avancés
+        return view('admin.documents.index-livewire');
     }
 
     public function create()
