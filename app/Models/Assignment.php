@@ -386,6 +386,57 @@ class Assignment extends Model
     }
 
     /**
+     * Vérifie si cette affectation chevauche une autre affectation existante
+     * pour le même véhicule ou le même chauffeur.
+     * 
+     * @param int|null $exceptAssignmentId ID de l'affectation à exclure de la vérification (pour les mises à jour).
+     * @return bool
+     */
+    public function isOverlapping(int $exceptAssignmentId = null): bool
+    {
+        // Normaliser les dates pour la comparaison
+        $start = $this->start_datetime;
+        $end = $this->end_datetime;
+
+        // Si l'affectation est à durée indéterminée, elle chevauche toute affectation future ou présente
+        if ($end === null) {
+            // Vérifier les affectations qui commencent avant la fin de celle-ci (indéterminée)
+            // et qui n'ont pas encore de fin OU dont la fin est après le début de celle-ci
+            $query = static::where(
+                    fn ($q) => $q->where(
+                        fn ($subQ) => $subQ->whereNull("end_datetime")->orWhere("end_datetime", ">", $start)
+                    )
+                )
+                ->where("start_datetime", "<", Carbon::maxValue()); // Utiliser Carbon::maxValue() pour les affectations indéterminées
+        } else {
+            // Vérifier les affectations qui se chevauchent avec la période définie
+            $query = static::where(
+                    fn ($q) => $q->where(
+                        fn ($subQ) => $subQ->whereNull("end_datetime")->orWhere("end_datetime", ">", $start)
+                    )
+                )
+                ->where("start_datetime", "<", $end);
+        }
+
+        // Appliquer les filtres pour le même véhicule OU le même chauffeur
+        $query->where(function ($q) {
+            $q->where("vehicle_id", $this->vehicle_id)
+              ->orWhere("driver_id", $this->driver_id);
+        });
+
+        // Exclure l'affectation en cours de modification si un ID est fourni
+        if ($exceptAssignmentId) {
+            $query->where("id", "!=", $exceptAssignmentId);
+        }
+
+        // Exclure les affectations annulées ou soft-deleted (si non restaurées)
+        $query->where("status", "!=", self::STATUS_CANCELLED);
+        $query->whereNull("deleted_at"); // S'assurer que ce ne sont pas des soft-deleted
+
+        return $query->exists();
+    }
+
+    /**
      * Méthodes d'action business
      */
     public function canBeEnded(): bool

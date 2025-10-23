@@ -77,40 +77,26 @@
  <div class="p-6 sm:p-8">
  <form wire:submit.prevent="save" class="space-y-6">
 
- {{-- Sélection du véhicule (MODE SELECT) --}}
+ {{-- Sélection du véhicule (MODE SELECT) avec TomSelect --}}
  @if($mode === 'select')
- <div>
- <label for="vehicleId" class="block text-sm font-medium text-gray-700 mb-2">
- Véhicule <span class="text-red-500">*</span>
- </label>
-
- {{-- Recherche --}}
- <div class="mb-3">
- <input
- type="text"
- wire:model.live.debounce.300ms="vehicleSearch"
- placeholder="Rechercher par plaque, marque ou modèle..."
- class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
- >
- </div>
-
- {{-- Liste des véhicules --}}
- <select
- id="vehicleId"
+ <div x-data="vehicleSelector()">
+ @php
+ $vehicleOptions = [];
+ foreach($availableVehicles as $vehicle) {
+ $vehicleOptions[$vehicle->id] = $vehicle->registration_plate . ' - ' . $vehicle->brand . ' ' . $vehicle->model . ' (' . number_format($vehicle->current_mileage) . ' km)';
+ }
+ @endphp
+ 
+ <x-tom-select
+ name="vehicleId"
+ label="Véhicule"
+ :options="$vehicleOptions"
+ placeholder="Rechercher un véhicule par plaque, marque ou modèle..."
+ required
  wire:model.live="vehicleId"
- class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors @error('vehicleId') border-red-500 @enderror"
- >
- <option value="">-- Sélectionnez un véhicule --</option>
- @foreach($availableVehicles as $vehicle)
- <option value="{{ $vehicle->id }}">
- {{ $vehicle->registration_plate }} - {{ $vehicle->brand }} {{ $vehicle->model }}
- ({{ number_format($vehicle->current_mileage) }} km)
- </option>
- @endforeach
- </select>
- @error('vehicleId')
- <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
- @enderror
+ x-on:change="loadVehicleMileage($event.target.value)"
+ :error="$errors->first('vehicleId')"
+ />
  </div>
  @endif
 
@@ -170,23 +156,37 @@
  </div>
 
  {{-- Date et heure --}}
+ <div class="grid grid-cols-1 md:grid-cols-2 gap-4" x-data="{ recordedDate: '{{ now()->format('Y-m-d') }}', recordedTime: '{{ now()->format('H:i') }}' }">
  <div>
- <label for="recordedAt" class="block text-sm font-medium text-gray-700 mb-2">
- Date et heure <span class="text-red-500">*</span>
- </label>
- <input
- type="datetime-local"
- id="recordedAt"
- wire:model="recordedAt"
- max="{{ now()->format('Y-m-d\TH:i') }}"
- class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors @error('recordedAt') border-red-500 @enderror"
- >
+ <x-datepicker
+ name="recordedDate"
+ label="Date du relevé"
+ placeholder="JJ/MM/AAAA"
+ :maxDate="date('Y-m-d')"
+ :minDate="date('Y-m-d', strtotime('-7 days'))"
+ required
+ x-model="recordedDate"
+ x-on:change="updateRecordedAt()"
+ helpText="Maximum 7 jours dans le passé"
+ />
+ </div>
+ 
+ <div>
+ <x-time-picker
+ name="recordedTime"
+ label="Heure du relevé"
+ placeholder="HH:MM"
+ required
+ x-model="recordedTime"
+ x-on:change="updateRecordedAt()"
+ helpText="Format 24 heures (HH:MM)"
+ />
+ </div>
+ 
+ <input type="hidden" wire:model="recordedAt" x-bind:value="recordedDate + 'T' + recordedTime">
+ 
  @error('recordedAt')
- <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
- @else
- <p class="mt-2 text-sm text-gray-500">
- Date et heure du relevé (maximum 7 jours dans le passé)
- </p>
+ <p class="col-span-2 mt-2 text-sm text-red-600">{{ $message }}</p>
  @enderror
  </div>
 
@@ -295,3 +295,36 @@
  </ul>
  </div>
 </div>
+
+@push('scripts')
+<script>
+// Alpine.js component for vehicle selector
+document.addEventListener('alpine:init', () => {
+    Alpine.data('vehicleSelector', () => ({
+        loadVehicleMileage(vehicleId) {
+            if (!vehicleId) return;
+            
+            // Le composant Livewire gère déjà le chargement via wire:model.live="vehicleId"
+            // Cette fonction est un placeholder pour des actions futures si nécessaire
+            console.log('Vehicle selected:', vehicleId);
+        }
+    }));
+});
+
+// Function to update combined recordedAt from date and time
+function updateRecordedAt() {
+    const dateInput = document.querySelector('input[name="recordedDate"]');
+    const timeInput = document.querySelector('input[name="recordedTime"]');
+    const recordedAtInput = document.querySelector('input[wire\\:model="recordedAt"]');
+    
+    if (dateInput && timeInput && recordedAtInput) {
+        const date = dateInput.value;
+        const time = timeInput.value;
+        if (date && time) {
+            recordedAtInput.value = date + 'T' + time;
+            recordedAtInput.dispatchEvent(new Event('input', { bubbles: true }));
+        }
+    }
+}
+</script>
+@endpush

@@ -617,10 +617,21 @@ function confirmArchiveDriver(driverId) {
     const form = document.createElement('form');
     form.method = 'POST';
     form.action = `/admin/drivers/${driverId}`;
-    form.innerHTML = `
-        @csrf
-        @method('DELETE')
-    `;
+    
+    // Ajouter le token CSRF (correctement généré par Blade)
+    const csrfInput = document.createElement('input');
+    csrfInput.type = 'hidden';
+    csrfInput.name = '_token';
+    csrfInput.value = '{{ csrf_token() }}';
+    form.appendChild(csrfInput);
+    
+    // Ajouter la méthode DELETE
+    const methodInput = document.createElement('input');
+    methodInput.type = 'hidden';
+    methodInput.name = '_method';
+    methodInput.value = 'DELETE';
+    form.appendChild(methodInput);
+    
     document.body.appendChild(form);
     closeDriverModal();
     setTimeout(() => form.submit(), 200);
@@ -706,10 +717,21 @@ function confirmRestoreDriver(driverId) {
     const form = document.createElement('form');
     form.method = 'POST';
     form.action = `/admin/drivers/${driverId}/restore`;
-    form.innerHTML = `
-        @csrf
-        @method('PATCH')
-    `;
+    
+    // Ajouter le token CSRF (correctement généré par Blade)
+    const csrfInput = document.createElement('input');
+    csrfInput.type = 'hidden';
+    csrfInput.name = '_token';
+    csrfInput.value = '{{ csrf_token() }}';
+    form.appendChild(csrfInput);
+    
+    // Ajouter la méthode PATCH
+    const methodInput = document.createElement('input');
+    methodInput.type = 'hidden';
+    methodInput.name = '_method';
+    methodInput.value = 'PATCH';
+    form.appendChild(methodInput);
+    
     document.body.appendChild(form);
     closeDriverModal();
     setTimeout(() => form.submit(), 200);
@@ -787,10 +809,21 @@ function confirmPermanentDeleteDriver(driverId) {
     const form = document.createElement('form');
     form.method = 'POST';
     form.action = `/admin/drivers/${driverId}/force-delete`;
-    form.innerHTML = `
-        @csrf
-        @method('DELETE')
-    `;
+    
+    // Ajouter le token CSRF (correctement généré par Blade)
+    const csrfInput = document.createElement('input');
+    csrfInput.type = 'hidden';
+    csrfInput.name = '_token';
+    csrfInput.value = '{{ csrf_token() }}';
+    form.appendChild(csrfInput);
+    
+    // Ajouter la méthode DELETE
+    const methodInput = document.createElement('input');
+    methodInput.type = 'hidden';
+    methodInput.name = '_method';
+    methodInput.value = 'DELETE';
+    form.appendChild(methodInput);
+    
     document.body.appendChild(form);
     closeDriverModal();
     setTimeout(() => form.submit(), 200);

@@ -239,7 +239,8 @@ DESIGN PRINCIPLES:
  name="start_date"
  label="Date de Début"
  format="d/m/Y"
- :minDate="date('Y-m-d')"
+ 
+ {{-- ✅ minDate retiré pour permettre les affectations passées --}}
  :value="old('start_date')"
  placeholder="JJ/MM/AAAA"
  required

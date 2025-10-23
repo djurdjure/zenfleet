@@ -19,6 +19,36 @@ class User extends Authenticatable
     use HasApiTokens, HasFactory, Notifiable, HasRoles, SoftDeletes;
 
     /**
+     * 🔐 OVERRIDE: Relation roles() pour gérer le multi-tenant avec organization_id
+     * 
+     * Le système Spatie standard ne prend pas en compte organization_id.
+     * Cette surcharge ajoute le filtre nécessaire pour le multi-tenant.
+     * 
+     * IMPORTANT: Le filtre organization_id doit accepter NULL OU la valeur de l'utilisateur
+     * pour gérer les permissions globales.
+     */
+    public function roles(): \Illuminate\Database\Eloquent\Relations\MorphToMany
+    {
+        $relation = $this->morphToMany(
+            config('permission.models.role'),
+            'model',
+            config('permission.table_names.model_has_roles'),
+            config('permission.column_names.model_morph_key'),
+            'role_id'
+        );
+        
+        // Filtrer par organization_id (NULL ou valeur utilisateur)
+        if ($this->organization_id) {
+            $relation->where(function($query) {
+                $query->where(config('permission.table_names.model_has_roles') . '.organization_id', $this->organization_id)
+                      ->orWhereNull(config('permission.table_names.model_has_roles') . '.organization_id');
+            });
+        }
+        
+        return $relation;
+    }
+
+    /**
      * The attributes that are mass assignable.
      */
     protected $fillable = [

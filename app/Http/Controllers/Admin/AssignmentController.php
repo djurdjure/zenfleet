@@ -198,6 +198,27 @@ class AssignmentController extends Controller
         // Nettoyer les champs temporaires
         unset($data['start_date'], $data['start_time'], $data['end_date'], $data['end_time'], $data['assignment_type'], $data['purpose']);
 
+        // ✅ VÉRIFICATION DES CHEVAUCHEMENTS AVANT CRÉATION
+        $newAssignment = new Assignment($data); // Créer une instance sans la persister
+        
+        if ($newAssignment->isOverlapping()) {
+            Log::warning('Tentative de création d\'affectation avec chevauchement', [
+                'vehicle_id' => $data['vehicle_id'],
+                'driver_id' => $data['driver_id'],
+                'start_datetime' => $data['start_datetime'],
+                'end_datetime' => $data['end_datetime'],
+                'user_id' => auth()->id()
+            ]);
+            
+            return redirect()->back()
+                ->withInput()
+                ->with(
+                    'error',
+                    'Un chevauchement d\'affectation a été détecté pour ce véhicule ou ce chauffeur. '
+                    . 'Veuillez vérifier les périodes existantes.'
+                );
+        }
+
         try {
             $assignment = Assignment::create($data);
 
@@ -263,9 +284,50 @@ class AssignmentController extends Controller
         $data = $request->validated();
         $data['updated_by'] = auth()->id();
 
-        $assignment->update($data);
+        // ✅ VÉRIFICATION DES CHEVAUCHEMENTS AVANT MISE À JOUR
+        $assignment->fill($data); // Mettre à jour l'instance existante
+        
+        if ($assignment->isOverlapping($assignment->id)) { // Passer l'ID de l'affectation actuelle
+            Log::warning('Tentative de modification d\'affectation avec chevauchement', [
+                'assignment_id' => $assignment->id,
+                'vehicle_id' => $data['vehicle_id'] ?? $assignment->vehicle_id,
+                'driver_id' => $data['driver_id'] ?? $assignment->driver_id,
+                'start_datetime' => $data['start_datetime'] ?? $assignment->start_datetime,
+                'end_datetime' => $data['end_datetime'] ?? $assignment->end_datetime,
+                'user_id' => auth()->id()
+            ]);
+            
+            return redirect()->back()
+                ->withInput()
+                ->with(
+                    'error',
+                    'Un chevauchement d\'affectation a été détecté pour ce véhicule ou ce chauffeur. '
+                    . 'Veuillez vérifier les périodes existantes.'
+                );
+        }
 
-        return redirect()->route('admin.assignments.index')->with('success', 'Affectation mise à jour avec succès.');
+        try {
+            $assignment->save();
+            
+            Log::info('Affectation mise à jour avec succès', [
+                'assignment_id' => $assignment->id,
+                'updated_by' => auth()->id()
+            ]);
+
+            return redirect()->route('admin.assignments.index')
+                ->with('success', 'Affectation mise à jour avec succès.');
+                
+        } catch (\Exception $e) {
+            Log::error('Erreur lors de la mise à jour de l\'affectation', [
+                'assignment_id' => $assignment->id,
+                'error' => $e->getMessage(),
+                'user_id' => auth()->id()
+            ]);
+
+            return redirect()->back()
+                ->withInput()
+                ->with('error', 'Erreur lors de la mise à jour de l\'affectation : ' . $e->getMessage());
+        }
     }
 
     /**
