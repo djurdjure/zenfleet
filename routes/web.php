@@ -752,3 +752,10 @@ if (app()->environment('local', 'development')) {
         })->name('phpinfo');
     });
 }
+
+/*
+|--------------------------------------------------------------------------
+| 🔧 MODULE MAINTENANCE - Enterprise Grade
+|--------------------------------------------------------------------------
+*/
+require __DIR__.'/maintenance.php';

@@ -207,6 +207,23 @@ class MaintenanceType extends Model
     }
 
     /**
+     * Méthode pour obtenir la couleur hexadécimale selon la catégorie
+     * 
+     * @return string Couleur hexadécimale
+     */
+    public function getCategoryColor(): string
+    {
+        $colors = [
+            self::CATEGORY_PREVENTIVE => '#10B981',  // Green
+            self::CATEGORY_CORRECTIVE => '#EF4444',  // Red
+            self::CATEGORY_INSPECTION => '#3B82F6',  // Blue
+            self::CATEGORY_REVISION => '#8B5CF6',    // Purple
+        ];
+
+        return $colors[$this->category] ?? '#6B7280'; // Gray par défaut
+    }
+
+    /**
      * Méthode pour obtenir le badge de catégorie avec couleur
      */
     public function getCategoryBadge(): string

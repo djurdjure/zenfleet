@@ -381,8 +381,8 @@ class MaintenanceService
                 'id' => $operation->id,
                 'title' => $operation->vehicle->registration_plate . ' - ' . $operation->maintenanceType->name,
                 'start' => $operation->scheduled_date->toDateString(),
-                'backgroundColor' => $operation->maintenanceType->color ?? '#3B82F6',
-                'borderColor' => $operation->maintenanceType->color ?? '#3B82F6',
+                'backgroundColor' => $operation->maintenanceType->getCategoryColor(),
+                'borderColor' => $operation->maintenanceType->getCategoryColor(),
                 'textColor' => '#FFFFFF',
                 'extendedProps' => [
                     'vehicle' => $operation->vehicle->registration_plate,

@@ -49,7 +49,9 @@ class MaintenanceOperationController extends Controller
             ->orderBy('registration_plate')
             ->get();
 
-        $maintenanceTypes = MaintenanceType::select('id', 'name', 'category', 'color')
+        // CORRECTION: Suppression de la colonne 'color' inexistante
+        // Les couleurs sont générées dynamiquement basées sur 'category'
+        $maintenanceTypes = MaintenanceType::select('id', 'name', 'category')
             ->orderBy('category')
             ->orderBy('name')
             ->get();
@@ -79,6 +81,7 @@ class MaintenanceOperationController extends Controller
             ->orderBy('registration_plate')
             ->get();
 
+        // Les couleurs sont générées dynamiquement via getCategoryColor() basé sur 'category'
         $maintenanceTypes = MaintenanceType::select('id', 'name', 'category', 'estimated_cost')
             ->orderBy('category')
             ->orderBy('name')
@@ -267,6 +270,37 @@ class MaintenanceOperationController extends Controller
         } catch (\Exception $e) {
             return back()->with('error', 'Erreur: ' . $e->getMessage());
         }
+    }
+
+    /**
+     * Vue Kanban
+     */
+    public function kanban()
+    {
+        Gate::authorize('viewAny', MaintenanceOperation::class);
+
+        return view('admin.maintenance.operations.kanban');
+    }
+
+    /**
+     * Vue Calendrier
+     */
+    public function calendar()
+    {
+        Gate::authorize('viewAny', MaintenanceOperation::class);
+
+        return view('admin.maintenance.operations.calendar');
+    }
+
+    /**
+     * Vue Timeline
+     */
+    public function timeline()
+    {
+        Gate::authorize('viewAny', MaintenanceOperation::class);
+
+        // TODO: Créer vue timeline
+        return view('admin.maintenance.operations.timeline');
     }
 
     /**
