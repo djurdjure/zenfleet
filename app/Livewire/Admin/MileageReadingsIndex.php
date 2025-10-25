@@ -48,7 +48,7 @@ class MileageReadingsIndex extends Component
      */
     public string $sortField = 'recorded_at';
     public string $sortDirection = 'desc';
-    public int $perPage = 20;
+    public int $perPage = 25; // Défaut 25 pour pagination entreprise
 
     /**
      * 🎛️ LISTENERS
