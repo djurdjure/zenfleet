@@ -243,28 +243,60 @@ class VehicleMileageHistory extends Component
     }
 
     /**
-     * 📊 STATISTIQUES DU VÉHICULE
+     * 📊 STATISTIQUES ENRICHIES DU VÉHICULE (ENTERPRISE-GRADE)
      */
     public function getStatsProperty(): array
     {
-        $readings = VehicleMileageReading::where('vehicle_id', $this->vehicleId)
+        $allReadings = VehicleMileageReading::where('vehicle_id', $this->vehicleId)
             ->where('organization_id', auth()->user()->organization_id)
+            ->orderBy('recorded_at', 'asc')
             ->get();
 
-        $manualCount = $readings->where('recording_method', 'manual')->count();
-        $automaticCount = $readings->where('recording_method', 'automatic')->count();
+        $manualCount = $allReadings->where('recording_method', 'manual')->count();
+        $automaticCount = $allReadings->where('recording_method', 'automatic')->count();
+        $totalCount = $allReadings->count();
 
-        $totalDistance = $this->vehicle->current_mileage - ($this->vehicle->initial_mileage ?? 0);
+        // Distance totale parcourue
+        $totalDistance = $totalCount > 1 
+            ? ($allReadings->last()->mileage - $allReadings->first()->mileage) 
+            : 0;
 
-        $lastReading = $readings->sortByDesc('recorded_at')->first();
+        // Dernier relevé
+        $lastReading = $allReadings->last();
+
+        // Relevés du mois en cours
+        $monthlyCount = $allReadings->where('recorded_at', '>=', now()->startOfMonth())->count();
+
+        // Relevés des 7 derniers jours
+        $last7Days = $allReadings->where('recorded_at', '>=', now()->subDays(7));
+        $last7DaysKm = $last7Days->count() > 1 
+            ? ($last7Days->last()->mileage - $last7Days->first()->mileage) 
+            : 0;
+
+        // Moyenne journalière (basée sur 30 derniers jours)
+        $avgDaily = $totalCount > 1 && $allReadings->first()->recorded_at 
+            ? round($totalDistance / max($allReadings->first()->recorded_at->diffInDays(now()), 1), 2) 
+            : 0;
+
+        // Tendance 7 jours
+        $trend7Days = $last7DaysKm;
+
+        // Premier relevé date
+        $firstReadingDate = $allReadings->first()?->recorded_at->format('d/m/Y');
 
         return [
-            'total_readings' => $readings->count(),
+            'total_readings' => $totalCount,
             'manual_count' => $manualCount,
             'automatic_count' => $automaticCount,
+            'manual_percentage' => $totalCount > 0 ? round(($manualCount / $totalCount) * 100, 1) : 0,
+            'automatic_percentage' => $totalCount > 0 ? round(($automaticCount / $totalCount) * 100, 1) : 0,
             'total_distance' => $totalDistance,
-            'average_mileage' => $readings->count() > 0 ? $readings->avg('mileage') : 0,
-            'last_reading_date' => $lastReading ? $lastReading->recorded_at->format('d/m/Y H:i') : 'N/A',
+            'last_reading' => $lastReading?->recorded_at,
+            'first_reading_date' => $firstReadingDate,
+            'monthly_count' => $monthlyCount,
+            'avg_daily' => $avgDaily,
+            'last_7_days_km' => $last7DaysKm,
+            'trend_7_days' => $trend7Days,
         ];
     }
 
