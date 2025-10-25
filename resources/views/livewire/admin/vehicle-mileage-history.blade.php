@@ -255,10 +255,13 @@
         =============================================== --}}
         <div class="bg-white shadow-sm rounded-lg border border-gray-200 mb-6">
             <div class="p-6">
-                <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
+                <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-6">
                     {{-- Recherche --}}
                     <div class="lg:col-span-2">
-                        <label for="search" class="block text-sm font-medium text-gray-700 mb-1">Rechercher</label>
+                        <label for="search" class="block text-sm font-medium text-gray-700 mb-1">
+                            <x-iconify icon="lucide:search" class="w-4 h-4 inline mr-1" />
+                            Rechercher
+                        </label>
                         <div class="relative">
                             <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                 <x-iconify icon="lucide:search" class="w-5 h-5 text-gray-400" />
@@ -297,22 +300,52 @@
                         </label>
                         <input wire:model.live="dateTo" type="date" id="date-to" class="block w-full border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-sm">
                     </div>
+
+                    {{-- NOUVEAU: Contrôle Pagination (Relevés par page) --}}
+                    <div>
+                        <label for="per-page" class="block text-sm font-medium text-gray-700 mb-1">
+                            <x-iconify icon="lucide:list" class="w-4 h-4 inline mr-1" />
+                            Par page
+                        </label>
+                        <select wire:model.live="perPage" id="per-page" class="block w-full border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-sm">
+                            <option value="10">10 relevés</option>
+                            <option value="15">15 relevés</option>
+                            <option value="25">25 relevés</option>
+                            <option value="50">50 relevés</option>
+                            <option value="100">100 relevés</option>
+                        </select>
+                    </div>
                 </div>
 
-                <div class="mt-4 flex items-center justify-between">
-                    <button wire:click="resetFilters" class="inline-flex items-center gap-2 px-3 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors">
-                        <x-iconify icon="lucide:x" class="w-4 h-4" />
-                        Réinitialiser filtres
-                    </button>
+                <div class="mt-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                    <div class="flex items-center gap-2">
+                        <button wire:click="resetFilters" class="inline-flex items-center gap-2 px-3 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors">
+                            <x-iconify icon="lucide:x" class="w-4 h-4" />
+                            Réinitialiser filtres
+                        </button>
 
-                    @can('export mileage readings')
-                    <div class="flex gap-2">
+                        {{-- Indicateur filtres actifs --}}
+                        @if($search || $methodFilter || $dateFrom || $dateTo)
+                        <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                            <x-iconify icon="lucide:filter" class="w-3 h-3" />
+                            Filtres actifs
+                        </span>
+                        @endif
+                    </div>
+
+                    <div class="flex items-center gap-2">
+                        @can('export mileage readings')
                         <button wire:click="exportCsv" class="inline-flex items-center gap-2 px-3 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors">
                             <x-iconify icon="lucide:download" class="w-4 h-4" />
                             Export CSV
                         </button>
+                        @endcan
+
+                        {{-- Compteur résultats --}}
+                        <div class="text-sm text-gray-600 px-3">
+                            <span class="font-semibold">{{ $readings->total() }}</span> relevé(s)
+                        </div>
                     </div>
-                    @endcan
                 </div>
             </div>
         </div>
