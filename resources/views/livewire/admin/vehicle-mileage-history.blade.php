@@ -207,19 +207,19 @@
             </div>
 
             {{-- 7. Kilométrage Actuel --}}
-            <div class="bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg border border-blue-200 p-4 hover:shadow-lg transition-shadow duration-300">
+            <div class="bg-white rounded-lg border border-gray-200 p-4 hover:shadow-lg transition-shadow duration-300">
                 <div class="flex items-center justify-between">
                     <div>
-                        <p class="text-xs font-medium text-blue-700">KM Actuel</p>
-                        <p class="text-xl font-bold text-blue-900 mt-1">
+                        <p class="text-xs font-medium text-gray-600">KM Actuel</p>
+                        <p class="text-xl font-bold text-blue-600 mt-1">
                             {{ number_format($vehicle->current_mileage) }}
                         </p>
-                        <p class="text-xs text-blue-600 mt-1 flex items-center gap-1">
+                        <p class="text-xs text-gray-500 mt-1 flex items-center gap-1">
                             <x-iconify icon="lucide:car" class="w-3 h-3" />
                             {{ $vehicle->registration_plate }}
                         </p>
                     </div>
-                    <div class="w-10 h-10 bg-white/80 rounded-lg flex items-center justify-center shadow-sm">
+                    <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
                         <x-iconify icon="lucide:gauge-circle" class="w-5 h-5 text-blue-600" />
                     </div>
                 </div>
