@@ -198,11 +198,16 @@ Route::middleware(['auth', 'verified'])
     */
     Route::middleware(['auth', 'verified', 'enterprise.permission'])->group(function () {
 
-        // 📊 Relevés Kilométriques - Module Complet (Livewire 3 Pattern)
+        // 📊 Relevés Kilométriques - Module Complet Enterprise-Grade (Livewire 3 Pattern)
         Route::prefix('mileage-readings')->name('mileage-readings.')->middleware('mileage.access')->group(function () {
             // Vue globale des relevés - Accès géré par middleware enterprise-grade
             Route::get('/', [\App\Http\Controllers\Admin\MileageReadingController::class, 'index'])
                 ->name('index');
+
+            // Export CSV avec filtres avancés - Enterprise
+            Route::get('/export', [\App\Http\Controllers\Admin\MileageReadingController::class, 'export'])
+                ->name('export')
+                ->middleware('can:view mileage readings');
 
             // Mise à jour du kilométrage (tous les rôles selon permissions)
             Route::get('/update/{vehicle?}', [\App\Http\Controllers\Admin\MileageReadingController::class, 'update'])
@@ -305,9 +310,9 @@ Route::middleware(['auth', 'verified'])
         Route::get('vehicles/available', [AssignmentController::class, 'availableVehicles'])->name('vehicles.available');
         Route::get('drivers/available', [AssignmentController::class, 'availableDrivers'])->name('drivers.available');
 
-        // 🏪 Fournisseurs et Catégories - LEGACY (maintenu pour compatibilité)
-        Route::resource('suppliers', SupplierController::class);
+        // 🏪 Fournisseurs et Catégories - ENTERPRISE GRADE V2.0
         Route::get('suppliers/export', [SupplierController::class, 'export'])->name('suppliers.export');
+        Route::resource('suppliers', SupplierController::class);
         Route::resource('supplier-categories', SupplierCategoryController::class);
 
         /*
@@ -495,13 +500,13 @@ Route::middleware(['auth', 'verified'])
 
         // 📋 Gestion des Types de Maintenance
         Route::prefix('types')->name('types.')->group(function () {
-            Route::get('/', [\App\Http\Controllers\Admin\MaintenanceTypeController::class, 'index'])->name('index');
-            Route::get('/create', [\App\Http\Controllers\Admin\MaintenanceTypeController::class, 'create'])->name('create');
-            Route::post('/', [\App\Http\Controllers\Admin\MaintenanceTypeController::class, 'store'])->name('store');
-            Route::get('/{maintenanceType}', [\App\Http\Controllers\Admin\MaintenanceTypeController::class, 'show'])->name('show');
-            Route::get('/{maintenanceType}/edit', [\App\Http\Controllers\Admin\MaintenanceTypeController::class, 'edit'])->name('edit');
-            Route::put('/{maintenanceType}', [\App\Http\Controllers\Admin\MaintenanceTypeController::class, 'update'])->name('update');
-            Route::delete('/{maintenanceType}', [\App\Http\Controllers\Admin\MaintenanceTypeController::class, 'destroy'])->name('destroy');
+            Route::get('/', [\App\Http\Controllers\Admin\Maintenance\MaintenanceTypeController::class, 'index'])->name('index');
+            Route::get('/create', [\App\Http\Controllers\Admin\Maintenance\MaintenanceTypeController::class, 'create'])->name('create');
+            Route::post('/', [\App\Http\Controllers\Admin\Maintenance\MaintenanceTypeController::class, 'store'])->name('store');
+            Route::get('/{maintenanceType}', [\App\Http\Controllers\Admin\Maintenance\MaintenanceTypeController::class, 'show'])->name('show');
+            Route::get('/{maintenanceType}/edit', [\App\Http\Controllers\Admin\Maintenance\MaintenanceTypeController::class, 'edit'])->name('edit');
+            Route::put('/{maintenanceType}', [\App\Http\Controllers\Admin\Maintenance\MaintenanceTypeController::class, 'update'])->name('update');
+            Route::delete('/{maintenanceType}', [\App\Http\Controllers\Admin\Maintenance\MaintenanceTypeController::class, 'destroy'])->name('destroy');
         });
 
         // 🏢 Gestion des Fournisseurs de Maintenance
