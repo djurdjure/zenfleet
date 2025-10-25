@@ -40,6 +40,8 @@ class MileageReadingsIndex extends Component
     public string $authorFilter = '';
     public ?string $dateFrom = null;
     public ?string $dateTo = null;
+    public string $mileageMin = ''; // NOUVEAU: Filtre kilométrage minimum
+    public string $mileageMax = ''; // NOUVEAU: Filtre kilométrage maximum
 
     /**
      * 📊 PROPRIÉTÉS DE TRI ET PAGINATION
@@ -88,6 +90,16 @@ class MileageReadingsIndex extends Component
         $this->resetPage();
     }
 
+    public function updatingMileageMin(): void
+    {
+        $this->resetPage();
+    }
+
+    public function updatingMileageMax(): void
+    {
+        $this->resetPage();
+    }
+
     /**
      * 📊 TRI DES COLONNES
      */
@@ -113,6 +125,8 @@ class MileageReadingsIndex extends Component
             'authorFilter',
             'dateFrom',
             'dateTo',
+            'mileageMin',
+            'mileageMax',
             'sortField',
             'sortDirection',
         ]);
@@ -183,6 +197,14 @@ class MileageReadingsIndex extends Component
 
         if (!empty($this->dateTo)) {
             $query->whereDate('recorded_at', '<=', $this->dateTo);
+        }
+
+        if (!empty($this->mileageMin)) {
+            $query->where('mileage', '>=', $this->mileageMin);
+        }
+
+        if (!empty($this->mileageMax)) {
+            $query->where('mileage', '<=', $this->mileageMax);
         }
 
         // 📊 TRI

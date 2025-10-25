@@ -63,12 +63,11 @@
             </x-alert>
         @endif
 
-        {{-- FORMULAIRE AVEC ALPINE.JS VALIDATION --}}
-        <div x-data="supplierFormValidation()" x-init="init()">
-            <x-card padding="p-0" margin="mb-6">
-                <form method="POST" action="{{ route('admin.suppliers.update', $supplier) }}" class="p-6" @submit="onSubmit">
-                    @csrf
-                    @method('PUT')
+        {{-- FORMULAIRE --}}
+        <x-card padding="p-0" margin="mb-6">
+            <form method="POST" action="{{ route('admin.suppliers.update', $supplier) }}" class="p-6">
+                @csrf
+                @method('PUT')
 
                 {{-- SECTION 1: INFORMATIONS GÉNÉRALES --}}
                 <div class="mb-8">
@@ -478,132 +477,9 @@
                     </x-button>
                 </div>
 
-                </form>
-            </x-card>
-        </div>
+            </form>
+        </x-card>
 
     </div>
 </section>
-
-{{-- ================================================================
-    ALPINE.JS VALIDATION SYSTEM - ENTERPRISE GRADE
-    ================================================================
-    Système de validation en temps réel identique au formulaire véhicules
-    - Validation par champ avec état persistant
-    - Indicateurs visuels (bordures rouges, messages d'erreur)
-    - Messages d'erreur contextuels sous les champs
-    - Validation côté client synchronisée avec serveur
-================================================================ --}}
-<script>
-function supplierFormValidation() {
-    return {
-        fieldErrors: {},
-        touchedFields: {},
-
-        init() {
-            // Initialiser avec les erreurs serveur si présentes
-            @if ($errors->any())
-                @foreach ($errors->keys() as $field)
-                    this.fieldErrors['{{ $field }}'] = true;
-                    this.touchedFields['{{ $field }}'] = true;
-                @endforeach
-            @endif
-        },
-
-        validateField(fieldName, value) {
-            // Marquer le champ comme touché
-            this.touchedFields[fieldName] = true;
-
-            // Règles de validation
-            const rules = {
-                'company_name': (v) => v && v.trim().length > 0,
-                'supplier_type': (v) => v && v.length > 0,
-                'contact_first_name': (v) => v && v.trim().length > 0,
-                'contact_last_name': (v) => v && v.trim().length > 0,
-                'contact_phone': (v) => v && v.trim().length > 0,
-                'address': (v) => v && v.trim().length > 0,
-                'wilaya': (v) => v && v.length > 0,
-                'city': (v) => v && v.trim().length > 0,
-                'trade_register': (v) => !v || /^[0-9]{2}\/[0-9]{2}-[0-9]{2}[A-Z][0-9]{7}$/.test(v),
-                'nif': (v) => !v || /^[0-9]{15}$/.test(v),
-            };
-
-            const isValid = rules[fieldName] ? rules[fieldName](value) : true;
-
-            if (!isValid) {
-                this.fieldErrors[fieldName] = true;
-                
-                // Ajouter classe ts-error pour TomSelect
-                const input = document.querySelector(`[name="${fieldName}"]`);
-                if (input) {
-                    const tsWrapper = input.closest('.ts-wrapper');
-                    if (tsWrapper) {
-                        tsWrapper.classList.add('ts-error');
-                    }
-                }
-            } else {
-                this.clearFieldError(fieldName);
-            }
-
-            return isValid;
-        },
-
-        clearFieldError(fieldName) {
-            delete this.fieldErrors[fieldName];
-            
-            const input = document.querySelector(`[name="${fieldName}"]`);
-            if (input) {
-                const tsWrapper = input.closest('.ts-wrapper');
-                if (tsWrapper) {
-                    tsWrapper.classList.remove('ts-error');
-                }
-            }
-        },
-
-        onSubmit(e) {
-            // Valider tous les champs requis
-            const requiredFields = ['company_name', 'supplier_type', 'contact_first_name', 'contact_last_name', 'contact_phone', 'address', 'wilaya', 'city'];
-            let allValid = true;
-
-            requiredFields.forEach(fieldName => {
-                const input = document.querySelector(`[name="${fieldName}"]`);
-                if (input) {
-                    const value = input.value;
-                    const isValid = this.validateField(fieldName, value);
-                    if (!isValid) {
-                        allValid = false;
-                    }
-                }
-            });
-
-            if (!allValid) {
-                e.preventDefault();
-                alert('Veuillez corriger les erreurs avant de soumettre le formulaire');
-                return false;
-            }
-
-            return true;
-        }
-    };
-}
-</script>
-
-<style>
-@keyframes shake {
-    0%, 100% { transform: translateX(0); }
-    10%, 30%, 50%, 70%, 90% { transform: translateX(-4px); }
-    20%, 40%, 60%, 80% { transform: translateX(4px); }
-}
-
-.animate-shake {
-    animation: shake 0.5s ease-in-out;
-}
-
-/* TomSelect error state */
-.ts-error .ts-control {
-    border-color: rgb(239 68 68) !important;
-    background-color: rgb(254 242 242) !important;
-}
-</style>
-
 @endsection

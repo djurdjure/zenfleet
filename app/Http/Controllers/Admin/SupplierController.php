@@ -27,9 +27,44 @@ class SupplierController extends Controller
     public function index(Request $request): View
     {
         $this->authorize('view suppliers');
-        $filters = $request->only(['search', 'per_page']);
-        $suppliers = $this->supplierService->getFilteredSuppliers($filters);
-        return view('admin.suppliers.index', compact('suppliers', 'filters'));
+        
+        // Filtres avancés
+        $filters = $request->only([
+            'search', 
+            'supplier_type', 
+            'category_id', 
+            'wilaya', 
+            'is_active', 
+            'is_preferred', 
+            'is_certified', 
+            'min_rating',
+            'sort_by',
+            'sort_direction',
+            'per_page'
+        ]);
+        
+        // Récupérer fournisseurs avec filtres avancés
+        $suppliers = $this->supplierService->getFilteredSuppliersAdvanced(
+            $filters,
+            $request->input('per_page', 15)
+        );
+        
+        // Analytics enrichies
+        $analytics = $this->supplierService->getAnalytics($filters);
+        
+        // Données pour les filtres
+        $categories = \App\Models\SupplierCategory::orderBy('name')->get();
+        $types = Supplier::TYPES;
+        $wilayas = Supplier::WILAYAS;
+        
+        return view('admin.suppliers.index', compact(
+            'suppliers', 
+            'analytics',
+            'filters',
+            'categories',
+            'types',
+            'wilayas'
+        ));
     }
 
     public function create(): View
@@ -62,10 +97,93 @@ class SupplierController extends Controller
         return redirect()->route('admin.suppliers.index')->with('success', 'Fournisseur mis à jour avec succès.');
     }
 
+    public function show(Supplier $supplier): View
+    {
+        $this->authorize('view suppliers');
+        
+        // Récupérer les données enrichies du fournisseur
+        $supplier->load(['category']);
+        
+        return view('admin.suppliers.show', compact('supplier'));
+    }
+
     public function destroy(Supplier $supplier): RedirectResponse
     {
         $this->authorize('delete suppliers');
         $this->supplierService->archiveSupplier($supplier);
         return redirect()->route('admin.suppliers.index')->with('success', 'Fournisseur archivé avec succès.');
+    }
+
+    /**
+     * Export des fournisseurs (CSV/Excel)
+     */
+    public function export(Request $request)
+    {
+        $this->authorize('view suppliers');
+        
+        $filters = $request->only([
+            'search', 'supplier_type', 'category_id', 'wilaya', 
+            'is_active', 'is_preferred', 'is_certified', 'min_rating'
+        ]);
+        
+        $suppliers = $this->supplierService->getFilteredSuppliersAdvanced($filters, 999999);
+        
+        $filename = 'fournisseurs_' . date('Y-m-d_His') . '.csv';
+        
+        $headers = [
+            'Content-Type' => 'text/csv; charset=utf-8',
+            'Content-Disposition' => "attachment; filename=\"{$filename}\"",
+        ];
+        
+        $callback = function() use ($suppliers) {
+            $file = fopen('php://output', 'w');
+            
+            // BOM UTF-8 pour Excel
+            fprintf($file, chr(0xEF).chr(0xBB).chr(0xBF));
+            
+            // En-têtes
+            fputcsv($file, [
+                'Raison Sociale',
+                'Type',
+                'Contact Prénom',
+                'Contact Nom',
+                'Téléphone',
+                'Email',
+                'Wilaya',
+                'Ville',
+                'Adresse',
+                'Rating',
+                'Score Qualité',
+                'Score Fiabilité',
+                'Actif',
+                'Préféré',
+                'Certifié',
+            ], ';');
+            
+            // Données
+            foreach ($suppliers as $supplier) {
+                fputcsv($file, [
+                    $supplier->company_name,
+                    \App\Models\Supplier::TYPES[$supplier->supplier_type] ?? $supplier->supplier_type,
+                    $supplier->contact_first_name,
+                    $supplier->contact_last_name,
+                    $supplier->contact_phone,
+                    $supplier->contact_email,
+                    \App\Models\Supplier::WILAYAS[$supplier->wilaya] ?? $supplier->wilaya,
+                    $supplier->city,
+                    $supplier->address,
+                    $supplier->rating,
+                    $supplier->quality_score,
+                    $supplier->reliability_score,
+                    $supplier->is_active ? 'Oui' : 'Non',
+                    $supplier->is_preferred ? 'Oui' : 'Non',
+                    $supplier->is_certified ? 'Oui' : 'Non',
+                ], ';');
+            }
+            
+            fclose($file);
+        };
+        
+        return response()->stream($callback, 200, $headers);
     }
 }

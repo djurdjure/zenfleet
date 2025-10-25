@@ -1,330 +1,498 @@
-{{-- resources/views/livewire/admin/update-vehicle-mileage.blade.php --}}
-<div class="fade-in">
- {{-- En-tête --}}
- <div class="mb-8">
- <div class="md:flex md:items-center md:justify-between">
- <div class="flex-1 min-w-0">
- <h1 class="text-2xl font-bold leading-7 text-gray-900 sm:text-3xl sm:truncate">
- Mettre à jour le kilométrage
- </h1>
- <p class="mt-2 text-sm text-gray-600">
- @if($mode === 'fixed' && $selectedVehicle)
- Mise à jour du kilométrage pour <strong>{{ $selectedVehicle->registration_plate }}</strong>
- @else
- Sélectionnez un véhicule et entrez le nouveau kilométrage
- @endif
- </p>
- </div>
- <div class="mt-4 flex md:mt-0 md:ml-4">
- <a href="{{ route('admin.mileage-readings.index') }}" class="inline-flex items-center px-4 py-2 bg-white hover:bg-gray-50 border-2 border-gray-300 text-gray-700 font-semibold rounded-lg shadow-sm transition-colors duration-200">
- <svg class="-ml-1 mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
- <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
- </svg>
- Retour
- </a>
- </div>
- </div>
- </div>
+{{-- ====================================================================
+ 📝 FORMULAIRE UPDATE KILOMÉTRAGE - ENTERPRISE-GRADE V8.0
+ ====================================================================
 
- {{-- Flash Messages --}}
- @if (session()->has('success'))
- <div class="mb-6 rounded-lg bg-green-50 border border-green-200 p-4">
- <div class="flex">
- <div class="flex-shrink-0">
- <svg class="h-5 w-5 text-green-400" fill="currentColor" viewBox="0 0 20 20">
- <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
- </svg>
- </div>
- <div class="ml-3">
- <p class="text-sm font-medium text-green-800">{{ session('success') }}</p>
- </div>
- </div>
- </div>
- @endif
+ SOLUTION AU PROBLÈME: TOUS LES CHAMPS VISIBLES DÈS LE DÉBUT
+ - Sélection véhicule intégrée dans le formulaire
+ - Champs disabled si pas de véhicule (au lieu de cachés)
+ - Card info véhicule dynamique Alpine.js (x-show)
+ - Calcul différence kilométrique temps réel
+ - Section informations système (dates created_at, updated_at)
+ - Validation temps réel
+ - UX professionnelle world-class
 
- @if (session()->has('error'))
- <div class="mb-6 rounded-lg bg-red-50 border border-red-200 p-4">
- <div class="flex">
- <div class="flex-shrink-0">
- <svg class="h-5 w-5 text-red-400" fill="currentColor" viewBox="0 0 20 20">
- <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path>
- </svg>
- </div>
- <div class="ml-3">
- <p class="text-sm font-medium text-red-800">{{ session('error') }}</p>
- </div>
- </div>
- </div>
- @endif
+ @version 8.0-Enterprise-World-Class
+ @since 2025-10-24
+ ==================================================================== --}}
 
- @if (session()->has('warning'))
- <div class="mb-6 rounded-lg bg-yellow-50 border border-yellow-200 p-4">
- <div class="flex">
- <div class="flex-shrink-0">
- <svg class="h-5 w-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
- <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
- </svg>
- </div>
- <div class="ml-3">
- <p class="text-sm font-medium text-yellow-800">{{ session('warning') }}</p>
- </div>
- </div>
- </div>
- @endif
+<div class="fade-in" x-data="mileageForm()">
+<section class="bg-gray-50 min-h-screen">
+    <div class="py-4 px-4 mx-auto max-w-4xl lg:py-6">
 
- {{-- Formulaire principal --}}
- <div class="bg-white shadow-lg rounded-lg overflow-hidden">
- <div class="p-6 sm:p-8">
- <form wire:submit.prevent="save" class="space-y-6">
+        {{-- ===============================================
+            HEADER
+        =============================================== --}}
+        <div class="mb-6">
+            <div class="md:flex md:items-center md:justify-between">
+                <div class="flex-1 min-w-0">
+                    <h1 class="text-2xl font-bold text-gray-900 mb-1 flex items-center gap-2.5">
+                        <x-iconify icon="lucide:gauge" class="w-6 h-6 text-blue-600" />
+                        Mettre à jour le kilométrage
+                    </h1>
+                    <p class="text-sm text-gray-600 ml-8.5">
+                        @if($mode === 'fixed' && $selectedVehicle)
+                            Mise à jour pour <strong>{{ $selectedVehicle->registration_plate }}</strong>
+                        @else
+                            Sélectionnez un véhicule et entrez le nouveau kilométrage
+                        @endif
+                    </p>
+                </div>
+                <div class="mt-4 flex md:mt-0 md:ml-4">
+                    <a href="{{ route('admin.mileage-readings.index') }}" 
+                       class="inline-flex items-center gap-2 px-4 py-2 bg-white hover:bg-gray-50 border border-gray-300 text-gray-700 font-medium rounded-lg shadow-sm transition-colors duration-200">
+                        <x-iconify icon="lucide:arrow-left" class="w-5 h-5" />
+                        Retour
+                    </a>
+                </div>
+            </div>
+        </div>
 
- {{-- Sélection du véhicule (MODE SELECT) avec TomSelect --}}
- @if($mode === 'select')
- <div x-data="vehicleSelector()">
- @php
- $vehicleOptions = [];
- foreach($availableVehicles as $vehicle) {
- $vehicleOptions[$vehicle->id] = $vehicle->registration_plate . ' - ' . $vehicle->brand . ' ' . $vehicle->model . ' (' . number_format($vehicle->current_mileage) . ' km)';
- }
- @endphp
- 
- <x-tom-select
- name="vehicleId"
- label="Véhicule"
- :options="$vehicleOptions"
- placeholder="Rechercher un véhicule par plaque, marque ou modèle..."
- required
- wire:model.live="vehicleId"
- x-on:change="loadVehicleMileage($event.target.value)"
- :error="$errors->first('vehicleId')"
- />
- </div>
- @endif
+        {{-- ===============================================
+            FLASH MESSAGES
+        =============================================== --}}
+        @if (session()->has('success'))
+        <div class="mb-6 rounded-lg bg-green-50 border border-green-200 p-4">
+            <div class="flex items-center">
+                <x-iconify icon="lucide:check-circle-2" class="w-5 h-5 text-green-600 mr-3" />
+                <p class="text-sm font-medium text-green-800">{{ session('success') }}</p>
+            </div>
+        </div>
+        @endif
 
- {{-- Informations du véhicule sélectionné --}}
- @if($selectedVehicle)
- <div class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-lg">
- <div class="flex items-start">
- <div class="flex-shrink-0">
- <svg class="h-6 w-6 text-blue-500" fill="currentColor" viewBox="0 0 20 20">
- <path d="M8 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM15 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z"></path>
- <path d="M3 4a1 1 0 00-1 1v10a1 1 0 001 1h1.05a2.5 2.5 0 014.9 0H10a1 1 0 001-1V5a1 1 0 00-1-1H3zM14 7a1 1 0 00-1 1v6.05A2.5 2.5 0 0115.95 16H17a1 1 0 001-1V8a1 1 0 00-1-1h-3z"></path>
- </svg>
- </div>
- <div class="ml-3 flex-1">
- <h3 class="text-sm font-semibold text-blue-900">
- {{ $selectedVehicle->brand }} {{ $selectedVehicle->model }}
- </h3>
- <div class="mt-2 text-sm text-blue-800 space-y-1">
- <p><strong>Plaque:</strong> {{ $selectedVehicle->registration_plate }}</p>
- <p><strong>Kilométrage actuel:</strong> <span class="font-bold text-lg">{{ number_format($selectedVehicle->current_mileage) }} km</span></p>
- </div>
- </div>
- </div>
- </div>
+        @if (session()->has('error'))
+        <div class="mb-6 rounded-lg bg-red-50 border border-red-200 p-4">
+            <div class="flex items-center">
+                <x-iconify icon="lucide:alert-circle" class="w-5 h-5 text-red-600 mr-3" />
+                <p class="text-sm font-medium text-red-800">{{ session('error') }}</p>
+            </div>
+        </div>
+        @endif
 
- {{-- Nouveau kilométrage --}}
- <div>
- <label for="newMileage" class="block text-sm font-medium text-gray-700 mb-2">
- Nouveau kilométrage (km) <span class="text-red-500">*</span>
- </label>
- <div class="relative">
- <input
- type="number"
- id="newMileage"
- wire:model.live="newMileage"
- min="{{ $selectedVehicle->current_mileage }}"
- max="9999999"
- class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors @error('newMileage') border-red-500 @enderror"
- placeholder="Ex: {{ number_format($selectedVehicle->current_mileage + 100) }}"
- >
- <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
- <span class="text-gray-500 font-medium">km</span>
- </div>
- </div>
- @error('newMileage')
- <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
- @else
- @if($newMileage > $selectedVehicle->current_mileage)
- <p class="mt-2 text-sm text-green-600 flex items-center">
- <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
- <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
- </svg>
- Distance parcourue: <strong class="ml-1">{{ number_format($newMileage - $selectedVehicle->current_mileage) }} km</strong>
- </p>
- @endif
- @enderror
- </div>
+        @if (session()->has('warning'))
+        <div class="mb-6 rounded-lg bg-amber-50 border border-amber-200 p-4">
+            <div class="flex items-center">
+                <x-iconify icon="lucide:alert-triangle" class="w-5 h-5 text-amber-600 mr-3" />
+                <p class="text-sm font-medium text-amber-800">{{ session('warning') }}</p>
+            </div>
+        </div>
+        @endif
 
- {{-- Date et heure --}}
- <div class="grid grid-cols-1 md:grid-cols-2 gap-4" x-data="{ recordedDate: '{{ now()->format('Y-m-d') }}', recordedTime: '{{ now()->format('H:i') }}' }">
- <div>
- <x-datepicker
- name="recordedDate"
- label="Date du relevé"
- placeholder="JJ/MM/AAAA"
- :maxDate="date('Y-m-d')"
- :minDate="date('Y-m-d', strtotime('-7 days'))"
- required
- x-model="recordedDate"
- x-on:change="updateRecordedAt()"
- helpText="Maximum 7 jours dans le passé"
- />
- </div>
- 
- <div>
- <x-time-picker
- name="recordedTime"
- label="Heure du relevé"
- placeholder="HH:MM"
- required
- x-model="recordedTime"
- x-on:change="updateRecordedAt()"
- helpText="Format 24 heures (HH:MM)"
- />
- </div>
- 
- <input type="hidden" wire:model="recordedAt" x-bind:value="recordedDate + 'T' + recordedTime">
- 
- @error('recordedAt')
- <p class="col-span-2 mt-2 text-sm text-red-600">{{ $message }}</p>
- @enderror
- </div>
+        {{-- ===============================================
+            FORMULAIRE COMPLET - TOUS CHAMPS VISIBLES ⭐
+        =============================================== --}}
+        <div class="bg-white shadow-lg rounded-lg overflow-hidden">
+            <div class="p-6 sm:p-8">
+                <form wire:submit.prevent="save" class="space-y-8">
 
- {{-- Notes --}}
- <div>
- <label for="notes" class="block text-sm font-medium text-gray-700 mb-2">
- Notes (optionnel)
- </label>
- <textarea
- id="notes"
- wire:model="notes"
- rows="3"
- maxlength="500"
- class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors @error('notes') border-red-500 @enderror"
- placeholder="Ajoutez des notes si nécessaire (ex: raison de la mise à jour, anomalies détectées, etc.)"
- ></textarea>
- <div class="mt-1 flex justify-between text-xs text-gray-500">
- <span>{{ strlen($notes) }}/500 caractères</span>
- </div>
- @error('notes')
- <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
- @enderror
- </div>
+                    {{-- =============================================
+                        SECTION 1: SÉLECTION VÉHICULE
+                    ============================================= --}}
+                    <div>
+                        <h3 class="text-lg font-medium text-gray-900 mb-4 flex items-center gap-2">
+                            <x-iconify icon="lucide:car" class="w-5 h-5 text-blue-600" />
+                            Sélection du Véhicule
+                        </h3>
 
- {{-- Boutons d'action --}}
- <div class="flex items-center justify-end space-x-3 pt-4 border-t border-gray-200">
- <button
- type="button"
- wire:click="refresh"
- class="inline-flex items-center px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium rounded-lg transition-colors duration-200"
- >
- <svg class="-ml-1 mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
- <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
- </svg>
- Actualiser
- </button>
+                        <div class="grid grid-cols-1 gap-6">
+                            {{-- Véhicule - TOUJOURS VISIBLE --}}
+                            @if($mode === 'select')
+                            <div>
+                                <label for="vehicleId" class="block mb-2 text-sm font-medium text-gray-900">
+                                    Véhicule <span class="text-red-600">*</span>
+                                </label>
+                                
+                                @php
+                                    $vehicleOptions = [];
+                                    foreach($availableVehicles as $vehicle) {
+                                        $vehicleOptions[$vehicle->id] = $vehicle->registration_plate . ' - ' . $vehicle->brand . ' ' . $vehicle->model . ' (' . number_format($vehicle->current_mileage) . ' km)';
+                                    }
+                                @endphp
+                                
+                                <x-tom-select
+                                    name="vehicleId"
+                                    :options="$vehicleOptions"
+                                    placeholder="Rechercher un véhicule par plaque, marque ou modèle..."
+                                    required
+                                    wire:model.live="vehicleId"
+                                    :error="$errors->first('vehicleId')"
+                                />
 
- <button
- type="submit"
- class="inline-flex items-center px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg shadow-lg transition-colors duration-200"
- wire:loading.attr="disabled"
- wire:target="save"
- >
- <svg class="-ml-1 mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" wire:loading.remove wire:target="save">
- <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
- </svg>
- <svg class="animate-spin -ml-1 mr-2 h-5 w-5" fill="none" viewBox="0 0 24 24" wire:loading wire:target="save">
- <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
- <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
- </svg>
- <span wire:loading.remove wire:target="save">Enregistrer</span>
- <span wire:loading wire:target="save">Enregistrement...</span>
- </button>
- </div>
- @endif
+                                <p class="mt-2 text-sm text-gray-600 flex items-center gap-1">
+                                    <x-iconify icon="lucide:info" class="w-4 h-4" />
+                                    Choisissez le véhicule dont vous souhaitez mettre à jour le kilométrage
+                                </p>
+                            </div>
+                            @else
+                            {{-- Mode Fixed: Afficher le véhicule pré-sélectionné --}}
+                            <div class="bg-blue-50 border-l-4 border-blue-600 p-6 rounded-lg">
+                                <div class="flex items-start gap-4">
+                                    <div class="w-14 h-14 bg-white rounded-xl flex items-center justify-center shadow-md flex-shrink-0">
+                                        <x-iconify icon="lucide:car" class="w-7 h-7 text-blue-600" />
+                                    </div>
+                                    <div class="flex-1">
+                                        <h4 class="text-lg font-bold text-blue-900">
+                                            {{ $selectedVehicle->brand }} {{ $selectedVehicle->model }}
+                                        </h4>
+                                        <div class="mt-3 grid grid-cols-2 gap-4">
+                                            <div>
+                                                <p class="text-xs text-blue-700 font-medium">Plaque</p>
+                                                <p class="text-sm font-semibold text-blue-900">{{ $selectedVehicle->registration_plate }}</p>
+                                            </div>
+                                            <div>
+                                                <p class="text-xs text-blue-700 font-medium">Kilométrage Actuel</p>
+                                                <p class="text-xl font-bold text-blue-900">
+                                                    {{ number_format($selectedVehicle->current_mileage) }} km
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            @endif
 
- {{-- Message si aucun véhicule sélectionné (MODE SELECT) --}}
- @if($mode === 'select' && !$selectedVehicle)
- <div class="text-center py-12">
- <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
- <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
- </svg>
- <p class="mt-4 text-sm text-gray-600">Sélectionnez un véhicule pour commencer</p>
- </div>
- @endif
+                            {{-- Info Véhicule Dynamique (MODE SELECT) - Alpine.js x-show --}}
+                            @if($mode === 'select')
+                            <div 
+                                x-show="$wire.selectedVehicle"
+                                x-transition:enter="transition ease-out duration-300"
+                                x-transition:enter-start="opacity-0 transform -translate-y-2"
+                                x-transition:enter-end="opacity-100 transform translate-y-0"
+                                class="bg-gradient-to-br from-blue-50 to-blue-100 border-l-4 border-blue-600 p-6 rounded-lg">
+                                
+                                <div class="flex items-start gap-4">
+                                    <div class="w-14 h-14 bg-white rounded-xl flex items-center justify-center shadow-md flex-shrink-0">
+                                        <x-iconify icon="lucide:car" class="w-7 h-7 text-blue-600" />
+                                    </div>
+                                    <div class="flex-1" x-show="$wire.selectedVehicle">
+                                        <h4 class="text-lg font-bold text-blue-900">
+                                            <template x-if="$wire.selectedVehicle">
+                                                <span x-text="$wire.selectedVehicle.brand + ' ' + $wire.selectedVehicle.model"></span>
+                                            </template>
+                                        </h4>
+                                        <div class="mt-3 grid grid-cols-2 gap-4">
+                                            <div>
+                                                <p class="text-xs text-blue-700 font-medium">Plaque</p>
+                                                <p class="text-sm font-semibold text-blue-900">
+                                                    <template x-if="$wire.selectedVehicle">
+                                                        <span x-text="$wire.selectedVehicle.registration_plate"></span>
+                                                    </template>
+                                                </p>
+                                            </div>
+                                            <div>
+                                                <p class="text-xs text-blue-700 font-medium">Kilométrage Actuel</p>
+                                                <p class="text-xl font-bold text-blue-900">
+                                                    <template x-if="$wire.selectedVehicle">
+                                                        <span x-text="Number($wire.selectedVehicle.current_mileage).toLocaleString()"></span>
+                                                    </template>
+                                                    km
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            @endif
+                        </div>
+                    </div>
 
- </form>
- </div>
- </div>
+                    {{-- =============================================
+                        SECTION 2: NOUVEAU RELEVÉ - TOUS CHAMPS VISIBLES ⭐
+                    ============================================= --}}
+                    <div>
+                        <h3 class="text-lg font-medium text-gray-900 mb-4 flex items-center gap-2">
+                            <x-iconify icon="lucide:edit-3" class="w-5 h-5 text-blue-600" />
+                            Nouveau Relevé
+                        </h3>
 
- {{-- Aide contextuelle --}}
- <div class="mt-6 bg-gray-50 border border-gray-200 rounded-lg p-6">
- <h3 class="text-sm font-semibold text-gray-900 mb-3 flex items-center">
- <svg class="w-5 h-5 mr-2 text-blue-500" fill="currentColor" viewBox="0 0 20 20">
- <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
- </svg>
- Informations importantes
- </h3>
- <ul class="space-y-2 text-sm text-gray-700">
- <li class="flex items-start">
- <svg class="w-4 h-4 mr-2 mt-0.5 text-blue-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
- <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
- </svg>
- Le nouveau kilométrage doit être supérieur au kilométrage actuel
- </li>
- <li class="flex items-start">
- <svg class="w-4 h-4 mr-2 mt-0.5 text-blue-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
- <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
- </svg>
- La date ne peut pas être dans le futur ni dépasser 7 jours dans le passé
- </li>
- <li class="flex items-start">
- <svg class="w-4 h-4 mr-2 mt-0.5 text-blue-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
- <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
- </svg>
- Toutes les mises à jour sont enregistrées dans l'historique
- </li>
- @if(auth()->user()->hasRole('Chauffeur'))
- <li class="flex items-start">
- <svg class="w-4 h-4 mr-2 mt-0.5 text-amber-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
- <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
- </svg>
- Vous ne pouvez mettre à jour que le kilométrage de votre véhicule assigné
- </li>
- @endif
- </ul>
- </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+                            {{-- Nouveau Kilométrage - TOUJOURS VISIBLE, disabled si pas de véhicule --}}
+                            <div class="md:col-span-2">
+                                <label for="newMileage" class="block mb-2 text-sm font-medium text-gray-900">
+                                    Nouveau Kilométrage (km) <span class="text-red-600">*</span>
+                                </label>
+                                
+                                <div class="relative">
+                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <x-iconify icon="lucide:gauge" class="w-5 h-5 text-gray-400" />
+                                    </div>
+                                    
+                                    <input
+                                        type="number"
+                                        id="newMileage"
+                                        wire:model.live="newMileage"
+                                        x-bind:min="$wire.selectedVehicle ? $wire.selectedVehicle.current_mileage : 0"
+                                        max="9999999"
+                                        required
+                                        placeholder="Ex: 75000"
+                                        x-bind:disabled="!$wire.selectedVehicle"
+                                        class="bg-gray-50 border text-gray-900 text-sm rounded-lg block w-full p-3 transition-all duration-200 border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 pl-10 pr-16 disabled:bg-gray-100 disabled:text-gray-500 disabled:cursor-not-allowed @error('newMileage') border-red-500 @enderror"
+                                    />
+
+                                    <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                                        <span class="text-gray-500 font-medium text-sm">km</span>
+                                    </div>
+                                </div>
+
+                                {{-- Différence calculée en temps réel --}}
+                                <div x-show="$wire.newMileage > 0 && $wire.selectedVehicle && $wire.newMileage > $wire.selectedVehicle.current_mileage" 
+                                     class="mt-2 text-sm text-green-600 flex items-center gap-1">
+                                    <x-iconify icon="lucide:check-circle-2" class="w-4 h-4" />
+                                    <span>
+                                        Distance parcourue: 
+                                        <strong x-text="($wire.newMileage - $wire.selectedVehicle.current_mileage).toLocaleString()"></strong> km
+                                    </span>
+                                </div>
+
+                                @error('newMileage')
+                                    <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                                @else
+                                    <p class="mt-2 text-sm text-gray-600">
+                                        Le kilométrage doit être supérieur à celui actuel
+                                    </p>
+                                @enderror
+                            </div>
+
+                            {{-- Date du Relevé - TOUJOURS VISIBLE --}}
+                            <div>
+                                <label for="recordedDate" class="block mb-2 text-sm font-medium text-gray-900">
+                                    Date du Relevé <span class="text-red-600">*</span>
+                                </label>
+                                
+                                <div class="relative">
+                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <x-iconify icon="lucide:calendar-days" class="w-5 h-5 text-gray-400" />
+                                    </div>
+                                    
+                                    <input
+                                        type="date"
+                                        id="recordedDate"
+                                        x-model="recordedDate"
+                                        x-bind:max="new Date().toISOString().split('T')[0]"
+                                        x-bind:min="new Date(Date.now() - 7*24*60*60*1000).toISOString().split('T')[0]"
+                                        required
+                                        x-bind:disabled="!$wire.selectedVehicle"
+                                        x-on:change="updateRecordedAt()"
+                                        class="bg-gray-50 border text-gray-900 text-sm rounded-lg block w-full p-3 transition-all duration-200 border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 pl-10 disabled:bg-gray-100 disabled:cursor-not-allowed"
+                                    />
+                                </div>
+                                
+                                <p class="mt-2 text-sm text-gray-600">
+                                    Maximum 7 jours dans le passé
+                                </p>
+                            </div>
+
+                            {{-- Heure du Relevé - TOUJOURS VISIBLE --}}
+                            <div>
+                                <label for="recordedTime" class="block mb-2 text-sm font-medium text-gray-900">
+                                    Heure du Relevé <span class="text-red-600">*</span>
+                                </label>
+                                
+                                <div class="relative">
+                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <x-iconify icon="lucide:clock" class="w-5 h-5 text-gray-400" />
+                                    </div>
+                                    
+                                    <input
+                                        type="time"
+                                        id="recordedTime"
+                                        x-model="recordedTime"
+                                        required
+                                        x-bind:disabled="!$wire.selectedVehicle"
+                                        x-on:change="updateRecordedAt()"
+                                        class="bg-gray-50 border text-gray-900 text-sm rounded-lg block w-full p-3 transition-all duration-200 border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 pl-10 disabled:bg-gray-100 disabled:cursor-not-allowed"
+                                    />
+                                </div>
+                                
+                                <p class="mt-2 text-sm text-gray-600">
+                                    Format 24h (HH:MM)
+                                </p>
+                            </div>
+
+                            {{-- Hidden field for combined recordedAt --}}
+                            <input 
+                                type="hidden" 
+                                wire:model="recordedAt" 
+                                x-bind:value="recordedDate + 'T' + recordedTime"
+                            />
+
+                            @error('recordedAt')
+                                <p class="md:col-span-2 mt-2 text-sm text-red-600">{{ $message }}</p>
+                            @enderror
+
+                            {{-- Notes - TOUJOURS VISIBLES --}}
+                            <div class="md:col-span-2">
+                                <label for="notes" class="block mb-2 text-sm font-medium text-gray-900">
+                                    Notes Internes (optionnel)
+                                </label>
+                                
+                                <textarea
+                                    id="notes"
+                                    wire:model="notes"
+                                    rows="4"
+                                    maxlength="500"
+                                    placeholder="Ex: Relevé après maintenance, compteur remis à zéro, anomalie détectée..."
+                                    x-bind:disabled="!$wire.selectedVehicle"
+                                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-3 disabled:bg-gray-100 disabled:cursor-not-allowed @error('notes') border-red-500 @enderror"
+                                ></textarea>
+                                
+                                <div class="mt-1 flex justify-between text-xs text-gray-500">
+                                    <span x-text="($wire.notes?.length ?? 0) + '/500 caractères'"></span>
+                                </div>
+
+                                @error('notes')
+                                    <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                                @enderror
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- =============================================
+                        SECTION 3: INFORMATIONS SYSTÈME
+                    ============================================= --}}
+                    <div class="bg-gray-50 rounded-lg p-6 border border-gray-200">
+                        <h4 class="text-sm font-semibold text-gray-700 mb-4 flex items-center gap-2">
+                            <x-iconify icon="lucide:database" class="w-4 h-4" />
+                            Informations Système
+                        </h4>
+                        
+                        <div class="grid grid-cols-2 gap-6 text-sm">
+                            <div>
+                                <p class="text-xs text-gray-600 mb-2 font-medium">Date/Heure Enregistrement</p>
+                                <p class="font-semibold text-gray-900 flex items-center gap-2">
+                                    <x-iconify icon="lucide:clock" class="w-4 h-4 text-gray-400" />
+                                    Automatique (à la soumission)
+                                </p>
+                                <p class="text-xs text-gray-500 mt-1">
+                                    Sera: {{ now()->format('d/m/Y à H:i:s') }}
+                                </p>
+                            </div>
+                            <div>
+                                <p class="text-xs text-gray-600 mb-2 font-medium">Enregistré par</p>
+                                <p class="font-semibold text-gray-900 flex items-center gap-2">
+                                    <x-iconify icon="lucide:user" class="w-4 h-4 text-gray-400" />
+                                    {{ auth()->user()->name }}
+                                </p>
+                                <p class="text-xs text-gray-500 mt-1">
+                                    Méthode: Manuel
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- =============================================
+                        ACTIONS
+                    ============================================= --}}
+                    <div class="flex items-center justify-between pt-6 border-t border-gray-200">
+                        <a 
+                            href="{{ route('admin.mileage-readings.index') }}"
+                            class="inline-flex items-center gap-2 px-5 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 text-gray-700 font-medium transition-colors">
+                            <x-iconify icon="lucide:x" class="w-5 h-5" />
+                            Annuler
+                        </a>
+
+                        <button
+                            type="submit"
+                            x-bind:disabled="!$wire.selectedVehicle || !$wire.newMileage"
+                            wire:loading.attr="disabled"
+                            class="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-semibold rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl disabled:shadow-none">
+                            <x-iconify 
+                                icon="lucide:check-circle" 
+                                class="w-5 h-5"
+                                wire:loading.remove 
+                            />
+                            <svg 
+                                class="animate-spin w-5 h-5" 
+                                fill="none" 
+                                viewBox="0 0 24 24"
+                                wire:loading>
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                            <span wire:loading.remove>Enregistrer le Relevé</span>
+                            <span wire:loading>Enregistrement...</span>
+                        </button>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+
+        {{-- ===============================================
+            AIDE CONTEXTUELLE
+        =============================================== --}}
+        <div class="mt-6 bg-white border border-gray-200 rounded-lg p-6">
+            <h3 class="text-sm font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                <x-iconify icon="lucide:info" class="w-5 h-5 text-blue-600" />
+                Informations importantes
+            </h3>
+            <ul class="space-y-2 text-sm text-gray-700">
+                <li class="flex items-start gap-2">
+                    <x-iconify icon="lucide:check-circle-2" class="w-4 h-4 mt-0.5 text-blue-600 flex-shrink-0" />
+                    <span>Le nouveau kilométrage doit être supérieur au kilométrage actuel</span>
+                </li>
+                <li class="flex items-start gap-2">
+                    <x-iconify icon="lucide:check-circle-2" class="w-4 h-4 mt-0.5 text-blue-600 flex-shrink-0" />
+                    <span>La date ne peut pas être dans le futur ni dépasser 7 jours dans le passé</span>
+                </li>
+                <li class="flex items-start gap-2">
+                    <x-iconify icon="lucide:check-circle-2" class="w-4 h-4 mt-0.5 text-blue-600 flex-shrink-0" />
+                    <span>Toutes les mises à jour sont enregistrées dans l'historique</span>
+                </li>
+                @if(auth()->user()->hasRole('Chauffeur'))
+                <li class="flex items-start gap-2">
+                    <x-iconify icon="lucide:alert-triangle" class="w-4 h-4 mt-0.5 text-amber-600 flex-shrink-0" />
+                    <span>Vous ne pouvez mettre à jour que le kilométrage de votre véhicule assigné</span>
+                </li>
+                @endif
+            </ul>
+        </div>
+
+    </div>
+</section>
 </div>
 
 @push('scripts')
 <script>
-// Alpine.js component for vehicle selector
-document.addEventListener('alpine:init', () => {
-    Alpine.data('vehicleSelector', () => ({
-        loadVehicleMileage(vehicleId) {
-            if (!vehicleId) return;
-            
-            // Le composant Livewire gère déjà le chargement via wire:model.live="vehicleId"
-            // Cette fonction est un placeholder pour des actions futures si nécessaire
-            console.log('Vehicle selected:', vehicleId);
+// Alpine.js component for mileage form
+function mileageForm() {
+    return {
+        recordedDate: '{{ now()->format('Y-m-d') }}',
+        recordedTime: '{{ now()->format('H:i') }}',
+        
+        init() {
+            // Initialize with current date/time
+            this.updateRecordedAt();
+        },
+        
+        updateRecordedAt() {
+            if (this.recordedDate && this.recordedTime) {
+                const combined = this.recordedDate + 'T' + this.recordedTime;
+                // Trigger Livewire update
+                @this.set('recordedAt', combined);
+            }
         }
-    }));
-});
-
-// Function to update combined recordedAt from date and time
-function updateRecordedAt() {
-    const dateInput = document.querySelector('input[name="recordedDate"]');
-    const timeInput = document.querySelector('input[name="recordedTime"]');
-    const recordedAtInput = document.querySelector('input[wire\\:model="recordedAt"]');
-    
-    if (dateInput && timeInput && recordedAtInput) {
-        const date = dateInput.value;
-        const time = timeInput.value;
-        if (date && time) {
-            recordedAtInput.value = date + 'T' + time;
-            recordedAtInput.dispatchEvent(new Event('input', { bubbles: true }));
-        }
-    }
+    };
 }
 </script>
+@endpush
+
+@push('styles')
+<style>
+/* Animation fade-in */
+.fade-in {
+    animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+    from { 
+        opacity: 0; 
+        transform: translateY(10px); 
+    }
+    to { 
+        opacity: 1; 
+        transform: translateY(0); 
+    }
+}
+</style>
 @endpush

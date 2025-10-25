@@ -26,6 +26,20 @@ class Supplier extends Model
     public const TYPE_TRANSPORT_VEHICULES = 'transport_vehicules';
     public const TYPE_AUTRE = 'autre';
 
+    // Tableau des types pour les formulaires et filtres
+    public const TYPES = [
+        self::TYPE_MECANICIEN => 'Mécanicien',
+        self::TYPE_ASSUREUR => 'Assureur',
+        self::TYPE_STATION_SERVICE => 'Station Service',
+        self::TYPE_PIECES_DETACHEES => 'Pièces Détachées',
+        self::TYPE_PEINTURE_CARROSSERIE => 'Peinture & Carrosserie',
+        self::TYPE_PNEUMATIQUES => 'Pneumatiques',
+        self::TYPE_ELECTRICITE_AUTO => 'Électricité Auto',
+        self::TYPE_CONTROLE_TECHNIQUE => 'Contrôle Technique',
+        self::TYPE_TRANSPORT_VEHICULES => 'Transport Véhicules',
+        self::TYPE_AUTRE => 'Autre',
+    ];
+
     // Constantes pour les 58 wilayas d'Algérie (complètes)
     public const WILAYAS = [
         '01' => 'Adrar', '02' => 'Chlef', '03' => 'Laghouat', '04' => 'Oum El Bouaghi',

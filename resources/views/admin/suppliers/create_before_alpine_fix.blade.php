@@ -1,10 +1,10 @@
 @extends('layouts.admin.catalyst')
 
-@section('title', 'Modifier ' . $supplier->company_name)
+@section('title', 'Nouveau Fournisseur')
 
 @section('content')
 {{-- ====================================================================
- 🏢 FORMULAIRE MODIFICATION FOURNISSEUR - ENTERPRISE GRADE WORLD-CLASS
+ 🏢 FORMULAIRE CRÉATION FOURNISSEUR - ENTERPRISE GRADE WORLD-CLASS
  ====================================================================
  
  Style identique au formulaire véhicules:
@@ -44,10 +44,10 @@
         <div class="mb-6">
             <h1 class="text-2xl font-bold text-gray-900 mb-1 flex items-center gap-2.5">
                 <x-iconify icon="heroicons:building-office" class="w-6 h-6 text-blue-600" />
-                Modifier Fournisseur
+                Nouveau Fournisseur
             </h1>
             <p class="text-sm text-gray-600 ml-8.5">
-                {{ $supplier->company_name }}
+                Remplissez les informations pour enregistrer un nouveau fournisseur
             </p>
         </div>
 
@@ -66,9 +66,8 @@
         {{-- FORMULAIRE AVEC ALPINE.JS VALIDATION --}}
         <div x-data="supplierFormValidation()" x-init="init()">
             <x-card padding="p-0" margin="mb-6">
-                <form method="POST" action="{{ route('admin.suppliers.update', $supplier) }}" class="p-6" @submit="onSubmit">
+                <form method="POST" action="{{ route('admin.suppliers.store') }}" class="p-6" @submit="onSubmit">
                     @csrf
-                    @method('PUT')
 
                 {{-- SECTION 1: INFORMATIONS GÉNÉRALES --}}
                 <div class="mb-8">
@@ -79,17 +78,36 @@
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         {{-- Raison Sociale --}}
-                        <div class="md:col-span-2">
-                            <x-input
-                                name="company_name"
-                                label="Raison Sociale"
-                                icon="building-office"
-                                placeholder="Ex: SARL Transport Alger"
-                                :value="old('company_name', $supplier->company_name)"
-                                required
-                                :error="$errors->first('company_name')"
-                                helpText="Nom officiel de l'entreprise"
-                            />
+                        <div class="md:col-span-2" @blur="validateField('company_name', $event.target.value)">
+                            <label for="company_name" class="block mb-2 text-sm font-medium text-gray-900">
+                                Raison Sociale <span class="text-red-600">*</span>
+                            </label>
+                            <div class="relative">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <x-iconify icon="heroicons:building-office" class="w-5 h-5 text-gray-400" />
+                                </div>
+                                <input
+                                    type="text"
+                                    name="company_name"
+                                    id="company_name"
+                                    required
+                                    placeholder="Ex: SARL Transport Alger"
+                                    value="{{ old('company_name') }}"
+                                    class="bg-gray-50 border text-gray-900 text-sm rounded-lg block w-full p-2.5 transition-colors duration-200 border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 pl-10"
+                                    x-bind:class="(fieldErrors && fieldErrors['company_name'] && touchedFields && touchedFields['company_name']) ? '!border-red-500 !focus:ring-2 !focus:ring-red-500 !focus:border-red-500 !bg-red-50' : ''"
+                                    @blur="validateField('company_name', $event.target.value)"
+                                />
+                            </div>
+                            <p class="mt-2 text-sm text-gray-600">Nom officiel de l'entreprise</p>
+                            <p x-show="fieldErrors && fieldErrors['company_name'] && touchedFields && touchedFields['company_name']"
+                               x-transition:enter="transition ease-out duration-200"
+                               x-transition:enter-start="opacity-0 transform -translate-y-1"
+                               x-transition:enter-end="opacity-100 transform translate-y-0"
+                               class="mt-2 text-sm text-red-600 flex items-start font-medium"
+                               style="display: none;">
+                                <x-iconify icon="lucide:circle-alert" class="w-4 h-4 mr-1.5 mt-0.5 flex-shrink-0" />
+                                <span>Ce champ est obligatoire</span>
+                            </p>
                         </div>
 
                         {{-- Type --}}
@@ -97,7 +115,7 @@
                             name="supplier_type"
                             label="Type de Fournisseur"
                             :options="App\Models\Supplier::getSupplierTypes()"
-                            :selected="old('supplier_type', $supplier->supplier_type)"
+                            :selected="old('supplier_type')"
                             placeholder="Sélectionnez un type..."
                             required
                             :error="$errors->first('supplier_type')"
@@ -109,7 +127,7 @@
                                 name="supplier_category_id"
                                 label="Catégorie"
                                 :options="$categories->pluck('name', 'id')->toArray()"
-                                :selected="old('supplier_category_id', $supplier->supplier_category_id)"
+                                :selected="old('supplier_category_id')"
                                 placeholder="Sélectionnez une catégorie..."
                                 :error="$errors->first('supplier_category_id')"
                             />
@@ -121,7 +139,7 @@
                             label="Registre du Commerce"
                             icon="identification"
                             placeholder="Ex: 16/00-23A1234567"
-                            :value="old('trade_register', $supplier->trade_register)"
+                            :value="old('trade_register')"
                             :error="$errors->first('trade_register')"
                             helpText="Format: XX/XX-XXAXXXXXXX"
                             pattern="[0-9]{2}/[0-9]{2}-[0-9]{2}[A-Z][0-9]{7}"
@@ -133,7 +151,7 @@
                             label="NIF"
                             icon="finger-print"
                             placeholder="Ex: 099116000987654"
-                            :value="old('nif', $supplier->nif)"
+                            :value="old('nif')"
                             :error="$errors->first('nif')"
                             helpText="15 chiffres"
                             maxlength="15"
@@ -146,7 +164,7 @@
                             label="NIS"
                             icon="document-text"
                             placeholder="Numéro NIS"
-                            :value="old('nis', $supplier->nis)"
+                            :value="old('nis')"
                             :error="$errors->first('nis')"
                         />
 
@@ -156,7 +174,7 @@
                             label="Article d'Imposition"
                             icon="document-check"
                             placeholder="Article d'imposition"
-                            :value="old('ai', $supplier->ai)"
+                            :value="old('ai')"
                             :error="$errors->first('ai')"
                         />
                     </div>
@@ -176,7 +194,7 @@
                             label="Prénom"
                             icon="user"
                             placeholder="Prénom du contact"
-                            :value="old('contact_first_name', $supplier->contact_first_name)"
+                            :value="old('contact_first_name')"
                             required
                             :error="$errors->first('contact_first_name')"
                         />
@@ -187,7 +205,7 @@
                             label="Nom"
                             icon="user"
                             placeholder="Nom du contact"
-                            :value="old('contact_last_name', $supplier->contact_last_name)"
+                            :value="old('contact_last_name')"
                             required
                             :error="$errors->first('contact_last_name')"
                         />
@@ -199,7 +217,7 @@
                             label="Téléphone"
                             icon="phone"
                             placeholder="Ex: 0561234567"
-                            :value="old('contact_phone', $supplier->contact_phone)"
+                            :value="old('contact_phone')"
                             required
                             :error="$errors->first('contact_phone')"
                         />
@@ -211,7 +229,7 @@
                             label="Email"
                             icon="envelope"
                             placeholder="contact@entreprise.dz"
-                            :value="old('contact_email', $supplier->contact_email)"
+                            :value="old('contact_email')"
                             :error="$errors->first('contact_email')"
                         />
 
@@ -222,7 +240,7 @@
                             label="Téléphone Entreprise"
                             icon="phone"
                             placeholder="Ex: 021234567"
-                            :value="old('phone', $supplier->phone)"
+                            :value="old('phone')"
                             :error="$errors->first('phone')"
                         />
 
@@ -233,7 +251,7 @@
                             label="Email Entreprise"
                             icon="envelope"
                             placeholder="info@entreprise.dz"
-                            :value="old('email', $supplier->email)"
+                            :value="old('email')"
                             :error="$errors->first('email')"
                         />
 
@@ -245,7 +263,7 @@
                                 label="Site Web"
                                 icon="globe-alt"
                                 placeholder="https://www.entreprise.dz"
-                                :value="old('website', $supplier->website)"
+                                :value="old('website')"
                                 :error="$errors->first('website')"
                             />
                         </div>
@@ -272,7 +290,7 @@
                                 required
                                 placeholder="Adresse complète du fournisseur"
                                 class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 @error('address') !border-red-500 !bg-red-50 @enderror"
-                            >{{ old('address', $supplier->address) }}</textarea>
+                            >{{ old('address') }}</textarea>
                             @error('address')
                                 <p class="mt-2 text-sm text-red-600 flex items-start font-medium">
                                     <x-iconify icon="lucide:circle-alert" class="w-4 h-4 mr-1.5 mt-0.5 flex-shrink-0" />
@@ -286,7 +304,7 @@
                             name="wilaya"
                             label="Wilaya"
                             :options="array_combine(array_keys(App\Models\Supplier::WILAYAS), array_map(fn($code, $name) => $code . ' - ' . $name, array_keys(App\Models\Supplier::WILAYAS), App\Models\Supplier::WILAYAS))"
-                            :selected="old('wilaya', $supplier->wilaya)"
+                            :selected="old('wilaya')"
                             placeholder="Rechercher une wilaya..."
                             required
                             :error="$errors->first('wilaya')"
@@ -298,7 +316,7 @@
                             label="Ville"
                             icon="building-office-2"
                             placeholder="Ville"
-                            :value="old('city', $supplier->city)"
+                            :value="old('city')"
                             required
                             :error="$errors->first('city')"
                         />
@@ -309,7 +327,7 @@
                             label="Commune"
                             icon="map"
                             placeholder="Commune"
-                            :value="old('commune', $supplier->commune)"
+                            :value="old('commune')"
                             :error="$errors->first('commune')"
                         />
 
@@ -319,7 +337,7 @@
                             label="Code Postal"
                             icon="map-pin"
                             placeholder="16000"
-                            :value="old('postal_code', $supplier->postal_code)"
+                            :value="old('postal_code')"
                             :error="$errors->first('postal_code')"
                         />
                     </div>
@@ -340,7 +358,7 @@
                             label="Rating (0-5)"
                             icon="star"
                             placeholder="5.0"
-                            :value="old('rating', $supplier->rating)"
+                            :value="old('rating', 5)"
                             :error="$errors->first('rating')"
                             min="0"
                             max="5"
@@ -354,7 +372,7 @@
                             label="Score Qualité (%)"
                             icon="chart-bar"
                             placeholder="100"
-                            :value="old('quality_score', $supplier->quality_score)"
+                            :value="old('quality_score')"
                             :error="$errors->first('quality_score')"
                             min="0"
                             max="100"
@@ -368,7 +386,7 @@
                             label="Score Fiabilité (%)"
                             icon="shield-check"
                             placeholder="100"
-                            :value="old('reliability_score', $supplier->reliability_score)"
+                            :value="old('reliability_score')"
                             :error="$errors->first('reliability_score')"
                             min="0"
                             max="100"
@@ -382,7 +400,7 @@
                             <input type="checkbox" 
                                    name="is_active" 
                                    value="1" 
-                                   {{ old('is_active', $supplier->is_active) ? 'checked' : '' }}
+                                   {{ old('is_active', true) ? 'checked' : '' }}
                                    id="is_active"
                                    class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500">
                             <label for="is_active" class="ml-2 text-sm font-medium text-gray-900">
@@ -394,7 +412,7 @@
                             <input type="checkbox" 
                                    name="is_preferred" 
                                    value="1" 
-                                   {{ old('is_preferred', $supplier->is_preferred) ? 'checked' : '' }}
+                                   {{ old('is_preferred') ? 'checked' : '' }}
                                    id="is_preferred"
                                    class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500">
                             <label for="is_preferred" class="ml-2 text-sm font-medium text-gray-900">
@@ -406,40 +424,13 @@
                             <input type="checkbox" 
                                    name="is_certified" 
                                    value="1" 
-                                   {{ old('is_certified', $supplier->is_certified) ? 'checked' : '' }}
+                                   {{ old('is_certified') ? 'checked' : '' }}
                                    id="is_certified"
                                    class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500">
                             <label for="is_certified" class="ml-2 text-sm font-medium text-gray-900">
                                 Certifié
                             </label>
                         </div>
-
-                        <div class="flex items-center">
-                            <input type="checkbox" 
-                                   name="blacklisted" 
-                                   value="1" 
-                                   {{ old('blacklisted', $supplier->blacklisted) ? 'checked' : '' }}
-                                   id="blacklisted"
-                                   class="w-4 h-4 text-red-600 bg-gray-100 border-gray-300 rounded focus:ring-red-500"
-                                   x-data
-                                   @change="document.getElementById('blacklist_reason_section').style.display = $event.target.checked ? 'block' : 'none'">
-                            <label for="blacklisted" class="ml-2 text-sm font-medium text-gray-900">
-                                Liste noire
-                            </label>
-                        </div>
-                    </div>
-
-                    {{-- Raison blacklist --}}
-                    <div id="blacklist_reason_section" class="mb-6" style="display: {{ old('blacklisted', $supplier->blacklisted) ? 'block' : 'none' }}">
-                        <label for="blacklist_reason" class="block mb-2 text-sm font-medium text-gray-900">
-                            Raison Liste Noire
-                        </label>
-                        <textarea
-                            id="blacklist_reason"
-                            name="blacklist_reason"
-                            rows="2"
-                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
-                        >{{ old('blacklist_reason', $supplier->blacklist_reason) }}</textarea>
                     </div>
 
                     {{-- Notes --}}
@@ -453,19 +444,19 @@
                             rows="4"
                             placeholder="Notes internes, commentaires, observations..."
                             class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
-                        >{{ old('notes', $supplier->notes) }}</textarea>
+                        >{{ old('notes') }}</textarea>
                     </div>
                 </div>
 
                 {{-- ACTIONS --}}
                 <div class="flex items-center justify-between pt-6 border-t border-gray-200">
                     <x-button 
-                        href="{{ route('admin.suppliers.show', $supplier) }}" 
+                        href="{{ route('admin.suppliers.index') }}" 
                         variant="secondary"
                         icon="arrow-left"
                         iconPosition="left"
                     >
-                        Retour
+                        Annuler
                     </x-button>
 
                     <x-button 
@@ -474,7 +465,7 @@
                         icon="check"
                         iconPosition="left"
                     >
-                        Enregistrer les Modifications
+                        Créer le Fournisseur
                     </x-button>
                 </div>
 
