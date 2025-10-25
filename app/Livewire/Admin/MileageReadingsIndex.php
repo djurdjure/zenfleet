@@ -5,6 +5,7 @@ namespace App\Livewire\Admin;
 use App\Models\VehicleMileageReading;
 use App\Models\Vehicle;
 use App\Models\User;
+use App\Services\MileageReadingService;
 use Illuminate\Contracts\View\View;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -24,6 +25,11 @@ use Livewire\WithPagination;
 class MileageReadingsIndex extends Component
 {
     use WithPagination;
+
+    /**
+     * 💼 SERVICE LAYER
+     */
+    protected MileageReadingService $service;
 
     /**
      * 🔍 PROPRIÉTÉS DE RECHERCHE ET FILTRES
@@ -242,37 +248,37 @@ class MileageReadingsIndex extends Component
     }
 
     /**
-     * 📊 STATISTIQUES GLOBALES
+     * 📊 ANALYTICS ENTERPRISE - VIA SERVICE LAYER
+     * 
+     * Utilise le MileageReadingService pour obtenir 20+ KPIs avancés
+     * avec caching intelligent (5 minutes).
+     */
+    public function getAnalyticsProperty(): array
+    {
+        if (!isset($this->service)) {
+            $this->service = app(MileageReadingService::class);
+        }
+
+        return $this->service->getAnalytics(auth()->user()->organization_id);
+    }
+
+    /**
+     * 📊 STATISTIQUES GLOBALES (Compatibilité legacy)
      */
     public function getStatsProperty(): array
     {
-        $user = auth()->user();
-
-        $query = VehicleMileageReading::where('organization_id', $user->organization_id);
-
-        // Appliquer le même scoping que pour les readings
-        if ($user->can('view all mileage readings')) {
-            // Tous
-        } elseif ($user->can('view team mileage readings')) {
-            $query->whereHas('vehicle', function ($q) use ($user) {
-                if ($user->depot_id) {
-                    $q->where('depot_id', $user->depot_id);
-                }
-            });
-        } else {
-            $query->where('recorded_by_id', $user->id);
-        }
-
-        $totalReadings = $query->count();
-        $manualCount = (clone $query)->where('recording_method', 'manual')->count();
-        $automaticCount = (clone $query)->where('recording_method', 'automatic')->count();
-        $vehiclesWithReadings = (clone $query)->distinct('vehicle_id')->count();
+        $analytics = $this->analytics;
 
         return [
-            'total_readings' => $totalReadings,
-            'manual_count' => $manualCount,
-            'automatic_count' => $automaticCount,
-            'vehicles_tracked' => $vehiclesWithReadings,
+            'total_readings' => $analytics['total_readings'] ?? 0,
+            'manual_count' => $analytics['manual_count'] ?? 0,
+            'automatic_count' => $analytics['automatic_count'] ?? 0,
+            'vehicles_tracked' => $analytics['vehicles_tracked'] ?? 0,
+            'last_reading_date' => $analytics['last_reading_date'] ?? null,
+            'total_mileage_covered' => $analytics['total_mileage_covered'] ?? 0,
+            'avg_daily_mileage' => $analytics['avg_daily_mileage'] ?? 0,
+            'readings_last_7_days' => $analytics['readings_last_7_days'] ?? 0,
+            'readings_last_30_days' => $analytics['readings_last_30_days'] ?? 0,
         ];
     }
 
@@ -286,6 +292,7 @@ class MileageReadingsIndex extends Component
             'vehicles' => $this->vehicles,
             'authors' => $this->authors,
             'stats' => $this->stats,
+            'analytics' => $this->analytics, // Analytics complètes 20+ KPIs
         ]);
     }
 }
