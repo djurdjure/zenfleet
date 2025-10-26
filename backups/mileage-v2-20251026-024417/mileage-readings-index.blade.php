@@ -43,6 +43,10 @@
  @author Expert Fullstack Developer (20+ years)
  ==================================================================== --}}
 
+<div x-data="{
+    showFilters: false,
+    selectedVehicle: @entangle('vehicleFilter')
+}" x-cloak>
 <section class="bg-gray-50 min-h-screen">
     <div class="py-4 px-4 mx-auto max-w-7xl lg:py-6">
 
@@ -192,54 +196,48 @@
         {{-- ===============================================
             BARRE D'ACTIONS ENTERPRISE-GRADE (Sur 1 ligne)
         =============================================== --}}
-        <div class="mb-6" x-data="{ showFilters: false }">
-            <div class="bg-white shadow-sm rounded-lg border border-gray-200 p-4">
-                <div class="flex flex-col lg:flex-row items-start lg:items-center gap-3">
+        <div class="bg-white shadow-sm rounded-lg border border-gray-200 p-4 mb-6">
+            <div class="flex flex-col lg:flex-row items-start lg:items-center gap-3">
 
-                    {{-- Recherche Globale --}}
-                    <div class="flex-1 w-full lg:w-auto">
-                        <div class="relative">
-                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                <x-iconify icon="lucide:search" class="w-5 h-5 text-gray-400" />
-                            </div>
-                            <input
-                                wire:model.live.debounce.300ms="search"
-                                type="text"
-                                placeholder="Rechercher par véhicule, plaque, notes..."
-                                class="block w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm shadow-sm">
+                {{-- Recherche Globale --}}
+                <div class="flex-1 w-full lg:w-auto">
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <x-iconify icon="lucide:search" class="w-5 h-5 text-gray-400" />
                         </div>
+                        <input
+                            wire:model.live.debounce.300ms="search"
+                            type="text"
+                            placeholder="Rechercher par véhicule, plaque, notes..."
+                            class="block w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm shadow-sm">
                     </div>
+                </div>
 
-                    {{-- Boutons Actions --}}
-                    <div class="flex flex-wrap items-center gap-2">
-                        {{-- Bouton Filtrer (Toggle) --}}
-                        <button
-                            @click="showFilters = !showFilters"
-                            type="button"
-                            class="inline-flex items-center gap-2 px-4 py-2.5 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-all duration-200 shadow-sm hover:shadow-md"
-                            :class="showFilters ? 'ring-2 ring-blue-500 bg-blue-50' : ''">
-                            <x-iconify icon="lucide:filter" class="w-5 h-5 text-gray-500" />
-                            <span class="font-medium text-gray-700">Filtres</span>
-                            @if($vehicleFilter || $methodFilter || $dateFrom || $dateTo || $authorFilter || $mileageMin || $mileageMax)
-                                <span class="inline-flex items-center justify-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-600 text-white">
-                                    {{
-                                        collect([
-                                            $vehicleFilter ? 1 : 0,
-                                            $methodFilter ? 1 : 0,
-                                            $dateFrom ? 1 : 0,
-                                            $dateTo ? 1 : 0,
-                                            $authorFilter ? 1 : 0,
-                                            $mileageMin ? 1 : 0,
-                                            $mileageMax ? 1 : 0,
-                                        ])->sum()
-                                    }}
-                                </span>
-                            @endif
-                            <x-iconify
-                                icon="heroicons:chevron-down"
-                                class="w-4 h-4 text-gray-400 transition-transform duration-200"
-                                x-bind:class="showFilters ? 'rotate-180' : ''" />
-                        </button>
+                {{-- Boutons Actions --}}
+                <div class="flex flex-wrap items-center gap-2">
+                    {{-- Bouton Filtrer (Toggle) --}}
+                    <button
+                        @click="showFilters = !showFilters"
+                        :class="showFilters ? 'bg-blue-50 border-blue-300 shadow-sm' : 'bg-white hover:bg-gray-50'"
+                        class="inline-flex items-center gap-2 px-4 py-2.5 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 transition-all">
+                        <x-iconify icon="lucide:filter" class="w-4 h-4" />
+                        Filtrer
+                        @if($vehicleFilter || $methodFilter || $dateFrom || $dateTo || $authorFilter || $mileageMin || $mileageMax)
+                            <span class="ml-1 inline-flex items-center justify-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-600 text-white">
+                                {{
+                                    collect([
+                                        $vehicleFilter ? 1 : 0,
+                                        $methodFilter ? 1 : 0,
+                                        $dateFrom ? 1 : 0,
+                                        $dateTo ? 1 : 0,
+                                        $authorFilter ? 1 : 0,
+                                        $mileageMin ? 1 : 0,
+                                        $mileageMax ? 1 : 0,
+                                    ])->sum()
+                                }}
+                            </span>
+                        @endif
+                    </button>
 
                     {{-- Bouton Export --}}
                     @can('export mileage readings')
@@ -286,7 +284,6 @@
                         Nouveau relevé
                     </a>
                     @endcan
-                    </div>
                 </div>
             </div>
 
@@ -294,13 +291,14 @@
                 FILTRES COLLAPSIBLES (Alpine.js)
             =============================================== --}}
             <div x-show="showFilters"
+                 x-cloak
                  x-transition:enter="transition ease-out duration-200"
-                 x-transition:enter-start="opacity-0 -translate-y-2"
-                 x-transition:enter-end="opacity-100 translate-y-0"
+                 x-transition:enter-start="opacity-0 transform -translate-y-2"
+                 x-transition:enter-end="opacity-100 transform translate-y-0"
                  x-transition:leave="transition ease-in duration-150"
-                 x-transition:leave-start="opacity-100 translate-y-0"
-                 x-transition:leave-end="opacity-0 -translate-y-2"
-                 class="mt-4 bg-white rounded-lg border border-gray-200 p-6 shadow-sm">
+                 x-transition:leave-start="opacity-100 transform translate-y-0"
+                 x-transition:leave-end="opacity-0 transform -translate-y-2"
+                 class="mt-4 pt-4 border-t border-gray-200">
                 
                 {{-- Ligne 1: Filtres principaux --}}
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4 mb-4">
@@ -742,23 +740,24 @@
             @endif
         </div>
 
-        {{-- Loading State --}}
-        <div wire:loading.flex 
-             wire:target="search, vehicleFilter, methodFilter, dateFrom, dateTo, authorFilter, mileageMin, mileageMax, perPage, sortBy, resetFilters"
-             class="fixed inset-0 z-50 bg-black bg-opacity-25 items-center justify-center">
-            <div class="bg-white rounded-lg px-6 py-4 shadow-xl">
-                <div class="flex items-center gap-3">
-                    <svg class="animate-spin h-5 w-5 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                    <span class="text-gray-700">Chargement...</span>
-                </div>
-            </div>
-        </div>
-
     </div>
 </section>
+
+{{-- Loading State --}}
+<div wire:loading.flex 
+     wire:target="search, vehicleFilter, methodFilter, dateFrom, dateTo, authorFilter, mileageMin, mileageMax, perPage, sortBy, resetFilters"
+     class="fixed inset-0 z-50 bg-black bg-opacity-25 items-center justify-center">
+    <div class="bg-white rounded-lg px-6 py-4 shadow-xl">
+        <div class="flex items-center gap-3">
+            <svg class="animate-spin h-5 w-5 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            <span class="text-gray-700">Chargement...</span>
+        </div>
+    </div>
+</div>
+</div>
 
 @push('styles')
 <style>

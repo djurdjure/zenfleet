@@ -43,6 +43,10 @@
  @author Expert Fullstack Developer (20+ years)
  ==================================================================== --}}
 
+<div x-data="{
+    showFilters: false,
+    selectedVehicle: @entangle('vehicleFilter')
+}" x-cloak>
 <section class="bg-gray-50 min-h-screen">
     <div class="py-4 px-4 mx-auto max-w-7xl lg:py-6">
 
@@ -192,54 +196,48 @@
         {{-- ===============================================
             BARRE D'ACTIONS ENTERPRISE-GRADE (Sur 1 ligne)
         =============================================== --}}
-        <div class="mb-6" x-data="{ showFilters: false }">
-            <div class="bg-white shadow-sm rounded-lg border border-gray-200 p-4">
-                <div class="flex flex-col lg:flex-row items-start lg:items-center gap-3">
+        <div class="bg-white shadow-sm rounded-lg border border-gray-200 p-4 mb-6">
+            <div class="flex flex-col lg:flex-row items-start lg:items-center gap-3">
 
-                    {{-- Recherche Globale --}}
-                    <div class="flex-1 w-full lg:w-auto">
-                        <div class="relative">
-                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                <x-iconify icon="lucide:search" class="w-5 h-5 text-gray-400" />
-                            </div>
-                            <input
-                                wire:model.live.debounce.300ms="search"
-                                type="text"
-                                placeholder="Rechercher par véhicule, plaque, notes..."
-                                class="block w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm shadow-sm">
+                {{-- Recherche Globale --}}
+                <div class="flex-1 w-full lg:w-auto">
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <x-iconify icon="lucide:search" class="w-5 h-5 text-gray-400" />
                         </div>
+                        <input
+                            wire:model.live.debounce.300ms="search"
+                            type="text"
+                            placeholder="Rechercher par véhicule, plaque, notes..."
+                            class="block w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm shadow-sm">
                     </div>
+                </div>
 
-                    {{-- Boutons Actions --}}
-                    <div class="flex flex-wrap items-center gap-2">
-                        {{-- Bouton Filtrer (Toggle) --}}
-                        <button
-                            @click="showFilters = !showFilters"
-                            type="button"
-                            class="inline-flex items-center gap-2 px-4 py-2.5 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-all duration-200 shadow-sm hover:shadow-md"
-                            :class="showFilters ? 'ring-2 ring-blue-500 bg-blue-50' : ''">
-                            <x-iconify icon="lucide:filter" class="w-5 h-5 text-gray-500" />
-                            <span class="font-medium text-gray-700">Filtres</span>
-                            @if($vehicleFilter || $methodFilter || $dateFrom || $dateTo || $authorFilter || $mileageMin || $mileageMax)
-                                <span class="inline-flex items-center justify-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-600 text-white">
-                                    {{
-                                        collect([
-                                            $vehicleFilter ? 1 : 0,
-                                            $methodFilter ? 1 : 0,
-                                            $dateFrom ? 1 : 0,
-                                            $dateTo ? 1 : 0,
-                                            $authorFilter ? 1 : 0,
-                                            $mileageMin ? 1 : 0,
-                                            $mileageMax ? 1 : 0,
-                                        ])->sum()
-                                    }}
-                                </span>
-                            @endif
-                            <x-iconify
-                                icon="heroicons:chevron-down"
-                                class="w-4 h-4 text-gray-400 transition-transform duration-200"
-                                x-bind:class="showFilters ? 'rotate-180' : ''" />
-                        </button>
+                {{-- Boutons Actions --}}
+                <div class="flex flex-wrap items-center gap-2">
+                    {{-- Bouton Filtrer (Toggle) --}}
+                    <button
+                        @click="showFilters = !showFilters"
+                        :class="showFilters ? 'bg-blue-50 border-blue-300 shadow-sm' : 'bg-white hover:bg-gray-50'"
+                        class="inline-flex items-center gap-2 px-4 py-2.5 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 transition-all">
+                        <x-iconify icon="lucide:filter" class="w-4 h-4" />
+                        Filtrer
+                        @if($vehicleFilter || $methodFilter || $dateFrom || $dateTo || $authorFilter || $mileageMin || $mileageMax)
+                            <span class="ml-1 inline-flex items-center justify-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-600 text-white">
+                                {{
+                                    collect([
+                                        $vehicleFilter ? 1 : 0,
+                                        $methodFilter ? 1 : 0,
+                                        $dateFrom ? 1 : 0,
+                                        $dateTo ? 1 : 0,
+                                        $authorFilter ? 1 : 0,
+                                        $mileageMin ? 1 : 0,
+                                        $mileageMax ? 1 : 0,
+                                    ])->sum()
+                                }}
+                            </span>
+                        @endif
+                    </button>
 
                     {{-- Bouton Export --}}
                     @can('export mileage readings')
@@ -286,7 +284,6 @@
                         Nouveau relevé
                     </a>
                     @endcan
-                    </div>
                 </div>
             </div>
 
@@ -294,18 +291,20 @@
                 FILTRES COLLAPSIBLES (Alpine.js)
             =============================================== --}}
             <div x-show="showFilters"
+                 x-cloak
                  x-transition:enter="transition ease-out duration-200"
-                 x-transition:enter-start="opacity-0 -translate-y-2"
-                 x-transition:enter-end="opacity-100 translate-y-0"
+                 x-transition:enter-start="opacity-0 transform -translate-y-2"
+                 x-transition:enter-end="opacity-100 transform translate-y-0"
                  x-transition:leave="transition ease-in duration-150"
-                 x-transition:leave-start="opacity-100 translate-y-0"
-                 x-transition:leave-end="opacity-0 -translate-y-2"
-                 class="mt-4 bg-white rounded-lg border border-gray-200 p-6 shadow-sm">
+                 x-transition:leave-start="opacity-100 transform translate-y-0"
+                 x-transition:leave-end="opacity-0 transform -translate-y-2"
+                 style="display: none;"
+                 class="mt-4 pt-4 border-t border-gray-200">
                 
                 {{-- Ligne 1: Filtres principaux --}}
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4 mb-4">
                     
-                    {{-- Véhicule --}}
+                    {{-- Véhicule avec TomSelect --}}
                     <div class="lg:col-span-2">
                         <label for="vehicle-select" class="block text-sm font-medium text-gray-700 mb-1">
                             <x-iconify icon="lucide:car" class="w-4 h-4 inline mr-1" />
@@ -314,7 +313,7 @@
                         <select 
                             wire:model.live="vehicleFilter"
                             id="vehicle-select"
-                            class="block w-full border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-sm bg-white">
+                            class="tom-select-vehicle">
                             <option value="">Tous les véhicules</option>
                             @foreach($vehicles as $vehicle)
                                 <option value="{{ $vehicle->id }}">
@@ -465,7 +464,7 @@
                     <thead class="bg-gray-50">
                         <tr>
                             <th wire:click="sortBy('vehicle')" 
-                                class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors">
+                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors">
                                 <div class="flex items-center gap-1.5">
                                     <x-iconify icon="lucide:car" class="w-4 h-4" />
                                     <span>Véhicule</span>
@@ -475,8 +474,19 @@
                                 </div>
                             </th>
 
+                            <th wire:click="sortBy('recorded_at')"
+                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors">
+                                <div class="flex items-center gap-1.5">
+                                    <x-iconify icon="lucide:calendar" class="w-4 h-4" />
+                                    <span>Date</span>
+                                    @if($sortField === 'recorded_at')
+                                        <x-iconify icon="lucide:{{ $sortDirection === 'asc' ? 'chevron-up' : 'chevron-down' }}" class="w-4 h-4 text-blue-600" />
+                                    @endif
+                                </div>
+                            </th>
+
                             <th wire:click="sortBy('mileage')"
-                                class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors">
+                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors">
                                 <div class="flex items-center gap-1.5">
                                     <x-iconify icon="lucide:gauge" class="w-4 h-4" />
                                     <span>Kilométrage</span>
@@ -486,37 +496,15 @@
                                 </div>
                             </th>
 
-                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                 <div class="flex items-center gap-1.5">
                                     <x-iconify icon="lucide:trending-up" class="w-4 h-4" />
                                     <span>Différence</span>
                                 </div>
                             </th>
 
-                            <th wire:click="sortBy('recorded_at')"
-                                class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors">
-                                <div class="flex items-center gap-1.5">
-                                    <x-iconify icon="lucide:calendar-clock" class="w-4 h-4" />
-                                    <span>Date/Heure Relevé</span>
-                                    @if($sortField === 'recorded_at')
-                                        <x-iconify icon="lucide:{{ $sortDirection === 'asc' ? 'chevron-up' : 'chevron-down' }}" class="w-4 h-4 text-blue-600" />
-                                    @endif
-                                </div>
-                            </th>
-
-                            <th wire:click="sortBy('created_at')"
-                                class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors">
-                                <div class="flex items-center gap-1.5">
-                                    <x-iconify icon="lucide:database" class="w-4 h-4" />
-                                    <span>Enregistré Le</span>
-                                    @if($sortField === 'created_at')
-                                        <x-iconify icon="lucide:{{ $sortDirection === 'asc' ? 'chevron-up' : 'chevron-down' }}" class="w-4 h-4 text-blue-600" />
-                                    @endif
-                                </div>
-                            </th>
-
                             <th wire:click="sortBy('recording_method')"
-                                class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors">
+                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors">
                                 <div class="flex items-center gap-1.5">
                                     <x-iconify icon="lucide:settings" class="w-4 h-4" />
                                     <span>Méthode</span>
@@ -526,14 +514,14 @@
                                 </div>
                             </th>
 
-                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                 <div class="flex items-center gap-1.5">
                                     <x-iconify icon="lucide:user" class="w-4 h-4" />
-                                    <span>Rapporté Par</span>
+                                    <span>Auteur</span>
                                 </div>
                             </th>
 
-                            <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                                 Actions
                             </th>
                         </tr>
@@ -541,14 +529,13 @@
                     <tbody class="bg-white divide-y divide-gray-200">
                         @forelse ($readings as $reading)
                         <tr class="hover:bg-gray-50 transition-colors duration-200">
-                            {{-- Véhicule --}}
-                            <td class="px-4 py-3 whitespace-nowrap">
+                            <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="flex items-center">
-                                    <div class="w-10 h-10 bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg flex items-center justify-center mr-3">
-                                        <x-iconify icon="lucide:car" class="w-5 h-5 text-blue-600" />
+                                    <div class="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center mr-3">
+                                        <x-iconify icon="lucide:car" class="w-5 h-5 text-gray-600" />
                                     </div>
                                     <div>
-                                        <div class="text-sm font-semibold text-gray-900">
+                                        <div class="text-sm font-medium text-gray-900">
                                             {{ $reading->vehicle->registration_plate }}
                                         </div>
                                         <div class="text-xs text-gray-500">
@@ -558,104 +545,67 @@
                                 </div>
                             </td>
 
-                            {{-- Kilométrage --}}
-                            <td class="px-4 py-3 whitespace-nowrap">
-                                <div class="text-base font-bold text-gray-900">
-                                    {{ number_format($reading->mileage) }}
-                                    <span class="text-xs font-normal text-gray-500">km</span>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div>
+                                    <div class="text-sm text-gray-900">
+                                        {{ $reading->recorded_at->format('d/m/Y') }}
+                                    </div>
+                                    <div class="text-xs text-gray-500">
+                                        {{ $reading->recorded_at->format('H:i') }}
+                                    </div>
                                 </div>
                             </td>
 
-                            {{-- Différence --}}
-                            <td class="px-4 py-3 whitespace-nowrap">
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm font-semibold text-gray-900">
+                                    {{ number_format($reading->mileage) }} km
+                                </div>
+                            </td>
+
+                            <td class="px-6 py-4 whitespace-nowrap">
                                 @php
                                     $difference = $reading->previous_mileage 
                                         ? $reading->mileage - $reading->previous_mileage
                                         : null;
                                 @endphp
                                 @if($difference !== null)
-                                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800">
+                                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
                                         <x-iconify icon="lucide:plus" class="w-3 h-3" />
                                         {{ number_format($difference) }} km
                                     </span>
                                 @else
-                                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-600">
-                                        <x-iconify icon="lucide:flag" class="w-3 h-3" />
-                                        Premier
-                                    </span>
+                                    <span class="text-xs text-gray-400">Premier relevé</span>
                                 @endif
                             </td>
 
-                            {{-- Date/Heure du Relevé --}}
-                            <td class="px-4 py-3 whitespace-nowrap">
-                                <div class="flex items-center gap-2">
-                                    <div class="w-8 h-8 bg-green-50 rounded-lg flex items-center justify-center">
-                                        <x-iconify icon="lucide:calendar-clock" class="w-4 h-4 text-green-600" />
-                                    </div>
-                                    <div>
-                                        <div class="text-sm font-medium text-gray-900">
-                                            {{ $reading->recorded_at->format('d/m/Y') }}
-                                        </div>
-                                        <div class="text-xs text-gray-500 font-mono">
-                                            {{ $reading->recorded_at->format('H:i') }}
-                                        </div>
-                                    </div>
-                                </div>
-                            </td>
-
-                            {{-- Date/Heure Enregistrement Système --}}
-                            <td class="px-4 py-3 whitespace-nowrap">
-                                <div class="flex items-center gap-2">
-                                    <div class="w-8 h-8 bg-purple-50 rounded-lg flex items-center justify-center">
-                                        <x-iconify icon="lucide:database" class="w-4 h-4 text-purple-600" />
-                                    </div>
-                                    <div>
-                                        <div class="text-sm font-medium text-gray-900">
-                                            {{ $reading->created_at->format('d/m/Y') }}
-                                        </div>
-                                        <div class="text-xs text-gray-500 font-mono">
-                                            {{ $reading->created_at->format('H:i:s') }}
-                                        </div>
-                                    </div>
-                                </div>
-                            </td>
-
-                            {{-- Méthode --}}
-                            <td class="px-4 py-3 whitespace-nowrap">
+                            <td class="px-6 py-4 whitespace-nowrap">
                                 @if($reading->recording_method === 'manual')
-                                    <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-green-100 text-green-800">
+                                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
                                         <x-iconify icon="lucide:hand" class="w-3.5 h-3.5" />
                                         Manuel
                                     </span>
                                 @else
-                                    <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-purple-100 text-purple-800">
+                                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
                                         <x-iconify icon="lucide:cpu" class="w-3.5 h-3.5" />
-                                        Auto
+                                        Automatique
                                     </span>
                                 @endif
                             </td>
 
-                            {{-- Rapporté Par --}}
-                            <td class="px-4 py-3 whitespace-nowrap">
-                                <div class="flex items-center gap-2">
-                                    <div class="w-8 h-8 bg-gradient-to-br from-indigo-50 to-indigo-100 rounded-full flex items-center justify-center">
-                                        <x-iconify icon="lucide:user" class="w-4 h-4 text-indigo-600" />
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="flex items-center">
+                                    <div class="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center mr-2">
+                                        <x-iconify icon="lucide:user" class="w-4 h-4 text-gray-600" />
                                     </div>
                                     <div>
-                                        <div class="text-sm font-medium text-gray-900">
-                                            {{ $reading->recordedBy->name ?? 'Système' }}
+                                        <div class="text-sm text-gray-900">
+                                            {{ $reading->user->name ?? 'Système' }}
                                         </div>
-                                        @if($reading->recordedBy)
-                                        <div class="text-xs text-gray-500">
-                                            {{ $reading->recordedBy->roles->first()->name ?? 'Utilisateur' }}
-                                        </div>
-                                        @endif
                                     </div>
                                 </div>
                             </td>
 
-                            {{-- Actions --}}
-                            <td class="px-4 py-3 whitespace-nowrap text-center">
+                            <td class="px-6 py-4 whitespace-nowrap text-center">
                                 <div class="flex items-center justify-center gap-1">
                                     <a href="{{ route('admin.vehicles.mileage-history', $reading->vehicle_id) }}" 
                                        class="p-1.5 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
@@ -742,26 +692,126 @@
             @endif
         </div>
 
-        {{-- Loading State --}}
-        <div wire:loading.flex 
-             wire:target="search, vehicleFilter, methodFilter, dateFrom, dateTo, authorFilter, mileageMin, mileageMax, perPage, sortBy, resetFilters"
-             class="fixed inset-0 z-50 bg-black bg-opacity-25 items-center justify-center">
-            <div class="bg-white rounded-lg px-6 py-4 shadow-xl">
-                <div class="flex items-center gap-3">
-                    <svg class="animate-spin h-5 w-5 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                    <span class="text-gray-700">Chargement...</span>
-                </div>
-            </div>
-        </div>
-
     </div>
 </section>
 
+{{-- Loading State --}}
+<div wire:loading.flex 
+     wire:target="search, vehicleFilter, methodFilter, dateFrom, dateTo, authorFilter, mileageMin, mileageMax, perPage, sortBy, resetFilters"
+     class="fixed inset-0 z-50 bg-black bg-opacity-25 items-center justify-center">
+    <div class="bg-white rounded-lg px-6 py-4 shadow-xl">
+        <div class="flex items-center gap-3">
+            <svg class="animate-spin h-5 w-5 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            <span class="text-gray-700">Chargement...</span>
+        </div>
+    </div>
+</div>
+</div>
+
 @push('styles')
+<link href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.css" rel="stylesheet">
 <style>
+/* ================================================
+   TOM SELECT CUSTOM STYLES - ENTERPRISE GRADE
+================================================ */
+.ts-wrapper {
+    width: 100%;
+}
+
+.ts-control {
+    border: 1px solid #d1d5db !important;
+    border-radius: 0.5rem !important;
+    padding: 0.625rem 0.75rem !important;
+    font-size: 0.875rem !important;
+    background-color: white !important;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05) !important;
+    transition: all 0.15s ease-in-out !important;
+    min-height: 42px !important;
+}
+
+.ts-control:hover {
+    border-color: #9ca3af !important;
+}
+
+.ts-control.focus,
+.ts-wrapper.focus .ts-control {
+    border-color: #3b82f6 !important;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.05) !important;
+    outline: none !important;
+}
+
+.ts-dropdown {
+    border: 1px solid #e5e7eb !important;
+    border-radius: 0.5rem !important;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1), 0 4px 6px rgba(0, 0, 0, 0.05) !important;
+    margin-top: 0.25rem !important;
+    overflow: hidden !important;
+}
+
+.ts-dropdown-content {
+    padding: 0.375rem !important;
+    max-height: 320px !important;
+}
+
+.ts-dropdown .option {
+    padding: 0.625rem !important;
+    border-radius: 0.375rem !important;
+    margin-bottom: 0.125rem !important;
+    transition: all 0.15s ease-in-out !important;
+    cursor: pointer !important;
+}
+
+.ts-dropdown .option:hover {
+    background-color: #f3f4f6 !important;
+}
+
+.ts-dropdown .option.active {
+    background-color: #eff6ff !important;
+    color: #1e40af !important;
+}
+
+.ts-dropdown .option.selected {
+    background-color: #dbeafe !important;
+    color: #1e40af !important;
+    font-weight: 500 !important;
+}
+
+.ts-control .item {
+    display: flex !important;
+    align-items: center !important;
+    padding: 0.25rem 0.5rem !important;
+    background-color: #eff6ff !important;
+    border: 1px solid #bfdbfe !important;
+    border-radius: 0.375rem !important;
+    font-size: 0.875rem !important;
+    color: #1e40af !important;
+}
+
+.ts-wrapper.single .ts-control .item {
+    background-color: transparent !important;
+    border: none !important;
+    padding: 0 !important;
+    color: #111827 !important;
+}
+
+/* Input placeholder */
+.ts-control input::placeholder {
+    color: #9ca3af !important;
+}
+
+/* Clear button */
+.ts-control .clear-button {
+    display: none !important;
+}
+
+/* Loading state */
+.ts-wrapper.loading .ts-control {
+    opacity: 0.6 !important;
+}
+
 /* ================================================
    ALPINE.JS X-CLOAK
 ================================================ */
@@ -790,8 +840,74 @@
 @endpush
 
 @push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js"></script>
 <script>
-// Pas de scripts supplémentaires nécessaires
-// Alpine.js gère les interactions
+document.addEventListener('DOMContentLoaded', function() {
+    initializeTomSelect();
+});
+
+// Réinitialiser après updates Livewire
+document.addEventListener('livewire:navigated', function() {
+    initializeTomSelect();
+});
+
+function initializeTomSelect() {
+    // Nettoyer les instances existantes
+    const existingSelect = document.querySelector('.tom-select-vehicle');
+    if (existingSelect && existingSelect.tomselect) {
+        existingSelect.tomselect.destroy();
+    }
+
+    // Initialiser TomSelect pour la sélection de véhicule
+    if (existingSelect) {
+        new TomSelect('.tom-select-vehicle', {
+            placeholder: 'Rechercher un véhicule...',
+            allowEmptyOption: true,
+            maxOptions: 100,
+            searchField: ['text'],
+            sortField: [{field: 'text', direction: 'asc'}],
+            plugins: ['dropdown_input'],
+            render: {
+                option: function(data, escape) {
+                    const parts = data.text.split(' - ');
+                    const plate = parts[0] || '';
+                    const vehicleInfo = parts[1] || '';
+
+                    return `<div class="py-1.5 px-1">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 bg-blue-50 rounded flex items-center justify-center flex-shrink-0">
+                                <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/>
+                                </svg>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <div class="font-medium text-gray-900 text-sm">${escape(plate)}</div>
+                                ${vehicleInfo ? `<div class="text-xs text-gray-500 truncate">${escape(vehicleInfo)}</div>` : ''}
+                            </div>
+                        </div>
+                    </div>`;
+                },
+                item: function(data, escape) {
+                    const plate = data.text.split(' - ')[0] || data.text;
+                    return `<div class="flex items-center gap-1.5">
+                        <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/>
+                        </svg>
+                        <span>${escape(plate)}</span>
+                    </div>`;
+                },
+                no_results: function() {
+                    return '<div class="text-sm text-gray-500 px-3 py-2">Aucun véhicule trouvé</div>';
+                }
+            },
+            onChange: function(value) {
+                // Trigger Livewire update
+                if (window.Livewire) {
+                    @this.set('vehicleFilter', value);
+                }
+            }
+        });
+    }
+}
 </script>
 @endpush

@@ -199,6 +199,11 @@ class UpdateVehicleMileage extends Component
         if ($value) {
             $this->loadVehicle($value);
             $this->resetValidation();
+            
+            // Force le rafraîchissement du kilométrage
+            if ($this->selectedVehicle) {
+                $this->newMileage = $this->selectedVehicle->current_mileage;
+            }
         } else {
             $this->selectedVehicle = null;
             $this->newMileage = 0;
