@@ -387,7 +387,8 @@ class UpdateVehicleMileage extends Component
         $user = auth()->user();
         
         $query = Vehicle::where('organization_id', $user->organization_id)
-            ->where('status', 'active')
+            ->active()  // Utilise le scope active() qui filtre par status_id = 1
+            ->visible() // Utilise le scope visible() qui filtre par is_archived = false
             ->with(['category', 'depot']);
             
         // Filtrage selon les permissions
