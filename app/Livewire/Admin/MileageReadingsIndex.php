@@ -7,6 +7,7 @@ use App\Models\Vehicle;
 use App\Models\User;
 use App\Services\MileageReadingService;
 use Illuminate\Contracts\View\View;
+use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -49,6 +50,12 @@ class MileageReadingsIndex extends Component
     public string $sortField = 'recorded_at';
     public string $sortDirection = 'desc';
     public int $perPage = 25; // Défaut 25 pour pagination entreprise
+
+    /**
+     * 🗑️ PROPRIÉTÉS DE SUPPRESSION
+     */
+    public ?int $deleteId = null;
+    public bool $showDeleteModal = false;
 
     /**
      * 🎛️ LISTENERS
@@ -302,6 +309,99 @@ class MileageReadingsIndex extends Component
             'readings_last_7_days' => $analytics['readings_last_7_days'] ?? 0,
             'readings_last_30_days' => $analytics['readings_last_30_days'] ?? 0,
         ];
+    }
+
+    /**
+     * 🗑️ CONFIRMER LA SUPPRESSION
+     * 
+     * Affiche la popup de confirmation avant suppression
+     * 
+     * @param int $id ID du relevé à supprimer
+     */
+    public function confirmDelete(int $id): void
+    {
+        // Vérifier que le relevé existe et appartient à l'organisation
+        $reading = VehicleMileageReading::where('organization_id', auth()->user()->organization_id)
+            ->findOrFail($id);
+
+        // Vérifier les permissions
+        if (!auth()->user()->can('delete mileage readings')) {
+            session()->flash('error', 'Vous n\'avez pas la permission de supprimer des relevés.');
+            return;
+        }
+
+        $this->deleteId = $id;
+        $this->showDeleteModal = true;
+    }
+
+    /**
+     * 🗑️ SUPPRIMER LE RELEVÉ
+     * 
+     * Supprime définitivement le relevé kilométrique
+     * Recalcule automatiquement le kilométrage actuel du véhicule
+     */
+    public function delete(): void
+    {
+        if (!$this->deleteId) {
+            session()->flash('error', 'Aucun relevé sélectionné pour la suppression.');
+            return;
+        }
+
+        try {
+            // Récupérer le relevé
+            $reading = VehicleMileageReading::where('organization_id', auth()->user()->organization_id)
+                ->findOrFail($this->deleteId);
+
+            // Vérifier les permissions
+            if (!auth()->user()->can('delete mileage readings')) {
+                session()->flash('error', 'Vous n\'avez pas la permission de supprimer des relevés.');
+                return;
+            }
+
+            $vehicleId = $reading->vehicle_id;
+            $deletedMileage = $reading->mileage;
+
+            DB::beginTransaction();
+            
+            // Supprimer le relevé
+            $reading->delete();
+
+            // Recalculer le kilométrage actuel du véhicule
+            // Prendre le dernier relevé restant
+            $lastReading = VehicleMileageReading::where('vehicle_id', $vehicleId)
+                ->orderBy('recorded_at', 'desc')
+                ->first();
+
+            if ($lastReading) {
+                Vehicle::where('id', $vehicleId)->update([
+                    'current_mileage' => $lastReading->mileage,
+                ]);
+            }
+
+            DB::commit();
+
+            session()->flash('success', "Relevé de " . number_format($deletedMileage) . " km supprimé avec succès.");
+            
+            // Émettre un événement
+            $this->dispatch('reading-deleted', vehicleId: $vehicleId);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            session()->flash('error', 'Erreur lors de la suppression : ' . $e->getMessage());
+        } finally {
+            $this->deleteId = null;
+            $this->showDeleteModal = false;
+            $this->resetPage();
+        }
+    }
+
+    /**
+     * ❌ ANNULER LA SUPPRESSION
+     */
+    public function cancelDelete(): void
+    {
+        $this->deleteId = null;
+        $this->showDeleteModal = false;
     }
 
     /**

@@ -1,25 +1,17 @@
 {{-- ====================================================================
- 📊 MISE À JOUR KILOMÉTRAGE - ENTERPRISE ULTRA-PRO V14.0 ✅ CORRIGÉ
- ====================================================================
- ⭐ FIX CRITIQUE: vehicleData array au lieu de selectedVehicle object
- 🕐 Dernière modification: 27/10/2025 16:05
+ 📊 MISE À JOUR KILOMÉTRAGE - ULTRA-PRO V14.0 AVEC TOMSELECT
  ====================================================================
 
- 🏆 DESIGN WORLD-CLASS SURPASSANT FLEETIO, SAMSARA, GEOTAB:
+ 🏆 SOLUTION ENTERPRISE-GRADE AVEC RECHERCHE AVANCÉE:
  
  ✨ FEATURES ULTRA-PROFESSIONNELLES:
- - Design identique à vehicles/create et drivers/create
- - Composants standards de l'application (x-input, x-iconify, x-button, x-alert)
- - Validation en temps réel sophistiquée
- - Animations fluides et feedback visuel immédiat
- - Historique récent du véhicule (5 derniers relevés)
- - Statistiques intelligentes (moyenne, tendance, alertes)
- - Suggestions contextuelles basées sur l'historique
- - Layout responsive ultra-soigné (mobile → desktop)
- - Messages d'erreur clairs et actionnables
- - Support multi-rôles (admin/superviseur/chauffeur)
+ - TomSelect pour recherche intelligente des véhicules
+ - Filtrage en temps réel (plaque, marque, modèle)
+ - Design identique aux standards de l'application
+ - Affichage conditionnel robuste
+ - Performance optimisée
  
- @version 13.0-Ultra-Pro-World-Class
+ @version 14.0-Ultra-Pro-TomSelect
  @since 2025-10-27
  @author Expert Fullstack Senior (20+ ans)
  ==================================================================== --}}
@@ -42,20 +34,10 @@
 </div>
 @endif
 
-{{-- ====================================================================
- 🎨 SECTION PRINCIPALE - FOND GRIS CLAIR MODERNE
- ==================================================================== --}}
 <section class="bg-gray-50 min-h-screen">
     <div class="py-6 px-4 mx-auto max-w-7xl lg:py-12">
-        
-        {{-- ⭐ MARQUEUR DEBUG VERSION V14.0 CORRIGÉE --}}
-        <div class="mb-4 px-4 py-2 bg-green-50 border-l-4 border-green-500 text-green-800 text-xs font-mono rounded">
-            ✅ Version 14.0 chargée - vehicleData array OK - {{ now()->format('d/m/Y H:i:s') }}
-        </div>
 
-        {{-- ===============================================
-            HEADER COMPACT ET MODERNE
-        =============================================== --}}
+        {{-- HEADER --}}
         <div class="mb-6">
             <div class="md:flex md:items-center md:justify-between">
                 <div class="flex-1 min-w-0">
@@ -67,7 +49,7 @@
                         @if($mode === 'fixed' && $vehicleData)
                             Mise à jour pour <strong>{{ $vehicleData['registration_plate'] }}</strong> - {{ $vehicleData['brand'] }} {{ $vehicleData['model'] }}
                         @else
-                            Sélectionnez un véhicule et entrez le nouveau kilométrage avec précision
+                            Recherchez et sélectionnez un véhicule pour mettre à jour son kilométrage
                         @endif
                     </p>
                 </div>
@@ -81,9 +63,7 @@
             </div>
         </div>
 
-        {{-- ===============================================
-            FLASH MESSAGES - DESIGN ULTRA-PRO
-        =============================================== --}}
+        {{-- FLASH MESSAGES --}}
         @if (session()->has('error'))
         <x-alert type="error" title="Erreur" dismissible class="mb-6">
             {{ session('error') }}
@@ -96,65 +76,55 @@
         </x-alert>
         @endif
 
-        {{-- ===============================================
-            FORMULAIRE PRINCIPAL - ULTRA-PRO LAYOUT
-        =============================================== --}}
+        {{-- FORMULAIRE PRINCIPAL --}}
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
             
-            {{-- ===============================================
-                COLONNE PRINCIPALE - FORMULAIRE (2/3)
-            =============================================== --}}
+            {{-- COLONNE PRINCIPALE (2/3) --}}
             <div class="lg:col-span-2 space-y-6">
                 
-                {{-- CARD FORMULAIRE --}}
-                <form wire:submit.prevent="save" x-data="mileageFormValidation()">
+                <form wire:submit.prevent="save">
                     <x-card padding="p-6">
                         <div class="space-y-6">
 
-                            {{-- ===============================================
-                                SÉLECTION VÉHICULE (MODE SELECT)
-                            =============================================== --}}
+                            {{-- SÉLECTION VÉHICULE AVEC TOMSELECT --}}
                             @if($mode === 'select')
                             <div>
-                                <label for="vehicleId" class="block mb-2 text-sm font-medium text-gray-900">
+                                <label for="vehicleSearch" class="block mb-2 text-sm font-medium text-gray-900">
                                     <x-iconify icon="heroicons:truck" class="w-5 h-5 inline mr-1 text-blue-600" />
-                                    Véhicule
+                                    Rechercher un véhicule
                                     <span class="text-red-600">*</span>
                                 </label>
                                 
-                                <select 
-                                    wire:model.live="vehicleId"
-                                    id="vehicleId"
-                                    required
-                                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 transition-colors">
-                                    <option value="">Sélectionnez un véhicule...</option>
-                                    @if($availableVehicles && count($availableVehicles) > 0)
-                                        @foreach($availableVehicles as $vehicle)
-                                            <option value="{{ $vehicle->id }}">
-                                                {{ $vehicle->registration_plate }} - {{ $vehicle->brand }} {{ $vehicle->model }} 
-                                                ({{ number_format($vehicle->current_mileage) }} km)
-                                            </option>
-                                        @endforeach
-                                    @else
-                                        <option value="" disabled>Aucun véhicule disponible</option>
-                                    @endif
-                                </select>
+                                <div class="relative">
+                                    <select 
+                                        id="vehicleSearch"
+                                        wire:model.live="vehicleId"
+                                        required
+                                        class="tomselect-vehicle">
+                                        <option value="">Rechercher par plaque, marque ou modèle...</option>
+                                        @if($availableVehicles && count($availableVehicles) > 0)
+                                            @foreach($availableVehicles as $vehicle)
+                                                <option value="{{ $vehicle->id }}" 
+                                                        data-data='@json([
+                                                            "plate" => $vehicle->registration_plate,
+                                                            "brand" => $vehicle->brand,
+                                                            "model" => $vehicle->model,
+                                                            "mileage" => $vehicle->current_mileage
+                                                        ])'>
+                                                    {{ $vehicle->registration_plate }} - {{ $vehicle->brand }} {{ $vehicle->model }} ({{ number_format($vehicle->current_mileage) }} km)
+                                                </option>
+                                            @endforeach
+                                        @endif
+                                    </select>
+                                </div>
+                                
                                 @error('vehicleId')
                                     <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                                 @enderror
-                                
-                                @if($availableVehicles && count($availableVehicles) === 0)
-                                <p class="mt-2 text-sm text-amber-600 flex items-center gap-1.5">
-                                    <x-iconify icon="heroicons:exclamation-triangle" class="w-4 h-4" />
-                                    Aucun véhicule n'est disponible pour la mise à jour du kilométrage.
-                                </p>
-                                @endif
                             </div>
                             @endif
 
-                            {{-- ===============================================
-                                CARTE INFO VÉHICULE (QUAND SÉLECTIONNÉ)
-                            =============================================== --}}
+                            {{-- CARTE INFO VÉHICULE --}}
                             @if($vehicleData)
                             <div class="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg border-2 border-blue-200 p-5">
                                 <div class="flex items-start gap-4">
@@ -174,19 +144,12 @@
                                                 <x-iconify icon="heroicons:gauge" class="w-4 h-4 text-blue-600" />
                                                 <strong class="text-blue-900">{{ number_format($vehicleData['current_mileage']) }} km</strong>
                                             </span>
-                                            @if(isset($vehicleData['category_name']) && $vehicleData['category_name'])
-                                            <span class="text-gray-600">
-                                                {{ $vehicleData['category_name'] }}
-                                            </span>
-                                            @endif
                                         </div>
                                     </div>
                                 </div>
                             </div>
 
-                            {{-- ===============================================
-                                FORMULAIRE RELEVÉ - GRID RESPONSIVE
-                            =============================================== --}}
+                            {{-- FORMULAIRE RELEVÉ --}}
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 
                                 {{-- Nouveau Kilométrage --}}
@@ -204,7 +167,7 @@
                                         :error="$errors->first('newMileage')"
                                     />
 
-                                    {{-- Badge Différence (Temps Réel) --}}
+                                    {{-- Badge Différence --}}
                                     @if($newMileage && $newMileage >= $vehicleData['current_mileage'])
                                     <div class="mt-3 inline-flex items-center gap-2 px-3 py-2 bg-green-50 border border-green-200 rounded-lg">
                                         <x-iconify icon="heroicons:arrow-trending-up" class="w-5 h-5 text-green-600" />
@@ -215,7 +178,7 @@
                                     @endif
                                 </div>
 
-                                {{-- Date du Relevé --}}
+                                {{-- Date --}}
                                 <x-input
                                     type="date"
                                     name="recordedDate"
@@ -229,7 +192,7 @@
                                     :error="$errors->first('recordedDate')"
                                 />
 
-                                {{-- Heure du Relevé --}}
+                                {{-- Heure --}}
                                 <x-input
                                     type="time"
                                     name="recordedTime"
@@ -242,7 +205,7 @@
                                 />
                             </div>
 
-                            {{-- Notes (Optionnel) --}}
+                            {{-- Notes --}}
                             <div>
                                 <label for="notes" class="block mb-2 text-sm font-medium text-gray-900">
                                     <x-iconify icon="heroicons:document-text" class="w-5 h-5 inline mr-1 text-gray-600" />
@@ -254,30 +217,27 @@
                                     rows="3"
                                     maxlength="500"
                                     class="block w-full border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-sm"
-                                    placeholder="Ex: Relevé effectué après le plein d'essence. Véhicule en bon état."></textarea>
+                                    placeholder="Ex: Relevé effectué après le plein d'essence"></textarea>
                                 <p class="mt-1 text-xs text-gray-500">
-                                    <span x-text="$wire.notes.length || 0"></span>/500 caractères
+                                    {{ strlen($notes) }}/500 caractères
                                 </p>
-                                @error('notes')
-                                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                                @enderror
                             </div>
 
-                            {{-- ===============================================
-                                BOUTONS D'ACTION
-                            =============================================== --}}
+                            {{-- BOUTONS D'ACTION --}}
                             <div class="flex items-center justify-between pt-4 border-t border-gray-200">
-                                <a href="{{ route('admin.mileage-readings.index') }}" 
-                                   class="inline-flex items-center gap-2 px-4 py-2 bg-white hover:bg-gray-50 border border-gray-300 text-gray-700 font-medium rounded-lg transition-colors">
+                                <button 
+                                    type="button"
+                                    wire:click="resetForm"
+                                    class="inline-flex items-center gap-2 px-4 py-2 bg-white hover:bg-gray-50 border border-gray-300 text-gray-700 font-medium rounded-lg transition-colors">
                                     <x-iconify icon="heroicons:x-mark" class="w-5 h-5" />
-                                    Annuler
-                                </a>
+                                    Réinitialiser
+                                </button>
                                 
                                 <button
                                     type="submit"
                                     wire:loading.attr="disabled"
                                     @if(!$vehicleData || !$newMileage || !$recordedDate || !$recordedTime) disabled @endif
-                                    class="inline-flex items-center gap-2 px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg shadow-sm transition-all duration-200 disabled:bg-gray-400 disabled:cursor-not-allowed disabled:shadow-none">
+                                    class="inline-flex items-center gap-2 px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg shadow-sm transition-all duration-200 disabled:bg-gray-400 disabled:cursor-not-allowed">
                                     <x-iconify icon="heroicons:check" class="w-5 h-5" wire:loading.remove />
                                     <svg wire:loading class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                                         <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
@@ -295,14 +255,10 @@
 
             </div>
 
-            {{-- ===============================================
-                COLONNE SIDEBAR - INFO & HISTORIQUE (1/3)
-            =============================================== --}}
+            {{-- SIDEBAR (1/3) --}}
             <div class="lg:col-span-1 space-y-6">
                 
-                {{-- ===============================================
-                    HISTORIQUE RÉCENT DU VÉHICULE
-                =============================================== --}}
+                {{-- HISTORIQUE RÉCENT --}}
                 @if($vehicleData && isset($recentReadings) && count($recentReadings) > 0)
                 <x-card padding="p-0">
                     <div class="p-4 border-b border-gray-200">
@@ -322,69 +278,18 @@
                                     <span class="text-base font-bold text-gray-900">
                                         {{ number_format($reading->mileage) }} km
                                     </span>
-                                    @if($loop->index > 0 && isset($recentReadings[$loop->index - 1]))
-                                    <span class="text-xs text-green-600 font-medium">
-                                        +{{ number_format($reading->mileage - $recentReadings[$loop->index - 1]->mileage) }}
-                                    </span>
-                                    @endif
                                 </div>
                                 <div class="text-xs text-gray-500">
                                     {{ $reading->recorded_at->format('d/m/Y à H:i') }}
-                                </div>
-                                <div class="text-xs text-gray-400 mt-0.5">
-                                    {{ $reading->recordedBy->name ?? 'Système' }}
                                 </div>
                             </div>
                         </div>
                         @endforeach
                     </div>
-                    <div class="p-3 bg-gray-50 border-t border-gray-200">
-                        <a href="{{ route('admin.vehicles.mileage-history', $vehicleData['id']) }}" 
-                           class="text-xs font-medium text-blue-600 hover:text-blue-700 flex items-center gap-1">
-                            Voir l'historique complet
-                            <x-iconify icon="heroicons:arrow-right" class="w-4 h-4" />
-                        </a>
-                    </div>
                 </x-card>
                 @endif
 
-                {{-- ===============================================
-                    STATISTIQUES INTELLIGENTES
-                =============================================== --}}
-                @if($vehicleData && $stats)
-                <x-card padding="p-0">
-                    <div class="p-4 border-b border-gray-200">
-                        <h3 class="text-sm font-semibold text-gray-900 flex items-center gap-2">
-                            <x-iconify icon="heroicons:chart-bar" class="w-5 h-5 text-purple-600" />
-                            Statistiques
-                        </h3>
-                    </div>
-                    <div class="p-4 space-y-4">
-                        <div>
-                            <div class="text-xs text-gray-500 mb-1">Moyenne Quotidienne</div>
-                            <div class="text-lg font-bold text-gray-900">
-                                {{ number_format($stats['avg_daily_mileage'] ?? 0) }} km/jour
-                            </div>
-                        </div>
-                        <div>
-                            <div class="text-xs text-gray-500 mb-1">Kilométrage Total Parcouru</div>
-                            <div class="text-lg font-bold text-gray-900">
-                                {{ number_format($stats['total_distance'] ?? 0) }} km
-                            </div>
-                        </div>
-                        <div>
-                            <div class="text-xs text-gray-500 mb-1">Nombre de Relevés</div>
-                            <div class="text-lg font-bold text-gray-900">
-                                {{ $stats['total_readings'] ?? 0 }}
-                            </div>
-                        </div>
-                    </div>
-                </x-card>
-                @endif
-
-                {{-- ===============================================
-                    AIDE & CONSEILS
-                =============================================== --}}
+                {{-- CONSEILS --}}
                 <x-card padding="p-4" class="bg-blue-50 border-blue-200">
                     <div class="flex items-start gap-3">
                         <x-iconify icon="heroicons:information-circle" class="w-6 h-6 text-blue-600 flex-shrink-0 mt-0.5" />
@@ -393,11 +298,11 @@
                             <ul class="text-xs text-blue-800 space-y-1.5">
                                 <li class="flex items-start gap-1.5">
                                     <span class="text-blue-600 mt-0.5">•</span>
-                                    <span>Relevez le kilométrage à la même heure chaque jour pour plus de précision</span>
+                                    <span>Utilisez la recherche pour trouver rapidement un véhicule par plaque, marque ou modèle</span>
                                 </li>
                                 <li class="flex items-start gap-1.5">
                                     <span class="text-blue-600 mt-0.5">•</span>
-                                    <span>Vérifiez le compteur du véhicule pour éviter les erreurs de saisie</span>
+                                    <span>Vérifiez le compteur du véhicule pour éviter les erreurs</span>
                                 </li>
                                 <li class="flex items-start gap-1.5">
                                     <span class="text-blue-600 mt-0.5">•</span>
@@ -415,27 +320,108 @@
     </div>
 </section>
 
-{{-- ====================================================================
- 💎 ALPINE.JS - VALIDATION FORMULAIRE TEMPS RÉEL
- ==================================================================== --}}
+{{-- TOMSELECT CSS & JS --}}
+@push('styles')
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.css">
+<style>
+.ts-wrapper.tomselect-vehicle {
+    width: 100% !important;
+}
+.ts-control {
+    border: 1px solid #d1d5db !important;
+    border-radius: 0.5rem !important;
+    padding: 0.625rem !important;
+    font-size: 0.875rem !important;
+}
+.ts-control:focus {
+    border-color: #3b82f6 !important;
+    ring: 2px !important;
+    ring-color: #3b82f6 !important;
+}
+.ts-dropdown {
+    border: 1px solid #d1d5db !important;
+    border-radius: 0.5rem !important;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1) !important;
+}
+.ts-dropdown-content {
+    max-height: 300px !important;
+}
+</style>
+@endpush
+
 @push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js"></script>
 <script>
-document.addEventListener('alpine:init', () => {
-    Alpine.data('mileageFormValidation', () => ({
-        init() {
-            // Initialisation si nécessaire
-        },
+document.addEventListener('DOMContentLoaded', function() {
+    const selectElement = document.getElementById('vehicleSearch');
+    
+    if (selectElement) {
+        const tomselect = new TomSelect(selectElement, {
+            create: false,
+            sortField: {
+                field: 'text',
+                direction: 'asc'
+            },
+            placeholder: 'Rechercher par plaque, marque ou modèle...',
+            maxOptions: 100,
+            render: {
+                option: function(data, escape) {
+                    if (data.value === '') {
+                        return '<div class="py-2 px-3 text-gray-500 text-sm">' + escape(data.text) + '</div>';
+                    }
+                    
+                    const vehicleData = data.customData || {};
+                    return '<div class="py-2 px-3 hover:bg-blue-50">' +
+                        '<div class="font-semibold text-gray-900">' + escape(vehicleData.plate || '') + '</div>' +
+                        '<div class="text-sm text-gray-600">' + escape(vehicleData.brand || '') + ' ' + escape(vehicleData.model || '') + '</div>' +
+                        '<div class="text-xs text-gray-500 mt-1">Kilométrage actuel: ' + (vehicleData.mileage ? vehicleData.mileage.toLocaleString() : '0') + ' km</div>' +
+                    '</div>';
+                },
+                item: function(data, escape) {
+                    const vehicleData = data.customData || {};
+                    return '<div>' + escape(vehicleData.plate || data.text) + '</div>';
+                }
+            },
+            onInitialize: function() {
+                // Parser les données custom pour chaque option
+                this.options = {};
+                selectElement.querySelectorAll('option').forEach(option => {
+                    if (option.value) {
+                        const dataAttr = option.getAttribute('data-data');
+                        this.addOption({
+                            value: option.value,
+                            text: option.textContent,
+                            customData: dataAttr ? JSON.parse(dataAttr) : {}
+                        });
+                    }
+                });
+                this.refreshOptions(false);
+            },
+            onChange: function(value) {
+                // Déclencher l'événement Livewire
+                const event = new Event('change', { bubbles: true });
+                selectElement.value = value;
+                selectElement.dispatchEvent(event);
+                
+                // Trigger Livewire update
+                if (window.Livewire) {
+                    @this.set('vehicleId', value);
+                }
+            }
+        });
         
-        validateMileage(value, minValue) {
-            if (!value) return false;
-            return parseInt(value) >= parseInt(minValue);
-        },
-        
-        calculateDifference(newMileage, currentMileage) {
-            if (!newMileage || !currentMileage) return 0;
-            return parseInt(newMileage) - parseInt(currentMileage);
-        }
-    }));
+        // Écouter les changements Livewire pour réinitialiser
+        document.addEventListener('livewire:load', function() {
+            Livewire.hook('message.processed', (message, component) => {
+                if (component.fingerprint.name === 'admin.update-vehicle-mileage') {
+                    // Réinitialiser TomSelect si le véhicule est cleared
+                    if (!component.data.vehicleId) {
+                        tomselect.clear();
+                    }
+                }
+            });
+        });
+    }
 });
 </script>
 @endpush

@@ -31,13 +31,14 @@ class UpdateVehicleMileage extends Component
      * 🚗 PROPRIÉTÉS DU VÉHICULE
      */
     public ?int $vehicleId = null;
-    public ?Vehicle $selectedVehicle = null;
+    public ?array $vehicleData = null;  // ⭐ CHANGÉ: Array au lieu d'objet pour sérialisation Livewire
 
     /**
      * 📝 PROPRIÉTÉS DU FORMULAIRE
      */
     public int $newMileage = 0;
-    public string $recordedAt = '';
+    public string $recordedDate = '';
+    public string $recordedTime = '';
     public string $notes = '';
 
     /**
@@ -58,11 +59,15 @@ class UpdateVehicleMileage extends Component
     protected function rules(): array
     {
         $rules = [
-            'recordedAt' => [
+            'recordedDate' => [
                 'required',
                 'date',
-                'before_or_equal:now',
+                'before_or_equal:today',
                 'after_or_equal:' . now()->subDays(7)->toDateString(),
+            ],
+            'recordedTime' => [
+                'required',
+                'date_format:H:i',
             ],
             'notes' => [
                 'nullable',
@@ -72,11 +77,11 @@ class UpdateVehicleMileage extends Component
         ];
 
         // Validation du kilométrage uniquement si un véhicule est sélectionné
-        if ($this->selectedVehicle) {
+        if ($this->vehicleData) {
             $rules['newMileage'] = [
                 'required',
                 'integer',
-                'min:' . $this->selectedVehicle->current_mileage,
+                'min:' . $this->vehicleData['current_mileage'],
                 'max:9999999',
             ];
         } else {
@@ -96,10 +101,12 @@ class UpdateVehicleMileage extends Component
         'newMileage.integer' => 'Le kilométrage doit être un nombre entier.',
         'newMileage.min' => 'Le kilométrage ne peut pas être inférieur au kilométrage actuel.',
         'newMileage.max' => 'Le kilométrage ne peut pas dépasser 9 999 999 km.',
-        'recordedAt.required' => 'La date est obligatoire.',
-        'recordedAt.date' => 'La date doit être une date valide.',
-        'recordedAt.before_or_equal' => 'La date ne peut pas être dans le futur.',
-        'recordedAt.after_or_equal' => 'La date ne peut pas dépasser 7 jours dans le passé.',
+        'recordedDate.required' => 'La date est obligatoire.',
+        'recordedDate.date' => 'La date doit être une date valide.',
+        'recordedDate.before_or_equal' => 'La date ne peut pas être dans le futur.',
+        'recordedDate.after_or_equal' => 'La date ne peut pas dépasser 7 jours dans le passé.',
+        'recordedTime.required' => 'L\'heure est obligatoire.',
+        'recordedTime.date_format' => 'L\'heure doit être au format HH:MM.',
         'notes.max' => 'Les notes ne peuvent pas dépasser 500 caractères.',
     ];
 
@@ -110,8 +117,9 @@ class UpdateVehicleMileage extends Component
     {
         $user = auth()->user();
 
-        // Initialiser la date à maintenant
-        $this->recordedAt = now()->format('Y-m-d\TH:i');
+        // Initialiser la date et l'heure à maintenant
+        $this->recordedDate = now()->format('Y-m-d');
+        $this->recordedTime = now()->format('H:i');
 
         // Si vehicleId fourni (depuis URL ou route)
         if ($vehicleId) {
@@ -140,6 +148,8 @@ class UpdateVehicleMileage extends Component
 
     /**
      * 🚗 CHARGER UN VÉHICULE
+     * 
+     * ⭐ CORRECTION ULTRA-PRO: Conversion en array pour sérialisation Livewire
      */
     private function loadVehicle(int $vehicleId): void
     {
@@ -162,13 +172,22 @@ class UpdateVehicleMileage extends Component
         }
         // Admin/Gestionnaire Flotte: pas de restriction supplémentaire
 
-        $this->selectedVehicle = $query->first();
+        $vehicle = $query->first();
 
-        if ($this->selectedVehicle) {
-            $this->newMileage = $this->selectedVehicle->current_mileage;
+        if ($vehicle) {
+            // ⭐ Convertir en array sérialisable pour Livewire
+            $this->vehicleData = [
+                'id' => $vehicle->id,
+                'registration_plate' => $vehicle->registration_plate,
+                'brand' => $vehicle->brand,
+                'model' => $vehicle->model,
+                'current_mileage' => $vehicle->current_mileage,
+                'category_name' => $vehicle->category ? $vehicle->category->name : null,
+            ];
+            $this->newMileage = $vehicle->current_mileage;
         } else {
             session()->flash('error', 'Vous n\'avez pas accès à ce véhicule.');
-            $this->selectedVehicle = null;
+            $this->vehicleData = null;
             $this->vehicleId = null;
         }
     }
@@ -200,12 +219,12 @@ class UpdateVehicleMileage extends Component
             $this->loadVehicle($value);
             $this->resetValidation();
             
-            // Force le rafraîchissement du kilométrage
-            if ($this->selectedVehicle) {
-                $this->newMileage = $this->selectedVehicle->current_mileage;
+            // ⭐ Force le rafraîchissement du kilométrage
+            if ($this->vehicleData) {
+                $this->newMileage = $this->vehicleData['current_mileage'];
             }
         } else {
-            $this->selectedVehicle = null;
+            $this->vehicleData = null;
             $this->newMileage = 0;
         }
     }
@@ -246,26 +265,26 @@ class UpdateVehicleMileage extends Component
     public function save(): void
     {
         // Charger le véhicule si pas encore fait
-        if (!$this->selectedVehicle && $this->vehicleId) {
+        if (!$this->vehicleData && $this->vehicleId) {
             $this->loadVehicle($this->vehicleId);
         }
 
         // Vérifier qu'un véhicule est sélectionné
-        if (!$this->selectedVehicle) {
+        if (!$this->vehicleData) {
             session()->flash('error', 'Veuillez sélectionner un véhicule.');
             return;
         }
 
         // Validation personnalisée supplémentaire
-        if ($this->newMileage < $this->selectedVehicle->current_mileage) {
+        if ($this->newMileage < $this->vehicleData['current_mileage']) {
             $this->addError('newMileage',
                 "Le kilométrage ({$this->newMileage} km) ne peut pas être inférieur au kilométrage actuel (" .
-                number_format($this->selectedVehicle->current_mileage) . " km)."
+                number_format($this->vehicleData['current_mileage']) . " km)."
             );
             return;
         }
 
-        if ($this->newMileage == $this->selectedVehicle->current_mileage) {
+        if ($this->newMileage == $this->vehicleData['current_mileage']) {
             $this->addError('newMileage', 'Le kilométrage doit être différent du kilométrage actuel.');
             return;
         }
@@ -275,11 +294,14 @@ class UpdateVehicleMileage extends Component
 
         DB::beginTransaction();
         try {
+            // Combiner date et heure
+            $recordedAt = $this->recordedDate . ' ' . $this->recordedTime;
+
             // Créer le relevé kilométrique
             $reading = VehicleMileageReading::create([
-                'vehicle_id' => $this->selectedVehicle->id,
+                'vehicle_id' => $this->vehicleData['id'],
                 'mileage' => $this->newMileage,
-                'recorded_at' => $this->recordedAt,
+                'recorded_at' => $recordedAt,
                 'recording_method' => 'manual',
                 'notes' => $this->notes,
                 'recorded_by_id' => auth()->id(),
@@ -291,7 +313,7 @@ class UpdateVehicleMileage extends Component
             DB::commit();
 
             // Message de succès
-            $oldMileage = $this->selectedVehicle->current_mileage;
+            $oldMileage = $this->vehicleData['current_mileage'];
             $difference = $this->newMileage - $oldMileage;
 
             session()->flash('success',
@@ -301,7 +323,7 @@ class UpdateVehicleMileage extends Component
 
             // CORRECTIF ENTERPRISE-GRADE: Sauvegarder le vehicleId AVANT resetForm()
             // pour éviter "Attempt to read property 'id' on null" lors du dispatch
-            $savedVehicleId = $this->selectedVehicle->id;
+            $savedVehicleId = $this->vehicleData['id'];
 
             // Réinitialiser le formulaire
             $this->resetForm();
@@ -317,22 +339,23 @@ class UpdateVehicleMileage extends Component
     }
 
     /**
-     * 🔄 RESET DU FORMULAIRE
+     * 🔄 RESET DU FORMULAIRE (PUBLIC pour wire:click)
      */
-    private function resetForm(): void
+    public function resetForm(): void
     {
         if ($this->mode === 'select') {
-            $this->reset(['vehicleId', 'selectedVehicle', 'newMileage', 'notes']);
+            $this->reset(['vehicleId', 'vehicleData', 'newMileage', 'notes']);
         } else {
             // En mode fixe, recharger le véhicule
-            if ($this->selectedVehicle) {
-                $this->selectedVehicle->refresh();
-                $this->newMileage = $this->selectedVehicle->current_mileage;
+            if ($this->vehicleData) {
+                $this->loadVehicle($this->vehicleData['id']);
+                $this->newMileage = $this->vehicleData['current_mileage'];
             }
             $this->notes = '';
         }
 
-        $this->recordedAt = now()->format('Y-m-d\TH:i');
+        $this->recordedDate = now()->format('Y-m-d');
+        $this->recordedTime = now()->format('H:i');
         $this->resetValidation();
     }
 
@@ -341,10 +364,67 @@ class UpdateVehicleMileage extends Component
      */
     public function refresh(): void
     {
-        if ($this->selectedVehicle) {
-            $this->selectedVehicle->refresh();
-            $this->newMileage = $this->selectedVehicle->current_mileage;
+        if ($this->vehicleData) {
+            $this->loadVehicle($this->vehicleData['id']);
+            $this->newMileage = $this->vehicleData['current_mileage'];
         }
+    }
+
+    /**
+     * 📊 HISTORIQUE RÉCENT DU VÉHICULE (5 derniers relevés)
+     * 
+     * Feature Ultra-Pro: Affiche les 5 derniers relevés pour contexte
+     */
+    public function getRecentReadingsProperty()
+    {
+        if (!$this->vehicleData) {
+            return collect([]);
+        }
+
+        return VehicleMileageReading::where('vehicle_id', $this->vehicleData['id'])
+            ->where('organization_id', auth()->user()->organization_id)
+            ->with('recordedBy')
+            ->orderBy('recorded_at', 'desc')
+            ->take(5)
+            ->get();
+    }
+
+    /**
+     * 📈 STATISTIQUES INTELLIGENTES
+     * 
+     * Feature Ultra-Pro: Calcule des stats avancées pour aider à la saisie
+     */
+    public function getStatsProperty()
+    {
+        if (!$this->vehicleData) {
+            return null;
+        }
+
+        $readings = VehicleMileageReading::where('vehicle_id', $this->vehicleData['id'])
+            ->where('organization_id', auth()->user()->organization_id)
+            ->orderBy('recorded_at', 'asc')
+            ->get();
+
+        if ($readings->count() < 2) {
+            return [
+                'avg_daily_mileage' => 0,
+                'total_distance' => 0,
+                'total_readings' => $readings->count(),
+            ];
+        }
+
+        $firstReading = $readings->first();
+        $lastReading = $readings->last();
+        
+        $totalDistance = $lastReading->mileage - $firstReading->mileage;
+        $daysDiff = $firstReading->recorded_at->diffInDays($lastReading->recorded_at);
+        $avgDaily = $daysDiff > 0 ? $totalDistance / $daysDiff : 0;
+
+        return [
+            'avg_daily_mileage' => round($avgDaily, 1),
+            'total_distance' => $totalDistance,
+            'total_readings' => $readings->count(),
+        ];
     }
 
     /**
@@ -353,7 +433,9 @@ class UpdateVehicleMileage extends Component
     public function render(): View
     {
         return view('livewire.admin.update-vehicle-mileage', [
-            'availableVehicles' => $this->mode === 'select' ? $this->availableVehicles : null,
+            'availableVehicles' => $this->mode === 'select' ? $this->availableVehicles : collect([]),
+            'recentReadings' => $this->recentReadings ?? collect([]),
+            'stats' => $this->stats,
         ])->layout('layouts.admin.catalyst');
     }
 }
