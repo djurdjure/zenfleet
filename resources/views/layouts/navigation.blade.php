@@ -163,25 +163,88 @@
  @endif
  </a>
 
- {{-- Dépenses Enterprise --}}
- <a href="{{ route('admin.vehicle-expenses.index') }}"
- class="nav-item flex items-center px-4 py-3 rounded-xl text-white/90 hover:text-white hover:bg-gradient-to-r hover:from-emerald-500/20 hover:to-green-500/20 transition-all duration-300 group {{ request()->routeIs('admin.vehicle-expenses.*', 'admin.expense-budgets.*') ? 'bg-gradient-to-r from-emerald-500/30 to-green-500/30 text-white border border-emerald-500/30' : '' }}">
- <div class="flex items-center justify-center w-10 h-10 rounded-lg {{ request()->routeIs('admin.vehicle-expenses.*', 'admin.expense-budgets.*') ? 'bg-gradient-to-r from-emerald-500 to-green-600' : 'bg-slate-700/50 group-hover:bg-slate-600/50' }} transition-all duration-300 relative">
- <x-iconify icon="heroicons:credit-card" class="h-5 w-5" / />
+ {{-- Gestion des Dépenses avec sous-menus --}}
+ <div class="nav-item" x-data="{ expanded: {{ request()->routeIs('admin.vehicle-expenses.*', 'admin.expense-groups.*') ? 'true' : 'false' }} }">
+ <button @click="expanded = !expanded"
+ class="w-full flex items-center px-4 py-3 rounded-xl text-white/90 hover:text-white hover:bg-gradient-to-r hover:from-emerald-500/20 hover:to-green-500/20 transition-all duration-300 group {{ request()->routeIs('admin.vehicle-expenses.*', 'admin.expense-groups.*') ? 'bg-gradient-to-r from-emerald-500/30 to-green-500/30 text-white border border-emerald-500/30' : '' }}">
+ <div class="flex items-center justify-center w-10 h-10 rounded-lg {{ request()->routeIs('admin.vehicle-expenses.*', 'admin.expense-groups.*') ? 'bg-gradient-to-r from-emerald-500 to-green-600' : 'bg-slate-700/50 group-hover:bg-slate-600/50' }} transition-all duration-300 relative">
+ <x-iconify icon="tabler:moneybag" class="h-5 w-5" />
  @if(auth()->user()->unreadNotifications->where('type', 'like', '%Expense%')->count() > 0)
- <span class="absolute -top-2 -right-2 bg-emerald-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+ <span class="absolute -top-2 -right-2 bg-emerald-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center animate-pulse">
  {{ auth()->user()->unreadNotifications->where('type', 'like', '%Expense%')->count() }}
  </span>
  @endif
  </div>
- <div class="ml-3 flex-1">
- <span class="font-medium">Dépenses</span>
- <div class="text-xs text-slate-400">Budgets • Paiements • Rapports</div>
+ <div class="ml-3 flex-1 text-left">
+ <span class="font-medium">Gestion des Dépenses</span>
+ <div class="text-xs text-slate-400">Finances • Budgets • Analytics</div>
  </div>
- @if(request()->routeIs('admin.vehicle-expenses.*', 'admin.expense-budgets.*'))
- <div class="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></div>
+ <x-iconify icon="heroicons:chevron-down" class="h-4 w-4 transition-transform duration-200" :class="expanded ? 'rotate-180' : ''" />
+ </button>
+ 
+ <div x-show="expanded" x-collapse class="mt-2 ml-6 space-y-1">
+ {{-- Vue d'ensemble --}}
+ <a href="{{ route('admin.vehicle-expenses.index') }}" 
+ class="flex items-center px-4 py-2 rounded-lg text-slate-300 hover:text-white hover:bg-slate-700/50 transition-all duration-200 {{ request()->routeIs('admin.vehicle-expenses.index') ? 'text-white bg-slate-700/50' : '' }}">
+ <x-iconify icon="carbon:dashboard" class="h-4 w-4 mr-3" />
+ Vue d'ensemble
+ </a>
+ 
+ {{-- Nouvelle dépense --}}
+ <a href="{{ route('admin.vehicle-expenses.create') }}" 
+ class="flex items-center px-4 py-2 rounded-lg text-slate-300 hover:text-white hover:bg-slate-700/50 transition-all duration-200 {{ request()->routeIs('admin.vehicle-expenses.create') ? 'text-white bg-slate-700/50' : '' }}">
+ <x-iconify icon="carbon:add-filled" class="h-4 w-4 mr-3" />
+ Nouvelle dépense
+ </a>
+ 
+ {{-- Analytics --}}
+ <a href="{{ route('admin.vehicle-expenses.dashboard') }}" 
+ class="flex items-center px-4 py-2 rounded-lg text-slate-300 hover:text-white hover:bg-slate-700/50 transition-all duration-200 {{ request()->routeIs('admin.vehicle-expenses.dashboard') ? 'text-white bg-slate-700/50' : '' }}">
+ <x-iconify icon="carbon:analytics" class="h-4 w-4 mr-3" />
+ Analytics & Rapports
+ </a>
+ 
+ {{-- Workflow d'approbation --}}
+ @can('approve expenses')
+ <a href="{{ route('admin.vehicle-expenses.index') }}?filter=pending_approval" 
+ class="flex items-center px-4 py-2 rounded-lg text-slate-300 hover:text-white hover:bg-slate-700/50 transition-all duration-200">
+ <x-iconify icon="carbon:task-approved" class="h-4 w-4 mr-3" />
+ En attente d'approbation
+ @php
+ $pendingCount = \App\Models\VehicleExpense::where('organization_id', auth()->user()->organization_id)
+ ->whereIn('approval_status', ['pending_level1', 'pending_level2'])
+ ->count();
+ @endphp
+ @if($pendingCount > 0)
+ <span class="ml-auto bg-yellow-500 text-white text-xs rounded-full px-2 py-0.5">{{ $pendingCount }}</span>
  @endif
  </a>
+ @endcan
+ 
+ {{-- Groupes de dépenses / Budgets --}}
+ <a href="{{ route('admin.vehicle-expenses.index') }}?section=groups" 
+ class="flex items-center px-4 py-2 rounded-lg text-slate-300 hover:text-white hover:bg-slate-700/50 transition-all duration-200">
+ <x-iconify icon="carbon:wallet" class="h-4 w-4 mr-3" />
+ Budgets & Groupes
+ </a>
+ 
+ {{-- Import/Export --}}
+ <a href="{{ route('admin.vehicle-expenses.export') }}" 
+ class="flex items-center px-4 py-2 rounded-lg text-slate-300 hover:text-white hover:bg-slate-700/50 transition-all duration-200">
+ <x-iconify icon="carbon:document-export" class="h-4 w-4 mr-3" />
+ Import / Export
+ </a>
+ 
+ {{-- Rapports TCO --}}
+ @can('view expense analytics')
+ <a href="{{ route('admin.vehicle-expenses.analytics.cost-trends') }}" 
+ class="flex items-center px-4 py-2 rounded-lg text-slate-300 hover:text-white hover:bg-slate-700/50 transition-all duration-200">
+ <x-iconify icon="carbon:chart-line" class="h-4 w-4 mr-3" />
+ TCO & Tendances
+ </a>
+ @endcan
+ </div>
+ </div>
 
  {{-- Maintenance Enterprise avec sous-menus --}}
  <div class="nav-item" x-data="{ expanded: {{ request()->routeIs('admin.maintenance.*') ? 'true' : 'false' }} }">

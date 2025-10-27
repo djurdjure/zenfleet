@@ -94,8 +94,8 @@ class VehicleExpenseController extends Controller
         // Alertes budgétaires
         $budgetAlerts = $this->expenseService->getBudgetAlerts($organizationId);
 
-        // La vue charge le composant Livewire ExpenseManager
-        return view('admin.vehicle-expenses.index', [
+        // Vue simplifiée temporaire
+        return view('admin.vehicle-expenses.index_simple', [
             'stats' => $stats,
             'budgetAlerts' => $budgetAlerts,
         ]);
