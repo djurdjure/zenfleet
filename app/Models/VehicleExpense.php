@@ -52,6 +52,8 @@ class VehicleExpense extends Model
         'supplier_id',
         'driver_id',
         'repair_request_id',
+        'expense_group_id', // Nouveau
+        'requester_id', // Nouveau
         'expense_category',
         'expense_type',
         'expense_subtype',
@@ -68,12 +70,30 @@ class VehicleExpense extends Model
         'expense_location',
         'expense_city',
         'expense_wilaya',
+        'cost_center', // Nouveau
         'needs_approval',
+        'priority_level', // Nouveau
+        'is_urgent', // Nouveau
+        'approval_deadline', // Nouveau
         'approval_comments',
+        'level1_approved', // Nouveau
+        'level1_approved_by', // Nouveau
+        'level1_approved_at', // Nouveau
+        'level1_comments', // Nouveau
+        'level2_approved', // Nouveau
+        'level2_approved_by', // Nouveau
+        'level2_approved_at', // Nouveau
+        'level2_comments', // Nouveau
+        'approval_status', // Nouveau
+        'is_rejected', // Nouveau
+        'rejected_by', // Nouveau
+        'rejected_at', // Nouveau
+        'rejection_reason', // Nouveau
         'payment_status',
         'payment_method',
         'payment_date',
         'payment_reference',
+        'external_reference', // Nouveau
         'recorded_by',
         'expense_date',
         'description',
@@ -98,14 +118,22 @@ class VehicleExpense extends Model
         'fuel_quantity' => 'decimal:3',
         'fuel_price_per_liter' => 'decimal:3',
         'expense_date' => 'date',
+        'approval_deadline' => 'date',
         'invoice_date' => 'date',
         'payment_date' => 'date',
         'next_due_date' => 'date',
         'approved_at' => 'datetime',
         'audited_at' => 'datetime',
+        'level1_approved_at' => 'datetime',
+        'level2_approved_at' => 'datetime',
+        'rejected_at' => 'datetime',
         'fiscal_receipt' => 'boolean',
         'needs_approval' => 'boolean',
         'approved' => 'boolean',
+        'level1_approved' => 'boolean',
+        'level2_approved' => 'boolean',
+        'is_rejected' => 'boolean',
+        'is_urgent' => 'boolean',
         'is_recurring' => 'boolean',
         'requires_audit' => 'boolean',
         'audited' => 'boolean',
@@ -158,6 +186,46 @@ class VehicleExpense extends Model
     public function auditedBy(): BelongsTo
     {
         return $this->belongsTo(User::class, 'audited_by');
+    }
+
+    /**
+     * Groupe de dépenses
+     */
+    public function expenseGroup(): BelongsTo
+    {
+        return $this->belongsTo(ExpenseGroup::class, 'expense_group_id');
+    }
+
+    /**
+     * Demandeur (qui a initié la dépense)
+     */
+    public function requester(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'requester_id');
+    }
+
+    /**
+     * Approbateur niveau 1
+     */
+    public function level1Approver(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'level1_approved_by');
+    }
+
+    /**
+     * Approbateur niveau 2
+     */
+    public function level2Approver(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'level2_approved_by');
+    }
+
+    /**
+     * Utilisateur qui a rejeté
+     */
+    public function rejectedByUser(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'rejected_by');
     }
 
     public function parentExpense(): BelongsTo

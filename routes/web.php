@@ -381,8 +381,6 @@ Route::middleware(['auth', 'verified'])
         */
 
         // 💰 MODULE DÉPENSES - Traçabilité Maximale
-        // TODO: VehicleExpenseController needs to be created
-        /*
         Route::prefix('vehicle-expenses')->name('vehicle-expenses.')->group(function () {
             // Dashboard principal avec analytics
             Route::get('/', [\App\Http\Controllers\Admin\VehicleExpenseController::class, 'index'])->name('index');
@@ -416,7 +414,6 @@ Route::middleware(['auth', 'verified'])
             Route::get('/analytics/cost-trends', [\App\Http\Controllers\Admin\VehicleExpenseController::class, 'costTrendsReport'])->name('analytics.cost-trends');
             Route::get('/analytics/budget-utilization', [\App\Http\Controllers\Admin\VehicleExpenseController::class, 'budgetUtilizationReport'])->name('analytics.budget-utilization');
         });
-        */
 
         // 📊 GESTION DES BUDGETS DE DÉPENSES
         // TODO: ExpenseBudgetController needs to be created
