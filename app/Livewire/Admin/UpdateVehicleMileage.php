@@ -262,7 +262,12 @@ class UpdateVehicleMileage extends Component
     // 💾 SAUVEGARDE
     // ====================================================================
     
-    public function save(): void
+    /**
+     * Sauvegarder le nouveau relevé kilométrique
+     * 
+     * @return \Illuminate\Http\RedirectResponse|void
+     */
+    public function save()
     {
         // Validation
         $this->validate();
@@ -313,18 +318,18 @@ class UpdateVehicleMileage extends Component
                 number_format($difference)
             ));
             
+            // Émettre un événement pour rafraîchir les listes
+            $this->dispatch('mileage-updated', vehicleId: $reading->vehicle_id);
+            
             // Réinitialiser le formulaire
             $this->reset(['vehicleId', 'vehicleData', 'newMileage', 'notes', 'validationMessage']);
             $this->recordedDate = now()->format('Y-m-d');
             $this->recordedTime = now()->format('H:i');
             
-            // Émettre un événement pour rafraîchir les listes
-            $this->dispatch('mileage-updated', vehicleId: $reading->vehicle_id);
-            
-            // Redirection si mode fixe
+            // Redirection si mode fixe (chauffeur)
             if ($this->mode === 'fixed') {
-                return redirect()->route('admin.mileage-readings.index')
-                    ->with('success', 'Relevé kilométrique enregistré avec succès.');
+                // Pour Livewire 3, utiliser redirectRoute au lieu de redirect
+                $this->redirectRoute('admin.mileage-readings.index');
             }
             
         } catch (\Exception $e) {
