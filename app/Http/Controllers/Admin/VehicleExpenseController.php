@@ -11,6 +11,7 @@ use App\Models\Supplier;
 use App\Services\VehicleExpenseService;
 use App\Services\ExpenseAnalyticsService;
 use App\Services\ExpenseApprovalService;
+use App\Http\Requests\VehicleExpenseRequest;
 use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\JsonResponse;
@@ -66,8 +67,8 @@ class VehicleExpenseController extends Controller
         // Middleware d'authentification
         $this->middleware(['auth', 'verified']);
         
-        // Middleware de permissions
-        $this->authorizeResource(VehicleExpense::class, 'expense');
+        // Note: Les permissions sont gérées via Gate::authorize dans chaque méthode
+        // pour un contrôle plus granulaire et éviter les conflits avec le Policy
     }
 
     // ====================================================================
@@ -94,10 +95,80 @@ class VehicleExpenseController extends Controller
         // Alertes budgétaires
         $budgetAlerts = $this->expenseService->getBudgetAlerts($organizationId);
 
-        // Vue simplifiée temporaire
-        return view('admin.vehicle-expenses.index_simple', [
+        // Récupérer les filtres de la requête
+        $filters = $request->only([
+            'search',
+            'vehicle_id', 
+            'expense_category',
+            'approval_status',
+            'payment_status',
+            'date_from',
+            'date_to',
+            'amount_min',
+            'amount_max'
+        ]);
+
+        // Récupérer les dépenses avec pagination
+        $query = VehicleExpense::where('organization_id', $organizationId)
+            ->with(['vehicle', 'supplier', 'driver', 'recordedBy']);
+
+        // Appliquer les filtres
+        if (!empty($filters['search'])) {
+            $query->where(function($q) use ($filters) {
+                $q->where('reference_number', 'like', '%' . $filters['search'] . '%')
+                  ->orWhere('invoice_number', 'like', '%' . $filters['search'] . '%')
+                  ->orWhere('description', 'like', '%' . $filters['search'] . '%')
+                  ->orWhereHas('vehicle', function($vq) use ($filters) {
+                      $vq->where('registration_plate', 'like', '%' . $filters['search'] . '%');
+                  });
+            });
+        }
+
+        if (!empty($filters['vehicle_id'])) {
+            $query->where('vehicle_id', $filters['vehicle_id']);
+        }
+
+        if (!empty($filters['expense_category'])) {
+            $query->where('expense_category', $filters['expense_category']);
+        }
+
+        if (!empty($filters['approval_status'])) {
+            $query->where('approval_status', $filters['approval_status']);
+        }
+
+        if (!empty($filters['payment_status'])) {
+            $query->where('payment_status', $filters['payment_status']);
+        }
+
+        if (!empty($filters['date_from'])) {
+            $query->where('expense_date', '>=', $filters['date_from']);
+        }
+
+        if (!empty($filters['date_to'])) {
+            $query->where('expense_date', '<=', $filters['date_to']);
+        }
+
+        if (!empty($filters['amount_min'])) {
+            $query->where('total_ttc', '>=', $filters['amount_min']);
+        }
+
+        if (!empty($filters['amount_max'])) {
+            $query->where('total_ttc', '<=', $filters['amount_max']);
+        }
+
+        // Ordre par défaut: les plus récentes en premier
+        $query->orderBy('expense_date', 'desc')->orderBy('created_at', 'desc');
+
+        // Pagination
+        $perPage = $request->get('per_page', 25);
+        $expenses = $query->paginate($perPage)->withQueryString();
+
+        // Vue avec toutes les données
+        return view('admin.vehicle-expenses.index_new', [
+            'expenses' => $expenses,
             'stats' => $stats,
             'budgetAlerts' => $budgetAlerts,
+            'filters' => $filters
         ]);
     }
 
@@ -147,23 +218,21 @@ class VehicleExpenseController extends Controller
 
         // Données pour le formulaire
         $vehicles = Vehicle::where('organization_id', $organizationId)
-            ->active()
-            ->visible()
             ->orderBy('registration_plate')
             ->get();
 
         $suppliers = Supplier::where('organization_id', $organizationId)
-            ->active()
+            ->where('is_active', true)
             ->orderBy('company_name')
             ->get();
 
         $expenseGroups = ExpenseGroup::where('organization_id', $organizationId)
-            ->active()
-            ->currentYear()
             ->orderBy('name')
             ->get();
 
-        return view('admin.vehicle-expenses.create', compact(
+        // ✨ ENTERPRISE FIX: Utilisation du formulaire corrigé avec catégories valides
+        // Utilise la configuration centralisée des catégories pour éviter les erreurs de validation
+        return view('admin.vehicle-expenses.create_fixed', compact(
             'vehicles',
             'suppliers',
             'expenseGroups'
@@ -173,41 +242,157 @@ class VehicleExpenseController extends Controller
     /**
      * Enregistrer une nouvelle dépense
      * 
-     * @param Request $request
+     * @param VehicleExpenseRequest $request
      * @return RedirectResponse
      */
-    public function store(Request $request): RedirectResponse
+    public function store(VehicleExpenseRequest $request): RedirectResponse
     {
-        Gate::authorize('create expenses');
-
-        // Validation
-        $validated = $this->validateExpense($request);
-
-        DB::beginTransaction();
         try {
-            // Créer la dépense via le service
-            $expense = $this->expenseService->create($validated);
+            Gate::authorize('create expenses');
+        } catch (\Illuminate\Auth\Access\AuthorizationException $e) {
+            Log::error('Autorisation refusée pour créer une dépense', [
+                'user_id' => auth()->id(),
+                'error' => $e->getMessage()
+            ]);
+            return back()
+                ->withInput()
+                ->with('error', 'Vous n\'êtes pas autorisé à créer des dépenses.');
+        }
 
-            // Log d'audit automatique via trigger PostgreSQL
+        try {
+            // Validation automatique via FormRequest
+            $validated = $request->validated();
+            
+            // Debug log pour tracer les données
+            Log::info('Données de dépense validées', [
+                'user_id' => auth()->id(),
+                'expense_category' => $validated['expense_category'] ?? 'non défini',
+                'amount_ht' => $validated['amount_ht'] ?? 0,
+                'vehicle_id' => $validated['vehicle_id'] ?? null
+            ]);
+            
+            // Ajouter les champs automatiques
+            $validated['organization_id'] = auth()->user()->organization_id;
+            $validated['recorded_by'] = auth()->id();
+            $validated['requester_id'] = $validated['requester_id'] ?? auth()->id();
+            
+            // Calculer TVA et TTC si la méthode existe
+            if (method_exists($this, 'calculateTaxes')) {
+                $this->calculateTaxes($validated);
+            } else {
+                // Calcul simple de la TVA
+                $validated['tva_amount'] = isset($validated['tva_rate']) && $validated['tva_rate'] > 0 
+                    ? ($validated['amount_ht'] * $validated['tva_rate'] / 100)
+                    : 0;
+                $validated['total_ttc'] = $validated['amount_ht'] + ($validated['tva_amount'] ?? 0);
+            }
+            
+            // Gérer le statut d'approbation
+            if (method_exists($this, 'setApprovalStatus')) {
+                $this->setApprovalStatus($request, $validated);
+            } else {
+                // Logique simple d'approbation basée sur le montant
+                $thresholds = config('expense_categories.requires_approval');
+                $category = $validated['expense_category'];
+                $threshold = $thresholds[$category] ?? 1000;
+                
+                if ($threshold === 0 || $validated['total_ttc'] > $threshold) {
+                    $validated['needs_approval'] = true;
+                    $validated['approval_status'] = 'pending_level1';
+                } else {
+                    $validated['needs_approval'] = false;
+                    $validated['approval_status'] = 'approved';
+                }
+            }
+            
+            // Gérer les fichiers attachés si présents
+            if ($request->hasFile('attachments')) {
+                if (method_exists($this, 'handleAttachments')) {
+                    $this->handleAttachments($request, $validated);
+                }
+            }
+
+            DB::beginTransaction();
+            
+            // Créer la dépense via le service ou directement
+            if ($this->expenseService) {
+                $expense = $this->expenseService->create($validated);
+            } else {
+                // Création directe si le service n'existe pas
+                $expense = VehicleExpense::create($validated);
+            }
+            
+            // Log d'audit
+            Log::info('Dépense créée avec succès', [
+                'expense_id' => $expense->id,
+                'amount' => $expense->total_ttc,
+                'category' => $expense->expense_category,
+                'user_id' => auth()->id()
+            ]);
             
             // Notification si nécessite approbation
-            if ($expense->needs_approval) {
-                $this->approvalService->notifyApprovers($expense, 'level1');
+            if ($expense->needs_approval && $this->approvalService) {
+                try {
+                    $this->approvalService->notifyApprovers($expense, 'level1');
+                } catch (\Exception $notifError) {
+                    Log::warning('Impossible d\'envoyer la notification d\'approbation', [
+                        'expense_id' => $expense->id,
+                        'error' => $notifError->getMessage()
+                    ]);
+                }
             }
 
             DB::commit();
 
             return redirect()
                 ->route('admin.vehicle-expenses.show', $expense)
-                ->with('success', 'Dépense enregistrée avec succès.');
+                ->with('success', 'Dépense enregistrée avec succès. Montant: ' . number_format($expense->total_ttc, 2) . ' €');
 
-        } catch (\Exception $e) {
+        } catch (\Illuminate\Validation\ValidationException $e) {
             DB::rollBack();
-            Log::error('Erreur création dépense: ' . $e->getMessage());
+            Log::error('Erreur de validation lors de la création de dépense', [
+                'errors' => $e->errors(),
+                'input' => $request->except(['attachments'])
+            ]);
+            
+            return back()
+                ->withErrors($e->errors())
+                ->withInput()
+                ->with('error', 'Erreur de validation. Veuillez vérifier les champs du formulaire.');
+                
+        } catch (\Illuminate\Database\QueryException $e) {
+            DB::rollBack();
+            Log::error('Erreur base de données lors de la création de dépense', [
+                'message' => $e->getMessage(),
+                'sql' => $e->getSql(),
+                'bindings' => $e->getBindings()
+            ]);
+            
+            // Message d'erreur plus explicite selon le type d'erreur
+            $errorMessage = 'Erreur lors de l\'enregistrement en base de données.';
+            
+            if (str_contains($e->getMessage(), 'expense_category_check')) {
+                $errorMessage = 'La catégorie de dépense sélectionnée n\'est pas valide. Veuillez choisir une catégorie dans la liste.';
+            } elseif (str_contains($e->getMessage(), 'vehicle_expenses_vehicle_id_foreign')) {
+                $errorMessage = 'Le véhicule sélectionné n\'existe pas ou n\'est plus disponible.';
+            } elseif (str_contains($e->getMessage(), 'vehicle_expenses_supplier_id_foreign')) {
+                $errorMessage = 'Le fournisseur sélectionné n\'existe pas ou n\'est plus actif.';
+            }
             
             return back()
                 ->withInput()
-                ->with('error', 'Erreur lors de l\'enregistrement: ' . $e->getMessage());
+                ->with('error', $errorMessage);
+                
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Erreur inattendue lors de la création de dépense', [
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            
+            return back()
+                ->withInput()
+                ->with('error', 'Une erreur inattendue s\'est produite. Veuillez réessayer ou contacter le support si le problème persiste.');
         }
     }
 
@@ -272,18 +457,15 @@ class VehicleExpenseController extends Controller
 
         // Données pour le formulaire
         $vehicles = Vehicle::where('organization_id', $organizationId)
-            ->active()
-            ->visible()
             ->orderBy('registration_plate')
             ->get();
 
         $suppliers = Supplier::where('organization_id', $organizationId)
-            ->active()
+            ->where('is_active', true)
             ->orderBy('company_name')
             ->get();
 
         $expenseGroups = ExpenseGroup::where('organization_id', $organizationId)
-            ->active()
             ->orderBy('name')
             ->get();
 
@@ -298,11 +480,11 @@ class VehicleExpenseController extends Controller
     /**
      * Mettre à jour une dépense
      * 
-     * @param Request $request
+     * @param VehicleExpenseRequest $request
      * @param VehicleExpense $expense
      * @return RedirectResponse
      */
-    public function update(Request $request, VehicleExpense $expense): RedirectResponse
+    public function update(VehicleExpenseRequest $request, VehicleExpense $expense): RedirectResponse
     {
         Gate::authorize('update', $expense);
 
@@ -311,8 +493,20 @@ class VehicleExpenseController extends Controller
             return back()->with('error', 'Les dépenses approuvées ne peuvent pas être modifiées.');
         }
 
-        // Validation
-        $validated = $this->validateExpense($request, $expense);
+        // Validation automatique via FormRequest
+        $validated = $request->validated();
+        
+        // Ajouter les champs automatiques
+        $validated['organization_id'] = auth()->user()->organization_id;
+        
+        // Calculer TVA et TTC
+        $this->calculateTaxes($validated);
+        
+        // Gérer le statut d'approbation
+        $this->setApprovalStatus($request, $validated);
+        
+        // Gérer les fichiers attachés
+        $this->handleAttachments($request, $validated);
 
         DB::beginTransaction();
         try {
@@ -707,61 +901,58 @@ class VehicleExpenseController extends Controller
     // ====================================================================
 
     /**
-     * Validation des données de dépense
+     * Calculer automatiquement TVA et TTC
+     * 
+     * @param array &$data
+     * @return void
+     */
+    private function calculateTaxes(array &$data): void
+    {
+        if (isset($data['amount_ht'])) {
+            // Si TVA non renseignée ou null, pas de TVA
+            if (empty($data['tva_rate'])) {
+                $data['tva_rate'] = 0;
+                $data['tva_amount'] = 0;
+                $data['total_ttc'] = $data['amount_ht'];
+            } else {
+                // Calculer le montant de la TVA
+                $data['tva_amount'] = round($data['amount_ht'] * $data['tva_rate'] / 100, 2);
+                // Calculer le total TTC
+                $data['total_ttc'] = round($data['amount_ht'] + $data['tva_amount'], 2);
+            }
+        }
+    }
+
+    /**
+     * Définir le statut d'approbation selon l'action
      * 
      * @param Request $request
-     * @param VehicleExpense|null $expense
-     * @return array
+     * @param array &$data
+     * @return void
      */
-    private function validateExpense(Request $request, ?VehicleExpense $expense = null): array
+    private function setApprovalStatus(Request $request, array &$data): void
     {
-        $rules = [
-            'vehicle_id' => 'required|exists:vehicles,id',
-            'supplier_id' => 'nullable|exists:suppliers,id',
-            'driver_id' => 'nullable|exists:users,id',
-            'expense_group_id' => 'nullable|exists:expense_groups,id',
-            'expense_category' => 'required|string',
-            'expense_type' => 'required|string|max:100',
-            'expense_subtype' => 'nullable|string|max:100',
-            'amount_ht' => 'required|numeric|min:0|max:99999999',
-            'tva_rate' => 'required|numeric|min:0|max:100',
-            'invoice_number' => 'nullable|string|max:100',
-            'invoice_date' => 'nullable|date',
-            'receipt_number' => 'nullable|string|max:100',
-            'fiscal_receipt' => 'boolean',
-            'odometer_reading' => 'nullable|integer|min:0',
-            'fuel_quantity' => 'nullable|numeric|min:0',
-            'fuel_price_per_liter' => 'nullable|numeric|min:0',
-            'fuel_type' => 'nullable|string|max:50',
-            'expense_date' => 'required|date|before_or_equal:today',
-            'description' => 'required|string|max:5000',
-            'internal_notes' => 'nullable|string|max:5000',
-            'needs_approval' => 'boolean',
-            'priority_level' => 'nullable|in:low,normal,high,urgent',
-            'is_urgent' => 'boolean',
-            'approval_deadline' => 'nullable|date|after:today',
-            'cost_center' => 'nullable|string|max:100',
-            'tags' => 'nullable|array',
-            'attachments' => 'nullable|array',
-            'attachments.*' => 'file|mimes:jpg,jpeg,png,pdf,doc,docx,xls,xlsx|max:5120' // 5MB par fichier
-        ];
-
-        // Validation conditionnelle pour carburant
-        if ($request->expense_category === 'carburant') {
-            $rules['odometer_reading'] = 'required|integer|min:0';
-            $rules['fuel_quantity'] = 'required|numeric|min:0';
-            $rules['fuel_price_per_liter'] = 'required|numeric|min:0';
-            $rules['fuel_type'] = 'required|string|max:50';
+        if ($request->input('action') === 'draft') {
+            $data['approval_status'] = 'draft';
+            $data['needs_approval'] = false;
+        } else {
+            $data['approval_status'] = 'pending_level1';
+            $data['needs_approval'] = true;
         }
+        
+        // Statut de paiement par défaut
+        $data['payment_status'] = $data['payment_status'] ?? 'pending';
+    }
 
-        $validated = $request->validate($rules);
-
-        // Ajouter les champs automatiques
-        $validated['organization_id'] = auth()->user()->organization_id;
-        $validated['recorded_by'] = auth()->id();
-        $validated['requester_id'] = $validated['requester_id'] ?? auth()->id();
-
-        // Gérer les fichiers attachés
+    /**
+     * Gérer l'upload des fichiers attachés
+     * 
+     * @param Request $request
+     * @param array &$data
+     * @return void
+     */
+    private function handleAttachments(Request $request, array &$data): void
+    {
         if ($request->hasFile('attachments')) {
             $attachmentPaths = [];
             foreach ($request->file('attachments') as $file) {
@@ -773,9 +964,7 @@ class VehicleExpenseController extends Controller
                     'mime' => $file->getMimeType()
                 ];
             }
-            $validated['attachments'] = $attachmentPaths;
+            $data['attachments'] = $attachmentPaths;
         }
-
-        return $validated;
     }
 }

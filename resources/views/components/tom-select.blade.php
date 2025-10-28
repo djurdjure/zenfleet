@@ -36,8 +36,9 @@
  @if($multiple) multiple @endif
  {{ $attributes->except(['class']) }}
  >
- @if(!$multiple && !$required)
- <option value="">{{ $placeholder }}</option>
+ {{-- ✨ ENTERPRISE FIX: Toujours ajouter une option vide pour éviter la présélection automatique --}}
+ @if(!$multiple)
+ <option value="">{{ $placeholder ?: '-- Sélectionner --' }}</option>
  @endif
 
  @foreach($options as $value => $optionLabel)

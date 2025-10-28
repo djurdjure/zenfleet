@@ -1,0 +1,70 @@
+// ================================================================================
+// COMMANDES À EXÉCUTER DANS TINKER POUR CORRIGER LES PERMISSIONS
+// ================================================================================
+// 
+// 1. Ouvrir tinker: docker exec -it zenfleet-app php artisan tinker
+// 2. Copier-coller ces commandes une par une:
+
+// Créer les permissions essentielles
+\Spatie\Permission\Models\Permission::firstOrCreate(['name' => 'view expenses', 'guard_name' => 'web']);
+\Spatie\Permission\Models\Permission::firstOrCreate(['name' => 'create expenses', 'guard_name' => 'web']);
+\Spatie\Permission\Models\Permission::firstOrCreate(['name' => 'edit expenses', 'guard_name' => 'web']);
+\Spatie\Permission\Models\Permission::firstOrCreate(['name' => 'update expenses', 'guard_name' => 'web']);
+\Spatie\Permission\Models\Permission::firstOrCreate(['name' => 'delete expenses', 'guard_name' => 'web']);
+\Spatie\Permission\Models\Permission::firstOrCreate(['name' => 'view expense analytics', 'guard_name' => 'web']);
+\Spatie\Permission\Models\Permission::firstOrCreate(['name' => 'view expense dashboard', 'guard_name' => 'web']);
+\Spatie\Permission\Models\Permission::firstOrCreate(['name' => 'export expenses', 'guard_name' => 'web']);
+\Spatie\Permission\Models\Permission::firstOrCreate(['name' => 'import expenses', 'guard_name' => 'web']);
+\Spatie\Permission\Models\Permission::firstOrCreate(['name' => 'approve expenses', 'guard_name' => 'web']);
+
+// Donner toutes les permissions de dépenses au rôle Admin
+$adminRole = \Spatie\Permission\Models\Role::where('name', 'Admin')->first();
+if ($adminRole) {
+    $adminRole->givePermissionTo([
+        'view expenses', 'create expenses', 'edit expenses', 'update expenses',
+        'delete expenses', 'view expense analytics', 'view expense dashboard',
+        'export expenses', 'import expenses', 'approve expenses'
+    ]);
+}
+
+// Donner toutes les permissions de dépenses au rôle Super Admin
+$superAdminRole = \Spatie\Permission\Models\Role::where('name', 'Super Admin')->first();
+if ($superAdminRole) {
+    $superAdminRole->givePermissionTo([
+        'view expenses', 'create expenses', 'edit expenses', 'update expenses',
+        'delete expenses', 'view expense analytics', 'view expense dashboard',
+        'export expenses', 'import expenses', 'approve expenses'
+    ]);
+}
+
+// Donner les permissions au rôle Gestionnaire Flotte
+$fleetRole = \Spatie\Permission\Models\Role::where('name', 'Gestionnaire Flotte')->first();
+if ($fleetRole) {
+    $fleetRole->givePermissionTo([
+        'view expenses', 'create expenses', 'edit expenses', 'update expenses',
+        'view expense analytics', 'view expense dashboard', 'export expenses'
+    ]);
+}
+
+// Donner les permissions au rôle Finance
+$financeRole = \Spatie\Permission\Models\Role::where('name', 'Finance')->first();
+if ($financeRole) {
+    $financeRole->givePermissionTo([
+        'view expenses', 'create expenses', 'edit expenses', 'update expenses',
+        'delete expenses', 'view expense analytics', 'view expense dashboard',
+        'export expenses', 'import expenses', 'approve expenses'
+    ]);
+}
+
+// Vider le cache des permissions
+app()['cache']->forget('spatie.permission.cache');
+
+// Afficher les utilisateurs ayant maintenant accès
+$usersWithAccess = \App\Models\User::permission('view expenses')->get();
+echo "Utilisateurs avec accès au module dépenses:\n";
+foreach($usersWithAccess as $user) {
+    echo "- {$user->first_name} {$user->last_name} ({$user->email})\n";
+}
+
+// Quitter tinker
+exit

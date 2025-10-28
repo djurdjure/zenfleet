@@ -216,6 +216,22 @@
  />
  </button>
 
+ {{-- Sélecteur de Vue - Enterprise Ultra Pro --}}
+ <div class="flex items-center bg-white border border-gray-300 rounded-lg p-1">
+    <button onclick="setView('table')" 
+            class="px-3 py-1.5 rounded-md transition-all {{ request('view', 'table') == 'table' ? 'bg-blue-600 text-white' : 'text-gray-600 hover:bg-gray-100' }}">
+        <x-iconify icon="lucide:list" class="w-4 h-4" />
+    </button>
+    <button onclick="setView('grid')" 
+            class="px-3 py-1.5 rounded-md transition-all {{ request('view') == 'grid' ? 'bg-blue-600 text-white' : 'text-gray-600 hover:bg-gray-100' }}">
+        <x-iconify icon="lucide:grid-3x3" class="w-4 h-4" />
+    </button>
+    <button onclick="setView('kanban')" 
+            class="px-3 py-1.5 rounded-md transition-all {{ request('view') == 'kanban' ? 'bg-blue-600 text-white' : 'text-gray-600 hover:bg-gray-100' }}">
+        <x-iconify icon="lucide:columns" class="w-4 h-4" />
+    </button>
+ </div>
+
  {{-- Boutons d'actions --}}
  <div class="flex items-center gap-2">
                      {{-- Toggle Voir Archives / Voir Actifs --}}
@@ -370,15 +386,81 @@
  </div>
 
  {{-- ===============================================
- TABLE ENTERPRISE-GRADE WORLD-CLASS
+ BARRE D'ACTIONS EN MASSE - ENTERPRISE ULTRA PRO
  =============================================== --}}
- <x-card padding="p-0" margin="mb-6">
+ <div x-data="batchActions()" class="relative">
+    {{-- Barre d'actions flottante qui apparaît lors de la sélection --}}
+    <div x-show="selectedVehicles.length > 0"
+         x-transition:enter="transition ease-out duration-300"
+         x-transition:enter-start="opacity-0 transform -translate-y-2"
+         x-transition:enter-end="opacity-100 transform translate-y-0"
+         class="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-40 bg-white rounded-2xl shadow-2xl border border-gray-200 p-4">
+        <div class="flex items-center gap-6">
+            {{-- Compteur de sélection --}}
+            <div class="flex items-center gap-2 px-4 py-2 bg-blue-50 rounded-lg">
+                <x-iconify icon="lucide:check-square" class="w-5 h-5 text-blue-600" />
+                <span class="text-sm font-semibold text-blue-900">
+                    <span x-text="selectedVehicles.length"></span> véhicule(s) sélectionné(s)
+                </span>
+            </div>
+            
+            {{-- Actions groupées --}}
+            <div class="flex items-center gap-2">
+                {{-- Changer statut en masse --}}
+                <button @click="openBatchStatusModal()"
+                        class="inline-flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-all">
+                    <x-iconify icon="lucide:settings-2" class="w-4 h-4 text-gray-600" />
+                    <span class="text-sm font-medium text-gray-700">Changer statut</span>
+                </button>
+                
+                {{-- Assigner en masse --}}
+                <button @click="openBatchAssignModal()"
+                        class="inline-flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-all">
+                    <x-iconify icon="lucide:users" class="w-4 h-4 text-gray-600" />
+                    <span class="text-sm font-medium text-gray-700">Assigner</span>
+                </button>
+                
+                {{-- Exporter la sélection --}}
+                <button @click="exportSelected()"
+                        class="inline-flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-all">
+                    <x-iconify icon="lucide:download" class="w-4 h-4" />
+                    <span class="text-sm font-medium">Exporter</span>
+                </button>
+                
+                {{-- Archiver en masse --}}
+                <button @click="archiveSelected()"
+                        class="inline-flex items-center gap-2 px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-all">
+                    <x-iconify icon="lucide:archive" class="w-4 h-4" />
+                    <span class="text-sm font-medium">Archiver</span>
+                </button>
+                
+                {{-- Annuler la sélection --}}
+                <button @click="clearSelection()"
+                        class="inline-flex items-center justify-center w-10 h-10 bg-gray-100 rounded-lg hover:bg-gray-200 transition-all ml-2">
+                    <x-iconify icon="lucide:x" class="w-5 h-5 text-gray-600" />
+                </button>
+            </div>
+        </div>
+    </div>
+ </div>
+
+ {{-- ===============================================
+ TABLE ENTERPRISE-GRADE WORLD-CLASS AVEC SÉLECTION
+ =============================================== --}}
+ <x-card padding="p-0" margin="mb-6" x-data="{ selectAll: false }">
  @if($vehicles && $vehicles->count() > 0)
  {{-- Table --}}
  <div class="overflow-x-auto">
  <table class="min-w-full divide-y divide-gray-200">
  <thead class="bg-gray-50">
  <tr>
+ {{-- Checkbox pour tout sélectionner --}}
+ <th scope="col" class="relative px-6 py-3 w-12">
+    <input type="checkbox"
+           x-model="selectAll"
+           @change="toggleAllVehicles()"
+           class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded cursor-pointer">
+ </th>
  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
  Véhicule
  </th>
@@ -394,6 +476,9 @@
  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
  Kilométrage
  </th>
+ <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+ Actions rapides
+ </th>
  <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
  Actions
  </th>
@@ -401,7 +486,16 @@
  </thead>
  <tbody class="bg-white divide-y divide-gray-200">
  @foreach($vehicles as $vehicle)
- <tr class="hover:bg-gray-50 transition-colors duration-150">
+ <tr class="hover:bg-gray-50 transition-colors duration-150" 
+     :class="{ 'bg-blue-50': selectedVehicles.includes({{ $vehicle->id }}) }">
+ {{-- Checkbox de sélection --}}
+ <td class="px-6 py-4 whitespace-nowrap">
+    <input type="checkbox"
+           :value="{{ $vehicle->id }}"
+           @change="toggleVehicle({{ $vehicle->id }})"
+           :checked="selectedVehicles.includes({{ $vehicle->id }})"
+           class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded cursor-pointer">
+ </td>
  <td class="px-6 py-4 whitespace-nowrap">
  <div class="flex items-center">
  <div class="flex-shrink-0 h-10 w-10">
@@ -487,6 +581,40 @@
  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-medium">
  {{ number_format($vehicle->current_mileage) }} km
  </td>
+ 
+ {{-- Actions Rapides - Enterprise Ultra Pro --}}
+ <td class="px-6 py-4 whitespace-nowrap text-center">
+    <div class="flex items-center justify-center gap-1">
+        {{-- Dupliquer --}}
+        <button onclick="duplicateVehicle({{ $vehicle->id }})"
+                class="inline-flex items-center p-1.5 text-purple-600 hover:text-purple-900 hover:bg-purple-50 rounded-lg transition-colors"
+                title="Dupliquer">
+            <x-iconify icon="lucide:copy" class="w-4 h-4" />
+        </button>
+        
+        {{-- QR Code --}}
+        <button onclick="generateQRCode({{ $vehicle->id }})"
+                class="inline-flex items-center p-1.5 text-indigo-600 hover:text-indigo-900 hover:bg-indigo-50 rounded-lg transition-colors"
+                title="QR Code">
+            <x-iconify icon="lucide:qr-code" class="w-4 h-4" />
+        </button>
+        
+        {{-- Export PDF --}}
+        <button onclick="exportVehiclePDF({{ $vehicle->id }})"
+                class="inline-flex items-center p-1.5 text-emerald-600 hover:text-emerald-900 hover:bg-emerald-50 rounded-lg transition-colors"
+                title="Export PDF">
+            <x-iconify icon="lucide:file-text" class="w-4 h-4" />
+        </button>
+        
+        {{-- Timeline/Historique --}}
+        <button onclick="showVehicleTimeline({{ $vehicle->id }})"
+                class="inline-flex items-center p-1.5 text-cyan-600 hover:text-cyan-900 hover:bg-cyan-50 rounded-lg transition-colors"
+                title="Historique">
+            <x-iconify icon="lucide:clock" class="w-4 h-4" />
+        </button>
+    </div>
+ </td>
+ 
  <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
  <div class="flex items-center justify-end gap-2">
                                 @if($vehicle->is_archived || $vehicle->trashed() || request('archived') === 'true')
@@ -587,6 +715,137 @@
 
 @push('scripts')
 <script>
+// ═══════════════════════════════════════════════════════════════════════════
+// GESTION DES ACTIONS BATCH - ENTERPRISE ULTRA PRO
+// ═══════════════════════════════════════════════════════════════════════════
+
+function batchActions() {
+    return {
+        selectedVehicles: [],
+        
+        toggleVehicle(id) {
+            if (this.selectedVehicles.includes(id)) {
+                this.selectedVehicles = this.selectedVehicles.filter(v => v !== id);
+            } else {
+                this.selectedVehicles.push(id);
+            }
+        },
+        
+        toggleAllVehicles() {
+            const allVehicleIds = @json($vehicles->pluck('id'));
+            if (this.selectedVehicles.length === allVehicleIds.length) {
+                this.selectedVehicles = [];
+            } else {
+                this.selectedVehicles = [...allVehicleIds];
+            }
+        },
+        
+        clearSelection() {
+            this.selectedVehicles = [];
+            this.selectAll = false;
+        },
+        
+        openBatchStatusModal() {
+            // Implémenter la modal de changement de statut en masse
+            alert('Fonctionnalité de changement de statut en masse - ' + this.selectedVehicles.length + ' véhicules sélectionnés');
+        },
+        
+        openBatchAssignModal() {
+            // Implémenter la modal d'assignation en masse
+            alert('Fonctionnalité d\'assignation en masse - ' + this.selectedVehicles.length + ' véhicules sélectionnés');
+        },
+        
+        exportSelected() {
+            if (this.selectedVehicles.length === 0) return;
+            
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = '/admin/vehicles/export';
+            
+            const csrfInput = document.createElement('input');
+            csrfInput.type = 'hidden';
+            csrfInput.name = '_token';
+            csrfInput.value = '{{ csrf_token() }}';
+            form.appendChild(csrfInput);
+            
+            const vehiclesInput = document.createElement('input');
+            vehiclesInput.type = 'hidden';
+            vehiclesInput.name = 'vehicles';
+            vehiclesInput.value = JSON.stringify(this.selectedVehicles);
+            form.appendChild(vehiclesInput);
+            
+            document.body.appendChild(form);
+            form.submit();
+        },
+        
+        archiveSelected() {
+            if (this.selectedVehicles.length === 0) return;
+            
+            if (confirm(`Confirmer l'archivage de ${this.selectedVehicles.length} véhicule(s) ?`)) {
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = '/admin/vehicles/batch-archive';
+                
+                const csrfInput = document.createElement('input');
+                csrfInput.type = 'hidden';
+                csrfInput.name = '_token';
+                csrfInput.value = '{{ csrf_token() }}';
+                form.appendChild(csrfInput);
+                
+                const vehiclesInput = document.createElement('input');
+                vehiclesInput.type = 'hidden';
+                vehiclesInput.name = 'vehicles';
+                vehiclesInput.value = JSON.stringify(this.selectedVehicles);
+                form.appendChild(vehiclesInput);
+                
+                document.body.appendChild(form);
+                form.submit();
+            }
+        }
+    };
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// ACTIONS RAPIDES - ENTERPRISE ULTRA PRO
+// ═══════════════════════════════════════════════════════════════════════════
+
+// Dupliquer un véhicule
+function duplicateVehicle(vehicleId) {
+    if (confirm('Créer une copie de ce véhicule ?')) {
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = `/admin/vehicles/${vehicleId}/duplicate`;
+        
+        const csrfInput = document.createElement('input');
+        csrfInput.type = 'hidden';
+        csrfInput.name = '_token';
+        csrfInput.value = '{{ csrf_token() }}';
+        form.appendChild(csrfInput);
+        
+        document.body.appendChild(form);
+        form.submit();
+    }
+}
+
+// Générer QR Code
+function generateQRCode(vehicleId) {
+    window.open(`/admin/vehicles/${vehicleId}/qrcode`, '_blank', 'width=400,height=400');
+}
+
+// Export PDF du véhicule
+function exportVehiclePDF(vehicleId) {
+    window.location.href = `/admin/vehicles/${vehicleId}/export-pdf`;
+}
+
+// Afficher la timeline/historique
+function showVehicleTimeline(vehicleId) {
+    window.location.href = `/admin/vehicles/${vehicleId}/timeline`;
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// ACTIONS D'ARCHIVAGE/RESTAURATION/SUPPRESSION - EXISTANTES
+// ═══════════════════════════════════════════════════════════════════════════
+
 // Fonction d'archivage avec modale
 function archiveVehicle(vehicleId, plate, brand) {
  // Créer modale de confirmation
