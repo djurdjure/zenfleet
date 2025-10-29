@@ -230,9 +230,9 @@ class VehicleExpenseController extends Controller
             ->orderBy('name')
             ->get();
 
-        // ✨ ENTERPRISE FIX: Utilisation du formulaire corrigé avec catégories valides
-        // Utilise la configuration centralisée des catégories pour éviter les erreurs de validation
-        return view('admin.vehicle-expenses.create_fixed', compact(
+        // ✨ ENTERPRISE FIX: Utilisation du formulaire avec catégories valides
+        // Utilise la configuration centralisée des catégories depuis config/expense_categories.php
+        return view('admin.vehicle-expenses.create', compact(
             'vehicles',
             'suppliers',
             'expenseGroups'

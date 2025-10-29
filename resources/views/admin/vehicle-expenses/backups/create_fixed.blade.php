@@ -49,7 +49,7 @@
             </div>
         @endif
 
-        @if(isset($errors) && $errors->any())
+        @if($errors->any())
             <div class="mb-6 bg-red-50 border border-red-200 text-red-800 px-6 py-4 rounded-lg animate-slide-in-down" role="alert">
                 <div class="flex items-start gap-3">
                     <x-iconify icon="lucide:alert-triangle" class="w-5 h-5 mt-0.5 flex-shrink-0" />
@@ -86,7 +86,7 @@
                             Véhicule <span class="text-red-500">*</span>
                         </label>
                         <select name="vehicle_id" id="vehicle_id" required
-                            class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 {{ isset($errors) && $errors->has('vehicle_id') ? 'border-red-300' : '' }}"
+                            class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 @error('vehicle_id') border-red-300 @enderror"
                             x-model="vehicleId">
                             <option value="">-- Sélectionner un véhicule --</option>
                             @php
@@ -101,12 +101,12 @@
                                 </option>
                             @endforeach
                         </select>
-                        @if(isset($errors) && $errors->has('vehicle_id'))
+                        @error('vehicle_id')
                             <p class="mt-1 text-sm text-red-600 flex items-center gap-1">
                                 <x-iconify icon="lucide:alert-circle" class="w-3 h-3" />
-                                {{ $errors->first('vehicle_id') }}
+                                {{ $message }}
                             </p>
-                        @endif
+                        @enderror
                     </div>
 
                     {{-- Date de dépense --}}
@@ -118,13 +118,13 @@
                         <input type="date" name="expense_date" id="expense_date" required
                             value="{{ old('expense_date', date('Y-m-d')) }}"
                             max="{{ date('Y-m-d') }}"
-                            class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 {{ isset($errors) && $errors->has('expense_date') ? 'border-red-300' : '' }}">
-                        @if(isset($errors) && $errors->has('expense_date'))
+                            class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 @error('expense_date') border-red-300 @enderror">
+                        @error('expense_date')
                             <p class="mt-1 text-sm text-red-600 flex items-center gap-1">
                                 <x-iconify icon="lucide:alert-circle" class="w-3 h-3" />
-                                {{ $errors->first('expense_date') }}
+                                {{ $message }}
                             </p>
-                        @endif
+                        @enderror
                     </div>
 
                     {{-- Catégorie de dépense --}}
@@ -134,7 +134,7 @@
                             Catégorie <span class="text-red-500">*</span>
                         </label>
                         <select name="expense_category" id="expense_category" required
-                            class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 {{ isset($errors) && $errors->has('expense_category') ? 'border-red-300' : '' }}"
+                            class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 @error('expense_category') border-red-300 @enderror"
                             x-model="category" @change="updateTypes()">
                             <option value="">-- Sélectionner une catégorie --</option>
                             @php
@@ -146,12 +146,12 @@
                                 </option>
                             @endforeach
                         </select>
-                        @if(isset($errors) && $errors->has('expense_category'))
+                        @error('expense_category')
                             <p class="mt-1 text-sm text-red-600 flex items-center gap-1">
                                 <x-iconify icon="lucide:alert-circle" class="w-3 h-3" />
-                                {{ $errors->first('expense_category') }}
+                                {{ $message }}
                             </p>
-                        @endif
+                        @enderror
                     </div>
 
                     {{-- Type de dépense --}}
@@ -161,19 +161,19 @@
                             Type de dépense <span class="text-red-500">*</span>
                         </label>
                         <select name="expense_type" id="expense_type" required
-                            class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 {{ isset($errors) && $errors->has('expense_type') ? 'border-red-300' : '' }}"
+                            class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 @error('expense_type') border-red-300 @enderror"
                             :disabled="!category">
                             <option value="">-- Sélectionner un type --</option>
                             <template x-for="(label, value) in expenseTypes" :key="value">
                                 <option :value="value" x-text="label" :selected="value === '{{ old('expense_type') }}'"></option>
                             </template>
                         </select>
-                        @if(isset($errors) && $errors->has('expense_type'))
+                        @error('expense_type')
                             <p class="mt-1 text-sm text-red-600 flex items-center gap-1">
                                 <x-iconify icon="lucide:alert-circle" class="w-3 h-3" />
-                                {{ $errors->first('expense_type') }}
+                                {{ $message }}
                             </p>
-                        @endif
+                        @enderror
                     </div>
                 </div>
             </div>
@@ -198,14 +198,14 @@
                             step="0.01" min="0" max="99999999"
                             value="{{ old('amount_ht') }}"
                             x-model="amountHT" @input="calculateTTC()"
-                            class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 {{ isset($errors) && $errors->has('amount_ht') ? 'border-red-300' : '' }}"
+                            class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 @error('amount_ht') border-red-300 @enderror"
                             placeholder="0.00">
-                        @if(isset($errors) && $errors->has('amount_ht'))
+                        @error('amount_ht')
                             <p class="mt-1 text-sm text-red-600 flex items-center gap-1">
                                 <x-iconify icon="lucide:alert-circle" class="w-3 h-3" />
-                                {{ $errors->first('amount_ht') }}
+                                {{ $message }}
                             </p>
-                        @endif
+                        @enderror
                     </div>
 
                     {{-- Taux TVA --}}
@@ -269,12 +269,12 @@
                                 </option>
                             @endforeach
                         </select>
-                        @if(isset($errors) && $errors->has('supplier_id'))
+                        @error('supplier_id')
                             <p class="mt-1 text-sm text-red-600 flex items-center gap-1">
                                 <x-iconify icon="lucide:alert-circle" class="w-3 h-3" />
-                                {{ $errors->first('supplier_id') }}
+                                {{ $message }}
                             </p>
-                        @endif
+                        @enderror
                     </div>
 
                     {{-- Numéro de facture --}}
@@ -342,14 +342,14 @@
                         </label>
                         <textarea name="description" id="description" rows="3" required
                             minlength="10" maxlength="5000"
-                            class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 {{ isset($errors) && $errors->has('description') ? 'border-red-300' : '' }}"
+                            class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 @error('description') border-red-300 @enderror"
                             placeholder="Décrivez la nature de la dépense, les travaux effectués, etc.">{{ old('description') }}</textarea>
-                        @if(isset($errors) && $errors->has('description'))
+                        @error('description')
                             <p class="mt-1 text-sm text-red-600 flex items-center gap-1">
                                 <x-iconify icon="lucide:alert-circle" class="w-3 h-3" />
-                                {{ $errors->first('description') }}
+                                {{ $message }}
                             </p>
-                        @endif
+                        @enderror
                         <p class="mt-1 text-xs text-gray-500">Minimum 10 caractères</p>
                     </div>
 
