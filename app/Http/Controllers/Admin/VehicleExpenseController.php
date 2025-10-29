@@ -230,9 +230,9 @@ class VehicleExpenseController extends Controller
             ->orderBy('name')
             ->get();
 
-        // ✨ ENTERPRISE FIX: Utilisation du formulaire avec catégories valides
+        // ✨ WORLD-CLASS FORM: Formulaire ultra-professionnel qui surpasse Fleetio
         // Utilise la configuration centralisée des catégories depuis config/expense_categories.php
-        return view('admin.vehicle-expenses.create', compact(
+        return view('admin.vehicle-expenses.create_world_class', compact(
             'vehicles',
             'suppliers',
             'expenseGroups'
@@ -364,24 +364,45 @@ class VehicleExpenseController extends Controller
             DB::rollBack();
             Log::error('Erreur base de données lors de la création de dépense', [
                 'message' => $e->getMessage(),
-                'sql' => $e->getSql(),
-                'bindings' => $e->getBindings()
+                'sql' => $e->getSql() ?? 'N/A',
+                'bindings' => $e->getBindings() ?? [],
+                'code' => $e->getCode(),
+                'user_id' => auth()->id(),
+                'input' => $request->except(['attachments', '_token'])
             ]);
             
             // Message d'erreur plus explicite selon le type d'erreur
             $errorMessage = 'Erreur lors de l\'enregistrement en base de données.';
+            $technicalDetails = '';
             
             if (str_contains($e->getMessage(), 'expense_category_check')) {
-                $errorMessage = 'La catégorie de dépense sélectionnée n\'est pas valide. Veuillez choisir une catégorie dans la liste.';
+                $errorMessage = 'La catégorie de dépense sélectionnée n\'est pas valide.';
+                $technicalDetails = 'Catégorie fournie: ' . ($validated['expense_category'] ?? 'N/A');
             } elseif (str_contains($e->getMessage(), 'vehicle_expenses_vehicle_id_foreign')) {
                 $errorMessage = 'Le véhicule sélectionné n\'existe pas ou n\'est plus disponible.';
             } elseif (str_contains($e->getMessage(), 'vehicle_expenses_supplier_id_foreign')) {
                 $errorMessage = 'Le fournisseur sélectionné n\'existe pas ou n\'est plus actif.';
+            } elseif (str_contains($e->getMessage(), 'valid_expense_date')) {
+                $errorMessage = 'La date de la dépense n\'est pas valide. Elle doit être antérieure ou égale à aujourd\'hui.';
+            } elseif (str_contains($e->getMessage(), 'valid_payment_data')) {
+                $errorMessage = 'Les données de paiement sont incohérentes. Si le statut est "payé", vous devez fournir un mode de paiement.';
+            } elseif (str_contains($e->getMessage(), 'has no field')) {
+                $errorMessage = 'Un champ requis par le système est manquant dans les données.';
+                // Extraire le nom du champ depuis le message d'erreur
+                if (preg_match('/has no field "([^"]+)"/', $e->getMessage(), $matches)) {
+                    $technicalDetails = 'Champ manquant: ' . $matches[1];
+                }
+            }
+            
+            // Message complet pour l'utilisateur
+            $fullMessage = $errorMessage;
+            if ($technicalDetails && config('app.debug')) {
+                $fullMessage .= ' (' . $technicalDetails . ')';
             }
             
             return back()
                 ->withInput()
-                ->with('error', $errorMessage);
+                ->with('error', $fullMessage);
                 
         } catch (\Exception $e) {
             DB::rollBack();
