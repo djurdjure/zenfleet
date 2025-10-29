@@ -161,6 +161,7 @@ class VehicleExpenseRequest extends FormRequest
             'fiscal_receipt' => 'boolean',
             'payment_method' => 'nullable|in:especes,cheque,virement,carte,bon,credit',
             'payment_status' => 'nullable|in:pending,paid,partial',
+            'payment_date' => 'nullable|date|before_or_equal:today',
             'odometer_reading' => 'nullable|integer|min:0|max:9999999',
             'fuel_quantity' => 'nullable|numeric|min:0|max:9999',
             'fuel_price_per_liter' => 'nullable|numeric|min:0|max:999',

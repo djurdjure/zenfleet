@@ -230,9 +230,9 @@ class VehicleExpenseController extends Controller
             ->orderBy('name')
             ->get();
 
-        // ✨ WORLD-CLASS FORM: Formulaire ultra-professionnel qui surpasse Fleetio
+        // ✨ SINGLE PAGE FORM: Formulaire simple et efficace sur une seule page
         // Utilise la configuration centralisée des catégories depuis config/expense_categories.php
-        return view('admin.vehicle-expenses.create_world_class', compact(
+        return view('admin.vehicle-expenses.create_single_page', compact(
             'vehicles',
             'suppliers',
             'expenseGroups'
@@ -275,6 +275,25 @@ class VehicleExpenseController extends Controller
             $validated['organization_id'] = auth()->user()->organization_id;
             $validated['recorded_by'] = auth()->id();
             $validated['requester_id'] = $validated['requester_id'] ?? auth()->id();
+            
+            // Gérer la date de paiement: si statut = paid et pas de date, utiliser la date de dépense
+            if (isset($validated['payment_status']) && $validated['payment_status'] === 'paid') {
+                if (empty($validated['payment_date'])) {
+                    $validated['payment_date'] = $validated['expense_date'];
+                }
+            }
+            
+            // Si statut = partial et pas de date de paiement, la définir aussi
+            if (isset($validated['payment_status']) && $validated['payment_status'] === 'partial') {
+                if (empty($validated['payment_date'])) {
+                    $validated['payment_date'] = $validated['expense_date'];
+                }
+            }
+            
+            // Si le statut n'est pas paid ou partial, supprimer payment_date
+            if (!isset($validated['payment_status']) || $validated['payment_status'] === 'pending') {
+                $validated['payment_date'] = null;
+            }
             
             // Calculer TVA et TTC si la méthode existe
             if (method_exists($this, 'calculateTaxes')) {
