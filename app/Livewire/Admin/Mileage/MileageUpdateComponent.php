@@ -79,6 +79,100 @@ class MileageUpdateComponent extends Component
     // RÈGLES DE VALIDATION
     // ====================================================================
     
+    /**
+     * Hook Livewire: Normaliser les données AVANT validation
+     * 
+     * ✅ ENTERPRISE-GRADE: Conversion automatique des formats
+     * - Date: d/m/Y → Y-m-d (21/10/2025 → 2025-10-21)
+     * - Heure: Accepte H:i, HH:i, H:i:s, etc.
+     */
+    protected function prepareForValidation($attributes)
+    {
+        // ✅ NORMALISATION DATE: d/m/Y → Y-m-d
+        if (isset($attributes['date']) && $attributes['date']) {
+            $attributes['date'] = $this->normalizeDateFormat($attributes['date']);
+        }
+        
+        // ✅ NORMALISATION HEURE: Assurer le format H:i
+        if (isset($attributes['time']) && $attributes['time']) {
+            $attributes['time'] = $this->normalizeTimeFormat($attributes['time']);
+        }
+        
+        return $attributes;
+    }
+    
+    /**
+     * Normaliser le format de date
+     * Accepte: d/m/Y, Y-m-d, d-m-Y, etc.
+     * Retourne: Y-m-d
+     */
+    private function normalizeDateFormat(string $date): string
+    {
+        try {
+            // Nettoyer la chaîne
+            $date = trim($date);
+            
+            // Tentative 1: Format d/m/Y (21/10/2025)
+            if (preg_match('/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/', $date, $matches)) {
+                return sprintf('%04d-%02d-%02d', $matches[3], $matches[2], $matches[1]);
+            }
+            
+            // Tentative 2: Format d-m-Y (21-10-2025)
+            if (preg_match('/^(\d{1,2})-(\d{1,2})-(\d{4})$/', $date, $matches)) {
+                return sprintf('%04d-%02d-%02d', $matches[3], $matches[2], $matches[1]);
+            }
+            
+            // Tentative 3: Format Y-m-d (2025-10-21) - Déjà bon
+            if (preg_match('/^(\d{4})-(\d{1,2})-(\d{1,2})$/', $date)) {
+                return $date;
+            }
+            
+            // Tentative 4: Parser avec Carbon (fallback)
+            return Carbon::parse($date)->format('Y-m-d');
+            
+        } catch (\Exception $e) {
+            \Log::warning('MileageUpdate: Date format invalid', [
+                'date' => $date,
+                'error' => $e->getMessage()
+            ]);
+            return $date; // Retourner tel quel, la validation échouera
+        }
+    }
+    
+    /**
+     * Normaliser le format d'heure
+     * Accepte: H:i, HH:i, H:i:s, etc.
+     * Retourne: HH:i
+     */
+    private function normalizeTimeFormat(string $time): string
+    {
+        try {
+            // Nettoyer la chaîne
+            $time = trim($time);
+            
+            // Pattern H:i ou HH:i (avec ou sans secondes)
+            if (preg_match('/^(\d{1,2}):(\d{1,2})/', $time, $matches)) {
+                $hours = (int) $matches[1];
+                $minutes = (int) $matches[2];
+                
+                // Validation basique
+                if ($hours >= 0 && $hours <= 23 && $minutes >= 0 && $minutes <= 59) {
+                    return sprintf('%02d:%02d', $hours, $minutes);
+                }
+            }
+            
+            // Fallback: Parser avec Carbon
+            return Carbon::parse($time)->format('H:i');
+            
+        } catch (\Exception $e) {
+            \Log::warning('MileageUpdate: Time format invalid', [
+                'time' => $time,
+                'error' => $e->getMessage()
+            ]);
+            return $time; // Retourner tel quel, la validation échouera
+        }
+    }
+    
     protected function rules(): array
     {
         $rules = [
@@ -319,33 +413,74 @@ class MileageUpdateComponent extends Component
     
     /**
      * Liste des véhicules disponibles pour la sélection
+     * 
+     * ✅ CORRECTION ENTERPRISE-GRADE:
+     * - Suppression du filtre whereNotNull('current_mileage') trop restrictif
+     * - Correction des statuts: 'Actif' et 'En maintenance' (au lieu de 'Disponible', 'En service')
+     * - Ajout d'un fallback si la relation vehicleStatus n'existe pas
+     * - Gestion robuste des erreurs avec logs
      */
     public function getAvailableVehiclesProperty()
     {
-        return Vehicle::where('organization_id', auth()->user()->organization_id)
-            ->whereNotNull('current_mileage')
-            ->where('is_archived', false)
-            ->whereHas('vehicleStatus', function ($query) {
-                $query->whereIn('name', ['Disponible', 'En service', 'En maintenance']);
-            })
-            ->with(['category', 'vehicleType'])
-            ->orderBy('registration_plate')
-            ->get()
-            ->map(function ($vehicle) {
+        try {
+            $user = auth()->user();
+            
+            if (!$user || !$user->organization_id) {
+                \Log::warning('MileageUpdate: User not authenticated or no organization_id');
+                return collect([]);
+            }
+            
+            $vehicles = Vehicle::where('organization_id', $user->organization_id)
+                ->where('is_archived', false)
+                // ✅ CORRECTION: Filtrer sur les statuts corrects
+                ->where(function ($query) {
+                    $query->whereHas('vehicleStatus', function ($statusQuery) {
+                        // Statuts réels: Actif, En maintenance (pas Inactif)
+                        $statusQuery->whereIn('name', ['Actif', 'En maintenance']);
+                    })
+                    // Fallback si pas de statut défini
+                    ->orWhereNull('status_id');
+                })
+                ->with(['category', 'vehicleType', 'vehicleStatus'])
+                ->orderBy('registration_plate')
+                ->get();
+            
+            // Log pour debug (seulement en local/dev)
+            if (app()->environment(['local', 'development'])) {
+                \Log::info('MileageUpdate: Vehicles loaded', [
+                    'count' => $vehicles->count(),
+                    'organization_id' => $user->organization_id
+                ]);
+            }
+            
+            return $vehicles->map(function ($vehicle) {
                 return [
                     'id' => $vehicle->id,
                     'label' => sprintf(
-                        '%s - %s %s (%s)',
+                        '%s - %s %s (%s) - %s km',
                         $vehicle->registration_plate,
                         $vehicle->brand,
                         $vehicle->model,
-                        $vehicle->category?->name ?? 'N/A'
+                        $vehicle->category?->name ?? 'N/A',
+                        number_format($vehicle->current_mileage ?? 0, 0, ',', ' ')
                     ),
                     'registration_plate' => $vehicle->registration_plate,
                     'brand' => $vehicle->brand,
                     'model' => $vehicle->model,
+                    'current_mileage' => $vehicle->current_mileage ?? 0,
+                    'status' => $vehicle->vehicleStatus?->name ?? 'N/A',
                 ];
             });
+            
+        } catch (\Exception $e) {
+            \Log::error('MileageUpdate: Error loading vehicles', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            
+            // En production, retourner collection vide au lieu de crasher
+            return collect([]);
+        }
     }
     
     /**

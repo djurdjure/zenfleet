@@ -194,56 +194,73 @@ class ZenFleetAdmin {
         // Configurer la locale française par défaut
         flatpickr.localize(French);
         
-        // DATEPICKERS
+        // DATEPICKERS - ENTERPRISE GRADE avec altInput
         const datepickers = document.querySelectorAll('.datepicker');
         datepickers.forEach(el => {
             if (!el._flatpickr) {
                 const minDate = el.getAttribute('data-min-date');
                 const maxDate = el.getAttribute('data-max-date');
-                const dateFormat = el.getAttribute('data-date-format') || 'd/m/Y';
 
                 flatpickr(el, {
                     locale: 'fr',
-                    dateFormat: dateFormat,
+                    // ✅ FORMAT SERVEUR: Y-m-d pour Laravel (2025-10-21)
+                    dateFormat: 'Y-m-d',
+                    // ✅ FORMAT AFFICHÉ: d/m/Y pour l'utilisateur français (21/10/2025)
+                    altInput: true,
+                    altFormat: 'd/m/Y',
                     minDate: minDate,
                     maxDate: maxDate,
                     allowInput: true,
                     disableMobile: true,
+                    // ✅ PARSE: Accepter les deux formats en saisie manuelle
+                    parseDate: (datestr, format) => {
+                        // Tenter d/m/Y
+                        const parts = datestr.split('/');
+                        if (parts.length === 3) {
+                            return new Date(parts[2], parts[1] - 1, parts[0]);
+                        }
+                        // Tenter Y-m-d
+                        return new Date(datestr);
+                    },
                 });
             }
         });
         
-        // TIMEPICKERS
+        // TIMEPICKERS - ENTERPRISE GRADE sans masque restrictif
         const timepickers = document.querySelectorAll('.timepicker');
         timepickers.forEach(el => {
             if (!el._flatpickr) {
                 const enableSeconds = el.getAttribute('data-enable-seconds') === 'true';
-                
-                // Masque de saisie HH:MM
-                el.addEventListener('input', function(e) {
-                    let value = e.target.value.replace(/\D/g, '');
-                    if (value.length >= 2) {
-                        let hours = Math.min(parseInt(value.substring(0, 2)), 23);
-                        let formattedValue = String(hours).padStart(2, '0');
-                        if (value.length >= 3) {
-                            let minutes = Math.min(parseInt(value.substring(2, 4)), 59);
-                            formattedValue += ':' + String(minutes).padStart(2, '0');
-                        } else if (value.length === 2) {
-                            formattedValue += ':';
-                        }
-                        e.target.value = formattedValue;
-                    }
-                });
 
                 flatpickr(el, {
                     enableTime: true,
                     noCalendar: true,
+                    // ✅ FORMAT: H:i (14:30) - Compatible Laravel
                     dateFormat: enableSeconds ? "H:i:S" : "H:i",
                     time_24hr: true,
+                    // ✅ IMPORTANT: allowInput pour saisie manuelle libre
                     allowInput: true,
                     disableMobile: true,
-                    defaultHour: 0,
-                    defaultMinute: 0,
+                    // ✅ Heure par défaut: heure actuelle
+                    defaultHour: new Date().getHours(),
+                    defaultMinute: new Date().getMinutes(),
+                    // ✅ Incréments: 15 minutes pour faciliter la saisie
+                    minuteIncrement: 1,
+                    // ✅ Parser flexible pour accepter différents formats
+                    parseDate: (datestr) => {
+                        // Accepter H:i, HH:i, H:i:s, etc.
+                        const parts = datestr.split(':');
+                        if (parts.length >= 2) {
+                            const date = new Date();
+                            date.setHours(parseInt(parts[0]) || 0);
+                            date.setMinutes(parseInt(parts[1]) || 0);
+                            if (parts.length >= 3) {
+                                date.setSeconds(parseInt(parts[2]) || 0);
+                            }
+                            return date;
+                        }
+                        return new Date();
+                    },
                 });
             }
         });
