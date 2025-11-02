@@ -33,6 +33,12 @@
  @if($disabled) disabled @endif
  {{ $attributes->except(['class']) }}
  >
+ {{-- ✨ ENTERPRISE FIX: Slot pour options custom OU options depuis prop --}}
+ @if($slot->isNotEmpty())
+ {{-- Options passées via le slot (méthode recommandée) --}}
+ {{ $slot }}
+ @else
+ {{-- Options passées via la prop $options (méthode alternative) --}}
  @if(!$required && !isset($options['']))
  <option value="">Sélectionner...</option>
  @endif
@@ -42,6 +48,7 @@
  {{ $label }}
  </option>
  @endforeach
+ @endif
  </select>
 
  @if($error)

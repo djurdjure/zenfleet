@@ -48,14 +48,14 @@
                     <div>
                         <p class="text-xs font-medium text-gray-600">Total dépenses</p>
                         <p class="text-xl font-bold text-blue-700 mt-1">
-                            {{ number_format($stats['total_amount'] ?? 0, 0, ',', ' ') }} €
+                            {{ number_format($stats['total_amount'] ?? 0, 0, ',', ' ') }} DA
                         </p>
                         <p class="text-xs text-gray-500 mt-1">
                             {{ $stats['total_count'] ?? 0 }} dépenses
                         </p>
                     </div>
                     <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                        <x-iconify icon="lucide:euro" class="w-5 h-5 text-blue-600" />
+                        <x-iconify icon="lucide:coins" class="w-5 h-5 text-blue-600" />
                     </div>
                 </div>
             </div>
@@ -126,7 +126,7 @@
                     <div>
                         <p class="text-xs font-semibold text-purple-600 uppercase tracking-wide">Ce mois</p>
                         <p class="text-xl font-bold text-purple-900 mt-1">
-                            {{ number_format($stats['this_month_amount'] ?? 0, 0, ',', ' ') }} €
+                            {{ number_format($stats['this_month_amount'] ?? 0, 0, ',', ' ') }} DA
                         </p>
                         <p class="text-xs text-purple-700 mt-1">{{ now()->format('F Y') }}</p>
                     </div>
@@ -142,7 +142,7 @@
                     <div>
                         <p class="text-xs font-semibold text-teal-600 uppercase tracking-wide">Moyenne</p>
                         <p class="text-xl font-bold text-teal-900 mt-1">
-                            {{ number_format($stats['average_amount'] ?? 0, 0, ',', ' ') }} €
+                            {{ number_format($stats['average_amount'] ?? 0, 0, ',', ' ') }} DA
                         </p>
                         <p class="text-xs text-teal-700 mt-1">Par dépense</p>
                     </div>
@@ -362,7 +362,7 @@
                         {{-- Montant min --}}
                         <div>
                             <label for="amount-min" class="block text-sm font-medium text-gray-700 mb-1">
-                                <x-iconify icon="lucide:euro" class="w-4 h-4 inline mr-1" />
+                                <x-iconify icon="lucide:coins" class="w-4 h-4 inline mr-1" />
                                 Montant min
                             </label>
                             <div class="relative">
@@ -374,15 +374,15 @@
                                     step="0.01"
                                     min="0"
                                     placeholder="0.00"
-                                    class="block w-full pr-8 border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-sm">
-                                <span class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500">€</span>
+                                    class="block w-full pr-12 border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-sm">
+                                <span class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 font-semibold">DA</span>
                             </div>
                         </div>
 
                         {{-- Montant max --}}
                         <div>
                             <label for="amount-max" class="block text-sm font-medium text-gray-700 mb-1">
-                                <x-iconify icon="lucide:euro" class="w-4 h-4 inline mr-1" />
+                                <x-iconify icon="lucide:coins" class="w-4 h-4 inline mr-1" />
                                 Montant max
                             </label>
                             <div class="relative">
@@ -394,8 +394,8 @@
                                     step="0.01"
                                     min="0"
                                     placeholder="999999.99"
-                                    class="block w-full pr-8 border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-sm">
-                                <span class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500">€</span>
+                                    class="block w-full pr-12 border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-sm">
+                                <span class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 font-semibold">DA</span>
                             </div>
                         </div>
                     </div>
@@ -506,11 +506,11 @@
                             {{-- Montant --}}
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="text-sm font-bold text-gray-900">
-                                    {{ number_format($expense->total_ttc ?? 0, 2, ',', ' ') }} €
+                                    {{ number_format($expense->total_ttc ?? 0, 2, ',', ' ') }} DA
                                 </div>
                                 @if($expense->amount_ht != $expense->total_ttc)
                                 <div class="text-xs text-gray-500">
-                                    HT: {{ number_format($expense->amount_ht ?? 0, 2, ',', ' ') }} €
+                                    HT: {{ number_format($expense->amount_ht ?? 0, 2, ',', ' ') }} DA
                                 </div>
                                 @endif
                             </td>

@@ -130,14 +130,9 @@ class ExpenseController extends Controller
             ->orderBy('first_name')
             ->get();
 
-        $expenseTypes = VehicleExpense::EXPENSE_TYPES;
-        $taxRates = VehicleExpense::TAX_RATES;
-
         return view('admin.expenses.create', compact(
             'vehicles',
-            'drivers',
-            'expenseTypes',
-            'taxRates'
+            'drivers'
         ));
     }
 
@@ -150,7 +145,7 @@ class ExpenseController extends Controller
         $validator = Validator::make($request->all(), [
             'vehicle_id' => 'required|exists:vehicles,id',
             'driver_id' => 'nullable|exists:drivers,id',
-            'expense_type' => 'required|in:' . implode(',', array_keys(VehicleExpense::EXPENSE_TYPES)),
+            'expense_type' => 'required|in:' . implode(',', array_keys(VehicleExpense::getExpenseCategories())),
             'expense_date' => 'required|date|before_or_equal:today',
             'amount' => 'required|numeric|min:0.01|max:999999.99',
             'tax_rate' => 'required|numeric|min:0|max:100',
@@ -169,7 +164,7 @@ class ExpenseController extends Controller
             'expense_date.before_or_equal' => 'La date de dépense ne peut pas être dans le futur.',
             'amount.required' => 'Le montant est obligatoire.',
             'amount.min' => 'Le montant doit être supérieur à 0.',
-            'amount.max' => 'Le montant ne peut pas dépasser 999 999,99 €.',
+            'amount.max' => 'Le montant ne peut pas dépasser 999 999,99 DA.',
             'description.required' => 'La description est obligatoire.',
             'receipt_file.mimes' => 'Le fichier doit être au format PDF, JPG, JPEG ou PNG.',
             'receipt_file.max' => 'Le fichier ne peut pas dépasser 10 MB.'
@@ -194,40 +189,38 @@ class ExpenseController extends Controller
             }
 
             // 💰 Calculs enterprise
-            $taxAmount = ($request->amount * $request->tax_rate) / 100;
-            $totalAmount = $request->amount + $taxAmount;
+            $amountHT = $request->amount;
+            $tvaRate = $request->tax_rate;
+            $tvaAmount = ($amountHT * $tvaRate) / 100;
 
-            // 📄 Génération du numéro de référence enterprise
-            $referenceNumber = $this->generateReferenceNumber();
+            // 📄 Génération du numéro de référence enterprise (optionnel pour l'instant)
+            $invoiceNumber = $request->invoice_number ?: 'EXP-' . now()->format('Ymd') . '-' . rand(1000, 9999);
 
             // 💾 Création de la dépense
             $expense = VehicleExpense::create([
                 'organization_id' => auth()->user()->organization_id,
                 'vehicle_id' => $request->vehicle_id,
                 'driver_id' => $request->driver_id,
-                'expense_type' => $request->expense_type,
+                'expense_category' => $request->expense_type,
                 'expense_date' => $request->expense_date,
-                'amount' => $request->amount,
-                'tax_rate' => $request->tax_rate,
-                'tax_amount' => $taxAmount,
-                'total_amount' => $totalAmount,
+                'amount_ht' => $amountHT,
+                'tva_rate' => $tvaRate,
                 'description' => $request->description,
                 'supplier_name' => $request->supplier_name,
-                'invoice_number' => $request->invoice_number,
-                'receipt_file_path' => $receiptPath,
-                'mileage_at_expense' => $request->mileage_at_expense,
-                'notes' => $request->notes,
-                'reference_number' => $referenceNumber,
-                'created_by' => auth()->id(),
-                'approval_status' => 'pending',
+                'invoice_number' => $invoiceNumber,
+                'attachments' => $receiptPath ? [$receiptPath] : null,
+                'odometer_reading' => $request->mileage_at_expense,
+                'internal_notes' => $request->notes,
+                'recorded_by' => auth()->id(),
+                'needs_approval' => true,
                 'payment_status' => 'pending'
             ]);
 
             DB::commit();
 
             return redirect()
-                ->route('admin.expenses.show', $expense)
-                ->with('success', '✅ Dépense créée avec succès ! Référence: ' . $referenceNumber);
+                ->route('admin.expenses.index')
+                ->with('success', '✅ Dépense créée avec succès ! Référence: ' . $invoiceNumber);
 
         } catch (\Exception $e) {
             DB::rollBack();

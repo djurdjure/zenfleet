@@ -267,22 +267,23 @@ return [
     ],
 
     /**
-     * Catégories avec TVA par défaut
+     * Catégories avec TVA par défaut (ALGÉRIE)
+     * Taux applicables: 0% (exonéré), 9% (réduit), 19% (normal)
      */
     'default_tva_rates' => [
-        'carburant' => 20,
-        'maintenance_preventive' => 20,
-        'reparation' => 20,
-        'pieces_detachees' => 20,
-        'parking' => 20,
-        'peage' => 20,
-        'lavage' => 20,
-        'transport' => 20,
+        'carburant' => 19,
+        'maintenance_preventive' => 19,
+        'reparation' => 19,
+        'pieces_detachees' => 19,
+        'parking' => 19,
+        'peage' => 19,
+        'lavage' => 19,
+        'transport' => 19,
         'assurance' => 0, // Pas de TVA
         'vignette' => 0, // Pas de TVA
         'amendes' => 0, // Pas de TVA
-        'controle_technique' => 20,
-        'formation_chauffeur' => 20,
-        'autre' => 20
+        'controle_technique' => 19,
+        'formation_chauffeur' => 9, // Taux réduit pour formation
+        'autre' => 19
     ]
 ];

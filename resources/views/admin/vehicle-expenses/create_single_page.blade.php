@@ -181,7 +181,7 @@
                         <x-input
                             type="number"
                             name="amount_ht"
-                            label="Montant HT"
+                            label="Montant HT (DA)"
                             step="0.01"
                             min="0"
                             required
@@ -189,7 +189,7 @@
                             :error="$errors->first('amount_ht')"
                             x-model="amountHT"
                             @input="calculateTTC()"
-                            helpText="Montant hors taxes"
+                            helpText="Montant hors taxes en Dinar Algérien"
                         />
                     </div>
 
@@ -198,30 +198,36 @@
                         <x-select
                             name="tva_rate"
                             label="Taux de TVA (%)"
-                            :value="old('tva_rate', '20')"
+                            :value="old('tva_rate', '19')"
                             :error="$errors->first('tva_rate')"
                             x-model="tvaRate"
                             @change="calculateTTC()"
                         >
-                            <option value="0">Sans TVA (0%)</option>
-                            <option value="5.5">TVA réduite (5,5%)</option>
-                            <option value="10">TVA intermédiaire (10%)</option>
-                            <option value="20" selected>TVA normale (20%)</option>
+                            <option value="0">Sans TVA (0%) - Exonéré</option>
+                            <option value="9">TVA réduite (9%)</option>
+                            <option value="19" selected>TVA normale (19%)</option>
                         </x-select>
+                        <p class="mt-1 text-xs text-gray-500">
+                            Taux TVA applicables en Algérie
+                        </p>
                     </div>
 
                     {{-- Montant TTC calculé --}}
                     <div>
-                        <label class="block text-sm font-medium text-gray-900 mb-2">
+                        <label class="block text-sm font-medium text-gray-900 mb-2 flex items-center gap-2">
                             Montant TTC
+                            <span class="inline-flex items-center px-2 py-0.5 rounded-md bg-green-100 text-green-800 text-xs font-semibold">
+                                <x-iconify icon="lucide:coins" class="w-3 h-3 mr-1" />
+                                Dinar Algérien
+                            </span>
                         </label>
                         <div class="h-10 px-3 flex items-center bg-blue-50 border border-blue-200 rounded-lg">
                             <span class="text-lg font-bold text-blue-600">
-                                <span x-text="formatCurrency(totalTTC)">0,00</span> €
+                                <span x-text="formatCurrency(totalTTC)">0,00</span> DA
                             </span>
                         </div>
                         <p class="mt-1 text-xs text-gray-500">
-                            TVA: <span x-text="formatCurrency(tvaAmount)">0,00</span> €
+                            TVA: <span x-text="formatCurrency(tvaAmount)">0,00</span> DA
                         </p>
                     </div>
 
@@ -388,7 +394,7 @@ function expenseForm() {
     return {
         category: '{{ old('expense_category', '') }}',
         amountHT: {{ old('amount_ht', 0) }},
-        tvaRate: {{ old('tva_rate', 20) }},
+        tvaRate: {{ old('tva_rate', 19) }},
         tvaAmount: 0,
         totalTTC: 0,
         paymentStatus: '{{ old('payment_status', 'pending') }}',

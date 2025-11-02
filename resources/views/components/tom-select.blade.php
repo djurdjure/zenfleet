@@ -36,7 +36,12 @@
  @if($multiple) multiple @endif
  {{ $attributes->except(['class']) }}
  >
- {{-- ✨ ENTERPRISE FIX: Toujours ajouter une option vide pour éviter la présélection automatique --}}
+ {{-- ✨ ENTERPRISE FIX: Slot pour options custom OU options depuis prop --}}
+ @if($slot->isNotEmpty())
+ {{-- Options passées via le slot (méthode recommandée) --}}
+ {{ $slot }}
+ @else
+ {{-- Options passées via la prop $options (méthode alternative) --}}
  @if(!$multiple)
  <option value="">{{ $placeholder ?: '-- Sélectionner --' }}</option>
  @endif
@@ -49,6 +54,7 @@
  {{ $optionLabel }}
  </option>
  @endforeach
+ @endif
  </select>
 
  @if($error)
