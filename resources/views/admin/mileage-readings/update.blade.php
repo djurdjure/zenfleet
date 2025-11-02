@@ -1,23 +1,15 @@
 {{--
- 📊 Mise à jour du Kilométrage - Enterprise Grade
+====================================================================
+🚀 MILEAGE UPDATE PAGE - ENTERPRISE SINGLE PAGE V2
+====================================================================
 
- Cette page charge le composant Livewire UpdateVehicleMileage qui gère:
- - Sélection du véhicule (selon rôle et permissions)
- - Saisie du nouveau kilométrage
- - Validation avancée (kilométrage croissant uniquement)
- - Enregistrement dans l'historique
+Vue d'entrée pour le module de mise à jour du kilométrage
+Charge le composant Livewire MileageUpdateComponent
 
- Architecture: Route → Controller → View → @livewire
- Compatible: Livewire 3 + Laravel 12
+@package Resources\Views\Admin\MileageReadings
+@version 2.0-Enterprise
+@since 2025-11-02
+====================================================================
 --}}
-@extends('layouts.admin.catalyst')
 
-@section('title', 'Mettre à jour le kilométrage')
-
-@section('content')
- @if(isset($vehicleId))
- @livewire('admin.update-vehicle-mileage', ['vehicleId' => $vehicleId])
- @else
- @livewire('admin.update-vehicle-mileage')
- @endif
-@endsection
+@livewire('admin.mileage.mileage-update-component', ['vehicleId' => $vehicleId ?? null])

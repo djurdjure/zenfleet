@@ -34,7 +34,7 @@
 
  <div class="relative">
  <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
- <x-iconify icon="lucide:calendar-days" class="w-4 h-4 {{ $error ? 'text-red-500' : 'text-gray-500' }}" />
+ <x-iconify icon="heroicons:calendar-days" class="w-4 h-4 {{ $error ? 'text-red-500' : 'text-gray-500' }}" />
  </div>
  <input
  type="text"

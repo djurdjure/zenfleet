@@ -17,6 +17,117 @@
  <!-- Iconify CDN -->
  <script src="https://code.iconify.design/3/3.1.0/iconify.min.js"></script>
 
+ {{-- ====================================================================
+ 📦 SCRIPTS & STYLES ENTERPRISE-GRADE
+ ==================================================================== 
+ Tom Select, Flatpickr, ApexCharts - Chargés globalement
+ @version 1.0 Production-Ready
+ ==================================================================== --}}
+ 
+ {{-- Tom Select CSS --}}
+ <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.css">
+ 
+ {{-- Flatpickr CSS --}}
+ <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+ <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/light.css">
+ 
+ {{-- Flatpickr Custom Styles ZenFleet --}}
+ <style>
+ /* 🎨 FLATPICKR ENTERPRISE-GRADE LIGHT MODE - ZenFleet Ultra-Pro */
+ .flatpickr-calendar {
+ background-color: white !important;
+ border: 1px solid rgb(229 231 235);
+ border-radius: 0.75rem;
+ box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+ font-family: inherit;
+ }
+
+ /* En-tête (mois/année) - Bleu blue-600 premium */
+ .flatpickr-months {
+ background: rgb(37 99 235) !important;
+ border-radius: 0.75rem 0.75rem 0 0;
+ padding: 0.875rem 0;
+ }
+
+ .flatpickr-months .flatpickr-month,
+ .flatpickr-current-month .flatpickr-monthDropdown-months {
+ background-color: transparent !important;
+ color: white !important;
+ font-weight: 600;
+ font-size: 1rem;
+ }
+
+ /* Boutons navigation */
+ .flatpickr-months .flatpickr-prev-month,
+ .flatpickr-months .flatpickr-next-month {
+ fill: white !important;
+ transition: all 0.2s;
+ }
+
+ .flatpickr-months .flatpickr-prev-month:hover,
+ .flatpickr-months .flatpickr-next-month:hover {
+ fill: rgb(219 234 254) !important;
+ transform: scale(1.15);
+ }
+
+ /* Jours de la semaine */
+ .flatpickr-weekdays {
+ background-color: rgb(249 250 251) !important;
+ padding: 0.625rem 0;
+ border-bottom: 1px solid rgb(229 231 235);
+ }
+
+ .flatpickr-weekday {
+ color: rgb(107 114 128) !important;
+ font-weight: 600;
+ font-size: 0.75rem;
+ text-transform: uppercase;
+ letter-spacing: 0.05em;
+ }
+
+ /* Corps du calendrier */
+ .flatpickr-days {
+ background-color: white !important;
+ }
+
+ /* Jours du mois */
+ .flatpickr-day {
+ color: rgb(17 24 39) !important;
+ border-radius: 0.5rem;
+ font-weight: 500;
+ transition: all 0.2s;
+ border: 1px solid transparent;
+ }
+
+ .flatpickr-day.today {
+ border: 2px solid rgb(37 99 235) !important;
+ font-weight: 700;
+ color: rgb(37 99 235) !important;
+ background-color: rgb(239 246 255) !important;
+ }
+
+ .flatpickr-day.selected,
+ .flatpickr-day.selected:hover {
+ background-color: rgb(37 99 235) !important;
+ border-color: rgb(37 99 235) !important;
+ color: white !important;
+ font-weight: 700;
+ box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.4);
+ }
+
+ .flatpickr-day:hover:not(.selected):not(.flatpickr-disabled):not(.today) {
+ background-color: rgb(243 244 246) !important;
+ border-color: rgb(229 231 235) !important;
+ color: rgb(17 24 39) !important;
+ transform: scale(1.05);
+ }
+
+ .flatpickr-day.flatpickr-disabled {
+ color: rgb(209 213 219) !important;
+ opacity: 0.4;
+ }
+ </style>
+
  @vite(['resources/js/admin/app.js'])
  @stack('styles')
 </head>
@@ -868,6 +979,161 @@
  </main>
  </div>
  </div>
+
+ {{-- ====================================================================
+ 📦 SCRIPTS JAVASCRIPT ENTERPRISE-GRADE
+ ==================================================================== 
+ Tom Select, Flatpickr - Chargés globalement avant Alpine.js
+ @version 1.0 Production-Ready
+ ==================================================================== --}}
+ 
+ {{-- Tom Select JS --}}
+ <script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js"></script>
+ 
+ {{-- Flatpickr JS --}}
+ <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+ <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/fr.js"></script>
+ 
+ {{-- Initialisation Globale Tom Select & Flatpickr --}}
+ <script>
+ document.addEventListener('DOMContentLoaded', function() {
+ // ====================================================================
+ // TOM SELECT - Initialisation Globale
+ // ====================================================================
+ document.querySelectorAll('.tomselect').forEach(function(el) {
+ if (el.tomselect) return; // Déjà initialisé
+ 
+ new TomSelect(el, {
+ plugins: ['clear_button', 'remove_button'],
+ maxOptions: 100,
+ placeholder: el.getAttribute('data-placeholder') || 'Rechercher...',
+ allowEmptyOption: true,
+ create: false,
+ sortField: {
+ field: "text",
+ direction: "asc"
+ },
+ render: {
+ no_results: function(data, escape) {
+ return '<div class="no-results p-2 text-sm text-gray-500">Aucun résultat trouvé</div>';
+ }
+ }
+ });
+ });
+
+ // ====================================================================
+ // FLATPICKR DATEPICKER - Initialisation Globale
+ // ====================================================================
+ document.querySelectorAll('.datepicker').forEach(function(el) {
+ if (el._flatpickr) return; // Déjà initialisé
+ 
+ const minDate = el.getAttribute('data-min-date');
+ const maxDate = el.getAttribute('data-max-date');
+ const dateFormat = el.getAttribute('data-date-format') || 'd/m/Y';
+
+ flatpickr(el, {
+ locale: 'fr',
+ dateFormat: dateFormat,
+ minDate: minDate,
+ maxDate: maxDate,
+ allowInput: true,
+ disableMobile: true,
+ nextArrow: '<svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path></svg>',
+ prevArrow: '<svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg>',
+ });
+ });
+
+ // ====================================================================
+ // FLATPICKR TIMEPICKER - Initialisation Globale avec Masque
+ // ====================================================================
+ 
+ // Fonction de masque de saisie pour le format HH:MM
+ function applyTimeMask(input) {
+ input.addEventListener('input', function(e) {
+ let value = e.target.value.replace(/\D/g, ''); // Garder seulement les chiffres
+
+ if (value.length >= 2) {
+ // Limiter les heures à 23
+ let hours = parseInt(value.substring(0, 2));
+ if (hours > 23) hours = 23;
+
+ let formattedValue = String(hours).padStart(2, '0');
+
+ if (value.length >= 3) {
+ // Limiter les minutes à 59
+ let minutes = parseInt(value.substring(2, 4));
+ if (minutes > 59) minutes = 59;
+ formattedValue += ':' + String(minutes).padStart(2, '0');
+ } else if (value.length === 2) {
+ formattedValue += ':';
+ }
+
+ e.target.value = formattedValue;
+ }
+ });
+
+ // Empêcher la suppression du ':'
+ input.addEventListener('keydown', function(e) {
+ if (e.key === 'Backspace') {
+ const cursorPos = e.target.selectionStart;
+ if (cursorPos === 3 && e.target.value.charAt(2) === ':') {
+ e.preventDefault();
+ e.target.value = e.target.value.substring(0, 2);
+ }
+ }
+ });
+ }
+ 
+ document.querySelectorAll('.timepicker').forEach(function(el) {
+ if (el._flatpickr) return; // Déjà initialisé
+ 
+ const enableSeconds = el.getAttribute('data-enable-seconds') === 'true';
+
+ // Appliquer le masque de saisie
+ applyTimeMask(el);
+
+ flatpickr(el, {
+ enableTime: true,
+ noCalendar: true,
+ dateFormat: enableSeconds ? "H:i:S" : "H:i",
+ time_24hr: true,
+ allowInput: true,
+ disableMobile: true,
+ defaultHour: 0,
+ defaultMinute: 0,
+ });
+ });
+ });
+ 
+ // ====================================================================
+ // LIVEWIRE - Réinitialisation après mises à jour
+ // ====================================================================
+ document.addEventListener('livewire:navigated', function () {
+ // Réinitialiser Tom Select
+ document.querySelectorAll('.tomselect').forEach(function(el) {
+ if (!el.tomselect) {
+ new TomSelect(el, {
+ plugins: ['clear_button', 'remove_button'],
+ maxOptions: 100,
+ placeholder: el.getAttribute('data-placeholder') || 'Rechercher...',
+ allowEmptyOption: true,
+ create: false,
+ });
+ }
+ });
+ 
+ // Réinitialiser Flatpickr
+ document.querySelectorAll('.datepicker, .timepicker').forEach(function(el) {
+ if (!el._flatpickr) {
+ flatpickr(el, {
+ locale: 'fr',
+ allowInput: true,
+ disableMobile: true,
+ });
+ }
+ });
+ });
+ </script>
 
  @stack('scripts')
  <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>

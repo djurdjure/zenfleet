@@ -5,6 +5,7 @@
 
 /* ✅ CRITIQUE: Import des librairies EN PREMIER */
 @import 'tom-select/dist/css/tom-select.css';
+@import 'flatpickr/dist/flatpickr.css';
 
 /* ✅ Import Tailwind CSS APRÈS les imports externes */
 @tailwind base;

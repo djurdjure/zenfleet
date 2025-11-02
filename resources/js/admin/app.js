@@ -12,11 +12,14 @@ import axios from 'axios';
 
 // ✅ OPTIMISATION: Imports sélectifs pour l'admin
 import TomSelect from 'tom-select';
+import flatpickr from 'flatpickr';
+import { French } from 'flatpickr/dist/l10n/fr.js';
 
 // Configuration sécurisée des objets globaux admin
 const initializeAdminGlobals = () => {
     window.axios = axios;
     window.TomSelect = TomSelect;
+    window.flatpickr = flatpickr;
 };
 
 // ✅ NOUVELLE ARCHITECTURE: Classe ZenFleetAdmin moderne
@@ -149,6 +152,7 @@ class ZenFleetAdmin {
     // ✅ OPTIMISATION: Initialisation des composants admin
     initializeComponents() {
         this.initializeTomSelect();
+        this.initializeFlatpickr();
         this.initializeTooltips();
         this.initializeForms();
         this.initializeModals();
@@ -158,7 +162,8 @@ class ZenFleetAdmin {
     
     // Configuration TomSelect pour admin
     initializeTomSelect() {
-        const selects = document.querySelectorAll('.admin-select, select[multiple]');
+        // ✅ CORRECTION: Chercher .tomselect au lieu de .admin-select
+        const selects = document.querySelectorAll('.tomselect, .admin-select, select[multiple]');
         selects.forEach(select => {
             if (!select.tomselect && !select.disabled) {
                 const tomSelect = new TomSelect(select, {
@@ -167,8 +172,13 @@ class ZenFleetAdmin {
                     maxItems: select.getAttribute('data-max-items') || null,
                     placeholder: select.getAttribute('placeholder') || 'Sélectionner...',
                     searchField: ['text', 'value'],
+                    allowEmptyOption: true,
+                    sortField: {
+                        field: "text",
+                        direction: "asc"
+                    },
                     render: {
-                        no_results: () => '<div class="p-2 text-gray-500">Aucun résultat</div>',
+                        no_results: () => '<div class="p-2 text-gray-500">Aucun résultat trouvé</div>',
                     }
                 });
                 
@@ -177,6 +187,68 @@ class ZenFleetAdmin {
         });
         
         console.log(`📝 ${selects.length} TomSelect initialized`);
+    }
+    
+    // ✅ NOUVEAU: Initialisation Flatpickr pour datepickers et timepickers
+    initializeFlatpickr() {
+        // Configurer la locale française par défaut
+        flatpickr.localize(French);
+        
+        // DATEPICKERS
+        const datepickers = document.querySelectorAll('.datepicker');
+        datepickers.forEach(el => {
+            if (!el._flatpickr) {
+                const minDate = el.getAttribute('data-min-date');
+                const maxDate = el.getAttribute('data-max-date');
+                const dateFormat = el.getAttribute('data-date-format') || 'd/m/Y';
+
+                flatpickr(el, {
+                    locale: 'fr',
+                    dateFormat: dateFormat,
+                    minDate: minDate,
+                    maxDate: maxDate,
+                    allowInput: true,
+                    disableMobile: true,
+                });
+            }
+        });
+        
+        // TIMEPICKERS
+        const timepickers = document.querySelectorAll('.timepicker');
+        timepickers.forEach(el => {
+            if (!el._flatpickr) {
+                const enableSeconds = el.getAttribute('data-enable-seconds') === 'true';
+                
+                // Masque de saisie HH:MM
+                el.addEventListener('input', function(e) {
+                    let value = e.target.value.replace(/\D/g, '');
+                    if (value.length >= 2) {
+                        let hours = Math.min(parseInt(value.substring(0, 2)), 23);
+                        let formattedValue = String(hours).padStart(2, '0');
+                        if (value.length >= 3) {
+                            let minutes = Math.min(parseInt(value.substring(2, 4)), 59);
+                            formattedValue += ':' + String(minutes).padStart(2, '0');
+                        } else if (value.length === 2) {
+                            formattedValue += ':';
+                        }
+                        e.target.value = formattedValue;
+                    }
+                });
+
+                flatpickr(el, {
+                    enableTime: true,
+                    noCalendar: true,
+                    dateFormat: enableSeconds ? "H:i:S" : "H:i",
+                    time_24hr: true,
+                    allowInput: true,
+                    disableMobile: true,
+                    defaultHour: 0,
+                    defaultMinute: 0,
+                });
+            }
+        });
+        
+        console.log(`📅 ${datepickers.length} datepickers + ${timepickers.length} timepickers initialized`);
     }
     
     // Initialisation des tooltips
