@@ -153,8 +153,11 @@ class MileageUpdateComponent extends Component
     
     /**
      * Normaliser le format d'heure
-     * Accepte: H:i, HH:i, H:i:s, etc.
-     * Retourne: HH:i
+     * Avec le nouveau time-picker Alpine.js, le format HH:MM est garanti
+     * Cette méthode est conservée par sécurité et rétrocompatibilité
+     * 
+     * @param string $time Format attendu: HH:MM
+     * @return string Format normalisé HH:MM
      */
     private function normalizeTimeFormat(string $time): string
     {
@@ -162,18 +165,24 @@ class MileageUpdateComponent extends Component
             // Nettoyer la chaîne
             $time = trim($time);
             
-            // Pattern H:i ou HH:i (avec ou sans secondes)
+            // Le nouveau time-picker Alpine.js garantit le format HH:MM
+            // Vérification simple avec regex
+            if (preg_match('/^([01]\d|2[0-3]):([0-5]\d)$/', $time)) {
+                return $time; // Déjà au bon format
+            }
+            
+            // Fallback pour compatibilité: Pattern H:i ou HH:i
             if (preg_match('/^(\d{1,2}):(\d{1,2})/', $time, $matches)) {
                 $hours = (int) $matches[1];
                 $minutes = (int) $matches[2];
                 
-                // Validation basique
+                // Validation et formatage
                 if ($hours >= 0 && $hours <= 23 && $minutes >= 0 && $minutes <= 59) {
                     return sprintf('%02d:%02d', $hours, $minutes);
                 }
             }
             
-            // Fallback: Parser avec Carbon
+            // Dernier recours: Parser avec Carbon
             return Carbon::parse($time)->format('H:i');
             
         } catch (\Exception $e) {
@@ -181,7 +190,7 @@ class MileageUpdateComponent extends Component
                 'time' => $time,
                 'error' => $e->getMessage()
             ]);
-            return $time; // Retourner tel quel, la validation échouera
+            return $time; // Retourner tel quel pour que la validation Livewire capture l'erreur
         }
     }
     
