@@ -32,6 +32,18 @@ use Livewire\Component;
 class MileageUpdateComponent extends Component
 {
     // ====================================================================
+    // CASTS LIVEWIRE - ENTERPRISE GRADE TYPE SAFETY
+    // ====================================================================
+    
+    /**
+     * ✅ CORRECTION CRITIQUE: Cast pour éviter TypeError avec Tom Select
+     * Livewire reçoit parfois des strings au lieu d'int depuis le frontend
+     */
+    protected array $casts = [
+        'vehicle_id' => 'integer',
+    ];
+    
+    // ====================================================================
     // PROPRIÉTÉS PUBLIQUES
     // ====================================================================
     
@@ -345,8 +357,58 @@ class MileageUpdateComponent extends Component
         try {
             DB::beginTransaction();
             
-            // Combiner date et heure
-            $recordedAt = Carbon::parse($this->date . ' ' . $this->time);
+            // ✅ CORRECTION ENTERPRISE V3: Parsing robuste multi-formats
+            // Gestion de tous les cas possibles de date/heure
+            
+            // 1. Normaliser la date au format Y-m-d
+            $normalizedDate = $this->normalizeDateFormat($this->date);
+            
+            // 2. Normaliser l'heure au format H:i
+            $normalizedTime = $this->normalizeTimeFormat($this->time);
+            
+            // 3. Combiner et créer l'objet Carbon
+            try {
+                // Méthode 1: createFromFormat strict
+                $recordedAt = Carbon::createFromFormat('Y-m-d H:i', $normalizedDate . ' ' . $normalizedTime);
+            } catch (\Exception $e) {
+                // Méthode 2: parse flexible comme fallback
+                try {
+                    $recordedAt = Carbon::parse($normalizedDate . ' ' . $normalizedTime);
+                } catch (\Exception $e2) {
+                    // Méthode 3: construire manuellement
+                    $dateParts = explode('-', $normalizedDate);
+                    $timeParts = explode(':', $normalizedTime);
+                    
+                    if (count($dateParts) === 3 && count($timeParts) === 2) {
+                        $recordedAt = Carbon::create(
+                            (int)$dateParts[0], // year
+                            (int)$dateParts[1], // month
+                            (int)$dateParts[2], // day
+                            (int)$timeParts[0], // hour
+                            (int)$timeParts[1], // minute
+                            0 // second
+                        );
+                    } else {
+                        throw new \Exception(
+                            "Impossible de parser la date/heure. " .
+                            "Date normalisée: {$normalizedDate}, Heure normalisée: {$normalizedTime}"
+                        );
+                    }
+                }
+            }
+            
+            // Vérification de sécurité Enterprise-Grade
+            if (!$recordedAt || !$recordedAt instanceof Carbon) {
+                throw new \Exception(
+                    "Erreur critique de création de date/heure. " .
+                    "Format attendu: Y-m-d H:i. Reçu: {$this->date} {$this->time}"
+                );
+            }
+            
+            // Vérifier que la date n'est pas dans le futur
+            if ($recordedAt->isFuture()) {
+                throw new \Exception("La date/heure du relevé ne peut pas être dans le futur.");
+            }
             
             // Créer le relevé
             $reading = VehicleMileageReading::createManual(

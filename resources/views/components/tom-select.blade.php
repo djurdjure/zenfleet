@@ -84,12 +84,16 @@
  @push('scripts')
  <script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js"></script>
  <script>
- document.addEventListener('DOMContentLoaded', function() {
- document.querySelectorAll('.tomselect').forEach(function(el) {
- new TomSelect(el, {
+ // ✅ OPTIMISATION ENTERPRISE: Fonction d'initialisation Tom Select réutilisable
+ function initializeTomSelect(element) {
+ if (element.tomSelectInstance) {
+ element.tomSelectInstance.destroy();
+ }
+ 
+ const tomSelectInstance = new TomSelect(element, {
  plugins: ['clear_button', 'remove_button'],
  maxOptions: 100,
- placeholder: el.getAttribute('data-placeholder') || 'Rechercher...',
+ placeholder: element.getAttribute('data-placeholder') || 'Rechercher...',
  allowEmptyOption: true,
  create: false,
  sortField: {
@@ -100,8 +104,84 @@
  no_results: function(data, escape) {
  return '<div class="no-results p-2 text-sm text-gray-500">Aucun résultat trouvé</div>';
  }
+ },
+ // ✅ INTÉGRATION LIVEWIRE ENTERPRISE-GRADE
+ onInitialize: function() {
+ const self = this;
+ 
+ // Stocker l'instance pour référence future
+ element.tomSelectInstance = self;
+ 
+ // Hook Livewire pour synchronisation après mise à jour DOM
+ if (typeof Livewire !== 'undefined') {
+ Livewire.hook('element.updated', (el, component) => {
+ if (el === element || el.contains(element)) {
+ // Synchroniser Tom Select avec les nouvelles options
+ self.sync();
+ 
+ // Préserver la valeur sélectionnée
+ const wireModel = element.getAttribute('wire:model.live') || 
+ element.getAttribute('wire:model');
+ if (wireModel && component.get(wireModel)) {
+ self.setValue(component.get(wireModel), true);
+ }
  }
  });
+ 
+ // Hook pour nettoyer l'instance avant destruction
+ Livewire.hook('element.removed', (el, component) => {
+ if (el === element || el.contains(element)) {
+ self.destroy();
+ }
+ });
+ }
+ },
+ // ✅ OPTIMISATION: Événements pour synchronisation bidirectionnelle
+ onChange: function(value) {
+ // Dispatch event pour Alpine.js et Livewire
+ element.dispatchEvent(new Event('change', { bubbles: true }));
+ 
+ // Force Livewire update si wire:model est présent
+ const wireModel = element.getAttribute('wire:model.live') || 
+ element.getAttribute('wire:model');
+ if (wireModel && typeof Livewire !== 'undefined') {
+ const component = Livewire.find(element.closest('[wire\\:id]').getAttribute('wire:id'));
+ if (component) {
+ component.set(wireModel, value);
+ }
+ }
+ }
+ });
+ 
+ return tomSelectInstance;
+ }
+ 
+ // ✅ INITIALISATION AU CHARGEMENT
+ document.addEventListener('DOMContentLoaded', function() {
+ document.querySelectorAll('.tomselect').forEach(function(el) {
+ initializeTomSelect(el);
+ });
+ });
+ 
+ // ✅ RÉINITIALISATION APRÈS NAVIGATION LIVEWIRE
+ document.addEventListener('livewire:navigated', function() {
+ document.querySelectorAll('.tomselect').forEach(function(el) {
+ if (!el.tomSelectInstance) {
+ initializeTomSelect(el);
+ }
+ });
+ });
+ 
+ // ✅ SUPPORT POUR COMPOSANTS DYNAMIQUES ALPINE.JS
+ document.addEventListener('alpine:init', function() {
+ Alpine.magic('tomselect', (el) => {
+ return () => {
+ const selectEl = el.querySelector('.tomselect');
+ if (selectEl && !selectEl.tomSelectInstance) {
+ return initializeTomSelect(selectEl);
+ }
+ return selectEl?.tomSelectInstance;
+ };
  });
  });
  </script>
