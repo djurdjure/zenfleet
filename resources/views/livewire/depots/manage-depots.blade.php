@@ -7,7 +7,7 @@
                 <p class="text-sm text-gray-600 mt-1">Gérez vos dépôts et leur capacité</p>
             </div>
             <button wire:click="openCreateModal" class="btn btn-primary">
-                <x-lucide-plus class="w-4 h-4 mr-2" />
+                <x-iconify icon="mdi:plus" class="w-4 h-4 mr-2" />
                 Nouveau Dépôt
             </button>
         </div>
@@ -20,7 +20,7 @@
                         <p class="text-sm text-gray-600">Total Dépôts</p>
                         <p class="text-2xl font-bold text-gray-900">{{ $stats['total_depots'] }}</p>
                     </div>
-                    <x-lucide-building-2 class="w-8 h-8 text-blue-500" />
+                    <x-iconify icon="mdi:office-building" class="w-8 h-8 text-blue-500" />
                 </div>
             </div>
 
@@ -30,7 +30,7 @@
                         <p class="text-sm text-gray-600">Dépôts Actifs</p>
                         <p class="text-2xl font-bold text-green-600">{{ $stats['active_depots'] }}</p>
                     </div>
-                    <x-lucide-check-circle class="w-8 h-8 text-green-500" />
+                    <x-iconify icon="mdi:check-circle" class="w-8 h-8 text-green-500" />
                 </div>
             </div>
 
@@ -40,7 +40,7 @@
                         <p class="text-sm text-gray-600">Capacité Totale</p>
                         <p class="text-2xl font-bold text-gray-900">{{ number_format($stats['total_capacity']) }}</p>
                     </div>
-                    <x-lucide-inbox class="w-8 h-8 text-indigo-500" />
+                    <x-iconify icon="mdi:inbox" class="w-8 h-8 text-indigo-500" />
                 </div>
             </div>
 
@@ -50,7 +50,7 @@
                         <p class="text-sm text-gray-600">Véhicules</p>
                         <p class="text-2xl font-bold text-orange-600">{{ number_format($stats['total_occupied']) }}</p>
                     </div>
-                    <x-lucide-car class="w-8 h-8 text-orange-500" />
+                    <x-iconify icon="mdi:car" class="w-8 h-8 text-orange-500" />
                 </div>
             </div>
 
@@ -60,7 +60,7 @@
                         <p class="text-sm text-gray-600">Taux Occupation</p>
                         <p class="text-2xl font-bold text-purple-600">{{ $stats['average_occupancy'] }}%</p>
                     </div>
-                    <x-lucide-pie-chart class="w-8 h-8 text-purple-500" />
+                    <x-iconify icon="mdi:chart-pie" class="w-8 h-8 text-purple-500" />
                 </div>
             </div>
         </div>
@@ -128,7 +128,7 @@
 
                     @if($depot->city || $depot->wilaya)
                         <div class="flex items-center text-sm text-gray-600">
-                            <x-lucide-map-pin class="w-4 h-4 mr-1" />
+                            <x-iconify icon="mdi:map-marker" class="w-4 h-4 mr-1" />
                             {{ $depot->city }}{{ $depot->wilaya ? ', ' . $depot->wilaya : '' }}
                         </div>
                     @endif
@@ -159,13 +159,13 @@
                     <div class="p-4 border-b border-gray-200 space-y-2">
                         @if($depot->manager_name)
                             <div class="flex items-center text-sm text-gray-600">
-                                <x-lucide-user class="w-4 h-4 mr-2 text-gray-400" />
+                                <x-iconify icon="mdi:account" class="w-4 h-4 mr-2 text-gray-400" />
                                 {{ $depot->manager_name }}
                             </div>
                         @endif
                         @if($depot->phone)
                             <div class="flex items-center text-sm text-gray-600">
-                                <x-lucide-phone class="w-4 h-4 mr-2 text-gray-400" />
+                                <x-iconify icon="mdi:phone" class="w-4 h-4 mr-2 text-gray-400" />
                                 {{ $depot->phone }}
                             </div>
                         @endif
@@ -175,11 +175,11 @@
                 {{-- Actions --}}
                 <div class="p-4 bg-gray-50 flex gap-2">
                     <button wire:click="openViewModal({{ $depot->id }})" class="flex-1 px-3 py-2 text-sm bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
-                        <x-lucide-eye class="w-4 h-4 inline mr-1" />
+                        <x-iconify icon="mdi:eye" class="w-4 h-4 inline mr-1" />
                         Voir
                     </button>
                     <button wire:click="openEditModal({{ $depot->id }})" class="flex-1 px-3 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
-                        <x-lucide-edit class="w-4 h-4 inline mr-1" />
+                        <x-iconify icon="mdi:pencil" class="w-4 h-4 inline mr-1" />
                         Modifier
                     </button>
                     <button
@@ -188,18 +188,18 @@
                         class="px-3 py-2 text-sm {{ $depot->is_active ? 'bg-orange-600' : 'bg-green-600' }} text-white rounded-lg hover:opacity-90 transition-opacity"
                         title="{{ $depot->is_active ? 'Désactiver' : 'Activer' }}"
                     >
-                        <x-lucide-power class="w-4 h-4" />
+                        <x-iconify icon="mdi:power" class="w-4 h-4" />
                     </button>
                 </div>
             </div>
         @empty
             <div class="col-span-full">
                 <div class="bg-white rounded-lg border-2 border-dashed border-gray-300 p-12 text-center">
-                    <x-lucide-building-2 class="w-16 h-16 mx-auto text-gray-400 mb-4" />
+                    <x-iconify icon="mdi:office-building" class="w-16 h-16 mx-auto text-gray-400 mb-4" />
                     <h3 class="text-lg font-medium text-gray-900 mb-2">Aucun dépôt trouvé</h3>
                     <p class="text-gray-600 mb-4">Commencez par créer votre premier dépôt</p>
                     <button wire:click="openCreateModal" class="btn btn-primary">
-                        <x-lucide-plus class="w-4 h-4 mr-2" />
+                        <x-iconify icon="mdi:plus" class="w-4 h-4 mr-2" />
                         Créer un dépôt
                     </button>
                 </div>
@@ -248,7 +248,7 @@
                             @endif
                         </h3>
                         <button wire:click="closeModal" class="text-gray-400 hover:text-gray-600">
-                            <x-lucide-x class="w-6 h-6" />
+                            <x-iconify icon="mdi:close" class="w-6 h-6" />
                         </button>
                     </div>
 

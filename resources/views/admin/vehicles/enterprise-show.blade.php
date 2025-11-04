@@ -640,7 +640,7 @@
  <div class="info-section rounded-lg p-6">
  <div class="section-header">
  <div class="section-icon bg-gradient-to-br from-indigo-500 to-indigo-600">
- <x-lucide-building-2 class="w-4 h-4" />
+ <x-iconify icon="mdi:office-building" class="w-4 h-4" />
  </div>
  <div class="flex-1 flex justify-between items-center">
  <h3 class="text-lg font-medium text-gray-900">Affectation Dépôt</h3>
@@ -649,7 +649,7 @@
  onclick="Livewire.dispatch('openAssignDepotModal', { vehicleId: {{ $vehicle->id }} })"
  class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors text-sm"
  >
- <x-lucide-arrow-right-left class="w-4 h-4 inline mr-1" />
+ <x-iconify icon="mdi:swap-horizontal" class="w-4 h-4 inline mr-1" />
  Changer de dépôt
  </button>
  @else
@@ -657,7 +657,7 @@
  onclick="Livewire.dispatch('openAssignDepotModal', { vehicleId: {{ $vehicle->id }} })"
  class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors text-sm"
  >
- <x-lucide-plus class="w-4 h-4 inline mr-1" />
+ <x-iconify icon="mdi:plus" class="w-4 h-4 inline mr-1" />
  Affecter à un dépôt
  </button>
  @endif
@@ -670,7 +670,7 @@
  <div class="flex items-start justify-between">
  <div class="flex-1">
  <div class="flex items-center mb-2">
- <x-lucide-building-2 class="w-5 h-5 text-indigo-600 mr-2" />
+ <x-iconify icon="mdi:office-building" class="w-5 h-5 text-indigo-600 mr-2" />
  <h4 class="font-semibold text-indigo-900">{{ $vehicle->depot->name }}</h4>
  <span class="ml-2 px-2 py-0.5 bg-indigo-100 text-indigo-800 rounded-full text-xs">
  {{ $vehicle->depot->code }}
@@ -680,28 +680,28 @@
  <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
  @if($vehicle->depot->city || $vehicle->depot->wilaya)
  <div class="flex items-center text-gray-700">
- <x-lucide-map-pin class="w-4 h-4 text-gray-500 mr-1" />
+ <x-iconify icon="mdi:map-marker" class="w-4 h-4 text-gray-500 mr-1" />
  {{ $vehicle->depot->city }}{{ $vehicle->depot->wilaya ? ', ' . $vehicle->depot->wilaya : '' }}
  </div>
  @endif
 
  @if($vehicle->depot->phone)
  <div class="flex items-center text-gray-700">
- <x-lucide-phone class="w-4 h-4 text-gray-500 mr-1" />
+ <x-iconify icon="mdi:phone" class="w-4 h-4 text-gray-500 mr-1" />
  {{ $vehicle->depot->phone }}
  </div>
  @endif
 
  @if($vehicle->depot->manager_name)
  <div class="flex items-center text-gray-700">
- <x-lucide-user class="w-4 h-4 text-gray-500 mr-1" />
+ <x-iconify icon="mdi:account" class="w-4 h-4 text-gray-500 mr-1" />
  {{ $vehicle->depot->manager_name }}
  </div>
  @endif
 
  @if($vehicle->depot->capacity)
  <div class="flex items-center text-gray-700">
- <x-lucide-inbox class="w-4 h-4 text-gray-500 mr-1" />
+ <x-iconify icon="mdi:inbox" class="w-4 h-4 text-gray-500 mr-1" />
  Occupation: {{ $vehicle->depot->current_count }} / {{ $vehicle->depot->capacity }}
  </div>
  @endif
@@ -755,11 +755,11 @@
  @endphp
  <div class="mr-3 {{ $iconColorClass }}">
  @if($history->action === 'assigned')
- <x-lucide-building-2 class="w-4 h-4" />
+ <x-iconify icon="mdi:office-building" class="w-4 h-4" />
  @elseif($history->action === 'unassigned')
- <x-lucide-x-circle class="w-4 h-4" />
+ <x-iconify icon="mdi:close-circle" class="w-4 h-4" />
  @else
- <x-lucide-arrow-right-left class="w-4 h-4" />
+ <x-iconify icon="mdi:swap-horizontal" class="w-4 h-4" />
  @endif
  </div>
  <div class="flex-1">
@@ -786,14 +786,14 @@
  @else
  {{-- Aucun dépôt affecté --}}
  <div class="bg-gray-50 border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
- <x-lucide-building-2 class="w-12 h-12 mx-auto text-gray-400 mb-3" />
+ <x-iconify icon="mdi:office-building" class="w-12 h-12 mx-auto text-gray-400 mb-3" />
  <h4 class="text-sm font-medium text-gray-900 mb-2">Aucun dépôt affecté</h4>
  <p class="text-sm text-gray-600 mb-4">Ce véhicule n'est actuellement affecté à aucun dépôt</p>
  <button
  onclick="Livewire.dispatch('openAssignDepotModal', { vehicleId: {{ $vehicle->id }} })"
  class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors text-sm"
  >
- <x-lucide-plus class="w-4 h-4 inline mr-1" />
+ <x-iconify icon="mdi:plus" class="w-4 h-4 inline mr-1" />
  Affecter à un dépôt
  </button>
  </div>

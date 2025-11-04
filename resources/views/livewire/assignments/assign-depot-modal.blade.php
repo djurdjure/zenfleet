@@ -48,7 +48,7 @@
                             @endif
                         </div>
                         <button wire:click="close" class="text-gray-400 hover:text-gray-600">
-                            <x-lucide-x class="w-6 h-6" />
+                            <x-iconify icon="mdi:close" class="w-6 h-6" />
                         </button>
                     </div>
 
@@ -56,7 +56,7 @@
                     @if($vehicle && $vehicle->depot)
                         <div class="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
                             <div class="flex items-center">
-                                <x-lucide-building-2 class="w-5 h-5 text-blue-600 mr-2" />
+                                <x-iconify icon="mdi:office-building" class="w-5 h-5 text-blue-600 mr-2" />
                                 <div>
                                     <p class="text-sm font-medium text-blue-900">Dépôt actuel</p>
                                     <p class="text-sm text-blue-700">{{ $vehicle->depot->name }} ({{ $vehicle->depot->code }})</p>
@@ -72,14 +72,14 @@
                                 wire:click="setAction('transfer')"
                                 class="px-4 py-2 text-sm font-medium {{ $action === 'transfer' ? 'text-blue-600 border-b-2 border-blue-600' : 'text-gray-600 hover:text-gray-900' }}"
                             >
-                                <x-lucide-arrow-right-left class="w-4 h-4 inline mr-1" />
+                                <x-iconify icon="mdi:swap-horizontal" class="w-4 h-4 inline mr-1" />
                                 Transférer
                             </button>
                             <button
                                 wire:click="setAction('unassign')"
                                 class="px-4 py-2 text-sm font-medium {{ $action === 'unassign' ? 'text-red-600 border-b-2 border-red-600' : 'text-gray-600 hover:text-gray-900' }}"
                             >
-                                <x-lucide-x-circle class="w-4 h-4 inline mr-1" />
+                                <x-iconify icon="mdi:close-circle" class="w-4 h-4 inline mr-1" />
                                 Retirer
                             </button>
                         </div>
@@ -141,7 +141,7 @@
                                                         {{-- Localisation --}}
                                                         @if($depot->city || $depot->wilaya)
                                                             <div class="flex items-center text-sm text-gray-600 mb-2">
-                                                                <x-lucide-map-pin class="w-4 h-4 mr-1" />
+                                                                <x-iconify icon="mdi:map-marker" class="w-4 h-4 mr-1" />
                                                                 {{ $depot->city }}{{ $depot->wilaya ? ', ' . $depot->wilaya : '' }}
                                                             </div>
                                                         @endif
@@ -149,7 +149,7 @@
                                                         {{-- Distance --}}
                                                         @if($depot->distance !== null)
                                                             <div class="flex items-center text-sm text-gray-600 mb-2">
-                                                                <x-lucide-navigation class="w-4 h-4 mr-1" />
+                                                                <x-iconify icon="mdi:navigation" class="w-4 h-4 mr-1" />
                                                                 {{ $depot->distance }} km
                                                             </div>
                                                         @endif
@@ -176,7 +176,7 @@
                                                             <p class="text-sm text-gray-500 mt-2 italic">Dépôt actuel</p>
                                                         @elseif(!$depot->can_assign)
                                                             <p class="text-sm text-red-600 mt-2">
-                                                                <x-lucide-alert-circle class="w-4 h-4 inline mr-1" />
+                                                                <x-iconify icon="mdi:alert-circle" class="w-4 h-4 inline mr-1" />
                                                                 Dépôt complet
                                                             </p>
                                                         @endif
@@ -197,7 +197,7 @@
                         @if($action === 'unassign')
                             <div class="mb-6 p-4 bg-orange-50 border border-orange-200 rounded-lg">
                                 <div class="flex">
-                                    <x-lucide-alert-triangle class="w-5 h-5 text-orange-600 mr-2 flex-shrink-0" />
+                                    <x-iconify icon="mdi:alert" class="w-5 h-5 text-orange-600 mr-2 flex-shrink-0" />
                                     <div>
                                         <p class="text-sm font-medium text-orange-900">Attention</p>
                                         <p class="text-sm text-orange-700 mt-1">
@@ -235,7 +235,7 @@
                                     wire:click="unassign"
                                     class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
                                 >
-                                    <x-lucide-x-circle class="w-4 h-4 inline mr-1" />
+                                    <x-iconify icon="mdi:close-circle" class="w-4 h-4 inline mr-1" />
                                     Retirer du dépôt
                                 </button>
                             @else
@@ -243,7 +243,7 @@
                                     type="submit"
                                     class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
                                 >
-                                    <x-lucide-check class="w-4 h-4 inline mr-1" />
+                                    <x-iconify icon="mdi:check" class="w-4 h-4 inline mr-1" />
                                     {{ $action === 'transfer' ? 'Transférer' : 'Affecter' }}
                                 </button>
                             @endif

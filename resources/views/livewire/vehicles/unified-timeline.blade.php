@@ -22,7 +22,7 @@
                 class="px-3 py-1.5 rounded-lg text-sm font-medium transition-colors
                     {{ $showDepotEvents ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200' }}"
             >
-                <x-lucide-building-2 class="w-4 h-4 inline mr-1" />
+                <x-iconify icon="mdi:office-building" class="w-4 h-4 inline mr-1" />
                 Dépôts ({{ $stats['depot'] }})
             </button>
 
@@ -31,7 +31,7 @@
                 class="px-3 py-1.5 rounded-lg text-sm font-medium transition-colors
                     {{ $showDriverEvents ? 'bg-purple-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200' }}"
             >
-                <x-lucide-user class="w-4 h-4 inline mr-1" />
+                <x-iconify icon="mdi:account" class="w-4 h-4 inline mr-1" />
                 Chauffeurs ({{ $stats['driver'] }})
             </button>
 
@@ -40,7 +40,7 @@
                 class="px-3 py-1.5 rounded-lg text-sm font-medium transition-colors
                     {{ $showMaintenanceEvents ? 'bg-orange-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200' }}"
             >
-                <x-lucide-wrench class="w-4 h-4 inline mr-1" />
+                <x-iconify icon="mdi:wrench" class="w-4 h-4 inline mr-1" />
                 Maintenances ({{ $stats['maintenance'] }})
             </button>
 
@@ -50,7 +50,7 @@
                     class="px-3 py-1.5 rounded-lg text-sm font-medium transition-colors
                         {{ $showExpenseEvents ? 'bg-yellow-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200' }}"
                 >
-                    <x-lucide-credit-card class="w-4 h-4 inline mr-1" />
+                    <x-iconify icon="mdi:credit-card" class="w-4 h-4 inline mr-1" />
                     Dépenses ({{ $stats['expense'] }})
                 </button>
             @endif
@@ -121,7 +121,7 @@
                                 {{-- User --}}
                                 @if($event['user'])
                                     <div class="flex items-center text-xs text-gray-500 mt-2">
-                                        <x-lucide-user class="w-3 h-3 mr-1" />
+                                        <x-iconify icon="mdi:account" class="w-3 h-3 mr-1" />
                                         Par {{ $event['user']->name ?? 'Utilisateur inconnu' }}
                                     </div>
                                 @endif
@@ -130,7 +130,7 @@
                                 @if($event['notes'])
                                     <div class="mt-3 pt-3 border-t border-gray-200">
                                         <p class="text-sm text-gray-700">
-                                            <x-lucide-message-square class="w-4 h-4 inline mr-1 text-gray-400" />
+                                            <x-iconify icon="mdi:message-text" class="w-4 h-4 inline mr-1 text-gray-400" />
                                             {{ $event['notes'] }}
                                         </p>
                                     </div>
@@ -145,16 +145,16 @@
                                         {{ $event['type'] === 'expense' ? 'bg-yellow-100 text-yellow-800' : '' }}
                                     ">
                                         @if($event['type'] === 'depot')
-                                            <x-lucide-building-2 class="w-3 h-3 mr-1" />
+                                            <x-iconify icon="mdi:office-building" class="w-3 h-3 mr-1" />
                                             Dépôt
                                         @elseif($event['type'] === 'driver')
-                                            <x-lucide-user class="w-3 h-3 mr-1" />
+                                            <x-iconify icon="mdi:account" class="w-3 h-3 mr-1" />
                                             Chauffeur
                                         @elseif($event['type'] === 'maintenance')
-                                            <x-lucide-wrench class="w-3 h-3 mr-1" />
+                                            <x-iconify icon="mdi:wrench" class="w-3 h-3 mr-1" />
                                             Maintenance
                                         @elseif($event['type'] === 'expense')
-                                            <x-lucide-credit-card class="w-3 h-3 mr-1" />
+                                            <x-iconify icon="mdi:credit-card" class="w-3 h-3 mr-1" />
                                             Dépense
                                         @endif
                                     </span>
@@ -172,7 +172,7 @@
                         wire:click="loadMore"
                         class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
                     >
-                        <x-lucide-chevron-down class="w-4 h-4 inline mr-1" />
+                        <x-iconify icon="mdi:chevron-down" class="w-4 h-4 inline mr-1" />
                         Charger plus
                     </button>
                 </div>
@@ -181,7 +181,7 @@
     @else
         {{-- État vide --}}
         <div class="bg-white rounded-lg border-2 border-dashed border-gray-300 p-12 text-center">
-            <x-lucide-calendar class="w-16 h-16 mx-auto text-gray-400 mb-4" />
+            <x-iconify icon="mdi:calendar" class="w-16 h-16 mx-auto text-gray-400 mb-4" />
             <h3 class="text-lg font-medium text-gray-900 mb-2">Aucun événement</h3>
             <p class="text-gray-600">
                 @if(!$showDepotEvents && !$showDriverEvents && !$showMaintenanceEvents && !$showExpenseEvents)
