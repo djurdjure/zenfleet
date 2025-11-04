@@ -249,6 +249,47 @@
                         </a>
                     @endif
 
+{{-- START: Tâche 1 - Bouton Export avec Menu Déroulant --}}
+@can('export vehicles')
+ <div class="relative" x-data="{ openExport: false }">
+    <button @click="openExport = !openExport"
+            @click.away="openExport = false"
+            class="inline-flex items-center gap-2 px-4 py-2.5 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-all duration-200 shadow-sm hover:shadow-md">
+        <x-iconify icon="lucide:download" class="w-5 h-5 text-gray-600" />
+        <span class="hidden sm:inline font-medium text-gray-700">Exporter</span>
+        <x-iconify icon="lucide:chevron-down" class="w-4 h-4 text-gray-500" />
+    </button>
+    
+    <div x-show="openExport"
+         x-transition:enter="transition ease-out duration-200"
+         x-transition:enter-start="opacity-0 transform scale-95"
+         x-transition:enter-end="opacity-100 transform scale-100"
+         x-transition:leave="transition ease-in duration-75"
+         x-transition:leave-start="opacity-100 transform scale-100"
+         x-transition:leave-end="opacity-0 transform scale-95"
+         class="absolute right-0 z-50 mt-2 w-48 rounded-lg shadow-lg bg-white ring-1 ring-black ring-opacity-5">
+        <div class="py-1">
+            <a href="{{ route('admin.vehicles.export.csv', request()->all()) }}"
+               class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
+                <x-iconify icon="lucide:file-text" class="w-4 h-4 mr-3 text-gray-500" />
+                Export CSV
+            </a>
+            <a href="{{ route('admin.vehicles.export.excel', request()->all()) }}"
+               class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
+                <x-iconify icon="lucide:file-spreadsheet" class="w-4 h-4 mr-3 text-gray-500" />
+                Export Excel
+            </a>
+            <a href="{{ route('admin.vehicles.export.pdf', request()->all()) }}"
+               class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
+                <x-iconify icon="lucide:file-text" class="w-4 h-4 mr-3 text-gray-500" />
+                Export PDF
+            </a>
+        </div>
+    </div>
+ </div>
+ @endcan
+{{-- END: Tâche 1 - Bouton Export avec Menu Déroulant --}}
+
 @can('create vehicles')
  <a href="{{ route('admin.vehicles.import.show') }}"
  class="inline-flex items-center gap-2 px-4 py-2.5 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg transition-colors duration-200 text-sm shadow-sm hover:shadow-md">
@@ -476,12 +517,11 @@
  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
  Kilométrage
  </th>
+ {{-- START: Tâche 2 - Suppression colonne Actions rapides et conservation seule colonne Actions --}}
  <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
- Actions rapides
- </th>
- <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
  Actions
  </th>
+ {{-- END: Tâche 2 --}}
  </tr>
  </thead>
  <tbody class="bg-white divide-y divide-gray-200">
@@ -582,81 +622,94 @@
  {{ number_format($vehicle->current_mileage) }} km
  </td>
  
- {{-- Actions Rapides - Enterprise Ultra Pro --}}
- <td class="px-6 py-4 whitespace-nowrap text-center">
+ {{-- START: Actions Directes et Menu Dropdown Enterprise Grade --}}
+ <td class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
     <div class="flex items-center justify-center gap-1">
-        {{-- Dupliquer --}}
-        <button onclick="duplicateVehicle({{ $vehicle->id }})"
-                class="inline-flex items-center p-1.5 text-purple-600 hover:text-purple-900 hover:bg-purple-50 rounded-lg transition-colors"
-                title="Dupliquer">
-            <x-iconify icon="lucide:copy" class="w-4 h-4" />
-        </button>
-        
-        {{-- QR Code --}}
-        <button onclick="generateQRCode({{ $vehicle->id }})"
-                class="inline-flex items-center p-1.5 text-indigo-600 hover:text-indigo-900 hover:bg-indigo-50 rounded-lg transition-colors"
-                title="QR Code">
-            <x-iconify icon="lucide:qr-code" class="w-4 h-4" />
-        </button>
-        
-        {{-- Export PDF --}}
-        <button onclick="exportVehiclePDF({{ $vehicle->id }})"
-                class="inline-flex items-center p-1.5 text-emerald-600 hover:text-emerald-900 hover:bg-emerald-50 rounded-lg transition-colors"
-                title="Export PDF">
-            <x-iconify icon="lucide:file-text" class="w-4 h-4" />
-        </button>
-        
-        {{-- Timeline/Historique --}}
-        <button onclick="showVehicleTimeline({{ $vehicle->id }})"
-                class="inline-flex items-center p-1.5 text-cyan-600 hover:text-cyan-900 hover:bg-cyan-50 rounded-lg transition-colors"
-                title="Historique">
-            <x-iconify icon="lucide:clock" class="w-4 h-4" />
-        </button>
+        @if($vehicle->is_archived || $vehicle->trashed() || request('archived') === 'true')
+            {{-- Actions directes pour véhicules ARCHIVÉS --}}
+            <button onclick="restoreVehicle({{ $vehicle->id }}, '{{ $vehicle->registration_plate }}', '{{ $vehicle->brand }} {{ $vehicle->model }}')"
+                    class="inline-flex items-center p-1.5 text-green-600 hover:text-green-700 hover:bg-green-50 rounded-lg transition-all duration-200"
+                    title="Restaurer">
+                <x-iconify icon="lucide:rotate-ccw" class="w-4 h-4" />
+            </button>
+            <button onclick="permanentDeleteVehicle({{ $vehicle->id }}, '{{ $vehicle->registration_plate }}', '{{ $vehicle->brand }} {{ $vehicle->model }}')"
+                    class="inline-flex items-center p-1.5 text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg transition-all duration-200"
+                    title="Supprimer définitivement">
+                <x-iconify icon="lucide:trash-2" class="w-4 h-4" />
+            </button>
+        @else
+            {{-- Actions directes pour véhicules ACTIFS --}}
+            @can('view vehicles')
+            <a href="{{ route('admin.vehicles.show', $vehicle) }}"
+               class="inline-flex items-center p-1.5 text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-lg transition-all duration-200"
+               title="Voir détails">
+                <x-iconify icon="lucide:eye" class="w-4 h-4" />
+            </a>
+            @endcan
+            
+            @can('update vehicles')
+            <a href="{{ route('admin.vehicles.edit', $vehicle) }}"
+               class="inline-flex items-center p-1.5 text-gray-600 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-all duration-200"
+               title="Modifier">
+                <x-iconify icon="lucide:edit" class="w-4 h-4" />
+            </a>
+            @endcan
+            
+            {{-- Menu dropdown pour actions supplémentaires --}}
+            <div class="relative inline-block text-left" x-data="{ open: false }">
+                <button @click="open = !open"
+                        @click.away="open = false"
+                        type="button"
+                        class="inline-flex items-center p-1.5 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-all duration-200"
+                        id="vehicle-menu-{{ $vehicle->id }}">
+                    <x-iconify icon="lucide:more-vertical" class="w-4 h-4" />
+                </button>
+
+                <div x-show="open"
+                     x-cloak
+                     x-transition:enter="transition ease-out duration-100"
+                     x-transition:enter-start="transform opacity-0 scale-95"
+                     x-transition:enter-end="transform opacity-100 scale-100"
+                     x-transition:leave="transition ease-in duration-75"
+                     x-transition:leave-start="transform opacity-100 scale-100"
+                     x-transition:leave-end="transform opacity-0 scale-95"
+                     class="absolute right-0 z-50 mt-2 w-56 rounded-lg shadow-lg bg-white ring-1 ring-black ring-opacity-5 divide-y divide-gray-100">
+                    <div class="py-1">
+                        {{-- Actions supplémentaires --}}
+                        <button onclick="duplicateVehicle({{ $vehicle->id }})"
+                                class="flex w-full items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
+                            <x-iconify icon="lucide:copy" class="w-4 h-4 mr-3 text-purple-600" />
+                            Dupliquer
+                        </button>
+                        
+                        <a href="{{ route('admin.vehicles.history', $vehicle) }}"
+                           class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
+                            <x-iconify icon="lucide:clock" class="w-4 h-4 mr-3 text-cyan-600" />
+                            Historique
+                        </a>
+                        
+                        <a href="{{ route('admin.vehicles.export.single.pdf', $vehicle) }}"
+                           class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
+                            <x-iconify icon="lucide:file-text" class="w-4 h-4 mr-3 text-emerald-600" />
+                            Exporter PDF
+                        </a>
+                        
+                        @can('delete vehicles')
+                        <div class="border-t border-gray-100 mt-1 pt-1">
+                            <button onclick="archiveVehicle({{ $vehicle->id }}, '{{ $vehicle->registration_plate }}', '{{ $vehicle->brand }} {{ $vehicle->model }}')"
+                                    class="flex w-full items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
+                                <x-iconify icon="lucide:archive" class="w-4 h-4 mr-3 text-orange-600" />
+                                Archiver
+                            </button>
+                        </div>
+                        @endcan
+                    </div>
+                </div>
+            </div>
+        @endif
     </div>
  </td>
- 
- <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
- <div class="flex items-center justify-end gap-2">
-                                @if($vehicle->is_archived || $vehicle->trashed() || request('archived') === 'true')
-                                    {{-- Actions pour véhicules ARCHIVÉS --}}
-                                    <button
-                                        onclick="restoreVehicle({{ $vehicle->id }}, '{{ $vehicle->registration_plate }}', '{{ $vehicle->brand }} {{ $vehicle->model }}')"
-                                        class="inline-flex items-center p-1.5 text-green-600 hover:text-green-900 hover:bg-green-50 rounded-lg transition-colors"
-                                        title="Restaurer">
-                                        <x-iconify icon="lucide:rotate-ccw" class="w-5 h-5" />
-                                    </button>
-                                    <button
-                                        onclick="permanentDeleteVehicle({{ $vehicle->id }}, '{{ $vehicle->registration_plate }}', '{{ $vehicle->brand }} {{ $vehicle->model }}')"
-                                        class="inline-flex items-center p-1.5 text-red-600 hover:text-red-900 hover:bg-red-50 rounded-lg transition-colors"
-                                        title="Supprimer définitivement">
-                                        <x-iconify icon="lucide:trash-2" class="w-5 h-5" />
-                                    </button>
-                                @else
-                                    {{-- Actions pour véhicules ACTIFS --}}
-                                    @can('view vehicles')
-                                    <a href="{{ route('admin.vehicles.show', $vehicle) }}"
-                                       class="inline-flex items-center p-1.5 text-blue-600 hover:text-blue-900 hover:bg-blue-50 rounded-lg transition-colors"
-                                       title="Voir">
-                                        <x-iconify icon="lucide:eye" class="w-5 h-5" />
-                                    </a>
-                                    @endcan
-                                    @can('update vehicles')
-                                    <a href="{{ route('admin.vehicles.edit', $vehicle) }}"
-                                       class="inline-flex items-center p-1.5 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
-                                       title="Modifier">
-                                        <x-iconify icon="lucide:edit" class="w-5 h-5" />
-                                    </a>
-                                    @endcan
-                                    @can('delete vehicles')
-                                    <button
-                                        onclick="archiveVehicle({{ $vehicle->id }}, '{{ $vehicle->registration_plate }}', '{{ $vehicle->brand }} {{ $vehicle->model }}')"\ n                                        class="inline-flex items-center p-1.5 text-orange-600 hover:text-orange-900 hover:bg-orange-50 rounded-lg transition-colors"
-                                        title="Archiver">
-                                        <x-iconify icon="lucide:archive" class="w-5 h-5" />
-                                    </button>
-                                    @endcan
-                                @endif
- </div>
- </td>
+ {{-- END: Tâche 2 - Menu Dropdown Trois Points --}}
  </tr>
  @endforeach
  </tbody>
@@ -832,10 +885,7 @@ function generateQRCode(vehicleId) {
     window.open(`/admin/vehicles/${vehicleId}/qrcode`, '_blank', 'width=400,height=400');
 }
 
-// Export PDF du véhicule
-function exportVehiclePDF(vehicleId) {
-    window.location.href = `/admin/vehicles/${vehicleId}/export-pdf`;
-}
+// Export PDF du véhicule - Supprimé car utilise directement lien href dans menu dropdown
 
 // Afficher la timeline/historique
 function showVehicleTimeline(vehicleId) {
@@ -951,19 +1001,16 @@ function restoreVehicle(vehicleId, plate, brand) {
  <p class="text-sm text-gray-500">
  Voulez-vous restaurer ce véhicule ? Il sera de nouveau visible dans la liste des véhicules actifs.
  </p>
- <div class="mt-4 bg-blue-50 border border-blue-200 rounded-lg p-4">
+ <div class="mt-4 bg-green-50 border border-green-200 rounded-lg p-4">
  <div class="flex items-center gap-3">
- <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
- <svg class="h-6 w-6 text-blue-600" fill="currentColor" viewBox="0 0 24 24">
+ <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
+ <svg class="h-6 w-6 text-green-600" fill="currentColor" viewBox="0 0 24 24">
  <path d="M18.92 6.01C18.72 5.42 18.16 5 17.5 5h-11c-.66 0-1.22.42-1.42 1.01L3 12v8c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h12v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-8l-2.08-5.99zM6.5 16c-.83 0-1.5-.67-1.5-1.5S5.67 13 6.5 13s1.5.67 1.5 1.5S7.33 16 6.5 16zm11 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zM5 11l1.5-4.5h11L19 11H5z"/>
  </svg>
  </div>
  <div>
- <p class="font-semibold text-blue-900">${plate}</p>
- <p class="text-sm text-blue-700">${brand}</p>
- </div>
- </div>
- </div>
+ <p class="font-semibold text-green-700">${plate}</p>
+ <p class="text-sm text-green-600">${brand}</p>
  </div>
  </div>
  </div>
@@ -975,6 +1022,9 @@ function restoreVehicle(vehicleId, plate, brand) {
  type="button"
  onclick="confirmRestore(${vehicleId})"
  class="w-full inline-flex justify-center rounded-lg border border-transparent shadow-sm px-4 py-2 bg-green-600 hover:bg-green-700 text-base font-medium text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 sm:ml-3 sm:w-auto sm:text-sm transition-colors">
+ <svg class="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+ <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+ </svg>
  Confirmer la restauration
  </button>
  <button

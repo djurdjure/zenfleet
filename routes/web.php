@@ -225,6 +225,12 @@ Route::middleware(['auth', 'verified'])
             Route::get('import-template', [VehicleController::class, 'downloadTemplate'])->name('import.template');
             Route::get('import/results', [VehicleController::class, 'showImportResults'])->name('import.results');
             Route::get('export', [VehicleController::class, 'export'])->name('export');
+            
+            // START: Tâche 1 - Routes d'Export Multiformats
+            Route::get('export/csv', [VehicleController::class, 'exportCsv'])->name('export.csv');
+            Route::get('export/excel', [VehicleController::class, 'exportExcel'])->name('export.excel');
+            Route::get('export/pdf', [VehicleController::class, 'exportPdf'])->name('export.pdf');
+            // END: Tâche 1
 
             // Gestion des archives
             Route::get('archived', [VehicleController::class, 'archived'])->name('archived');
@@ -251,6 +257,11 @@ Route::middleware(['auth', 'verified'])
             Route::get('{vehicle}/history', [VehicleController::class, 'history'])->name('history');
             Route::get('{vehicle}/maintenance', [VehicleController::class, 'maintenance'])->name('maintenance');
             Route::get('{vehicle}/documents', [VehicleController::class, 'documents'])->name('documents');
+            
+            // START: Tâche 2 - Routes pour Export PDF individuel et Duplication
+            Route::get('{vehicle}/export/pdf', [VehicleController::class, 'exportSinglePdf'])->name('export.single.pdf');
+            Route::post('{vehicle}/duplicate', [VehicleController::class, 'duplicate'])->name('duplicate');
+            // END: Tâche 2
 
             // Historique kilométrique - Livewire Component via Controller
             Route::get('{vehicle}/mileage-history', [\App\Http\Controllers\Admin\MileageReadingController::class, 'history'])->name('mileage-history');

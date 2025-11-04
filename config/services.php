@@ -6,12 +6,6 @@ return [
     |--------------------------------------------------------------------------
     | Third Party Services
     |--------------------------------------------------------------------------
-    |
-    | This file is for storing the credentials for third party services such
-    | as Mailgun, Postmark, AWS and more. This file provides the de facto
-    | location for this type of information, allowing packages to have
-    | a conventional file to locate the various service credentials.
-    |
     */
 
     'mailgun' => [
@@ -30,11 +24,23 @@ return [
         'secret' => env('AWS_SECRET_ACCESS_KEY'),
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
+
+    'slack' => [
+        'notifications' => [
+            'bot_user_oauth_token' => env('SLACK_BOT_USER_OAUTH_TOKEN'),
+            'channel' => env('SLACK_BOT_USER_DEFAULT_CHANNEL'),
+        ],
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | PDF Microservice Configuration
+    |--------------------------------------------------------------------------
+    */
     'pdf' => [
-        'url' => env('PDF_SERVICE_URL', 'http://pdf-service:3000/generate-pdf'),
-        'health_url' => env('PDF_SERVICE_HEALTH_URL', 'http://pdf-service:3000/health'),
-        'timeout' => env('PDF_SERVICE_TIMEOUT', 120),
-        'retries' => env('PDF_SERVICE_RETRIES', 3),
+        'url' => env('PDF_SERVICE_URL', 'http://pdf-service:3000'),
+        'timeout' => env('PDF_SERVICE_TIMEOUT', 60),
+        'retry' => env('PDF_SERVICE_RETRY', 3),
     ],
 
 ];

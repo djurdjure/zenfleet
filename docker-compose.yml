@@ -29,8 +29,6 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
-      pdf-service:
-        condition: service_healthy
 
   # --- Service Nginx (Serveur Web) ---
   nginx:
@@ -98,19 +96,23 @@ services:
     working_dir: /var/www/html
     tty: true
 
-  # --- Microservice de Génération de PDF ---
+  # --- Microservice de Génération de PDF Enterprise ---
   pdf-service:
     build:
       context: ./pdf-service
+      dockerfile: Dockerfile
     container_name: zenfleet_pdf_service
     restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
     networks:
-      zenfleet_network:
-        aliases:
-          - node
+      - zenfleet_network
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
       interval: 30s
       timeout: 10s
       retries: 5
-      start_period: 30s
+      start_period: 40s
