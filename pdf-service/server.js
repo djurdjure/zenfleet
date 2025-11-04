@@ -1,12 +1,12 @@
 /**
- * PDF Microservice - Enterprise Grade v2.1
+ * PDF Microservice - Enterprise Grade v3.0
  * Service Node.js pour génération de PDFs haute qualité
- * Compatible avec format ES6 et CommonJS
+ * Compatible avec format CommonJS
  */
 
-import express from 'express';
-import puppeteer from 'puppeteer';
-import cors from 'cors';
+const express = require('express');
+const puppeteer = require('puppeteer');
+const cors = require('cors');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -24,6 +24,7 @@ async function initBrowser() {
     if (!browser) {
         browser = await puppeteer.launch({
             headless: 'new',
+            executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || '/usr/bin/chromium',
             args: [
                 '--no-sandbox',
                 '--disable-setuid-sandbox',
@@ -179,14 +180,41 @@ process.on('SIGINT', async () => {
 
 // Démarrage du serveur
 app.listen(PORT, async () => {
-    console.log(`🚀 PDF Microservice Enterprise démarré sur le port ${PORT}`);
-    console.log(`📍 Endpoints disponibles:`);
-    console.log(`   - GET  /health`);
-    console.log(`   - POST /generate-pdf`);
-    console.log(`   - POST /generate (alias)`);
-    
+    console.log(`
+========================================
+🚀 PDF Microservice Enterprise v3.0
+========================================
+📍 Port: ${PORT}
+📍 Environment: ${process.env.NODE_ENV}
+📍 Process ID: ${process.pid}
+
+📌 Endpoints disponibles:
+   GET  http://localhost:${PORT}/health
+   GET  http://localhost:${PORT}/test
+   POST http://localhost:${PORT}/generate-pdf
+   POST http://localhost:${PORT}/generate
+========================================
+`);
+
     // Pré-initialiser le browser pour des performances optimales
-    await initBrowser();
+    try {
+        console.log('🚀 Initialisation de Puppeteer...');
+        await initBrowser();
+        console.log('✅ Puppeteer initialisé avec succès');
+    } catch (error) {
+        console.error('❌ Erreur initialisation Puppeteer:', error);
+        console.error('❌ Erreur lors de l\'initialisation:', error);
+    }
 });
 
-export default app;
+// Route de test
+app.get('/test', (req, res) => {
+    res.json({
+        status: 'ok',
+        message: 'PDF Microservice is running',
+        version: '3.0.0',
+        puppeteer: browser ? 'initialized' : 'not initialized'
+    });
+});
+
+module.exports = app;

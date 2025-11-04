@@ -92,7 +92,7 @@ class VehiclePdfExportService
                 'depot',
                 'category',
                 'assignments' => function($q) {
-                    $q->where('is_active', true)
+                    $q->where('status', 'active')
                       ->with('driver.user');
                 }
             ]);
@@ -129,7 +129,7 @@ class VehiclePdfExportService
      */
     protected function generateSingleVehicleHtml($vehicle)
     {
-        $activeAssignment = $vehicle->assignments->where('is_active', true)->first();
+        $activeAssignment = $vehicle->assignments->where('status', 'active')->first();
         $driver = $activeAssignment ? $activeAssignment->driver : null;
         $user = $driver ? $driver->user : null;
 

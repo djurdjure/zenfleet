@@ -80,7 +80,7 @@ class VehiclesCsvExport
                 'depot',
                 'category',
                 'assignments' => function($q) {
-                    $q->where('is_active', true)
+                    $q->where('status', 'active')
                       ->with('driver.user');
                 }
             ]);

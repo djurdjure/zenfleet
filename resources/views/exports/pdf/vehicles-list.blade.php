@@ -147,7 +147,7 @@
         <tbody>
             @foreach($vehicles as $vehicle)
                 @php
-                    $activeAssignment = $vehicle->assignments->where('is_active', true)->first();
+                    $activeAssignment = $vehicle->assignments->where('status', 'active')->first();
                     $driver = $activeAssignment ? $activeAssignment->driver : null;
                     $user = $driver ? $driver->user : null;
                     

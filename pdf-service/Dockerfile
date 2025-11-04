@@ -1,11 +1,13 @@
 FROM node:18-slim
 
-# Installer les dépendances pour Puppeteer et healthcheck
+# Installer Chromium et les dépendances pour Puppeteer
 RUN apt-get update && apt-get install -y \
     wget \
     curl \
     ca-certificates \
     fonts-liberation \
+    fonts-noto-color-emoji \
+    chromium \
     libappindicator3-1 \
     libasound2 \
     libatk-bridge2.0-0 \
@@ -60,8 +62,8 @@ EXPOSE 3000
 
 # Variables d'environnement
 ENV NODE_ENV=production
-ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=false
-ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
+ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
+ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium
 
 # Démarrer le service
 CMD ["node", "server.js"]

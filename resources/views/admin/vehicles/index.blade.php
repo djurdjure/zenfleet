@@ -638,7 +638,7 @@
                 <x-iconify icon="lucide:trash-2" class="w-4 h-4" />
             </button>
         @else
-            {{-- Actions directes pour véhicules ACTIFS --}}
+            {{-- Actions directes PRINCIPALES pour véhicules ACTIFS --}}
             @can('view vehicles')
             <a href="{{ route('admin.vehicles.show', $vehicle) }}"
                class="inline-flex items-center p-1.5 text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-lg transition-all duration-200"
@@ -649,7 +649,7 @@
             
             @can('update vehicles')
             <a href="{{ route('admin.vehicles.edit', $vehicle) }}"
-               class="inline-flex items-center p-1.5 text-gray-600 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-all duration-200"
+               class="inline-flex items-center p-1.5 text-amber-600 hover:text-amber-700 hover:bg-amber-50 rounded-lg transition-all duration-200"
                title="Modifier">
                 <x-iconify icon="lucide:edit" class="w-4 h-4" />
             </a>
