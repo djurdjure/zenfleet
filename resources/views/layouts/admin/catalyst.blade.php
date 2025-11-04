@@ -265,6 +265,17 @@
  </li>
  @endhasanyrole
 
+ {{-- Dépôts - ENTERPRISE GRADE --}}
+ @hasanyrole('Super Admin|Admin|Gestionnaire Flotte')
+ <li class="flex">
+ <a href="{{ route('admin.depots.index') }}"
+ class="flex items-center w-full h-11 px-3.5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 {{ request()->routeIs('admin.depots.*') ? 'bg-blue-600 text-white shadow-md' : 'text-gray-700 hover:bg-white hover:text-gray-900 hover:shadow-sm' }}">
+ <x-iconify icon="mdi:office-building" class="w-5 h-5 mr-3 {{ request()->routeIs('admin.depots.*') ? 'text-white' : 'text-gray-600' }}" />
+ <span class="flex-1">Dépôts</span>
+ </a>
+ </li>
+ @endhasanyrole
+
  {{-- Demandes de Réparation - Chauffeurs uniquement (menu séparé) --}}
  @hasrole('Chauffeur')
  @can('view own repair requests')
@@ -794,6 +805,17 @@
  class="group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold {{ request()->routeIs('admin.drivers.*') ? 'bg-zinc-950 text-white' : 'text-zinc-700 hover:text-zinc-950 hover:bg-zinc-100' }}">
  <x-iconify icon="heroicons:user" class="h-5 w-5 shrink-0" />
  Chauffeurs
+ </a>
+ </li>
+ @endhasanyrole
+
+ {{-- Dépôts - ENTERPRISE GRADE (Mobile) --}}
+ @hasanyrole('Super Admin|Admin|Gestionnaire Flotte')
+ <li>
+ <a href="{{ route('admin.depots.index') }}"
+ class="group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold {{ request()->routeIs('admin.depots.*') ? 'bg-zinc-950 text-white' : 'text-zinc-700 hover:text-zinc-950 hover:bg-zinc-100' }}">
+ <x-iconify icon="mdi:office-building" class="h-5 w-5 shrink-0" />
+ Dépôts
  </a>
  </li>
  @endhasanyrole

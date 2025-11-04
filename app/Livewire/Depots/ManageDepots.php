@@ -1,0 +1,317 @@
+<?php
+
+namespace App\Livewire\Depots;
+
+use App\Models\VehicleDepot;
+use App\Services\DepotAssignmentService;
+use Illuminate\Support\Facades\Auth;
+use Livewire\Component;
+use Livewire\WithPagination;
+
+/**
+ * ManageDepots Livewire Component
+ *
+ * Enterprise-grade depot management interface with:
+ * - Interactive list with real-time statistics
+ * - Advanced filtering and search
+ * - CRUD operations with validation
+ * - Capacity management
+ * - Vehicle assignment tracking
+ *
+ * @package App\Livewire\Depots
+ */
+class ManageDepots extends Component
+{
+    use WithPagination;
+
+    // Search and filters
+    public $search = '';
+    public $statusFilter = 'all'; // all, active, inactive
+    public $capacityFilter = 'all'; // all, available, full
+    public $sortBy = 'name';
+    public $sortDirection = 'asc';
+
+    // Modal state
+    public $showModal = false;
+    public $modalMode = 'create'; // create, edit, view
+    public $selectedDepotId = null;
+
+    // Form fields
+    public $name = '';
+    public $code = '';
+    public $address = '';
+    public $city = '';
+    public $wilaya = '';
+    public $postal_code = '';
+    public $phone = '';
+    public $email = '';
+    public $manager_name = '';
+    public $manager_phone = '';
+    public $capacity = null;
+    public $latitude = null;
+    public $longitude = '';
+    public $description = '';
+    public $is_active = true;
+
+    protected $queryString = [
+        'search' => ['except' => ''],
+        'statusFilter' => ['except' => 'all'],
+        'capacityFilter' => ['except' => 'all'],
+        'sortBy' => ['except' => 'name'],
+        'sortDirection' => ['except' => 'asc'],
+    ];
+
+    protected function rules()
+    {
+        return [
+            'name' => 'required|string|max:255',
+            'code' => 'required|string|max:50|unique:vehicle_depots,code,' . $this->selectedDepotId,
+            'address' => 'nullable|string|max:500',
+            'city' => 'nullable|string|max:100',
+            'wilaya' => 'nullable|string|max:100',
+            'postal_code' => 'nullable|string|max:20',
+            'phone' => 'nullable|string|max:20',
+            'email' => 'nullable|email|max:255',
+            'manager_name' => 'nullable|string|max:255',
+            'manager_phone' => 'nullable|string|max:20',
+            'capacity' => 'nullable|integer|min:1|max:10000',
+            'latitude' => 'nullable|numeric|between:-90,90',
+            'longitude' => 'nullable|numeric|between:-180,180',
+            'description' => 'nullable|string|max:1000',
+            'is_active' => 'boolean',
+        ];
+    }
+
+    public function mount()
+    {
+        // Initialize component
+    }
+
+    public function render()
+    {
+        $depots = $this->getDepots();
+        $stats = $this->getOverallStats();
+
+        return view('livewire.depots.manage-depots', [
+            'depots' => $depots,
+            'stats' => $stats,
+        ]);
+    }
+
+    protected function getDepots()
+    {
+        $query = VehicleDepot::forOrganization(Auth::user()->organization_id)
+            ->withCount('vehicles');
+
+        // Search
+        if ($this->search) {
+            $query->where(function ($q) {
+                $q->where('name', 'like', '%' . $this->search . '%')
+                    ->orWhere('code', 'like', '%' . $this->search . '%')
+                    ->orWhere('city', 'like', '%' . $this->search . '%')
+                    ->orWhere('wilaya', 'like', '%' . $this->search . '%');
+            });
+        }
+
+        // Status filter
+        if ($this->statusFilter === 'active') {
+            $query->active();
+        } elseif ($this->statusFilter === 'inactive') {
+            $query->where('is_active', false);
+        }
+
+        // Capacity filter
+        if ($this->capacityFilter === 'available') {
+            $query->whereRaw('current_count < capacity')
+                ->whereNotNull('capacity');
+        } elseif ($this->capacityFilter === 'full') {
+            $query->whereRaw('current_count >= capacity')
+                ->whereNotNull('capacity');
+        }
+
+        // Sorting
+        $query->orderBy($this->sortBy, $this->sortDirection);
+
+        return $query->paginate(12);
+    }
+
+    protected function getOverallStats()
+    {
+        $orgId = Auth::user()->organization_id;
+
+        $allDepots = VehicleDepot::forOrganization($orgId)->get();
+
+        $totalCapacity = $allDepots->sum('capacity');
+        $totalOccupied = $allDepots->sum('current_count');
+        $totalAvailable = $totalCapacity - $totalOccupied;
+
+        return [
+            'total_depots' => $allDepots->count(),
+            'active_depots' => $allDepots->where('is_active', true)->count(),
+            'total_capacity' => $totalCapacity,
+            'total_occupied' => $totalOccupied,
+            'total_available' => $totalAvailable,
+            'average_occupancy' => $totalCapacity > 0 ? round(($totalOccupied / $totalCapacity) * 100, 1) : 0,
+        ];
+    }
+
+    public function updatingSearch()
+    {
+        $this->resetPage();
+    }
+
+    public function updatingStatusFilter()
+    {
+        $this->resetPage();
+    }
+
+    public function updatingCapacityFilter()
+    {
+        $this->resetPage();
+    }
+
+    public function sortBy($field)
+    {
+        if ($this->sortBy === $field) {
+            $this->sortDirection = $this->sortDirection === 'asc' ? 'desc' : 'asc';
+        } else {
+            $this->sortBy = $field;
+            $this->sortDirection = 'asc';
+        }
+    }
+
+    public function openCreateModal()
+    {
+        $this->resetForm();
+        $this->modalMode = 'create';
+        $this->showModal = true;
+    }
+
+    public function openEditModal($depotId)
+    {
+        $depot = VehicleDepot::where('id', $depotId)
+            ->where('organization_id', Auth::user()->organization_id)
+            ->firstOrFail();
+
+        $this->selectedDepotId = $depot->id;
+        $this->name = $depot->name;
+        $this->code = $depot->code;
+        $this->address = $depot->address;
+        $this->city = $depot->city;
+        $this->wilaya = $depot->wilaya;
+        $this->postal_code = $depot->postal_code;
+        $this->phone = $depot->phone;
+        $this->email = $depot->email;
+        $this->manager_name = $depot->manager_name;
+        $this->manager_phone = $depot->manager_phone;
+        $this->capacity = $depot->capacity;
+        $this->latitude = $depot->latitude;
+        $this->longitude = $depot->longitude;
+        $this->description = $depot->description;
+        $this->is_active = $depot->is_active;
+
+        $this->modalMode = 'edit';
+        $this->showModal = true;
+    }
+
+    public function openViewModal($depotId)
+    {
+        $this->selectedDepotId = $depotId;
+        $this->modalMode = 'view';
+        $this->showModal = true;
+    }
+
+    public function closeModal()
+    {
+        $this->showModal = false;
+        $this->resetForm();
+        $this->resetValidation();
+    }
+
+    public function save()
+    {
+        $this->validate();
+
+        $data = [
+            'name' => $this->name,
+            'code' => $this->code,
+            'address' => $this->address,
+            'city' => $this->city,
+            'wilaya' => $this->wilaya,
+            'postal_code' => $this->postal_code,
+            'phone' => $this->phone,
+            'email' => $this->email,
+            'manager_name' => $this->manager_name,
+            'manager_phone' => $this->manager_phone,
+            'capacity' => $this->capacity,
+            'latitude' => $this->latitude,
+            'longitude' => $this->longitude,
+            'description' => $this->description,
+            'is_active' => $this->is_active,
+            'organization_id' => Auth::user()->organization_id,
+        ];
+
+        if ($this->modalMode === 'create') {
+            $data['current_count'] = 0;
+            VehicleDepot::create($data);
+            session()->flash('success', 'Dépôt créé avec succès');
+        } else {
+            $depot = VehicleDepot::where('id', $this->selectedDepotId)
+                ->where('organization_id', Auth::user()->organization_id)
+                ->firstOrFail();
+
+            $depot->update($data);
+            session()->flash('success', 'Dépôt mis à jour avec succès');
+        }
+
+        $this->closeModal();
+    }
+
+    public function delete($depotId)
+    {
+        $depot = VehicleDepot::where('id', $depotId)
+            ->where('organization_id', Auth::user()->organization_id)
+            ->firstOrFail();
+
+        // Check if depot has vehicles
+        if ($depot->current_count > 0) {
+            session()->flash('error', 'Impossible de supprimer un dépôt avec des véhicules affectés');
+            return;
+        }
+
+        $depot->delete();
+        session()->flash('success', 'Dépôt supprimé avec succès');
+    }
+
+    public function toggleActive($depotId)
+    {
+        $depot = VehicleDepot::where('id', $depotId)
+            ->where('organization_id', Auth::user()->organization_id)
+            ->firstOrFail();
+
+        $depot->is_active = !$depot->is_active;
+        $depot->save();
+
+        session()->flash('success', $depot->is_active ? 'Dépôt activé' : 'Dépôt désactivé');
+    }
+
+    protected function resetForm()
+    {
+        $this->selectedDepotId = null;
+        $this->name = '';
+        $this->code = '';
+        $this->address = '';
+        $this->city = '';
+        $this->wilaya = '';
+        $this->postal_code = '';
+        $this->phone = '';
+        $this->email = '';
+        $this->manager_name = '';
+        $this->manager_phone = '';
+        $this->capacity = null;
+        $this->latitude = null;
+        $this->longitude = '';
+        $this->description = '';
+        $this->is_active = true;
+    }
+}

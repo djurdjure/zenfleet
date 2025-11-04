@@ -267,6 +267,23 @@ Route::middleware(['auth', 'verified'])
             Route::get('{vehicle}/mileage-history', [\App\Http\Controllers\Admin\MileageReadingController::class, 'history'])->name('mileage-history');
         });
 
+        /*
+        |--------------------------------------------------------------------------
+        | 🏢 DÉPÔTS - GESTION ENTERPRISE-GRADE
+        |--------------------------------------------------------------------------
+        | Système complet de gestion des dépôts avec:
+        | - CRUD complet avec Livewire
+        | - Affectation véhicules avec capacité
+        | - Historique des affectations
+        | - Statistiques et reporting
+        */
+        Route::prefix('depots')->name('depots.')->group(function () {
+            // Page principale de gestion (Livewire Component)
+            Route::get('/', function() {
+                return view('admin.depots.index');
+            })->name('index');
+        });
+
         // 👨‍💼 Chauffeurs avec Import/Export
         Route::prefix('drivers')->name('drivers.')->group(function () {
             // CORRECTION MAJEURE: Routes spécifiques AVANT les routes avec paramètres

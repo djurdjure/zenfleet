@@ -52,6 +52,7 @@ class Vehicle extends Model
     public function maintenanceLogs(): HasMany { return $this->hasMany(MaintenanceLog::class); }
     public function repairRequests(): HasMany { return $this->hasMany(RepairRequest::class); }
     public function mileageReadings(): HasMany { return $this->hasMany(VehicleMileageReading::class); }
+    public function depotAssignmentHistory(): HasMany { return $this->hasMany(DepotAssignmentHistory::class); }
 
     // =========================================================================
     // MILEAGE MANAGEMENT METHODS

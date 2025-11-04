@@ -636,6 +636,170 @@
  </div>
  </div>
 
+ {{-- Affectation Dépôt - ENTERPRISE GRADE --}}
+ <div class="info-section rounded-lg p-6">
+ <div class="section-header">
+ <div class="section-icon bg-gradient-to-br from-indigo-500 to-indigo-600">
+ <x-lucide-building-2 class="w-4 h-4" />
+ </div>
+ <div class="flex-1 flex justify-between items-center">
+ <h3 class="text-lg font-medium text-gray-900">Affectation Dépôt</h3>
+ @if($vehicle->depot_id)
+ <button
+ onclick="Livewire.dispatch('openAssignDepotModal', { vehicleId: {{ $vehicle->id }} })"
+ class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors text-sm"
+ >
+ <x-lucide-arrow-right-left class="w-4 h-4 inline mr-1" />
+ Changer de dépôt
+ </button>
+ @else
+ <button
+ onclick="Livewire.dispatch('openAssignDepotModal', { vehicleId: {{ $vehicle->id }} })"
+ class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors text-sm"
+ >
+ <x-lucide-plus class="w-4 h-4 inline mr-1" />
+ Affecter à un dépôt
+ </button>
+ @endif
+ </div>
+ </div>
+
+ @if($vehicle->depot)
+ {{-- Dépôt actuel --}}
+ <div class="bg-indigo-50 border-2 border-indigo-200 rounded-lg p-4 mb-4">
+ <div class="flex items-start justify-between">
+ <div class="flex-1">
+ <div class="flex items-center mb-2">
+ <x-lucide-building-2 class="w-5 h-5 text-indigo-600 mr-2" />
+ <h4 class="font-semibold text-indigo-900">{{ $vehicle->depot->name }}</h4>
+ <span class="ml-2 px-2 py-0.5 bg-indigo-100 text-indigo-800 rounded-full text-xs">
+ {{ $vehicle->depot->code }}
+ </span>
+ </div>
+
+ <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+ @if($vehicle->depot->city || $vehicle->depot->wilaya)
+ <div class="flex items-center text-gray-700">
+ <x-lucide-map-pin class="w-4 h-4 text-gray-500 mr-1" />
+ {{ $vehicle->depot->city }}{{ $vehicle->depot->wilaya ? ', ' . $vehicle->depot->wilaya : '' }}
+ </div>
+ @endif
+
+ @if($vehicle->depot->phone)
+ <div class="flex items-center text-gray-700">
+ <x-lucide-phone class="w-4 h-4 text-gray-500 mr-1" />
+ {{ $vehicle->depot->phone }}
+ </div>
+ @endif
+
+ @if($vehicle->depot->manager_name)
+ <div class="flex items-center text-gray-700">
+ <x-lucide-user class="w-4 h-4 text-gray-500 mr-1" />
+ {{ $vehicle->depot->manager_name }}
+ </div>
+ @endif
+
+ @if($vehicle->depot->capacity)
+ <div class="flex items-center text-gray-700">
+ <x-lucide-inbox class="w-4 h-4 text-gray-500 mr-1" />
+ Occupation: {{ $vehicle->depot->current_count }} / {{ $vehicle->depot->capacity }}
+ </div>
+ @endif
+ </div>
+ </div>
+
+ @if($vehicle->depot->capacity)
+ <div class="ml-4">
+ <div class="w-24">
+ @php
+ $percentage = $vehicle->depot->capacity > 0
+ ? ($vehicle->depot->current_count / $vehicle->depot->capacity) * 100
+ : 0;
+ $colorClass = $percentage >= 100 ? 'bg-red-500' : ($percentage >= 80 ? 'bg-orange-500' : 'bg-green-500');
+ @endphp
+ <div class="text-center mb-1">
+ <span class="text-2xl font-bold text-indigo-900">{{ round($percentage) }}%</span>
+ </div>
+ <div class="w-full bg-gray-200 rounded-full h-2">
+ <div class="{{ $colorClass }} h-2 rounded-full transition-all" style="width: {{ min($percentage, 100) }}%"></div>
+ </div>
+ <p class="text-xs text-gray-600 text-center mt-1">Taux d'occupation</p>
+ </div>
+ </div>
+ @endif
+ </div>
+ </div>
+
+ {{-- Historique récent --}}
+ @php
+ $recentHistory = $vehicle->depotAssignmentHistory()
+ ->with(['depot', 'previousDepot', 'assignedBy'])
+ ->latest('assigned_at')
+ ->limit(3)
+ ->get();
+ @endphp
+
+ @if($recentHistory->count() > 0)
+ <div class="mt-4">
+ <h5 class="text-sm font-medium text-gray-700 mb-3">Historique récent</h5>
+ <div class="space-y-2">
+ @foreach($recentHistory as $history)
+ <div class="flex items-center text-sm p-2 bg-gray-50 rounded-lg">
+ @php
+ $iconColorClass = match($history->action) {
+ 'assigned' => 'text-green-600',
+ 'unassigned' => 'text-red-600',
+ 'transferred' => 'text-blue-600',
+ default => 'text-gray-600',
+ };
+ @endphp
+ <div class="mr-3 {{ $iconColorClass }}">
+ @if($history->action === 'assigned')
+ <x-lucide-building-2 class="w-4 h-4" />
+ @elseif($history->action === 'unassigned')
+ <x-lucide-x-circle class="w-4 h-4" />
+ @else
+ <x-lucide-arrow-right-left class="w-4 h-4" />
+ @endif
+ </div>
+ <div class="flex-1">
+ <p class="font-medium text-gray-900">{{ $history->actionLabel }}</p>
+ <p class="text-xs text-gray-600">
+ @if($history->isTransfer())
+ De {{ $history->previousDepot?->name ?? 'Inconnu' }} vers {{ $history->depot?->name ?? 'Inconnu' }}
+ @elseif($history->isAssignment())
+ {{ $history->depot?->name ?? 'Dépôt inconnu' }}
+ @else
+ {{ $history->previousDepot?->name ?? 'Dépôt inconnu' }}
+ @endif
+ </p>
+ </div>
+ <div class="text-right">
+ <p class="text-xs text-gray-500">{{ $history->assigned_at->format('d/m/Y') }}</p>
+ <p class="text-xs text-gray-400">{{ $history->assigned_at->format('H:i') }}</p>
+ </div>
+ </div>
+ @endforeach
+ </div>
+ </div>
+ @endif
+ @else
+ {{-- Aucun dépôt affecté --}}
+ <div class="bg-gray-50 border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
+ <x-lucide-building-2 class="w-12 h-12 mx-auto text-gray-400 mb-3" />
+ <h4 class="text-sm font-medium text-gray-900 mb-2">Aucun dépôt affecté</h4>
+ <p class="text-sm text-gray-600 mb-4">Ce véhicule n'est actuellement affecté à aucun dépôt</p>
+ <button
+ onclick="Livewire.dispatch('openAssignDepotModal', { vehicleId: {{ $vehicle->id }} })"
+ class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors text-sm"
+ >
+ <x-lucide-plus class="w-4 h-4 inline mr-1" />
+ Affecter à un dépôt
+ </button>
+ </div>
+ @endif
+ </div>
+
  {{-- Informations financières --}}
  <div class="info-section rounded-lg p-6">
  <div class="section-header">
@@ -821,6 +985,10 @@
  </div>
  </div>
 </div>
+
+{{-- Modal Livewire pour affectation dépôt --}}
+@livewire('assignments.assign-depot-modal')
+
 @endsection
 
 @push('scripts')
