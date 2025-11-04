@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Interface Actions Véhicules - ZenFleet Enterprise</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@iconify/iconify@3.1.1/dist/iconify.min.css">
+    <script src="https://code.iconify.design/3/3.1.1/iconify.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+</head>
+<body class="bg-gray-50 p-8">
+    <div class="max-w-6xl mx-auto">
+        <div class="bg-white rounded-lg shadow-lg p-8">
+            <h1 class="text-3xl font-bold text-gray-900 mb-2">Interface Actions Véhicules</h1>
+            <p class="text-gray-600 mb-8">Comparaison Avant/Après - Enterprise Grade</p>
+
+            <!-- Avant -->
+            <div class="mb-12">
+                <h2 class="text-xl font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                    <span class="text-red-500">❌</span> Avant (Icônes seules)
+                </h2>
+                <div class="bg-gray-50 p-6 rounded-lg border border-gray-200">
+                    <div class="flex items-center justify-center gap-1">
+                        <!-- Ancien design -->
+                        <a href="#" class="inline-flex items-center p-1.5 text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-lg transition-all duration-200" title="Voir détails">
+                            <iconify-icon icon="lucide:eye" class="w-4 h-4"></iconify-icon>
+                        </a>
+                        <a href="#" class="inline-flex items-center p-1.5 text-gray-600 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-all duration-200" title="Modifier">
+                            <iconify-icon icon="lucide:edit" class="w-4 h-4"></iconify-icon>
+                        </a>
+                        <div class="relative inline-block text-left" x-data="{ open: false }">
+                            <button type="button" class="inline-flex items-center p-1.5 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-all duration-200">
+                                <iconify-icon icon="lucide:more-vertical" class="w-4 h-4"></iconify-icon>
+                            </button>
+                        </div>
+                    </div>
+                    <p class="text-sm text-gray-500 mt-4 text-center">
+                        ⚠️ Problème: Pas clair pour l'utilisateur, nécessite de survoler pour comprendre
+                    </p>
+                </div>
+            </div>
+
+            <!-- Après -->
+            <div class="mb-12">
+                <h2 class="text-xl font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                    <span class="text-green-500">✅</span> Après (Boutons avec Texte)
+                </h2>
+                <div class="bg-gradient-to-br from-blue-50 to-purple-50 p-6 rounded-lg border-2 border-green-300">
+                    <div class="flex items-center justify-center gap-1">
+                        <!-- Nouveau design -->
+                        <a href="#" class="inline-flex items-center gap-1.5 px-3 py-1.5 text-blue-600 hover:text-white bg-blue-50 hover:bg-blue-600 rounded-lg transition-all duration-200 font-medium text-sm" title="Voir les détails du véhicule">
+                            <iconify-icon icon="lucide:eye" class="w-4 h-4"></iconify-icon>
+                            <span>Voir</span>
+                        </a>
+                        <a href="#" class="inline-flex items-center gap-1.5 px-3 py-1.5 text-gray-700 hover:text-white bg-gray-100 hover:bg-gray-700 rounded-lg transition-all duration-200 font-medium text-sm" title="Modifier le véhicule">
+                            <iconify-icon icon="lucide:edit" class="w-4 h-4"></iconify-icon>
+                            <span>Modifier</span>
+                        </a>
+                        <div class="relative inline-block text-left" x-data="{ open: false }">
+                            <button @click="open = !open" @click.away="open = false" type="button" class="inline-flex items-center p-1.5 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-all duration-200">
+                                <iconify-icon icon="lucide:more-vertical" class="w-4 h-4"></iconify-icon>
+                            </button>
+                            
+                            <div x-show="open" 
+                                 x-cloak
+                                 x-transition:enter="transition ease-out duration-100"
+                                 x-transition:enter-start="transform opacity-0 scale-95"
+                                 x-transition:enter-end="transform opacity-100 scale-100"
+                                 class="absolute right-0 z-50 mt-2 w-56 rounded-lg shadow-lg bg-white ring-1 ring-black ring-opacity-5">
+                                <div class="py-1">
+                                    <a href="#" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                        <iconify-icon icon="lucide:copy" class="w-4 h-4 mr-3 text-purple-600"></iconify-icon>
+                                        Dupliquer
+                                    </a>
+                                    <a href="#" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                        <iconify-icon icon="lucide:clock" class="w-4 h-4 mr-3 text-cyan-600"></iconify-icon>
+                                        Historique
+                                    </a>
+                                    <a href="#" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                        <iconify-icon icon="lucide:file-text" class="w-4 h-4 mr-3 text-emerald-600"></iconify-icon>
+                                        Exporter PDF
+                                    </a>
+                                    <div class="border-t border-gray-100 mt-1 pt-1">
+                                        <a href="#" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                            <iconify-icon icon="lucide:archive" class="w-4 h-4 mr-3 text-orange-600"></iconify-icon>
+                                            Archiver
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="text-sm text-green-700 mt-4 text-center font-medium">
+                        ✅ Solution: Clair, intuitif, professionnel - Surpasse Fleetio et autres leaders !
+                    </p>
+                </div>
+            </div>
+
+            <!-- Comparaison détaillée -->
+            <div class="bg-gray-100 rounded-lg p-6">
+                <h3 class="text-lg font-semibold text-gray-800 mb-4">📊 Comparaison Détaillée</h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="bg-white p-4 rounded-lg">
+                        <h4 class="font-semibold text-gray-700 mb-2">Visibilité</h4>
+                        <p class="text-sm text-gray-600">Avant: ⭐⭐</p>
+                        <p class="text-sm text-green-600 font-semibold">Après: ⭐⭐⭐⭐⭐</p>
+                    </div>
+                    <div class="bg-white p-4 rounded-lg">
+                        <h4 class="font-semibold text-gray-700 mb-2">Clarté</h4>
+                        <p class="text-sm text-gray-600">Avant: ⭐⭐</p>
+                        <p class="text-sm text-green-600 font-semibold">Après: ⭐⭐⭐⭐⭐</p>
+                    </div>
+                    <div class="bg-white p-4 rounded-lg">
+                        <h4 class="font-semibold text-gray-700 mb-2">UX</h4>
+                        <p class="text-sm text-gray-600">Avant: ⭐⭐⭐</p>
+                        <p class="text-sm text-green-600 font-semibold">Après: ⭐⭐⭐⭐⭐</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Instructions -->
+            <div class="mt-8 bg-blue-50 border border-blue-200 rounded-lg p-6">
+                <h3 class="text-lg font-semibold text-blue-900 mb-3">📝 Instructions Test</h3>
+                <ol class="list-decimal list-inside space-y-2 text-sm text-blue-800">
+                    <li>Survolez les boutons "Voir" et "Modifier" pour voir les effets hover</li>
+                    <li>Cliquez sur le bouton ⋮ pour ouvrir le menu dropdown</li>
+                    <li>Comparez avec l'ancienne version (icônes seules)</li>
+                    <li>Redimensionnez la fenêtre pour tester le responsive</li>
+                </ol>
+            </div>
+
+            <!-- Responsive Test -->
+            <div class="mt-8">
+                <h3 class="text-lg font-semibold text-gray-800 mb-4">📱 Test Responsive</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Mobile -->
+                    <div class="bg-gray-800 rounded-lg p-4">
+                        <p class="text-white font-semibold mb-3">Mobile (< 1024px)</p>
+                        <div class="bg-white rounded p-4">
+                            <div class="flex items-center justify-center gap-1">
+                                <a href="#" class="inline-flex items-center gap-1.5 px-3 py-1.5 text-blue-600 bg-blue-50 hover:bg-blue-600 hover:text-white rounded-lg font-medium text-sm">
+                                    <iconify-icon icon="lucide:eye" class="w-4 h-4"></iconify-icon>
+                                    <span class="hidden">Voir</span>
+                                </a>
+                                <a href="#" class="inline-flex items-center gap-1.5 px-3 py-1.5 text-gray-700 bg-gray-100 hover:bg-gray-700 hover:text-white rounded-lg font-medium text-sm">
+                                    <iconify-icon icon="lucide:edit" class="w-4 h-4"></iconify-icon>
+                                    <span class="hidden">Modifier</span>
+                                </a>
+                            </div>
+                            <p class="text-xs text-gray-500 mt-2 text-center">Icônes uniquement</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Desktop -->
+                    <div class="bg-blue-900 rounded-lg p-4">
+                        <p class="text-white font-semibold mb-3">Desktop (≥ 1024px)</p>
+                        <div class="bg-white rounded p-4">
+                            <div class="flex items-center justify-center gap-1">
+                                <a href="#" class="inline-flex items-center gap-1.5 px-3 py-1.5 text-blue-600 bg-blue-50 hover:bg-blue-600 hover:text-white rounded-lg font-medium text-sm">
+                                    <iconify-icon icon="lucide:eye" class="w-4 h-4"></iconify-icon>
+                                    <span>Voir</span>
+                                </a>
+                                <a href="#" class="inline-flex items-center gap-1.5 px-3 py-1.5 text-gray-700 bg-gray-100 hover:bg-gray-700 hover:text-white rounded-lg font-medium text-sm">
+                                    <iconify-icon icon="lucide:edit" class="w-4 h-4"></iconify-icon>
+                                    <span>Modifier</span>
+                                </a>
+                            </div>
+                            <p class="text-xs text-gray-500 mt-2 text-center">Icône + Texte</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
