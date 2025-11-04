@@ -517,6 +517,9 @@
  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
  Kilométrage
  </th>
+ <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+ Dépôt
+ </th>
  {{-- START: Tâche 2 - Suppression colonne Actions rapides et conservation seule colonne Actions --}}
  <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
  Actions
@@ -621,7 +624,17 @@
  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-medium">
  {{ number_format($vehicle->current_mileage) }} km
  </td>
- 
+ <td class="px-6 py-4 whitespace-nowrap">
+ @if($vehicle->depot)
+ <div class="flex items-center gap-2">
+ <x-iconify icon="lucide:building-2" class="w-4 h-4 text-purple-600" />
+ <span class="text-sm text-gray-900">{{ $vehicle->depot->name }}</span>
+ </div>
+ @else
+ <span class="text-sm text-gray-400 italic">Non assigné</span>
+ @endif
+ </td>
+
  {{-- START: Actions Directes et Menu Dropdown Enterprise Grade --}}
  <td class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
     <div class="flex items-center justify-center gap-1">
@@ -647,7 +660,7 @@
             </a>
             @endcan
             
-            @can('update vehicles')
+            @can('edit vehicles')
             <a href="{{ route('admin.vehicles.edit', $vehicle) }}"
                class="inline-flex items-center p-1.5 text-amber-600 hover:text-amber-700 hover:bg-amber-50 rounded-lg transition-all duration-200"
                title="Modifier">
@@ -775,24 +788,28 @@
 function batchActions() {
     return {
         selectedVehicles: [],
-        
+        selectAll: false,
+
         toggleVehicle(id) {
             if (this.selectedVehicles.includes(id)) {
                 this.selectedVehicles = this.selectedVehicles.filter(v => v !== id);
             } else {
                 this.selectedVehicles.push(id);
             }
+            // Update selectAll checkbox state
+            const allVehicleIds = @json($vehicles->pluck('id'));
+            this.selectAll = this.selectedVehicles.length === allVehicleIds.length;
         },
-        
+
         toggleAllVehicles() {
             const allVehicleIds = @json($vehicles->pluck('id'));
-            if (this.selectedVehicles.length === allVehicleIds.length) {
-                this.selectedVehicles = [];
-            } else {
+            if (this.selectAll) {
                 this.selectedVehicles = [...allVehicleIds];
+            } else {
+                this.selectedVehicles = [];
             }
         },
-        
+
         clearSelection() {
             this.selectedVehicles = [];
             this.selectAll = false;

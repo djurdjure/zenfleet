@@ -612,7 +612,7 @@ class VehicleController extends Controller
     {
         $query = Vehicle::with([
             'vehicleType', 'fuelType', 'transmissionType', 'vehicleStatus',
-            'organization',
+            'organization', 'depot', 'category',
             // Eager loading des affectations actives avec chauffeur et utilisateur (optimisation N+1)
             'assignments' => function ($query) {
                 $query->where('status', 'active')
