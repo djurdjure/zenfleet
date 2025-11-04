@@ -483,12 +483,11 @@
             </div>
         </div>
     </div>
- </div>
 
  {{-- ===============================================
  TABLE ENTERPRISE-GRADE WORLD-CLASS AVEC SÉLECTION
  =============================================== --}}
- <x-card padding="p-0" margin="mb-6" x-data="{ selectAll: false }">
+ <x-card padding="p-0" margin="mb-6">
  @if($vehicles && $vehicles->count() > 0)
  {{-- Table --}}
  <div class="overflow-x-auto">
@@ -774,6 +773,8 @@
  </div>
  </div>
  @endif
+
+</div> {{-- End batchActions() context --}}
 
  </div>
 </section>

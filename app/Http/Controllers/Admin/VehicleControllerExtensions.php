@@ -45,7 +45,7 @@ trait VehicleControllerExtensions
             return $csvExport->download();
             
         } catch (\Exception $e) {
-            $this->logError('vehicle.export.csv.error', $e, ['request' => $request->all()]);
+            $this->logError('vehicle.export.csv.error', $e, $request, ['request_data' => $request->all()]);
             return back()->with('error', 'Erreur lors de l\'export CSV: ' . $e->getMessage());
         }
     }
@@ -69,7 +69,7 @@ trait VehicleControllerExtensions
             return Excel::download(new VehiclesExport($filters), $fileName);
             
         } catch (\Exception $e) {
-            $this->logError('vehicle.export.excel.error', $e, ['request' => $request->all()]);
+            $this->logError('vehicle.export.excel.error', $e, $request, ['request_data' => $request->all()]);
             return back()->with('error', 'Erreur lors de l\'export Excel: ' . $e->getMessage());
         }
     }
@@ -93,7 +93,7 @@ trait VehicleControllerExtensions
             return $pdfService->exportList();
             
         } catch (\Exception $e) {
-            $this->logError('vehicle.export.pdf.error', $e, ['request' => $request->all()]);
+            $this->logError('vehicle.export.pdf.error', $e, $request, ['request_data' => $request->all()]);
             return back()->with('error', 'Erreur lors de l\'export PDF: ' . $e->getMessage());
         }
     }
@@ -121,7 +121,7 @@ trait VehicleControllerExtensions
             return $pdfService->exportSingle($vehicle->id);
             
         } catch (\Exception $e) {
-            $this->logError('vehicle.export.single.pdf.error', $e, ['vehicle_id' => $vehicle->id]);
+            $this->logError('vehicle.export.single.pdf.error', $e, null, ['vehicle_id' => $vehicle->id]);
             return back()->with('error', 'Erreur lors de l\'export PDF: ' . $e->getMessage());
         }
     }
@@ -214,7 +214,7 @@ trait VehicleControllerExtensions
 
         } catch (\Exception $e) {
             DB::rollBack();
-            $this->logError('vehicle.duplicate.error', $e, ['vehicle_id' => $vehicle->id]);
+            $this->logError('vehicle.duplicate.error', $e, null, ['vehicle_id' => $vehicle->id]);
             return back()->with('error', 'Erreur lors de la duplication: ' . $e->getMessage());
         }
     }
@@ -309,7 +309,7 @@ trait VehicleControllerExtensions
             return view('admin.vehicles.history', compact('vehicle', 'timeline'));
 
         } catch (\Exception $e) {
-            $this->logError('vehicle.history.error', $e, ['vehicle_id' => $vehicle->id]);
+            $this->logError('vehicle.history.error', $e, null, ['vehicle_id' => $vehicle->id]);
             return back()->with('error', 'Erreur lors du chargement de l\'historique');
         }
     }
