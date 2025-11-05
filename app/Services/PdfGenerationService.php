@@ -93,7 +93,7 @@ class PdfGenerationService
 
                 $response = $httpClient->get($this->healthUrl);
 
-                if ($response->successful() && $response->json('status') === 'OK') {
+                if ($response->successful() && in_array($response->json('status'), ['OK', 'healthy'])) {
                     return true;
                 }
             } catch (RequestException $e) {

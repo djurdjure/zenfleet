@@ -38,9 +38,11 @@ return [
     |--------------------------------------------------------------------------
     */
     'pdf' => [
-        'url' => env('PDF_SERVICE_URL', 'http://pdf-service:3000'),
+        'url' => env('PDF_SERVICE_URL', 'http://pdf-service:3000') . '/generate-pdf',
+        'health_url' => env('PDF_SERVICE_HEALTH_URL', 'http://pdf-service:3000/health'),
         'timeout' => env('PDF_SERVICE_TIMEOUT', 60),
-        'retry' => env('PDF_SERVICE_RETRY', 3),
+        'retries' => env('PDF_SERVICE_RETRY', 3),
+        'api_key' => env('PDF_SERVICE_API_KEY', ''),
     ],
 
 ];

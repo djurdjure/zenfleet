@@ -10,7 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Barryvdh\DomPDF\Facade\Pdf;
+use App\Services\PdfGenerationService;
 
 /**
  * VehicleDepotController - Gestion Enterprise-Grade des Dépôts
@@ -27,10 +27,12 @@ use Barryvdh\DomPDF\Facade\Pdf;
 class VehicleDepotController extends Controller
 {
     protected DepotAssignmentService $depotService;
+    protected PdfGenerationService $pdfService;
 
-    public function __construct(DepotAssignmentService $depotService)
+    public function __construct(DepotAssignmentService $depotService, PdfGenerationService $pdfService)
     {
         $this->depotService = $depotService;
+        $this->pdfService = $pdfService;
     }
 
     /**
@@ -125,20 +127,23 @@ class VehicleDepotController extends Controller
             ->limit(10)
             ->get();
 
-        // Configuration PDF
-        $pdf = Pdf::loadView('admin.depots.pdf', compact(
+        // Générer HTML depuis la vue PDF
+        $html = view('admin.depots.pdf', compact(
             'depot',
             'stats',
             'vehicles',
             'vehiclesByStatus',
             'recentHistory'
-        ));
+        ))->render();
 
-        $pdf->setPaper('A4', 'portrait');
+        // Générer PDF via microservice enterprise-grade
+        $pdfContent = $this->pdfService->generateFromHtml($html);
 
         $filename = 'depot_' . ($depot->code ?? $depot->id) . '_' . now()->format('Y-m-d') . '.pdf';
 
-        return $pdf->download($filename);
+        return response($pdfContent, 200)
+            ->header('Content-Type', 'application/pdf')
+            ->header('Content-Disposition', 'attachment; filename="' . $filename . '"');
     }
 
     /**
