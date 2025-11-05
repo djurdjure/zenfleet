@@ -1,4 +1,4 @@
-<div>
+<div x-data="{}" @depot-toggled.window="$wire.$refresh()">
     {{-- Messages Flash Enterprise-Grade --}}
     @if (session()->has('success'))
         <div class="mb-6 bg-green-50 border-l-4 border-green-500 p-4 rounded-r-lg shadow-sm" x-data="{ show: true }" x-show="show" x-init="setTimeout(() => show = false, 5000)">
@@ -438,18 +438,21 @@
 
                 {{-- Toggle Dépôt actif - INTÉGRÉ DANS LA GRILLE --}}
                 @if($modalMode !== 'view')
-                    <div class="md:col-span-2 flex items-center">
+                    <div class="md:col-span-2">
+                        <label class="block mb-2 text-sm font-medium text-gray-900">Statut du Dépôt</label>
                         <label class="inline-flex items-center cursor-pointer">
                             <input
                                 type="checkbox"
-                                wire:model.defer="is_active"
+                                wire:model.live="is_active"
                                 class="sr-only peer"
                             >
                             <div class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
                             <span class="ms-3 text-sm font-medium text-gray-900">Dépôt actif</span>
                         </label>
-                        @error('is_active') <span class="text-xs text-red-500 ml-4">{{ $message }}</span> @enderror
+                        @error('is_active') <span class="text-xs text-red-500 mt-1 block">{{ $message }}</span> @enderror
                     </div>
+                    {{-- Div de remplissage pour la grille 3 colonnes --}}
+                    <div class="hidden lg:block"></div>
                 @endif
             </div>
 

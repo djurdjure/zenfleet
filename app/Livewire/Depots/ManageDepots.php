@@ -390,6 +390,9 @@ class ManageDepots extends Component
         $depot->save();
 
         session()->flash('success', $depot->is_active ? 'Dépôt activé' : 'Dépôt désactivé');
+
+        // Force refresh pour synchronisation immédiate avec l'interface
+        $this->dispatch('depot-toggled');
     }
 
     protected function resetForm()
