@@ -64,10 +64,10 @@ class VehicleDepotController extends Controller
 
         // Historique récent (10 dernières affectations)
         $recentHistory = DB::table('depot_assignment_history')
-            ->where('depot_id', $depot->id)
-            ->where('organization_id', Auth::user()->organization_id)
             ->join('vehicles', 'depot_assignment_history.vehicle_id', '=', 'vehicles.id')
             ->join('users', 'depot_assignment_history.assigned_by', '=', 'users.id')
+            ->where('depot_assignment_history.depot_id', $depot->id)
+            ->where('depot_assignment_history.organization_id', Auth::user()->organization_id)
             ->select(
                 'depot_assignment_history.*',
                 'vehicles.registration_plate',
@@ -112,10 +112,10 @@ class VehicleDepotController extends Controller
         });
 
         $recentHistory = DB::table('depot_assignment_history')
-            ->where('depot_id', $depot->id)
-            ->where('organization_id', Auth::user()->organization_id)
             ->join('vehicles', 'depot_assignment_history.vehicle_id', '=', 'vehicles.id')
             ->join('users', 'depot_assignment_history.assigned_by', '=', 'users.id')
+            ->where('depot_assignment_history.depot_id', $depot->id)
+            ->where('depot_assignment_history.organization_id', Auth::user()->organization_id)
             ->select(
                 'depot_assignment_history.*',
                 'vehicles.registration_plate',
