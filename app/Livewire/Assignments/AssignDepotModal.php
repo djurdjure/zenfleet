@@ -79,7 +79,7 @@ class AssignDepotModal extends Component
     {
         $this->vehicle = Vehicle::where('id', $this->vehicleId)
             ->where('organization_id', Auth::user()->organization_id)
-            ->with(['depot', 'make', 'model'])
+            ->with(['depot'])
             ->firstOrFail();
     }
 

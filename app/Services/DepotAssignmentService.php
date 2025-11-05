@@ -561,7 +561,6 @@ class DepotAssignmentService
     {
         return Vehicle::where('depot_id', $depot->id)
             ->where('organization_id', $depot->organization_id)
-            ->with(['make', 'model'])
             ->get();
     }
 
