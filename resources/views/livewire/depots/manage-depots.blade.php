@@ -1,4 +1,29 @@
 <div>
+    {{-- Messages Flash Enterprise-Grade --}}
+    @if (session()->has('success'))
+        <div class="mb-6 bg-green-50 border-l-4 border-green-500 p-4 rounded-r-lg shadow-sm" x-data="{ show: true }" x-show="show" x-init="setTimeout(() => show = false, 5000)">
+            <div class="flex items-center">
+                <x-iconify icon="lucide:check-circle" class="w-5 h-5 text-green-600 mr-3" />
+                <p class="text-sm font-medium text-green-800">{{ session('success') }}</p>
+                <button @click="show = false" class="ml-auto text-green-600 hover:text-green-800">
+                    <x-iconify icon="lucide:x" class="w-4 h-4" />
+                </button>
+            </div>
+        </div>
+    @endif
+
+    @if (session()->has('error'))
+        <div class="mb-6 bg-red-50 border-l-4 border-red-500 p-4 rounded-r-lg shadow-sm" x-data="{ show: true }" x-show="show" x-init="setTimeout(() => show = false, 5000)">
+            <div class="flex items-center">
+                <x-iconify icon="lucide:alert-circle" class="w-5 h-5 text-red-600 mr-3" />
+                <p class="text-sm font-medium text-red-800">{{ session('error') }}</p>
+                <button @click="show = false" class="ml-auto text-red-600 hover:text-red-800">
+                    <x-iconify icon="lucide:x" class="w-4 h-4" />
+                </button>
+            </div>
+        </div>
+    @endif
+
     {{-- Header avec statistiques globales --}}
     <div class="mb-6">
         <div class="flex justify-between items-center mb-4">
@@ -361,21 +386,21 @@
                         {{ $modalMode === 'view' ? 'disabled' : '' }}
                     ></textarea>
                 </div>
-
-                {{-- Actif --}}
-                @if($modalMode !== 'view')
-                    <div class="md:col-span-2">
-                        <label class="inline-flex items-center cursor-pointer">
-                            <input type="checkbox" wire:model="is_active" class="sr-only peer">
-                            <div class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-                            <span class="ms-3 text-sm font-medium text-gray-900">Dépôt actif</span>
-                        </label>
-                    </div>
-                @endif
             </div>
 
+            {{-- Dépôt actif (hors grille pour éviter l'espace) --}}
             @if($modalMode !== 'view')
-                <div class="flex justify-end gap-3 pt-4 border-t border-gray-200">
+                <div class="mt-4 pt-4 border-t border-gray-200">
+                    <label class="inline-flex items-center cursor-pointer">
+                        <input type="checkbox" wire:model.live="is_active" class="sr-only peer">
+                        <div class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                        <span class="ms-3 text-sm font-medium text-gray-900">Dépôt actif</span>
+                    </label>
+                </div>
+            @endif
+
+            @if($modalMode !== 'view')
+                <div class="flex justify-end gap-3 pt-4 border-t border-gray-200 mt-4">
                     <x-button @click="$dispatch('close-modal', 'depot-modal')" type="button" variant="secondary">
                         Annuler
                     </x-button>

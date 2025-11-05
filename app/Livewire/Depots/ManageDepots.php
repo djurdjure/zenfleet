@@ -78,7 +78,7 @@ class ManageDepots extends Component
             'latitude' => 'nullable|numeric|between:-90,90',
             'longitude' => 'nullable|numeric|between:-180,180',
             'description' => 'nullable|string|max:1000',
-            'is_active' => 'boolean',
+            'is_active' => 'nullable|boolean',
         ];
     }
 
@@ -271,24 +271,33 @@ class ManageDepots extends Component
             'latitude' => $this->latitude,
             'longitude' => $this->longitude,
             'description' => $this->description,
-            'is_active' => $this->is_active,
+            'is_active' => (bool) $this->is_active, // Cast explicite en boolean
             'organization_id' => Auth::user()->organization_id,
         ];
 
-        if ($this->modalMode === 'create') {
-            $data['current_count'] = 0;
-            VehicleDepot::create($data);
-            session()->flash('success', 'Dépôt créé avec succès');
-        } else {
-            $depot = VehicleDepot::where('id', $this->selectedDepotId)
-                ->where('organization_id', Auth::user()->organization_id)
-                ->firstOrFail();
+        try {
+            if ($this->modalMode === 'create') {
+                $data['current_count'] = 0;
+                VehicleDepot::create($data);
+                session()->flash('success', 'Dépôt créé avec succès');
+            } else {
+                $depot = VehicleDepot::where('id', $this->selectedDepotId)
+                    ->where('organization_id', Auth::user()->organization_id)
+                    ->firstOrFail();
 
-            $depot->update($data);
-            session()->flash('success', 'Dépôt mis à jour avec succès');
+                $depot->update($data);
+                session()->flash('success', 'Dépôt mis à jour avec succès');
+            }
+
+            $this->closeModal();
+
+            // Réinitialiser la pagination à la première page pour voir le nouveau dépôt
+            $this->resetPage();
+
+        } catch (\Exception $e) {
+            session()->flash('error', 'Erreur lors de l\'enregistrement : ' . $e->getMessage());
+            \Log::error('Erreur création dépôt: ' . $e->getMessage());
         }
-
-        $this->closeModal();
     }
 
     public function delete($depotId)
