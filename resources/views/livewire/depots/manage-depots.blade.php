@@ -374,13 +374,17 @@
 
     @push('scripts')
     <script>
-        // Ouvrir/fermer modal avec Livewire
-        Livewire.on('depot-modal-open', () => {
-            window.dispatchEvent(new CustomEvent('open-modal', { detail: 'depot-modal' }));
-        });
+        // Livewire 3 Event Listeners - Enterprise Grade Modal System
+        document.addEventListener('livewire:initialized', () => {
+            // Écouter l'événement Livewire pour ouvrir le modal
+            Livewire.on('depot-modal-open', () => {
+                window.dispatchEvent(new CustomEvent('open-modal', { detail: 'depot-modal' }));
+            });
 
-        Livewire.on('depot-modal-close', () => {
-            window.dispatchEvent(new CustomEvent('close-modal', { detail: 'depot-modal' }));
+            // Écouter l'événement Livewire pour fermer le modal
+            Livewire.on('depot-modal-close', () => {
+                window.dispatchEvent(new CustomEvent('close-modal', { detail: 'depot-modal' }));
+            });
         });
     </script>
     @endpush
