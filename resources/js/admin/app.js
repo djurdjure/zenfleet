@@ -7,6 +7,9 @@
 // ✅ CORRECTION: Import CSS admin en premier
 import '../../css/admin/app.css';
 
+// ✅ CRITIQUE: Import Livewire 3 pour wire:click et composants Livewire
+import { Livewire, Alpine } from '../../../vendor/livewire/livewire/dist/livewire.esm.js';
+
 // Import des dépendances système (ESM)
 import axios from 'axios';
 
@@ -672,15 +675,20 @@ class ZenFleetAdmin {
     }
 }
 
+// ✅ INITIALISATION LIVEWIRE + ALPINE
+// Démarrer Livewire (doit être fait AVANT DOMContentLoaded)
+Livewire.start();
+
 // ✅ INITIALISATION GLOBALE
 document.addEventListener('DOMContentLoaded', function() {
     // Initialiser les objets globaux
     initializeAdminGlobals();
-    
+
     // Créer l'instance admin globale
     window.zenfleetAdmin = new ZenFleetAdmin();
-    
+
     console.log('🎉 ZenFleet Admin fully loaded and ready!');
+    console.log('⚡ Livewire 3 initialized and active');
 });
 
 // Export pour utilisation dans d'autres modules
