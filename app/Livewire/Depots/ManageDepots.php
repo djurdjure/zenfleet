@@ -49,7 +49,7 @@ class ManageDepots extends Component
     public $manager_phone = '';
     public $capacity = null;
     public $latitude = null;
-    public $longitude = null; // Corrigé: null au lieu de '' pour validation nullable
+    public $longitude = null; // Initialisé à null pour cohérence
     public $description = '';
     public $is_active = true;
 
@@ -272,9 +272,9 @@ class ManageDepots extends Component
             'email' => $this->email,
             'manager_name' => $this->manager_name,
             'manager_phone' => $this->manager_phone,
-            'capacity' => $this->capacity,
-            'latitude' => $this->latitude,
-            'longitude' => $this->longitude,
+            'capacity' => $this->capacity ? (int) $this->capacity : null, // Cast explicite en integer
+            'latitude' => $this->latitude ? (float) $this->latitude : null, // Cast explicite en float
+            'longitude' => $this->longitude ? (float) $this->longitude : null, // Cast explicite en float
             'description' => $this->description,
             'is_active' => (bool) $this->is_active, // Cast explicite en boolean
             'organization_id' => Auth::user()->organization_id,
@@ -407,7 +407,7 @@ class ManageDepots extends Component
         $this->manager_phone = '';
         $this->capacity = null;
         $this->latitude = null;
-        $this->longitude = null; // Corrigé: null au lieu de '' pour cohérence
+        $this->longitude = null; // Reset à null pour cohérence avec l'initialisation
         $this->description = '';
         $this->is_active = true;
     }

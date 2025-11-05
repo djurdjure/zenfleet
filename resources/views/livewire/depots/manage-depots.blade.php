@@ -435,55 +435,52 @@
                     ></textarea>
                     @error('description') <span class="text-xs text-red-500 mt-1">{{ $message }}</span> @enderror
                 </div>
+
+                {{-- Toggle Dépôt actif - INTÉGRÉ DANS LA GRILLE --}}
+                @if($modalMode !== 'view')
+                    <div class="md:col-span-2 flex items-center">
+                        <label class="inline-flex items-center cursor-pointer">
+                            <input
+                                type="checkbox"
+                                wire:model.live="is_active"
+                                class="sr-only peer"
+                            >
+                            <div class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                            <span class="ms-3 text-sm font-medium text-gray-900">Dépôt actif</span>
+                        </label>
+                        @error('is_active') <span class="text-xs text-red-500 ml-4">{{ $message }}</span> @enderror
+                    </div>
+                @endif
             </div>
 
-            {{-- Section séparée pour toggle + actions - Fix problème espace --}}
+            {{-- Actions - Séparation unique et simple --}}
             @if($modalMode !== 'view')
-                <div class="pt-4 border-t border-gray-200">
-                    <div class="flex items-center justify-between">
-                        {{-- Toggle dans une section stable --}}
-                        <div class="flex items-center">
-                            <label class="inline-flex items-center cursor-pointer">
-                                <input 
-                                    type="checkbox" 
-                                    wire:model.defer="is_active" 
-                                    class="sr-only peer"
-                                >
-                                <div class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-                                <span class="ms-3 text-sm font-medium text-gray-900">Dépôt actif</span>
-                            </label>
-                            @error('is_active') <span class="text-xs text-red-500 ml-4">{{ $message }}</span> @enderror
-                        </div>
-
-                        {{-- Actions alignées à droite --}}
-                        <div class="flex gap-3">
-                            <x-button 
-                                @click="$dispatch('close-modal', 'depot-modal')" 
-                                type="button" 
-                                variant="secondary"
-                            >
-                                Annuler
-                            </x-button>
-                            <x-button 
-                                type="submit" 
-                                variant="primary" 
-                                icon="check"
-                                wire:loading.attr="disabled"
-                                wire:target="save"
-                            >
-                                <span wire:loading.remove wire:target="save">
-                                    {{ $modalMode === 'create' ? 'Créer' : 'Mettre à jour' }}
-                                </span>
-                                <span wire:loading wire:target="save" class="flex items-center">
-                                    <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                    </svg>
-                                    Enregistrement...
-                                </span>
-                            </x-button>
-                        </div>
-                    </div>
+                <div class="flex justify-end gap-3 pt-4 border-t border-gray-200">
+                    <x-button 
+                        @click="$dispatch('close-modal', 'depot-modal')" 
+                        type="button" 
+                        variant="secondary"
+                    >
+                        Annuler
+                    </x-button>
+                    <x-button 
+                        type="submit" 
+                        variant="primary" 
+                        icon="check"
+                        wire:loading.attr="disabled"
+                        wire:target="save"
+                    >
+                        <span wire:loading.remove wire:target="save">
+                            {{ $modalMode === 'create' ? 'Créer' : 'Mettre à jour' }}
+                        </span>
+                        <span wire:loading wire:target="save" class="flex items-center">
+                            <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                            Enregistrement...
+                        </span>
+                    </x-button>
                 </div>
             @endif
         </form>
