@@ -314,6 +314,228 @@ class DepotAssignmentService
     }
 
     /**
+     * Bulk assign multiple vehicles to a depot
+     *
+     * This method handles batch assignment of multiple vehicles to a single depot
+     * with comprehensive validation, capacity checking, and atomic transactions.
+     *
+     * Business rules:
+     * 1. All vehicles must exist and belong to same organization
+     * 2. Depot must have sufficient capacity for ALL vehicles
+     * 3. Pre-validates ALL vehicles before starting assignment
+     * 4. Uses atomic transaction - all succeed or all fail
+     * 5. Skips vehicles already assigned to target depot
+     * 6. Creates individual history records for each assignment
+     * 7. Returns detailed result with success/failure breakdown
+     *
+     * @param array $vehicleIds Array of vehicle IDs to assign
+     * @param VehicleDepot $depot The target depot
+     * @param User $user The user performing the action
+     * @param string|null $notes Optional notes/reason for bulk assignment
+     * @return array Result with success/failure counts and details
+     * @throws InvalidArgumentException If validation fails
+     * @throws RuntimeException If operation fails
+     */
+    public function bulkAssignVehiclesToDepot(
+        array $vehicleIds,
+        VehicleDepot $depot,
+        User $user,
+        ?string $notes = null
+    ): array {
+        // Validate input
+        if (empty($vehicleIds)) {
+            throw new InvalidArgumentException('No vehicles provided for bulk assignment');
+        }
+
+        // Validate user organization
+        if ($depot->organization_id !== $user->organization_id) {
+            throw new InvalidArgumentException(
+                "User must belong to the same organization as depot. " .
+                "User org: {$user->organization_id}, Depot org: {$depot->organization_id}"
+            );
+        }
+
+        // Fetch all vehicles with organization filter
+        $vehicles = Vehicle::whereIn('id', $vehicleIds)
+            ->where('organization_id', $user->organization_id)
+            ->get();
+
+        // Validate all vehicles were found
+        if ($vehicles->count() !== count($vehicleIds)) {
+            $foundIds = $vehicles->pluck('id')->toArray();
+            $missingIds = array_diff($vehicleIds, $foundIds);
+            throw new InvalidArgumentException(
+                "Some vehicles not found or don't belong to your organization: " .
+                implode(', ', $missingIds)
+            );
+        }
+
+        // PRE-VALIDATION: Check all vehicles before starting transaction
+        $validationErrors = [];
+        $vehiclesToAssign = collect();
+
+        foreach ($vehicles as $vehicle) {
+            // Skip vehicles already assigned to this depot
+            if ($vehicle->depot_id === $depot->id) {
+                Log::info('Vehicle already assigned to target depot, skipping', [
+                    'vehicle_id' => $vehicle->id,
+                    'vehicle_plate' => $vehicle->registration_plate,
+                    'depot_id' => $depot->id
+                ]);
+                continue;
+            }
+
+            // Validate organization match
+            if ($vehicle->organization_id !== $depot->organization_id) {
+                $validationErrors[] = [
+                    'vehicle_id' => $vehicle->id,
+                    'vehicle_plate' => $vehicle->registration_plate,
+                    'error' => 'Vehicle and depot belong to different organizations'
+                ];
+                continue;
+            }
+
+            $vehiclesToAssign->push($vehicle);
+        }
+
+        // Check if depot has capacity for all vehicles to assign
+        $requiredCapacity = $vehiclesToAssign->count();
+        $availableCapacity = $depot->availableCapacity;
+
+        if ($requiredCapacity > $availableCapacity) {
+            throw new RuntimeException(
+                "Depot {$depot->name} has insufficient capacity. " .
+                "Required: {$requiredCapacity}, Available: {$availableCapacity} " .
+                "(Current: {$depot->current_count}/{$depot->capacity})"
+            );
+        }
+
+        // If no vehicles to assign after filtering
+        if ($vehiclesToAssign->isEmpty()) {
+            return [
+                'success' => true,
+                'total_requested' => count($vehicleIds),
+                'assigned' => 0,
+                'skipped' => count($vehicleIds) - count($validationErrors),
+                'failed' => count($validationErrors),
+                'errors' => $validationErrors,
+                'message' => 'No vehicles required assignment (all already assigned or invalid)'
+            ];
+        }
+
+        // START ATOMIC TRANSACTION
+        DB::beginTransaction();
+
+        try {
+            $successCount = 0;
+            $failedCount = 0;
+            $historyRecords = [];
+
+            foreach ($vehiclesToAssign as $vehicle) {
+                try {
+                    $previousDepotId = $vehicle->depot_id;
+
+                    // Decrement previous depot count if exists
+                    if ($previousDepotId) {
+                        $previousDepot = VehicleDepot::find($previousDepotId);
+                        if ($previousDepot) {
+                            $previousDepot->decrementCount();
+                        }
+                    }
+
+                    // Update vehicle depot assignment
+                    $vehicle->depot_id = $depot->id;
+                    $vehicle->save();
+
+                    // Increment new depot count
+                    $depot->incrementCount();
+
+                    // Create history record
+                    $historyRecord = DepotAssignmentHistory::create([
+                        'vehicle_id' => $vehicle->id,
+                        'depot_id' => $depot->id,
+                        'organization_id' => $vehicle->organization_id,
+                        'previous_depot_id' => $previousDepotId,
+                        'action' => $previousDepotId
+                            ? DepotAssignmentHistory::ACTION_TRANSFERRED
+                            : DepotAssignmentHistory::ACTION_ASSIGNED,
+                        'assigned_by' => $user->id,
+                        'notes' => $notes ? "BULK: {$notes}" : 'BULK: Affectation par lot',
+                        'assigned_at' => now(),
+                    ]);
+
+                    $historyRecords[] = $historyRecord;
+                    $successCount++;
+
+                    Log::info('Vehicle bulk assigned successfully', [
+                        'vehicle_id' => $vehicle->id,
+                        'vehicle_plate' => $vehicle->registration_plate,
+                        'depot_id' => $depot->id,
+                        'previous_depot_id' => $previousDepotId
+                    ]);
+
+                } catch (\Exception $e) {
+                    $failedCount++;
+                    $validationErrors[] = [
+                        'vehicle_id' => $vehicle->id,
+                        'vehicle_plate' => $vehicle->registration_plate,
+                        'error' => $e->getMessage()
+                    ];
+
+                    Log::error('Failed to assign vehicle in bulk operation', [
+                        'vehicle_id' => $vehicle->id,
+                        'vehicle_plate' => $vehicle->registration_plate,
+                        'error' => $e->getMessage()
+                    ]);
+
+                    // Rollback and rethrow to fail entire batch
+                    throw $e;
+                }
+            }
+
+            DB::commit();
+
+            Log::info('Bulk vehicle assignment completed successfully', [
+                'depot_id' => $depot->id,
+                'depot_name' => $depot->name,
+                'total_requested' => count($vehicleIds),
+                'assigned' => $successCount,
+                'skipped' => count($vehicleIds) - $vehiclesToAssign->count() - count($validationErrors),
+                'failed' => $failedCount,
+                'user_id' => $user->id
+            ]);
+
+            return [
+                'success' => true,
+                'total_requested' => count($vehicleIds),
+                'assigned' => $successCount,
+                'skipped' => count($vehicleIds) - $vehiclesToAssign->count() - count($validationErrors),
+                'failed' => $failedCount,
+                'errors' => $validationErrors,
+                'history_records' => $historyRecords,
+                'message' => "{$successCount} véhicule(s) affecté(s) avec succès au dépôt {$depot->name}"
+            ];
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            Log::error('Bulk vehicle assignment failed - transaction rolled back', [
+                'depot_id' => $depot->id,
+                'vehicle_count' => $vehiclesToAssign->count(),
+                'user_id' => $user->id,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            throw new RuntimeException(
+                "Échec de l'affectation par lot: " . $e->getMessage(),
+                0,
+                $e
+            );
+        }
+    }
+
+    /**
      * Get assignment history for a vehicle
      *
      * @param Vehicle $vehicle

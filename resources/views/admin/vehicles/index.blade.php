@@ -460,7 +460,14 @@
                     <x-iconify icon="lucide:users" class="w-4 h-4 text-gray-600" />
                     <span class="text-sm font-medium text-gray-700">Assigner</span>
                 </button>
-                
+
+                {{-- Affecter au dépôt en masse --}}
+                <button @click="openBulkDepotAssignmentModal()"
+                        class="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all">
+                    <x-iconify icon="lucide:building-2" class="w-4 h-4" />
+                    <span class="text-sm font-medium">Affecter au dépôt</span>
+                </button>
+
                 {{-- Exporter la sélection --}}
                 <button @click="exportSelected()"
                         class="inline-flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-all">
@@ -777,6 +784,12 @@
 </div> {{-- End batchActions() context --}}
 
  </div>
+
+{{-- ===============================================
+MODAL AFFECTATION DÉPÔT EN MASSE - LIVEWIRE
+=============================================== --}}
+@livewire('vehicles.bulk-depot-assignment')
+
 </section>
 @endsection
 
@@ -825,7 +838,17 @@ function batchActions() {
             // Implémenter la modal d'assignation en masse
             alert('Fonctionnalité d\'assignation en masse - ' + this.selectedVehicles.length + ' véhicules sélectionnés');
         },
-        
+
+        openBulkDepotAssignmentModal() {
+            if (this.selectedVehicles.length === 0) {
+                alert('Veuillez sélectionner au moins un véhicule');
+                return;
+            }
+
+            // Dispatch Livewire event to open bulk depot assignment modal
+            Livewire.dispatch('openBulkAssignmentModal', [this.selectedVehicles]);
+        },
+
         exportSelected() {
             if (this.selectedVehicles.length === 0) return;
             
@@ -1173,6 +1196,30 @@ function confirmPermanentDelete(vehicleId) {
     closeModal();
     setTimeout(() => form.submit(), 200);
 }
+
+// ═══════════════════════════════════════════════════════════════════════════
+// LIVEWIRE EVENT LISTENERS - BULK DEPOT ASSIGNMENT
+// ═══════════════════════════════════════════════════════════════════════════
+
+// Listen for vehicles-bulk-assigned event and reload page to refresh list
+document.addEventListener('livewire:init', () => {
+    Livewire.on('vehicles-bulk-assigned', (event) => {
+        console.log('Vehicles bulk assigned to depot:', event);
+
+        // Show success message and reload page after short delay
+        setTimeout(() => {
+            window.location.reload();
+        }, 2000);
+    });
+
+    Livewire.on('close-modal-delayed', (event) => {
+        setTimeout(() => {
+            window.dispatchEvent(new CustomEvent('close-modal', {
+                detail: event.modalName
+            }));
+        }, 1500);
+    });
+});
 
 </script>
 @endpush
