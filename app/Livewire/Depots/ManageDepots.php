@@ -65,7 +65,7 @@ class ManageDepots extends Component
     {
         return [
             'name' => 'required|string|max:255',
-            'code' => 'required|string|max:50|unique:vehicle_depots,code,' . $this->selectedDepotId,
+            'code' => 'nullable|string|max:50|unique:vehicle_depots,code,' . $this->selectedDepotId,
             'address' => 'nullable|string|max:500',
             'city' => 'nullable|string|max:100',
             'wilaya' => 'nullable|string|max:100',
@@ -185,6 +185,7 @@ class ManageDepots extends Component
         $this->resetForm();
         $this->modalMode = 'create';
         $this->showModal = true;
+        $this->dispatch('depot-modal-open');
     }
 
     public function openEditModal($depotId)
@@ -212,13 +213,35 @@ class ManageDepots extends Component
 
         $this->modalMode = 'edit';
         $this->showModal = true;
+        $this->dispatch('depot-modal-open');
     }
 
     public function openViewModal($depotId)
     {
-        $this->selectedDepotId = $depotId;
+        $depot = VehicleDepot::where('id', $depotId)
+            ->where('organization_id', Auth::user()->organization_id)
+            ->firstOrFail();
+
+        $this->selectedDepotId = $depot->id;
+        $this->name = $depot->name;
+        $this->code = $depot->code;
+        $this->address = $depot->address;
+        $this->city = $depot->city;
+        $this->wilaya = $depot->wilaya;
+        $this->postal_code = $depot->postal_code;
+        $this->phone = $depot->phone;
+        $this->email = $depot->email;
+        $this->manager_name = $depot->manager_name;
+        $this->manager_phone = $depot->manager_phone;
+        $this->capacity = $depot->capacity;
+        $this->latitude = $depot->latitude;
+        $this->longitude = $depot->longitude;
+        $this->description = $depot->description;
+        $this->is_active = $depot->is_active;
+
         $this->modalMode = 'view';
         $this->showModal = true;
+        $this->dispatch('depot-modal-open');
     }
 
     public function closeModal()
@@ -226,6 +249,7 @@ class ManageDepots extends Component
         $this->showModal = false;
         $this->resetForm();
         $this->resetValidation();
+        $this->dispatch('depot-modal-close');
     }
 
     public function save()
