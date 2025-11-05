@@ -252,7 +252,22 @@
 
     {{-- Modal CRUD avec composant x-modal --}}
     <x-modal name="depot-modal" :title="$modalMode === 'create' ? 'Nouveau Dépôt' : ($modalMode === 'edit' ? 'Modifier le Dépôt' : 'Détails du Dépôt')" maxWidth="3xl">
-        <form wire:submit="save" class="space-y-4">
+        {{-- Messages d'erreur dans le modal - Enterprise UX --}}
+        @if (session()->has('error'))
+            <div class="mb-4 bg-red-50 border-l-4 border-red-500 p-4 rounded-r-lg" x-data="{ show: true }" x-show="show">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center">
+                        <x-iconify icon="lucide:alert-circle" class="w-5 h-5 text-red-600 mr-3 flex-shrink-0" />
+                        <p class="text-sm font-medium text-red-800">{{ session('error') }}</p>
+                    </div>
+                    <button @click="show = false" type="button" class="text-red-600 hover:text-red-800">
+                        <x-iconify icon="lucide:x" class="w-4 h-4" />
+                    </button>
+                </div>
+            </div>
+        @endif
+
+        <form wire:submit="save" class="space-y-6">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {{-- Nom --}}
                 <div>
@@ -274,9 +289,9 @@
                         wire:model="code"
                         name="code"
                         label="Code"
-                        placeholder="DC-001 (optionnel)"
+                        placeholder="Auto-généré si vide"
                         icon="hashtag"
-                        helpText="Code unique pour identifier rapidement le dépôt"
+                        helpText="Code unique (auto-généré: DP0001, DP0002...)"
                         :disabled="$modalMode === 'view'"
                     />
                     @error('code') <span class="text-xs text-red-500 mt-1">{{ $message }}</span> @enderror
@@ -414,35 +429,61 @@
                     <textarea
                         wire:model="description"
                         rows="3"
-                        class="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                        class="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 transition-colors"
                         placeholder="Description du dépôt..."
                         {{ $modalMode === 'view' ? 'disabled' : '' }}
                     ></textarea>
                     @error('description') <span class="text-xs text-red-500 mt-1">{{ $message }}</span> @enderror
                 </div>
-
-                {{-- Dépôt actif (intégré dans la grille) --}}
-                @if($modalMode !== 'view')
-                    <div class="md:col-span-2 flex items-center pt-2">
-                        <label class="inline-flex items-center cursor-pointer">
-                            <input type="checkbox" wire:model.live="is_active" class="sr-only peer">
-                            <div class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-                            <span class="ms-3 text-sm font-medium text-gray-900">Dépôt actif</span>
-                        </label>
-                        @error('is_active') <span class="text-xs text-red-500 ml-4">{{ $message }}</span> @enderror
-                    </div>
-                @endif
             </div>
 
-            {{-- Actions (séparateur unique) --}}
+            {{-- Section séparée pour toggle + actions - Fix problème espace --}}
             @if($modalMode !== 'view')
-                <div class="flex justify-end gap-3 pt-4 border-t border-gray-200">
-                    <x-button @click="$dispatch('close-modal', 'depot-modal')" type="button" variant="secondary">
-                        Annuler
-                    </x-button>
-                    <x-button type="submit" variant="primary" icon="check">
-                        {{ $modalMode === 'create' ? 'Créer' : 'Mettre à jour' }}
-                    </x-button>
+                <div class="pt-4 border-t border-gray-200">
+                    <div class="flex items-center justify-between">
+                        {{-- Toggle dans une section stable --}}
+                        <div class="flex items-center">
+                            <label class="inline-flex items-center cursor-pointer">
+                                <input 
+                                    type="checkbox" 
+                                    wire:model.defer="is_active" 
+                                    class="sr-only peer"
+                                >
+                                <div class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                                <span class="ms-3 text-sm font-medium text-gray-900">Dépôt actif</span>
+                            </label>
+                            @error('is_active') <span class="text-xs text-red-500 ml-4">{{ $message }}</span> @enderror
+                        </div>
+
+                        {{-- Actions alignées à droite --}}
+                        <div class="flex gap-3">
+                            <x-button 
+                                @click="$dispatch('close-modal', 'depot-modal')" 
+                                type="button" 
+                                variant="secondary"
+                            >
+                                Annuler
+                            </x-button>
+                            <x-button 
+                                type="submit" 
+                                variant="primary" 
+                                icon="check"
+                                wire:loading.attr="disabled"
+                                wire:target="save"
+                            >
+                                <span wire:loading.remove wire:target="save">
+                                    {{ $modalMode === 'create' ? 'Créer' : 'Mettre à jour' }}
+                                </span>
+                                <span wire:loading wire:target="save" class="flex items-center">
+                                    <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                    </svg>
+                                    Enregistrement...
+                                </span>
+                            </x-button>
+                        </div>
+                    </div>
                 </div>
             @endif
         </form>

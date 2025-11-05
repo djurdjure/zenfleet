@@ -256,6 +256,11 @@ class ManageDepots extends Component
     {
         $this->validate();
 
+        // Auto-generate code if empty (Enterprise-grade feature)
+        if (empty($this->code)) {
+            $this->code = $this->generateDepotCode();
+        }
+
         $data = [
             'name' => $this->name,
             'code' => $this->code,
@@ -278,7 +283,15 @@ class ManageDepots extends Component
         try {
             if ($this->modalMode === 'create') {
                 $data['current_count'] = 0;
-                VehicleDepot::create($data);
+                $depot = VehicleDepot::create($data);
+                
+                \Log::info('Dépôt créé avec succès', [
+                    'depot_id' => $depot->id,
+                    'depot_name' => $depot->name,
+                    'depot_code' => $depot->code,
+                    'organization_id' => $depot->organization_id
+                ]);
+                
                 session()->flash('success', 'Dépôt créé avec succès');
             } else {
                 $depot = VehicleDepot::where('id', $this->selectedDepotId)
@@ -286,6 +299,12 @@ class ManageDepots extends Component
                     ->firstOrFail();
 
                 $depot->update($data);
+                
+                \Log::info('Dépôt mis à jour avec succès', [
+                    'depot_id' => $depot->id,
+                    'depot_name' => $depot->name,
+                ]);
+                
                 session()->flash('success', 'Dépôt mis à jour avec succès');
             }
 
@@ -294,10 +313,55 @@ class ManageDepots extends Component
             // Réinitialiser la pagination à la première page pour voir le nouveau dépôt
             $this->resetPage();
 
+            // Force refresh to display new depot
+            $this->dispatch('depot-saved');
+
         } catch (\Exception $e) {
+            // Ne PAS fermer le modal en cas d'erreur - Enterprise UX
+            \Log::error('Erreur enregistrement dépôt', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'data' => $data
+            ]);
+            
             session()->flash('error', 'Erreur lors de l\'enregistrement : ' . $e->getMessage());
-            \Log::error('Erreur création dépôt: ' . $e->getMessage());
         }
+    }
+
+    /**
+     * Generate unique depot code
+     * Enterprise-grade auto-generation with collision prevention
+     */
+    protected function generateDepotCode(): string
+    {
+        $orgId = Auth::user()->organization_id;
+        $prefix = 'DP';
+        
+        // Find the highest existing code number for this organization
+        // PostgreSQL-compatible query (use INTEGER instead of UNSIGNED)
+        $lastDepot = VehicleDepot::forOrganization($orgId)
+            ->whereNotNull('code')
+            ->where('code', 'like', $prefix . '%')
+            ->orderByRaw('CAST(SUBSTRING(code, 3) AS INTEGER) DESC')
+            ->first();
+        
+        if ($lastDepot && preg_match('/^DP(\d+)$/', $lastDepot->code, $matches)) {
+            $nextNumber = intval($matches[1]) + 1;
+        } else {
+            $nextNumber = 1;
+        }
+        
+        $code = $prefix . str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
+        
+        // Collision prevention - ensure uniqueness
+        $attempts = 0;
+        while (VehicleDepot::forOrganization($orgId)->where('code', $code)->exists() && $attempts < 10) {
+            $nextNumber++;
+            $code = $prefix . str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
+            $attempts++;
+        }
+        
+        return $code;
     }
 
     public function delete($depotId)
