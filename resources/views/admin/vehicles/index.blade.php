@@ -453,13 +453,6 @@
                     <x-iconify icon="lucide:settings-2" class="w-4 h-4 text-gray-600" />
                     <span class="text-sm font-medium text-gray-700">Changer statut</span>
                 </button>
-                
-                {{-- Assigner en masse --}}
-                <button @click="openBatchAssignModal()"
-                        class="inline-flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-all">
-                    <x-iconify icon="lucide:users" class="w-4 h-4 text-gray-600" />
-                    <span class="text-sm font-medium text-gray-700">Assigner</span>
-                </button>
 
                 {{-- Affecter au dépôt en masse --}}
                 <button @click="openBulkDepotAssignmentModal()"
@@ -833,11 +826,6 @@ function batchActions() {
             // Implémenter la modal de changement de statut en masse
             alert('Fonctionnalité de changement de statut en masse - ' + this.selectedVehicles.length + ' véhicules sélectionnés');
         },
-        
-        openBatchAssignModal() {
-            // Implémenter la modal d'assignation en masse
-            alert('Fonctionnalité d\'assignation en masse - ' + this.selectedVehicles.length + ' véhicules sélectionnés');
-        },
 
         openBulkDepotAssignmentModal() {
             if (this.selectedVehicles.length === 0) {
@@ -845,8 +833,15 @@ function batchActions() {
                 return;
             }
 
-            // Dispatch Livewire event to open bulk depot assignment modal
+            // 1. Dispatch Livewire event to load vehicle data
             Livewire.dispatch('openBulkAssignmentModal', [this.selectedVehicles]);
+
+            // 2. Open the x-modal component
+            window.dispatchEvent(new CustomEvent('open-modal', {
+                detail: 'bulk-depot-assignment'
+            }));
+
+            console.log('✅ Bulk depot assignment modal opened with', this.selectedVehicles.length, 'vehicles');
         },
 
         exportSelected() {
