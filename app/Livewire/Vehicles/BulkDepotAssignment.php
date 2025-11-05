@@ -127,19 +127,23 @@ class BulkDepotAssignment extends Component
 
     /**
      * Load data for selected vehicles
+     *
+     * CORRECTION ENTERPRISE-GRADE:
+     * Vehicle utilise des colonnes 'brand' et 'model' (string), pas des relations.
+     * Seule la relation 'depot' existe.
      */
     protected function loadSelectedVehiclesData()
     {
         $this->selectedVehiclesData = Vehicle::whereIn('id', $this->selectedVehicleIds)
             ->where('organization_id', Auth::user()->organization_id)
-            ->with(['make', 'model', 'depot'])
+            ->with(['depot']) // Seule relation existante
             ->get()
             ->map(function ($vehicle) {
                 return [
                     'id' => $vehicle->id,
                     'registration_plate' => $vehicle->registration_plate,
-                    'make_name' => $vehicle->make?->name ?? 'N/A',
-                    'model_name' => $vehicle->model?->name ?? 'N/A',
+                    'make_name' => $vehicle->brand ?? 'N/A', // Colonne directe
+                    'model_name' => $vehicle->model ?? 'N/A', // Colonne directe
                     'current_depot_name' => $vehicle->depot?->name ?? 'Non affecté',
                     'current_depot_id' => $vehicle->depot_id,
                     'status' => $vehicle->status,
