@@ -255,26 +255,32 @@
         <form wire:submit="save" class="space-y-4">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {{-- Nom --}}
-                <x-input
-                    wire:model="name"
-                    name="name"
-                    label="Nom"
-                    placeholder="Dépôt Central"
-                    icon="office-building"
-                    :required="true"
-                    :disabled="$modalMode === 'view'"
-                />
+                <div>
+                    <x-input
+                        wire:model="name"
+                        name="name"
+                        label="Nom"
+                        placeholder="Dépôt Central"
+                        icon="office-building"
+                        :required="true"
+                        :disabled="$modalMode === 'view'"
+                    />
+                    @error('name') <span class="text-xs text-red-500 mt-1">{{ $message }}</span> @enderror
+                </div>
 
                 {{-- Code (optionnel) --}}
-                <x-input
-                    wire:model="code"
-                    name="code"
-                    label="Code"
-                    placeholder="DC-001 (optionnel)"
-                    icon="hashtag"
-                    helpText="Code unique pour identifier rapidement le dépôt"
-                    :disabled="$modalMode === 'view'"
-                />
+                <div>
+                    <x-input
+                        wire:model="code"
+                        name="code"
+                        label="Code"
+                        placeholder="DC-001 (optionnel)"
+                        icon="hashtag"
+                        helpText="Code unique pour identifier rapidement le dépôt"
+                        :disabled="$modalMode === 'view'"
+                    />
+                    @error('code') <span class="text-xs text-red-500 mt-1">{{ $message }}</span> @enderror
+                </div>
 
                 {{-- Adresse --}}
                 <div class="md:col-span-2">
@@ -289,91 +295,118 @@
                 </div>
 
                 {{-- Ville --}}
-                <x-input
-                    wire:model="city"
-                    name="city"
-                    label="Ville"
-                    placeholder="Alger"
-                    :disabled="$modalMode === 'view'"
-                />
+                <div>
+                    <x-input
+                        wire:model="city"
+                        name="city"
+                        label="Ville"
+                        placeholder="Alger"
+                        :disabled="$modalMode === 'view'"
+                    />
+                    @error('city') <span class="text-xs text-red-500 mt-1">{{ $message }}</span> @enderror
+                </div>
 
                 {{-- Wilaya --}}
-                <x-input
-                    wire:model="wilaya"
-                    name="wilaya"
-                    label="Wilaya"
-                    placeholder="Alger"
-                    :disabled="$modalMode === 'view'"
-                />
+                <div>
+                    <x-input
+                        wire:model="wilaya"
+                        name="wilaya"
+                        label="Wilaya"
+                        placeholder="Alger"
+                        :disabled="$modalMode === 'view'"
+                    />
+                    @error('wilaya') <span class="text-xs text-red-500 mt-1">{{ $message }}</span> @enderror
+                </div>
 
                 {{-- Téléphone --}}
-                <x-input
-                    wire:model="phone"
-                    name="phone"
-                    label="Téléphone"
-                    placeholder="+213 XXX XX XX XX"
-                    icon="phone"
-                    :disabled="$modalMode === 'view'"
-                />
+                <div>
+                    <x-input
+                        wire:model="phone"
+                        name="phone"
+                        label="Téléphone"
+                        placeholder="+213 XXX XX XX XX"
+                        icon="phone"
+                        :disabled="$modalMode === 'view'"
+                    />
+                    @error('phone') <span class="text-xs text-red-500 mt-1">{{ $message }}</span> @enderror
+                </div>
 
                 {{-- Email --}}
-                <x-input
-                    wire:model="email"
-                    name="email"
-                    type="email"
-                    label="Email"
-                    placeholder="depot@example.com"
-                    icon="envelope"
-                    :disabled="$modalMode === 'view'"
-                />
+                <div>
+                    <x-input
+                        wire:model="email"
+                        name="email"
+                        type="email"
+                        label="Email"
+                        placeholder="depot@example.com"
+                        icon="envelope"
+                        :disabled="$modalMode === 'view'"
+                    />
+                    @error('email') <span class="text-xs text-red-500 mt-1">{{ $message }}</span> @enderror
+                </div>
 
                 {{-- Manager --}}
-                <x-input
-                    wire:model="manager_name"
-                    name="manager_name"
-                    label="Responsable"
-                    placeholder="Nom du responsable"
-                    icon="user"
-                    :disabled="$modalMode === 'view'"
-                />
+                <div>
+                    <x-input
+                        wire:model="manager_name"
+                        name="manager_name"
+                        label="Responsable"
+                        placeholder="Nom du responsable"
+                        icon="user"
+                        :disabled="$modalMode === 'view'"
+                    />
+                    @error('manager_name') <span class="text-xs text-red-500 mt-1">{{ $message }}</span> @enderror
+                </div>
 
                 {{-- Manager Phone --}}
-                <x-input
-                    wire:model="manager_phone"
-                    name="manager_phone"
-                    label="Tél. Responsable"
-                    placeholder="+213 XXX XX XX XX"
-                    icon="phone"
-                    :disabled="$modalMode === 'view'"
-                />
+                <div>
+                    <x-input
+                        wire:model="manager_phone"
+                        name="manager_phone"
+                        label="Tél. Responsable"
+                        placeholder="+213 XXX XX XX XX"
+                        icon="phone"
+                        :disabled="$modalMode === 'view'"
+                    />
+                    @error('manager_phone') <span class="text-xs text-red-500 mt-1">{{ $message }}</span> @enderror
+                </div>
 
                 {{-- Capacité --}}
-                <x-input
-                    wire:model="capacity"
-                    name="capacity"
-                    type="number"
-                    label="Capacité (véhicules)"
-                    placeholder="50"
-                    :disabled="$modalMode === 'view'"
-                />
+                <div>
+                    <x-input
+                        wire:model="capacity"
+                        name="capacity"
+                        type="number"
+                        label="Capacité (véhicules)"
+                        placeholder="50"
+                        :disabled="$modalMode === 'view'"
+                    />
+                    @error('capacity') <span class="text-xs text-red-500 mt-1">{{ $message }}</span> @enderror
+                </div>
 
                 {{-- Latitude --}}
-                <x-input
-                    wire:model="latitude"
-                    name="latitude"
-                    label="Latitude"
-                    placeholder="36.7538"
-                    :disabled="$modalMode === 'view'"
-                />
+                <div>
+                    <x-input
+                        wire:model="latitude"
+                        name="latitude"
+                        label="Latitude"
+                        placeholder="36.7538"
+                        :disabled="$modalMode === 'view'"
+                    />
+                    @error('latitude') <span class="text-xs text-red-500 mt-1">{{ $message }}</span> @enderror
+                </div>
 
                 {{-- Longitude --}}
-                <x-input
-                    wire:model="longitude"
-                    name="longitude"
-                    label="Longitude"
-                    placeholder="3.0588"
-                    :disabled="$modalMode === 'view'"
-                />
+                <div>
+                    <x-input
+                        wire:model="longitude"
+                        name="longitude"
+                        label="Longitude"
+                        placeholder="3.0588"
+                        :disabled="$modalMode === 'view'"
+                    />
+                    @error('longitude') <span class="text-xs text-red-500 mt-1">{{ $message }}</span> @enderror
+                </div>
 
                 {{-- Description --}}
                 <div class="md:col-span-2">
@@ -385,22 +418,25 @@
                         placeholder="Description du dépôt..."
                         {{ $modalMode === 'view' ? 'disabled' : '' }}
                     ></textarea>
+                    @error('description') <span class="text-xs text-red-500 mt-1">{{ $message }}</span> @enderror
                 </div>
+
+                {{-- Dépôt actif (intégré dans la grille) --}}
+                @if($modalMode !== 'view')
+                    <div class="md:col-span-2 flex items-center pt-2">
+                        <label class="inline-flex items-center cursor-pointer">
+                            <input type="checkbox" wire:model.live="is_active" class="sr-only peer">
+                            <div class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                            <span class="ms-3 text-sm font-medium text-gray-900">Dépôt actif</span>
+                        </label>
+                        @error('is_active') <span class="text-xs text-red-500 ml-4">{{ $message }}</span> @enderror
+                    </div>
+                @endif
             </div>
 
-            {{-- Dépôt actif (hors grille pour éviter l'espace) --}}
+            {{-- Actions (séparateur unique) --}}
             @if($modalMode !== 'view')
-                <div class="mt-4 pt-4 border-t border-gray-200">
-                    <label class="inline-flex items-center cursor-pointer">
-                        <input type="checkbox" wire:model.live="is_active" class="sr-only peer">
-                        <div class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-                        <span class="ms-3 text-sm font-medium text-gray-900">Dépôt actif</span>
-                    </label>
-                </div>
-            @endif
-
-            @if($modalMode !== 'view')
-                <div class="flex justify-end gap-3 pt-4 border-t border-gray-200 mt-4">
+                <div class="flex justify-end gap-3 pt-4 border-t border-gray-200">
                     <x-button @click="$dispatch('close-modal', 'depot-modal')" type="button" variant="secondary">
                         Annuler
                     </x-button>

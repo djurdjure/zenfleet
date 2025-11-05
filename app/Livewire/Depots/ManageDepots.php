@@ -49,7 +49,7 @@ class ManageDepots extends Component
     public $manager_phone = '';
     public $capacity = null;
     public $latitude = null;
-    public $longitude = '';
+    public $longitude = null; // Corrigé: null au lieu de '' pour validation nullable
     public $description = '';
     public $is_active = true;
 
@@ -343,7 +343,7 @@ class ManageDepots extends Component
         $this->manager_phone = '';
         $this->capacity = null;
         $this->latitude = null;
-        $this->longitude = '';
+        $this->longitude = null; // Corrigé: null au lieu de '' pour cohérence
         $this->description = '';
         $this->is_active = true;
     }
