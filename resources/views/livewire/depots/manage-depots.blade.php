@@ -213,10 +213,11 @@
 
                 {{-- Actions --}}
                 <div class="p-4 bg-gray-50 flex gap-2">
-                    <x-button wire:click="openViewModal({{ $depot->id }})" variant="secondary" class="flex-1" size="sm">
-                        <x-iconify icon="heroicons:eye" class="w-4 h-4 mr-1" />
+                    <a href="{{ route('admin.depots.show', $depot->id) }}"
+                       class="flex-1 inline-flex items-center justify-center gap-2 px-3 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-all text-sm font-medium text-gray-700">
+                        <x-iconify icon="heroicons:eye" class="w-4 h-4" />
                         Voir
-                    </x-button>
+                    </a>
                     <x-button wire:click="openEditModal({{ $depot->id }})" variant="primary" class="flex-1" size="sm">
                         <x-iconify icon="heroicons:pencil" class="w-4 h-4 mr-1" />
                         Modifier

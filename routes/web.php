@@ -14,6 +14,7 @@ use App\Http\Controllers\Admin\SupplierController;
 use App\Http\Controllers\Admin\SupplierCategoryController;
 use App\Http\Controllers\Admin\DocumentController;
 use App\Http\Controllers\Admin\DocumentCategoryController;
+use App\Http\Controllers\Admin\VehicleDepotController;
 // use App\Http\Controllers\Admin\MaintenanceDashboardController;
 // use App\Http\Controllers\Admin\MaintenancePlanController; // Temporairement désactivé
 use App\Http\Controllers\Admin\MaintenanceLogController;
@@ -282,6 +283,18 @@ Route::middleware(['auth', 'verified'])
             Route::get('/', function() {
                 return view('admin.depots.index');
             })->name('index');
+
+            // Fiche détaillée dépôt (format document professionnel)
+            Route::get('/{id}', [VehicleDepotController::class, 'show'])->name('show');
+
+            // Export PDF
+            Route::get('/{id}/pdf', [VehicleDepotController::class, 'exportPdf'])->name('export.pdf');
+
+            // Suppression (soft delete)
+            Route::delete('/{id}', [VehicleDepotController::class, 'destroy'])->name('destroy');
+
+            // Restauration
+            Route::post('/{id}/restore', [VehicleDepotController::class, 'restore'])->name('restore');
         });
 
         // 👨‍💼 Chauffeurs avec Import/Export
