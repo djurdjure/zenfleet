@@ -13,53 +13,68 @@
 
         {{-- Statistiques globales --}}
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4 hover:shadow-md transition-shadow">
+            {{-- Total Dépôts --}}
+            <div class="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-lg transition-shadow duration-300">
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-sm font-medium text-gray-600">Total Dépôts</p>
                         <p class="text-2xl font-bold text-gray-900 mt-1">{{ $stats['total_depots'] }}</p>
                     </div>
-                    <x-iconify icon="mdi:office-building" class="w-10 h-10 text-blue-600" />
+                    <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                        <x-iconify icon="lucide:building-2" class="w-6 h-6 text-blue-600" />
+                    </div>
                 </div>
             </div>
 
-            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4 hover:shadow-md transition-shadow">
+            {{-- Dépôts Actifs --}}
+            <div class="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-lg transition-shadow duration-300">
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-sm font-medium text-gray-600">Dépôts Actifs</p>
                         <p class="text-2xl font-bold text-green-600 mt-1">{{ $stats['active_depots'] }}</p>
                     </div>
-                    <x-iconify icon="heroicons:check-circle" class="w-10 h-10 text-green-600" />
+                    <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                        <x-iconify icon="lucide:check-circle" class="w-6 h-6 text-green-600" />
+                    </div>
                 </div>
             </div>
 
-            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4 hover:shadow-md transition-shadow">
+            {{-- Capacité Totale --}}
+            <div class="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-lg transition-shadow duration-300">
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-sm font-medium text-gray-600">Capacité Totale</p>
-                        <p class="text-2xl font-bold text-gray-900 mt-1">{{ number_format($stats['total_capacity']) }}</p>
+                        <p class="text-2xl font-bold text-indigo-600 mt-1">{{ number_format($stats['total_capacity']) }}</p>
                     </div>
-                    <x-iconify icon="heroicons:inbox" class="w-10 h-10 text-indigo-600" />
+                    <div class="w-12 h-12 bg-indigo-100 rounded-lg flex items-center justify-center">
+                        <x-iconify icon="lucide:package" class="w-6 h-6 text-indigo-600" />
+                    </div>
                 </div>
             </div>
 
-            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4 hover:shadow-md transition-shadow">
+            {{-- Véhicules Affectés --}}
+            <div class="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-lg transition-shadow duration-300">
                 <div class="flex items-center justify-between">
                     <div>
-                        <p class="text-sm font-medium text-gray-600">Véhicules</p>
+                        <p class="text-sm font-medium text-gray-600">Véhicules Affectés</p>
                         <p class="text-2xl font-bold text-orange-600 mt-1">{{ number_format($stats['total_occupied']) }}</p>
                     </div>
-                    <x-iconify icon="heroicons:truck" class="w-10 h-10 text-orange-600" />
+                    <div class="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
+                        <x-iconify icon="lucide:truck" class="w-6 h-6 text-orange-600" />
+                    </div>
                 </div>
             </div>
 
-            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4 hover:shadow-md transition-shadow">
+            {{-- Taux d'Occupation --}}
+            <div class="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-lg transition-shadow duration-300">
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-sm font-medium text-gray-600">Taux Occupation</p>
                         <p class="text-2xl font-bold text-purple-600 mt-1">{{ $stats['average_occupancy'] }}%</p>
                     </div>
-                    <x-iconify icon="heroicons:chart-pie" class="w-10 h-10 text-purple-600" />
+                    <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+                        <x-iconify icon="lucide:pie-chart" class="w-6 h-6 text-purple-600" />
+                    </div>
                 </div>
             </div>
         </div>

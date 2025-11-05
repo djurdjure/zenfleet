@@ -60,12 +60,14 @@ class VehicleDepot extends Model
         'wilaya',
         'postal_code',
         'phone',
+        'email',
         'manager_name',
         'manager_phone',
         'capacity',
         'current_count',
         'latitude',
         'longitude',
+        'description',
         'is_active',
     ];
 
