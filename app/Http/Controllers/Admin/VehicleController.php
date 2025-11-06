@@ -574,6 +574,91 @@ class VehicleController extends Controller
     }
 
     /**
+     * 📦 Archivage en masse - Enterprise Batch Operation
+     */
+    public function batchArchive(Request $request): RedirectResponse
+    {
+        $this->authorize('delete vehicles');
+        $this->logUserAction('vehicle.batch_archive.attempted', $request);
+
+        try {
+            $request->validate([
+                'vehicles' => 'required|json',
+            ]);
+
+            $vehicleIds = json_decode($request->input('vehicles'), true);
+
+            if (empty($vehicleIds) || !is_array($vehicleIds)) {
+                return redirect()->back()->with('error', 'Aucun véhicule sélectionné');
+            }
+
+            $count = Vehicle::whereIn('id', $vehicleIds)
+                ->where('organization_id', Auth::user()->organization_id)
+                ->update(['is_archived' => true]);
+
+            $this->logUserAction('vehicle.batch_archive.success', null, [
+                'vehicle_count' => $count,
+                'vehicle_ids' => $vehicleIds
+            ]);
+
+            Cache::tags(['vehicles', 'analytics'])->flush();
+
+            return redirect()
+                ->route('admin.vehicles.index')
+                ->with('success', "{$count} véhicule(s) archivé(s) avec succès");
+
+        } catch (\Exception $e) {
+            $this->logError('vehicle.batch_archive.error', $e, $request);
+            return redirect()->back()->with('error', 'Erreur lors de l\'archivage en masse');
+        }
+    }
+
+    /**
+     * 🔄 Changement de statut en masse - Enterprise Batch Operation
+     */
+    public function batchStatus(Request $request): RedirectResponse
+    {
+        $this->authorize('edit vehicles');
+        $this->logUserAction('vehicle.batch_status.attempted', $request);
+
+        try {
+            $request->validate([
+                'vehicles' => 'required|json',
+                'status_id' => 'required|exists:vehicle_statuses,id',
+            ]);
+
+            $vehicleIds = json_decode($request->input('vehicles'), true);
+            $statusId = $request->input('status_id');
+
+            if (empty($vehicleIds) || !is_array($vehicleIds)) {
+                return redirect()->back()->with('error', 'Aucun véhicule sélectionné');
+            }
+
+            $count = Vehicle::whereIn('id', $vehicleIds)
+                ->where('organization_id', Auth::user()->organization_id)
+                ->update(['status_id' => $statusId]);
+
+            $this->logUserAction('vehicle.batch_status.success', null, [
+                'vehicle_count' => $count,
+                'vehicle_ids' => $vehicleIds,
+                'status_id' => $statusId
+            ]);
+
+            Cache::tags(['vehicles', 'analytics'])->flush();
+
+            $statusName = \App\Models\VehicleStatus::find($statusId)->name ?? 'nouveau statut';
+
+            return redirect()
+                ->route('admin.vehicles.index')
+                ->with('success', "{$count} véhicule(s) mis à jour avec le statut \"{$statusName}\"");
+
+        } catch (\Exception $e) {
+            $this->logError('vehicle.batch_status.error', $e, $request);
+            return redirect()->back()->with('error', 'Erreur lors du changement de statut en masse');
+        }
+    }
+
+    /**
      * 📊 Export enterprise avec formats multiples
      */
     public function export(Request $request): \Symfony\Component\HttpFoundation\BinaryFileResponse
@@ -663,6 +748,11 @@ class VehicleController extends Controller
 
         if ($request->filled('fuel_type_id')) {
             $query->where('fuel_type_id', $request->get('fuel_type_id'));
+        }
+
+        // Filtre par dépôt - Enterprise-Grade
+        if ($request->filled('depot_id')) {
+            $query->where('depot_id', $request->get('depot_id'));
         }
 
         // Filtres par date
@@ -770,6 +860,7 @@ class VehicleController extends Controller
                     ->get(),
                 'depots' => \App\Models\VehicleDepot::forOrganization($organizationId)
                     ->active()
+                    ->withCount('vehicles')
                     ->orderBy('name')
                     ->get(),
                 'organizations' => Auth::user()->hasRole('Super Admin')

@@ -233,6 +233,10 @@ Route::middleware(['auth', 'verified'])
             Route::get('export/pdf', [VehicleController::class, 'exportPdf'])->name('export.pdf');
             // END: Tâche 1
 
+            // Actions en masse (Batch Operations) - Enterprise-Grade
+            Route::post('batch-archive', [VehicleController::class, 'batchArchive'])->name('batch.archive');
+            Route::post('batch-status', [VehicleController::class, 'batchStatus'])->name('batch.status');
+
             // Gestion des archives
             Route::get('archived', [VehicleController::class, 'archived'])->name('archived');
 
