@@ -3,33 +3,33 @@
 namespace App\Services;
 
 use App\Models\Vehicle;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Log;
 
 /**
  * 📑 Enterprise Vehicle PDF Export Service
- * 
- * Service d'export PDF utilisant le microservice Node.js
- * Architecture microservices avec communication HTTP
- * 
+ *
+ * Service d'export PDF utilisant le microservice Node.js centralisé
+ * Architecture microservices avec communication HTTP via PdfGenerationService
+ *
  * @package App\Services
- * @version 1.0
+ * @version 2.0
  * @since 2025-11-03
+ * @updated 2025-11-06 - Migration vers PdfGenerationService centralisé
  */
 class VehiclePdfExportService
 {
-    protected $pdfServiceUrl;
+    protected PdfGenerationService $pdfService;
     protected $filters;
     protected $organization_id;
 
     /**
-     * Constructeur
+     * Constructeur avec injection de dépendance
      */
     public function __construct($filters = [])
     {
-        $this->pdfServiceUrl = config('services.pdf.url', 'http://pdf-service:3000');
+        $this->pdfService = app(PdfGenerationService::class);
         $this->filters = $filters;
         $this->organization_id = Auth::user()->organization_id;
     }
@@ -154,77 +154,46 @@ class VehiclePdfExportService
     }
 
     /**
-     * Appeler le microservice PDF pour générer le fichier
+     * Appeler le microservice PDF centralisé pour générer le fichier
+     *
+     * Utilise PdfGenerationService qui gère:
+     * - Health checks automatiques
+     * - Retry logic avec exponential backoff
+     * - Configuration centralisée
+     * - Logging unifié
      */
     protected function generatePdf($html, $filename)
     {
         try {
-            // Configuration avancée pour PDF premium
-            $pdfOptions = [
-                'format' => 'A4',
-                'printBackground' => true,
-                'preferCSSPageSize' => false,
-                'displayHeaderFooter' => true,
-                'headerTemplate' => '<div></div>',
-                'footerTemplate' => '<div style="width:100%; text-align:center; font-size:10px; color:#999;">
-                    <span class="pageNumber"></span> / <span class="totalPages"></span>
-                </div>',
-                'margin' => [
-                    'top' => '15mm',
-                    'right' => '10mm',
-                    'bottom' => '15mm',
-                    'left' => '10mm'
-                ],
-                'scale' => 0.95,
-                'landscape' => false,
-                'preferredColorScheme' => 'light',
-                'omitBackground' => false
-            ];
+            // Déléguer la génération au service centralisé enterprise-grade
+            $pdfContent = $this->pdfService->generateFromHtml($html);
 
-            // Appel au microservice avec configuration enterprise
-            $response = Http::timeout(60)
-                ->withHeaders([
-                    'Content-Type' => 'application/json',
-                    'Accept' => 'application/pdf'
-                ])
-                ->post($this->pdfServiceUrl . '/generate-pdf', [
-                    'html' => $html,
-                    'options' => $pdfOptions,
-                    'waitUntil' => 'networkidle0',
-                    'emulateMediaType' => 'print'
-                ]);
-
-            if ($response->successful()) {
-                // Forcer le téléchargement du PDF
-                return Response::make($response->body(), 200, [
-                    'Content-Type' => 'application/pdf',
-                    'Content-Disposition' => 'attachment; filename="' . $filename . '"',
-                    'Content-Length' => strlen($response->body()),
-                    'Cache-Control' => 'no-cache, no-store, must-revalidate',
-                    'Pragma' => 'no-cache',
-                    'Expires' => '0',
-                    'X-Content-Type-Options' => 'nosniff',
-                    'X-Frame-Options' => 'DENY'
-                ]);
-            }
-
-            Log::error('Microservice PDF erreur status', [
-                'status' => $response->status(),
-                'body' => $response->body()
+            // Retourner le PDF avec headers de sécurité enterprise
+            return Response::make($pdfContent, 200, [
+                'Content-Type' => 'application/pdf',
+                'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+                'Content-Length' => strlen($pdfContent),
+                'Cache-Control' => 'no-cache, no-store, must-revalidate',
+                'Pragma' => 'no-cache',
+                'Expires' => '0',
+                'X-Content-Type-Options' => 'nosniff',
+                'X-Frame-Options' => 'DENY',
+                'X-PDF-Service' => 'Enterprise Microservice v2.0'
             ]);
 
-            throw new \Exception('Le service PDF a retourné une erreur: ' . $response->status());
-            
         } catch (\Exception $e) {
-            Log::error('Erreur génération PDF', [
+            Log::error('Erreur génération PDF véhicules', [
                 'error' => $e->getMessage(),
+                'filename' => $filename,
+                'html_length' => strlen($html),
                 'trace' => $e->getTraceAsString()
             ]);
-            
-            // Ne pas faire de fallback HTML - plutôt retourner une erreur claire
+
+            // Retourner une erreur HTTP claire avec détails pour debugging
             return Response::json([
                 'error' => 'Le service de génération PDF est temporairement indisponible',
-                'message' => 'Veuillez réessayer dans quelques instants ou contacter l\'administrateur'
+                'message' => 'Veuillez réessayer dans quelques instants ou contacter l\'administrateur',
+                'details' => config('app.debug') ? $e->getMessage() : null
             ], 503);
         }
     }
