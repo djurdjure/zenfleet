@@ -1,0 +1,48 @@
+Timing is on.
+Expanded display is off.
+         info         |                                          value                                          
+----------------------+-----------------------------------------------------------------------------------------
+ 1️⃣ POSTGRESQL VERSION | PostgreSQL 18.0 on x86_64-pc-linux-musl, compiled by gcc (Alpine 14.2.0) 14.2.0, 64-bit
+(1 row)
+
+Time: 0.542 ms
+       info        |                                                                                                                                                                             value                                                                                                                                                                             
+-------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ 2️⃣ POSTGIS VERSION | POSTGIS="3.6.0 0" [EXTENSION] PGSQL="180" GEOS="3.13.1-CAPI-1.19.2" PROJ="9.6.0 NETWORK_ENABLED=OFF URL_ENDPOINT=https://cdn.proj.org USER_WRITABLE_DIRECTORY=/var/lib/postgresql/.local/share/proj DATABASE_PATH=/usr/share/proj/proj.db" (compiled against PROJ 9.6.0) LIBXML="2.13.9" LIBJSON="0.18" LIBPROTOBUF="1.5.2" WAGYU="0.5.0 (Internal)" TOPOLOGY
+(1 row)
+
+Time: 27.137 ms
+
+3️⃣ EXTENSIONS UPGRADÉES
+       Extension        | Version 
+------------------------+---------
+ btree_gist             | 1.8
+ fuzzystrmatch          | 1.2
+ plpgsql                | 1.0
+ postgis                | 3.6.0
+ postgis_tiger_geocoder | 3.6.0
+ postgis_topology       | 3.6.0
+(6 rows)
+
+Time: 1.281 ms
+
+4️⃣ INTÉGRITÉ DES DONNÉES
+    Table     | Enregistrements 
+--------------+-----------------
+ Véhicules    | 56
+ Chauffeurs   | 3
+ Affectations | 0
+ Fournisseurs | 2
+ Documents    | 0
+ Utilisateurs | 10
+(6 rows)
+
+Time: 10.442 ms
+
+5️⃣ TAILLE BASE DE DONNÉES
+ Taille Totale 
+---------------
+ 30 MB
+(1 row)
+
+Time: 2.511 ms

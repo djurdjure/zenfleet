@@ -1,0 +1,61 @@
+Timing is on.
+═══════════════════════════════════════════════════════════════
+🚀 BENCHMARK POSTGRESQL 18 - ZENFLEET PRODUCTION
+═══════════════════════════════════════════════════════════════
+
+📊 Test 1: SELECT simple avec WHERE (véhicules)
+ count 
+-------
+    56
+(1 row)
+
+Time: 5.754 ms
+
+📊 Test 2: JOIN avec 2 tables (véhicules + statuts)
+ count 
+-------
+    56
+(1 row)
+
+Time: 2.414 ms
+
+📊 Test 3: DISTINCT avec ORDER BY (Skip Scan PG18)
+ registration_plate 
+--------------------
+ 105790-16
+ 118910-16
+ 126902-16
+ 130672-16
+ 139371-16
+(5 rows)
+
+Time: 1.248 ms
+
+📊 Test 4: Aggregate avec GROUP BY
+ status_id | count 
+-----------+-------
+         1 |    52
+         2 |     4
+(2 rows)
+
+Time: 0.451 ms
+
+📊 Test 5: Full-text search index (si activé)
+ count 
+-------
+     0
+(1 row)
+
+Time: 1.666 ms
+
+📊 Test 6: PostGIS spatial query performance
+            postgis_version            
+---------------------------------------
+ 3.6 USE_GEOS=1 USE_PROJ=1 USE_STATS=1
+(1 row)
+
+Time: 12.730 ms
+
+═══════════════════════════════════════════════════════════════
+✅ BENCHMARK TERMINÉ - PostgreSQL 18.0 + PostGIS 3.6
+═══════════════════════════════════════════════════════════════

@@ -46,7 +46,7 @@ services:
 
   # --- Base de Données (PostgreSQL) ---
   database:
-    image: postgis/postgis:18-3.6-alpine
+    image: postgis/postgis:16-3.4-alpine
     container_name: zenfleet_database
     restart: unless-stopped
     ports: ["5432:5432"]

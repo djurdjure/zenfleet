@@ -1,0 +1,101 @@
+==============================================================================
+📊 RAPPORT DE VALIDATION POST-MIGRATION POSTGRESQL 18
+==============================================================================
+Date: $(date '+%Y-%m-%d %H:%M:%S')
+Projet: ZenFleet Enterprise
+Migration: PostgreSQL 16.4 → PostgreSQL 18.0
+==============================================================================
+
+Timing is on.
+Expanded display is off.
+    info    |                                                                                                                                                                             value                                                                                                                                                                             
+------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ 1️⃣ VERSIONS | PostgreSQL 18.0 on x86_64-pc-linux-musl, compiled by gcc (Alpine 14.2.0) 14.2.0, 64-bit
+    PostGIS | POSTGIS="3.6.0 0" [EXTENSION] PGSQL="180" GEOS="3.13.1-CAPI-1.19.2" PROJ="9.6.0 NETWORK_ENABLED=OFF URL_ENDPOINT=https://cdn.proj.org USER_WRITABLE_DIRECTORY=/var/lib/postgresql/.local/share/proj DATABASE_PATH=/usr/share/proj/proj.db" (compiled against PROJ 9.6.0) LIBXML="2.13.9" LIBJSON="0.18" LIBPROTOBUF="1.5.2" WAGYU="0.5.0 (Internal)" TOPOLOGY
+(2 rows)
+
+Time: 46.105 ms
+
+2️⃣ EXTENSIONS UPGRADÉES
+       Extension        | Version 
+------------------------+---------
+ btree_gist             | 1.8
+ fuzzystrmatch          | 1.2
+ plpgsql                | 1.0
+ postgis                | 3.6.0
+ postgis_tiger_geocoder | 3.6.0
+ postgis_topology       | 3.6.0
+(6 rows)
+
+Time: 0.894 ms
+
+3️⃣ INTÉGRITÉ DES DONNÉES
+    Table     | Enregistrements 
+--------------+-----------------
+ Véhicules    | 56
+ Chauffeurs   | 3
+ Affectations | 0
+ Fournisseurs | 2
+ Documents    | 0
+ Utilisateurs | 10
+(6 rows)
+
+Time: 11.247 ms
+
+4️⃣ TAILLE BASE DE DONNÉES
+ Taille Totale 
+---------------
+ 30 MB
+(1 row)
+
+Time: 3.048 ms
+
+5️⃣ TOP 10 TABLES PAR TAILLE
+          Table          | Taille  
+-------------------------+---------
+ public.spatial_ref_sys  | 7144 kB
+ tiger.pagc_rules        | 1240 kB
+ tiger.pagc_lex          | 600 kB
+ public.suppliers        | 352 kB
+ public.organizations    | 320 kB
+ public.vehicles         | 256 kB
+ public.vehicle_expenses | 240 kB
+ tiger.pagc_gaz          | 216 kB
+ public.driver_statuses  | 208 kB
+ public.driver_sanctions | 208 kB
+(10 rows)
+
+Time: 107.352 ms
+
+6️⃣ INDEX ACTIFS (Top 5)
+         Table          |        Index         | Scans 
+------------------------+----------------------+-------
+ public.spatial_ref_sys | spatial_ref_sys_pkey | 17000
+ tiger.pagc_rules       | pagc_rules_pkey      |     3
+ tiger.loader_platform  | loader_platform_pkey |     2
+ tiger.pagc_gaz         | pagc_gaz_pkey        |     2
+ tiger.pagc_lex         | pagc_lex_pkey        |     2
+(5 rows)
+
+Time: 5.335 ms
+
+7️⃣ CONTRAINTES CRITIQUES
+               Contrainte               | Type 
+----------------------------------------+------
+ cardinal_number_domain_check           | c
+ yes_or_no_check                        | c
+ spatial_ref_sys_srid_check             | c
+ driver_sanction_histories_action_check | c
+ driver_sanctions_sanction_type_check   | c
+ driver_sanctions_severity_check        | c
+ driver_sanctions_status_check          | c
+ users_user_status_check                | c
+ expense_budgets_budget_period_check    | c
+ granular_permissions_scope_check       | c
+(10 rows)
+
+Time: 1.268 ms
+
+==============================================================================
+✅ MIGRATION VALIDÉE AVEC SUCCÈS
+==============================================================================
