@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\Concerns\BelongsToOrganization;
+use App\Models\Concerns\HasStatusBadge;
 use App\Models\Maintenance\MaintenanceLog;
 use App\Models\Maintenance\MaintenancePlan;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -15,7 +16,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Vehicle extends Model
 {
-    use HasFactory, SoftDeletes, BelongsToOrganization;
+    use HasFactory, SoftDeletes, BelongsToOrganization, HasStatusBadge;
 
     protected $fillable = [
         'registration_plate', 'vin', 'brand', 'model', 'color', 'vehicle_type_id',
@@ -53,6 +54,24 @@ class Vehicle extends Model
     public function repairRequests(): HasMany { return $this->hasMany(RepairRequest::class); }
     public function mileageReadings(): HasMany { return $this->hasMany(VehicleMileageReading::class); }
     public function depotAssignmentHistory(): HasMany { return $this->hasMany(DepotAssignmentHistory::class); }
+
+    /**
+     * 📊 Relation polymorphique avec l'historique des statuts
+     */
+    public function statusHistory(): \Illuminate\Database\Eloquent\Relations\MorphMany
+    {
+        return $this->morphMany(StatusHistory::class, 'statusable')->orderBy('changed_at', 'desc');
+    }
+
+    /**
+     * 📊 Obtient l'historique récent des changements de statut (30 derniers jours)
+     */
+    public function recentStatusHistory(): \Illuminate\Database\Eloquent\Relations\MorphMany
+    {
+        return $this->morphMany(StatusHistory::class, 'statusable')
+            ->where('changed_at', '>=', now()->subDays(30))
+            ->orderBy('changed_at', 'desc');
+    }
 
     // =========================================================================
     // MILEAGE MANAGEMENT METHODS

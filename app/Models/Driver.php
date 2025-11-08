@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\Concerns\BelongsToOrganization;
+use App\Models\Concerns\HasStatusBadge;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -12,7 +13,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Driver extends Model
 {
-    use HasFactory, SoftDeletes, BelongsToOrganization;
+    use HasFactory, SoftDeletes, BelongsToOrganization, HasStatusBadge;
 
     protected $fillable = [
         // Champs de base
@@ -97,6 +98,24 @@ class Driver extends Model
     public function sanctions(): HasMany
     {
         return $this->hasMany(DriverSanction::class);
+    }
+
+    /**
+     * 📊 Relation polymorphique avec l'historique des statuts
+     */
+    public function statusHistory(): \Illuminate\Database\Eloquent\Relations\MorphMany
+    {
+        return $this->morphMany(StatusHistory::class, 'statusable')->orderBy('changed_at', 'desc');
+    }
+
+    /**
+     * 📊 Obtient l'historique récent des changements de statut (30 derniers jours)
+     */
+    public function recentStatusHistory(): \Illuminate\Database\Eloquent\Relations\MorphMany
+    {
+        return $this->morphMany(StatusHistory::class, 'statusable')
+            ->where('changed_at', '>=', now()->subDays(30))
+            ->orderBy('changed_at', 'desc');
     }
 
     /**
