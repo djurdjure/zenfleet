@@ -12,16 +12,21 @@ use App\Models\Concerns\BelongsToOrganization;
  * 🚛 MODÈLE DRIVER STATUS - Version Enterprise-Grade
  *
  * Gestion complète des statuts de chauffeurs avec fonctionnalités avancées :
- * - Multi-tenant avec organisation
+ * - DONNÉES DE RÉFÉRENCE GLOBALES (partagées entre organisations)
  * - Permissions et règles métier
  * - Interface utilisateur intégrée
  * - Validation et contrôles
  *
- * @version 2.0-Enterprise
+ * ⚠️ IMPORTANT: Les statuts de chauffeurs sont des données de référence
+ * globales, PAS des données spécifiques à une organisation. Le trait
+ * BelongsToOrganization a été RETIRÉ pour permettre l'accès aux statuts
+ * par toutes les organisations.
+ *
+ * @version 2.1-Enterprise-Fixed
  */
 class DriverStatus extends Model
 {
-    use HasFactory, BelongsToOrganization;
+    use HasFactory;
 
     /**
      * The attributes that are mass assignable.
