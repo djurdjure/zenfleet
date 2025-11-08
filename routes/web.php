@@ -342,6 +342,11 @@ Route::middleware(['auth', 'verified'])
         // 🔄 Affectations Enterprise-Grade
         Route::resource('assignments', AssignmentController::class);
         Route::prefix('assignments')->name('assignments.')->group(function () {
+            // 🚀 NOUVEAU: Wizard d'affectation en page unique (Ultra-Pro)
+            Route::get('wizard', function() {
+                return view('admin.assignments.wizard');
+            })->name('wizard');
+
             Route::patch('{assignment}/end', [AssignmentController::class, 'end'])->name('end');
             Route::get('{assignment}/details', [AssignmentController::class, 'details'])->name('details');
             Route::post('{assignment}/extend', [AssignmentController::class, 'extend'])->name('extend');
