@@ -7,6 +7,8 @@ use App\Models\Driver;
 use App\Models\StatusHistory;
 use App\Enums\VehicleStatusEnum;
 use App\Enums\DriverStatusEnum;
+use App\Events\VehicleStatusChanged;
+use App\Events\DriverStatusChanged;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -73,7 +75,7 @@ class StatusTransitionService
             }
 
             // Enregistrer dans l'historique
-            StatusHistory::recordChange(
+            $statusHistory = StatusHistory::recordChange(
                 $vehicle,
                 $previousStatus,
                 $newStatus->value,
@@ -85,6 +87,16 @@ class StatusTransitionService
 
             // Hook post-transition (peut être étendu)
             $this->executeVehiclePostTransitionHook($vehicle, $currentStatusEnum, $newStatus, $options);
+
+            // Dispatcher l'événement Laravel
+            event(new VehicleStatusChanged(
+                $vehicle,
+                $currentStatusEnum,
+                $newStatus,
+                $statusHistory,
+                $options['reason'] ?? null,
+                $options['metadata'] ?? null
+            ));
 
             // Log l'événement
             Log::info("Vehicle status changed", [
@@ -136,7 +148,7 @@ class StatusTransitionService
             }
 
             // Enregistrer dans l'historique
-            StatusHistory::recordChange(
+            $statusHistory = StatusHistory::recordChange(
                 $driver,
                 $previousStatus,
                 $newStatus->value,
@@ -148,6 +160,16 @@ class StatusTransitionService
 
             // Hook post-transition
             $this->executeDriverPostTransitionHook($driver, $currentStatusEnum, $newStatus, $options);
+
+            // Dispatcher l'événement Laravel
+            event(new DriverStatusChanged(
+                $driver,
+                $currentStatusEnum,
+                $newStatus,
+                $statusHistory,
+                $options['reason'] ?? null,
+                $options['metadata'] ?? null
+            ));
 
             // Log l'événement
             Log::info("Driver status changed", [
