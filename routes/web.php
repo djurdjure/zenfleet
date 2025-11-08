@@ -340,20 +340,28 @@ Route::middleware(['auth', 'verified'])
         });
 
         // 🔄 Affectations Enterprise-Grade
-        Route::resource('assignments', AssignmentController::class);
+        // IMPORTANT: Routes spécifiques AVANT Route::resource pour éviter conflits
         Route::prefix('assignments')->name('assignments.')->group(function () {
-            // 🚀 NOUVEAU: Wizard d'affectation en page unique (Ultra-Pro)
+            // 🚀 WIZARD: Page unique ultra-pro (AVANT resource pour priorité routing)
             Route::get('wizard', function() {
                 return view('admin.assignments.wizard');
             })->name('wizard');
 
-            Route::patch('{assignment}/end', [AssignmentController::class, 'end'])->name('end');
-            Route::get('{assignment}/details', [AssignmentController::class, 'details'])->name('details');
-            Route::post('{assignment}/extend', [AssignmentController::class, 'extend'])->name('extend');
+            // Routes utilitaires (AVANT resource)
             Route::get('calendar', [AssignmentController::class, 'calendar'])->name('calendar');
             Route::get('gantt', [AssignmentController::class, 'gantt'])->name('gantt');
             Route::get('export', [AssignmentController::class, 'export'])->name('export');
             Route::get('stats', [AssignmentController::class, 'stats'])->name('stats');
+        });
+
+        // Resource routes (APRÈS les routes spécifiques)
+        Route::resource('assignments', AssignmentController::class);
+
+        // Routes avec paramètres (APRÈS resource)
+        Route::prefix('assignments')->name('assignments.')->group(function () {
+            Route::patch('{assignment}/end', [AssignmentController::class, 'end'])->name('end');
+            Route::get('{assignment}/details', [AssignmentController::class, 'details'])->name('details');
+            Route::post('{assignment}/extend', [AssignmentController::class, 'extend'])->name('extend');
         });
 
         // 🚗 API pour les ressources disponibles (via AssignmentController)
