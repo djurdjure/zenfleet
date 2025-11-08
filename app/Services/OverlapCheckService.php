@@ -236,6 +236,54 @@ class OverlapCheckService
     }
 
     /**
+     * ⚡ MÉTHODE POUR LIVEWIRE - Vérifie les conflits avec format simplifié
+     *
+     * Cette méthode est spécifiquement conçue pour AssignmentWizard Livewire.
+     * Elle accepte des strings datetime et retourne un tableau simple de conflits.
+     *
+     * @param int $vehicleId ID du véhicule
+     * @param int $driverId ID du chauffeur
+     * @param string $startDatetime Date/heure début (format: 'Y-m-d\TH:i')
+     * @param string|null $endDatetime Date/heure fin ou null si indéterminée
+     * @param int|null $excludeId ID affectation à exclure (pour édition)
+     * @return array Tableau de conflits formatés
+     */
+    public function checkConflicts(
+        int $vehicleId,
+        int $driverId,
+        string $startDatetime,
+        ?string $endDatetime = null,
+        ?int $excludeId = null
+    ): array {
+        // Conversion strings → Carbon avec gestion multi-tenant
+        $organizationId = auth()->check() ? auth()->user()->organization_id : null;
+
+        if (!$organizationId) {
+            throw new \RuntimeException('User must be authenticated to check conflicts');
+        }
+
+        try {
+            $start = Carbon::parse($startDatetime);
+            $end = $endDatetime ? Carbon::parse($endDatetime) : null;
+        } catch (\Exception $e) {
+            throw new \InvalidArgumentException('Invalid datetime format: ' . $e->getMessage());
+        }
+
+        // Utiliser la méthode principale checkOverlap
+        $result = $this->checkOverlap(
+            $vehicleId,
+            $driverId,
+            $start,
+            $end,
+            $excludeId,
+            $organizationId
+        );
+
+        // Retourner seulement les conflits (pas suggestions) pour Livewire
+        return $result['conflicts'];
+    }
+
+    /**
      * Valide une affectation complète avec messages d'erreur explicites
      */
     public function validateAssignment(
