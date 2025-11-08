@@ -56,6 +56,36 @@ services:
       POSTGRES_DB: ${DB_DATABASE}
       POSTGRES_USER: ${DB_USERNAME}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
+    # 🚀 CONFIGURATION POSTGRESQL ENTERPRISE-GRADE OPTIMISÉE
+    command: >
+      postgres
+      -c shared_buffers=2GB
+      -c work_mem=32MB
+      -c maintenance_work_mem=1GB
+      -c effective_cache_size=6GB
+      -c wal_buffers=16MB
+      -c max_wal_size=4GB
+      -c min_wal_size=1GB
+      -c checkpoint_completion_target=0.9
+      -c random_page_cost=1.1
+      -c effective_io_concurrency=200
+      -c max_parallel_workers_per_gather=4
+      -c max_parallel_maintenance_workers=4
+      -c max_parallel_workers=8
+      -c jit=on
+      -c log_min_duration_statement=1000
+      -c log_checkpoints=on
+      -c log_connections=on
+      -c log_disconnections=on
+      -c log_lock_waits=on
+      -c log_statement=ddl
+      -c shared_preload_libraries=pg_stat_statements
+      -c pg_stat_statements.track=all
+      -c pg_stat_statements.max=10000
+      -c autovacuum_max_workers=3
+      -c autovacuum_naptime=10s
+      -c track_io_timing=on
+      -c track_functions=all
     networks:
       - zenfleet_network
     healthcheck:
