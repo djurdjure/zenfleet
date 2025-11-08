@@ -609,19 +609,8 @@
  </span>
  </td>
  <td class="px-6 py-4 whitespace-nowrap">
- @php
- $statusColors = [
- 'Disponible' => 'bg-green-100 text-green-800',
- 'Affecté' => 'bg-orange-100 text-orange-800',
- 'Maintenance' => 'bg-red-100 text-red-800',
- 'Hors service' => 'bg-gray-100 text-gray-800'
- ];
- $statusName = $vehicle->vehicleStatus->name ?? 'Inconnu';
- $colorClass = $statusColors[$statusName] ?? 'bg-gray-100 text-gray-800';
- @endphp
- <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $colorClass }}">
- {{ $statusName }}
- </span>
+ {{-- 🎯 Composant Livewire de changement de statut inline --}}
+ @livewire('admin.vehicle-status-badge', ['vehicle' => $vehicle], key('vehicle-status-'.$vehicle->id))
  </td>
  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-medium">
  {{ number_format($vehicle->current_mileage) }} km
