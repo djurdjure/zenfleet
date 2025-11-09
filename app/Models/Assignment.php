@@ -439,9 +439,25 @@ class Assignment extends Model
     /**
      * Méthodes d'action business
      */
+    /**
+     * 🔍 Vérifie si l'affectation peut être terminée manuellement
+     *
+     * CONDITIONS ENTERPRISE-GRADE :
+     * - Statut calculé (pas DB) doit être ACTIVE
+     * - end_datetime doit être NULL (pas encore terminée)
+     * - L'affectation doit avoir démarré (start_datetime <= now)
+     *
+     * IMPORTANT : On utilise $this->getStatusAttribute() et NON $this->attributes['status']
+     * car le statut peut être calculé dynamiquement (pas stocké en base).
+     *
+     * @return bool
+     */
     public function canBeEnded(): bool
     {
-        return $this->status === self::STATUS_ACTIVE && $this->end_datetime === null;
+        // Utiliser l'accessor (calculé dynamiquement) et non l'attribut DB brut
+        return $this->getStatusAttribute($this->attributes['status'] ?? null) === self::STATUS_ACTIVE
+            && $this->end_datetime === null
+            && $this->start_datetime <= now();
     }
 
     public function canBeEdited(): bool
@@ -461,7 +477,18 @@ class Assignment extends Model
     }
 
     /**
-     * Terminer l'affectation
+     * 🏁 Terminer l'affectation - Enterprise-Grade
+     *
+     * Cette méthode :
+     * 1. Valide que l'affectation peut être terminée
+     * 2. Met à jour end_datetime, end_mileage, notes
+     * 3. Dispatch l'événement AssignmentEnded
+     * 4. Déclenche automatiquement la libération du véhicule/chauffeur
+     *
+     * @param Carbon|null $endTime Date/heure de fin (défaut: maintenant)
+     * @param int|null $endMileage Kilométrage de fin
+     * @param string|null $notes Notes de fin
+     * @return bool Succès de la sauvegarde
      */
     public function end(?Carbon $endTime = null, ?int $endMileage = null, ?string $notes = null): bool
     {
@@ -483,7 +510,14 @@ class Assignment extends Model
                 "Terminaison: " . $notes;
         }
 
-        return $this->save();
+        $saved = $this->save();
+
+        // 🎯 Dispatcher l'événement pour déclencher la libération automatique
+        if ($saved) {
+            \App\Events\AssignmentEnded::dispatch($this, 'manual', auth()->id());
+        }
+
+        return $saved;
     }
 
     /**

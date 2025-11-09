@@ -139,7 +139,13 @@ class OverlapCheckService
     }
 
     /**
-     * Génère des suggestions de créneaux libres
+     * Génère des suggestions de créneaux libres - ENTERPRISE-GRADE
+     *
+     * Algorithme robuste qui :
+     * - Vérifie les conflits pour véhicule ET chauffeur séparément
+     * - Gère correctement les affectations indéterminées (end_datetime = NULL)
+     * - Détecte les affectations actives qui ont commencé dans le passé
+     * - Trouve les créneaux réellement libres sans faux positifs
      */
     private function generateSuggestions(
         int $vehicleId,
@@ -149,43 +155,90 @@ class OverlapCheckService
         int $organizationId,
         ?int $excludeId = null
     ): array {
-        $suggestions = [];
-        $requestedDuration = $end ? $start->diffInHours($end) : 24; // Durée par défaut si indéterminée
-
-        // Recherche des créneaux libres dans les 7 prochains jours
+        $requestedDuration = $end ? $start->diffInHours($end) : 24;
         $searchStart = now();
         $searchEnd = now()->addDays(7);
 
-        $existingAssignments = Assignment::where('organization_id', $organizationId)
-            ->where(function ($query) use ($vehicleId, $driverId) {
-                $query->where('vehicle_id', $vehicleId)
-                      ->orWhere('driver_id', $driverId);
-            })
+        // Récupérer TOUTES les affectations actives ou futures pour véhicule ET chauffeur
+        // (y compris celles qui ont commencé avant searchStart mais sont toujours actives)
+        $vehicleAssignments = Assignment::where('organization_id', $organizationId)
+            ->where('vehicle_id', $vehicleId)
             ->when($excludeId, fn($q) => $q->where('id', '!=', $excludeId))
-            ->whereBetween('start_datetime', [$searchStart, $searchEnd])
+            ->where(function ($q) use ($searchStart) {
+                $q->whereNull('end_datetime') // Affectations indéterminées
+                  ->orWhere('end_datetime', '>=', $searchStart); // Affectations qui se terminent après maintenant
+            })
             ->orderBy('start_datetime')
             ->get();
 
-        // Trouver les créneaux libres
-        $currentTime = $searchStart->copy();
-        foreach ($existingAssignments as $assignment) {
-            if ($currentTime->addHours($requestedDuration)->lte($assignment->start_datetime)) {
-                $suggestions[] = [
-                    'start' => $currentTime->format('Y-m-d\TH:i'),
-                    'end' => $currentTime->copy()->addHours($requestedDuration)->format('Y-m-d\TH:i'),
-                    'description' => 'Disponible à partir du ' . $currentTime->format('d/m/Y H:i')
-                ];
+        $driverAssignments = Assignment::where('organization_id', $organizationId)
+            ->where('driver_id', $driverId)
+            ->when($excludeId, fn($q) => $q->where('id', '!=', $excludeId))
+            ->where(function ($q) use ($searchStart) {
+                $q->whereNull('end_datetime')
+                  ->orWhere('end_datetime', '>=', $searchStart);
+            })
+            ->orderBy('start_datetime')
+            ->get();
 
-                if (count($suggestions) >= 3) break; // Limiter à 3 suggestions
+        // Fusionner et trier par date de début
+        $allAssignments = $vehicleAssignments->merge($driverAssignments)
+            ->unique('id')
+            ->sortBy('start_datetime')
+            ->values();
+
+        // Trouver les créneaux libres
+        $suggestions = [];
+        $currentSlot = $searchStart->copy();
+
+        foreach ($allAssignments as $assignment) {
+            $assignmentStart = $assignment->start_datetime;
+            $assignmentEnd = $assignment->end_datetime ?? Carbon::create(2099, 12, 31);
+
+            // Si le créneau actuel est avant le début de cette affectation
+            if ($currentSlot->lt($assignmentStart)) {
+                $proposedEnd = $currentSlot->copy()->addHours($requestedDuration);
+
+                // Vérifier si la durée demandée rentre avant cette affectation
+                if ($proposedEnd->lte($assignmentStart)) {
+                    $suggestions[] = [
+                        'start' => $currentSlot->format('Y-m-d\TH:i'),
+                        'end' => $proposedEnd->format('Y-m-d\TH:i'),
+                        'description' => 'Disponible du ' . $currentSlot->format('d/m/Y H:i') . ' au ' . $proposedEnd->format('d/m/Y H:i')
+                    ];
+
+                    if (count($suggestions) >= 3) break;
+                }
             }
-            $currentTime = $assignment->end_datetime ?? $assignment->start_datetime->copy()->addHours(24);
+
+            // Passer au prochain créneau possible après cette affectation
+            if ($assignmentEnd->gt($currentSlot)) {
+                $currentSlot = $assignmentEnd->copy();
+            }
+        }
+
+        // Si on n'a pas encore 3 suggestions, proposer après la dernière affectation
+        if (count($suggestions) < 3 && $currentSlot->lte($searchEnd)) {
+            $proposedEnd = $currentSlot->copy()->addHours($requestedDuration);
+            if ($proposedEnd->lte($searchEnd)) {
+                $suggestions[] = [
+                    'start' => $currentSlot->format('Y-m-d\TH:i'),
+                    'end' => $proposedEnd->format('Y-m-d\TH:i'),
+                    'description' => 'Disponible du ' . $currentSlot->format('d/m/Y H:i') . ' au ' . $proposedEnd->format('d/m/Y H:i')
+                ];
+            }
         }
 
         return $suggestions;
     }
 
     /**
-     * Trouve le prochain créneau libre de durée donnée
+     * Trouve le prochain créneau libre de durée donnée - ENTERPRISE-GRADE
+     *
+     * Algorithme robuste similaire à generateSuggestions() mais :
+     * - Retourne le PREMIER créneau disponible uniquement
+     * - Recherche sur 30 jours (plus large que les suggestions)
+     * - Gère correctement les affectations indéterminées
      */
     public function findNextAvailableSlot(
         int $vehicleId,
@@ -195,44 +248,74 @@ class OverlapCheckService
     ): ?array {
         $organizationId = $organizationId ?? auth()->user()->organization_id;
 
-        // Recherche dans les 30 prochains jours
         $searchStart = now();
         $searchEnd = now()->addDays(30);
 
-        $assignments = Assignment::where('organization_id', $organizationId)
-            ->where(function ($query) use ($vehicleId, $driverId) {
-                $query->where('vehicle_id', $vehicleId)
-                      ->orWhere('driver_id', $driverId);
+        // Récupérer toutes les affectations actives ou futures
+        $vehicleAssignments = Assignment::where('organization_id', $organizationId)
+            ->where('vehicle_id', $vehicleId)
+            ->where(function ($q) use ($searchStart) {
+                $q->whereNull('end_datetime')
+                  ->orWhere('end_datetime', '>=', $searchStart);
             })
-            ->where('start_datetime', '>=', $searchStart)
             ->orderBy('start_datetime')
             ->get();
 
+        $driverAssignments = Assignment::where('organization_id', $organizationId)
+            ->where('driver_id', $driverId)
+            ->where(function ($q) use ($searchStart) {
+                $q->whereNull('end_datetime')
+                  ->orWhere('end_datetime', '>=', $searchStart);
+            })
+            ->orderBy('start_datetime')
+            ->get();
+
+        // Fusionner et trier
+        $allAssignments = $vehicleAssignments->merge($driverAssignments)
+            ->unique('id')
+            ->sortBy('start_datetime')
+            ->values();
+
         $currentSlot = $searchStart->copy();
 
-        foreach ($assignments as $assignment) {
-            $proposedEnd = $currentSlot->copy()->addHours($durationHours);
+        // Trouver le premier créneau disponible
+        foreach ($allAssignments as $assignment) {
+            $assignmentStart = $assignment->start_datetime;
+            $assignmentEnd = $assignment->end_datetime ?? Carbon::create(2099, 12, 31);
 
-            if ($proposedEnd->lte($assignment->start_datetime)) {
-                return [
-                    'start' => $currentSlot->format('Y-m-d\TH:i'),
-                    'end' => $proposedEnd->format('Y-m-d\TH:i'),
-                    'start_formatted' => $currentSlot->format('d/m/Y H:i'),
-                    'end_formatted' => $proposedEnd->format('d/m/Y H:i')
-                ];
+            // Vérifier si la durée demandée rentre avant cette affectation
+            if ($currentSlot->lt($assignmentStart)) {
+                $proposedEnd = $currentSlot->copy()->addHours($durationHours);
+
+                if ($proposedEnd->lte($assignmentStart)) {
+                    return [
+                        'start' => $currentSlot->format('Y-m-d\TH:i'),
+                        'end' => $proposedEnd->format('Y-m-d\TH:i'),
+                        'start_formatted' => $currentSlot->format('d/m/Y H:i'),
+                        'end_formatted' => $proposedEnd->format('d/m/Y H:i')
+                    ];
+                }
             }
 
-            // Passer au slot suivant après cette affectation
-            $currentSlot = $assignment->end_datetime ?? $assignment->start_datetime->copy()->addDay();
+            // Avancer au prochain créneau possible
+            if ($assignmentEnd->gt($currentSlot)) {
+                $currentSlot = $assignmentEnd->copy();
+            }
         }
 
-        // Si aucun conflit trouvé, retourner le slot immédiat
-        return [
-            'start' => $currentSlot->format('Y-m-d\TH:i'),
-            'end' => $currentSlot->copy()->addHours($durationHours)->format('Y-m-d\TH:i'),
-            'start_formatted' => $currentSlot->format('d/m/Y H:i'),
-            'end_formatted' => $currentSlot->copy()->addHours($durationHours)->format('d/m/Y H:i')
-        ];
+        // Si aucun conflit, retourner le créneau immédiat
+        if ($currentSlot->lte($searchEnd)) {
+            $proposedEnd = $currentSlot->copy()->addHours($durationHours);
+            return [
+                'start' => $currentSlot->format('Y-m-d\TH:i'),
+                'end' => $proposedEnd->format('Y-m-d\TH:i'),
+                'start_formatted' => $currentSlot->format('d/m/Y H:i'),
+                'end_formatted' => $proposedEnd->format('d/m/Y H:i')
+            ];
+        }
+
+        // Aucun créneau disponible dans les 30 prochains jours
+        return null;
     }
 
     /**

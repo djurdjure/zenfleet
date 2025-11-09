@@ -29,6 +29,11 @@ class EventServiceProvider extends ServiceProvider
         RepairRequestStatusChanged::class => [
             SendRepairRequestNotifications::class,
         ],
+
+        // 🚗 ASSIGNMENT EVENTS - Enterprise-Grade Auto-Release
+        \App\Events\AssignmentEnded::class => [
+            \App\Listeners\ReleaseVehicleAndDriver::class,
+        ],
     ];
 
     /**

@@ -9,10 +9,29 @@ class Kernel extends ConsoleKernel
 {
     /**
      * Define the application's command schedule.
+     *
+     * 🚀 ENTERPRISE-GRADE SCHEDULED TASKS
      */
     protected function schedule(Schedule $schedule): void
     {
-        // $schedule->command('inspire')->hourly();
+        // ⏰ Traiter les affectations expirées toutes les 5 minutes
+        // Cette tâche libère automatiquement les véhicules et chauffeurs
+        $schedule->command('assignments:process-expired')
+            ->everyFiveMinutes()
+            ->withoutOverlapping(10) // Timeout 10 min si bloqué
+            ->runInBackground()
+            ->onSuccess(function () {
+                \Log::info('[Scheduler] assignments:process-expired SUCCÈS');
+            })
+            ->onFailure(function () {
+                \Log::error('[Scheduler] assignments:process-expired ÉCHEC');
+            });
+
+        // 🧹 Nettoyage logs anciens (tous les jours à 2h du matin)
+        $schedule->command('queue:prune-batches --hours=48')
+            ->daily()
+            ->at('02:00')
+            ->runInBackground();
     }
 
     /**

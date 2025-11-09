@@ -1,0 +1,40 @@
+# Docker Compose Extension pour Laravel Scheduler
+# Usage: docker-compose -f docker-compose.yml -f docker-compose.scheduler.yml up -d
+
+version: '3.8'
+
+services:
+  scheduler:
+    image: ${PHP_IMAGE:-php:8.3-fpm-alpine}
+    container_name: zenfleet_scheduler
+    working_dir: /var/www/html
+    command: php artisan schedule:work
+    volumes:
+      - .:/var/www/html
+    environment:
+      - APP_ENV=${APP_ENV:-production}
+      - APP_DEBUG=${APP_DEBUG:-false}
+      - DB_CONNECTION=${DB_CONNECTION:-pgsql}
+      - DB_HOST=${DB_HOST:-database}
+      - DB_PORT=${DB_PORT:-5432}
+      - DB_DATABASE=${DB_DATABASE}
+      - DB_USERNAME=${DB_USERNAME}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - REDIS_HOST=${REDIS_HOST:-redis}
+      - REDIS_PORT=${REDIS_PORT:-6379}
+      - QUEUE_CONNECTION=${QUEUE_CONNECTION:-redis}
+    networks:
+      - zenfleet
+    depends_on:
+      - database
+      - redis
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+networks:
+  zenfleet:
+    external: true
