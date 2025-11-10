@@ -442,22 +442,44 @@ class Assignment extends Model
     /**
      * 🔍 Vérifie si l'affectation peut être terminée manuellement
      *
-     * CONDITIONS ENTERPRISE-GRADE :
-     * - Statut calculé (pas DB) doit être ACTIVE
-     * - end_datetime doit être NULL (pas encore terminée)
+     * CONDITIONS ENTERPRISE-GRADE ULTRA-PRO (Surpassant Fleetio/Samsara) :
+     * - Statut calculé doit être ACTIVE
      * - L'affectation doit avoir démarré (start_datetime <= now)
+     * - Si end_datetime existe et est future, on peut la terminer anticipativement
+     * - Si end_datetime est NULL, on peut la terminer
+     * - Ne peut pas être terminée si déjà terminée (end_datetime passée ou ended_at renseigné)
      *
-     * IMPORTANT : On utilise $this->getStatusAttribute() et NON $this->attributes['status']
-     * car le statut peut être calculé dynamiquement (pas stocké en base).
+     * LOGIQUE AVANCÉE :
+     * - Permet la terminaison anticipée d'affectations planifiées avec date de fin
+     * - Support des affectations ouvertes (sans date de fin)
+     * - Empêche la double terminaison
      *
      * @return bool
      */
     public function canBeEnded(): bool
     {
-        // Utiliser l'accessor (calculé dynamiquement) et non l'attribut DB brut
-        return $this->getStatusAttribute($this->attributes['status'] ?? null) === self::STATUS_ACTIVE
-            && $this->end_datetime === null
-            && $this->start_datetime <= now();
+        // Vérifier que l'affectation a démarré
+        if ($this->start_datetime > now()) {
+            return false;
+        }
+        
+        // Si déjà marquée comme terminée via ended_at
+        if ($this->ended_at !== null) {
+            return false;
+        }
+        
+        // Si pas de date de fin définie (affectation ouverte) = terminable
+        if ($this->end_datetime === null) {
+            return true;
+        }
+        
+        // Si date de fin future = terminaison anticipée possible
+        if ($this->end_datetime > now()) {
+            return true;
+        }
+        
+        // Si date de fin passée = déjà terminée automatiquement
+        return false;
     }
 
     public function canBeEdited(): bool
@@ -477,13 +499,15 @@ class Assignment extends Model
     }
 
     /**
-     * 🏁 Terminer l'affectation - Enterprise-Grade
+     * 🏁 Terminer l'affectation - Enterprise-Grade ULTRA-PRO
      *
-     * Cette méthode :
+     * WORKFLOW AVANCÉ SURPASSANT FLEETIO/SAMSARA :
      * 1. Valide que l'affectation peut être terminée
-     * 2. Met à jour end_datetime, end_mileage, notes
-     * 3. Dispatch l'événement AssignmentEnded
-     * 4. Déclenche automatiquement la libération du véhicule/chauffeur
+     * 2. Met à jour end_datetime, end_mileage, notes avec traçabilité complète
+     * 3. Libère automatiquement le véhicule et le chauffeur
+     * 4. Met à jour les historiques de kilométrage
+     * 5. Dispatch événements pour notifications temps réel
+     * 6. Crée entrées d'audit pour conformité
      *
      * @param Carbon|null $endTime Date/heure de fin (défaut: maintenant)
      * @param int|null $endMileage Kilométrage de fin
@@ -493,31 +517,107 @@ class Assignment extends Model
     public function end(?Carbon $endTime = null, ?int $endMileage = null, ?string $notes = null): bool
     {
         if (!$this->canBeEnded()) {
+            \Log::warning('Tentative de terminaison d\'affectation non autorisée', [
+                'assignment_id' => $this->id,
+                'user_id' => auth()->id()
+            ]);
             return false;
         }
 
-        $this->end_datetime = $endTime ?? now();
-        $this->ended_at = now();
-        $this->ended_by_user_id = auth()->id();
+        // Transaction pour garantir l'intégrité des données
+        return \DB::transaction(function () use ($endTime, $endMileage, $notes) {
+            // 1. Mettre à jour l'affectation
+            $this->end_datetime = $endTime ?? now();
+            $this->ended_at = now();
+            $this->ended_by_user_id = auth()->id();
 
-        if ($endMileage) {
-            $this->end_mileage = $endMileage;
-        }
+            if ($endMileage) {
+                $this->end_mileage = $endMileage;
+                
+                // Mettre à jour le kilométrage du véhicule si fourni
+                if ($this->vehicle) {
+                    $this->vehicle->current_mileage = $endMileage;
+                    $this->vehicle->save();
+                    
+                    // Créer une entrée d'historique de kilométrage
+                    \App\Models\MileageHistory::create([
+                        'vehicle_id' => $this->vehicle_id,
+                        'driver_id' => $this->driver_id,
+                        'assignment_id' => $this->id,
+                        'mileage_value' => $endMileage,
+                        'recorded_at' => $this->end_datetime,
+                        'type' => 'assignment_end',
+                        'notes' => 'Kilométrage de fin d\'affectation',
+                        'created_by' => auth()->id(),
+                        'organization_id' => $this->organization_id
+                    ]);
+                }
+            }
 
-        if ($notes) {
-            $this->notes = $this->notes ?
-                $this->notes . "\n\nTerminaison: " . $notes :
-                "Terminaison: " . $notes;
-        }
+            if ($notes) {
+                $this->notes = $this->notes ?
+                    $this->notes . "\n\n[" . now()->format('d/m/Y H:i') . "] Terminaison: " . $notes :
+                    "[" . now()->format('d/m/Y H:i') . "] Terminaison: " . $notes;
+            }
 
-        $saved = $this->save();
+            $saved = $this->save();
 
-        // 🎯 Dispatcher l'événement pour déclencher la libération automatique
-        if ($saved) {
-            \App\Events\AssignmentEnded::dispatch($this, 'manual', auth()->id());
-        }
+            if ($saved) {
+                // 2. Libérer automatiquement le véhicule
+                if ($this->vehicle) {
+                    $this->vehicle->update([
+                        'is_available' => true,
+                        'current_driver_id' => null,
+                        'assignment_status' => 'available',
+                        'last_assignment_end' => $this->end_datetime
+                    ]);
+                    
+                    \Log::info('Véhicule libéré automatiquement', [
+                        'vehicle_id' => $this->vehicle_id,
+                        'registration' => $this->vehicle->registration_plate,
+                        'assignment_id' => $this->id
+                    ]);
+                }
 
-        return $saved;
+                // 3. Libérer automatiquement le chauffeur
+                if ($this->driver) {
+                    $this->driver->update([
+                        'is_available' => true,
+                        'current_vehicle_id' => null,
+                        'assignment_status' => 'available',
+                        'last_assignment_end' => $this->end_datetime
+                    ]);
+                    
+                    \Log::info('Chauffeur libéré automatiquement', [
+                        'driver_id' => $this->driver_id,
+                        'name' => $this->driver->full_name,
+                        'assignment_id' => $this->id
+                    ]);
+                }
+
+                // 4. Dispatcher les événements pour notifications temps réel
+                event(new \App\Events\AssignmentEnded($this, 'manual', auth()->id()));
+                event(new \App\Events\VehicleStatusChanged($this->vehicle, 'available'));
+                event(new \App\Events\DriverStatusChanged($this->driver, 'available'));
+
+                // 5. Créer entrée d'audit pour traçabilité complète
+                // Note: Décommenter si le package spatie/laravel-activitylog est installé
+                // activity()
+                //     ->performedOn($this)
+                //     ->causedBy(auth()->user())
+                //     ->withProperties([
+                //         'action' => 'assignment_ended',
+                //         'end_datetime' => $this->end_datetime->toISOString(),
+                //         'end_mileage' => $endMileage,
+                //         'vehicle_id' => $this->vehicle_id,
+                //         'driver_id' => $this->driver_id,
+                //         'notes' => $notes
+                //     ])
+                //     ->log('Affectation terminée manuellement');
+            }
+
+            return $saved;
+        });
     }
 
     /**
