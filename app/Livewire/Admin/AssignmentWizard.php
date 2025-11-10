@@ -101,7 +101,7 @@ class AssignmentWizard extends Component
     }
 
     /**
-     * Render du composant
+     * Render du composant avec optimisations Enterprise
      */
     public function render()
     {
@@ -332,6 +332,48 @@ class AssignmentWizard extends Component
                 'message' => 'Aucun créneau libre trouvé dans les 30 prochains jours'
             ]);
         }
+    }
+
+    /**
+     * Valider l'affectation avant création
+     */
+    public function validateAssignment()
+    {
+        $this->isValidating = true;
+        $this->hasConflicts = false;
+        $this->conflicts = [];
+        $this->errorMessage = '';
+        
+        // Validation des champs requis
+        if (!$this->selectedVehicleId || !$this->selectedDriverId) {
+            $this->errorMessage = 'Veuillez sélectionner un véhicule et un chauffeur.';
+            $this->isValidating = false;
+            return;
+        }
+        
+        if (!$this->startDatetime) {
+            $this->errorMessage = 'La date de début est requise.';
+            $this->isValidating = false;
+            return;
+        }
+        
+        if (!$this->reason) {
+            $this->errorMessage = 'La raison de l\'affectation est requise.';
+            $this->isValidating = false;
+            return;
+        }
+        
+        // Vérification des conflits
+        $this->checkForConflicts();
+        
+        if ($this->hasConflicts) {
+            $this->errorMessage = 'Des conflits ont été détectés. Veuillez ajuster les dates ou utiliser la suggestion automatique.';
+        } else {
+            $this->successMessage = '✅ Validation réussie. L\'affectation peut être créée.';
+            $this->dispatch('assignment-validated');
+        }
+        
+        $this->isValidating = false;
     }
 
     /**

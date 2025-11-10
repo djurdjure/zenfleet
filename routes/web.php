@@ -343,19 +343,25 @@ Route::middleware(['auth', 'verified'])
         // IMPORTANT: Routes spécifiques AVANT Route::resource pour éviter conflits
         Route::prefix('assignments')->name('assignments.')->group(function () {
             // 🚀 WIZARD: Page unique ultra-pro (AVANT resource pour priorité routing)
-            Route::get('wizard', function() {
+            // 🚀 WIZARD EST MAINTENANT LE SYSTÈME PAR DÉFAUT (remplace l'ancien create)
+            Route::get('create', function() {
                 return view('admin.assignments.wizard');
-            })->name('wizard');
+            })->name('create'); // Le wizard EST la route create
 
-            // Routes utilitaires (AVANT resource)
+            // Routes utilitaires avancées Enterprise
             Route::get('calendar', [AssignmentController::class, 'calendar'])->name('calendar');
             Route::get('gantt', [AssignmentController::class, 'gantt'])->name('gantt');
             Route::get('export', [AssignmentController::class, 'export'])->name('export');
             Route::get('stats', [AssignmentController::class, 'stats'])->name('stats');
+            
+            // Routes CRUD (index, store, show, edit, update, destroy)
+            Route::get('/', [AssignmentController::class, 'index'])->name('index');
+            Route::post('/', [AssignmentController::class, 'store'])->name('store');
+            Route::get('{assignment}', [AssignmentController::class, 'show'])->name('show');
+            Route::get('{assignment}/edit', [AssignmentController::class, 'edit'])->name('edit');
+            Route::put('{assignment}', [AssignmentController::class, 'update'])->name('update');
+            Route::delete('{assignment}', [AssignmentController::class, 'destroy'])->name('destroy');
         });
-
-        // Resource routes (APRÈS les routes spécifiques)
-        Route::resource('assignments', AssignmentController::class);
 
         // Routes avec paramètres (APRÈS resource)
         Route::prefix('assignments')->name('assignments.')->group(function () {
