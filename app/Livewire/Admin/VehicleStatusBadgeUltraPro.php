@@ -31,62 +31,132 @@ use Illuminate\Support\Facades\DB;
  */
 class VehicleStatusBadgeUltraPro extends Component
 {
+    // ✅ FIX: Utiliser l'ID au lieu de l'objet complet pour la réactivité
+    public int $vehicleId;
     public Vehicle $vehicle;
     public bool $showDropdown = false;
     public bool $showConfirmModal = false;
     public ?string $pendingStatus = null;
     public ?VehicleStatusEnum $pendingStatusEnum = null;
     public string $confirmMessage = '';
-    
+
+    // ✅ Listeners pour synchronisation multi-composants
     protected $listeners = [
         'refreshComponent' => '$refresh',
         'vehicleStatusUpdated' => 'refreshVehicleData',
-        'vehicleStatusChanged' => 'handleStatusChanged'
+        'vehicleStatusChanged' => 'handleStatusChanged',
+        'echo:vehicles,VehicleStatusChanged' => 'onVehicleStatusChanged' // Real-time via WebSocket
     ];
 
     /**
      * Initialisation du composant avec préchargement des relations
+     * ✅ FIX: Stocker l'ID et charger le véhicule dynamiquement
      */
-    public function mount(Vehicle $vehicle)
+    public function mount($vehicle)
     {
-        // Précharger les relations nécessaires pour éviter les requêtes N+1
-        $this->vehicle = $vehicle->load(['vehicleStatus', 'depot', 'assignments.driver']);
+        // Accepter soit un ID soit un objet Vehicle
+        if ($vehicle instanceof Vehicle) {
+            $this->vehicleId = $vehicle->id;
+            $this->vehicle = $vehicle->load(['vehicleStatus', 'depot', 'assignments.driver']);
+        } else {
+            $this->vehicleId = (int) $vehicle;
+            $this->loadVehicle();
+        }
+    }
+
+    /**
+     * ✅ NOUVELLE MÉTHODE: Charge le véhicule depuis la DB avec toutes ses relations
+     */
+    protected function loadVehicle(): void
+    {
+        $this->vehicle = Vehicle::with(['vehicleStatus', 'depot', 'assignments.driver'])
+            ->findOrFail($this->vehicleId);
     }
 
     /**
      * Rafraîchit les données du véhicule
+     * ✅ FIX: Utilise maintenant loadVehicle() pour éviter les doublons de code
      */
     public function refreshVehicleData($vehicleId = null)
     {
         // Vérifier si c'est bien notre véhicule qui a été modifié
-        if ($vehicleId && $vehicleId != $this->vehicle->id) {
+        if ($vehicleId && $vehicleId != $this->vehicleId) {
             return;
         }
-        
+
         // Rafraîchir le modèle depuis la base de données
-        $this->vehicle = Vehicle::with(['vehicleStatus', 'depot', 'assignments.driver'])
-            ->find($this->vehicle->id);
+        $this->loadVehicle();
+
+        Log::info('Vehicle data refreshed in badge', [
+            'vehicle_id' => $this->vehicleId,
+            'new_status' => $this->vehicle->vehicleStatus?->name,
+            'component' => 'VehicleStatusBadgeUltraPro'
+        ]);
     }
     
     /**
      * Gère l'événement de changement de statut
+     * ✅ FIX: Utilise maintenant vehicleId au lieu de vehicle->id
      */
     public function handleStatusChanged($payload)
     {
         // Vérifier si c'est notre véhicule qui a changé
-        if (isset($payload['vehicleId']) && $payload['vehicleId'] == $this->vehicle->id) {
+        if (isset($payload['vehicleId']) && $payload['vehicleId'] == $this->vehicleId) {
             $this->refreshVehicleData($payload['vehicleId']);
         }
     }
 
     /**
+     * ✅ NOUVELLE MÉTHODE: Gère les changements de statut via WebSocket (temps réel)
+     */
+    public function onVehicleStatusChanged($event)
+    {
+        // Vérifier si c'est notre véhicule qui a changé
+        if (isset($event['vehicleId']) && $event['vehicleId'] == $this->vehicleId) {
+            $this->refreshVehicleData($event['vehicleId']);
+        }
+    }
+
+    /**
      * Récupère le statut actuel sous forme d'enum
+     * ✅ FIX ENTERPRISE: Utilise directement le slug de la table au lieu de le générer
      */
     public function getCurrentStatusEnum(): ?VehicleStatusEnum
     {
         if ($this->vehicle->vehicleStatus) {
-            $slug = \Str::slug($this->vehicle->vehicleStatus->name);
-            return VehicleStatusEnum::tryFrom($slug);
+            // ✅ CORRECTION: Utiliser le slug de la table qui contient déjà le bon format
+            // Avant: \Str::slug($this->vehicle->vehicleStatus->name) générait 'en-panne' (tiret)
+            // Maintenant: Utilise directement $this->vehicle->vehicleStatus->slug qui vaut 'en_panne' (underscore)
+            $slug = $this->vehicle->vehicleStatus->slug;
+
+            // Tentative directe avec le slug de la table
+            $enum = VehicleStatusEnum::tryFrom($slug);
+
+            // ⚠️ FALLBACK: Si le slug de la table ne matche pas exactement, essayer avec les underscores
+            // Ceci gère les cas où le slug DB utilise des tirets mais l'enum utilise des underscores
+            if (!$enum && str_contains($slug, '-')) {
+                $slugWithUnderscore = str_replace('-', '_', $slug);
+                $enum = VehicleStatusEnum::tryFrom($slugWithUnderscore);
+            }
+
+            // ⚠️ FALLBACK 2: Si toujours pas de match, essayer de générer depuis le name
+            if (!$enum) {
+                $generatedSlug = str_replace('-', '_', \Str::slug($this->vehicle->vehicleStatus->name));
+                $enum = VehicleStatusEnum::tryFrom($generatedSlug);
+            }
+
+            // 📊 LOGGING: Si aucun enum trouvé, logger pour debugging
+            if (!$enum) {
+                Log::warning('VehicleStatusEnum not found for vehicle status', [
+                    'vehicle_id' => $this->vehicleId,
+                    'vehicle_status_id' => $this->vehicle->vehicleStatus->id,
+                    'vehicle_status_name' => $this->vehicle->vehicleStatus->name,
+                    'vehicle_status_slug' => $slug,
+                    'component' => 'VehicleStatusBadgeUltraPro'
+                ]);
+            }
+
+            return $enum;
         }
         return null;
     }
@@ -191,13 +261,14 @@ class VehicleStatusBadgeUltraPro extends Component
                     $this->vehicle,
                     $this->pendingStatusEnum,
                     [
-                        'reason' => "Changement manuel via interface badge",
-                        'change_type' => 'manual_badge',
+                        'reason' => "Changement manuel via badge de statut",
+                        'change_type' => 'manual', // ✅ FIX: Utiliser 'manual' au lieu de 'manual_badge'
                         'user_id' => auth()->id(),
                         'metadata' => [
                             'ip' => request()->ip(),
                             'user_agent' => request()->userAgent(),
-                            'component' => 'VehicleStatusBadgeUltraPro'
+                            'component' => 'VehicleStatusBadgeUltraPro',
+                            'source' => 'badge'
                         ]
                     ]
                 );

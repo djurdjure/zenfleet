@@ -114,11 +114,11 @@ enum VehicleStatusEnum: string
     public function icon(): string
     {
         return match($this) {
-            self::PARKING => 'check-circle',        // Disponible
-            self::AFFECTE => 'user-check',          // Assigné à un chauffeur
-            self::EN_PANNE => 'alert-triangle',     // Alerte panne
-            self::EN_MAINTENANCE => 'wrench',       // En réparation
-            self::REFORME => 'archive',             // Archivé/Réformé
+            self::PARKING => 'lucide:square-parking',    // Parking
+            self::AFFECTE => 'lucide:user-check',        // Assigné à un chauffeur
+            self::EN_PANNE => 'lucide:alert-triangle',   // Alerte panne
+            self::EN_MAINTENANCE => 'lucide:wrench',     // En réparation
+            self::REFORME => 'lucide:archive',           // Archivé/Réformé
         };
     }
 
@@ -130,16 +130,16 @@ enum VehicleStatusEnum: string
         $colorClasses = match($this) {
             // Parking: Bleu clair professionnel - Disponible
             self::PARKING => 'bg-blue-50 text-blue-700 ring-1 ring-blue-200',
-            
-            // Affecté: Vert émeraude clair - Actif/opérationnel  
+
+            // Affecté: Vert émeraude clair - Actif/opérationnel
             self::AFFECTE => 'bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200',
-            
+
             // En panne: Rouge rose clair - Attention requise
             self::EN_PANNE => 'bg-rose-50 text-rose-700 ring-1 ring-rose-200',
-            
+
             // En maintenance: Ambre clair - Travaux en cours
             self::EN_MAINTENANCE => 'bg-amber-50 text-amber-700 ring-1 ring-amber-200',
-            
+
             // Réformé: Gris neutre - Archivé/inactif
             self::REFORME => 'bg-gray-100 text-gray-600 ring-1 ring-gray-200',
         };

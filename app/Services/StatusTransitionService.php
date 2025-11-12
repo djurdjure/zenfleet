@@ -233,6 +233,7 @@ class StatusTransitionService
 
     /**
      * Récupère le statut actuel d'un véhicule sous forme d'Enum
+     * ✅ FIX ENTERPRISE: Utilise le slug de la table au lieu de le générer
      */
     protected function getCurrentVehicleStatus(Vehicle $vehicle): ?VehicleStatusEnum
     {
@@ -243,8 +244,38 @@ class StatusTransitionService
 
         // Sinon, récupérer depuis la relation status_id
         if ($vehicle->status_id && $vehicle->vehicleStatus) {
-            $statusSlug = \Str::slug($vehicle->vehicleStatus->name);
-            return VehicleStatusEnum::tryFrom($statusSlug);
+            // ✅ CORRECTION: Utiliser le slug de la table (déjà au bon format)
+            // AVANT: $statusSlug = \Str::slug($vehicle->vehicleStatus->name); // 'En panne' → 'en-panne' ❌
+            // MAINTENANT: Utilise directement le slug de la table qui contient 'en_panne' ✅
+            $statusSlug = $vehicle->vehicleStatus->slug;
+
+            // Tentative directe
+            $enum = VehicleStatusEnum::tryFrom($statusSlug);
+
+            // ⚠️ FALLBACK: Si le slug DB utilise des tirets, essayer avec underscores
+            if (!$enum && str_contains($statusSlug, '-')) {
+                $slugWithUnderscore = str_replace('-', '_', $statusSlug);
+                $enum = VehicleStatusEnum::tryFrom($slugWithUnderscore);
+            }
+
+            // ⚠️ FALLBACK 2: En dernier recours, générer depuis le name (legacy)
+            if (!$enum) {
+                $generatedSlug = str_replace('-', '_', \Str::slug($vehicle->vehicleStatus->name));
+                $enum = VehicleStatusEnum::tryFrom($generatedSlug);
+            }
+
+            // 📊 LOGGING: Si aucun enum trouvé après tous les fallbacks
+            if (!$enum) {
+                Log::warning('StatusTransitionService: VehicleStatusEnum not found', [
+                    'vehicle_id' => $vehicle->id,
+                    'vehicle_status_id' => $vehicle->status_id,
+                    'vehicle_status_name' => $vehicle->vehicleStatus->name,
+                    'vehicle_status_slug' => $statusSlug,
+                    'service' => 'StatusTransitionService'
+                ]);
+            }
+
+            return $enum;
         }
 
         return null;
@@ -252,6 +283,7 @@ class StatusTransitionService
 
     /**
      * Récupère le statut actuel d'un chauffeur sous forme d'Enum
+     * ✅ FIX ENTERPRISE: Utilise le slug de la table au lieu de le générer
      */
     protected function getCurrentDriverStatus(Driver $driver): ?DriverStatusEnum
     {
@@ -262,8 +294,36 @@ class StatusTransitionService
 
         // Sinon, récupérer depuis la relation status_id
         if ($driver->status_id && $driver->driverStatus) {
-            $statusSlug = \Str::slug($driver->driverStatus->name);
-            return DriverStatusEnum::tryFrom($statusSlug);
+            // ✅ CORRECTION: Utiliser le slug de la table (déjà au bon format)
+            $statusSlug = $driver->driverStatus->slug;
+
+            // Tentative directe
+            $enum = DriverStatusEnum::tryFrom($statusSlug);
+
+            // ⚠️ FALLBACK: Si le slug DB utilise des tirets, essayer avec underscores
+            if (!$enum && str_contains($statusSlug, '-')) {
+                $slugWithUnderscore = str_replace('-', '_', $statusSlug);
+                $enum = DriverStatusEnum::tryFrom($slugWithUnderscore);
+            }
+
+            // ⚠️ FALLBACK 2: En dernier recours, générer depuis le name (legacy)
+            if (!$enum) {
+                $generatedSlug = str_replace('-', '_', \Str::slug($driver->driverStatus->name));
+                $enum = DriverStatusEnum::tryFrom($generatedSlug);
+            }
+
+            // 📊 LOGGING: Si aucun enum trouvé après tous les fallbacks
+            if (!$enum) {
+                Log::warning('StatusTransitionService: DriverStatusEnum not found', [
+                    'driver_id' => $driver->id,
+                    'driver_status_id' => $driver->status_id,
+                    'driver_status_name' => $driver->driverStatus->name,
+                    'driver_status_slug' => $statusSlug,
+                    'service' => 'StatusTransitionService'
+                ]);
+            }
+
+            return $enum;
         }
 
         return null;
