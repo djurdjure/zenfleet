@@ -6,6 +6,7 @@ use App\Models\Vehicle;
 use App\Enums\VehicleStatusEnum;
 use App\Services\StatusTransitionService;
 use Livewire\Component;
+use Livewire\Attributes\On;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
 
@@ -37,7 +38,11 @@ class VehicleStatusBadgeUltraPro extends Component
     public ?VehicleStatusEnum $pendingStatusEnum = null;
     public string $confirmMessage = '';
     
-    protected $listeners = ['refreshComponent' => '$refresh'];
+    protected $listeners = [
+        'refreshComponent' => '$refresh',
+        'vehicleStatusUpdated' => 'refreshVehicleData',
+        'vehicleStatusChanged' => 'handleStatusChanged'
+    ];
 
     /**
      * Initialisation du composant avec préchargement des relations
@@ -46,6 +51,32 @@ class VehicleStatusBadgeUltraPro extends Component
     {
         // Précharger les relations nécessaires pour éviter les requêtes N+1
         $this->vehicle = $vehicle->load(['vehicleStatus', 'depot', 'assignments.driver']);
+    }
+
+    /**
+     * Rafraîchit les données du véhicule
+     */
+    public function refreshVehicleData($vehicleId = null)
+    {
+        // Vérifier si c'est bien notre véhicule qui a été modifié
+        if ($vehicleId && $vehicleId != $this->vehicle->id) {
+            return;
+        }
+        
+        // Rafraîchir le modèle depuis la base de données
+        $this->vehicle = Vehicle::with(['vehicleStatus', 'depot', 'assignments.driver'])
+            ->find($this->vehicle->id);
+    }
+    
+    /**
+     * Gère l'événement de changement de statut
+     */
+    public function handleStatusChanged($payload)
+    {
+        // Vérifier si c'est notre véhicule qui a changé
+        if (isset($payload['vehicleId']) && $payload['vehicleId'] == $this->vehicle->id) {
+            $this->refreshVehicleData($payload['vehicleId']);
+        }
     }
 
     /**
@@ -176,31 +207,40 @@ class VehicleStatusBadgeUltraPro extends Component
                 $this->vehicle->load(['vehicleStatus', 'depot', 'assignments.driver']);
             });
 
-            // Fermer la modal et notifier le succès
+            // Sauvegarder le label du nouveau statut avant de réinitialiser
+            $newStatusLabel = $this->pendingStatusEnum->label();
+            $newStatusValue = $this->pendingStatusEnum->value;
+            
+            // Fermer la modal
             $this->showConfirmModal = false;
-            $this->pendingStatus = null;
-            $this->pendingStatusEnum = null;
-
+            
             // Notification de succès avec détails
             $this->dispatch('toast', [
                 'type' => 'success',
-                'title' => 'Statut modifié',
-                'message' => "Le statut a été changé vers \"{$this->pendingStatusEnum->label()}\" avec succès.",
+                'title' => 'Statut modifié avec succès',
+                'message' => "Le statut du véhicule a été changé vers \"{$newStatusLabel}\".",
                 'duration' => 4000
             ]);
 
-            // Émettre l'événement pour rafraîchir d'autres composants si nécessaire
+            // Rafraîchir immédiatement les données du véhicule
+            $this->refreshVehicleData();
+            
+            // Émettre l'événement pour que tous les badges de ce véhicule se rafraîchissent
             $this->dispatch('vehicleStatusChanged', [
                 'vehicleId' => $this->vehicle->id,
-                'newStatus' => $this->pendingStatusEnum->value,
+                'newStatus' => $newStatusValue,
                 'timestamp' => now()->toIso8601String()
             ]);
+            
+            // Réinitialiser les variables temporaires APRÈS avoir envoyé les notifications
+            $this->pendingStatus = null;
+            $this->pendingStatusEnum = null;
 
             // Log détaillé pour l'audit
             Log::info('Vehicle status changed via badge', [
                 'vehicle_id' => $this->vehicle->id,
                 'registration' => $this->vehicle->registration_plate,
-                'new_status' => $this->pendingStatusEnum->value,
+                'new_status' => $newStatusValue,
                 'user_id' => auth()->id(),
                 'user_name' => auth()->user()->name,
                 'component' => 'VehicleStatusBadgeUltraPro'

@@ -1213,14 +1213,24 @@
                          </template>
                      </div>
                      <div class="ml-3 flex-1">
-                         <p class="text-sm font-medium"
+                         <template x-if="toast.title">
+                             <p class="text-sm font-semibold mb-1"
+                                :class="{
+                                    'text-green-900': toast.type === 'success',
+                                    'text-red-900': toast.type === 'error',
+                                    'text-blue-900': toast.type === 'info',
+                                    'text-yellow-900': toast.type === 'warning'
+                                }"
+                                x-text="toast.title"></p>
+                         </template>
+                         <p class="text-sm"
                             :class="{
                                 'text-green-800': toast.type === 'success',
                                 'text-red-800': toast.type === 'error',
                                 'text-blue-800': toast.type === 'info',
                                 'text-yellow-800': toast.type === 'warning'
                             }"
-                            x-text="toast.message"></p>
+                            x-text="toast.message || 'Notification'"></p>
                      </div>
                      <div class="ml-4 flex-shrink-0 flex">
                          <button @click="removeToast(toast.id)"
@@ -1253,6 +1263,7 @@
              const toast = {
                  id: id,
                  type: detail.type || 'info',
+                 title: detail.title || '',
                  message: detail.message || 'Notification',
                  show: true
              };
