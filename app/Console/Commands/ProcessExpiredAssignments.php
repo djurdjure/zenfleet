@@ -36,8 +36,10 @@ class ProcessExpiredAssignments extends Command
      * Signature de la commande
      */
     protected $signature = 'assignments:process-expired
-                            {--dry-run : Exécuter en mode simulation sans mise à jour}
-                            {--limit=100 : Nombre maximum d\'affectations à traiter par run}';
+                            {--organization= : ID de l\'organisation à traiter}
+                            {--mode=automatic : Mode de traitement (automatic, forced)}
+                            {--verbose : Afficher les logs détaillés}
+                            {--stats : Afficher les statistiques détaillées}';
 
     /**
      * Description de la commande
@@ -45,123 +47,121 @@ class ProcessExpiredAssignments extends Command
     protected $description = '🔄 Traite automatiquement les affectations expirées et libère les ressources';
 
     /**
-     * Exécuter la commande
+     * Exécuter la commande - VERSION ENTERPRISE-GRADE ULTRA-PRO
+     *
+     * AMÉLIORATIONS PAR RAPPORT À L'ANCIENNE VERSION :
+     * ✅ Dispatch du Job au lieu de l'Event (correction critique)
+     * ✅ Détection des affectations zombies (ended_at IS NULL)
+     * ✅ Statistiques détaillées en temps réel
+     * ✅ Logs structurés pour monitoring
+     * ✅ Support multi-organisation
      */
     public function handle(): int
     {
-        $dryRun = $this->option('dry-run');
-        $limit = (int) $this->option('limit');
+        $organizationId = $this->option('organization');
+        $mode = $this->option('mode');
+        $verbose = $this->option('verbose');
+        $showStats = $this->option('stats');
 
-        $this->info('🚀 Démarrage du traitement des affectations expirées...');
-        $this->info('Mode: ' . ($dryRun ? '🧪 DRY-RUN (simulation)' : '✅ PRODUCTION'));
+        $this->displayHeader();
+
+        $this->displayConfig($organizationId, $mode, $verbose);
 
         $startTime = microtime(true);
 
-        // Trouver les affectations expirées
-        // Note : On filtre d'abord par end_datetime, puis on exclut les 'completed' côté PHP
-        // car le statut peut être NULL en base et calculé dynamiquement
-        $expiredAssignments = Assignment::query()
-            ->whereNotNull('end_datetime')
-            ->where('end_datetime', '<=', now())
-            ->where(function($query) {
-                $query->whereNull('status')
-                      ->orWhere('status', '!=', Assignment::STATUS_COMPLETED);
-            })
-            ->limit($limit)
-            ->get()
-            ->filter(function($assignment) {
-                // Filtrer côté PHP pour utiliser l'accessor calculé
-                return $assignment->status !== Assignment::STATUS_COMPLETED;
-            });
+        // Dispatcher le Job vers la queue au lieu de traiter directement
+        // C'est la correction CRITIQUE qui manquait !
+        $job = new \App\Jobs\ProcessExpiredAssignments(
+            $organizationId ? (int) $organizationId : null,
+            $mode
+        );
 
-        $count = $expiredAssignments->count();
+        dispatch($job);
 
-        if ($count === 0) {
-            $this->info('✅ Aucune affectation expirée à traiter.');
-            return Command::SUCCESS;
+        $this->newLine();
+        $this->info('🔄 Dispatch du job de traitement...');
+        $this->newLine();
+        $this->info('✅ Job dispatché avec succès !');
+        $this->info('   Le traitement s\'exécute en arrière-plan.');
+
+        // Afficher les statistiques actuelles si demandé
+        if ($showStats) {
+            $this->newLine();
+            $this->displayStatistics();
         }
-
-        $this->info("📊 {$count} affectation(s) expirée(s) trouvée(s)");
-
-        // Alerte si trop d'affectations expirées (anomalie)
-        if ($count >= 100) {
-            Log::warning('[ProcessExpiredAssignments] ALERTE : Nombre anormal d\'affectations expirées', [
-                'count' => $count,
-                'limit' => $limit,
-            ]);
-            $this->warn("⚠️  ALERTE : {$count} affectations expirées détectées (limite: {$limit})");
-        }
-
-        $processed = 0;
-        $errors = 0;
-
-        // Progress bar
-        $progressBar = $this->output->createProgressBar($count);
-        $progressBar->setFormat(' %current%/%max% [%bar%] %percent:3s%% %message%');
-
-        foreach ($expiredAssignments as $assignment) {
-            $progressBar->setMessage("Traitement Assignment #{$assignment->id}");
-
-            try {
-                if (!$dryRun) {
-                    // Mettre à jour le statut (force l'écriture en DB)
-                    $assignment->update(['status' => Assignment::STATUS_COMPLETED]);
-
-                    // Dispatcher l'événement pour libérer véhicule/chauffeur
-                    AssignmentEnded::dispatch($assignment, 'automatic', null);
-                }
-
-                $processed++;
-                $progressBar->advance();
-
-                Log::info('[ProcessExpiredAssignments] Affectation traitée', [
-                    'assignment_id' => $assignment->id,
-                    'vehicle_id' => $assignment->vehicle_id,
-                    'driver_id' => $assignment->driver_id,
-                    'end_datetime' => $assignment->end_datetime->toIso8601String(),
-                    'dry_run' => $dryRun,
-                ]);
-
-            } catch (\Throwable $e) {
-                $errors++;
-
-                Log::error('[ProcessExpiredAssignments] ERREUR lors du traitement', [
-                    'assignment_id' => $assignment->id,
-                    'error' => $e->getMessage(),
-                    'trace' => $e->getTraceAsString(),
-                ]);
-
-                $this->error("\n❌ Erreur Assignment #{$assignment->id}: {$e->getMessage()}");
-            }
-        }
-
-        $progressBar->setMessage('Terminé');
-        $progressBar->finish();
-        $this->newLine(2);
 
         $duration = round((microtime(true) - $startTime) * 1000, 2);
 
-        // Résumé
-        $this->info("✅ Traitement terminé en {$duration}ms");
-        $this->table(
-            ['Métrique', 'Valeur'],
-            [
-                ['Affectations trouvées', $count],
-                ['Traitées avec succès', $processed],
-                ['Erreurs', $errors],
-                ['Durée (ms)', $duration],
-                ['Mode', $dryRun ? 'DRY-RUN' : 'PRODUCTION'],
-            ]
-        );
-
-        Log::info('[ProcessExpiredAssignments] Exécution terminée', [
-            'total' => $count,
-            'processed' => $processed,
-            'errors' => $errors,
+        Log::info('[ProcessExpiredAssignments Command] Job dispatché', [
+            'organization_id' => $organizationId,
+            'mode' => $mode,
             'duration_ms' => $duration,
-            'dry_run' => $dryRun,
         ]);
 
-        return $errors > 0 ? Command::FAILURE : Command::SUCCESS;
+        return Command::SUCCESS;
+    }
+
+    /**
+     * Afficher l'en-tête de la commande
+     */
+    private function displayHeader(): void
+    {
+        $this->line('╔══════════════════════════════════════════════════════╗');
+        $this->line('║  <fg=cyan>TRAITEMENT DES AFFECTATIONS EXPIRÉES - ZENFLEET</>     ║');
+        $this->line('╚══════════════════════════════════════════════════════╝');
+        $this->newLine();
+    }
+
+    /**
+     * Afficher la configuration
+     */
+    private function displayConfig(?string $organizationId, string $mode, bool $verbose): void
+    {
+        $this->table(
+            ['Paramètre', 'Valeur'],
+            [
+                ['Organisation', $organizationId ?? 'Toutes'],
+                ['Mode', ucfirst($mode)],
+                ['Dry Run', 'Non'],
+                ['Logs détaillés', $verbose ? 'Oui' : 'Non'],
+                ['Démarré à', now()->format('d/m/Y H:i:s')],
+            ]
+        );
+    }
+
+    /**
+     * Afficher les statistiques actuelles
+     */
+    private function displayStatistics(): void
+    {
+        $totalAssignments = Assignment::count();
+        $activeAssignments = Assignment::where('status', Assignment::STATUS_ACTIVE)->count();
+        $scheduledAssignments = Assignment::where('status', Assignment::STATUS_SCHEDULED)->count();
+
+        // Affectations expirées non traitées (ZOMBIES)
+        $expiredUnprocessed = Assignment::query()
+            ->whereNotNull('end_datetime')
+            ->where('end_datetime', '<=', now())
+            ->whereNull('ended_at')
+            ->count();
+
+        // Affectations terminées aujourd'hui
+        $completedToday = Assignment::query()
+            ->where('status', Assignment::STATUS_COMPLETED)
+            ->whereDate('ended_at', today())
+            ->count();
+
+        $this->info('<fg=cyan>📊 STATISTIQUES ACTUELLES</>');
+        $this->line('─────────────────────────');
+        $this->line("  • Total affectations        : <fg=white>{$totalAssignments}</>");
+        $this->line("  • Actives                   : <fg=green>{$activeAssignments}</>");
+        $this->line("  • Planifiées               : <fg=blue>{$scheduledAssignments}</>");
+        $this->line("  • Expirées non traitées   : <fg=" . ($expiredUnprocessed > 0 ? 'red' : 'green') . ">{$expiredUnprocessed}</>");
+        $this->line("  • Terminées aujourd'hui    : <fg=white>{$completedToday}</>");
+
+        if ($expiredUnprocessed > 10) {
+            $this->newLine();
+            $this->warn("⚠️  ALERTE : {$expiredUnprocessed} affectations zombies détectées !");
+        }
     }
 }

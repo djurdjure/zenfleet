@@ -1,0 +1,539 @@
+@extends('layouts.admin.catalyst')
+
+@section('title', '🏥 Supervision Affectations - Health Dashboard')
+
+@push('styles')
+<style>
+    @keyframes pulse-warning {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.5; }
+    }
+
+    .pulse-warning {
+        animation: pulse-warning 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    }
+
+    @keyframes slideIn {
+        from {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .slide-in {
+        animation: slideIn 0.3s ease-out;
+    }
+</style>
+@endpush
+
+@section('content')
+<div x-data="assignmentHealthDashboard()" x-init="init()" class="py-6">
+    <!-- En-tête Ultra-Pro -->
+    <div class="mb-8">
+        <div class="flex items-center justify-between">
+            <div>
+                <h1 class="text-3xl font-bold text-gray-900 dark:text-white flex items-center gap-3">
+                    <iconify-icon icon="medical-icon:i-health-services" class="text-emerald-600" width="40"></iconify-icon>
+                    Supervision Santé des Affectations
+                </h1>
+                <p class="mt-2 text-gray-600 dark:text-gray-400">
+                    Monitoring en temps réel • Détection automatique des anomalies • Auto-healing intelligent
+                </p>
+            </div>
+
+            <div class="flex items-center gap-3">
+                <!-- Bouton Rafraîchir -->
+                <button
+                    @click="refreshData()"
+                    :disabled="loading"
+                    class="inline-flex items-center px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-200 disabled:opacity-50"
+                    :class="{ 'animate-spin': loading }">
+                    <iconify-icon icon="mdi:refresh" class="mr-2" width="18"></iconify-icon>
+                    <span x-show="!loading">Rafraîchir</span>
+                    <span x-show="loading">Chargement...</span>
+                </button>
+
+                <!-- Bouton Auto-Refresh -->
+                <button
+                    @click="toggleAutoRefresh()"
+                    class="inline-flex items-center px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200"
+                    :class="autoRefresh ? 'bg-emerald-600 text-white' : 'bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300'">
+                    <iconify-icon :icon="autoRefresh ? 'mdi:pause' : 'mdi:play'" class="mr-2" width="18"></iconify-icon>
+                    <span x-text="autoRefresh ? 'Auto (30s)' : 'Auto OFF'"></span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Dernière mise à jour -->
+        <div class="mt-4 text-sm text-gray-500 dark:text-gray-400">
+            <iconify-icon icon="mdi:clock-outline" width="16" class="inline"></iconify-icon>
+            Dernière mise à jour : <span x-text="lastUpdate"></span>
+        </div>
+    </div>
+
+    <!-- Statut Général (Cards) -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <!-- Statut Santé -->
+        <div class="slide-in bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border-l-4 transition-all duration-300 hover:shadow-xl"
+             :class="{
+                'border-emerald-500': health.status === 'healthy',
+                'border-yellow-500': health.status === 'degraded',
+                'border-orange-500': health.status === 'warning',
+                'border-red-500': health.status === 'critical'
+             }">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Statut Système</p>
+                    <p class="mt-2 text-3xl font-bold capitalize"
+                       :class="{
+                          'text-emerald-600': health.status === 'healthy',
+                          'text-yellow-600': health.status === 'degraded',
+                          'text-orange-600': health.status === 'warning',
+                          'text-red-600': health.status === 'critical'
+                       }"
+                       x-text="health.status || 'Chargement...'">
+                    </p>
+                </div>
+                <div class="p-3 rounded-full"
+                     :class="{
+                        'bg-emerald-100 dark:bg-emerald-900/30': health.status === 'healthy',
+                        'bg-yellow-100 dark:bg-yellow-900/30': health.status === 'degraded',
+                        'bg-orange-100 dark:bg-orange-900/30': health.status === 'warning',
+                        'bg-red-100 dark:bg-red-900/30': health.status === 'critical'
+                     }">
+                    <iconify-icon
+                        :icon="health.status === 'healthy' ? 'mdi:check-circle' :
+                               health.status === 'degraded' ? 'mdi:alert-circle' :
+                               health.status === 'warning' ? 'mdi:alert' :
+                               'mdi:alert-octagon'"
+                        width="32"
+                        :class="{
+                           'text-emerald-600': health.status === 'healthy',
+                           'text-yellow-600': health.status === 'degraded',
+                           'text-orange-600': health.status === 'warning',
+                           'text-red-600': health.status === 'critical'
+                        }">
+                    </iconify-icon>
+                </div>
+            </div>
+        </div>
+
+        <!-- Affectations Zombies -->
+        <div class="slide-in bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border-l-4 transition-all duration-300 hover:shadow-xl"
+             :class="metrics.zombies_count > 0 ? 'border-red-500' : 'border-emerald-500'">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Affectations Zombies</p>
+                    <p class="mt-2 text-3xl font-bold"
+                       :class="metrics.zombies_count > 0 ? 'text-red-600' : 'text-emerald-600'"
+                       x-text="metrics.zombies_count ?? '-'">
+                    </p>
+                    <p class="mt-1 text-xs text-gray-500" x-show="metrics.avg_zombie_age_days > 0">
+                        Âge moyen: <span x-text="metrics.avg_zombie_age_days"></span> jours
+                    </p>
+                </div>
+                <div class="p-3 rounded-full"
+                     :class="metrics.zombies_count > 0 ? 'bg-red-100 dark:bg-red-900/30 pulse-warning' : 'bg-emerald-100 dark:bg-emerald-900/30'">
+                    <iconify-icon
+                        icon="mdi:ghost"
+                        width="32"
+                        :class="metrics.zombies_count > 0 ? 'text-red-600' : 'text-emerald-600'">
+                    </iconify-icon>
+                </div>
+            </div>
+        </div>
+
+        <!-- Ressources Bloquées -->
+        <div class="slide-in bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border-l-4 border-blue-500 transition-all duration-300 hover:shadow-xl">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Ressources Bloquées</p>
+                    <p class="mt-2 text-3xl font-bold text-blue-600" x-text="metrics.resources_locked ?? '-'"></p>
+                    <p class="mt-1 text-xs text-gray-500">Véhicules + Chauffeurs</p>
+                </div>
+                <div class="p-3 rounded-full bg-blue-100 dark:bg-blue-900/30">
+                    <iconify-icon icon="mdi:lock" width="32" class="text-blue-600"></iconify-icon>
+                </div>
+            </div>
+        </div>
+
+        <!-- Uptime Système -->
+        <div class="slide-in bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border-l-4 border-purple-500 transition-all duration-300 hover:shadow-xl">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Uptime Système</p>
+                    <p class="mt-2 text-3xl font-bold text-purple-600" x-text="metrics.system_uptime_hours ?? '-'"></p>
+                    <p class="mt-1 text-xs text-gray-500">Heures depuis dernière correction</p>
+                </div>
+                <div class="p-3 rounded-full bg-purple-100 dark:bg-purple-900/30">
+                    <iconify-icon icon="mdi:timer" width="32" class="text-purple-600"></iconify-icon>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recommandations -->
+    <div x-show="recommendations.length > 0" class="mb-8 slide-in">
+        <div class="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-xl shadow-lg p-6 border border-blue-200 dark:border-blue-800">
+            <div class="flex items-start gap-4">
+                <div class="flex-shrink-0">
+                    <iconify-icon icon="mdi:lightbulb" width="32" class="text-blue-600"></iconify-icon>
+                </div>
+                <div class="flex-1">
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-3">
+                        Recommandations du Système
+                    </h3>
+                    <div class="space-y-3">
+                        <template x-for="(rec, index) in recommendations" :key="index">
+                            <div class="flex items-start gap-3 p-3 bg-white dark:bg-gray-800 rounded-lg border border-blue-100 dark:border-blue-800"
+                                 :class="{
+                                    'border-l-4 border-l-red-500': rec.priority === 'high',
+                                    'border-l-4 border-l-orange-500': rec.priority === 'medium',
+                                    'border-l-4 border-l-blue-500': rec.priority === 'info'
+                                 }">
+                                <iconify-icon
+                                    :icon="rec.priority === 'high' ? 'mdi:alert-circle' :
+                                           rec.priority === 'medium' ? 'mdi:information' :
+                                           'mdi:check-circle'"
+                                    width="20"
+                                    :class="{
+                                       'text-red-600': rec.priority === 'high',
+                                       'text-orange-600': rec.priority === 'medium',
+                                       'text-blue-600': rec.priority === 'info'
+                                    }">
+                                </iconify-icon>
+                                <div class="flex-1">
+                                    <p class="text-sm text-gray-700 dark:text-gray-300" x-text="rec.message"></p>
+                                </div>
+                                <button
+                                    x-show="rec.action === 'heal_zombies'"
+                                    @click="healZombies()"
+                                    class="px-3 py-1 bg-red-600 text-white text-xs font-medium rounded-lg hover:bg-red-700 transition-colors duration-200">
+                                    Corriger
+                                </button>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabs Navigation -->
+    <div class="bg-white dark:bg-gray-800 rounded-t-xl shadow-lg border-b border-gray-200 dark:border-gray-700">
+        <nav class="flex space-x-8 px-6" aria-label="Tabs">
+            <button @click="activeTab = 'zombies'"
+                    :class="activeTab === 'zombies' ? 'border-blue-600 text-blue-600 dark:text-blue-400' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300'"
+                    class="py-4 px-1 border-b-2 font-medium text-sm transition-colors duration-200">
+                <iconify-icon icon="mdi:ghost" width="18" class="inline mr-2"></iconify-icon>
+                Zombies Détectés (<span x-text="zombies.length"></span>)
+            </button>
+            <button @click="activeTab = 'metrics'"
+                    :class="activeTab === 'metrics' ? 'border-blue-600 text-blue-600 dark:text-blue-400' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300'"
+                    class="py-4 px-1 border-b-2 font-medium text-sm transition-colors duration-200">
+                <iconify-icon icon="mdi:chart-box" width="18" class="inline mr-2"></iconify-icon>
+                Métriques Détaillées
+            </button>
+        </nav>
+    </div>
+
+    <!-- Tab Content -->
+    <div class="bg-white dark:bg-gray-800 rounded-b-xl shadow-lg p-6">
+        <!-- Zombies Tab -->
+        <div x-show="activeTab === 'zombies'" class="slide-in">
+            <div x-show="zombies.length === 0" class="text-center py-12">
+                <iconify-icon icon="mdi:check-circle" width="64" class="text-emerald-600 mx-auto mb-4"></iconify-icon>
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                    Système Sain !
+                </h3>
+                <p class="text-gray-600 dark:text-gray-400">
+                    Aucune affectation zombie détectée. Tous les systèmes fonctionnent normalement.
+                </p>
+            </div>
+
+            <div x-show="zombies.length > 0">
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                        <thead class="bg-gray-50 dark:bg-gray-900">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">ID</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Véhicule</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Chauffeur</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Fin Prévue</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Retard</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Sévérité</th>
+                                <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                            <template x-for="zombie in zombies" :key="zombie.id">
+                                <tr class="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-150">
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
+                                        #<span x-text="zombie.id"></span>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">
+                                        <span x-text="zombie.vehicle.registration"></span>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">
+                                        <span x-text="zombie.driver.name"></span>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">
+                                        <span x-text="new Date(zombie.dates.end).toLocaleDateString('fr-FR', {day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit'})"></span>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                        <span class="font-semibold text-red-600" x-text="zombie.days_overdue + ' jours'"></span>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                        <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full"
+                                              :class="{
+                                                 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400': zombie.severity === 'critical',
+                                                 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-400': zombie.severity === 'high',
+                                                 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400': zombie.severity === 'medium',
+                                                 'bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-400': zombie.severity === 'low'
+                                              }"
+                                              x-text="zombie.severity">
+                                        </span>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                        <button @click="healSingleZombie(zombie.id)"
+                                                class="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300 font-medium transition-colors duration-200">
+                                            Corriger
+                                        </button>
+                                    </td>
+                                </tr>
+                            </template>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Metrics Tab -->
+        <div x-show="activeTab === 'metrics'" class="slide-in">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Assignments Metrics -->
+                <div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-6">
+                    <h4 class="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+                        <iconify-icon icon="mdi:clipboard-list" width="24" class="text-blue-600"></iconify-icon>
+                        Affectations
+                    </h4>
+                    <dl class="space-y-3">
+                        <div class="flex justify-between">
+                            <dt class="text-sm text-gray-600 dark:text-gray-400">Total</dt>
+                            <dd class="text-sm font-semibold text-gray-900 dark:text-white" x-text="detailedMetrics.assignments?.total ?? '-'"></dd>
+                        </div>
+                        <div class="flex justify-between">
+                            <dt class="text-sm text-gray-600 dark:text-gray-400">Actives</dt>
+                            <dd class="text-sm font-semibold text-emerald-600" x-text="detailedMetrics.assignments?.active ?? '-'"></dd>
+                        </div>
+                        <div class="flex justify-between">
+                            <dt class="text-sm text-gray-600 dark:text-gray-400">Planifiées</dt>
+                            <dd class="text-sm font-semibold text-blue-600" x-text="detailedMetrics.assignments?.scheduled ?? '-'"></dd>
+                        </div>
+                        <div class="flex justify-between">
+                            <dt class="text-sm text-gray-600 dark:text-gray-400">Terminées</dt>
+                            <dd class="text-sm font-semibold text-gray-600" x-text="detailedMetrics.assignments?.completed ?? '-'"></dd>
+                        </div>
+                    </dl>
+                </div>
+
+                <!-- Resources Metrics -->
+                <div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-6">
+                    <h4 class="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+                        <iconify-icon icon="mdi:car-multiple" width="24" class="text-purple-600"></iconify-icon>
+                        Ressources
+                    </h4>
+                    <dl class="space-y-3">
+                        <div class="flex justify-between">
+                            <dt class="text-sm text-gray-600 dark:text-gray-400">Véhicules Total</dt>
+                            <dd class="text-sm font-semibold text-gray-900 dark:text-white" x-text="detailedMetrics.resources?.vehicles_total ?? '-'"></dd>
+                        </div>
+                        <div class="flex justify-between">
+                            <dt class="text-sm text-gray-600 dark:text-gray-400">Véhicules Dispo.</dt>
+                            <dd class="text-sm font-semibold text-emerald-600" x-text="detailedMetrics.resources?.vehicles_available ?? '-'"></dd>
+                        </div>
+                        <div class="flex justify-between">
+                            <dt class="text-sm text-gray-600 dark:text-gray-400">Chauffeurs Total</dt>
+                            <dd class="text-sm font-semibold text-gray-900 dark:text-white" x-text="detailedMetrics.resources?.drivers_total ?? '-'"></dd>
+                        </div>
+                        <div class="flex justify-between">
+                            <dt class="text-sm text-gray-600 dark:text-gray-400">Chauffeurs Dispo.</dt>
+                            <dd class="text-sm font-semibold text-emerald-600" x-text="detailedMetrics.resources?.drivers_available ?? '-'"></dd>
+                        </div>
+                    </dl>
+                </div>
+
+                <!-- Performance Metrics -->
+                <div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-6">
+                    <h4 class="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+                        <iconify-icon icon="mdi:speedometer" width="24" class="text-orange-600"></iconify-icon>
+                        Performance
+                    </h4>
+                    <dl class="space-y-3">
+                        <div class="flex justify-between">
+                            <dt class="text-sm text-gray-600 dark:text-gray-400">Durée Moy. (jours)</dt>
+                            <dd class="text-sm font-semibold text-gray-900 dark:text-white" x-text="detailedMetrics.performance?.avg_assignment_duration_days ?? '-'"></dd>
+                        </div>
+                        <div class="flex justify-between">
+                            <dt class="text-sm text-gray-600 dark:text-gray-400">Taux Complétion 24h</dt>
+                            <dd class="text-sm font-semibold text-emerald-600" x-text="(detailedMetrics.performance?.completion_rate_24h ?? 0) + '%'"></dd>
+                        </div>
+                        <div class="flex justify-between">
+                            <dt class="text-sm text-gray-600 dark:text-gray-400">Zombies</dt>
+                            <dd class="text-sm font-semibold"
+                                :class="detailedMetrics.health?.zombies > 0 ? 'text-red-600' : 'text-emerald-600'"
+                                x-text="detailedMetrics.health?.zombies ?? '-'"></dd>
+                        </div>
+                        <div class="flex justify-between">
+                            <dt class="text-sm text-gray-600 dark:text-gray-400">Incohérences</dt>
+                            <dd class="text-sm font-semibold"
+                                :class="detailedMetrics.health?.inconsistencies > 0 ? 'text-orange-600' : 'text-emerald-600'"
+                                x-text="detailedMetrics.health?.inconsistencies ?? '-'"></dd>
+                        </div>
+                    </dl>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@push('scripts')
+<script>
+function assignmentHealthDashboard() {
+    return {
+        health: {},
+        metrics: {},
+        recommendations: [],
+        zombies: [],
+        detailedMetrics: {},
+        activeTab: 'zombies',
+        loading: false,
+        autoRefresh: false,
+        refreshInterval: null,
+        lastUpdate: 'Jamais',
+
+        async init() {
+            await this.refreshData();
+        },
+
+        async refreshData() {
+            this.loading = true;
+
+            try {
+                // Charger health status
+                const healthResponse = await fetch('/admin/assignments/health');
+                const healthData = await healthResponse.json();
+                this.health = healthData;
+                this.metrics = healthData.metrics || {};
+                this.recommendations = healthData.recommendations || [];
+
+                // Charger zombies
+                const zombiesResponse = await fetch('/admin/assignments/zombies');
+                const zombiesData = await zombiesResponse.json();
+                this.zombies = zombiesData.zombies || [];
+
+                // Charger métriques détaillées
+                const metricsResponse = await fetch('/admin/assignments/metrics');
+                this.detailedMetrics = await metricsResponse.json();
+
+                this.lastUpdate = new Date().toLocaleString('fr-FR');
+            } catch (error) {
+                console.error('Erreur lors du chargement des données:', error);
+                alert('Erreur lors du chargement des données');
+            } finally {
+                this.loading = false;
+            }
+        },
+
+        toggleAutoRefresh() {
+            this.autoRefresh = !this.autoRefresh;
+
+            if (this.autoRefresh) {
+                this.refreshInterval = setInterval(() => {
+                    this.refreshData();
+                }, 30000); // 30 secondes
+            } else {
+                if (this.refreshInterval) {
+                    clearInterval(this.refreshInterval);
+                    this.refreshInterval = null;
+                }
+            }
+        },
+
+        async healZombies() {
+            if (!confirm('Voulez-vous corriger toutes les affectations zombies détectées ?')) {
+                return;
+            }
+
+            this.loading = true;
+
+            try {
+                const response = await fetch('/admin/assignments/heal', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                    },
+                    body: JSON.stringify({ dry_run: false })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    alert('✅ Correction effectuée avec succès !');
+                    await this.refreshData();
+                } else {
+                    alert('❌ Erreur : ' + result.message);
+                }
+            } catch (error) {
+                console.error('Erreur:', error);
+                alert('❌ Erreur lors de la correction');
+            } finally {
+                this.loading = false;
+            }
+        },
+
+        async healSingleZombie(assignmentId) {
+            if (!confirm(`Voulez-vous corriger l'affectation #${assignmentId} ?`)) {
+                return;
+            }
+
+            this.loading = true;
+
+            try {
+                const response = await fetch('/admin/assignments/heal', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                    },
+                    body: JSON.stringify({
+                        assignment_id: assignmentId,
+                        dry_run: false
+                    })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    alert('✅ Correction effectuée avec succès !');
+                    await this.refreshData();
+                } else {
+                    alert('❌ Erreur : ' + result.message);
+                }
+            } catch (error) {
+                console.error('Erreur:', error);
+                alert('❌ Erreur lors de la correction');
+            } finally {
+                this.loading = false;
+            }
+        }
+    }
+}
+</script>
+@endpush
+@endsection

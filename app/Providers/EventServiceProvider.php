@@ -41,8 +41,12 @@ class EventServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        User::observe(UserObserver::class); // <--- AJOUTEZ CETTE LIGNE
-        Driver::observe(DriverObserver::class); // <-- Ajouter cette ligne 
+        User::observe(UserObserver::class);
+        Driver::observe(DriverObserver::class);
+
+        // 🚀 OBSERVER ENTERPRISE-GRADE POUR CYCLE DE VIE DES AFFECTATIONS
+        // Auto-persistance du statut + détection zombies + auto-healing
+        \App\Models\Assignment::observe(\App\Observers\AssignmentObserver::class);
     }
 
     /**

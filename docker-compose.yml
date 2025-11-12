@@ -3,8 +3,16 @@ networks:
     driver: bridge
 
 volumes:
+  # 🏢 CONFIGURATION ENTERPRISE-GRADE DES VOLUMES
+  # Volumes persistants déclarés comme externes pour garantir la stabilité
+  # Les volumes existent déjà et contiennent les données de production
+  # Cette configuration évite toute recréation accidentelle des volumes
   zenfleet_postgres_data:
+    external: true
+    name: zenfleet_postgres_data
   zenfleet_redis_data:
+    external: true
+    name: zenfleet_redis_data
 
 services:
   # --- Service PHP (Application Laravel) ---
@@ -125,6 +133,57 @@ services:
       - 1.1.1.1
     working_dir: /var/www/html
     tty: true
+
+  # --- ⏰ SCHEDULER LARAVEL - TÂCHES PLANIFIÉES ENTERPRISE-GRADE ---
+  # Ce service exécute le scheduler Laravel toutes les minutes
+  # Responsable de l'exécution automatique des tâches planifiées :
+  # - assignments:process-expired (toutes les 5 min) → Libération auto ressources
+  # - queue:prune-batches (quotidien) → Nettoyage logs queue
+  # - backup:run (quotidien) → Sauvegarde DB vers S3
+  scheduler:
+    build:
+      context: .
+      dockerfile: ./docker/php/Dockerfile
+      args:
+        USER_ID: ${UID:-1000}
+        GROUP_ID: ${GID:-1000}
+    container_name: zenfleet_scheduler
+    restart: unless-stopped
+    dns:
+      - 8.8.8.8
+      - 1.1.1.1
+    volumes:
+      - ./:/var/www/html
+    networks:
+      - zenfleet_network
+    depends_on:
+      database:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      php:
+        condition: service_started
+    # 🚀 COMMANDE ENTERPRISE-GRADE : Scheduler Laravel en mode continu
+    # Le scheduler vérifie toutes les minutes si des tâches doivent être exécutées
+    # Log détaillé pour monitoring et debugging
+    command: >
+      sh -c "
+        echo '🚀 Starting Laravel Scheduler (Enterprise-Grade)...'
+        echo '📊 Scheduled Tasks:'
+        php artisan schedule:list
+        echo ''
+        echo '⏰ Running scheduler every minute...'
+        while true; do
+          php artisan schedule:run --verbose >> /var/www/html/storage/logs/scheduler.log 2>&1
+          sleep 60
+        done
+      "
+    healthcheck:
+      test: ["CMD-SHELL", "ps aux | grep '[s]chedule:run' || exit 1"]
+      interval: 60s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
 
   # --- Microservice de Génération de PDF Enterprise ---
   pdf-service:

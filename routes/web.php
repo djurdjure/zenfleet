@@ -368,6 +368,22 @@ Route::middleware(['auth', 'verified'])
             Route::patch('{assignment}/end', [AssignmentController::class, 'end'])->name('end');
             Route::get('{assignment}/details', [AssignmentController::class, 'details'])->name('details');
             Route::post('{assignment}/extend', [AssignmentController::class, 'extend'])->name('extend');
+
+            // 🏥 HEALTH CHECK ENTERPRISE-GRADE - Monitoring et Auto-Healing
+            // Dashboard UI
+            Route::get('health-dashboard', function() {
+                return view('admin.assignments.health-dashboard');
+            })->name('health-dashboard');
+
+            // API Endpoints
+            Route::get('health', [\App\Http\Controllers\Admin\AssignmentHealthCheckController::class, 'health'])
+                ->name('health');
+            Route::get('zombies', [\App\Http\Controllers\Admin\AssignmentHealthCheckController::class, 'zombies'])
+                ->name('zombies');
+            Route::get('metrics', [\App\Http\Controllers\Admin\AssignmentHealthCheckController::class, 'metrics'])
+                ->name('metrics');
+            Route::post('heal', [\App\Http\Controllers\Admin\AssignmentHealthCheckController::class, 'heal'])
+                ->name('heal');
         });
 
         // 🚗 API pour les ressources disponibles (via AssignmentController)
