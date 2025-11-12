@@ -297,6 +297,247 @@ class AssignmentWizard extends Component
     }
 
     /**
+     * 🎯 VALIDATION ENTERPRISE-GRADE DES DATES
+     * 
+     * Méthode critique pour validation temps réel des dates d'affectation.
+     * Surpasse les standards de Fleetio et Samsara avec:
+     * - Validation multi-niveaux
+     * - Détection de chevauchements
+     * - Suggestions automatiques
+     * - Feedback temps réel
+     * 
+     * @return void
+     */
+    public function validateDates()
+    {
+        $this->errorMessage = '';
+        $this->successMessage = '';
+        
+        try {
+            // 1. Validation de base - Dates requises
+            if (!$this->startDatetime) {
+                $this->errorMessage = '⚠️ La date de début est requise.';
+                return;
+            }
+            
+            // 2. Parse des dates avec Carbon pour validation
+            $startDate = Carbon::parse($this->startDatetime);
+            $now = Carbon::now();
+            
+            // 3. Validation: Date de début ne peut pas être dans le futur trop lointain (1 an max)
+            $maxFutureDate = $now->copy()->addYear();
+            if ($startDate->greaterThan($maxFutureDate)) {
+                $this->errorMessage = '⚠️ La date de début ne peut pas être supérieure à 1 an dans le futur.';
+                return;
+            }
+            
+            // 4. Validation: Avertissement pour dates passées (autoriser mais avertir)
+            if ($startDate->lessThan($now)) {
+                // Permettre les dates passées jusqu'à 3 mois pour régularisation
+                $minPastDate = $now->copy()->subMonths(3);
+                if ($startDate->lessThan($minPastDate)) {
+                    $this->errorMessage = '❌ La date de début ne peut pas être antérieure à 3 mois.';
+                    return;
+                }
+                
+                // Avertissement pour date passée
+                $this->dispatch('toast', [
+                    'type' => 'warning',
+                    'message' => '⚠️ Attention: Vous créez une affectation avec une date passée (régularisation).'
+                ]);
+            }
+            
+            // 5. Validation de la date de fin si non indéterminée
+            if (!$this->isIndefinite && $this->endDatetime) {
+                $endDate = Carbon::parse($this->endDatetime);
+                
+                // La date de fin doit être après la date de début
+                if ($endDate->lessThanOrEqualTo($startDate)) {
+                    $this->errorMessage = '❌ La date de fin doit être après la date de début.';
+                    return;
+                }
+                
+                // Durée minimale: 1 heure
+                $duration = $startDate->diffInHours($endDate);
+                if ($duration < 1) {
+                    $this->errorMessage = '⚠️ La durée minimale d\'une affectation est de 1 heure.';
+                    return;
+                }
+                
+                // Durée maximale: 1 an
+                if ($duration > 8760) { // 365 * 24
+                    $this->errorMessage = '⚠️ La durée maximale d\'une affectation est de 1 an. Utilisez "Durée indéterminée" pour les affectations longues.';
+                    return;
+                }
+                
+                // Calcul et affichage de la durée
+                $durationFormatted = $this->formatDuration($startDate, $endDate);
+                $this->successMessage = "✅ Durée: {$durationFormatted}";
+            }
+            
+            // 6. Vérification des conflits si véhicule et chauffeur sélectionnés
+            if ($this->selectedVehicleId || $this->selectedDriverId) {
+                $this->checkForConflicts();
+                
+                if ($this->hasConflicts) {
+                    $conflictCount = count($this->conflicts);
+                    $this->errorMessage = "⚠️ {$conflictCount} conflit(s) détecté(s). Ajustez les dates ou utilisez la suggestion automatique.";
+                    
+                    // Suggestion automatique de créneau libre
+                    $this->generateSmartSuggestion();
+                }
+            }
+            
+            // 7. Validation métier avancée
+            $this->validateBusinessRules($startDate, $endDate ?? null);
+            
+            // 8. Si tout est valide, déclencher la validation temps réel
+            if (!$this->errorMessage) {
+                $this->validateInRealTime();
+                
+                if (!$this->hasConflicts) {
+                    $this->successMessage = '✅ Dates valides - Aucun conflit détecté';
+                }
+            }
+            
+        } catch (\Exception $e) {
+            Log::error('Erreur validation dates', [
+                'error' => $e->getMessage(),
+                'start' => $this->startDatetime,
+                'end' => $this->endDatetime
+            ]);
+            
+            $this->errorMessage = '❌ Erreur lors de la validation des dates. Vérifiez le format.';
+        }
+    }
+
+    /**
+     * Vérification des conflits d'affectation
+     */
+    protected function checkForConflicts()
+    {
+        if (!$this->selectedVehicleId && !$this->selectedDriverId) {
+            return;
+        }
+
+        try {
+            $endDate = $this->isIndefinite ? null : $this->endDatetime;
+            
+            // Utiliser le service de détection de conflits
+            if (isset($this->overlapService)) {
+                $conflicts = $this->overlapService->checkConflicts(
+                    vehicleId: $this->selectedVehicleId,
+                    driverId: $this->selectedDriverId,
+                    startDatetime: $this->startDatetime,
+                    endDatetime: $endDate
+                );
+                
+                $this->conflicts = $conflicts;
+                $this->hasConflicts = !empty($conflicts);
+            }
+        } catch (\Exception $e) {
+            Log::error('Erreur vérification conflits', ['error' => $e->getMessage()]);
+        }
+    }
+
+    /**
+     * Génération intelligente de suggestions de créneaux
+     */
+    protected function generateSmartSuggestion()
+    {
+        try {
+            if (!isset($this->overlapService)) {
+                return;
+            }
+            
+            $duration = 24; // Durée par défaut en heures
+            if (!$this->isIndefinite && $this->endDatetime && $this->startDatetime) {
+                $duration = Carbon::parse($this->startDatetime)->diffInHours(Carbon::parse($this->endDatetime));
+            }
+            
+            $suggestion = $this->overlapService->findNextAvailableSlot(
+                vehicleId: $this->selectedVehicleId,
+                driverId: $this->selectedDriverId,
+                durationHours: (int) $duration
+            );
+            
+            if ($suggestion) {
+                $this->showSuggestions = true;
+                $this->suggestions = [$suggestion];
+                
+                $this->dispatch('toast', [
+                    'type' => 'info',
+                    'message' => '💡 Suggestion: Créneau libre disponible à partir du ' . $suggestion['start_formatted']
+                ]);
+            }
+        } catch (\Exception $e) {
+            Log::error('Erreur génération suggestion', ['error' => $e->getMessage()]);
+        }
+    }
+
+    /**
+     * Validation des règles métier avancées
+     */
+    protected function validateBusinessRules(Carbon $startDate, ?Carbon $endDate)
+    {
+        // Règle 1: Pas d'affectation le dimanche (configurable)
+        if ($startDate->isSunday() && config('zenfleet.assignments.restrict_sunday', false)) {
+            $this->dispatch('toast', [
+                'type' => 'warning',
+                'message' => '⚠️ Attention: Affectation un dimanche détectée.'
+            ]);
+        }
+        
+        // Règle 2: Vérifier les heures de travail (6h-22h par défaut)
+        $startHour = $startDate->hour;
+        if ($startHour < 6 || $startHour >= 22) {
+            $this->dispatch('toast', [
+                'type' => 'info',
+                'message' => '🌙 Affectation en dehors des heures normales de travail.'
+            ]);
+        }
+        
+        // Règle 3: Durée maximale continue de conduite (9h selon réglementation)
+        if ($endDate) {
+            $durationHours = $startDate->diffInHours($endDate);
+            if ($durationHours > 9) {
+                $this->dispatch('toast', [
+                    'type' => 'warning',
+                    'message' => '⚠️ Durée supérieure à 9h - Pensez aux pauses réglementaires.'
+                ]);
+            }
+        }
+    }
+
+    /**
+     * Formatage intelligent de la durée
+     */
+    protected function formatDuration(Carbon $start, Carbon $end): string
+    {
+        $diff = $start->diff($end);
+        
+        $parts = [];
+        
+        if ($diff->y > 0) {
+            $parts[] = $diff->y . ' an' . ($diff->y > 1 ? 's' : '');
+        }
+        if ($diff->m > 0) {
+            $parts[] = $diff->m . ' mois';
+        }
+        if ($diff->d > 0) {
+            $parts[] = $diff->d . ' jour' . ($diff->d > 1 ? 's' : '');
+        }
+        if ($diff->h > 0) {
+            $parts[] = $diff->h . ' heure' . ($diff->h > 1 ? 's' : '');
+        }
+        if ($diff->i > 0 && count($parts) < 2) {
+            $parts[] = $diff->i . ' minute' . ($diff->i > 1 ? 's' : '');
+        }
+        
+        return implode(' ', array_slice($parts, 0, 2));
+    }
+
+    /**
      * Suggérer un créneau libre
      */
     public function suggestSlot()
@@ -381,14 +622,21 @@ class AssignmentWizard extends Component
      */
     public function createAssignment()
     {
-        // Validation des champs obligatoires
+        // Validation des champs obligatoires avec règles Enterprise-Grade
+        $minDate = now()->subMonths(3)->format('Y-m-d H:i:s'); // Permettre jusqu'à 3 mois dans le passé
+        $maxDate = now()->addYear()->format('Y-m-d H:i:s'); // Maximum 1 an dans le futur
+        
         $this->validate([
             'selectedVehicleId' => 'required|exists:vehicles,id',
             'selectedDriverId' => 'required|exists:drivers,id',
-            'startDatetime' => 'required|date|after:now',
+            'startDatetime' => "required|date|after:{$minDate}|before:{$maxDate}",
             'endDatetime' => 'nullable|date|after:startDatetime',
             'reason' => 'nullable|string|max:500',
             'notes' => 'nullable|string|max:1000',
+        ], [
+            'startDatetime.after' => 'La date de début ne peut pas être antérieure à 3 mois.',
+            'startDatetime.before' => 'La date de début ne peut pas être supérieure à 1 an dans le futur.',
+            'endDatetime.after' => 'La date de fin doit être après la date de début.',
         ]);
 
         // Vérifier conflits

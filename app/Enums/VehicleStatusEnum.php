@@ -81,63 +81,70 @@ enum VehicleStatusEnum: string
     }
 
     /**
-     * Couleur Tailwind CSS pour badges
+     * Couleur Tailwind CSS pour badges - Design Ultra-Pro
      */
     public function color(): string
     {
         return match($this) {
-            self::PARKING => 'blue',
-            self::AFFECTE => 'green',
-            self::EN_PANNE => 'red',
-            self::EN_MAINTENANCE => 'yellow',
-            self::REFORME => 'gray',
+            self::PARKING => 'sky',        // Bleu ciel pour disponibilité
+            self::AFFECTE => 'emerald',    // Vert émeraude pour actif
+            self::EN_PANNE => 'rose',       // Rouge rosé pour urgence
+            self::EN_MAINTENANCE => 'amber', // Ambre pour maintenance
+            self::REFORME => 'slate',      // Gris ardoise pour archivé
         };
     }
 
     /**
-     * Couleur hexadécimale pour graphiques/exports
+     * Couleur hexadécimale pour graphiques/exports - Palette Enterprise
      */
     public function hexColor(): string
     {
         return match($this) {
-            self::PARKING => '#3b82f6',  // Bleu
-            self::AFFECTE => '#10b981',  // Vert
-            self::EN_PANNE => '#ef4444',  // Rouge
-            self::EN_MAINTENANCE => '#f59e0b', // Orange
-            self::REFORME => '#6b7280',  // Gris
+            self::PARKING => '#0ea5e9',     // Sky-500 - Disponible
+            self::AFFECTE => '#10b981',     // Emerald-500 - Actif
+            self::EN_PANNE => '#f43f5e',    // Rose-500 - Panne
+            self::EN_MAINTENANCE => '#f59e0b', // Amber-500 - Maintenance
+            self::REFORME => '#64748b',     // Slate-500 - Réformé
         };
     }
 
     /**
-     * Icône FontAwesome/Heroicons
+     * Icône moderne pour Iconify/Lucide - Design System Ultra-Pro
      */
     public function icon(): string
     {
         return match($this) {
-            self::PARKING => 'parking',
-            self::AFFECTE => 'user-check',
-            self::EN_PANNE => 'exclamation-triangle',
-            self::EN_MAINTENANCE => 'wrench',
-            self::REFORME => 'archive',
+            self::PARKING => 'check-circle',        // Disponible
+            self::AFFECTE => 'user-check',          // Assigné à un chauffeur
+            self::EN_PANNE => 'alert-triangle',     // Alerte panne
+            self::EN_MAINTENANCE => 'wrench',       // En réparation
+            self::REFORME => 'archive',             // Archivé/Réformé
         };
     }
 
     /**
-     * Classes CSS Tailwind complètes pour badge
+     * Classes CSS Tailwind complètes pour badge - Style Enterprise Grade
      */
     public function badgeClasses(): string
     {
-        $base = 'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium';
-
         $colorClasses = match($this) {
-            self::PARKING => 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200',
-            self::AFFECTE => 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200',
-            self::EN_PANNE => 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200',
-            self::EN_MAINTENANCE => 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200',
-            self::REFORME => 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300',
+            // Parking: Bleu clair professionnel - Disponible
+            self::PARKING => 'bg-blue-50 text-blue-700 ring-1 ring-blue-200',
+            
+            // Affecté: Vert émeraude clair - Actif/opérationnel  
+            self::AFFECTE => 'bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200',
+            
+            // En panne: Rouge rose clair - Attention requise
+            self::EN_PANNE => 'bg-rose-50 text-rose-700 ring-1 ring-rose-200',
+            
+            // En maintenance: Ambre clair - Travaux en cours
+            self::EN_MAINTENANCE => 'bg-amber-50 text-amber-700 ring-1 ring-amber-200',
+            
+            // Réformé: Gris neutre - Archivé/inactif
+            self::REFORME => 'bg-gray-100 text-gray-600 ring-1 ring-gray-200',
         };
 
-        return "{$base} {$colorClasses}";
+        return $colorClasses;
     }
 
     // =========================================================================

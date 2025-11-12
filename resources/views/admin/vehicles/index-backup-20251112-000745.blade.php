@@ -488,275 +488,185 @@
     </div>
 
  {{-- ===============================================
- TABLE ENTERPRISE-GRADE WORLD-CLASS AVEC SÉLECTION - VERSION OPTIMISÉE ULTRA-PRO
+ TABLE ENTERPRISE-GRADE WORLD-CLASS AVEC SÉLECTION
  =============================================== --}}
  <x-card padding="p-0" margin="mb-6">
  @if($vehicles && $vehicles->count() > 0)
- {{-- Table avec padding réduit et organisation optimisée --}}
+ {{-- Table --}}
  <div class="overflow-x-auto">
  <table class="min-w-full divide-y divide-gray-200">
  <thead class="bg-gray-50">
  <tr>
- {{-- Checkbox pour tout sélectionner - padding réduit --}}
- <th scope="col" class="relative px-3 py-2 w-12">
+ {{-- Checkbox pour tout sélectionner --}}
+ <th scope="col" class="relative px-6 py-3 w-12">
     <input type="checkbox"
            x-model="selectAll"
            @change="toggleAllVehicles()"
            class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded cursor-pointer">
  </th>
- {{-- Colonnes réorganisées selon votre demande --}}
- <th scope="col" class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+ <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
  Véhicule
  </th>
- <th scope="col" class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
- Type
- </th>
- <th scope="col" class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
- Kilométrage
- </th>
- <th scope="col" class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
- Statut
- </th>
- <th scope="col" class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
- Dépôt
- </th>
- <th scope="col" class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+ <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
  Chauffeur
  </th>
- <th scope="col" class="px-3 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+ <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+ Type
+ </th>
+ <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+ Statut
+ </th>
+ <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+ Kilométrage
+ </th>
+ <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+ Dépôt
+ </th>
+ {{-- START: Tâche 2 - Suppression colonne Actions rapides et conservation seule colonne Actions --}}
+ <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
  Actions
  </th>
+ {{-- END: Tâche 2 --}}
  </tr>
  </thead>
  <tbody class="bg-white divide-y divide-gray-200">
  @foreach($vehicles as $vehicle)
  <tr class="hover:bg-gray-50 transition-colors duration-150" 
      :class="{ 'bg-blue-50': selectedVehicles.includes({{ $vehicle->id }}) }">
- {{-- Checkbox de sélection - padding réduit --}}
- <td class="px-3 py-2 whitespace-nowrap">
+ {{-- Checkbox de sélection --}}
+ <td class="px-6 py-4 whitespace-nowrap">
     <input type="checkbox"
            :value="{{ $vehicle->id }}"
            @change="toggleVehicle({{ $vehicle->id }})"
            :checked="selectedVehicles.includes({{ $vehicle->id }})"
            class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded cursor-pointer">
  </td>
- 
- {{-- Colonne 1: Véhicule - padding réduit et icône arrondie style gris clair pro --}}
- <td class="px-3 py-2 whitespace-nowrap">
+ <td class="px-6 py-4 whitespace-nowrap">
  <div class="flex items-center">
- <div class="flex-shrink-0 h-9 w-9">
- <div class="h-9 w-9 rounded-full bg-gray-100 flex items-center justify-center ring-1 ring-gray-200 shadow-sm">
- <x-iconify icon="lucide:car" class="h-4 w-4 text-gray-600" />
+ <div class="flex-shrink-0 h-10 w-10">
+ <div class="h-10 w-10 rounded-lg bg-gray-100 flex items-center justify-center">
+ <x-iconify icon="lucide:car" class="h-5 w-5 text-gray-500" />
  </div>
  </div>
- <div class="ml-3">
+ <div class="ml-4">
  <div class="text-sm font-semibold text-gray-900">
  {{ $vehicle->registration_plate }}
  </div>
- <div class="text-xs text-gray-500">
+ <div class="text-sm text-gray-500">
  {{ $vehicle->brand }} {{ $vehicle->model }}
  </div>
  </div>
  </div>
  </td>
 
- {{-- Colonne 2: Type - padding réduit --}}
- <td class="px-3 py-2 whitespace-nowrap">
- <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+ {{-- Colonne Chauffeur (World-Class Enterprise-Grade) --}}
+ <td class="px-6 py-4 whitespace-nowrap">
+ @php
+ // Utilise les données déjà chargées par eager loading (optimisation N+1)
+ $activeAssignment = $vehicle->assignments->first();
+ $driver = $activeAssignment->driver ?? null;
+ $user = $driver->user ?? null;
+ @endphp
+
+ @if($driver && $user)
+ <div class="flex items-center">
+ {{-- Avatar Premium avec Photo --}}
+ <div class="flex-shrink-0 h-10 w-10">
+ @if($user->profile_photo_path)
+ <img src="{{ Storage::url($user->profile_photo_path) }}"
+ alt="{{ $user->name }}"
+ class="h-10 w-10 rounded-full object-cover ring-2 ring-blue-100 shadow-sm">
+ @else
+ <div class="h-10 w-10 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center ring-2 ring-blue-100 shadow-sm">
+ <span class="text-sm font-bold text-white">
+ {{ strtoupper(substr($user->name, 0, 1)) }}{{ strtoupper(substr($user->last_name ?? '', 0, 1)) }}
+ </span>
+ </div>
+ @endif
+ </div>
+ {{-- Informations Chauffeur --}}
+ <div class="ml-3">
+ <div class="text-sm font-semibold text-gray-900">
+ {{ $user->name }} {{ $user->last_name ?? '' }}
+ </div>
+ <div class="flex items-center gap-1 text-xs text-gray-500">
+ <x-iconify icon="lucide:phone" class="w-3.5 h-3.5" />
+ <span>{{ $driver->phone ?? $user->phone ?? 'N/A' }}</span>
+ </div>
+ </div>
+ </div>
+ @else
+ <div class="flex items-center gap-2 text-sm text-gray-400">
+ <x-iconify icon="lucide:user-check" class="w-5 h-5" />
+ <span class="italic">Non affecté</span>
+ </div>
+ @endif
+ </td>
+
+ <td class="px-6 py-4 whitespace-nowrap">
+ <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
  {{ $vehicle->vehicleType->name ?? 'N/A' }}
  </span>
  </td>
- 
- {{-- Colonne 3: Kilométrage - padding réduit --}}
- <td class="px-3 py-2 whitespace-nowrap">
- <div class="flex items-center text-sm">
- <x-iconify icon="lucide:gauge" class="h-3.5 w-3.5 text-gray-400 mr-1.5" />
- <span class="font-medium text-gray-900">{{ number_format($vehicle->current_mileage) }}</span>
- <span class="text-gray-500 ml-1">km</span>
- </div>
+ <td class="px-6 py-4 whitespace-nowrap">
+ {{-- 🎯 Composant Livewire de changement de statut inline --}}
+ @livewire('admin.vehicle-status-badge', ['vehicle' => $vehicle], key('vehicle-status-'.$vehicle->id))
  </td>
- 
- {{-- Colonne 4: Statut - padding réduit --}}
- <td class="px-3 py-2 whitespace-nowrap">
- {{-- 🎯 Composant Livewire Ultra-Pro de changement de statut inline avec confirmation --}}
- @livewire('admin.vehicle-status-badge-ultra-pro', ['vehicle' => $vehicle], key('vehicle-status-ultra-pro-'.$vehicle->id))
+ <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-medium">
+ {{ number_format($vehicle->current_mileage) }} km
  </td>
- 
- {{-- Colonne 5: Dépôt - padding réduit --}}
- <td class="px-3 py-2 whitespace-nowrap">
+ <td class="px-6 py-4 whitespace-nowrap">
  @if($vehicle->depot)
- <div class="flex items-center gap-1.5">
- <x-iconify icon="lucide:building-2" class="w-3.5 h-3.5 text-purple-600" />
+ <div class="flex items-center gap-2">
+ <x-iconify icon="lucide:building-2" class="w-4 h-4 text-purple-600" />
  <span class="text-sm text-gray-900">{{ $vehicle->depot->name }}</span>
  </div>
  @else
- <span class="text-xs text-gray-400 italic">Non assigné</span>
+ <span class="text-sm text-gray-400 italic">Non assigné</span>
  @endif
  </td>
 
- {{-- Colonne 6: Chauffeur (optimisée avec solution enterprise-grade) --}}
- <td class="px-3 py-2 whitespace-nowrap">
- @php
- /**
-  * 🚗 RÉCUPÉRATION INTELLIGENTE DU CHAUFFEUR ACTIF
-  * Architecture Enterprise avec mécanismes de fallback
-  * et optimisation des performances via eager loading
-  */
- 
- // 1. Récupération de l'affectation active avec filtrage intelligent
- $activeAssignment = null;
- if ($vehicle->assignments && $vehicle->assignments->count() > 0) {
-     // Priorité 1: Affectation avec statut 'active' explicite
-     $activeAssignment = $vehicle->assignments->firstWhere('status', 'active');
-     
-     // Fallback: Si pas d'affectation active, prendre la première (compatibilité legacy)
-     if (!$activeAssignment) {
-         $activeAssignment = $vehicle->assignments->first();
-     }
- }
- 
- // 2. Récupération du driver avec vérification d'intégrité
- $driver = $activeAssignment ? $activeAssignment->driver : null;
- 
- // 3. Initialisation des variables d'affichage
- $displayName = null;
- $displayPhone = null;
- $displayPhoto = null;
- $initials = '';
- $driverStatus = 'unassigned'; // unassigned, active, inactive
- 
- if ($driver) {
-     // 4. Construction du nom complet avec fallback intelligent
-     $firstName = $driver->first_name ?? '';
-     $lastName = $driver->last_name ?? '';
-     $displayName = trim($firstName . ' ' . $lastName);
-     
-     // Fallback sur l'utilisateur associé si pas de nom dans driver
-     if (empty($displayName) && $driver->user) {
-         $displayName = trim(($driver->user->name ?? '') . ' ' . ($driver->user->last_name ?? ''));
-     }
-     
-     // Si toujours pas de nom, utiliser l'ID ou 'Chauffeur #ID'
-     if (empty($displayName)) {
-         $displayName = 'Chauffeur #' . $driver->id;
-     }
-     
-     // 5. Récupération du téléphone avec hiérarchie de priorités
-     $displayPhone = $driver->personal_phone ?? 
-                     $driver->phone ?? 
-                     ($driver->user ? $driver->user->phone : null) ?? 
-                     'Non renseigné';
-     
-     // 6. Récupération de la photo avec fallback sur avatar par défaut
-     $displayPhoto = $driver->photo ?? 
-                     ($driver->user ? $driver->user->profile_photo_path : null);
-     
-     // 7. Génération des initiales pour l'avatar
-     $initials = strtoupper(
-         substr($firstName ?: ($driver->user->name ?? 'X'), 0, 1) . 
-         substr($lastName ?: ($driver->user->last_name ?? 'X'), 0, 1)
-     );
-     
-     // 8. Détermination du statut du chauffeur pour l'indicateur visuel
-     $driverStatus = ($activeAssignment && $activeAssignment->status === 'active') ? 'active' : 'inactive';
- }
- @endphp
-
- @if($driver && $displayName)
- <div class="flex items-center group">
- {{-- Avatar Enterprise avec photo miniature --}}
- <div class="relative flex-shrink-0">
- <div class="h-9 w-9">
- @if($displayPhoto)
- {{-- Affichage de la photo sans vérification Storage::exists (qui peut causer des problèmes) --}}
- <img src="{{ Storage::url($displayPhoto) }}"
- alt="{{ $displayName }}"
- class="h-9 w-9 rounded-full object-cover ring-2 {{ $driverStatus === 'active' ? 'ring-emerald-400' : 'ring-gray-300' }} shadow-sm"
- onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\'h-9 w-9 rounded-full {{ $driverStatus === 'active' ? 'bg-gradient-to-br from-emerald-500 to-green-600' : 'bg-gradient-to-br from-gray-400 to-gray-500' }} flex items-center justify-center ring-2 {{ $driverStatus === 'active' ? 'ring-emerald-400' : 'ring-gray-300' }} shadow-sm\'><span class=\'text-xs font-bold text-white\'>{{ $initials ?: '??' }}</span></div>';">
- @else
- <div class="h-9 w-9 rounded-full {{ $driverStatus === 'active' ? 'bg-gradient-to-br from-emerald-500 to-green-600' : 'bg-gradient-to-br from-gray-400 to-gray-500' }} flex items-center justify-center ring-2 {{ $driverStatus === 'active' ? 'ring-emerald-400' : 'ring-gray-300' }} shadow-sm">
- <span class="text-xs font-bold text-white">
- {{ $initials ?: '??' }}
- </span>
- </div>
- @endif
- </div>
- {{-- Indicateur de statut actif --}}
- @if($driverStatus === 'active')
- <div class="absolute -bottom-0.5 -right-0.5 h-3 w-3 bg-emerald-400 border-2 border-white rounded-full animate-pulse" title="Chauffeur actif"></div>
- @endif
- </div>
- 
- {{-- Informations Chauffeur Enterprise Grade --}}
- <div class="ml-3 min-w-0">
- <div class="flex items-center gap-1.5">
- <div class="text-sm font-semibold text-gray-900 truncate">
- {{ $displayName }}
- </div>
- @if($driverStatus === 'active')
- <span class="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-emerald-50 text-emerald-700">
- <x-iconify icon="tabler:point-filled" class="w-2 h-2 mr-0.5" />
- Actif
- </span>
- @endif
- </div>
- <div class="flex items-center gap-1 text-xs text-gray-500">
- <x-iconify icon="tabler:phone" class="w-3 h-3" />
- <span>{{ $displayPhone }}</span>
- </div>
- </div>
- </div>
- @else
- <div class="flex items-center gap-2">
- <div class="h-8 w-8 rounded-full bg-gray-100 flex items-center justify-center ring-1 ring-gray-200">
- <x-iconify icon="tabler:user-off" class="w-4 h-4 text-gray-400" />
- </div>
- <span class="text-xs text-gray-500 italic">Non affecté</span>
- </div>
- @endif
- </td>
-
- {{-- Colonne 7: Actions - padding réduit --}}
- <td class="px-3 py-2 whitespace-nowrap text-center text-sm font-medium">
-    <div class="flex items-center justify-center gap-0.5">
+ {{-- START: Actions Directes et Menu Dropdown Enterprise Grade --}}
+ <td class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
+    <div class="flex items-center justify-center gap-1">
         @if($vehicle->is_archived || $vehicle->trashed() || request('archived') === 'true')
-            {{-- Actions pour véhicules ARCHIVÉS --}}
+            {{-- Actions directes pour véhicules ARCHIVÉS --}}
             <button onclick="restoreVehicle({{ $vehicle->id }}, '{{ $vehicle->registration_plate }}', '{{ $vehicle->brand }} {{ $vehicle->model }}')"
-                    class="inline-flex items-center p-1 text-green-600 hover:text-green-700 hover:bg-green-50 rounded-lg transition-all duration-200"
+                    class="inline-flex items-center p-1.5 text-green-600 hover:text-green-700 hover:bg-green-50 rounded-lg transition-all duration-200"
                     title="Restaurer">
-                <x-iconify icon="lucide:rotate-ccw" class="w-3.5 h-3.5" />
+                <x-iconify icon="lucide:rotate-ccw" class="w-4 h-4" />
             </button>
             <button onclick="permanentDeleteVehicle({{ $vehicle->id }}, '{{ $vehicle->registration_plate }}', '{{ $vehicle->brand }} {{ $vehicle->model }}')"
-                    class="inline-flex items-center p-1 text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg transition-all duration-200"
+                    class="inline-flex items-center p-1.5 text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg transition-all duration-200"
                     title="Supprimer définitivement">
-                <x-iconify icon="lucide:trash-2" class="w-3.5 h-3.5" />
+                <x-iconify icon="lucide:trash-2" class="w-4 h-4" />
             </button>
         @else
-            {{-- Actions pour véhicules ACTIFS --}}
+            {{-- Actions directes PRINCIPALES pour véhicules ACTIFS --}}
             @can('view vehicles')
             <a href="{{ route('admin.vehicles.show', $vehicle) }}"
-               class="inline-flex items-center p-1 text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-lg transition-all duration-200"
+               class="inline-flex items-center p-1.5 text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-lg transition-all duration-200"
                title="Voir détails">
-                <x-iconify icon="lucide:eye" class="w-3.5 h-3.5" />
+                <x-iconify icon="lucide:eye" class="w-4 h-4" />
             </a>
             @endcan
             
             @can('edit vehicles')
             <a href="{{ route('admin.vehicles.edit', $vehicle) }}"
-               class="inline-flex items-center p-1 text-amber-600 hover:text-amber-700 hover:bg-amber-50 rounded-lg transition-all duration-200"
+               class="inline-flex items-center p-1.5 text-amber-600 hover:text-amber-700 hover:bg-amber-50 rounded-lg transition-all duration-200"
                title="Modifier">
-                <x-iconify icon="lucide:edit" class="w-3.5 h-3.5" />
+                <x-iconify icon="lucide:edit" class="w-4 h-4" />
             </a>
             @endcan
             
-            {{-- Menu dropdown compact --}}
+            {{-- Menu dropdown pour actions supplémentaires --}}
             <div class="relative inline-block text-left" x-data="{ open: false }">
                 <button @click="open = !open"
                         @click.away="open = false"
                         type="button"
-                        class="inline-flex items-center p-1 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-all duration-200"
+                        class="inline-flex items-center p-1.5 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-all duration-200"
                         id="vehicle-menu-{{ $vehicle->id }}">
-                    <x-iconify icon="lucide:more-vertical" class="w-3.5 h-3.5" />
+                    <x-iconify icon="lucide:more-vertical" class="w-4 h-4" />
                 </button>
 
                 <div x-show="open"
@@ -767,31 +677,32 @@
                      x-transition:leave="transition ease-in duration-75"
                      x-transition:leave-start="transform opacity-100 scale-100"
                      x-transition:leave-end="transform opacity-0 scale-95"
-                     class="absolute right-0 z-50 mt-2 w-48 rounded-lg shadow-lg bg-white ring-1 ring-black ring-opacity-5 divide-y divide-gray-100">
+                     class="absolute right-0 z-50 mt-2 w-56 rounded-lg shadow-lg bg-white ring-1 ring-black ring-opacity-5 divide-y divide-gray-100">
                     <div class="py-1">
+                        {{-- Actions supplémentaires --}}
                         <button onclick="duplicateVehicle({{ $vehicle->id }})"
-                                class="flex w-full items-center px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
-                            <x-iconify icon="lucide:copy" class="w-3.5 h-3.5 mr-2 text-purple-600" />
+                                class="flex w-full items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
+                            <x-iconify icon="lucide:copy" class="w-4 h-4 mr-3 text-purple-600" />
                             Dupliquer
                         </button>
                         
                         <a href="{{ route('admin.vehicles.history', $vehicle) }}"
-                           class="flex items-center px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
-                            <x-iconify icon="lucide:clock" class="w-3.5 h-3.5 mr-2 text-cyan-600" />
+                           class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
+                            <x-iconify icon="lucide:clock" class="w-4 h-4 mr-3 text-cyan-600" />
                             Historique
                         </a>
                         
                         <a href="{{ route('admin.vehicles.export.single.pdf', $vehicle) }}"
-                           class="flex items-center px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
-                            <x-iconify icon="lucide:file-text" class="w-3.5 h-3.5 mr-2 text-emerald-600" />
+                           class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
+                            <x-iconify icon="lucide:file-text" class="w-4 h-4 mr-3 text-emerald-600" />
                             Exporter PDF
                         </a>
                         
                         @can('delete vehicles')
                         <div class="border-t border-gray-100 mt-1 pt-1">
                             <button onclick="archiveVehicle({{ $vehicle->id }}, '{{ $vehicle->registration_plate }}', '{{ $vehicle->brand }} {{ $vehicle->model }}')"
-                                    class="flex w-full items-center px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
-                                <x-iconify icon="lucide:archive" class="w-3.5 h-3.5 mr-2 text-orange-600" />
+                                    class="flex w-full items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
+                                <x-iconify icon="lucide:archive" class="w-4 h-4 mr-3 text-orange-600" />
                                 Archiver
                             </button>
                         </div>
@@ -802,6 +713,7 @@
         @endif
     </div>
  </td>
+ {{-- END: Tâche 2 - Menu Dropdown Trois Points --}}
  </tr>
  @endforeach
  </tbody>

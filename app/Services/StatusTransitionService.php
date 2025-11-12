@@ -88,14 +88,18 @@ class StatusTransitionService
             // Hook post-transition (peut être étendu)
             $this->executeVehiclePostTransitionHook($vehicle, $currentStatusEnum, $newStatus, $options);
 
-            // Dispatcher l'événement Laravel
+            // Dispatcher l'événement Laravel avec le format attendu
             event(new VehicleStatusChanged(
                 $vehicle,
-                $currentStatusEnum,
-                $newStatus,
-                $statusHistory,
-                $options['reason'] ?? null,
-                $options['metadata'] ?? null
+                $newStatus->value,  // Passer la valeur string de l'enum
+                array_merge(
+                    $options['metadata'] ?? [],
+                    [
+                        'previous_status' => $currentStatusEnum?->value,
+                        'reason' => $options['reason'] ?? null,
+                        'user_id' => $options['user_id'] ?? auth()->id(),
+                    ]
+                )
             ));
 
             // Log l'événement
@@ -161,14 +165,18 @@ class StatusTransitionService
             // Hook post-transition
             $this->executeDriverPostTransitionHook($driver, $currentStatusEnum, $newStatus, $options);
 
-            // Dispatcher l'événement Laravel
+            // Dispatcher l'événement Laravel avec le format attendu
             event(new DriverStatusChanged(
                 $driver,
-                $currentStatusEnum,
-                $newStatus,
-                $statusHistory,
-                $options['reason'] ?? null,
-                $options['metadata'] ?? null
+                $newStatus->value,  // Passer la valeur string de l'enum
+                array_merge(
+                    $options['metadata'] ?? [],
+                    [
+                        'previous_status' => $currentStatusEnum?->value,
+                        'reason' => $options['reason'] ?? null,
+                        'user_id' => $options['user_id'] ?? auth()->id(),
+                    ]
+                )
             ));
 
             // Log l'événement

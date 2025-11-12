@@ -1,30 +1,20 @@
 <div class="relative inline-block" x-data="{ open: @entangle('showDropdown') }">
-    {{-- Badge actuel (cliquable si permission) --}}
+    {{-- Badge de statut professionnel - Enterprise Grade --}}
     @if($canUpdate && count($allowedStatuses) > 0)
         <button
             wire:click="toggleDropdown"
             type="button"
-            class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium transition-all hover:scale-105 hover:shadow-md cursor-pointer {{ $currentEnum ? $currentEnum->badgeClasses() : 'bg-gray-100 text-gray-800' }}"
+            class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium transition-all hover:shadow-sm hover:scale-105 cursor-pointer {{ $currentEnum ? $currentEnum->badgeClasses() : 'bg-gray-100 text-gray-700' }}"
             title="Cliquer pour changer le statut">
-            @if($currentEnum)
-                <i class="fas fa-{{ $currentEnum->icon() }} text-xs"></i>
-                {{ $currentEnum->label() }}
-            @else
-                Inconnu
-            @endif
-            <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+            <span>{{ $currentEnum ? $currentEnum->label() : 'Inconnu' }}</span>
+            <svg class="w-3 h-3 opacity-60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
             </svg>
         </button>
     @else
-        {{-- Badge simple (non cliquable) --}}
-        <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium {{ $currentEnum ? $currentEnum->badgeClasses() : 'bg-gray-100 text-gray-800' }}">
-            @if($currentEnum)
-                <i class="fas fa-{{ $currentEnum->icon() }} text-xs"></i>
-                {{ $currentEnum->label() }}
-            @else
-                Inconnu
-            @endif
+        {{-- Badge simple (non cliquable) - Style professionnel --}}
+        <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium {{ $currentEnum ? $currentEnum->badgeClasses() : 'bg-gray-100 text-gray-700' }}">
+            {{ $currentEnum ? $currentEnum->label() : 'Inconnu' }}
         </span>
     @endif
 
@@ -51,22 +41,19 @@
                     <button
                         wire:click="changeStatus('{{ $status->value }}')"
                         type="button"
-                        class="w-full flex items-center gap-2 px-3 py-2.5 text-sm hover:bg-gray-50 transition-colors group">
-                        <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-xs font-medium {{ $status->badgeClasses() }} group-hover:scale-105 transition-transform">
-                            <i class="fas fa-{{ $status->icon() }} text-xs"></i>
+                        class="w-full flex items-center justify-between px-4 py-2.5 text-sm hover:bg-gray-50 transition-all duration-200 group">
+                        <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium {{ $status->badgeClasses() }} group-hover:shadow-sm transition-all">
                             {{ $status->label() }}
                         </span>
-                        <span class="ml-auto">
-                            <svg class="w-4 h-4 text-gray-400 group-hover:text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                            </svg>
-                        </span>
+                        <svg class="w-4 h-4 text-gray-400 group-hover:text-blue-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                        </svg>
                     </button>
                 @endforeach
 
                 @if($currentEnum)
-                    <div class="px-3 py-2 text-xs text-gray-500 border-t border-gray-200 mt-2">
-                        <i class="fas fa-info-circle mr-1"></i>
+                    <div class="px-3 py-2 text-xs text-gray-500 border-t border-gray-200 mt-2 flex items-center gap-1">
+                        <x-iconify icon="lucide:info" class="w-3 h-3" />
                         {{ $currentEnum->description() }}
                     </div>
                 @endif
@@ -76,15 +63,15 @@
 
     {{-- Message si aucune transition possible --}}
     @if($canUpdate && count($allowedStatuses) === 0 && $currentEnum && !$currentEnum->isTerminal())
-        <div class="text-xs text-gray-400 mt-1">
-            <i class="fas fa-lock"></i> Aucune transition disponible
+        <div class="text-xs text-gray-400 mt-1 flex items-center gap-1">
+            <x-iconify icon="lucide:lock" class="w-3 h-3" /> Aucune transition disponible
         </div>
     @endif
 
     {{-- Message si état terminal --}}
     @if($currentEnum && $currentEnum->isTerminal())
-        <div class="text-xs text-gray-400 mt-1">
-            <i class="fas fa-ban"></i> État terminal
+        <div class="text-xs text-gray-400 mt-1 flex items-center gap-1">
+            <x-iconify icon="lucide:ban" class="w-3 h-3" /> État terminal
         </div>
     @endif
 </div>

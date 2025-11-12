@@ -1,4 +1,4 @@
-{{-- resources/views/admin/vehicles/enterprise-show.blade.php --}}
+{{-- resources/views/admin/vehicles/show.blade.php --}}
 {{-- 🏆 ENTERPRISE-GRADE VEHICLE MANAGEMENT - ZENFLEET 2025 --}}
 @extends('layouts.admin.catalyst')
 @section('title', $vehicle->registration_plate . ' - Fiche Véhicule')
@@ -618,7 +618,7 @@
                     ];
                     $status = $statusConfig[$statusName] ?? ['bg' => 'bg-gray-500/20', 'border' => 'border-gray-400/50', 'text' => 'text-gray-100', 'pulse' => 'bg-gray-300'];
 
-                    // ✅ CORRECTION : Calcul correct de l'âge basé sur l'année de fabrication
+                    // Calcul correct de l'âge basé sur l'année de fabrication
                     $vehicleAge = date('Y') - $vehicle->manufacturing_year;
                 @endphp
 
