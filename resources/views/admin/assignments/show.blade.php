@@ -474,11 +474,14 @@ Design surpassant Fleetio, Samsara et Verizon Connect:
                                 <span class="font-medium text-gray-900">{{ $assignment->creator->name }}</span>
                             </div>
                         @endif
-                        @if($assignment->updated_at && !$assignment->updated_at->eq($assignment->created_at))
+                        @if($assignment->updated_at && 
+                            ($assignment->updated_at instanceof \Carbon\Carbon ? 
+                                !$assignment->updated_at->eq($assignment->created_at) : 
+                                $assignment->updated_at != $assignment->created_at))
                             <div class="flex justify-between items-start">
                                 <span class="text-gray-600">Modifiée le:</span>
                                 <span class="font-medium text-gray-900 text-right">
-                                    {{ $assignment->updated_at->format('d/m/Y H:i') }}
+                                    {{ $assignment->safeFormatDate($assignment->updated_at, 'd/m/Y H:i', 'Non défini') }}
                                 </span>
                             </div>
                         @endif
@@ -486,7 +489,7 @@ Design surpassant Fleetio, Samsara et Verizon Connect:
                             <div class="flex justify-between items-start">
                                 <span class="text-gray-600">Terminée le:</span>
                                 <span class="font-medium text-gray-900 text-right">
-                                    {{ $assignment->ended_at->format('d/m/Y H:i') }}
+                                    {{ $assignment->safeFormatDate($assignment->ended_at, 'd/m/Y H:i', 'Non défini') }}
                                 </span>
                             </div>
                         @endif

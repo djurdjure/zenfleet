@@ -352,9 +352,15 @@ class VehicleController extends Controller
 
         try {
             // Chargement optimisé des relations
+            // 🔧 FIX CRITIQUE: Filtrage explicite des affectations non soft-deleted
             $vehicle->load([
                 'vehicleType', 'fuelType', 'transmissionType', 'vehicleStatus',
-                'assignments.driver.user', 'maintenancePlans', 'maintenanceLogs'
+                'assignments' => function ($query) {
+                    $query->whereNull('deleted_at')  // ✅ CORRECTION ENTERPRISE-GRADE: Respect du soft delete
+                          ->with('driver.user')
+                          ->orderBy('start_datetime', 'desc');
+                },
+                'maintenancePlans', 'maintenanceLogs'
             ]);
 
             // Analytics spécifiques au véhicule
@@ -699,8 +705,10 @@ class VehicleController extends Controller
             'vehicleType', 'fuelType', 'transmissionType', 'vehicleStatus',
             'organization', 'depot', 'category',
             // Eager loading des affectations actives avec chauffeur et utilisateur (optimisation N+1)
+            // 🔧 FIX CRITIQUE: Ajout de whereNull('deleted_at') pour respecter le soft delete
             'assignments' => function ($query) {
-                $query->where('status', 'active')
+                $query->whereNull('deleted_at')  // ✅ CORRECTION ENTERPRISE-GRADE: Respect du soft delete
+                      ->where('status', 'active')
                       ->where('start_datetime', '<=', now())
                       ->where(function($q) {
                           $q->whereNull('end_datetime')

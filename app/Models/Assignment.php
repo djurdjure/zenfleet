@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\Concerns\BelongsToOrganization;
+use App\Traits\EnterpriseFormatsDates;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -40,7 +41,7 @@ use Carbon\Carbon;
  */
 class Assignment extends Model
 {
-    use HasFactory, SoftDeletes, BelongsToOrganization;
+    use HasFactory, SoftDeletes, BelongsToOrganization, EnterpriseFormatsDates;
 
     /**
      * Statuts possibles d'une affectation enterprise-grade
@@ -75,8 +76,18 @@ class Assignment extends Model
     protected $casts = [
         'start_datetime' => 'datetime',
         'end_datetime' => 'datetime',
+        'ended_at' => 'datetime',
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
+        'deleted_at' => 'datetime',
         'start_mileage' => 'integer',
-        'end_mileage' => 'integer'
+        'end_mileage' => 'integer',
+        'created_by' => 'integer',
+        'updated_by' => 'integer',
+        'ended_by_user_id' => 'integer',
+        'organization_id' => 'integer',
+        'vehicle_id' => 'integer',
+        'driver_id' => 'integer'
     ];
 
     /**

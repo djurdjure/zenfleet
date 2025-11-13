@@ -163,10 +163,132 @@ class AssignmentObserver
                 'changed_by' => auth()->id(),
             ]);
 
-            // Si passage à 'completed', vérifier la libération des ressources
-            if ($newStatus === Assignment::STATUS_COMPLETED) {
-                $this->checkResourcesReleased($assignment);
-            }
+            // SYNCHRONISATION AUTOMATIQUE DES RESSOURCES ENTERPRISE-GRADE
+            $this->syncResourcesBasedOnStatus($assignment, $oldStatus, $newStatus);
+        }
+    }
+
+    /**
+     * Synchronise automatiquement les ressources selon le statut
+     *
+     * @param Assignment $assignment
+     * @param string $oldStatus
+     * @param string $newStatus
+     * @return void
+     */
+    private function syncResourcesBasedOnStatus(Assignment $assignment, string $oldStatus, string $newStatus): void
+    {
+        // Si passage à 'completed' ou 'cancelled', libérer les ressources
+        if (in_array($newStatus, [Assignment::STATUS_COMPLETED, Assignment::STATUS_CANCELLED])) {
+            $this->releaseResourcesIfNoOtherActiveAssignment($assignment);
+        }
+
+        // Si passage à 'active' ou 'scheduled', verrouiller les ressources
+        if (in_array($newStatus, [Assignment::STATUS_ACTIVE, Assignment::STATUS_SCHEDULED]) &&
+            !in_array($oldStatus, [Assignment::STATUS_ACTIVE, Assignment::STATUS_SCHEDULED])) {
+            $this->lockResources($assignment);
+        }
+    }
+
+    /**
+     * Libère les ressources si aucune autre affectation active
+     *
+     * @param Assignment $assignment
+     * @return void
+     */
+    private function releaseResourcesIfNoOtherActiveAssignment(Assignment $assignment): void
+    {
+        // Vérifier le véhicule
+        $hasOtherVehicleAssignment = Assignment::where('vehicle_id', $assignment->vehicle_id)
+            ->where('id', '!=', $assignment->id)
+            ->whereNull('deleted_at')
+            ->whereIn('status', [Assignment::STATUS_ACTIVE, Assignment::STATUS_SCHEDULED])
+            ->exists();
+
+        if (!$hasOtherVehicleAssignment && $assignment->vehicle) {
+            $assignment->vehicle->update([
+                'is_available' => true,
+                'current_driver_id' => null,
+                'assignment_status' => 'available',
+                'last_assignment_end' => now()
+            ]);
+
+            Log::info('[AssignmentObserver] ✅ Véhicule libéré automatiquement', [
+                'vehicle_id' => $assignment->vehicle_id,
+                'assignment_id' => $assignment->id
+            ]);
+        }
+
+        // Vérifier le chauffeur
+        $hasOtherDriverAssignment = Assignment::where('driver_id', $assignment->driver_id)
+            ->where('id', '!=', $assignment->id)
+            ->whereNull('deleted_at')
+            ->whereIn('status', [Assignment::STATUS_ACTIVE, Assignment::STATUS_SCHEDULED])
+            ->exists();
+
+        if (!$hasOtherDriverAssignment && $assignment->driver) {
+            // 🔧 FIX ENTERPRISE-GRADE: Synchronisation complète avec status_id (statut métier)
+            // Récupérer l'ID du statut "Disponible" depuis la table driver_statuses
+            $disponibleStatusId = \DB::table('driver_statuses')
+                ->where('name', 'Disponible')
+                ->value('id') ?? 7; // Fallback sur ID 7 si non trouvé
+
+            $assignment->driver->update([
+                'is_available' => true,
+                'current_vehicle_id' => null,
+                'assignment_status' => 'available',
+                'status_id' => $disponibleStatusId,  // ✅ CORRECTION: Synchroniser le statut métier
+                'last_assignment_end' => now()
+            ]);
+
+            Log::info('[AssignmentObserver] ✅ Chauffeur libéré automatiquement', [
+                'driver_id' => $assignment->driver_id,
+                'assignment_id' => $assignment->id,
+                'status_id_updated' => $disponibleStatusId
+            ]);
+        }
+    }
+
+    /**
+     * Verrouille les ressources pour une affectation active
+     *
+     * @param Assignment $assignment
+     * @return void
+     */
+    private function lockResources(Assignment $assignment): void
+    {
+        if ($assignment->vehicle) {
+            $assignment->vehicle->update([
+                'is_available' => false,
+                'current_driver_id' => $assignment->driver_id,
+                'assignment_status' => 'assigned'
+            ]);
+
+            Log::info('[AssignmentObserver] 🔒 Véhicule verrouillé automatiquement', [
+                'vehicle_id' => $assignment->vehicle_id,
+                'assignment_id' => $assignment->id
+            ]);
+        }
+
+        if ($assignment->driver) {
+            // 🔧 FIX ENTERPRISE-GRADE: Synchronisation complète avec status_id (statut métier)
+            // Récupérer l'ID du statut "En mission" depuis la table driver_statuses
+            $enMissionStatusId = \DB::table('driver_statuses')
+                ->where('name', 'En mission')
+                ->value('id') ?? 8; // Fallback sur ID 8 si non trouvé
+
+            $assignment->driver->update([
+                'is_available' => false,
+                'current_vehicle_id' => $assignment->vehicle_id,
+                'assignment_status' => 'assigned',
+                'status_id' => $enMissionStatusId  // ✅ CORRECTION: Synchroniser le statut métier
+            ]);
+
+            Log::info('[AssignmentObserver] 🔒 Chauffeur verrouillé automatiquement', [
+                'driver_id' => $assignment->driver_id,
+                'assignment_id' => $assignment->id,
+                'status_id_updated' => $enMissionStatusId
+            ]);
         }
     }
 

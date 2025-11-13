@@ -250,8 +250,7 @@ Route::middleware(['auth', 'verified'])
             // Routes avec paramètres {vehicle} - TOUJOURS EN DERNIER
             Route::get('{vehicle}', [VehicleController::class, 'show'])->name('show');
             Route::get('{vehicle}/edit', [VehicleController::class, 'edit'])->name('edit');
-            Route::put('{vehicle}', [VehicleController::class, 'update'])->name('update');
-            Route::patch('{vehicle}', [VehicleController::class, 'update'])->name('update');
+            Route::match(['put', 'patch'], '{vehicle}', [VehicleController::class, 'update'])->name('update');
             Route::delete('{vehicle}', [VehicleController::class, 'destroy'])->name('destroy');
 
             // Actions spécifiques avec paramètres
@@ -353,23 +352,9 @@ Route::middleware(['auth', 'verified'])
             Route::get('gantt', [AssignmentController::class, 'gantt'])->name('gantt');
             Route::get('export', [AssignmentController::class, 'export'])->name('export');
             Route::get('stats', [AssignmentController::class, 'stats'])->name('stats');
-            
-            // Routes CRUD (index, store, show, edit, update, destroy)
-            Route::get('/', [AssignmentController::class, 'index'])->name('index');
-            Route::post('/', [AssignmentController::class, 'store'])->name('store');
-            Route::get('{assignment}', [AssignmentController::class, 'show'])->name('show');
-            Route::get('{assignment}/edit', [AssignmentController::class, 'edit'])->name('edit');
-            Route::put('{assignment}', [AssignmentController::class, 'update'])->name('update');
-            Route::delete('{assignment}', [AssignmentController::class, 'destroy'])->name('destroy');
-        });
-
-        // Routes avec paramètres (APRÈS resource)
-        Route::prefix('assignments')->name('assignments.')->group(function () {
-            Route::patch('{assignment}/end', [AssignmentController::class, 'end'])->name('end');
-            Route::get('{assignment}/details', [AssignmentController::class, 'details'])->name('details');
-            Route::post('{assignment}/extend', [AssignmentController::class, 'extend'])->name('extend');
 
             // 🏥 HEALTH CHECK ENTERPRISE-GRADE - Monitoring et Auto-Healing
+            // IMPORTANT: Ces routes DOIVENT être AVANT {assignment} pour éviter conflits de routing
             // Dashboard UI
             Route::get('health-dashboard', function() {
                 return view('admin.assignments.health-dashboard');
@@ -384,6 +369,21 @@ Route::middleware(['auth', 'verified'])
                 ->name('metrics');
             Route::post('heal', [\App\Http\Controllers\Admin\AssignmentHealthCheckController::class, 'heal'])
                 ->name('heal');
+
+            // Routes CRUD (index, store, show, edit, update, destroy)
+            Route::get('/', [AssignmentController::class, 'index'])->name('index');
+            Route::post('/', [AssignmentController::class, 'store'])->name('store');
+            Route::get('{assignment}', [AssignmentController::class, 'show'])->name('show');
+            Route::get('{assignment}/edit', [AssignmentController::class, 'edit'])->name('edit');
+            Route::put('{assignment}', [AssignmentController::class, 'update'])->name('update');
+            Route::delete('{assignment}', [AssignmentController::class, 'destroy'])->name('destroy');
+        });
+
+        // Routes avec paramètres (APRÈS resource)
+        Route::prefix('assignments')->name('assignments.')->group(function () {
+            Route::patch('{assignment}/end', [AssignmentController::class, 'end'])->name('end');
+            Route::get('{assignment}/details', [AssignmentController::class, 'details'])->name('details');
+            Route::post('{assignment}/extend', [AssignmentController::class, 'extend'])->name('extend');
         });
 
         // 🚗 API pour les ressources disponibles (via AssignmentController)
