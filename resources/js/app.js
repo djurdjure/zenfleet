@@ -14,19 +14,27 @@ import './bootstrap';
 
 // Import des librairies tierces avec optimisation
 import Alpine from 'alpinejs';
-import TomSelect from 'tom-select';
 import Sortable from 'sortablejs';
 import ApexCharts from 'apexcharts';
 import flatpickr from "flatpickr";
 
+// Import ZenFleet SlimSelect (nouveau remplacement de TomSelect)
+import ZenFleetSelect, { zenfleetSelectDirective, zenfleetSelectData } from './components/zenfleet-select';
+
 // ✅ OPTIMISATION: Configuration des objets globaux de manière sécurisée
 const initializeGlobals = () => {
     window.Alpine = Alpine;
-    window.TomSelect = TomSelect;
+    window.ZenFleetSelect = ZenFleetSelect;
     window.Sortable = Sortable;
     window.ApexCharts = ApexCharts;
     window.flatpickr = flatpickr;
 };
+
+// ✅ NOUVEAU: Enregistrement directive Alpine.js pour ZenFleetSelect
+zenfleetSelectDirective(Alpine);
+
+// ✅ NOUVEAU: Enregistrement Alpine.data pour ZenFleetSelect
+Alpine.data('zenfleetSelect', zenfleetSelectData);
 
 // ✅ AMÉLIORATION: Configuration Alpine.js ultra-moderne
 Alpine.data('zenfleet', () => ({
@@ -176,36 +184,43 @@ Alpine.data('zenfleet', () => ({
     
     // ✅ AMÉLIORATION: Initialisation des composants optimisée
     initializeComponents() {
-        // TomSelect avec configuration avancée
-        this.initializeTomSelect();
-        
+        // ZenFleetSelect (SlimSelect) avec configuration ultra-pro
+        this.initializeZenFleetSelect();
+
         // Flatpickr avec localisation
         this.initializeFlatpickr();
-        
+
         // Sortable avec sauvegarde d'état
         this.initializeSortable();
-        
+
         // ApexCharts avec thème ZenFleet
         this.initializeCharts();
     },
-    
-    // Configuration TomSelect
-    initializeTomSelect() {
-        document.querySelectorAll('.select2, select[multiple], .tom-select').forEach(select => {
-            if (!select.tomselect && !select.disabled) {
-                new TomSelect(select, {
-                    plugins: ['remove_button', 'dropdown_header'],
-                    create: select.hasAttribute('data-create'),
-                    maxItems: select.getAttribute('data-max-items') || null,
-                    placeholder: select.getAttribute('placeholder') || 'Sélectionner...',
-                    searchField: ['text', 'value'],
-                    sortField: [
-                        { field: 'text', direction: 'asc' }
-                    ],
-                    render: {
-                        no_results: () => '<div class="no-results p-2 text-gray-500">Aucun résultat trouvé</div>',
+
+    // Configuration ZenFleetSelect (SlimSelect ultra-optimisé)
+    initializeZenFleetSelect() {
+        // Auto-init tous les select qui n'ont pas x-data ou wire:ignore
+        document.querySelectorAll('select:not([x-data]):not([wire\\:ignore])').forEach(select => {
+            // Skip si déjà initialisé ou désactivé
+            if (select.zenfleetSelect || select.disabled) return;
+
+            // Skip si dans un composant Alpine.js ou Livewire
+            if (select.closest('[x-data]') || select.closest('[wire\\:id]')) return;
+
+            try {
+                const instance = new ZenFleetSelect(select, {
+                    settings: {
+                        searchPlaceholder: select.getAttribute('placeholder') || 'Rechercher...',
+                        placeholderText: select.getAttribute('placeholder') || 'Sélectionner une option',
+                        allowDeselect: !select.hasAttribute('required'),
+                        closeOnSelect: !select.hasAttribute('multiple')
                     }
                 });
+
+                // Stocker l'instance pour référence
+                select.zenfleetSelect = instance;
+            } catch (error) {
+                console.error('[ZenFleet] Erreur init select:', select, error);
             }
         });
     },

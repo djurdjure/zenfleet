@@ -331,16 +331,33 @@ class AssignmentForm extends Component
     {
         $organizationId = auth()->user()->organization_id;
 
-        // CORRECTION ENTERPRISE: Utilisation du scope active()
+        // CORRECTION ENTERPRISE V2: Utilisation des bons status_id et triple vérification
         $this->vehicleOptions = Vehicle::where('organization_id', $organizationId)
-            ->active() // Scope: status_id = 1 (Actif)
+            ->where(function($query) {
+                // Véhicules au parking (disponibles) OU marqués comme disponibles
+                $query->where('status_id', 8) // Parking
+                      ->orWhere(function($q) {
+                          $q->where('is_available', true)
+                            ->where('assignment_status', 'available')
+                            ->whereNull('current_driver_id');
+                      });
+            })
+            ->where('is_archived', false)
             ->select('id', 'registration_plate', 'brand', 'model')
             ->orderBy('registration_plate')
             ->get();
 
-        // TODO: Créer scope active() pour Driver (status_id)
+        // CORRECTION ENTERPRISE V2: Support des statuts multiples pour les chauffeurs
         $this->driverOptions = Driver::where('organization_id', $organizationId)
-            ->where('status_id', 1) // CORRECTION TEMPORAIRE: utiliser status_id
+            ->where(function($query) {
+                // Chauffeurs avec statut Actif (1) OU Disponible (7) OU marqués comme disponibles
+                $query->whereIn('status_id', [1, 7]) // Actif ou Disponible
+                      ->orWhere(function($q) {
+                          $q->where('is_available', true)
+                            ->where('assignment_status', 'available')
+                            ->whereNull('current_vehicle_id');
+                      });
+            })
             ->select('id', 'first_name', 'last_name', 'license_number')
             ->orderBy('last_name')
             ->get();

@@ -9,6 +9,7 @@ use App\Models\Assignment;
 use App\Models\Vehicle;
 use App\Models\Driver;
 use App\Models\User;
+use App\Traits\ResourceAvailability;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -18,6 +19,7 @@ use Illuminate\Support\Facades\Log;
 
 class AssignmentController extends Controller
 {
+    use ResourceAvailability;
     public function __construct()
     {
         $this->middleware('auth');
@@ -99,53 +101,10 @@ class AssignmentController extends Controller
     {
         $this->authorize('create assignments');
 
-        // Véhicules disponibles avec logique enterprise améliorée
-        $availableVehicles = Vehicle::where('organization_id', auth()->user()->organization_id)
-            ->where(function($query) {
-                // Inclure véhicules avec statut disponible OU sans statut défini
-                $query->whereHas('vehicleStatus', function($statusQuery) {
-                    $statusQuery->where('name', 'ILIKE', '%disponible%')
-                              ->orWhere('name', 'ILIKE', '%available%')
-                              ->orWhere('name', 'ILIKE', '%actif%')
-                              ->orWhere('name', 'ILIKE', '%active%');
-                })
-                ->orWhereDoesntHave('vehicleStatus'); // Véhicules sans statut = disponibles
-            })
-            ->whereDoesntHave('assignments', function($query) {
-                // Exclure véhicules avec affectation active (sans date de fin ou pas encore terminée)
-                $query->where(function($subQuery) {
-                    $subQuery->whereNull('end_datetime') // Affectation ouverte
-                             ->orWhere('end_datetime', '>', now()); // Affectation programmée pas encore finie
-                })
-                ->where('start_datetime', '<=', now()); // Déjà commencée
-            })
-            ->with(['vehicleType', 'vehicleStatus'])
-            ->orderBy('registration_plate')
-            ->get();
-
-        // Chauffeurs disponibles avec logique enterprise améliorée
-        $availableDrivers = Driver::where('organization_id', auth()->user()->organization_id)
-            ->where(function($query) {
-                // Inclure chauffeurs avec statut actif ET autorisés à conduire
-                $query->whereHas('driverStatus', function($statusQuery) {
-                    $statusQuery->where('is_active', true)
-                               ->where('can_drive', true)
-                               ->where('can_assign', true);
-                })
-                ->orWhereNull('status_id'); // Chauffeurs sans statut = actifs par défaut
-            })
-            ->whereDoesntHave('assignments', function($query) {
-                // Exclure chauffeurs avec affectation active
-                $query->where(function($subQuery) {
-                    $subQuery->whereNull('end_datetime') // Affectation ouverte
-                             ->orWhere('end_datetime', '>', now()); // Affectation programmée pas encore finie
-                })
-                ->where('start_datetime', '<=', now()); // Déjà commencée
-            })
-            ->with('driverStatus') // Charger la relation pour l'affichage
-            ->orderBy('last_name')
-            ->orderBy('first_name')
-            ->get();
+        // ✅ NOUVELLE LOGIQUE ENTERPRISE: Utilisation du trait ResourceAvailability
+        // Source de vérité unique: is_available + assignment_status
+        $availableVehicles = $this->getAvailableVehicles();
+        $availableDrivers = $this->getAvailableDrivers();
 
         // Affectations actives pour les statistiques
         $activeAssignments = Assignment::where('organization_id', auth()->user()->organization_id)

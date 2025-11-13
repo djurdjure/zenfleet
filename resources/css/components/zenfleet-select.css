@@ -1,0 +1,559 @@
+/**
+ * 🎨 ZENFLEET SLIMSELECT STYLING - ULTRA-PRO ENTERPRISE-GRADE
+ *
+ * Design system cohérent avec l'application ZenFleet
+ * ✅ Tailwind CSS utility-first approach
+ * ✅ Dark mode complet
+ * ✅ Animations fluides 60fps
+ * ✅ Accessibilité WCAG 2.1 AA
+ * ✅ Mobile responsive
+ * ✅ Print-friendly
+ *
+ * @version 2.0.0-Enterprise
+ * @author ZenFleet Design Team
+ */
+
+/* ========================================
+   IMPORT SLIMSELECT BASE
+   ======================================== */
+@import 'slim-select/styles';
+
+/* ========================================
+   VARIABLES ZENFLEET
+   ======================================== */
+:root {
+    --zf-select-border: theme('colors.gray.300');
+    --zf-select-border-hover: theme('colors.gray.400');
+    --zf-select-border-focus: theme('colors.blue.500');
+    --zf-select-bg: theme('colors.white');
+    --zf-select-text: theme('colors.gray.900');
+    --zf-select-placeholder: theme('colors.gray.500');
+    --zf-select-shadow: theme('boxShadow.sm');
+    --zf-select-shadow-focus: theme('boxShadow.lg');
+    --zf-select-radius: theme('borderRadius.lg');
+    --zf-select-option-hover: theme('colors.blue.50');
+    --zf-select-option-selected: theme('colors.blue.100');
+    --zf-select-highlight: theme('colors.yellow.200');
+}
+
+.dark {
+    --zf-select-border: theme('colors.gray.600');
+    --zf-select-border-hover: theme('colors.gray.500');
+    --zf-select-border-focus: theme('colors.blue.500');
+    --zf-select-bg: theme('colors.gray.800');
+    --zf-select-text: theme('colors.gray.100');
+    --zf-select-placeholder: theme('colors.gray.400');
+    --zf-select-shadow: theme('boxShadow.md');
+    --zf-select-shadow-focus: theme('boxShadow.2xl');
+    --zf-select-option-hover: theme('colors.blue.900 / 20%');
+    --zf-select-option-selected: theme('colors.blue.900 / 40%');
+    --zf-select-highlight: theme('colors.yellow.800');
+}
+
+/* ========================================
+   MAIN CONTAINER
+   ======================================== */
+.ss-main {
+    @apply relative w-full;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+/* Hide original select */
+.ss-main select {
+    @apply hidden;
+}
+
+/* ========================================
+   SINGLE SELECT
+   ======================================== */
+.ss-single-selected {
+    @apply flex items-center justify-between gap-2;
+    @apply px-4 py-2.5;
+    @apply bg-white dark:bg-gray-800;
+    @apply border border-gray-300 dark:border-gray-600;
+    @apply rounded-lg;
+    @apply text-sm text-gray-900 dark:text-gray-100;
+    @apply transition-all duration-200 ease-in-out;
+    @apply cursor-pointer;
+    background-color: var(--zf-select-bg);
+    border-color: var(--zf-select-border);
+    color: var(--zf-select-text);
+    border-radius: var(--zf-select-radius);
+    box-shadow: var(--zf-select-shadow);
+}
+
+.ss-single-selected:hover {
+    border-color: var(--zf-select-border-hover);
+    @apply shadow-md;
+}
+
+.ss-single-selected:focus,
+.ss-single-selected:focus-visible {
+    @apply outline-none ring-2 ring-blue-500 ring-offset-2 dark:ring-offset-gray-900;
+    border-color: var(--zf-select-border-focus);
+    box-shadow: var(--zf-select-shadow-focus);
+}
+
+/* Placeholder state */
+.ss-single-selected .placeholder {
+    color: var(--zf-select-placeholder);
+    @apply italic font-normal;
+}
+
+/* Selected value */
+.ss-single-selected .ss-value {
+    @apply flex-1 truncate;
+    @apply font-medium;
+}
+
+/* Arrow indicator */
+.ss-single-selected .ss-arrow {
+    @apply flex-shrink-0 ml-2;
+    @apply transition-transform duration-200;
+}
+
+.ss-single-selected .ss-arrow span {
+    @apply border-gray-400 dark:border-gray-500;
+}
+
+.ss-open .ss-single-selected .ss-arrow {
+    @apply rotate-180;
+}
+
+/* Disabled state */
+.ss-disabled .ss-single-selected {
+    @apply opacity-60 cursor-not-allowed;
+    @apply bg-gray-100 dark:bg-gray-900;
+}
+
+/* ========================================
+   MULTI SELECT
+   ======================================== */
+.ss-multi-selected {
+    @apply flex flex-wrap items-center gap-2;
+    @apply px-3 py-2;
+    @apply bg-white dark:bg-gray-800;
+    @apply border border-gray-300 dark:border-gray-600;
+    @apply rounded-lg;
+    @apply text-sm;
+    @apply transition-all duration-200 ease-in-out;
+    @apply cursor-pointer min-h-[42px];
+    background-color: var(--zf-select-bg);
+    border-color: var(--zf-select-border);
+    border-radius: var(--zf-select-radius);
+    box-shadow: var(--zf-select-shadow);
+}
+
+.ss-multi-selected:hover {
+    border-color: var(--zf-select-border-hover);
+    @apply shadow-md;
+}
+
+.ss-multi-selected:focus,
+.ss-multi-selected:focus-visible {
+    @apply outline-none ring-2 ring-blue-500 ring-offset-2 dark:ring-offset-gray-900;
+    border-color: var(--zf-select-border-focus);
+}
+
+/* Placeholder */
+.ss-multi-selected .ss-placeholder {
+    color: var(--zf-select-placeholder);
+    @apply italic;
+}
+
+/* Values container */
+.ss-multi-selected .ss-values {
+    @apply flex flex-wrap gap-1.5;
+}
+
+/* Individual value chip */
+.ss-multi-selected .ss-value {
+    @apply inline-flex items-center gap-1.5;
+    @apply px-2.5 py-1;
+    @apply bg-blue-100 dark:bg-blue-900/40;
+    @apply text-blue-800 dark:text-blue-200;
+    @apply text-xs font-medium;
+    @apply rounded-md;
+    @apply transition-all duration-150;
+    @apply hover:bg-blue-200 dark:hover:bg-blue-900/60;
+}
+
+/* Delete button on chip */
+.ss-multi-selected .ss-value .ss-value-delete {
+    @apply ml-1 text-blue-600 dark:text-blue-400;
+    @apply hover:text-red-600 dark:hover:text-red-400;
+    @apply cursor-pointer;
+    @apply transition-colors duration-150;
+}
+
+/* Arrow */
+.ss-multi-selected .ss-arrow {
+    @apply ml-auto flex-shrink-0;
+    @apply transition-transform duration-200;
+}
+
+.ss-open .ss-multi-selected .ss-arrow {
+    @apply rotate-180;
+}
+
+/* ========================================
+   DROPDOWN CONTENT
+   ======================================== */
+.ss-content {
+    @apply absolute z-50 w-full mt-1;
+    @apply bg-white dark:bg-gray-800;
+    @apply border border-gray-300 dark:border-gray-600;
+    @apply rounded-lg;
+    @apply shadow-lg dark:shadow-2xl;
+    @apply overflow-hidden;
+    @apply max-h-64;
+    background-color: var(--zf-select-bg);
+    border-color: var(--zf-select-border);
+    border-radius: var(--zf-select-radius);
+    animation: zenfleet-fade-in 0.2s ease-out;
+}
+
+/* Position variants */
+.ss-content.ss-relative {
+    @apply relative mt-0;
+}
+
+.ss-content.ss-open-above {
+    @apply mb-1 mt-0;
+    animation: zenfleet-fade-in-up 0.2s ease-out;
+}
+
+/* ========================================
+   SEARCH INPUT
+   ======================================== */
+.ss-search {
+    @apply sticky top-0 z-10;
+    @apply bg-gray-50 dark:bg-gray-900/80;
+    @apply border-b border-gray-200 dark:border-gray-700;
+    @apply backdrop-blur-sm;
+}
+
+.ss-search input {
+    @apply w-full px-4 py-2.5;
+    @apply bg-transparent;
+    @apply text-sm text-gray-900 dark:text-gray-100;
+    @apply placeholder-gray-500 dark:placeholder-gray-400;
+    @apply focus:outline-none focus:bg-white dark:focus:bg-gray-800/50;
+    @apply transition-colors duration-150;
+}
+
+.ss-search input::placeholder {
+    @apply font-normal;
+}
+
+/* Search icon (if added via custom template) */
+.ss-search::before {
+    content: '';
+    @apply absolute left-3 top-1/2 -translate-y-1/2;
+    @apply w-4 h-4;
+    @apply pointer-events-none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236b7280'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z'%3E%3C/path%3E%3C/svg%3E");
+    background-size: contain;
+}
+
+.dark .ss-search::before {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%239ca3af'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z'%3E%3C/path%3E%3C/svg%3E");
+}
+
+/* ========================================
+   OPTIONS LIST
+   ======================================== */
+.ss-list {
+    @apply py-1 overflow-y-auto;
+    @apply max-h-60;
+    scrollbar-width: thin;
+    scrollbar-color: theme('colors.gray.300') transparent;
+}
+
+.dark .ss-list {
+    scrollbar-color: theme('colors.gray.600') transparent;
+}
+
+.ss-list::-webkit-scrollbar {
+    @apply w-2;
+}
+
+.ss-list::-webkit-scrollbar-track {
+    @apply bg-transparent;
+}
+
+.ss-list::-webkit-scrollbar-thumb {
+    @apply bg-gray-300 dark:bg-gray-600 rounded-full;
+}
+
+.ss-list::-webkit-scrollbar-thumb:hover {
+    @apply bg-gray-400 dark:bg-gray-500;
+}
+
+/* Option item */
+.ss-option {
+    @apply px-4 py-2.5;
+    @apply text-sm text-gray-900 dark:text-gray-100;
+    @apply cursor-pointer;
+    @apply transition-all duration-150;
+    @apply flex items-center justify-between;
+}
+
+.ss-option:not(.ss-disabled):hover {
+    background-color: var(--zf-select-option-hover);
+}
+
+/* Selected option */
+.ss-option.ss-selected {
+    background-color: var(--zf-select-option-selected);
+    @apply font-semibold;
+    @apply relative;
+}
+
+.ss-option.ss-selected::after {
+    content: '✓';
+    @apply text-blue-600 dark:text-blue-400;
+    @apply font-bold text-base;
+    @apply ml-2;
+}
+
+/* Highlighted (keyboard navigation) */
+.ss-option.ss-highlighted {
+    @apply outline outline-2 outline-blue-500 outline-offset-[-2px];
+    @apply bg-blue-50 dark:bg-blue-900/30;
+}
+
+/* Disabled option */
+.ss-option.ss-disabled {
+    @apply text-gray-400 dark:text-gray-600;
+    @apply cursor-not-allowed;
+    @apply bg-gray-50 dark:bg-gray-900/50;
+}
+
+/* Option with custom data attributes */
+.ss-option[data-badge]::before {
+    content: attr(data-badge);
+    @apply inline-flex items-center px-2 py-0.5 mr-2;
+    @apply text-xs font-medium rounded;
+    @apply bg-gray-200 dark:bg-gray-700;
+    @apply text-gray-700 dark:text-gray-300;
+}
+
+/* ========================================
+   SEARCH HIGHLIGHTING
+   ======================================== */
+.ss-search-highlight {
+    background-color: var(--zf-select-highlight);
+    @apply font-semibold px-0.5 rounded;
+}
+
+/* ========================================
+   LOADING STATE
+   ======================================== */
+.ss-content.ss-loading {
+    @apply pointer-events-none;
+}
+
+.ss-content.ss-loading::after {
+    content: '';
+    @apply absolute inset-0 flex items-center justify-center;
+    @apply bg-white/80 dark:bg-gray-800/80;
+    @apply backdrop-blur-sm;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath fill='%233B82F6' d='M12,1A11,11,0,1,0,23,12,11,11,0,0,0,12,1Zm0,19a8,8,0,1,1,8-8A8,8,0,0,1,12,20Z' opacity='.25'/%3E%3Cpath fill='%233B82F6' d='M12,4a8,8,0,0,1,7.89,6.7A1.53,1.53,0,0,0,21.38,12h0a1.5,1.5,0,0,0,1.48-1.75,11,11,0,0,0-21.72,0A1.5,1.5,0,0,0,2.62,12h0a1.53,1.53,0,0,0,1.49-1.3A8,8,0,0,1,12,4Z'%3E%3CanimateTransform attributeName='transform' dur='0.75s' repeatCount='indefinite' type='rotate' values='0 12 12;360 12 12'/%3E%3C/path%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+/* ========================================
+   EMPTY STATE
+   ======================================== */
+.ss-empty {
+    @apply px-4 py-8 text-center;
+    @apply text-gray-500 dark:text-gray-400;
+    @apply text-sm;
+}
+
+.ss-empty::before {
+    content: '🔍';
+    @apply block text-3xl mb-2;
+}
+
+/* ========================================
+   ERROR STATE
+   ======================================== */
+.zenfleet-select-error {
+    @apply mt-1.5 text-xs;
+    @apply text-red-600 dark:text-red-400;
+    @apply flex items-center gap-1.5;
+    @apply animate-fade-in;
+}
+
+/* ========================================
+   OPEN STATE
+   ======================================== */
+.zenfleet-select-open {
+    /* Custom class added when dropdown is open */
+}
+
+/* ========================================
+   ANIMATIONS
+   ======================================== */
+@keyframes zenfleet-fade-in {
+    from {
+        opacity: 0;
+        transform: translateY(-8px) scale(0.98);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+@keyframes zenfleet-fade-in-up {
+    from {
+        opacity: 0;
+        transform: translateY(8px) scale(0.98);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.animate-fade-in {
+    animation: zenfleet-fade-in 0.2s ease-out;
+}
+
+/* ========================================
+   RESPONSIVE DESIGN
+   ======================================== */
+@media (max-width: 640px) {
+    .ss-content {
+        @apply max-h-56;
+    }
+
+    .ss-list {
+        @apply max-h-48;
+    }
+
+    .ss-option,
+    .ss-search input {
+        @apply py-3;
+        @apply text-base; /* Prevent zoom on iOS */
+    }
+
+    .ss-single-selected,
+    .ss-multi-selected {
+        @apply py-3;
+    }
+}
+
+/* Touch device optimizations */
+@media (hover: none) and (pointer: coarse) {
+    .ss-option {
+        @apply py-3;
+        min-height: 44px; /* iOS touch target */
+    }
+
+    .ss-value .ss-value-delete {
+        @apply p-1; /* Larger touch target */
+    }
+}
+
+/* ========================================
+   PRINT STYLES
+   ======================================== */
+@media print {
+    .ss-content,
+    .ss-arrow,
+    .ss-value-delete {
+        display: none !important;
+    }
+
+    .ss-single-selected,
+    .ss-multi-selected {
+        @apply border-gray-400 shadow-none !important;
+    }
+
+    .ss-value {
+        @apply bg-gray-200 text-gray-900 !important;
+    }
+}
+
+/* ========================================
+   ACCESSIBILITY ENHANCEMENTS
+   ======================================== */
+
+/* Focus visible for keyboard navigation */
+.ss-single-selected:focus-visible,
+.ss-multi-selected:focus-visible,
+.ss-option:focus-visible {
+    @apply outline-2 outline-blue-500 outline-offset-2;
+}
+
+/* Reduce motion for users who prefer it */
+@media (prefers-reduced-motion: reduce) {
+    .ss-single-selected,
+    .ss-multi-selected,
+    .ss-option,
+    .ss-arrow,
+    .ss-content {
+        @apply transition-none !important;
+        animation: none !important;
+    }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+    .ss-single-selected,
+    .ss-multi-selected {
+        @apply border-2 !important;
+    }
+
+    .ss-option.ss-selected::after {
+        content: '✓';
+        @apply font-black;
+    }
+}
+
+/* ========================================
+   UTILITY CLASSES
+   ======================================== */
+
+/* Compact size variant */
+.zenfleet-select-compact .ss-single-selected,
+.zenfleet-select-compact .ss-multi-selected {
+    @apply py-1.5 text-xs;
+}
+
+.zenfleet-select-compact .ss-option {
+    @apply py-1.5 text-xs;
+}
+
+/* Large size variant */
+.zenfleet-select-lg .ss-single-selected,
+.zenfleet-select-lg .ss-multi-selected {
+    @apply py-3 text-base;
+}
+
+.zenfleet-select-lg .ss-option {
+    @apply py-3 text-base;
+}
+
+/* Success state */
+.zenfleet-select-success .ss-single-selected,
+.zenfleet-select-success .ss-multi-selected {
+    @apply border-green-500 ring-2 ring-green-500/20;
+}
+
+/* Error state */
+.zenfleet-select-error .ss-single-selected,
+.zenfleet-select-error .ss-multi-selected {
+    @apply border-red-500 ring-2 ring-red-500/20;
+}
+
+/* Warning state */
+.zenfleet-select-warning .ss-single-selected,
+.zenfleet-select-warning .ss-multi-selected {
+    @apply border-yellow-500 ring-2 ring-yellow-500/20;
+}

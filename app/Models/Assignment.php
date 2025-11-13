@@ -370,7 +370,10 @@ class Assignment extends Model
      */
     public function calculateStatus(): string
     {
-        if ($this->status === self::STATUS_CANCELLED) {
+        // Accéder directement à l'attribut pour éviter la récursion
+        $rawStatus = $this->attributes['status'] ?? null;
+        
+        if ($rawStatus === self::STATUS_CANCELLED) {
             return self::STATUS_CANCELLED;
         }
 
@@ -574,35 +577,45 @@ class Assignment extends Model
             $saved = $this->save();
 
             if ($saved) {
-                // 2. Libérer automatiquement le véhicule
+                // 2. Libérer automatiquement le véhicule avec synchronisation COMPLÈTE des statuts
                 if ($this->vehicle) {
-                    $this->vehicle->update([
+                    $vehicleUpdates = [
                         'is_available' => true,
                         'current_driver_id' => null,
                         'assignment_status' => 'available',
+                        'status_id' => 8, // ✅ FIX V2: ID direct du statut "Parking"
                         'last_assignment_end' => $this->end_datetime
-                    ]);
-                    
-                    \Log::info('Véhicule libéré automatiquement', [
+                    ];
+
+                    $this->vehicle->update($vehicleUpdates);
+
+                    \Log::info('Véhicule libéré automatiquement avec synchronisation complète', [
                         'vehicle_id' => $this->vehicle_id,
                         'registration' => $this->vehicle->registration_plate,
-                        'assignment_id' => $this->id
+                        'assignment_id' => $this->id,
+                        'status_id' => $availableVehicleStatus?->id,
+                        'status_name' => $availableVehicleStatus?->name
                     ]);
                 }
 
-                // 3. Libérer automatiquement le chauffeur
+                // 3. Libérer automatiquement le chauffeur avec synchronisation COMPLÈTE des statuts
                 if ($this->driver) {
-                    $this->driver->update([
+                    $driverUpdates = [
                         'is_available' => true,
                         'current_vehicle_id' => null,
                         'assignment_status' => 'available',
+                        'status_id' => 7, // ✅ FIX V2: ID direct du statut "Disponible"
                         'last_assignment_end' => $this->end_datetime
-                    ]);
-                    
-                    \Log::info('Chauffeur libéré automatiquement', [
+                    ];
+
+                    $this->driver->update($driverUpdates);
+
+                    \Log::info('Chauffeur libéré automatiquement avec synchronisation complète', [
                         'driver_id' => $this->driver_id,
                         'name' => $this->driver->full_name,
-                        'assignment_id' => $this->id
+                        'assignment_id' => $this->id,
+                        'status_id' => $availableDriverStatus?->id,
+                        'status_name' => $availableDriverStatus?->name
                     ]);
                 }
 

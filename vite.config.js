@@ -20,18 +20,22 @@ export default defineConfig({
         emptyOutDir: true,
         manifest: 'manifest.json',
         sourcemap: false,
-        
+
         rollupOptions: {
             output: {
                 manualChunks: {
                     'vendor-common': ['axios'],
-                    'ui-public': ['alpinejs', 'tom-select', 'flatpickr', 'sortablejs'],
+                    'ui-public': ['alpinejs', 'slim-select', 'flatpickr', 'sortablejs'],
                     'charts': ['apexcharts'],
                 },
             },
         },
-        
+
         chunkSizeWarningLimit: 600,
+    },
+
+    optimizeDeps: {
+        include: ['slim-select', 'alpinejs', 'axios', 'apexcharts', 'flatpickr', 'sortablejs']
     },
     
     server: {

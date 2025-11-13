@@ -123,6 +123,10 @@ class AssignmentObserver
     /**
      * Événement déclenché après la création
      *
+     * CORRECTION CRITIQUE V3 : Synchronisation des ressources lors de la création
+     * - Si l'affectation est créée déjà terminée (dates passées), libérer les ressources
+     * - Si l'affectation est active ou planifiée, verrouiller les ressources
+     *
      * @param Assignment $assignment
      * @return void
      */
@@ -136,6 +140,43 @@ class AssignmentObserver
             'start_datetime' => $assignment->start_datetime->toIso8601String(),
             'end_datetime' => $assignment->end_datetime?->toIso8601String(),
         ]);
+        
+        // ✅ CORRECTION CRITIQUE: Synchroniser les ressources selon le statut initial
+        switch ($assignment->status) {
+            case Assignment::STATUS_COMPLETED:
+                // Affectation créée déjà terminée (dates passées)
+                $this->releaseResourcesIfNoOtherActiveAssignment($assignment);
+                Log::info('[AssignmentObserver] 📦 Ressources auto-libérées (affectation historique)', [
+                    'assignment_id' => $assignment->id,
+                    'vehicle_id' => $assignment->vehicle_id,
+                    'driver_id' => $assignment->driver_id
+                ]);
+                break;
+                
+            case Assignment::STATUS_ACTIVE:
+            case Assignment::STATUS_SCHEDULED:
+                // Affectation active ou planifiée - verrouiller les ressources
+                $this->lockResources($assignment);
+                Log::info('[AssignmentObserver] 🔒 Ressources verrouillées pour affectation ' . $assignment->status, [
+                    'assignment_id' => $assignment->id,
+                    'vehicle_id' => $assignment->vehicle_id,
+                    'driver_id' => $assignment->driver_id
+                ]);
+                break;
+                
+            case Assignment::STATUS_CANCELLED:
+                // Rien à faire pour une affectation annulée dès la création
+                Log::info('[AssignmentObserver] ⚠️ Affectation créée avec statut annulé', [
+                    'assignment_id' => $assignment->id
+                ]);
+                break;
+                
+            default:
+                Log::warning('[AssignmentObserver] ⚠️ Statut inconnu lors de la création', [
+                    'assignment_id' => $assignment->id,
+                    'status' => $assignment->status
+                ]);
+        }
     }
 
     /**
@@ -206,16 +247,19 @@ class AssignmentObserver
             ->exists();
 
         if (!$hasOtherVehicleAssignment && $assignment->vehicle) {
+            // 🔧 FIX ENTERPRISE V2: Synchronisation complète avec status_id
             $assignment->vehicle->update([
                 'is_available' => true,
                 'current_driver_id' => null,
                 'assignment_status' => 'available',
+                'status_id' => 8, // ✅ CORRECTION: Statut "Parking" pour véhicule disponible
                 'last_assignment_end' => now()
             ]);
 
-            Log::info('[AssignmentObserver] ✅ Véhicule libéré automatiquement', [
+            Log::info('[AssignmentObserver] ✅ Véhicule libéré automatiquement avec synchronisation complète', [
                 'vehicle_id' => $assignment->vehicle_id,
-                'assignment_id' => $assignment->id
+                'assignment_id' => $assignment->id,
+                'status_id_updated' => 8
             ]);
         }
 

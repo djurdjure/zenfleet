@@ -4,8 +4,10 @@
  */
 
 /* ✅ Import des librairies tierces EN PREMIER */
-@import 'tom-select/dist/css/tom-select.css';
 @import 'flatpickr/dist/flatpickr.min.css';
+
+/* ✅ Import ZenFleet Select (SlimSelect wrapper) */
+@import './components/zenfleet-select.css';
 
 /* ✅ Import des styles personnalisés pour les statuts de véhicules */
 @import './vehicle-status.css';
