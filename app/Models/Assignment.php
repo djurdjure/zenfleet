@@ -513,135 +513,67 @@ class Assignment extends Model
     }
 
     /**
-     * 🏁 Terminer l'affectation - Enterprise-Grade ULTRA-PRO
+     * 🏁 Terminer l'affectation - Enterprise-Grade ULTRA-PRO V2
      *
-     * WORKFLOW AVANCÉ SURPASSANT FLEETIO/SAMSARA :
-     * 1. Valide que l'affectation peut être terminée
-     * 2. Met à jour end_datetime, end_mileage, notes avec traçabilité complète
-     * 3. Libère automatiquement le véhicule et le chauffeur
-     * 4. Met à jour les historiques de kilométrage
-     * 5. Dispatch événements pour notifications temps réel
-     * 6. Crée entrées d'audit pour conformité
+     * 🎯 VERSION RÉVOLUTIONNAIRE avec AssignmentTerminationService
+     *
+     * Cette nouvelle version délègue la terminaison au service centralisé atomique
+     * qui garantit une cohérence parfaite et une libération intelligente des ressources.
+     *
+     * AVANTAGES SURPASSANT FLEETIO/SAMSARA :
+     * 1. Transaction ACID garantie avec rollback automatique
+     * 2. Vérification intelligente des autres affectations actives
+     * 3. Libération conditionnelle des ressources (évite les conflits multi-affectations)
+     * 4. Synchronisation automatique des status_id
+     * 5. Gestion complète des événements et audit trail
+     * 6. Support avancé du kilométrage et des notes
+     * 7. Détection et prévention des zombies
      *
      * @param Carbon|null $endTime Date/heure de fin (défaut: maintenant)
      * @param int|null $endMileage Kilométrage de fin
      * @param string|null $notes Notes de fin
-     * @return bool Succès de la sauvegarde
+     * @return bool Succès de la terminaison
      */
     public function end(?Carbon $endTime = null, ?int $endMileage = null, ?string $notes = null): bool
     {
         if (!$this->canBeEnded()) {
-            \Log::warning('Tentative de terminaison d\'affectation non autorisée', [
+            \Log::warning('[Assignment::end] Tentative de terminaison non autorisée', [
                 'assignment_id' => $this->id,
+                'status' => $this->status,
                 'user_id' => auth()->id()
             ]);
             return false;
         }
 
-        // Transaction pour garantir l'intégrité des données
-        return \DB::transaction(function () use ($endTime, $endMileage, $notes) {
-            // 1. Mettre à jour l'affectation
-            $this->end_datetime = $endTime ?? now();
-            $this->ended_at = now();
-            $this->ended_by_user_id = auth()->id();
+        try {
+            // 🎯 Utiliser le service de terminaison atomique enterprise-grade
+            $service = app(\App\Services\AssignmentTerminationService::class);
 
-            if ($endMileage) {
-                $this->end_mileage = $endMileage;
-                
-                // Mettre à jour le kilométrage du véhicule si fourni
-                if ($this->vehicle) {
-                    $this->vehicle->current_mileage = $endMileage;
-                    $this->vehicle->save();
-                    
-                    // Créer une entrée d'historique de kilométrage
-                    \App\Models\MileageHistory::create([
-                        'vehicle_id' => $this->vehicle_id,
-                        'driver_id' => $this->driver_id,
-                        'assignment_id' => $this->id,
-                        'mileage_value' => $endMileage,
-                        'recorded_at' => $this->end_datetime,
-                        'type' => 'assignment_end',
-                        'notes' => 'Kilométrage de fin d\'affectation',
-                        'created_by' => auth()->id(),
-                        'organization_id' => $this->organization_id
-                    ]);
-                }
-            }
+            $result = $service->terminateAssignment(
+                $this,
+                $endTime,
+                $endMileage,
+                $notes,
+                auth()->id()
+            );
 
-            if ($notes) {
-                $this->notes = $this->notes ?
-                    $this->notes . "\n\n[" . now()->format('d/m/Y H:i') . "] Terminaison: " . $notes :
-                    "[" . now()->format('d/m/Y H:i') . "] Terminaison: " . $notes;
-            }
+            \Log::info('[Assignment::end] Terminaison réussie via AssignmentTerminationService', [
+                'assignment_id' => $this->id,
+                'actions' => $result['actions'],
+                'success' => $result['success']
+            ]);
 
-            $saved = $this->save();
+            return $result['success'];
 
-            if ($saved) {
-                // 2. Libérer automatiquement le véhicule avec synchronisation COMPLÈTE des statuts
-                if ($this->vehicle) {
-                    $vehicleUpdates = [
-                        'is_available' => true,
-                        'current_driver_id' => null,
-                        'assignment_status' => 'available',
-                        'status_id' => 8, // ✅ FIX V2: ID direct du statut "Parking"
-                        'last_assignment_end' => $this->end_datetime
-                    ];
+        } catch (\Exception $e) {
+            \Log::error('[Assignment::end] Erreur lors de la terminaison', [
+                'assignment_id' => $this->id,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
 
-                    $this->vehicle->update($vehicleUpdates);
-
-                    \Log::info('Véhicule libéré automatiquement avec synchronisation complète', [
-                        'vehicle_id' => $this->vehicle_id,
-                        'registration' => $this->vehicle->registration_plate,
-                        'assignment_id' => $this->id,
-                        'status_id' => $availableVehicleStatus?->id,
-                        'status_name' => $availableVehicleStatus?->name
-                    ]);
-                }
-
-                // 3. Libérer automatiquement le chauffeur avec synchronisation COMPLÈTE des statuts
-                if ($this->driver) {
-                    $driverUpdates = [
-                        'is_available' => true,
-                        'current_vehicle_id' => null,
-                        'assignment_status' => 'available',
-                        'status_id' => 7, // ✅ FIX V2: ID direct du statut "Disponible"
-                        'last_assignment_end' => $this->end_datetime
-                    ];
-
-                    $this->driver->update($driverUpdates);
-
-                    \Log::info('Chauffeur libéré automatiquement avec synchronisation complète', [
-                        'driver_id' => $this->driver_id,
-                        'name' => $this->driver->full_name,
-                        'assignment_id' => $this->id,
-                        'status_id' => $availableDriverStatus?->id,
-                        'status_name' => $availableDriverStatus?->name
-                    ]);
-                }
-
-                // 4. Dispatcher les événements pour notifications temps réel
-                event(new \App\Events\AssignmentEnded($this, 'manual', auth()->id()));
-                event(new \App\Events\VehicleStatusChanged($this->vehicle, 'available'));
-                event(new \App\Events\DriverStatusChanged($this->driver, 'available'));
-
-                // 5. Créer entrée d'audit pour traçabilité complète
-                // Note: Décommenter si le package spatie/laravel-activitylog est installé
-                // activity()
-                //     ->performedOn($this)
-                //     ->causedBy(auth()->user())
-                //     ->withProperties([
-                //         'action' => 'assignment_ended',
-                //         'end_datetime' => $this->end_datetime->toISOString(),
-                //         'end_mileage' => $endMileage,
-                //         'vehicle_id' => $this->vehicle_id,
-                //         'driver_id' => $this->driver_id,
-                //         'notes' => $notes
-                //     ])
-                //     ->log('Affectation terminée manuellement');
-            }
-
-            return $saved;
-        });
+            return false;
+        }
     }
 
     /**

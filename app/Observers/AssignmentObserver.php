@@ -247,19 +247,19 @@ class AssignmentObserver
             ->exists();
 
         if (!$hasOtherVehicleAssignment && $assignment->vehicle) {
-            // 🔧 FIX ENTERPRISE V2: Synchronisation complète avec status_id
             $assignment->vehicle->update([
                 'is_available' => true,
                 'current_driver_id' => null,
                 'assignment_status' => 'available',
-                'status_id' => 8, // ✅ CORRECTION: Statut "Parking" pour véhicule disponible
                 'last_assignment_end' => now()
             ]);
 
+            // ✅ SYNCHRONISATION AUTOMATIQUE via le service
+            app(\App\Services\ResourceStatusSynchronizer::class)->syncVehicleStatus($assignment->vehicle->fresh());
+
             Log::info('[AssignmentObserver] ✅ Véhicule libéré automatiquement avec synchronisation complète', [
                 'vehicle_id' => $assignment->vehicle_id,
-                'assignment_id' => $assignment->id,
-                'status_id_updated' => 8
+                'assignment_id' => $assignment->id
             ]);
         }
 
@@ -271,24 +271,19 @@ class AssignmentObserver
             ->exists();
 
         if (!$hasOtherDriverAssignment && $assignment->driver) {
-            // 🔧 FIX ENTERPRISE-GRADE: Synchronisation complète avec status_id (statut métier)
-            // Récupérer l'ID du statut "Disponible" depuis la table driver_statuses
-            $disponibleStatusId = \DB::table('driver_statuses')
-                ->where('name', 'Disponible')
-                ->value('id') ?? 7; // Fallback sur ID 7 si non trouvé
-
             $assignment->driver->update([
                 'is_available' => true,
                 'current_vehicle_id' => null,
                 'assignment_status' => 'available',
-                'status_id' => $disponibleStatusId,  // ✅ CORRECTION: Synchroniser le statut métier
                 'last_assignment_end' => now()
             ]);
 
-            Log::info('[AssignmentObserver] ✅ Chauffeur libéré automatiquement', [
+            // ✅ SYNCHRONISATION AUTOMATIQUE via le service
+            app(\App\Services\ResourceStatusSynchronizer::class)->syncDriverStatus($assignment->driver->fresh());
+
+            Log::info('[AssignmentObserver] ✅ Chauffeur libéré automatiquement avec synchronisation complète', [
                 'driver_id' => $assignment->driver_id,
-                'assignment_id' => $assignment->id,
-                'status_id_updated' => $disponibleStatusId
+                'assignment_id' => $assignment->id
             ]);
         }
     }
@@ -308,30 +303,28 @@ class AssignmentObserver
                 'assignment_status' => 'assigned'
             ]);
 
-            Log::info('[AssignmentObserver] 🔒 Véhicule verrouillé automatiquement', [
+            // ✅ SYNCHRONISATION AUTOMATIQUE via le service
+            app(\App\Services\ResourceStatusSynchronizer::class)->syncVehicleStatus($assignment->vehicle->fresh());
+
+            Log::info('[AssignmentObserver] 🔒 Véhicule verrouillé automatiquement avec synchronisation', [
                 'vehicle_id' => $assignment->vehicle_id,
                 'assignment_id' => $assignment->id
             ]);
         }
 
         if ($assignment->driver) {
-            // 🔧 FIX ENTERPRISE-GRADE: Synchronisation complète avec status_id (statut métier)
-            // Récupérer l'ID du statut "En mission" depuis la table driver_statuses
-            $enMissionStatusId = \DB::table('driver_statuses')
-                ->where('name', 'En mission')
-                ->value('id') ?? 8; // Fallback sur ID 8 si non trouvé
-
             $assignment->driver->update([
                 'is_available' => false,
                 'current_vehicle_id' => $assignment->vehicle_id,
-                'assignment_status' => 'assigned',
-                'status_id' => $enMissionStatusId  // ✅ CORRECTION: Synchroniser le statut métier
+                'assignment_status' => 'assigned'
             ]);
 
-            Log::info('[AssignmentObserver] 🔒 Chauffeur verrouillé automatiquement', [
+            // ✅ SYNCHRONISATION AUTOMATIQUE via le service
+            app(\App\Services\ResourceStatusSynchronizer::class)->syncDriverStatus($assignment->driver->fresh());
+
+            Log::info('[AssignmentObserver] 🔒 Chauffeur verrouillé automatiquement avec synchronisation', [
                 'driver_id' => $assignment->driver_id,
-                'assignment_id' => $assignment->id,
-                'status_id_updated' => $enMissionStatusId
+                'assignment_id' => $assignment->id
             ]);
         }
     }

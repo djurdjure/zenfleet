@@ -20,30 +20,13 @@ use Illuminate\Support\Facades\Log;
 class AssignmentController extends Controller
 {
     use ResourceAvailability;
-        public function __construct()
+    public function __construct()
     {
         $this->middleware('auth');
-        
-        // 🛡️ SYSTÈME DE PERMISSIONS ENTERPRISE
-        // Utilisation de vérifications manuelles pour un contrôle précis
-        // Les permissions sont vérifiées dans chaque méthode individuellement
-        // Cela permet une granularité maximale et évite les conflits
-        
-        // Option de debug des permissions (activé en dev)
-        if (config('app.debug')) {
-            $this->middleware(function ($request, $next) {
-                if ($request->user()) {
-                    \Log::debug('Assignment Controller Access', [
-                        'user' => $request->user()->email,
-                        'method' => $request->method(),
-                        'path' => $request->path(),
-                        'can_create' => $request->user()->can('create assignments'),
-                        'all_permissions' => $request->user()->getAllPermissions()->pluck('name')
-                    ]);
-                }
-                return $next($request);
-            });
-        }
+
+        // NOTE: authorizeResource désactivé car il entre en conflit avec les vérifications manuelles
+        // On utilise des vérifications manuelles explicites pour plus de contrôle
+        // $this->authorizeResource(Assignment::class, 'assignment');
     }
 
     /**
@@ -115,46 +98,9 @@ class AssignmentController extends Controller
     /**
      * Affiche le formulaire de création.
      */
-        /**
-     * Affiche le formulaire de création - ENTERPRISE EDITION
-     * 
-     * @throws \Illuminate\Auth\Access\AuthorizationException
-     */
     public function create(): View
     {
-        // 🛡️ VÉRIFICATION DES PERMISSIONS ENTERPRISE
-        // Vérification explicite avec gestion d'erreur détaillée
-        
-        $user = auth()->user();
-        
-        // Log pour debug (uniquement en dev)
-        if (config('app.debug')) {
-            \Log::info('Assignment Create Access Attempt', [
-                'user' => $user->email,
-                'organization' => $user->organization_id,
-                'roles' => $user->roles->pluck('name'),
-                'has_permission' => $user->can('create assignments')
-            ]);
-        }
-        
-        // Vérification multiple pour compatibilité maximale
-        $canCreate = $user->can('create assignments') || 
-                     $user->can('assignments.create') ||
-                     $user->hasPermissionTo('create assignments') ||
-                     $user->hasPermissionTo('assignments.create');
-        
-        if (!$canCreate) {
-            // Log détaillé de l'échec
-            \Log::warning('Assignment Create Permission Denied', [
-                'user' => $user->email,
-                'permissions' => $user->getAllPermissions()->pluck('name'),
-                'roles' => $user->roles->pluck('name')
-            ]);
-            
-            // Message d'erreur enterprise avec instructions
-            abort(403, 'Accès non autorisé. Vous n\'avez pas la permission de créer des affectations. ' .
-                       'Contactez votre administrateur pour obtenir la permission "create assignments".');
-        }
+        $this->authorize('create assignments');
 
         // ✅ NOUVELLE LOGIQUE ENTERPRISE: Utilisation du trait ResourceAvailability
         // Source de vérité unique: is_available + assignment_status
@@ -168,15 +114,15 @@ class AssignmentController extends Controller
             ->with(['vehicle', 'driver'])
             ->get();
 
-        // Debug pour diagnostique (uniquement en dev)
-        if (config('app.debug')) {
-            \Log::info('Assignment Create Data', [
-                'user_org_id' => $user->organization_id,
-                'vehicles_count' => $availableVehicles->count(),
-                'drivers_count' => $availableDrivers->count(),
-                'active_assignments_count' => $activeAssignments->count()
-            ]);
-        }
+        // Debug pour diagnostique (à retirer en production)
+        \Log::info('Ressources disponibles pour affectation', [
+            'user_org_id' => auth()->user()->organization_id,
+            'vehicles_count' => $availableVehicles->count(),
+            'drivers_count' => $availableDrivers->count(),
+            'active_assignments_count' => $activeAssignments->count(),
+            'vehicles' => $availableVehicles->pluck('registration_plate'),
+            'drivers' => $availableDrivers->pluck('first_name', 'last_name')
+        ]);
 
         // Utiliser la vue wizard qui est la vue entreprise moderne pour la création
         return view('admin.assignments.wizard', compact('availableVehicles', 'availableDrivers', 'activeAssignments'));
@@ -706,39 +652,5 @@ class AssignmentController extends Controller
             ->sum('duration_hours');
 
         return $totalPeriodHours > 0 ? round(($usedHours / $totalPeriodHours) * 100, 2) : 0;
-    }
-
-
-    /**
-     * 🛡️ Helper Enterprise pour vérification des permissions
-     * 
-     * @param string $permission
-     * @param string $errorMessage
-     * @return void
-     * @throws \Illuminate\Auth\Access\AuthorizationException
-     */
-    private function checkPermissionEnterprise(string $permission, string $errorMessage = null): void
-    {
-        $user = auth()->user();
-        
-        // Vérifications multiples pour compatibilité
-        $hasPermission = $user->can($permission) || 
-                        $user->hasPermissionTo($permission) ||
-                        $user->can(str_replace(' ', '.', $permission)) ||
-                        $user->hasPermissionTo(str_replace(' ', '.', $permission));
-        
-        if (!$hasPermission) {
-            $message = $errorMessage ?? "Vous n'avez pas la permission: {$permission}";
-            
-            if (config('app.debug')) {
-                \Log::warning('Permission Denied', [
-                    'user' => $user->email,
-                    'required_permission' => $permission,
-                    'user_permissions' => $user->getAllPermissions()->pluck('name')
-                ]);
-            }
-            
-            abort(403, $message);
-        }
     }
 }

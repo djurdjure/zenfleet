@@ -49,6 +49,12 @@ class AssignmentForm extends Component
     #[Validate('nullable|string|max:1000')]
     public string $notes = '';
 
+    // 🆕 KILOMÉTRAGE INITIAL
+    #[Validate('nullable|integer|min:0')]
+    public ?int $start_mileage = null;
+
+    public ?int $current_vehicle_mileage = null;
+
     // État de validation
     public array $conflicts = [];
     public array $suggestions = [];
@@ -95,6 +101,20 @@ class AssignmentForm extends Component
      */
     public function updatedVehicleId()
     {
+        // Charger le kilométrage actuel du véhicule sélectionné
+        if ($this->vehicle_id) {
+            $vehicle = Vehicle::find($this->vehicle_id);
+            if ($vehicle) {
+                $this->current_vehicle_mileage = $vehicle->current_mileage;
+                // Pré-remplir le kilométrage de départ si vide
+                if ($this->start_mileage === null && $vehicle->current_mileage) {
+                    $this->start_mileage = $vehicle->current_mileage;
+                }
+            }
+        } else {
+            $this->current_vehicle_mileage = null;
+        }
+
         $this->validateAssignment();
     }
 
@@ -119,7 +139,7 @@ class AssignmentForm extends Component
     public function validateAssignment()
     {
         if (empty($this->vehicle_id) || empty($this->driver_id) || empty($this->start_datetime)) {
-            $this->resetValidation();
+            $this->resetConflictsValidation();
             return;
         }
 
@@ -257,6 +277,7 @@ class AssignmentForm extends Component
                 'driver_id' => (int) $this->driver_id,
                 'start_datetime' => Carbon::parse($this->start_datetime),
                 'end_datetime' => $this->end_datetime ? Carbon::parse($this->end_datetime) : null,
+                'start_mileage' => $this->start_mileage,
                 'reason' => $this->reason ?: null,
                 'notes' => $this->notes ?: null,
             ];
@@ -280,9 +301,11 @@ class AssignmentForm extends Component
             if (!$this->isEditing) {
                 $this->reset([
                     'vehicle_id', 'driver_id', 'start_datetime',
-                    'end_datetime', 'reason', 'notes', 'forceCreate'
+                    'end_datetime', 'start_mileage', 'reason', 'notes', 'forceCreate'
                 ]);
-                $this->resetValidation();
+                $this->resetConflictsValidation();
+                parent::resetValidation(); // Réinitialiser aussi les erreurs de validation Livewire
+                $this->current_vehicle_mileage = null;
             }
 
         } catch (\Exception $e) {
@@ -315,8 +338,14 @@ class AssignmentForm extends Component
         $this->driver_id = (string) $assignment->driver_id;
         $this->start_datetime = $assignment->start_datetime->format('Y-m-d\TH:i');
         $this->end_datetime = $assignment->end_datetime?->format('Y-m-d\TH:i') ?? '';
+        $this->start_mileage = $assignment->start_mileage;
         $this->reason = $assignment->reason ?? '';
         $this->notes = $assignment->notes ?? '';
+
+        // Charger le kilométrage actuel du véhicule
+        if ($assignment->vehicle) {
+            $this->current_vehicle_mileage = $assignment->vehicle->current_mileage;
+        }
     }
 
     private function initializeNewAssignment()
@@ -363,7 +392,11 @@ class AssignmentForm extends Component
             ->get();
     }
 
-    private function resetValidation()
+    /**
+     * Réinitialise l'état de validation des conflits et suggestions
+     * Note: Ne pas confondre avec resetValidation() native de Livewire
+     */
+    protected function resetConflictsValidation()
     {
         $this->conflicts = [];
         $this->suggestions = [];

@@ -1,30 +1,33 @@
 @extends('layouts.admin.catalyst')
 
-@section('title', 'Nouvelle Affectation - Enterprise')
+@section('title', 'Nouvelle Affectation')
 
 @section('content')
 {{-- ====================================================================
- 🚀 ASSIGNMENT WIZARD ULTRA-PRO - SYSTÈME ENTERPRISE-GRADE
- ====================================================================
- Interface révolutionnaire surpassant Fleetio, Samsara et Verizon Connect:
- - Architecture Single Page Application (SPA) optimisée
- - Intelligence Artificielle pour suggestions automatiques
- - Validation temps réel avec prévention des conflits
- - Changement automatique des statuts en cascade
- - Performance < 100ms avec cache Redis
- - Design system cohérent avec l'application
+🎯 PAGE CRÉATION AFFECTATION V2 - ULTRA-PROFESSIONAL ENTERPRISE GRADE
+====================================================================
 
- @version 3.0-Enterprise-Ultra-Pro
- @since 2025-11-09
- ==================================================================== --}}
+Design surpassant Fleetio, Samsara et Verizon Connect:
+✨ Design épuré inspiré de la page show
+✨ SlimSelect pour sélecteurs professionnels
+✨ Kilométrage initial auto-chargé
+✨ Toasts optimisés sans texte inutile
+✨ Validation temps réel avec feedback visuel
+✨ Layout responsive et moderne
+
+@version 2.0-Enterprise-Grade
+@since 2025-11-14
+==================================================================== --}}
 
 <section class="bg-gray-50 min-h-screen">
-    {{-- Header Enterprise avec breadcrumb et métriques temps réel --}}
+    {{-- ===============================================
+    HEADER AVEC BREADCRUMB
+    =============================================== --}}
     <div class="bg-white border-b border-gray-200 shadow-sm">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="py-4">
-                {{-- Breadcrumb professionnel --}}
-                <nav class="flex items-center space-x-2 text-sm text-gray-500 mb-3">
+                {{-- Breadcrumb --}}
+                <nav class="flex items-center space-x-2 text-sm text-gray-500 mb-3" aria-label="Breadcrumb">
                     <a href="{{ route('admin.dashboard') }}" class="hover:text-gray-700 transition-colors">
                         <x-iconify icon="lucide:home" class="w-4 h-4" />
                     </a>
@@ -36,57 +39,48 @@
                     <span class="text-gray-900 font-medium">Nouvelle Affectation</span>
                 </nav>
 
-                {{-- Header principal avec actions --}}
+                {{-- Header --}}
                 <div class="flex items-center justify-between">
                     <div>
                         <h1 class="text-2xl font-bold text-gray-900 flex items-center gap-2.5">
                             <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg flex items-center justify-center shadow-lg">
-                                <x-iconify icon="lucide:git-branch-plus" class="w-6 h-6 text-white" />
+                                <x-iconify icon="lucide:clipboard-check" class="w-6 h-6 text-white" />
                             </div>
-                            Wizard d'Affectation Intelligent
+                            Nouvelle Affectation
                         </h1>
                         <p class="text-sm text-gray-600 mt-1 ml-12.5">
-                            Système d'affectation nouvelle génération avec IA et validation temps réel
+                            Créez une nouvelle affectation véhicule ↔ chauffeur avec validation temps réel
                         </p>
                     </div>
 
-                    {{-- Bouton retour stylisé --}}
+                    {{-- Bouton retour --}}
                     <a href="{{ route('admin.assignments.index') }}"
-                       class="inline-flex items-center gap-2 px-4 py-2.5 bg-white border border-gray-300 rounded-lg 
-                              hover:bg-gray-50 hover:shadow-md transition-all duration-200 text-sm font-medium">
+                       class="inline-flex items-center gap-2 px-4 py-2.5 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 hover:shadow-md transition-all duration-200 text-sm font-medium">
                         <x-iconify icon="lucide:arrow-left" class="w-4 h-4 text-gray-500" />
-                        <span>Retour</span>
+                        <span>Retour à la liste</span>
                     </a>
                 </div>
             </div>
         </div>
     </div>
 
-    {{-- Container principal avec le composant Livewire --}}
+    {{-- ===============================================
+    COMPOSANT LIVEWIRE FORMULAIRE
+    =============================================== --}}
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        @livewire('admin.assignment-wizard')
+        @livewire('assignment-form')
     </div>
 </section>
 @endsection
 
 @push('styles')
 <style>
-/* Optimisations pour le wizard */
-.assignment-wizard-card {
+/* Styles optimisés pour la page de création */
+.assignment-form-card {
     transition: all 0.2s ease;
 }
 
-.assignment-wizard-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-}
-
-.assignment-wizard-card.selected {
-    border-color: #3b82f6;
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-}
-
-/* Animation de chargement */
+/* Animation de loading */
 .loading-pulse {
     animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
@@ -96,10 +90,11 @@
     50% { opacity: 0.5; }
 }
 
-/* Print styles */
-@media print {
-    .no-print {
-        display: none !important;
+/* Responsive adjustments */
+@media (max-width: 640px) {
+    .max-w-7xl {
+        padding-left: 1rem;
+        padding-right: 1rem;
     }
 }
 </style>
@@ -107,26 +102,18 @@
 
 @push('scripts')
 <script>
-// Scripts additionnels si nécessaire
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('✅ Assignment Wizard loaded - Enterprise Grade');
-
-    // Écouter les événements Livewire
-    Livewire.on('assignment-created', (data) => {
-        console.log('✅ Assignment created:', data);
-
-        // Redirection optionnelle après 2 secondes
+// Listener pour les événements Livewire
+document.addEventListener('livewire:init', () => {
+    // Redirection après création réussie
+    Livewire.on('assignment-created', (event) => {
         setTimeout(() => {
-            // window.location.href = "{{ route('admin.assignments.index') }}";
+            window.location.href = '{{ route("admin.assignments.index") }}';
         }, 2000);
     });
 
-    Livewire.on('vehicle-selected', (data) => {
-        console.log('🚗 Vehicle selected:', data.vehicleId);
-    });
-
-    Livewire.on('driver-selected', (data) => {
-        console.log('👨‍💼 Driver selected:', data.driverId);
+    // Fermeture du formulaire (si modal)
+    Livewire.on('close-form', () => {
+        window.location.href = '{{ route("admin.assignments.index") }}';
     });
 });
 </script>
