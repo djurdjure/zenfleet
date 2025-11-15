@@ -83,8 +83,6 @@ class AssignmentForm extends Component
 
     public function mount(?Assignment $assignment = null)
     {
-        \Log::info('[SUBDIRECTORY AssignmentForm] mount() appelé - app/Livewire/Assignments/AssignmentForm.php');
-
         $this->assignment = $assignment;
         $this->isEdit = $assignment !== null;
 
@@ -92,8 +90,6 @@ class AssignmentForm extends Component
             $this->authorize('update', $assignment);
             $this->loadAssignmentData();
         } else {
-            // Log avant autorisation
-            \Log::info('[SUBDIRECTORY AssignmentForm] Tentative authorize create');
             $this->authorize('create', Assignment::class);
             $this->setDefaultValues();
         }

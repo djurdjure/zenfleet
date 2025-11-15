@@ -75,16 +75,12 @@ class AssignmentForm extends Component
 
     public function mount(?Assignment $assignment = null)
     {
-        \Log::info('[ROOT AssignmentForm] mount() appelé - app/Livewire/AssignmentForm.php');
-
         if ($assignment) {
             $this->assignment = $assignment;
             $this->isEditing = true;
             $this->authorize('update', $assignment);
             $this->fillFromAssignment($assignment);
         } else {
-            // Log avant autorisation
-            \Log::info('[ROOT AssignmentForm] Tentative authorize create');
             $this->authorize('create', Assignment::class);
             $this->initializeNewAssignment();
         }
@@ -340,7 +336,7 @@ class AssignmentForm extends Component
     {
         $this->vehicle_id = (string) $assignment->vehicle_id;
         $this->driver_id = (string) $assignment->driver_id;
-        $this->start_datetime = $assignment->start_datetime ? $assignment->start_datetime->format('Y-m-d\TH:i') : now()->format('Y-m-d\TH:i');
+        $this->start_datetime = $assignment->start_datetime->format('Y-m-d\TH:i');
         $this->end_datetime = $assignment->end_datetime?->format('Y-m-d\TH:i') ?? '';
         $this->start_mileage = $assignment->start_mileage;
         $this->reason = $assignment->reason ?? '';

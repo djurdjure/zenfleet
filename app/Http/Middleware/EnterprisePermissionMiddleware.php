@@ -54,16 +54,16 @@ class EnterprisePermissionMiddleware
         'admin.drivers.export' => 'view drivers', // Basé sur view
         'admin.drivers.import.*' => 'create drivers', // Basé sur create
 
-        // Affectations
-        'admin.assignments.index' => 'view assignments',
-        'admin.assignments.create' => 'create assignments',
-        'admin.assignments.store' => 'create assignments',
-        'admin.assignments.show' => 'view assignments',
-        'admin.assignments.edit' => 'edit assignments',
-        'admin.assignments.update' => 'edit assignments',
-        'admin.assignments.destroy' => 'view assignments', // Pas de delete assignment
-        'admin.assignments.end' => 'end assignments',
-        'admin.assignments.export' => 'view assignments',
+        // Affectations - FORMAT MODERNE (dot notation)
+        'admin.assignments.index' => 'assignments.view',
+        'admin.assignments.create' => 'assignments.create',
+        'admin.assignments.store' => 'assignments.create',
+        'admin.assignments.show' => 'assignments.view',
+        'admin.assignments.edit' => 'assignments.update',
+        'admin.assignments.update' => 'assignments.update',
+        'admin.assignments.destroy' => 'assignments.view', // Pas de delete assignment
+        'admin.assignments.end' => 'assignments.end',
+        'admin.assignments.export' => 'assignments.view',
 
         // Utilisateurs
         'admin.users.index' => 'view users',
@@ -349,6 +349,12 @@ class EnterprisePermissionMiddleware
             'create assignments' => 'Vous n\'avez pas l\'autorisation de créer des affectations.',
             'edit assignments' => 'Vous n\'avez pas l\'autorisation de modifier les affectations.',
             'end assignments' => 'Vous n\'avez pas l\'autorisation de terminer des affectations.',
+            // Format moderne (dot notation)
+            'assignments.view' => 'Vous n\'avez pas l\'autorisation de consulter les affectations.',
+            'assignments.create' => 'Vous n\'avez pas l\'autorisation de créer des affectations.',
+            'assignments.update' => 'Vous n\'avez pas l\'autorisation de modifier les affectations.',
+            'assignments.delete' => 'Vous n\'avez pas l\'autorisation de supprimer des affectations.',
+            'assignments.end' => 'Vous n\'avez pas l\'autorisation de terminer des affectations.',
             'view maintenance' => 'Vous n\'avez pas l\'autorisation de consulter la maintenance.',
             'manage maintenance plans' => 'Vous n\'avez pas l\'autorisation de gérer les plans de maintenance.',
             'view suppliers' => 'Vous n\'avez pas l\'autorisation de consulter les fournisseurs.',

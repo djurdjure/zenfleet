@@ -42,7 +42,8 @@ class AssignmentPolicy
      */
     public function create(User $user): bool
     {
-        return $user->can('create assignments');
+        return $user->can('assignments.create') ||
+               $user->hasRole(['Super Admin', 'Admin', 'Gestionnaire Flotte']);
     }
 
     /**
