@@ -1,132 +1,150 @@
 {{-- ====================================================================
-🎯 FORMULAIRE D'AFFECTATION V2 - ULTRA-PROFESSIONAL ENTERPRISE GRADE
+🎯 FORMULAIRE D'AFFECTATION V3 - ULTRA-PROFESSIONAL ENTERPRISE GRADE
 ====================================================================
 
 Design surpassant Fleetio, Samsara et Verizon Connect:
-✨ Design épuré inspiré de la page show
-✨ SlimSelect pour sélecteurs professionnels
-✨ Kilométrage initial auto-chargé
-✨ Toasts optimisés sans texte inutile
-✨ Layout responsive et moderne
+✨ Composants Blade uniformes (x-input, x-select, x-datepicker)
+✨ Icônes Iconify cohérentes avec le reste de l'application
+✨ Single-page (pas de multi-steps)
+✨ Gestion d'erreurs enterprise-grade
 ✨ Validation temps réel avec feedback visuel
+✨ Layout responsive et moderne
+✨ Kilométrage initial auto-chargé
+✨ Suggestions de créneaux intelligentes
 
-@version 2.0-Enterprise-Grade
-@since 2025-11-14
+@version 3.0-Enterprise-Grade
+@since 2025-11-15
 ==================================================================== --}}
 
-<div x-data="assignmentFormComponent()" class="bg-gray-50">
-    {{-- ===============================================
-    HEADER DU FORMULAIRE
-    =============================================== --}}
-    <div class="bg-white border-b border-gray-200 px-6 py-4">
-        <div class="flex items-center justify-between">
-            <div>
-                <h2 class="text-xl font-bold text-gray-900 flex items-center gap-2.5">
-                    <x-iconify icon="lucide:clipboard-check" class="w-6 h-6 text-blue-600" />
-                    {{ $isEditing ? 'Modifier l\'affectation' : 'Nouvelle affectation' }}
-                </h2>
-                <p class="mt-1 text-sm text-gray-600">
-                    {{ $isEditing ? 'Modifiez les informations de cette affectation véhicule ↔ chauffeur.' : 'Créez une nouvelle affectation pour assigner un véhicule à un chauffeur.' }}
-                </p>
+<div x-data="assignmentFormValidation()" class="bg-gray-50 min-h-screen py-8">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+        {{-- ===============================================
+        HEADER AVEC GRADIENT ET ICÔNE
+        =============================================== --}}
+        <div class="mb-6">
+            <div class="flex items-start gap-4">
+                {{-- Icône avec gradient box --}}
+                <div class="flex-shrink-0">
+                    <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-lg shadow-blue-500/30">
+                        <x-iconify icon="heroicons:clipboard-document-check" class="w-8 h-8 text-white" />
+                    </div>
+                </div>
+
+                {{-- Titre et description --}}
+                <div class="flex-1">
+                    <h1 class="text-2xl font-bold text-gray-900 mb-1 flex items-center gap-2.5">
+                        {{ $isEditing ? 'Modifier l\'Affectation' : 'Nouvelle Affectation' }}
+                    </h1>
+                    <p class="text-sm text-gray-600 leading-relaxed">
+                        {{ $isEditing
+                            ? 'Modifiez les informations de cette affectation véhicule ↔ chauffeur.'
+                            : 'Assignez un véhicule à un chauffeur pour une période donnée. Les conflits seront détectés automatiquement.'
+                        }}
+                    </p>
+                </div>
             </div>
         </div>
-    </div>
 
-    {{-- ===============================================
-    ALERTES DE VALIDATION
-    =============================================== --}}
-    @if($hasConflicts && !$forceCreate)
-        <div class="mx-6 mt-6 rounded-lg bg-red-50 border border-red-200 p-4" role="alert" aria-live="polite" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 transform -translate-y-2" x-transition:enter-end="opacity-100 transform translate-y-0">
-            <div class="flex">
-                <div class="flex-shrink-0">
-                    <x-iconify icon="lucide:alert-circle" class="w-5 h-5 text-red-600" />
-                </div>
-                <div class="ml-3 flex-1">
-                    <h3 class="text-sm font-semibold text-red-900">
-                        {{ count($conflicts) === 1 ? 'Conflit détecté' : count($conflicts) . ' conflits détectés' }}
-                    </h3>
-                    <div class="mt-2 text-sm text-red-800">
-                        <ul class="list-disc space-y-1.5 pl-5">
-                            @foreach($conflicts as $conflict)
-                                <li>
-                                    <strong class="font-medium">{{ $conflict['resource_label'] }}</strong>
-                                    déjà affecté du {{ $conflict['period']['start'] }} au {{ $conflict['period']['end'] }}
-                                    <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-red-100 text-red-800 ml-1">
-                                        {{ $conflict['status'] }}
-                                    </span>
-                                </li>
+        {{-- ===============================================
+        ALERTES GLOBALES DE VALIDATION
+        =============================================== --}}
+        @if ($errors->any())
+            <x-alert type="error" title="Erreurs de validation" dismissible class="mb-6">
+                Veuillez corriger les erreurs suivantes avant de continuer :
+                <ul class="mt-2 ml-5 list-disc text-sm space-y-1">
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </x-alert>
+        @endif
+
+        {{-- Alerte de conflits détectés --}}
+        @if($hasConflicts && !$forceCreate)
+            <x-alert type="error" title="{{ count($conflicts) === 1 ? 'Conflit détecté' : count($conflicts) . ' conflits détectés' }}" class="mb-6">
+                <ul class="mt-2 space-y-2 text-sm">
+                    @foreach($conflicts as $conflict)
+                        <li class="flex items-start gap-2">
+                            <x-iconify icon="heroicons:exclamation-circle" class="w-4 h-4 flex-shrink-0 mt-0.5" />
+                            <span>
+                                <strong class="font-medium">{{ $conflict['resource_label'] }}</strong>
+                                déjà affecté du {{ $conflict['period']['start'] }} au {{ $conflict['period']['end'] }}
+                                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-red-100 text-red-800 ml-1">
+                                    {{ $conflict['status'] }}
+                                </span>
+                            </span>
+                        </li>
+                    @endforeach
+                </ul>
+
+                {{-- Suggestions de créneaux --}}
+                @if(count($suggestions) > 0)
+                    <div class="mt-4 pt-4 border-t border-red-200">
+                        <h4 class="text-sm font-medium text-red-900 mb-2">Créneaux disponibles suggérés :</h4>
+                        <div class="flex flex-wrap gap-2">
+                            @foreach($suggestions as $index => $suggestion)
+                                <button
+                                    type="button"
+                                    wire:click="applySuggestion({{ $index }})"
+                                    class="inline-flex items-center gap-1.5 px-3 py-1.5 border border-red-300 text-sm font-medium rounded-lg text-red-800 bg-white hover:bg-red-50 transition-colors">
+                                    <x-iconify icon="heroicons:calendar-days" class="w-4 h-4" />
+                                    {{ $suggestion['description'] }}
+                                </button>
                             @endforeach
-                        </ul>
-                    </div>
-
-                    {{-- Suggestions de créneaux --}}
-                    @if(count($suggestions) > 0)
-                        <div class="mt-4 pt-4 border-t border-red-200">
-                            <h4 class="text-sm font-medium text-red-900 mb-2">Créneaux disponibles :</h4>
-                            <div class="flex flex-wrap gap-2">
-                                @foreach($suggestions as $index => $suggestion)
-                                    <button
-                                        type="button"
-                                        wire:click="applySuggestion({{ $index }})"
-                                        class="inline-flex items-center gap-1.5 px-3 py-1.5 border border-red-300 text-sm font-medium rounded-lg text-red-800 bg-white hover:bg-red-50 transition-colors">
-                                        <x-iconify icon="lucide:calendar-check" class="w-4 h-4" />
-                                        {{ $suggestion['description'] }}
-                                    </button>
-                                @endforeach
-                            </div>
                         </div>
-                    @endif
-
-                    {{-- Bouton forcer --}}
-                    <div class="mt-4">
-                        <button
-                            type="button"
-                            wire:click="toggleForceCreate"
-                            class="inline-flex items-center gap-2 px-3 py-2 border border-red-300 text-sm font-medium rounded-lg text-red-700 bg-white hover:bg-red-50 transition-colors shadow-sm">
-                            <x-iconify icon="lucide:alert-triangle" class="w-4 h-4" />
-                            Ignorer les conflits
-                        </button>
                     </div>
-                </div>
-            </div>
-        </div>
-    @endif
+                @endif
 
-    @if($forceCreate)
-        <div class="mx-6 mt-6 rounded-lg bg-yellow-50 border border-yellow-200 p-4" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 transform -translate-y-2" x-transition:enter-end="opacity-100 transform translate-y-0">
-            <div class="flex">
-                <div class="flex-shrink-0">
-                    <x-iconify icon="lucide:shield-alert" class="w-5 h-5 text-yellow-600" />
+                {{-- Bouton forcer --}}
+                <div class="mt-4">
+                    <button
+                        type="button"
+                        wire:click="toggleForceCreate"
+                        class="inline-flex items-center gap-2 px-3 py-2 border border-red-300 text-sm font-medium rounded-lg text-red-700 bg-white hover:bg-red-50 transition-colors shadow-sm">
+                        <x-iconify icon="heroicons:shield-exclamation" class="w-4 h-4" />
+                        Ignorer les conflits et continuer
+                    </button>
                 </div>
-                <div class="ml-3">
-                    <h3 class="text-sm font-semibold text-yellow-900">Mode force activé</h3>
-                    <p class="mt-1 text-sm text-yellow-800">Les conflits seront ignorés lors de la sauvegarde de cette affectation.</p>
-                </div>
-            </div>
-        </div>
-    @endif
+            </x-alert>
+        @endif
 
-    {{-- ===============================================
-    FORMULAIRE PRINCIPAL
-    =============================================== --}}
-    <form wire:submit="save" class="p-6">
-        <div class="bg-white rounded-lg border border-gray-200 shadow-sm">
-            <div class="p-6 space-y-6">
-                {{-- ===============================================
-                SECTION : VÉHICULE ET CHAUFFEUR
-                =============================================== --}}
-                <div>
-                    <h3 class="text-sm font-semibold text-gray-900 uppercase tracking-wider mb-4 flex items-center gap-2">
-                        <x-iconify icon="lucide:users" class="w-4 h-4 text-gray-500" />
-                        Ressources à affecter
-                    </h3>
+        {{-- Alerte mode force activé --}}
+        @if($forceCreate)
+            <x-alert type="warning" title="Mode force activé" class="mb-6">
+                <p class="text-sm">Les conflits seront ignorés lors de la sauvegarde de cette affectation.</p>
+                <button
+                    type="button"
+                    wire:click="toggleForceCreate"
+                    class="mt-2 inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-yellow-700 hover:text-yellow-800">
+                    <x-iconify icon="heroicons:x-mark" class="w-4 h-4" />
+                    Désactiver le mode force
+                </button>
+            </x-alert>
+        @endif
 
-                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {{-- ===============================================
+        FORMULAIRE PRINCIPAL
+        =============================================== --}}
+        <form wire:submit="save" class="space-y-6">
+            {{-- ===============================================
+            SECTION 1: RESSOURCES À AFFECTER
+            =============================================== --}}
+            <x-card>
+                <div class="space-y-6">
+                    <div>
+                        <h2 class="text-lg font-semibold text-gray-900 mb-1 flex items-center gap-2">
+                            <x-iconify icon="heroicons:users" class="w-5 h-5 text-blue-600" />
+                            Ressources à Affecter
+                        </h2>
+                        <p class="text-sm text-gray-600">Sélectionnez le véhicule et le chauffeur pour cette affectation.</p>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         {{-- Sélection Véhicule --}}
                         <div>
                             <label for="vehicle_id" class="block text-sm font-medium text-gray-700 mb-2">
                                 <div class="flex items-center gap-2">
-                                    <x-iconify icon="lucide:car" class="w-4 h-4 text-gray-500" />
+                                    <x-iconify icon="heroicons:truck" class="w-4 h-4 text-gray-500" />
                                     Véhicule
                                     <span class="text-red-500">*</span>
                                 </div>
@@ -147,16 +165,22 @@ Design surpassant Fleetio, Samsara et Verizon Connect:
                             </div>
                             @error('vehicle_id')
                                 <p class="mt-1.5 text-sm text-red-600 flex items-center gap-1">
-                                    <x-iconify icon="lucide:alert-circle" class="w-4 h-4" />
+                                    <x-iconify icon="heroicons:exclamation-circle" class="w-4 h-4" />
                                     {{ $message }}
                                 </p>
                             @enderror
+                            <p class="mt-1.5 text-xs text-gray-500">Sélectionnez le véhicule à affecter</p>
 
                             {{-- Indicateur kilométrage actuel --}}
                             @if($current_vehicle_mileage)
-                                <div class="mt-2 flex items-center gap-2 text-sm text-gray-600">
-                                    <x-iconify icon="lucide:gauge" class="w-4 h-4 text-purple-600" />
-                                    <span>Kilométrage actuel : <strong class="font-semibold text-gray-900">{{ number_format($current_vehicle_mileage) }} km</strong></span>
+                                <div class="mt-3 flex items-start gap-2.5 p-3 bg-purple-50 border border-purple-100 rounded-lg">
+                                    <x-iconify icon="heroicons:information-circle" class="w-5 h-5 text-purple-600 flex-shrink-0 mt-0.5" />
+                                    <div class="text-sm">
+                                        <p class="font-medium text-purple-900">Kilométrage actuel</p>
+                                        <p class="text-purple-700 mt-0.5">
+                                            <strong class="font-semibold">{{ number_format($current_vehicle_mileage) }} km</strong>
+                                        </p>
+                                    </div>
                                 </div>
                             @endif
                         </div>
@@ -165,7 +189,7 @@ Design surpassant Fleetio, Samsara et Verizon Connect:
                         <div>
                             <label for="driver_id" class="block text-sm font-medium text-gray-700 mb-2">
                                 <div class="flex items-center gap-2">
-                                    <x-iconify icon="lucide:user" class="w-4 h-4 text-gray-500" />
+                                    <x-iconify icon="heroicons:user" class="w-4 h-4 text-gray-500" />
                                     Chauffeur
                                     <span class="text-red-500">*</span>
                                 </div>
@@ -189,253 +213,187 @@ Design surpassant Fleetio, Samsara et Verizon Connect:
                             </div>
                             @error('driver_id')
                                 <p class="mt-1.5 text-sm text-red-600 flex items-center gap-1">
-                                    <x-iconify icon="lucide:alert-circle" class="w-4 h-4" />
+                                    <x-iconify icon="heroicons:exclamation-circle" class="w-4 h-4" />
                                     {{ $message }}
                                 </p>
                             @enderror
+                            <p class="mt-1.5 text-xs text-gray-500">Sélectionnez le chauffeur assigné</p>
                         </div>
                     </div>
                 </div>
+            </x-card>
 
-                {{-- Divider --}}
-                <div class="border-t border-gray-200"></div>
+            {{-- ===============================================
+            SECTION 2: PÉRIODE D'AFFECTATION
+            =============================================== --}}
+            <x-card>
+                <div class="space-y-6">
+                    <div>
+                        <h2 class="text-lg font-semibold text-gray-900 mb-1 flex items-center gap-2">
+                            <x-iconify icon="heroicons:calendar-days" class="w-5 h-5 text-blue-600" />
+                            Période d'Affectation
+                        </h2>
+                        <p class="text-sm text-gray-600">Définissez la période de remise et de restitution du véhicule.</p>
+                    </div>
 
-                {{-- ===============================================
-                SECTION : PÉRIODE D'AFFECTATION
-                =============================================== --}}
-                <div>
-                    <h3 class="text-sm font-semibold text-gray-900 uppercase tracking-wider mb-4 flex items-center gap-2">
-                        <x-iconify icon="lucide:calendar-range" class="w-4 h-4 text-gray-500" />
-                        Période d'affectation
-                    </h3>
-
-                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         {{-- Date/heure de début --}}
                         <div>
-                            <label for="start_datetime" class="block text-sm font-medium text-gray-700 mb-2">
-                                <div class="flex items-center gap-2">
-                                    <x-iconify icon="lucide:calendar-clock" class="w-4 h-4 text-gray-500" />
-                                    Date et heure de remise
-                                    <span class="text-red-500">*</span>
-                                </div>
-                            </label>
-                            <input
-                                type="datetime-local"
+                            <x-datepicker
+                                name="start_datetime"
                                 wire:model.live="start_datetime"
-                                id="start_datetime"
-                                class="block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 @error('start_datetime') border-red-300 @enderror"
-                                required>
-                            @error('start_datetime')
-                                <p class="mt-1.5 text-sm text-red-600 flex items-center gap-1">
-                                    <x-iconify icon="lucide:alert-circle" class="w-4 h-4" />
-                                    {{ $message }}
-                                </p>
-                            @enderror
+                                label="Date et heure de remise"
+                                icon="calendar-days"
+                                type="datetime-local"
+                                required
+                                :value="$start_datetime"
+                                :error="$errors->first('start_datetime')"
+                                helpText="Quand le chauffeur récupère le véhicule"
+                            />
                         </div>
 
                         {{-- Date/heure de fin --}}
                         <div>
-                            <label for="end_datetime" class="block text-sm font-medium text-gray-700 mb-2">
-                                <div class="flex items-center gap-2">
-                                    <x-iconify icon="lucide:calendar-x" class="w-4 h-4 text-gray-500" />
-                                    Date et heure de restitution
-                                    <span class="text-xs font-normal text-gray-500">(optionnel)</span>
-                                </div>
-                            </label>
-                            <input
-                                type="datetime-local"
+                            <x-datepicker
+                                name="end_datetime"
                                 wire:model.live="end_datetime"
-                                id="end_datetime"
-                                class="block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 @error('end_datetime') border-red-300 @enderror">
-                            @error('end_datetime')
-                                <p class="mt-1.5 text-sm text-red-600 flex items-center gap-1">
-                                    <x-iconify icon="lucide:alert-circle" class="w-4 h-4" />
-                                    {{ $message }}
-                                </p>
-                            @enderror
+                                label="Date et heure de restitution"
+                                icon="calendar-days"
+                                type="datetime-local"
+                                :value="$end_datetime"
+                                :error="$errors->first('end_datetime')"
+                                helpText="Laisser vide pour une durée indéterminée"
+                            />
 
-                            {{-- Affichage durée --}}
+                            {{-- Affichage durée calculée --}}
                             @if($this->duration_hours !== null)
-                                <div class="mt-2 flex items-center gap-2 text-sm text-gray-600">
-                                    <x-iconify icon="lucide:timer" class="w-4 h-4 text-blue-600" />
+                                <div class="mt-3 flex items-center gap-2 text-sm text-gray-600 bg-blue-50 border border-blue-100 rounded-lg p-3">
+                                    <x-iconify icon="heroicons:clock" class="w-5 h-5 text-blue-600" />
                                     <span>Durée : <strong class="font-semibold text-gray-900">{{ $this->formatted_duration }}</strong></span>
                                 </div>
                             @elseif($start_datetime && !$end_datetime)
-                                <div class="mt-2 flex items-center gap-2 text-sm text-blue-600">
-                                    <x-iconify icon="lucide:infinity" class="w-4 h-4" />
+                                <div class="mt-3 flex items-center gap-2 text-sm text-blue-600 bg-blue-50 border border-blue-100 rounded-lg p-3">
+                                    <x-iconify icon="heroicons:arrow-path" class="w-5 h-5" />
                                     <span class="font-medium">Durée indéterminée</span>
                                 </div>
                             @endif
                         </div>
                     </div>
 
-                    {{-- Action suggérer créneau --}}
-                    @if($start_datetime)
-                        <div class="mt-4">
+                    {{-- Bouton suggérer créneau --}}
+                    @if($start_datetime && $vehicle_id && $driver_id)
+                        <div class="pt-4 border-t border-gray-200">
                             <button
                                 type="button"
                                 wire:click="suggestNextSlot"
-                                {{ empty($vehicle_id) || empty($driver_id) ? 'disabled' : '' }}
-                                class="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-sm">
-                                <x-iconify icon="lucide:sparkles" class="w-4 h-4 text-blue-600" />
-                                <span>Suggérer un créneau libre à partir du {{ \Carbon\Carbon::parse($start_datetime)->format('d/m/Y H:i') }}</span>
+                                class="inline-flex items-center gap-2 px-4 py-2.5 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors shadow-sm">
+                                <x-iconify icon="heroicons:sparkles" class="w-5 h-5 text-yellow-500" />
+                                <span>Suggérer un créneau libre</span>
                             </button>
+                            <p class="mt-2 text-xs text-gray-500">Recherche automatique du prochain créneau disponible pour ces ressources</p>
                         </div>
                     @endif
                 </div>
+            </x-card>
 
-                {{-- Divider --}}
-                <div class="border-t border-gray-200"></div>
+            {{-- ===============================================
+            SECTION 3: DÉTAILS DE L'AFFECTATION
+            =============================================== --}}
+            <x-card>
+                <div class="space-y-6">
+                    <div>
+                        <h2 class="text-lg font-semibold text-gray-900 mb-1 flex items-center gap-2">
+                            <x-iconify icon="heroicons:document-text" class="w-5 h-5 text-blue-600" />
+                            Détails de l'Affectation
+                        </h2>
+                        <p class="text-sm text-gray-600">Informations complémentaires et suivi du kilométrage.</p>
+                    </div>
 
-                {{-- ===============================================
-                SECTION : KILOMÉTRAGE ET DÉTAILS
-                =============================================== --}}
-                <div>
-                    <h3 class="text-sm font-semibold text-gray-900 uppercase tracking-wider mb-4 flex items-center gap-2">
-                        <x-iconify icon="lucide:file-text" class="w-4 h-4 text-gray-500" />
-                        Détails de l'affectation
-                    </h3>
-
-                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         {{-- Kilométrage initial --}}
                         <div>
-                            <label for="start_mileage" class="block text-sm font-medium text-gray-700 mb-2">
-                                <div class="flex items-center gap-2">
-                                    <x-iconify icon="lucide:gauge" class="w-4 h-4 text-gray-500" />
-                                    Kilométrage initial
-                                </div>
-                            </label>
-                            <div class="relative">
-                                <input
-                                    type="number"
-                                    wire:model="start_mileage"
-                                    id="start_mileage"
-                                    min="0"
-                                    step="1"
-                                    class="block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 pr-12 @error('start_mileage') border-red-300 @enderror"
-                                    placeholder="Ex: 125000">
-                                <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                            <x-input
+                                name="start_mileage"
+                                wire:model="start_mileage"
+                                type="number"
+                                label="Kilométrage initial"
+                                icon="gauge"
+                                placeholder="Ex: 125000"
+                                :value="$start_mileage"
+                                :error="$errors->first('start_mileage')"
+                                helpText="Kilométrage au moment de la remise du véhicule"
+                                min="0"
+                                step="1"
+                            >
+                                <x-slot name="suffix">
                                     <span class="text-gray-500 text-sm font-medium">km</span>
-                                </div>
-                            </div>
-                            @error('start_mileage')
-                                <p class="mt-1.5 text-sm text-red-600 flex items-center gap-1">
-                                    <x-iconify icon="lucide:alert-circle" class="w-4 h-4" />
-                                    {{ $message }}
-                                </p>
-                            @enderror
-                            @if($current_vehicle_mileage)
-                                <p class="mt-1.5 text-xs text-gray-500">
-                                    Le kilométrage actuel du véhicule est pré-rempli, vous pouvez le modifier si nécessaire.
+                                </x-slot>
+                            </x-input>
+                            @if($current_vehicle_mileage && $start_mileage)
+                                <p class="mt-2 text-xs text-gray-500">
+                                    💡 Le kilométrage actuel du véhicule ({{ number_format($current_vehicle_mileage) }} km) a été pré-rempli automatiquement.
                                 </p>
                             @endif
                         </div>
 
                         {{-- Motif --}}
                         <div>
-                            <label for="reason" class="block text-sm font-medium text-gray-700 mb-2">
-                                <div class="flex items-center gap-2">
-                                    <x-iconify icon="lucide:tag" class="w-4 h-4 text-gray-500" />
-                                    Motif de l'affectation
-                                </div>
-                            </label>
-                            <input
-                                type="text"
+                            <x-input
+                                name="reason"
                                 wire:model="reason"
-                                id="reason"
+                                label="Motif de l'affectation"
+                                icon="tag"
+                                placeholder="Ex: Mission commerciale, formation..."
+                                :value="$reason"
+                                :error="$errors->first('reason')"
+                                helpText="Raison de cette affectation"
                                 maxlength="500"
-                                class="block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 @error('reason') border-red-300 @enderror"
-                                placeholder="Ex: Mission commerciale, formation, maintenance...">
-                            @error('reason')
-                                <p class="mt-1.5 text-sm text-red-600 flex items-center gap-1">
-                                    <x-iconify icon="lucide:alert-circle" class="w-4 h-4" />
-                                    {{ $message }}
-                                </p>
-                            @enderror
+                            />
                         </div>
                     </div>
 
                     {{-- Notes complémentaires --}}
-                    <div class="mt-6">
-                        <label for="notes" class="block text-sm font-medium text-gray-700 mb-2">
-                            <div class="flex items-center gap-2">
-                                <x-iconify icon="lucide:message-square-text" class="w-4 h-4 text-gray-500" />
-                                Notes complémentaires
-                            </div>
-                        </label>
-                        <textarea
+                    <div>
+                        <x-textarea
+                            name="notes"
                             wire:model="notes"
-                            id="notes"
+                            label="Notes complémentaires"
                             rows="4"
+                            placeholder="Informations supplémentaires, instructions particulières, remarques..."
+                            :value="$notes"
+                            :error="$errors->first('notes')"
+                            helpText="Informations additionnelles (optionnel)"
                             maxlength="1000"
-                            class="block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 @error('notes') border-red-300 @enderror"
-                            placeholder="Informations supplémentaires, instructions particulières, remarques..."></textarea>
-                        @error('notes')
-                            <p class="mt-1.5 text-sm text-red-600 flex items-center gap-1">
-                                <x-iconify icon="lucide:alert-circle" class="w-4 h-4" />
-                                {{ $message }}
-                            </p>
-                        @enderror
-                        <p class="mt-1.5 text-xs text-gray-500 text-right">{{ strlen($notes) }} / 1000 caractères</p>
+                        />
+                        <p class="mt-1.5 text-xs text-gray-500 text-right">{{ strlen($notes ?? '') }} / 1000 caractères</p>
                     </div>
                 </div>
-
-                {{-- ===============================================
-                ERREURS GÉNÉRALES
-                =============================================== --}}
-                @if($errors->has('business_validation') || $errors->has('save'))
-                    <div class="rounded-lg bg-red-50 border border-red-200 p-4">
-                        <div class="flex">
-                            <div class="flex-shrink-0">
-                                <x-iconify icon="lucide:alert-circle" class="w-5 h-5 text-red-600" />
-                            </div>
-                            <div class="ml-3">
-                                <h3 class="text-sm font-semibold text-red-900 mb-2">Erreur lors de la sauvegarde</h3>
-                                <ul class="text-sm text-red-800 space-y-1">
-                                    @foreach($errors->get('business_validation') as $error)
-                                        <li class="flex items-start gap-2">
-                                            <x-iconify icon="lucide:x" class="w-4 h-4 flex-shrink-0 mt-0.5" />
-                                            <span>{{ $error }}</span>
-                                        </li>
-                                    @endforeach
-                                    @foreach($errors->get('save') as $error)
-                                        <li class="flex items-start gap-2">
-                                            <x-iconify icon="lucide:x" class="w-4 h-4 flex-shrink-0 mt-0.5" />
-                                            <span>{{ $error }}</span>
-                                        </li>
-                                    @endforeach
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                @endif
-            </div>
+            </x-card>
 
             {{-- ===============================================
-            FOOTER: ACTIONS
+            FOOTER: ACTIONS DU FORMULAIRE
             =============================================== --}}
-            <div class="px-6 py-4 bg-gray-50 border-t border-gray-200 flex items-center justify-end gap-3 rounded-b-lg">
-                <button
-                    type="button"
-                    wire:click="$dispatch('close-form')"
-                    class="inline-flex items-center gap-2 px-4 py-2.5 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors shadow-sm">
-                    <x-iconify icon="lucide:x" class="w-4 h-4" />
+            <div class="flex items-center justify-end gap-3 pt-4">
+                <a
+                    href="{{ route('admin.assignments.index') }}"
+                    class="inline-flex items-center gap-2 px-5 py-2.5 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors shadow-sm">
+                    <x-iconify icon="heroicons:x-mark" class="w-5 h-5" />
                     <span>Annuler</span>
-                </button>
+                </a>
 
                 <button
                     type="submit"
                     wire:loading.attr="disabled"
                     wire:target="save"
-                    class="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-medium text-white transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed
-                    {{ $hasConflicts && !$forceCreate ? 'bg-red-600 hover:bg-red-700' : 'bg-blue-600 hover:bg-blue-700' }}">
+                    class="inline-flex items-center gap-2 px-6 py-2.5 rounded-lg text-sm font-medium text-white transition-all shadow-sm disabled:opacity-50 disabled:cursor-not-allowed
+                    {{ $hasConflicts && !$forceCreate ? 'bg-red-600 hover:bg-red-700 shadow-red-500/20' : 'bg-blue-600 hover:bg-blue-700 shadow-blue-500/20' }}">
 
-                    <span wire:loading.remove wire:target="save">
+                    <span wire:loading.remove wire:target="save" class="flex items-center gap-2">
                         @if($hasConflicts && !$forceCreate)
-                            <x-iconify icon="lucide:shield-alert" class="w-5 h-5" />
+                            <x-iconify icon="heroicons:shield-exclamation" class="w-5 h-5" />
                             Créer malgré les conflits
                         @else
-                            <x-iconify icon="lucide:save" class="w-5 h-5" />
+                            <x-iconify icon="heroicons:check-circle" class="w-5 h-5" />
                             {{ $isEditing ? 'Enregistrer les modifications' : 'Créer l\'affectation' }}
                         @endif
                     </span>
@@ -445,32 +403,35 @@ Design surpassant Fleetio, Samsara et Verizon Connect:
                             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                             <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                         </svg>
-                        <span>Sauvegarde...</span>
+                        <span>Sauvegarde en cours...</span>
                     </span>
                 </button>
             </div>
-        </div>
-    </form>
+        </form>
+    </div>
 </div>
 
 {{-- ====================================================================
-SCRIPTS SLIMSELECT ET INTERACTIONS
+SCRIPTS SLIMSELECT ET ALPINE.JS
 ==================================================================== --}}
 @push('scripts')
 <script>
-function assignmentFormComponent() {
+function assignmentFormValidation() {
     return {
+        vehicleSlimSelect: null,
+        driverSlimSelect: null,
+
         init() {
             this.initSlimSelect();
             this.setupLivewireListeners();
         },
 
         initSlimSelect() {
-            // SlimSelect est déjà chargé via CDN dans le layout
+            // SlimSelect est chargé via CDN dans le layout
             if (typeof SlimSelect !== 'undefined') {
                 // Véhicule select
                 if (document.querySelector('.slimselect-vehicle')) {
-                    new SlimSelect({
+                    this.vehicleSlimSelect = new SlimSelect({
                         select: '.slimselect-vehicle',
                         settings: {
                             searchPlaceholder: 'Rechercher un véhicule...',
@@ -488,7 +449,7 @@ function assignmentFormComponent() {
 
                 // Chauffeur select
                 if (document.querySelector('.slimselect-driver')) {
-                    new SlimSelect({
+                    this.driverSlimSelect = new SlimSelect({
                         select: '.slimselect-driver',
                         settings: {
                             searchPlaceholder: 'Rechercher un chauffeur...',
@@ -519,24 +480,44 @@ function assignmentFormComponent() {
             });
 
             Livewire.on('force-mode-enabled', (event) => {
-                this.showToast('Mode force activé - Les conflits seront ignorés', 'warning');
+                this.showToast('Mode force activé', 'warning');
+            });
+
+            Livewire.on('force-mode-disabled', (event) => {
+                this.showToast('Mode force désactivé', 'info');
             });
 
             Livewire.on('assignment-created', (event) => {
-                this.showToast('Affectation créée avec succès', 'success');
+                this.showToast('✓ Affectation créée avec succès', 'success');
+                // Redirection après 1.5 secondes
+                setTimeout(() => {
+                    window.location.href = '{{ route("admin.assignments.index") }}';
+                }, 1500);
             });
 
             Livewire.on('assignment-updated', (event) => {
-                this.showToast('Affectation mise à jour avec succès', 'success');
+                this.showToast('✓ Affectation mise à jour', 'success');
+            });
+
+            Livewire.on('conflicts-detected', (event) => {
+                // Animation d'alerte visuelle
+                const alertBox = document.querySelector('[role="alert"]');
+                if (alertBox) {
+                    alertBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                }
+            });
+
+            Livewire.on('conflicts-cleared', (event) => {
+                this.showToast('✓ Aucun conflit détecté', 'success');
             });
         },
 
         showToast(message, type = 'info') {
             const icons = {
-                success: 'lucide:check-circle',
-                error: 'lucide:x-circle',
-                warning: 'lucide:alert-triangle',
-                info: 'lucide:info'
+                success: 'heroicons:check-circle',
+                error: 'heroicons:x-circle',
+                warning: 'heroicons:exclamation-triangle',
+                info: 'heroicons:information-circle'
             };
 
             const colors = {
@@ -547,12 +528,12 @@ function assignmentFormComponent() {
             };
 
             const toast = document.createElement('div');
-            toast.className = `fixed top-4 right-4 z-50 flex items-center gap-3 px-4 py-3 rounded-lg shadow-lg text-white ${colors[type]} transform transition-all duration-300`;
+            toast.className = `fixed top-4 right-4 z-50 flex items-center gap-3 px-5 py-3 rounded-lg shadow-xl text-white ${colors[type]} transform transition-all duration-300`;
             toast.style.opacity = '0';
             toast.style.transform = 'translateY(-10px)';
 
             toast.innerHTML = `
-                <iconify-icon icon="${icons[type]}" class="text-2xl"></iconify-icon>
+                <iconify-icon icon="${icons[type]}" class="text-xl flex-shrink-0"></iconify-icon>
                 <span class="font-medium">${message}</span>
             `;
 
@@ -577,12 +558,14 @@ function assignmentFormComponent() {
 @endpush
 
 {{-- ====================================================================
-STYLES SLIMSELECT PERSONNALISÉS
+STYLES SLIMSELECT PERSONNALISÉS - ZENFLEET ENTERPRISE
 ==================================================================== --}}
 @push('styles')
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/slim-select@2/dist/slimselect.css">
 <style>
-/* Personnalisation SlimSelect pour ZenFleet */
+/* 🎨 Personnalisation SlimSelect pour ZenFleet Enterprise */
+
+/* Container principal */
 .ss-main {
     @apply rounded-lg border-gray-300 shadow-sm;
 }
@@ -591,20 +574,25 @@ STYLES SLIMSELECT PERSONNALISÉS
     @apply border-blue-500 ring-1 ring-blue-500;
 }
 
+/* Champ de sélection unique */
 .ss-single {
-    @apply px-3 py-2;
+    @apply px-3 py-2.5 bg-white;
 }
 
+/* Dropdown content */
 .ss-content {
-    @apply rounded-lg border border-gray-200 shadow-lg mt-1;
+    @apply rounded-lg border border-gray-200 shadow-lg mt-1 bg-white;
+    max-height: 300px !important;
 }
 
+/* Champ de recherche */
 .ss-search input {
-    @apply px-3 py-2 text-sm;
+    @apply px-3 py-2.5 text-sm border-0 border-b border-gray-200 focus:border-blue-500 focus:ring-0;
 }
 
+/* Options */
 .ss-option {
-    @apply px-3 py-2 text-sm hover:bg-blue-50;
+    @apply px-3 py-2.5 text-sm text-gray-700 hover:bg-blue-50 cursor-pointer transition-colors;
 }
 
 .ss-option.ss-highlighted {
@@ -612,7 +600,76 @@ STYLES SLIMSELECT PERSONNALISÉS
 }
 
 .ss-option.ss-disabled {
-    @apply opacity-50 cursor-not-allowed;
+    @apply opacity-50 cursor-not-allowed bg-gray-50;
+}
+
+.ss-option:not(.ss-disabled):hover {
+    @apply bg-blue-50;
+}
+
+/* Textes de recherche */
+.ss-search::placeholder,
+.ss-disabled,
+.ss-list .ss-option.ss-disabled {
+    @apply text-gray-400;
+}
+
+/* Flèche dropdown */
+.ss-arrow {
+    @apply text-gray-400;
+}
+
+.ss-main.ss-open-above .ss-arrow,
+.ss-main.ss-open-below .ss-arrow {
+    @apply text-blue-600;
+}
+
+/* État d'erreur (pour Livewire validation) */
+.slimselect-vehicle.error .ss-main,
+.slimselect-driver.error .ss-main {
+    @apply border-red-300 ring-1 ring-red-300;
+}
+
+/* Loading state */
+.ss-searching {
+    @apply text-blue-600 text-sm px-3 py-2;
+}
+
+/* No results */
+.ss-search-noresults {
+    @apply text-gray-500 text-sm px-3 py-2 italic;
+}
+
+/* Multiple selects (si besoin futur) */
+.ss-values .ss-value {
+    @apply bg-blue-100 text-blue-800 rounded px-2 py-1 text-sm;
+}
+
+.ss-values .ss-value .ss-value-delete {
+    @apply text-blue-600 hover:text-blue-800;
+}
+
+/* Animation smooth */
+.ss-content {
+    animation: slideDown 0.2s ease-out;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+    .ss-content {
+        max-height: 250px !important;
+    }
 }
 </style>
 @endpush

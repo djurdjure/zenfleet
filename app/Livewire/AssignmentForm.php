@@ -73,23 +73,29 @@ class AssignmentForm extends Component
         $this->overlapService = $overlapService;
     }
 
-    public function mount(?Assignment $assignment = null)
+    public function mount($assignmentId = null)
     {
-        \Log::info('[ROOT AssignmentForm] mount() appelé - app/Livewire/AssignmentForm.php');
+        \Log::info('[ROOT AssignmentForm] mount() appelé - app/Livewire/AssignmentForm.php', [
+            'assignmentId' => $assignmentId,
+            'assignmentId_type' => gettype($assignmentId)
+        ]);
 
-        if ($assignment) {
-            $this->assignment = $assignment;
+        if ($assignmentId) {
+            \Log::info('[ROOT AssignmentForm] Mode ÉDITION détecté', ['assignmentId' => $assignmentId]);
+            $this->assignment = Assignment::findOrFail($assignmentId);
             $this->isEditing = true;
-            $this->authorize('update', $assignment);
-            $this->fillFromAssignment($assignment);
+            $this->authorize('update', $this->assignment);
+            $this->fillFromAssignment($this->assignment);
         } else {
-            // Log avant autorisation
-            \Log::info('[ROOT AssignmentForm] Tentative authorize create');
+            \Log::info('[ROOT AssignmentForm] Mode CRÉATION détecté - Tentative authorize create');
             $this->authorize('create', Assignment::class);
+            \Log::info('[ROOT AssignmentForm] ✅ AUTHORIZE PASSED!');
             $this->initializeNewAssignment();
         }
 
+        \Log::info('[ROOT AssignmentForm] Avant loadOptions()');
         $this->loadOptions();
+        \Log::info('[ROOT AssignmentForm] Après loadOptions() - mount() terminé avec succès');
     }
 
     public function render()

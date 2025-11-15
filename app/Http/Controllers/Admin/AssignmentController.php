@@ -122,38 +122,18 @@ class AssignmentController extends Controller
      */
     public function create(): View
     {
-        // 🛡️ VÉRIFICATION DES PERMISSIONS ENTERPRISE
-        // Vérification explicite avec gestion d'erreur détaillée
-        
+        // 🛡️ VÉRIFICATION DES PERMISSIONS ENTERPRISE - Via Policy (Pattern Laravel Standard)
+        $this->authorize('create', Assignment::class);
+
         $user = auth()->user();
-        
+
         // Log pour debug (uniquement en dev)
         if (config('app.debug')) {
-            \Log::info('Assignment Create Access Attempt', [
+            \Log::info('Assignment Create Access Granted', [
                 'user' => $user->email,
                 'organization' => $user->organization_id,
-                'roles' => $user->roles->pluck('name'),
-                'has_permission' => $user->can('create assignments')
-            ]);
-        }
-        
-        // Vérification multiple pour compatibilité maximale
-        $canCreate = $user->can('create assignments') || 
-                     $user->can('assignments.create') ||
-                     $user->hasPermissionTo('create assignments') ||
-                     $user->hasPermissionTo('assignments.create');
-        
-        if (!$canCreate) {
-            // Log détaillé de l'échec
-            \Log::warning('Assignment Create Permission Denied', [
-                'user' => $user->email,
-                'permissions' => $user->getAllPermissions()->pluck('name'),
                 'roles' => $user->roles->pluck('name')
             ]);
-            
-            // Message d'erreur enterprise avec instructions
-            abort(403, 'Accès non autorisé. Vous n\'avez pas la permission de créer des affectations. ' .
-                       'Contactez votre administrateur pour obtenir la permission "create assignments".');
         }
 
         // ✅ NOUVELLE LOGIQUE ENTERPRISE: Utilisation du trait ResourceAvailability

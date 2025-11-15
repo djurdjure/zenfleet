@@ -343,11 +343,8 @@ Route::middleware(['auth', 'verified'])
         Route::prefix('assignments')->name('assignments.')->group(function () {
             // 🚀 WIZARD: Page unique ultra-pro (AVANT resource pour priorité routing)
             // 🚀 WIZARD EST MAINTENANT LE SYSTÈME PAR DÉFAUT (remplace l'ancien create)
-            // 🔒 SÉCURITÉ ENTERPRISE: Vérification de permission via Policy
-            Route::get('create', function() {
-                return view('admin.assignments.wizard');
-            })->name('create')
-              ->middleware('can:create,App\Models\Assignment'); // Utilise AssignmentPolicy::create()
+            // 🔒 SÉCURITÉ ENTERPRISE: Utilise le contrôleur pour respecter le pattern MVC
+            Route::get('create', [AssignmentController::class, 'create'])->name('create');
 
             // Routes utilitaires avancées Enterprise
             Route::get('calendar', [AssignmentController::class, 'calendar'])->name('calendar');
