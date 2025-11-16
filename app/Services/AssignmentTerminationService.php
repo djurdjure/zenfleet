@@ -6,6 +6,7 @@ use App\Models\Assignment;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use App\Services\VehicleMileageService;
 
 /**
  * 🎯 SERVICE ENTERPRISE-GRADE : TERMINAISON D'AFFECTATION
@@ -33,10 +34,14 @@ use Illuminate\Support\Facades\Log;
 class AssignmentTerminationService
 {
     private ResourceStatusSynchronizer $statusSync;
+    private VehicleMileageService $mileageService;
 
-    public function __construct(ResourceStatusSynchronizer $statusSync)
-    {
+    public function __construct(
+        ResourceStatusSynchronizer $statusSync,
+        VehicleMileageService $mileageService
+    ) {
         $this->statusSync = $statusSync;
+        $this->mileageService = $mileageService;
     }
 
     /**
@@ -170,34 +175,37 @@ class AssignmentTerminationService
             }
 
             // 2.5. METTRE À JOUR LE KILOMÉTRAGE VÉHICULE SI FOURNI
+            // 🎯 ENTERPRISE UPGRADE: Utilisation du VehicleMileageService pour traçabilité complète
             if ($endMileage && $assignment->vehicle) {
-                $assignment->vehicle->current_mileage = $endMileage;
-                $assignment->vehicle->save();
-
-                $result['actions'][] = 'vehicle_mileage_updated';
-
-                // Créer historique de kilométrage (si table existe)
                 try {
-                    if (class_exists('\App\Models\MileageHistory')) {
-                        \App\Models\MileageHistory::create([
-                            'vehicle_id' => $assignment->vehicle_id,
-                            'driver_id' => $assignment->driver_id,
-                            'assignment_id' => $assignment->id,
-                            'mileage_value' => $endMileage,
-                            'recorded_at' => $endTime,
-                            'type' => 'assignment_end',
-                            'notes' => 'Kilométrage de fin d\'affectation',
-                            'created_by' => $userId,
-                            'organization_id' => $assignment->organization_id,
-                        ]);
+                    $mileageResult = $this->mileageService->recordAssignmentEnd(
+                        $assignment->vehicle,
+                        $endMileage,
+                        $assignment->driver_id,
+                        $assignment->id,
+                        $endTime
+                    );
 
-                        $result['actions'][] = 'mileage_history_created';
-                    }
-                } catch (\Exception $e) {
-                    // Table MileageHistory n'existe peut-être pas encore
-                    Log::debug('[AssignmentTermination] Impossible de créer l\'historique kilométrique', [
-                        'error' => $e->getMessage(),
+                    $result['actions'] = array_merge($result['actions'], $mileageResult['actions']);
+                    $result['mileage_update'] = $mileageResult;
+
+                    Log::info('[AssignmentTermination] Kilométrage de fin enregistré via VehicleMileageService', [
+                        'assignment_id' => $assignment->id,
+                        'end_mileage' => $endMileage,
+                        'mileage_result' => $mileageResult,
                     ]);
+                } catch (\Exception $e) {
+                    // Logger l'erreur mais ne pas bloquer la terminaison
+                    Log::error('[AssignmentTermination] Erreur lors de l\'enregistrement du kilométrage de fin', [
+                        'assignment_id' => $assignment->id,
+                        'error' => $e->getMessage(),
+                        'trace' => $e->getTraceAsString(),
+                    ]);
+                    
+                    // Fallback : mise à jour directe (pour compatibilité)
+                    $assignment->vehicle->current_mileage = $endMileage;
+                    $assignment->vehicle->save();
+                    $result['actions'][] = 'vehicle_mileage_updated_fallback';
                 }
             }
 

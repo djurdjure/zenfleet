@@ -5,6 +5,7 @@ namespace App\Livewire\Admin\Assignment;
 use App\Models\Assignment;
 use App\Models\Vehicle;
 use App\Models\Driver;
+use App\Services\VehicleMileageService;
 use Carbon\Carbon;
 use Livewire\Component;
 use Livewire\Attributes\On;
@@ -494,6 +495,35 @@ class CreateAssignment extends Component
                 'created_by' => auth()->id(),
             ]);
 
+            // 🎯 ENTERPRISE UPGRADE: Enregistrer le kilométrage de début avec traçabilité complète
+            $vehicle = Vehicle::findOrFail($validated['vehicle_id']);
+            $mileageService = app(VehicleMileageService::class);
+            
+            try {
+                $mileageResult = $mileageService->recordAssignmentStart(
+                    $vehicle,
+                    $validated['start_mileage'],
+                    $validated['driver_id'],
+                    $assignment->id,
+                    $startDateTime
+                );
+
+                Log::info('[CreateAssignment] Kilométrage de début enregistré', [
+                    'assignment_id' => $assignment->id,
+                    'mileage_result' => $mileageResult,
+                ]);
+            } catch (\Exception $e) {
+                // Si l'enregistrement du kilométrage échoue, rollback de tout
+                Log::error('[CreateAssignment] Erreur enregistrement kilométrage de début', [
+                    'assignment_id' => $assignment->id,
+                    'error' => $e->getMessage(),
+                ]);
+                
+                throw new \Exception(
+                    "Erreur lors de l'enregistrement du kilométrage : " . $e->getMessage()
+                );
+            }
+
             DB::commit();
 
             // Log enterprise
@@ -503,6 +533,7 @@ class CreateAssignment extends Component
                 'driver_id' => $assignment->driver_id,
                 'start_datetime' => $startDateTime->toDateTimeString(),
                 'end_datetime' => $endDateTime?->toDateTimeString(),
+                'start_mileage' => $validated['start_mileage'],
                 'type' => $validated['assignment_type'],
                 'created_by' => auth()->id(),
                 'organization_id' => auth()->user()->organization_id,
