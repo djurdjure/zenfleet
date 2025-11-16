@@ -369,34 +369,163 @@
  <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
  <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" wire:click="closeEndModal"></div>
  <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
- <div class="inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full sm:p-6">
- <div class="sm:flex sm:items-start">
- <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-green-100 sm:mx-0 sm:h-10 sm:w-10">
+ <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-2xl sm:w-full">
+ 
+ {{-- En-tête --}}
+ <div class="bg-gradient-to-r from-green-500 to-emerald-600 px-6 py-4">
+ <div class="flex items-center">
+ <div class="flex-shrink-0">
+ <div class="h-12 w-12 rounded-full bg-white flex items-center justify-center">
  <svg class="h-6 w-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
- <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+ <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
  </svg>
  </div>
- <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
- <h3 class="text-lg leading-6 font-medium text-gray-900">Terminer l'affectation</h3>
- <div class="mt-2">
- <p class="text-sm text-gray-500">
- Voulez-vous terminer l'affectation du véhicule <strong>{{ $selectedAssignment->vehicle_display }}</strong>
- au chauffeur <strong>{{ $selectedAssignment->driver_display }}</strong> ?
+ </div>
+ <div class="ml-4">
+ <h3 class="text-lg font-semibold text-white">Terminer l'affectation</h3>
+ <p class="text-sm text-green-100">Restitution du véhicule au {{ now()->format('d/m/Y à H:i') }}</p>
+ </div>
+ </div>
+ </div>
+
+ {{-- Corps --}}
+ <div class="px-6 py-5 space-y-5">
+ 
+ {{-- Informations de l'affectation --}}
+ <div class="bg-gray-50 rounded-lg p-4 border border-gray-200">
+ <div class="grid grid-cols-2 gap-4">
+ <div>
+ <dt class="text-xs font-medium text-gray-500 uppercase tracking-wider">Véhicule</dt>
+ <dd class="mt-1 text-sm font-semibold text-gray-900">{{ $selectedAssignment->vehicle_display }}</dd>
+ </div>
+ <div>
+ <dt class="text-xs font-medium text-gray-500 uppercase tracking-wider">Chauffeur</dt>
+ <dd class="mt-1 text-sm font-semibold text-gray-900">{{ $selectedAssignment->driver_display }}</dd>
+ </div>
+ <div>
+ <dt class="text-xs font-medium text-gray-500 uppercase tracking-wider">Date de remise</dt>
+ <dd class="mt-1 text-sm text-gray-900">{{ $selectedAssignment->start_datetime->format('d/m/Y H:i') }}</dd>
+ </div>
+ <div>
+ <dt class="text-xs font-medium text-gray-500 uppercase tracking-wider">Kilométrage début</dt>
+ <dd class="mt-1 text-sm font-mono text-gray-900">{{ number_format($selectedAssignment->start_mileage) }} km</dd>
+ </div>
+ </div>
+
+ {{-- Indication du kilométrage actuel du véhicule --}}
+ <div class="mt-4 pt-4 border-t border-gray-300">
+ <div class="flex items-start space-x-3 bg-blue-50 rounded-md p-3 border border-blue-200">
+ <div class="flex-shrink-0">
+ <svg class="h-5 w-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+ <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+ </svg>
+ </div>
+ <div class="flex-1 min-w-0">
+ <p class="text-xs font-medium text-blue-700 uppercase tracking-wider">Kilométrage actuel du véhicule</p>
+ <p class="mt-1 text-lg font-bold text-blue-900 font-mono">
+ {{ number_format($selectedAssignment->vehicle?->current_mileage ?? $endMileage) }} km
  </p>
- <p class="mt-2 text-sm text-gray-500">
- Date de restitution : <strong>{{ now()->format('d/m/Y à H:i') }}</strong>
+ <p class="mt-0.5 text-xs text-blue-600">
+ Enregistré dans le système • Pré-rempli automatiquement
  </p>
  </div>
  </div>
  </div>
- <div class="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse">
- <button wire:click="confirmEnd" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-green-600 text-base font-medium text-white hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 sm:ml-3 sm:w-auto sm:text-sm">
- Confirmer
+ </div>
+
+ {{-- Kilométrage de fin --}}
+ <div>
+ <label for="end-mileage" class="block text-sm font-medium text-gray-700 mb-1">
+ Kilométrage de fin <span class="text-red-500">*</span>
+ </label>
+ <div class="relative">
+ <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+ <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+ <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+ </svg>
+ </div>
+ <input 
+ wire:model="endMileage" 
+ type="number" 
+ id="end-mileage" 
+ min="{{ $selectedAssignment->start_mileage }}"
+ step="1"
+ class="block w-full pl-10 pr-16 py-3 text-base border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 font-mono"
+ placeholder="Saisir le kilométrage"
+ required
+ >
+ <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+ <span class="text-gray-500 text-sm font-medium">km</span>
+ </div>
+ </div>
+ 
+ {{-- Calcul automatique de la distance --}}
+ @if($endMileage && $endMileage >= $selectedAssignment->start_mileage)
+ <div class="mt-2 flex items-center text-sm">
+ <svg class="h-4 w-4 text-blue-500 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+ <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+ </svg>
+ <span class="text-gray-700">
+ Distance parcourue : 
+ <span class="font-semibold text-blue-600">
+ {{ number_format($endMileage - $selectedAssignment->start_mileage) }} km
+ </span>
+ </span>
+ </div>
+ @endif
+
+ @error('endMileage')
+ <p class="mt-2 text-sm text-red-600 flex items-center">
+ <svg class="h-4 w-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+ <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+ </svg>
+ {{ $message }}
+ </p>
+ @enderror
+ 
+ <p class="mt-2 text-xs text-gray-500">
+ 💡 Le kilométrage actuel du véhicule est pré-rempli. Vous pouvez le corriger si nécessaire.
+ </p>
+ </div>
+
+ {{-- Notes de restitution (optionnel) --}}
+ <div>
+ <label for="end-notes" class="block text-sm font-medium text-gray-700 mb-1">
+ Notes de restitution <span class="text-gray-400 text-xs">(Optionnel)</span>
+ </label>
+ <textarea 
+ wire:model="endNotes" 
+ id="end-notes" 
+ rows="3"
+ class="block w-full px-3 py-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 text-sm"
+ placeholder="État du véhicule, observations particulières..."
+ ></textarea>
+ <p class="mt-1 text-xs text-gray-500">
+ Exemples : Carburant, état de la carrosserie, équipements remis, etc.
+ </p>
+ </div>
+
+ </div>
+
+ {{-- Pied de page avec actions --}}
+ <div class="bg-gray-50 px-6 py-4 sm:flex sm:flex-row-reverse sm:gap-3">
+ <button 
+ wire:click="confirmEnd" 
+ class="w-full inline-flex justify-center items-center rounded-lg border border-transparent shadow-sm px-6 py-3 bg-green-600 text-base font-medium text-white hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors sm:w-auto sm:text-sm"
+ >
+ <svg class="h-5 w-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+ <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+ </svg>
+ Confirmer la restitution
  </button>
- <button wire:click="closeEndModal" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:mt-0 sm:w-auto sm:text-sm">
+ <button 
+ wire:click="closeEndModal" 
+ class="mt-3 w-full inline-flex justify-center items-center rounded-lg border border-gray-300 shadow-sm px-6 py-3 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors sm:mt-0 sm:w-auto sm:text-sm"
+ >
  Annuler
  </button>
  </div>
+
  </div>
  </div>
  </div>

@@ -31,6 +31,21 @@ class Kernel extends ConsoleKernel
                 \Log::error('[Scheduler] ❌ Traitement affectations expirées: ÉCHEC');
             });
 
+        // =================================================================
+        // 🚀 TRANSITION SCHEDULED -> ACTIVE (INSTANTANÉE)
+        // =================================================================
+        // Exécuté toutes les minutes pour une synchronisation immédiate des ressources
+        $schedule->job(new \App\Jobs\ProcessScheduledAssignments())
+            ->everyMinute()
+            ->name('process-scheduled-assignments')
+            ->withoutOverlapping(1) // Très important pour l'exécution fréquente
+            ->onSuccess(function () {
+                \Log::info('[Scheduler] ✅ Transition Scheduled->Active: SUCCÈS');
+            })
+            ->onFailure(function () {
+                \Log::error('[Scheduler] ❌ Transition Scheduled->Active: ÉCHEC');
+            });
+
         // 🧟 Détection et correction des zombies toutes les 30 minutes
         // Correction des incohérences de statut et ressources bloquées
         $schedule->command('assignments:fix-zombies --force')

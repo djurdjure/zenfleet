@@ -4,6 +4,7 @@ namespace App\Jobs;
 
 use App\Models\Assignment;
 use App\Events\AssignmentEnded;
+use App\Traits\ManagesResourceStatus;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -40,7 +41,7 @@ use Carbon\Carbon;
  */
 class ProcessExpiredAssignmentsEnhanced implements ShouldQueue, ShouldBeUnique
 {
-    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels, ManagesResourceStatus;
 
     /**
      * Nombre de tentatives en cas d'échec
@@ -180,13 +181,10 @@ class ProcessExpiredAssignmentsEnhanced implements ShouldQueue, ShouldBeUnique
 
             $this->totalExpired++;
 
-            // 2. Libérer les ressources si nécessaire
-            $vehicleReleased = $this->releaseVehicleIfNeeded($assignment);
-            $driverReleased = $this->releaseDriverIfNeeded($assignment);
-
-            if ($vehicleReleased || $driverReleased) {
-                $this->totalReleased++;
-            }
+            // 2. Libérer les ressources si nécessaire (Utilisation du Trait ManagesResourceStatus)
+            $this->releaseResource($assignment->vehicle);
+            $this->releaseResource($assignment->driver);
+            $this->totalReleased++;
 
             // 3. Déclencher l'événement pour notifications et autres listeners
             event(new AssignmentEnded($assignment, 'automatic', null, [
@@ -194,11 +192,8 @@ class ProcessExpiredAssignmentsEnhanced implements ShouldQueue, ShouldBeUnique
                 'processed_by' => 'ProcessExpiredAssignmentsEnhanced'
             ]));
 
-            // 4. Log pour audit trail
             Log::info('[ProcessExpiredAssignmentsEnhanced] ✅ Affectation traitée avec succès', [
-                'assignment_id' => $assignment->id,
-                'vehicle_released' => $vehicleReleased,
-                'driver_released' => $driverReleased
+                'assignment_id' => $assignment->id
             ]);
 
         } catch (\Exception $e) {
@@ -214,97 +209,6 @@ class ProcessExpiredAssignmentsEnhanced implements ShouldQueue, ShouldBeUnique
         }
     }
 
-    /**
-     * Libérer le véhicule si nécessaire
-     *
-     * @param Assignment $assignment
-     * @return bool
-     */
-    private function releaseVehicleIfNeeded(Assignment $assignment): bool
-    {
-        if (!$assignment->vehicle) {
-            return false;
-        }
-
-        // Vérifier s'il y a d'autres affectations actives pour ce véhicule
-        $hasOtherActiveAssignment = Assignment::where('vehicle_id', $assignment->vehicle_id)
-            ->where('id', '!=', $assignment->id)
-            ->where(function ($query) {
-                $query->whereNull('end_datetime')
-                      ->orWhere('end_datetime', '>', now());
-            })
-            ->where('start_datetime', '<=', now())
-            ->whereNull('deleted_at')
-            ->exists();
-
-        if (!$hasOtherActiveAssignment) {
-            // Libérer le véhicule
-            $assignment->vehicle->update([
-                'is_available' => true,
-                'current_driver_id' => null,
-                'assignment_status' => 'available',
-                'last_assignment_end' => $assignment->end_datetime
-            ]);
-
-            Log::info('[ProcessExpiredAssignmentsEnhanced] 🚗 Véhicule libéré', [
-                'vehicle_id' => $assignment->vehicle_id,
-                'registration' => $assignment->vehicle->registration_plate
-            ]);
-
-            // Événement pour notifications temps réel
-            event(new \App\Events\VehicleStatusChanged($assignment->vehicle, 'available'));
-
-            return true;
-        }
-
-        return false;
-    }
-
-    /**
-     * Libérer le chauffeur si nécessaire
-     *
-     * @param Assignment $assignment
-     * @return bool
-     */
-    private function releaseDriverIfNeeded(Assignment $assignment): bool
-    {
-        if (!$assignment->driver) {
-            return false;
-        }
-
-        // Vérifier s'il y a d'autres affectations actives pour ce chauffeur
-        $hasOtherActiveAssignment = Assignment::where('driver_id', $assignment->driver_id)
-            ->where('id', '!=', $assignment->id)
-            ->where(function ($query) {
-                $query->whereNull('end_datetime')
-                      ->orWhere('end_datetime', '>', now());
-            })
-            ->where('start_datetime', '<=', now())
-            ->whereNull('deleted_at')
-            ->exists();
-
-        if (!$hasOtherActiveAssignment) {
-            // Libérer le chauffeur
-            $assignment->driver->update([
-                'is_available' => true,
-                'current_vehicle_id' => null,
-                'assignment_status' => 'available',
-                'last_assignment_end' => $assignment->end_datetime
-            ]);
-
-            Log::info('[ProcessExpiredAssignmentsEnhanced] 👤 Chauffeur libéré', [
-                'driver_id' => $assignment->driver_id,
-                'name' => $assignment->driver->full_name
-            ]);
-
-            // Événement pour notifications temps réel
-            event(new \App\Events\DriverStatusChanged($assignment->driver, 'available'));
-
-            return true;
-        }
-
-        return false;
-    }
 
     /**
      * Effectuer des vérifications post-traitement

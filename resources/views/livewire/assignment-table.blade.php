@@ -406,6 +406,28 @@
  </p>
  </div>
 
+ {{-- Indication du kilométrage actuel du véhicule --}}
+ @if($selectedAssignment->vehicle && $selectedAssignment->vehicle->current_mileage)
+ <div class="mt-3 bg-blue-50 rounded-md p-3 border border-blue-200">
+ <div class="flex items-start">
+ <div class="flex-shrink-0">
+ <svg class="h-5 w-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+ <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+ </svg>
+ </div>
+ <div class="ml-3 flex-1">
+ <p class="text-xs font-medium text-blue-700 uppercase tracking-wider">Kilométrage actuel du véhicule</p>
+ <p class="mt-0.5 text-base font-bold text-blue-900 font-mono">
+ {{ number_format($selectedAssignment->vehicle->current_mileage) }} km
+ </p>
+ <p class="mt-0.5 text-xs text-blue-600">
+ Enregistré dans le système pour information
+ </p>
+ </div>
+ </div>
+ </div>
+ @endif
+
  <div class="mt-4 space-y-4">
  <div>
  <label for="terminateDateTime" class="block text-sm font-medium text-gray-700">

@@ -67,6 +67,10 @@ class AssignmentTable extends Component
     public bool $showEndModal = false;
     public bool $showDeleteModal = false;
     public ?Assignment $selectedAssignment = null;
+    
+    // Kilométrage de fin (enterprise upgrade)
+    public ?int $endMileage = null;
+    public ?string $endNotes = null;
 
     // Données pour les selects
     public $vehicles = [];
@@ -227,6 +231,11 @@ class AssignmentTable extends Component
         }
 
         $this->selectedAssignment = $assignment;
+        
+        // 🎯 ENTERPRISE UPGRADE: Pré-remplir avec le kilométrage actuel du véhicule
+        $this->endMileage = $assignment->vehicle?->current_mileage ?? $assignment->start_mileage;
+        $this->endNotes = null;
+        
         $this->showEndModal = true;
     }
 
@@ -239,9 +248,23 @@ class AssignmentTable extends Component
 
         $this->authorize('end', $this->selectedAssignment);
 
-        if ($this->selectedAssignment->end()) {
+        // Validation du kilométrage
+        if ($this->endMileage < $this->selectedAssignment->start_mileage) {
             $this->setMessage(
-                "Affectation terminée avec succès. Véhicule {$this->selectedAssignment->vehicle_display} restitué.",
+                "Le kilométrage de fin ({$this->endMileage} km) ne peut pas être inférieur au kilométrage de début (" . 
+                number_format($this->selectedAssignment->start_mileage) . " km).",
+                'error'
+            );
+            return;
+        }
+
+        // 🎯 ENTERPRISE UPGRADE: Terminer avec kilométrage et notes
+        if ($this->selectedAssignment->end(now(), $this->endMileage, $this->endNotes)) {
+            $distanceParcourue = $this->endMileage - $this->selectedAssignment->start_mileage;
+            
+            $this->setMessage(
+                "Affectation terminée avec succès. Véhicule {$this->selectedAssignment->vehicle_display} restitué. " .
+                "Distance parcourue: " . number_format($distanceParcourue) . " km.",
                 'success'
             );
 
@@ -402,6 +425,8 @@ class AssignmentTable extends Component
     {
         $this->showEndModal = false;
         $this->selectedAssignment = null;
+        $this->endMileage = null;
+        $this->endNotes = null;
     }
 
     public function closeDeleteModal()

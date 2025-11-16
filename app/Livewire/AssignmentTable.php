@@ -273,7 +273,7 @@ class AssignmentTable extends Component
 
     public function openTerminateModal(int $assignmentId): void
     {
-        $this->selectedAssignment = Assignment::findOrFail($assignmentId);
+        $this->selectedAssignment = Assignment::with('vehicle')->findOrFail($assignmentId);
         $this->authorize('update', $this->selectedAssignment);
 
         if (!$this->selectedAssignment->is_ongoing) {

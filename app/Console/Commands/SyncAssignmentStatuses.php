@@ -6,6 +6,7 @@ use App\Models\Assignment;
 use App\Models\Driver;
 use App\Models\Vehicle;
 use App\Notifications\AssignmentSyncAnomalyDetected;
+use App\Traits\ManagesResourceStatus;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -49,6 +50,8 @@ use Carbon\Carbon;
  */
 class SyncAssignmentStatuses extends Command
 {
+    use ManagesResourceStatus;
+
     protected $signature = 'assignments:sync
                             {--dry-run : Simulation sans modification}
                             {--force : Force sans confirmation}
@@ -217,11 +220,9 @@ class SyncAssignmentStatuses extends Command
                 }
 
                 if (!$dryRun) {
-                    $vehicle->is_available = $shouldBeAvailable;
-                    $vehicle->assignment_status = $shouldBeAvailable ? 'available' : 'assigned';
-
                     if ($shouldBeAvailable) {
-                        $vehicle->current_driver_id = null;
+                        // Utiliser la logique de libération intelligente du Trait
+                        $this->releaseResource($vehicle);
                         $this->vehiclesFreed++;
                     } else {
                         // Récupérer le chauffeur de l'affectation active
@@ -294,17 +295,9 @@ class SyncAssignmentStatuses extends Command
                 }
 
                 if (!$dryRun) {
-                    $driver->is_available = $shouldBeAvailable;
-                    $driver->assignment_status = $shouldBeAvailable ? 'available' : 'assigned';
-
-                    // 🔧 FIX ENTERPRISE-GRADE: Synchronisation du status_id (statut métier)
                     if ($shouldBeAvailable) {
-                        $driver->current_vehicle_id = null;
-                        // Mettre le statut métier "Disponible"
-                        $disponibleStatusId = \DB::table('driver_statuses')
-                            ->where('name', 'Disponible')
-                            ->value('id') ?? 7;
-                        $driver->status_id = $disponibleStatusId;
+                        // Utiliser la logique de libération intelligente du Trait
+                        $this->releaseResource($driver);
                         $this->driversFreed++;
                     } else {
                         // Récupérer le véhicule de l'affectation active
