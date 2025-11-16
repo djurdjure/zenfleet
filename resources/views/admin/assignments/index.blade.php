@@ -380,7 +380,7 @@ DESIGN PRINCIPLES:
  <div class="flex items-center justify-center gap-1">
  {{-- Terminer Button (only for active/ongoing assignments) --}}
  @if($assignment->canBeEnded())
- <button onclick="endAssignment({{ $assignment->id }}, '{{ addslashes($assignment->vehicle->registration_plate) }}', '{{ addslashes($assignment->driver->full_name) }}')"
+ <button onclick="endAssignment({{ $assignment->id }}, '{{ addslashes($assignment->vehicle->registration_plate) }}', '{{ addslashes($assignment->driver->full_name) }}', {{ $assignment->vehicle->current_mileage ?? 'null' }})"
  class="inline-flex items-center p-1.5 text-orange-600 hover:text-orange-700 hover:bg-orange-50 rounded-lg transition-all duration-200"
  title="Terminer l'affectation">
  <x-iconify icon="lucide:flag-triangle-right" class="w-4 h-4" />
@@ -510,7 +510,7 @@ DESIGN PRINCIPLES:
 /**
  * Terminer une affectation avec modal ultra-professionnelle
  */
-function endAssignment(assignmentId, vehiclePlate, driverName) {
+function endAssignment(assignmentId, vehiclePlate, driverName, currentMileage = null) {
     // Générer la date/heure actuelle au format datetime-local
     const now = new Date();
     const year = now.getFullYear();
@@ -519,6 +519,9 @@ function endAssignment(assignmentId, vehiclePlate, driverName) {
     const hours = String(now.getHours()).padStart(2, '0');
     const minutes = String(now.getMinutes()).padStart(2, '0');
     const currentDatetime = `${year}-${month}-${day}T${hours}:${minutes}`;
+
+    // Formatter le kilométrage pour l'affichage
+    const formattedMileage = currentMileage ? new Intl.NumberFormat('fr-FR').format(currentMileage) : null;
 
     const modal = document.createElement('div');
     modal.className = 'fixed inset-0 z-50 overflow-y-auto';
@@ -583,6 +586,28 @@ function endAssignment(assignmentId, vehiclePlate, driverName) {
                                         Champ obligatoire
                                     </p>
                                 </div>
+
+                                ${formattedMileage ? `
+                                {{-- Indication du kilométrage actuel du véhicule --}}
+                                <div class="bg-blue-50 rounded-lg p-3 border border-blue-200">
+                                    <div class="flex items-start">
+                                        <div class="flex-shrink-0">
+                                            <svg class="h-5 w-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                                            </svg>
+                                        </div>
+                                        <div class="ml-3 flex-1">
+                                            <p class="text-xs font-medium text-blue-700 uppercase tracking-wider">Kilométrage actuel du véhicule</p>
+                                            <p class="mt-0.5 text-base font-bold text-blue-900 font-mono">
+                                                ${formattedMileage} km
+                                            </p>
+                                            <p class="mt-0.5 text-xs text-blue-600">
+                                                Valeur enregistrée dans le système pour information
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                                ` : ''}
 
                                 {{-- Kilométrage de fin - OPTIONNEL --}}
                                 <div>
