@@ -111,10 +111,6 @@ class AssignmentForm extends Component
 
         \Log::info('[ROOT AssignmentForm] Avant loadOptions()');
         $this->loadOptions();
-        
-        // Formater les dates pour l'affichage dans le formulaire
-        $this->formatDatesForDisplay();
-        
         \Log::info('[ROOT AssignmentForm] Après loadOptions() - mount() terminé avec succès');
     }
 
@@ -180,7 +176,6 @@ class AssignmentForm extends Component
     // 🆕 WATCHERS POUR DATE/HEURE SÉPARÉES
     public function updatedStartDate()
     {
-        $this->convertDateFromFrenchFormat('start_date');
         $this->combineDateTime();
         $this->validateAssignment();
     }
@@ -193,9 +188,6 @@ class AssignmentForm extends Component
 
     public function updatedEndDate()
     {
-        if ($this->end_date) {
-            $this->convertDateFromFrenchFormat('end_date');
-        }
         $this->combineDateTime();
         $this->validateAssignment();
     }
@@ -266,106 +258,6 @@ class AssignmentForm extends Component
             $this->end_datetime = $this->end_date . ' ' . $this->end_time;
         } elseif (!$this->end_date) {
             $this->end_datetime = '';
-        }
-    }
-
-    /**
-     * 🔥 ENTERPRISE GRADE: Convertit une date du format français (d/m/Y) vers ISO (Y-m-d)
-     * Gère intelligemment les différents formats possibles
-     * 
-     * @param string $property Nom de la propriété à convertir
-     * @return void
-     */
-    private function convertDateFromFrenchFormat(string $property): void
-    {
-        if (empty($this->$property)) {
-            return;
-        }
-
-        try {
-            $dateValue = $this->$property;
-            
-            // Si déjà au format ISO (Y-m-d), ne rien faire
-            if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $dateValue)) {
-                return;
-            }
-            
-            // Convertir du format français (d/m/Y ou d-m-Y) vers ISO
-            if (preg_match('/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})$/', $dateValue, $matches)) {
-                $day = str_pad($matches[1], 2, '0', STR_PAD_LEFT);
-                $month = str_pad($matches[2], 2, '0', STR_PAD_LEFT);
-                $year = $matches[3];
-                
-                // Validation basique de la date
-                if (checkdate((int)$month, (int)$day, (int)$year)) {
-                    $this->$property = "$year-$month-$day";
-                } else {
-                    // Date invalide, réinitialiser
-                    $this->addError($property, "La date saisie n'est pas valide.");
-                    $this->$property = '';
-                }
-            }
-        } catch (\Exception $e) {
-            \Log::error('[AssignmentForm] Erreur conversion date', [
-                'property' => $property,
-                'value' => $this->$property ?? null,
-                'error' => $e->getMessage()
-            ]);
-            $this->$property = '';
-        }
-    }
-
-    /**
-     * 🔥 ENTERPRISE GRADE: Convertit une date du format ISO (Y-m-d) vers français (d/m/Y)
-     * Pour l'affichage dans les champs de formulaire
-     * 
-     * @param string $date Date au format ISO
-     * @return string Date au format français
-     */
-    private function formatDateForDisplay(string $date): string
-    {
-        if (empty($date)) {
-            return '';
-        }
-
-        try {
-            // Si déjà au format français, retourner tel quel
-            if (preg_match('/^\d{1,2}[\/\-]\d{1,2}[\/\-]\d{4}$/', $date)) {
-                return str_replace('-', '/', $date);
-            }
-            
-            // Convertir du format ISO vers français
-            if (preg_match('/^(\d{4})-(\d{2})-(\d{2})/', $date, $matches)) {
-                return $matches[3] . '/' . $matches[2] . '/' . $matches[1];
-            }
-            
-            // Essayer avec Carbon comme fallback
-            return Carbon::parse($date)->format('d/m/Y');
-        } catch (\Exception $e) {
-            \Log::error('[AssignmentForm] Erreur formatage date pour affichage', [
-                'date' => $date,
-                'error' => $e->getMessage()
-            ]);
-            return $date;
-        }
-    }
-
-    /**
-     * 🔥 ENTERPRISE GRADE: Formate toutes les dates du formulaire pour l'affichage
-     * Convertit du format ISO stocké en interne vers le format français pour l'UI
-     * 
-     * @return void
-     */
-    private function formatDatesForDisplay(): void
-    {
-        // Formater la date de début si présente
-        if ($this->start_date && preg_match('/^\d{4}-\d{2}-\d{2}$/', $this->start_date)) {
-            $this->start_date = $this->formatDateForDisplay($this->start_date);
-        }
-        
-        // Formater la date de fin si présente
-        if ($this->end_date && preg_match('/^\d{4}-\d{2}-\d{2}$/', $this->end_date)) {
-            $this->end_date = $this->formatDateForDisplay($this->end_date);
         }
     }
 
@@ -485,12 +377,6 @@ class AssignmentForm extends Component
      */
     public function save()
     {
-        // S'assurer que les dates sont au format ISO avant validation
-        $this->convertDateFromFrenchFormat('start_date');
-        if ($this->end_date) {
-            $this->convertDateFromFrenchFormat('end_date');
-        }
-        
         // Combiner date et heure avant validation
         $this->combineDateTime();
 
@@ -639,7 +525,7 @@ class AssignmentForm extends Component
         $this->vehicle_id = (string) $assignment->vehicle_id;
         $this->driver_id = (string) $assignment->driver_id;
 
-        // Séparation date et heure - Format ISO pour le stockage interne
+        // Séparation date et heure
         if ($assignment->start_datetime) {
             $this->start_date = $assignment->start_datetime->format('Y-m-d');
             $this->start_time = $assignment->start_datetime->format('H:i');
@@ -655,8 +541,6 @@ class AssignmentForm extends Component
             $this->end_time = '18:00';
             $this->end_datetime = '';
         }
-        
-        // Les dates seront formatées en français dans mount() via formatDatesForDisplay()
 
         $this->start_mileage = $assignment->start_mileage;
         $this->reason = $assignment->reason ?? '';
@@ -672,8 +556,8 @@ class AssignmentForm extends Component
 
     private function initializeNewAssignment()
     {
-        // Date de début = aujourd'hui au format français
-        $this->start_date = now()->format('Y-m-d'); // Format ISO pour la logique interne
+        // Date de début = demain
+        $this->start_date = now()->addDay()->format('Y-m-d');
         $this->start_time = '08:00';
 
         // Fin vide par défaut (durée indéterminée)

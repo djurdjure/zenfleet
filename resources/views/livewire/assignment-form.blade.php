@@ -19,33 +19,6 @@ Design surpassant Fleetio, Samsara et Verizon Connect:
 <div x-data="assignmentFormValidation()" class="bg-gray-50 min-h-screen py-8">
     <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
         {{-- ===============================================
-        HEADER AVEC GRADIENT ET ICÔNE
-        =============================================== --}}
-        <div class="mb-6">
-            <div class="flex items-start gap-4">
-                {{-- Icône avec gradient box --}}
-                <div class="flex-shrink-0">
-                    <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-lg shadow-blue-500/30">
-                        <x-iconify icon="heroicons:clipboard-document-check" class="w-8 h-8 text-white" />
-                    </div>
-                </div>
-
-                {{-- Titre et description --}}
-                <div class="flex-1">
-                    <h1 class="text-2xl font-bold text-gray-900 mb-1 flex items-center gap-2.5">
-                        {{ $isEditing ? 'Modifier l\'Affectation' : 'Nouvelle Affectation' }}
-                    </h1>
-                    <p class="text-sm text-gray-600 leading-relaxed">
-                        {{ $isEditing
-                            ? 'Modifiez les informations de cette affectation véhicule ↔ chauffeur.'
-                            : 'Assignez un véhicule à un chauffeur pour une période donnée. Les conflits seront détectés automatiquement.'
-                        }}
-                    </p>
-                </div>
-            </div>
-        </div>
-
-        {{-- ===============================================
         ALERTES GLOBALES DE VALIDATION
         =============================================== --}}
         @if ($errors->any())
@@ -127,16 +100,16 @@ Design surpassant Fleetio, Samsara et Verizon Connect:
         =============================================== --}}
         <form wire:submit="save" class="space-y-6">
             {{-- ===============================================
-            SECTION 1: RESSOURCES À AFFECTER
+            SECTION 1: RESSOURCES À AFFECTER (ENTERPRISE V3 - FOND BLEU)
             =============================================== --}}
-            <x-card>
+            <x-card class="bg-gradient-to-br from-blue-50 to-cyan-50 border-2 border-blue-200">
                 <div class="space-y-6">
-                    <div>
-                        <h2 class="text-lg font-semibold text-gray-900 mb-1 flex items-center gap-2">
+                    <div class="pb-4 border-b border-blue-200">
+                        <h2 class="text-lg font-semibold text-blue-900 mb-1 flex items-center gap-2">
                             <x-iconify icon="heroicons:users" class="w-5 h-5 text-blue-600" />
                             Ressources à Affecter
                         </h2>
-                        <p class="text-sm text-gray-600">Sélectionnez le véhicule et le chauffeur pour cette affectation.</p>
+                        <p class="text-sm text-blue-700">Sélectionnez le véhicule et le chauffeur pour cette affectation.</p>
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -149,15 +122,20 @@ Design surpassant Fleetio, Samsara et Verizon Connect:
                                     <span class="text-red-500">*</span>
                                 </div>
                             </label>
-                            <div wire:ignore>
+                            {{-- wire:ignore car SlimSelect gère le DOM, pas de wire:model pour éviter conflit --}}
+                            <div wire:ignore id="vehicle-select-wrapper">
                                 <select
-                                    wire:model="vehicle_id"
                                     id="vehicle_id"
+                                    name="vehicle_id"
                                     class="slimselect-vehicle w-full"
                                     required>
-                                    <option value="">Sélectionnez un véhicule</option>
+                                    {{-- Option placeholder avec data-placeholder pour SlimSelect --}}
+                                    <option data-placeholder="true" value=""></option>
                                     @foreach($vehicleOptions as $vehicle)
-                                        <option value="{{ $vehicle->id }}" @selected($vehicle_id == $vehicle->id)>
+                                        <option 
+                                            value="{{ $vehicle->id }}" 
+                                            data-mileage="{{ $vehicle->current_mileage ?? 0 }}"
+                                            @selected($vehicle_id == $vehicle->id)>
                                             {{ $vehicle->registration_plate }} - {{ $vehicle->brand }} {{ $vehicle->model }}
                                         </option>
                                     @endforeach
@@ -171,18 +149,56 @@ Design surpassant Fleetio, Samsara et Verizon Connect:
                             @enderror
                             <p class="mt-1.5 text-xs text-gray-500">Sélectionnez le véhicule à affecter</p>
 
-                            {{-- Indicateur kilométrage actuel --}}
-                            @if($current_vehicle_mileage)
-                                <div class="mt-3 flex items-start gap-2.5 p-3 bg-purple-50 border border-purple-100 rounded-lg">
-                                    <x-iconify icon="heroicons:information-circle" class="w-5 h-5 text-purple-600 flex-shrink-0 mt-0.5" />
-                                    <div class="text-sm">
-                                        <p class="font-medium text-purple-900">Kilométrage actuel</p>
-                                        <p class="text-purple-700 mt-0.5">
-                                            <strong class="font-semibold">{{ number_format($current_vehicle_mileage) }} km</strong>
-                                        </p>
+                            {{-- 🆕 ENTERPRISE V3: Indicateur kilométrage actuel ÉDITABLE (affiché dès la sélection) --}}
+                            <div 
+                                id="mileage-display-section" 
+                                class="mt-3 p-4 bg-white border-2 border-blue-200 rounded-lg shadow-sm"
+                                style="display: {{ $current_vehicle_mileage ? 'block' : 'none' }};">
+                                <div class="flex items-start justify-between gap-3 mb-3">
+                                    <div class="flex items-start gap-2.5">
+                                        <x-iconify icon="heroicons:gauge" class="w-6 h-6 text-blue-600 flex-shrink-0 mt-0.5" />
+                                        <div>
+                                            <p class="font-semibold text-blue-900 text-sm">Kilométrage du véhicule</p>
+                                            <p class="text-xs text-blue-600 mt-0.5">
+                                                Actuel: <strong class="font-bold" id="current-mileage-display">{{ number_format($current_vehicle_mileage ?? 0) }} km</strong>
+                                            </p>
+                                        </div>
                                     </div>
                                 </div>
-                            @endif
+
+                                {{-- Champ de mise à jour du kilométrage --}}
+                                <div class="space-y-2">
+                                    <div class="flex items-center gap-2">
+                                        <input
+                                            type="number"
+                                            wire:model.live="start_mileage"
+                                            id="start_mileage_input"
+                                            class="flex-1 px-3 py-2 text-sm border border-blue-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                            placeholder="Entrer le nouveau kilométrage"
+                                            min="{{ $current_vehicle_mileage ?? 0 }}">
+                                        <span class="text-sm font-medium text-gray-600">km</span>
+                                    </div>
+
+                                    {{-- Checkbox pour mettre à jour le véhicule --}}
+                                    <label class="flex items-center gap-2 text-xs cursor-pointer">
+                                        <input
+                                            type="checkbox"
+                                            wire:model="updateVehicleMileage"
+                                            class="w-4 h-4 text-blue-600 border-blue-300 rounded focus:ring-blue-500">
+                                        <span class="text-gray-700">
+                                            Mettre à jour le kilométrage du véhicule et créer une entrée dans l'historique
+                                        </span>
+                                    </label>
+
+                                    {{-- Indicateur de modification --}}
+                                    @if($mileageModified && $start_mileage > $current_vehicle_mileage)
+                                        <div class="flex items-center gap-1.5 text-xs text-green-700 bg-green-50 px-2 py-1 rounded">
+                                            <x-iconify icon="heroicons:check-circle" class="w-4 h-4" />
+                                            <span>Nouveau kilométrage: {{ number_format($start_mileage) }} km (+{{ number_format($start_mileage - $current_vehicle_mileage) }} km)</span>
+                                        </div>
+                                    @endif
+                                </div>
+                            </div>
                         </div>
 
                         {{-- Sélection Chauffeur --}}
@@ -194,13 +210,15 @@ Design surpassant Fleetio, Samsara et Verizon Connect:
                                     <span class="text-red-500">*</span>
                                 </div>
                             </label>
-                            <div wire:ignore>
+                            {{-- wire:ignore car SlimSelect gère le DOM, pas de wire:model pour éviter conflit --}}
+                            <div wire:ignore id="driver-select-wrapper">
                                 <select
-                                    wire:model="driver_id"
                                     id="driver_id"
+                                    name="driver_id"
                                     class="slimselect-driver w-full"
                                     required>
-                                    <option value="">Sélectionnez un chauffeur</option>
+                                    {{-- Option placeholder avec data-placeholder pour SlimSelect --}}
+                                    <option data-placeholder="true" value=""></option>
                                     @foreach($driverOptions as $driver)
                                         <option value="{{ $driver->id }}" @selected($driver_id == $driver->id)>
                                             {{ $driver->first_name }} {{ $driver->last_name }}
@@ -224,7 +242,7 @@ Design surpassant Fleetio, Samsara et Verizon Connect:
             </x-card>
 
             {{-- ===============================================
-            SECTION 2: PÉRIODE D'AFFECTATION
+            SECTION 2: PÉRIODE D'AFFECTATION (ENTERPRISE V3 - DATE/HEURE SÉPARÉES)
             =============================================== --}}
             <x-card>
                 <div class="space-y-6">
@@ -237,42 +255,109 @@ Design surpassant Fleetio, Samsara et Verizon Connect:
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        {{-- Date/heure de début --}}
-                        <div>
-                            <x-datepicker
-                                name="start_datetime"
-                                wire:model.live="start_datetime"
-                                label="Date et heure de remise"
-                                icon="calendar-days"
-                                type="datetime-local"
-                                required
-                                :value="$start_datetime"
-                                :error="$errors->first('start_datetime')"
-                                helpText="Quand le chauffeur récupère le véhicule"
-                            />
+                        {{-- DÉBUT : Date + Heure --}}
+                        <div class="space-y-4">
+                            <h3 class="text-sm font-semibold text-gray-900 flex items-center gap-2">
+                                <x-iconify icon="heroicons:play" class="w-4 h-4 text-green-600" />
+                                Début d'affectation
+                            </h3>
+
+                            {{-- Date + Heure de début (côte à côte) --}}
+                            <div class="flex items-start gap-3">
+                                {{-- Date de début (largeur réduite) --}}
+                                <div class="flex-1 min-w-0">
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Date de remise *</label>
+                                    <x-datepicker
+                                        name="start_date"
+                                        wire:model.live="start_date"
+                                        :value="$start_date"
+                                        :error="$errors->first('start_date')"
+                                        placeholder="Choisir une date"
+                                        format="d/m/Y"
+                                        required
+                                    />
+                                </div>
+
+                                {{-- Heure de début (petite largeur) --}}
+                                <div class="w-32 flex-shrink-0">
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Heure *</label>
+                                    <div wire:ignore id="start-time-wrapper">
+                                        <select
+                                            id="start_time"
+                                            name="start_time"
+                                            class="slimselect-time-start w-full"
+                                            required>
+                                            <option data-placeholder="true" value=""></option>
+                                            @foreach($this->timeOptions as $time)
+                                                <option value="{{ $time['value'] }}" @selected($start_time == $time['value'])>
+                                                    {{ $time['label'] }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
 
-                        {{-- Date/heure de fin --}}
-                        <div>
-                            <x-datepicker
-                                name="end_datetime"
-                                wire:model.live="end_datetime"
-                                label="Date et heure de restitution"
-                                icon="calendar-days"
-                                type="datetime-local"
-                                :value="$end_datetime"
-                                :error="$errors->first('end_datetime')"
-                                helpText="Laisser vide pour une durée indéterminée"
-                            />
+                        {{-- FIN : Date + Heure (optionnel) --}}
+                        <div class="space-y-4">
+                            <h3 class="text-sm font-semibold text-gray-900 flex items-center gap-2">
+                                <x-iconify icon="heroicons:stop" class="w-4 h-4 text-red-600" />
+                                Fin d'affectation (optionnel)
+                            </h3>
+
+                            {{-- Date + Heure de fin (côte à côte) --}}
+                            <div class="flex items-start gap-3">
+                                {{-- Date de fin (largeur réduite) --}}
+                                <div class="flex-1 min-w-0">
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Date de restitution</label>
+                                    <x-datepicker
+                                        name="end_date"
+                                        wire:model.live="end_date"
+                                        :value="$end_date"
+                                        :error="$errors->first('end_date')"
+                                        placeholder="Laisser vide si indéterminée"
+                                        format="d/m/Y"
+                                        :minDate="$start_date"
+                                    />
+                                    <p class="mt-1 text-xs text-gray-500">Laisser vide pour une durée indéterminée</p>
+                                </div>
+
+                                {{-- Heure de fin (petite largeur) - Affiché seulement si date de fin --}}
+                                <div class="w-32 flex-shrink-0">
+                                    @if($end_date)
+                                        <div wire:ignore id="end-time-wrapper">
+                                            <label class="block text-sm font-medium text-gray-700 mb-2">Heure</label>
+                                            <select
+                                                id="end_time"
+                                                name="end_time"
+                                                class="slimselect-time-end w-full">
+                                                <option data-placeholder="true" value=""></option>
+                                                @foreach($this->timeOptions as $time)
+                                                    <option value="{{ $time['value'] }}" @selected($end_time == $time['value'])>
+                                                        {{ $time['label'] }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                            @error('end_time')
+                                                <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
+                                            @enderror
+                                        </div>
+                                    @else
+                                        {{-- Placeholder vide pour maintenir l'alignement --}}
+                                        <div class="h-[42px] mb-2">&nbsp;</div>
+                                    @endif
+                                </div>
+                            </div>
 
                             {{-- Affichage durée calculée --}}
                             @if($this->duration_hours !== null)
-                                <div class="mt-3 flex items-center gap-2 text-sm text-gray-600 bg-blue-50 border border-blue-100 rounded-lg p-3">
+                                <div class="flex items-center gap-2 text-sm text-gray-600 bg-blue-50 border border-blue-100 rounded-lg p-3 mt-3">
                                     <x-iconify icon="heroicons:clock" class="w-5 h-5 text-blue-600" />
                                     <span>Durée : <strong class="font-semibold text-gray-900">{{ $this->formatted_duration }}</strong></span>
                                 </div>
-                            @elseif($start_datetime && !$end_datetime)
-                                <div class="mt-3 flex items-center gap-2 text-sm text-blue-600 bg-blue-50 border border-blue-100 rounded-lg p-3">
+                            @elseif($start_date && !$end_date)
+                                <div class="flex items-center gap-2 text-sm text-blue-600 bg-blue-50 border border-blue-100 rounded-lg p-3 mt-3">
                                     <x-iconify icon="heroicons:arrow-path" class="w-5 h-5" />
                                     <span class="font-medium">Durée indéterminée</span>
                                 </div>
@@ -281,7 +366,7 @@ Design surpassant Fleetio, Samsara et Verizon Connect:
                     </div>
 
                     {{-- Bouton suggérer créneau --}}
-                    @if($start_datetime && $vehicle_id && $driver_id)
+                    @if($start_date && $vehicle_id && $driver_id)
                         <div class="pt-4 border-t border-gray-200">
                             <button
                                 type="button"
@@ -306,36 +391,10 @@ Design surpassant Fleetio, Samsara et Verizon Connect:
                             <x-iconify icon="heroicons:document-text" class="w-5 h-5 text-blue-600" />
                             Détails de l'Affectation
                         </h2>
-                        <p class="text-sm text-gray-600">Informations complémentaires et suivi du kilométrage.</p>
+                        <p class="text-sm text-gray-600">Informations complémentaires sur cette affectation.</p>
                     </div>
 
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        {{-- Kilométrage initial --}}
-                        <div>
-                            <x-input
-                                name="start_mileage"
-                                wire:model="start_mileage"
-                                type="number"
-                                label="Kilométrage initial"
-                                icon="gauge"
-                                placeholder="Ex: 125000"
-                                :value="$start_mileage"
-                                :error="$errors->first('start_mileage')"
-                                helpText="Kilométrage au moment de la remise du véhicule"
-                                min="0"
-                                step="1"
-                            >
-                                <x-slot name="suffix">
-                                    <span class="text-gray-500 text-sm font-medium">km</span>
-                                </x-slot>
-                            </x-input>
-                            @if($current_vehicle_mileage && $start_mileage)
-                                <p class="mt-2 text-xs text-gray-500">
-                                    💡 Le kilométrage actuel du véhicule ({{ number_format($current_vehicle_mileage) }} km) a été pré-rempli automatiquement.
-                                </p>
-                            @endif
-                        </div>
-
+                    <div class="space-y-6">
                         {{-- Motif --}}
                         <div>
                             <x-input
@@ -350,7 +409,6 @@ Design surpassant Fleetio, Samsara et Verizon Connect:
                                 maxlength="500"
                             />
                         </div>
-                    </div>
 
                     {{-- Notes complémentaires --}}
                     <div>
@@ -420,53 +478,206 @@ function assignmentFormValidation() {
     return {
         vehicleSlimSelect: null,
         driverSlimSelect: null,
+        startTimeSlimSelect: null,
+        endTimeSlimSelect: null,
+        isUpdating: false,  // Flag anti-boucle infinie
 
         init() {
-            this.initSlimSelect();
-            this.setupLivewireListeners();
+            this.$nextTick(() => {
+                this.initSlimSelect();
+                this.initTimeSelects();
+                this.setupLivewireListeners();
+            });
         },
 
         initSlimSelect() {
-            // SlimSelect est chargé via CDN dans le layout
-            if (typeof SlimSelect !== 'undefined') {
-                // Véhicule select
-                if (document.querySelector('.slimselect-vehicle')) {
+            // Vérifier que SlimSelect est chargé
+            if (typeof SlimSelect === 'undefined') {
+                console.error('❌ SlimSelect library not loaded');
+                return;
+            }
+
+            // Véhicule select
+            const vehicleEl = document.getElementById('vehicle_id');
+            if (vehicleEl && !this.vehicleSlimSelect) {
+                try {
                     this.vehicleSlimSelect = new SlimSelect({
-                        select: '.slimselect-vehicle',
+                        select: vehicleEl,
                         settings: {
+                            showSearch: true,
+                            searchHighlight: true,
+                            closeOnSelect: true,
+                            allowDeselect: true,  // Permet de revenir au placeholder
+                            placeholderText: 'Sélectionnez un véhicule',
                             searchPlaceholder: 'Rechercher un véhicule...',
                             searchText: 'Aucun véhicule trouvé',
-                            searchingText: 'Recherche...',
-                            placeholderText: 'Sélectionnez un véhicule',
+                            searchingText: 'Recherche en cours...',
                         },
                         events: {
                             afterChange: (newVal) => {
-                                @this.set('vehicle_id', newVal[0]?.value || '');
+                                // Protection anti-boucle infinie
+                                if (this.isUpdating) return;
+                                this.isUpdating = true;
+
+                                const value = newVal[0]?.value || '';
+                                console.log('🚗 Véhicule sélectionné:', value);
+
+                                // Mettre à jour Livewire sans déclencher de re-render
+                                @this.set('vehicle_id', value, false);
+
+                                // Retirer l'état d'erreur
+                                if (value) {
+                                    document.getElementById('vehicle-select-wrapper')?.classList.remove('slimselect-error');
+                                }
+
+                                // 🆕 ENTERPRISE GRADE: Afficher le kilométrage immédiatement (UX réactive)
+                                this.updateMileageDisplay(newVal[0]);
+
+                                // 🔥 CORRECTIF: Charger le kilométrage depuis le serveur pour synchroniser Livewire
+                                if (value) {
+                                    @this.call('loadVehicleMileage').then(() => {
+                                        console.log('✅ Kilométrage synchronisé avec Livewire depuis le serveur');
+                                    }).catch(error => {
+                                        console.error('❌ Erreur lors du chargement du kilométrage:', error);
+                                    });
+                                }
+
+                                // Réinitialiser le flag après un court délai
+                                setTimeout(() => { this.isUpdating = false; }, 100);
                             }
                         }
                     });
+                    console.log('✅ Véhicule SlimSelect initialisé');
+                } catch (error) {
+                    console.error('❌ Erreur init véhicule SlimSelect:', error);
                 }
+            }
 
-                // Chauffeur select
-                if (document.querySelector('.slimselect-driver')) {
+            // Chauffeur select
+            const driverEl = document.getElementById('driver_id');
+            if (driverEl && !this.driverSlimSelect) {
+                try {
                     this.driverSlimSelect = new SlimSelect({
-                        select: '.slimselect-driver',
+                        select: driverEl,
                         settings: {
+                            showSearch: true,
+                            searchHighlight: true,
+                            closeOnSelect: true,
+                            allowDeselect: true,  // Permet de revenir au placeholder
+                            placeholderText: 'Sélectionnez un chauffeur',
                             searchPlaceholder: 'Rechercher un chauffeur...',
                             searchText: 'Aucun chauffeur trouvé',
-                            searchingText: 'Recherche...',
-                            placeholderText: 'Sélectionnez un chauffeur',
+                            searchingText: 'Recherche en cours...',
                         },
                         events: {
                             afterChange: (newVal) => {
-                                @this.set('driver_id', newVal[0]?.value || '');
+                                // Protection anti-boucle infinie
+                                if (this.isUpdating) return;
+                                this.isUpdating = true;
+
+                                const value = newVal[0]?.value || '';
+                                console.log('👤 Chauffeur sélectionné:', value);
+
+                                // Mettre à jour Livewire sans déclencher de re-render
+                                @this.set('driver_id', value, false);
+
+                                // Retirer l'état d'erreur
+                                if (value) {
+                                    document.getElementById('driver-select-wrapper')?.classList.remove('slimselect-error');
+                                }
+
+                                // Réinitialiser le flag après un court délai
+                                setTimeout(() => { this.isUpdating = false; }, 100);
                             }
                         }
                     });
+                    console.log('✅ Chauffeur SlimSelect initialisé');
+                } catch (error) {
+                    console.error('❌ Erreur init chauffeur SlimSelect:', error);
                 }
-            } else {
-                console.error('SlimSelect library not loaded. Please check the CDN link in layout.');
             }
+        },
+
+        /**
+         * 🆕 ENTERPRISE V3: Initialisation des time selectors
+         */
+        initTimeSelects() {
+            if (typeof SlimSelect === 'undefined') return;
+
+            // Heure de début
+            const startTimeEl = document.getElementById('start_time');
+            if (startTimeEl && !this.startTimeSlimSelect) {
+                try {
+                    this.startTimeSlimSelect = new SlimSelect({
+                        select: startTimeEl,
+                        settings: {
+                            showSearch: true,
+                            searchHighlight: false,
+                            closeOnSelect: true,
+                            allowDeselect: false,
+                            placeholderText: 'Sélectionner l\'heure',
+                        },
+                        events: {
+                            afterChange: (newVal) => {
+                                if (this.isUpdating) return;
+                                this.isUpdating = true;
+
+                                const value = newVal[0]?.value || '08:00';
+                                console.log('🕐 Heure début:', value);
+
+                                @this.set('start_time', value, false);
+
+                                setTimeout(() => { this.isUpdating = false; }, 100);
+                            }
+                        }
+                    });
+                    console.log('✅ Time Start SlimSelect initialisé');
+                } catch (error) {
+                    console.error('❌ Erreur init time start SlimSelect:', error);
+                }
+            }
+
+            // Heure de fin (si élément existe)
+            const endTimeEl = document.getElementById('end_time');
+            if (endTimeEl && !this.endTimeSlimSelect) {
+                try {
+                    this.endTimeSlimSelect = new SlimSelect({
+                        select: endTimeEl,
+                        settings: {
+                            showSearch: true,
+                            searchHighlight: false,
+                            closeOnSelect: true,
+                            allowDeselect: false,
+                            placeholderText: 'Sélectionner l\'heure',
+                        },
+                        events: {
+                            afterChange: (newVal) => {
+                                if (this.isUpdating) return;
+                                this.isUpdating = true;
+
+                                const value = newVal[0]?.value || '18:00';
+                                console.log('🕐 Heure fin:', value);
+
+                                @this.set('end_time', value, false);
+
+                                setTimeout(() => { this.isUpdating = false; }, 100);
+                            }
+                        }
+                    });
+                    console.log('✅ Time End SlimSelect initialisé');
+                } catch (error) {
+                    console.error('❌ Erreur init time end SlimSelect:', error);
+                }
+            }
+
+            // Observer pour réinitialiser le sélecteur de fin quand end_date change
+            Livewire.on('reinit-end-time', () => {
+                if (this.endTimeSlimSelect) {
+                    this.endTimeSlimSelect.destroy();
+                    this.endTimeSlimSelect = null;
+                }
+                setTimeout(() => this.initTimeSelects(), 100);
+            });
         },
 
         setupLivewireListeners() {
@@ -510,6 +721,91 @@ function assignmentFormValidation() {
             Livewire.on('conflicts-cleared', (event) => {
                 this.showToast('✓ Aucun conflit détecté', 'success');
             });
+
+            // Gestion des erreurs de validation pour SlimSelect
+            this.setupValidationErrorHandling();
+        },
+
+        setupValidationErrorHandling() {
+            // Observer les erreurs de validation Livewire
+            const checkForErrors = () => {
+                // Véhicule
+                const vehicleHasError = {{ $errors->has('vehicle_id') ? 'true' : 'false' }};
+                const vehicleWrapper = document.getElementById('vehicle-select-wrapper');
+                if (vehicleWrapper) {
+                    vehicleWrapper.classList.toggle('slimselect-error', vehicleHasError);
+                }
+
+                // Chauffeur
+                const driverHasError = {{ $errors->has('driver_id') ? 'true' : 'false' }};
+                const driverWrapper = document.getElementById('driver-select-wrapper');
+                if (driverWrapper) {
+                    driverWrapper.classList.toggle('slimselect-error', driverHasError);
+                }
+            };
+
+            // Vérifier au chargement initial
+            checkForErrors();
+        },
+
+        /**
+         * 🆕 ENTERPRISE GRADE: Affiche le kilométrage du véhicule sélectionné immédiatement
+         * 🔥 CORRECTIF: Amélioration du diagnostic et de la récupération du kilométrage
+         */
+        updateMileageDisplay(selectedOption) {
+            const mileageSection = document.getElementById('mileage-display-section');
+            const mileageDisplay = document.getElementById('current-mileage-display');
+            const mileageInput = document.getElementById('start_mileage_input');
+
+            if (selectedOption && selectedOption.value) {
+                // Récupérer le kilométrage depuis l'option sélectionnée
+                const select = document.getElementById('vehicle_id');
+                const option = select?.querySelector(`option[value="${selectedOption.value}"]`);
+
+                if (!option) {
+                    console.warn('⚠️ Option non trouvée pour le véhicule ID:', selectedOption.value);
+                    return;
+                }
+
+                const mileageAttr = option.getAttribute('data-mileage');
+                const mileage = mileageAttr ? parseInt(mileageAttr, 10) : 0;
+
+                console.log('📊 Kilométrage récupéré:', {
+                    vehicleId: selectedOption.value,
+                    mileageAttr: mileageAttr,
+                    mileageParsed: mileage
+                });
+
+                // Afficher la section
+                if (mileageSection) {
+                    mileageSection.style.display = 'block';
+                }
+
+                // Mettre à jour l'affichage du kilométrage actuel
+                if (mileageDisplay) {
+                    mileageDisplay.textContent = new Intl.NumberFormat('fr-FR').format(mileage) + ' km';
+                }
+
+                // Pré-remplir le champ de kilométrage
+                if (mileageInput) {
+                    mileageInput.value = mileage;
+                    mileageInput.setAttribute('min', mileage);
+                }
+
+                // Notifier Livewire du changement (sans déclencher re-render)
+                @this.set('current_vehicle_mileage', mileage, false);
+                @this.set('start_mileage', mileage, false);
+
+                console.log('✅ Kilométrage affiché avec succès:', mileage, 'km');
+            } else {
+                // Cacher la section si aucun véhicule sélectionné
+                if (mileageSection) {
+                    mileageSection.style.display = 'none';
+                }
+
+                @this.set('current_vehicle_mileage', null, false);
+                @this.set('start_mileage', null, false);
+            }
         },
 
         showToast(message, type = 'info') {
@@ -559,116 +855,204 @@ function assignmentFormValidation() {
 
 {{-- ====================================================================
 STYLES SLIMSELECT PERSONNALISÉS - ZENFLEET ENTERPRISE
+Utilisation des variables CSS natives SlimSelect (--ss-*)
+Note: Le CSS SlimSelect de base est déjà chargé via CDN dans layouts/admin/catalyst.blade.php
 ==================================================================== --}}
 @push('styles')
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/slim-select@2/dist/slimselect.css">
 <style>
-/* 🎨 Personnalisation SlimSelect pour ZenFleet Enterprise */
+/**
+ * 🎨 ZENFLEET SLIMSELECT - Variables CSS Natives
+ * Cohérence visuelle avec Tailwind sans surcharge @apply
+ * Basé sur la palette ZenFleet et les standards du formulaire
+ */
 
-/* Container principal */
+/* ========================================
+   VARIABLES SLIMSELECT PERSONNALISÉES
+   ======================================== */
+:root {
+    /* Couleurs alignées sur Tailwind/ZenFleet */
+    --ss-primary-color: #2563eb;              /* blue-600 - couleur principale */
+    --ss-bg-color: #ffffff;                   /* blanc */
+    --ss-font-color: #1f2937;                 /* gray-800 - texte principal */
+    --ss-font-placeholder-color: #9ca3af;     /* gray-400 - placeholder */
+    --ss-disabled-color: #f3f4f6;             /* gray-100 - désactivé */
+    --ss-border-color: #d1d5db;               /* gray-300 - bordure par défaut */
+    --ss-highlight-color: #fef3c7;            /* yellow-100 - surlignage recherche */
+    --ss-success-color: #16a34a;              /* green-600 */
+    --ss-error-color: #dc2626;                /* red-600 */
+    --ss-focus-color: #3b82f6;                /* blue-500 - focus ring */
+
+    /* Dimensions cohérentes avec x-input et x-datepicker */
+    --ss-main-height: 42px;                   /* Même hauteur que les autres inputs */
+    --ss-content-height: 280px;               /* Hauteur max dropdown */
+    --ss-spacing-l: 12px;                     /* px-3 = 0.75rem = 12px */
+    --ss-spacing-m: 8px;                      /* py-2 = 0.5rem = 8px */
+    --ss-spacing-s: 4px;                      /* petit espacement */
+    --ss-animation-timing: 0.2s;              /* transition fluide */
+    --ss-border-radius: 8px;                  /* rounded-lg = 0.5rem = 8px */
+}
+
+/* ========================================
+   AJUSTEMENTS MINIMAUX (sans @apply)
+   ======================================== */
+
+/* Container principal - alignement avec autres champs */
 .ss-main {
-    @apply rounded-lg border-gray-300 shadow-sm;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); /* shadow-sm */
+    transition: all var(--ss-animation-timing) ease;
 }
 
-.ss-main:focus-within {
-    @apply border-blue-500 ring-1 ring-blue-500;
+/* Focus state avec ring effect */
+.ss-main:focus,
+.ss-main.ss-open-below,
+.ss-main.ss-open-above {
+    border-color: var(--ss-focus-color);
+    box-shadow:
+        0 0 0 3px rgba(59, 130, 246, 0.1),      /* ring-blue-500/10 */
+        0 1px 2px 0 rgba(0, 0, 0, 0.05);         /* shadow-sm */
 }
 
-/* Champ de sélection unique */
-.ss-single {
-    @apply px-3 py-2.5 bg-white;
+/* Valeur sélectionnée - meilleur padding */
+.ss-main .ss-values .ss-single {
+    font-size: 0.875rem;                          /* text-sm = 14px */
+    line-height: 1.25rem;                         /* leading-5 */
+    font-weight: 400;
 }
 
-/* Dropdown content */
+/* Placeholder styling */
+.ss-main .ss-values .ss-placeholder {
+    font-size: 0.875rem;
+    font-style: normal;
+}
+
+/* Dropdown content - ombre plus prononcée */
 .ss-content {
-    @apply rounded-lg border border-gray-200 shadow-lg mt-1 bg-white;
-    max-height: 300px !important;
+    margin-top: 4px;
+    box-shadow:
+        0 10px 15px -3px rgba(0, 0, 0, 0.1),     /* shadow-lg */
+        0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    border-color: #e5e7eb;                        /* gray-200 */
 }
 
 /* Champ de recherche */
-.ss-search input {
-    @apply px-3 py-2.5 text-sm border-0 border-b border-gray-200 focus:border-blue-500 focus:ring-0;
+.ss-content .ss-search {
+    background-color: #f9fafb;                    /* gray-50 */
+    border-bottom: 1px solid #e5e7eb;             /* gray-200 */
+    padding: var(--ss-spacing-m);
 }
 
-/* Options */
-.ss-option {
-    @apply px-3 py-2.5 text-sm text-gray-700 hover:bg-blue-50 cursor-pointer transition-colors;
+.ss-content .ss-search input {
+    font-size: 0.875rem;
+    padding: 10px 12px;
+    border-radius: 6px;                           /* rounded-md */
 }
 
-.ss-option.ss-highlighted {
-    @apply bg-blue-600 text-white;
+.ss-content .ss-search input:focus {
+    border-color: var(--ss-focus-color);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
 
-.ss-option.ss-disabled {
-    @apply opacity-50 cursor-not-allowed bg-gray-50;
+/* Options - style hover amélioré */
+.ss-content .ss-list .ss-option {
+    font-size: 0.875rem;
+    padding: 10px var(--ss-spacing-l);
+    transition: background-color 0.15s ease, color 0.15s ease;
 }
 
-.ss-option:not(.ss-disabled):hover {
-    @apply bg-blue-50;
+.ss-content .ss-list .ss-option:hover {
+    background-color: #eff6ff;                    /* blue-50 */
+    color: var(--ss-font-color);                  /* Garder texte lisible */
 }
 
-/* Textes de recherche */
-.ss-search::placeholder,
-.ss-disabled,
-.ss-list .ss-option.ss-disabled {
-    @apply text-gray-400;
+/* Option sélectionnée - fond plus subtil */
+.ss-content .ss-list .ss-option.ss-highlighted,
+.ss-content .ss-list .ss-option:not(.ss-disabled).ss-selected {
+    background-color: var(--ss-primary-color);
+    color: #ffffff;
 }
 
-/* Flèche dropdown */
-.ss-arrow {
-    @apply text-gray-400;
+/* Option sélectionnée avec checkmark */
+.ss-content .ss-list .ss-option:not(.ss-disabled).ss-selected::after {
+    content: '✓';
+    margin-left: auto;
+    font-weight: 600;
 }
 
-.ss-main.ss-open-above .ss-arrow,
-.ss-main.ss-open-below .ss-arrow {
-    @apply text-blue-600;
+/* État d'erreur de validation Livewire */
+.slimselect-error .ss-main {
+    border-color: var(--ss-error-color) !important;
+    box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1) !important; /* ring-red-600/10 */
 }
 
-/* État d'erreur (pour Livewire validation) */
-.slimselect-vehicle.error .ss-main,
-.slimselect-driver.error .ss-main {
-    @apply border-red-300 ring-1 ring-red-300;
+/* Cacher le placeholder dans la liste des options */
+.ss-content .ss-list .ss-option[data-placeholder="true"] {
+    display: none !important;
 }
 
-/* Loading state */
-.ss-searching {
-    @apply text-blue-600 text-sm px-3 py-2;
+/* Message d'erreur */
+.ss-content .ss-list .ss-error {
+    font-size: 0.875rem;
+    padding: var(--ss-spacing-l);
 }
 
-/* No results */
-.ss-search-noresults {
-    @apply text-gray-500 text-sm px-3 py-2 italic;
+/* Message de recherche en cours */
+.ss-content .ss-list .ss-searching {
+    font-size: 0.875rem;
+    color: var(--ss-primary-color);
+    padding: var(--ss-spacing-l);
 }
 
-/* Multiple selects (si besoin futur) */
-.ss-values .ss-value {
-    @apply bg-blue-100 text-blue-800 rounded px-2 py-1 text-sm;
+/* Flèche de dropdown */
+.ss-main .ss-arrow path {
+    stroke-width: 14;
 }
 
-.ss-values .ss-value .ss-value-delete {
-    @apply text-blue-600 hover:text-blue-800;
+/* Animation d'ouverture du dropdown */
+.ss-content.ss-open-below,
+.ss-content.ss-open-above {
+    animation: zenfleetSlideIn var(--ss-animation-timing) ease-out;
 }
 
-/* Animation smooth */
-.ss-content {
-    animation: slideDown 0.2s ease-out;
-}
-
-@keyframes slideDown {
+@keyframes zenfleetSlideIn {
     from {
         opacity: 0;
-        transform: translateY(-10px);
+        transform: scaleY(0.95) translateY(-4px);
     }
     to {
         opacity: 1;
-        transform: translateY(0);
+        transform: scaleY(1) translateY(0);
     }
 }
 
-/* Responsive */
+/* ========================================
+   RESPONSIVE MOBILE
+   ======================================== */
 @media (max-width: 640px) {
-    .ss-content {
-        max-height: 250px !important;
+    :root {
+        --ss-main-height: 44px;                   /* Plus grand pour touch */
+        --ss-content-height: 240px;
+    }
+
+    .ss-content .ss-list .ss-option {
+        padding: 12px var(--ss-spacing-l);        /* Touch-friendly */
+        min-height: 44px;                         /* iOS minimum */
+    }
+
+    .ss-content .ss-search input {
+        padding: 12px;
+        font-size: 16px;                          /* Évite zoom iOS */
+    }
+}
+
+/* ========================================
+   ACCESSIBILITÉ
+   ======================================== */
+@media (prefers-reduced-motion: reduce) {
+    .ss-main,
+    .ss-content,
+    .ss-option {
+        transition: none !important;
+        animation: none !important;
     }
 }
 </style>

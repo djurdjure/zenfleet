@@ -660,7 +660,10 @@ function endAssignment(assignmentId, vehiclePlate, driverName, currentMileage = 
 }
 
 /**
- * Confirmer la fin d'affectation
+ * 🔥 ENTERPRISE-GRADE: Confirmer la fin d'affectation avec FETCH API
+ *
+ * CORRECTIF pour éviter l'alerte "leave site: Changes you made may not be saved"
+ * Utilisation de fetch() au lieu de form.submit() pour une expérience utilisateur fluide
  */
 function confirmEndAssignment(assignmentId) {
     const endDatetime = document.getElementById('end_datetime')?.value;
@@ -673,48 +676,126 @@ function confirmEndAssignment(assignmentId) {
         return;
     }
 
-    const form = document.createElement('form');
-    form.method = 'POST';
-    form.action = `/admin/assignments/${assignmentId}/end`;
-
-    const csrfInput = document.createElement('input');
-    csrfInput.type = 'hidden';
-    csrfInput.name = '_token';
-    csrfInput.value = '{{ csrf_token() }}';
-    form.appendChild(csrfInput);
-
-    const methodInput = document.createElement('input');
-    methodInput.type = 'hidden';
-    methodInput.name = '_method';
-    methodInput.value = 'PATCH';
-    form.appendChild(methodInput);
-
-    // end_datetime OBLIGATOIRE
-    const datetimeInput = document.createElement('input');
-    datetimeInput.type = 'hidden';
-    datetimeInput.name = 'end_datetime';
-    datetimeInput.value = endDatetime;
-    form.appendChild(datetimeInput);
+    // Préparer les données du formulaire
+    const formData = new FormData();
+    formData.append('_token', '{{ csrf_token() }}');
+    formData.append('_method', 'PATCH');
+    formData.append('end_datetime', endDatetime);
 
     if (endMileage) {
-        const mileageInput = document.createElement('input');
-        mileageInput.type = 'hidden';
-        mileageInput.name = 'end_mileage';
-        mileageInput.value = endMileage;
-        form.appendChild(mileageInput);
+        formData.append('end_mileage', endMileage);
     }
 
     if (endNotes) {
-        const notesInput = document.createElement('input');
-        notesInput.type = 'hidden';
-        notesInput.name = 'notes';
-        notesInput.value = endNotes;
-        form.appendChild(notesInput);
+        formData.append('notes', endNotes);
     }
 
-    document.body.appendChild(form);
-    closeModal();
-    setTimeout(() => form.submit(), 200);
+    // Afficher un indicateur de chargement
+    const modalContent = document.querySelector('.fixed.inset-0.z-50');
+    if (modalContent) {
+        modalContent.innerHTML = `
+            <div class="flex items-center justify-center min-h-screen">
+                <div class="bg-white rounded-2xl p-8 shadow-xl text-center">
+                    <div class="animate-spin rounded-full h-16 w-16 border-b-2 border-orange-600 mx-auto mb-4"></div>
+                    <p class="text-gray-700 font-medium">Terminaison en cours...</p>
+                </div>
+            </div>
+        `;
+    }
+
+    // 🚀 FETCH API ENTERPRISE-GRADE: Requête asynchrone sans rechargement de page
+    fetch(`/admin/assignments/${assignmentId}/end`, {
+        method: 'POST',
+        headers: {
+            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+            'X-Requested-With': 'XMLHttpRequest',
+            'Accept': 'application/json'
+        },
+        body: formData
+    })
+    .then(response => {
+        if (!response.ok) {
+            return response.json().then(data => {
+                throw new Error(data.message || 'Erreur lors de la terminaison');
+            });
+        }
+        return response.json();
+    })
+    .then(data => {
+        // Succès - Fermer la modale
+        closeModal();
+
+        // Afficher un message de succès
+        showSuccessToast(data.message || 'Affectation terminée avec succès');
+
+        // Recharger la page après un court délai pour afficher le nouveau statut
+        setTimeout(() => {
+            window.location.reload();
+        }, 1000);
+    })
+    .catch(error => {
+        // Erreur - Afficher un message d'erreur
+        closeModal();
+        showErrorToast(error.message || 'Erreur lors de la terminaison de l\'affectation');
+
+        console.error('[confirmEndAssignment] Erreur:', error);
+    });
+}
+
+/**
+ * 🎨 Afficher un toast de succès
+ */
+function showSuccessToast(message) {
+    const toast = document.createElement('div');
+    toast.className = 'fixed top-4 right-4 z-50 max-w-md';
+    toast.innerHTML = `
+        <div class="bg-white rounded-lg shadow-lg border-l-4 border-green-500 p-4 animate-slide-in">
+            <div class="flex items-start">
+                <div class="flex-shrink-0">
+                    <svg class="h-6 w-6 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                </div>
+                <div class="ml-3 flex-1">
+                    <p class="text-sm font-medium text-gray-900">Succès</p>
+                    <p class="mt-1 text-sm text-gray-500">${message}</p>
+                </div>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(toast);
+
+    setTimeout(() => {
+        toast.remove();
+    }, 5000);
+}
+
+/**
+ * 🎨 Afficher un toast d'erreur
+ */
+function showErrorToast(message) {
+    const toast = document.createElement('div');
+    toast.className = 'fixed top-4 right-4 z-50 max-w-md';
+    toast.innerHTML = `
+        <div class="bg-white rounded-lg shadow-lg border-l-4 border-red-500 p-4 animate-slide-in">
+            <div class="flex items-start">
+                <div class="flex-shrink-0">
+                    <svg class="h-6 w-6 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                </div>
+                <div class="ml-3 flex-1">
+                    <p class="text-sm font-medium text-gray-900">Erreur</p>
+                    <p class="mt-1 text-sm text-gray-500">${message}</p>
+                </div>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(toast);
+
+    setTimeout(() => {
+        toast.remove();
+    }, 5000);
 }
 
 /**
