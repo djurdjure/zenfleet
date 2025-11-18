@@ -760,8 +760,9 @@ class AssignmentForm extends Component
 
     private function initializeNewAssignment()
     {
-        // Date de début = aujourd'hui au format français
-        $this->start_date = now()->format('Y-m-d'); // Format ISO pour la logique interne
+        // 🔥 ENTERPRISE FIX: Date de début = aujourd'hui
+        // On initialise d'abord au format français pour l'affichage
+        $this->start_date = now()->format('d/m/Y');
         $this->start_time = '08:00';
 
         // Fin vide par défaut (durée indéterminée)
@@ -771,7 +772,12 @@ class AssignmentForm extends Component
         $this->reason = '';
         $this->notes = '';
 
-        // Combiner les valeurs initiales
+        // 🔥 CONVERSION INTELLIGENTE: Convertir vers ISO pour la logique interne
+        // Cette conversion est nécessaire pour que combineDateTime() crée un datetime valide
+        // La date sera reconvertie en français pour l'affichage par formatDatesForDisplay() dans mount()
+        $this->convertDateFromFrenchFormat('start_date');
+        
+        // Combiner les valeurs (maintenant au format ISO)
         $this->combineDateTime();
 
         $this->mileageModified = false;
