@@ -190,7 +190,10 @@ class AssignmentForm extends Component
     // 🆕 WATCHERS POUR DATE/HEURE SÉPARÉES
     public function updatedStartDate()
     {
-        $this->convertDateFromFrenchFormat('start_date');
+        // 🔥 ENTERPRISE FIX: NE PAS convertir ici pour garder le format français dans l'UI
+        // La conversion vers ISO se fera temporairement dans combineDateTime()
+        // Cela évite que Livewire envoie une valeur ISO au navigateur que Flatpickr ne peut pas parser
+        
         $this->combineDateTime();
         
         // 🔍 DÉTECTION AFFECTATION RÉTROACTIVE
@@ -207,9 +210,9 @@ class AssignmentForm extends Component
 
     public function updatedEndDate()
     {
-        if ($this->end_date) {
-            $this->convertDateFromFrenchFormat('end_date');
-        }
+        // 🔥 ENTERPRISE FIX: NE PAS convertir ici, garder format français
+        // La conversion se fera dans combineDateTime()
+        
         $this->combineDateTime();
         $this->validateAssignment();
     }
@@ -266,21 +269,61 @@ class AssignmentForm extends Component
     }
 
     /**
-     * 🆕 ENTERPRISE V3: Combine date et heure
+     * 🆕 ENTERPRISE V4: Combine date et heure avec conversion ISO temporaire
+     * Cette méthode convertit les dates du format français vers ISO pour créer des datetime valides,
+     * SANS modifier les propriétés start_date et end_date (qui restent en français pour l'UI)
      */
     private function combineDateTime(): void
     {
         // Combiner date et heure de début
         if ($this->start_date && $this->start_time) {
-            $this->start_datetime = $this->start_date . ' ' . $this->start_time;
+            // Convertir temporairement vers ISO si nécessaire
+            $startDateISO = $this->convertToISO($this->start_date);
+            $this->start_datetime = $startDateISO . ' ' . $this->start_time;
         }
 
         // Combiner date et heure de fin (si présentes)
         if ($this->end_date && $this->end_time) {
-            $this->end_datetime = $this->end_date . ' ' . $this->end_time;
+            // Convertir temporairement vers ISO si nécessaire
+            $endDateISO = $this->convertToISO($this->end_date);
+            $this->end_datetime = $endDateISO . ' ' . $this->end_time;
         } elseif (!$this->end_date) {
             $this->end_datetime = '';
         }
+    }
+
+    /**
+     * 🔥 ENTERPRISE GRADE: Convertit une date vers ISO SANS modifier la propriété source
+     * Retourne une version ISO de la date pour utilisation interne
+     * 
+     * @param string $date Date au format français ou ISO
+     * @return string Date au format ISO
+     */
+    private function convertToISO(string $date): string
+    {
+        if (empty($date)) {
+            return '';
+        }
+
+        // Si déjà au format ISO, retourner tel quel
+        if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $date)) {
+            return $date;
+        }
+
+        // Convertir du format français vers ISO
+        if (preg_match('/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})$/', $date, $matches)) {
+            $day = str_pad($matches[1], 2, '0', STR_PAD_LEFT);
+            $month = str_pad($matches[2], 2, '0', STR_PAD_LEFT);
+            $year = $matches[3];
+            
+            // Validation de la date
+            if (checkdate((int)$month, (int)$day, (int)$year)) {
+                return "$year-$month-$day";
+            }
+        }
+
+        // Si échec, retourner la valeur originale
+        return $date;
     }
 
     /**
@@ -365,19 +408,21 @@ class AssignmentForm extends Component
     }
 
     /**
-     * 🔥 ENTERPRISE GRADE: Formate toutes les dates du formulaire pour l'affichage
-     * Convertit du format ISO stocké en interne vers le format français pour l'UI
+     * 🔥 ENTERPRISE GRADE V2: Formate les dates ISO vers français pour l'affichage
+     * Convertit UNIQUEMENT les dates au format ISO, laisse les dates françaises intactes
+     * Utilisé après fillFromAssignment() pour convertir les dates venant de la BDD
      * 
      * @return void
      */
     private function formatDatesForDisplay(): void
     {
-        // Formater la date de début si présente
+        // Formater la date de début SI elle est au format ISO
+        // Les dates déjà en français ne sont pas touchées
         if ($this->start_date && preg_match('/^\d{4}-\d{2}-\d{2}$/', $this->start_date)) {
             $this->start_date = $this->formatDateForDisplay($this->start_date);
         }
         
-        // Formater la date de fin si présente
+        // Formater la date de fin SI elle est au format ISO
         if ($this->end_date && preg_match('/^\d{4}-\d{2}-\d{2}$/', $this->end_date)) {
             $this->end_date = $this->formatDateForDisplay($this->end_date);
         }
@@ -573,11 +618,9 @@ class AssignmentForm extends Component
      */
     public function save()
     {
-        // S'assurer que les dates sont au format ISO avant validation
-        $this->convertDateFromFrenchFormat('start_date');
-        if ($this->end_date) {
-            $this->convertDateFromFrenchFormat('end_date');
-        }
+        // 🔥 ENTERPRISE FIX V2: NE PAS convertir les dates ici
+        // Les dates restent en français dans start_date et end_date
+        // combineDateTime() fait la conversion temporaire pour créer start_datetime et end_datetime en ISO
         
         // Combiner date et heure avant validation
         $this->combineDateTime();
@@ -760,8 +803,9 @@ class AssignmentForm extends Component
 
     private function initializeNewAssignment()
     {
-        // 🔥 ENTERPRISE FIX: Date de début = aujourd'hui
-        // On initialise d'abord au format français pour l'affichage
+        // 🔥 ENTERPRISE FIX V2: Date de début = aujourd'hui au format FRANÇAIS
+        // On garde le format français dans la propriété pour compatibilité Flatpickr
+        // La conversion vers ISO se fera automatiquement dans combineDateTime()
         $this->start_date = now()->format('d/m/Y');
         $this->start_time = '08:00';
 
@@ -772,12 +816,8 @@ class AssignmentForm extends Component
         $this->reason = '';
         $this->notes = '';
 
-        // 🔥 CONVERSION INTELLIGENTE: Convertir vers ISO pour la logique interne
-        // Cette conversion est nécessaire pour que combineDateTime() crée un datetime valide
-        // La date sera reconvertie en français pour l'affichage par formatDatesForDisplay() dans mount()
-        $this->convertDateFromFrenchFormat('start_date');
-        
-        // Combiner les valeurs (maintenant au format ISO)
+        // 🔥 PAS DE CONVERSION ICI: start_date reste en français
+        // combineDateTime() fera la conversion temporaire pour créer start_datetime en ISO
         $this->combineDateTime();
 
         $this->mileageModified = false;
