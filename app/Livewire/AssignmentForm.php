@@ -7,6 +7,7 @@ use App\Models\Vehicle;
 use App\Models\Driver;
 use App\Models\VehicleMileageReading;
 use App\Services\OverlapCheckService;
+use App\Services\RetroactiveAssignmentService;
 use Livewire\Component;
 use Livewire\Attributes\Validate;
 use Livewire\Attributes\On;
@@ -78,15 +79,24 @@ class AssignmentForm extends Component
     public bool $isValidating = false;
     public bool $forceCreate = false;
 
+    // 🆕 GESTION DES AFFECTATIONS RÉTROACTIVES (ENTERPRISE V4)
+    public bool $isRetroactive = false;
+    public array $retroactiveValidation = [];
+    public array $historicalWarnings = [];
+    public ?int $confidenceScore = null;
+    public bool $allowPastDates = true; // Autoriser les dates passées
+
     // Options pour les selects
     public $vehicleOptions = [];
     public $driverOptions = [];
 
     protected OverlapCheckService $overlapService;
+    protected RetroactiveAssignmentService $retroactiveService;
 
-    public function boot(OverlapCheckService $overlapService)
+    public function boot(OverlapCheckService $overlapService, RetroactiveAssignmentService $retroactiveService)
     {
         $this->overlapService = $overlapService;
+        $this->retroactiveService = $retroactiveService;
     }
 
     public function mount($assignmentId = null)
@@ -182,6 +192,10 @@ class AssignmentForm extends Component
     {
         $this->convertDateFromFrenchFormat('start_date');
         $this->combineDateTime();
+        
+        // 🔍 DÉTECTION AFFECTATION RÉTROACTIVE
+        $this->checkIfRetroactive();
+        
         $this->validateAssignment();
     }
 
@@ -370,6 +384,48 @@ class AssignmentForm extends Component
     }
 
     /**
+     * 🕐 ENTERPRISE GRADE: Vérifie si l'affectation est rétroactive
+     * Détecte les dates passées et active les validations historiques
+     * 
+     * @return void
+     */
+    private function checkIfRetroactive(): void
+    {
+        if (empty($this->start_date)) {
+            $this->isRetroactive = false;
+            return;
+        }
+
+        try {
+            // Convertir la date au format Carbon pour comparaison
+            $startDate = $this->start_datetime ? Carbon::parse($this->start_datetime) : null;
+            
+            if ($startDate && $startDate->isPast()) {
+                $this->isRetroactive = true;
+                
+                // Calculer le nombre de jours dans le passé
+                $daysInPast = $startDate->diffInDays(now());
+                
+                // Afficher un message informatif
+                if ($daysInPast > 0) {
+                    $this->dispatch('retroactive-detected', [
+                        'message' => "⚠️ Affectation rétroactive détectée ({$daysInPast} jour(s) dans le passé)",
+                        'days' => $daysInPast
+                    ]);
+                }
+            } else {
+                $this->isRetroactive = false;
+            }
+        } catch (\Exception $e) {
+            \Log::error('[AssignmentForm] Erreur détection rétroactive', [
+                'error' => $e->getMessage(),
+                'start_date' => $this->start_date
+            ]);
+            $this->isRetroactive = false;
+        }
+    }
+
+    /**
      * Validation des conflits d'affectation
      */
     public function validateAssignment()
@@ -385,6 +441,38 @@ class AssignmentForm extends Component
             $start = Carbon::parse($this->start_datetime);
             $end = $this->end_datetime ? Carbon::parse($this->end_datetime) : null;
 
+            // 🕐 VALIDATION RÉTROACTIVE si date passée
+            if ($this->isRetroactive) {
+                $retroValidation = $this->retroactiveService->validateRetroactiveAssignment(
+                    vehicleId: (int) $this->vehicle_id,
+                    driverId: (int) $this->driver_id,
+                    startDate: $start,
+                    endDate: $end,
+                    organizationId: auth()->user()->organization_id
+                );
+
+                $this->retroactiveValidation = $retroValidation;
+                $this->historicalWarnings = $retroValidation['warnings'] ?? [];
+                $this->confidenceScore = $retroValidation['confidence_score']['score'] ?? null;
+
+                // Ajouter les erreurs historiques aux erreurs standard
+                if (!$retroValidation['is_valid']) {
+                    foreach ($retroValidation['errors'] as $error) {
+                        $this->addError('historical_validation', $error['message']);
+                    }
+                }
+
+                // Dispatch event pour afficher les warnings historiques
+                if (count($this->historicalWarnings) > 0) {
+                    $this->dispatch('historical-warnings', [
+                        'warnings' => $this->historicalWarnings,
+                        'confidence_score' => $this->confidenceScore,
+                        'recommendations' => $retroValidation['recommendations'] ?? []
+                    ]);
+                }
+            }
+
+            // Validation standard des conflits
             $result = $this->overlapService->checkOverlap(
                 vehicleId: (int) $this->vehicle_id,
                 driverId: (int) $this->driver_id,
@@ -403,7 +491,7 @@ class AssignmentForm extends Component
                     'conflicts' => $this->conflicts,
                     'suggestions' => $this->suggestions
                 ]);
-            } else {
+            } else if (!$this->isRetroactive) {
                 $this->dispatch('conflicts-cleared');
             }
 

@@ -81,6 +81,48 @@ Design surpassant Fleetio, Samsara et Verizon Connect:
             </x-alert>
         @endif
 
+        {{-- 🆕 ENTERPRISE V4: Alerte pour affectations rétroactives --}}
+        @if($isRetroactive && count($historicalWarnings) > 0)
+            <div class="mb-6 bg-gradient-to-r from-orange-50 to-yellow-50 border-l-4 border-orange-500 rounded-lg p-5 shadow-sm">
+                <div class="flex items-start gap-3">
+                    <div class="flex-shrink-0">
+                        <x-iconify icon="heroicons:exclamation-triangle" class="w-6 h-6 text-orange-600" />
+                    </div>
+                    <div class="flex-1">
+                        <h3 class="text-sm font-semibold text-orange-900 mb-2">
+                            ⚠️ Affectation Rétroactive - {{ count($historicalWarnings) }} avertissement(s)
+                        </h3>
+                        <ul class="space-y-2 text-sm text-orange-800">
+                            @foreach($historicalWarnings as $warning)
+                                <li class="flex items-start gap-2">
+                                    <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium
+                                        {{ $warning['severity'] === 'high' ? 'bg-red-100 text-red-800' : 
+                                           ($warning['severity'] === 'medium' ? 'bg-orange-100 text-orange-800' : 'bg-yellow-100 text-yellow-800') }}">
+                                        {{ strtoupper($warning['severity']) }}
+                                    </span>
+                                    <span class="flex-1">{{ $warning['message'] }}</span>
+                                </li>
+                            @endforeach
+                        </ul>
+                        
+                        @if(isset($retroactiveValidation['recommendations']) && count($retroactiveValidation['recommendations']) > 0)
+                            <div class="mt-4 pt-4 border-t border-orange-200">
+                                <h4 class="text-xs font-semibold text-orange-900 mb-2">📋 Recommandations :</h4>
+                                <ul class="space-y-1 text-xs text-orange-700">
+                                    @foreach($retroactiveValidation['recommendations'] as $recommendation)
+                                        <li class="flex items-start gap-2">
+                                            <span class="text-orange-500">•</span>
+                                            <span>{{ $recommendation }}</span>
+                                        </li>
+                                    @endforeach
+                                </ul>
+                            </div>
+                        @endif
+                    </div>
+                </div>
+            </div>
+        @endif
+
         {{-- Alerte mode force activé --}}
         @if($forceCreate)
             <x-alert type="warning" title="Mode force activé" class="mb-6">
@@ -266,16 +308,36 @@ Design surpassant Fleetio, Samsara et Verizon Connect:
                             <div class="flex items-start gap-3">
                                 {{-- Date de début (largeur réduite) --}}
                                 <div class="flex-1 min-w-0">
-                                    <label class="block text-sm font-medium text-gray-700 mb-2">Date de remise *</label>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                                        Date de remise * 
+                                        @if($isRetroactive)
+                                            <span class="ml-2 text-xs font-normal text-orange-600 bg-orange-50 px-2 py-0.5 rounded-full">
+                                                🕐 Rétroactive
+                                            </span>
+                                        @endif
+                                    </label>
                                     <x-datepicker
                                         name="start_date"
                                         wire:model.live="start_date"
                                         :value="$start_date"
                                         :error="$errors->first('start_date')"
-                                        placeholder="Choisir une date"
+                                        placeholder="Choisir une date (passée autorisée)"
                                         format="d/m/Y"
                                         required
                                     />
+                                    @if($isRetroactive && $confidenceScore !== null)
+                                        <div class="mt-2 flex items-center gap-2">
+                                            <div class="flex-1">
+                                                <div class="h-2 bg-gray-200 rounded-full overflow-hidden">
+                                                    <div class="h-full {{ $confidenceScore >= 70 ? 'bg-green-500' : ($confidenceScore >= 50 ? 'bg-yellow-500' : 'bg-red-500') }}" 
+                                                         style="width: {{ $confidenceScore }}%"></div>
+                                                </div>
+                                            </div>
+                                            <span class="text-xs font-medium text-gray-600">
+                                                Confiance: {{ $confidenceScore }}%
+                                            </span>
+                                        </div>
+                                    @endif
                                 </div>
 
                                 {{-- Heure de début (petite largeur) --}}
