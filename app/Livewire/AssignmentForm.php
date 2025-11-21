@@ -42,13 +42,14 @@ class AssignmentForm extends Component
     public string $driver_id = '';
 
     // 🆕 SÉPARATION DATE ET HEURE (ENTERPRISE V3)
-    #[Validate('required|date')]
+    // 📅 FORMAT FRANÇAIS DD/MM/YYYY - date_format:d/m/Y
+    #[Validate('required|date_format:d/m/Y')]
     public string $start_date = '';
 
     #[Validate('required|string')]
     public string $start_time = '08:00';
 
-    #[Validate('nullable|date')]
+    #[Validate('nullable|date_format:d/m/Y')]
     public string $end_date = '';
 
     #[Validate('nullable|string')]
@@ -212,9 +213,13 @@ class AssignmentForm extends Component
     {
         // 🔥 ENTERPRISE FIX: NE PAS convertir ici, garder format français
         // La conversion se fera dans combineDateTime()
-        
+
         $this->combineDateTime();
         $this->validateAssignment();
+
+        // 🔥 CORRECTION : Réinitialiser le SlimSelect end_time quand end_date change
+        // Cela permet d'initialiser le SlimSelect quand le champ end_time apparaît
+        $this->dispatch('reinit-end-time');
     }
 
     public function updatedEndTime()
@@ -659,6 +664,17 @@ class AssignmentForm extends Component
                 'reason' => $this->reason ?: null,
                 'notes' => $this->notes ?: null,
             ];
+
+            // 🔍 DIAGNOSTIC : Logger les données avant création/mise à jour
+            \Log::info('[AssignmentForm] 📝 Data prepared for Assignment', [
+                'start_datetime_string' => $this->start_datetime,
+                'end_datetime_string' => $this->end_datetime,
+                'start_datetime_carbon' => $data['start_datetime']->toIso8601String(),
+                'end_datetime_carbon' => $data['end_datetime'] ? $data['end_datetime']->toIso8601String() : null,
+                'start_timestamp' => $data['start_datetime']->timestamp,
+                'end_timestamp' => $data['end_datetime'] ? $data['end_datetime']->timestamp : null,
+                'comparison' => $data['end_datetime'] ? ($data['start_datetime'] < $data['end_datetime'] ? 'start < end ✓' : 'start >= end ✗') : 'no end',
+            ]);
 
             if ($this->isEditing) {
                 $this->assignment->update($data);

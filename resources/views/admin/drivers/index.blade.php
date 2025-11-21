@@ -466,11 +466,14 @@
                                         <div class="flex items-center gap-1.5">
                                             <x-iconify icon="lucide:car" class="w-4 h-4 text-blue-600" />
                                             <span class="font-medium text-gray-900">
-                                                {{ $driver->activeAssignment->vehicle->registration_number }}
+                                                {{ $driver->activeAssignment->vehicle->registration_plate }}
                                             </span>
                                         </div>
+                                        <div class="text-xs text-gray-400 mt-0.5">
+                                            {{ $driver->activeAssignment->vehicle->brand ?? '' }} {{ $driver->activeAssignment->vehicle->model ?? '' }}
+                                        </div>
                                     @else
-                                        <span class="text-gray-400">Aucun</span>
+                                        <span class="text-gray-400 italic">Aucun véhicule</span>
                                     @endif
                                 </td>
 

@@ -101,6 +101,32 @@ class Driver extends Model
     }
 
     /**
+     * ⚡ Relation pour récupérer l'affectation active en cours (sans date de fin)
+     * Utilisé pour afficher le véhicule actuel dans la liste des chauffeurs
+     */
+    public function activeAssignment(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(Assignment::class)
+            ->whereNull('end_datetime')
+            ->orWhere(function ($query) {
+                $query->where('end_datetime', '>=', now());
+            })
+            ->with('vehicle') // Eager load le véhicule
+            ->latest('start_datetime');
+    }
+
+    /**
+     * ⚡ Relation pour récupérer les sanctions actives
+     * Utilisé pour déterminer le statut du chauffeur
+     */
+    public function activeSanctions(): HasMany
+    {
+        return $this->hasMany(DriverSanction::class)
+            ->where('status', 'active')
+            ->whereNull('archived_at');
+    }
+
+    /**
      * 📊 Relation polymorphique avec l'historique des statuts
      */
     public function statusHistory(): \Illuminate\Database\Eloquent\Relations\MorphMany

@@ -5,15 +5,24 @@ namespace App\Http\Requests\Admin\Assignment;
 use Illuminate\Foundation\Http\FormRequest;
 use Carbon\Carbon;
 
-class StoreAssignmentRequest extends FormRequest
+/**
+ * 📝 UpdateAssignmentRequest - Validation Enterprise-Grade
+ *
+ * Validation pour la modification d'une affectation existante
+ * Support format date français (DD/MM/YYYY)
+ * Compatible avec l'architecture multitenant
+ *
+ * @author ZenFleet Architecture Team
+ */
+class UpdateAssignmentRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
      */
     public function authorize(): bool
     {
-        // L'utilisateur doit avoir la permission de créer des affectations.
-        return $this->user()->can('create assignments');
+        // L'utilisateur doit avoir la permission de modifier des affectations.
+        return $this->user()->can('edit assignments');
     }
 
     /**
@@ -29,14 +38,13 @@ class StoreAssignmentRequest extends FormRequest
 
             // 📅 VALIDATION FORMAT EUROPÉEN/FRANÇAIS (DD/MM/YYYY)
             // Enterprise-Grade: Support format date localisé
-            // Compatible avec datepicker JavaScript et saisie manuelle
+            // Pour l'update, on autorise les dates passées (correction d'erreur)
             'start_date' => [
                 'required',
                 'date_format:d/m/Y', // Format français: 19/11/2025
-                'after_or_equal:today'
             ],
             'start_time' => ['required', 'regex:/^([01]?[0-9]|2[0-3]):[0-5][0-9]$/'],
-            'start_mileage' => ['required', 'integer', 'min:0'],
+            'start_mileage' => ['nullable', 'integer', 'min:0'],
 
             // Type d'affectation
             'assignment_type' => ['required', 'in:open,scheduled'],
@@ -49,7 +57,7 @@ class StoreAssignmentRequest extends FormRequest
                 'required_if:assignment_type,scheduled'
             ],
             'end_time' => ['nullable', 'regex:/^([01]?[0-9]|2[0-3]):[0-5][0-9]$/', 'required_if:assignment_type,scheduled'],
-            'estimated_end_mileage' => ['nullable', 'integer', 'min:0', 'gt:start_mileage'],
+            'estimated_end_mileage' => ['nullable', 'integer', 'min:0'],
 
             // Informations complémentaires
             'purpose' => ['nullable', 'string', 'max:255'],
@@ -66,7 +74,6 @@ class StoreAssignmentRequest extends FormRequest
             // Messages date début
             'start_date.required' => 'La date de début est obligatoire.',
             'start_date.date_format' => 'Le format de la date de début doit être JJ/MM/AAAA (ex: 19/11/2025).',
-            'start_date.after_or_equal' => 'La date de début ne peut pas être antérieure à aujourd\'hui.',
 
             // Messages heure
             'start_time.required' => 'L\'heure de début est obligatoire.',
@@ -86,16 +93,15 @@ class StoreAssignmentRequest extends FormRequest
             'end_time.regex' => 'Le format de l\'heure de fin doit être HH:MM (ex: 16:30).',
 
             // Messages kilométrage
-            'estimated_end_mileage.gt' => 'Le kilométrage de fin doit être supérieur au kilométrage de début.',
+            'estimated_end_mileage.integer' => 'Le kilométrage doit être un nombre entier.',
+            'estimated_end_mileage.min' => 'Le kilométrage ne peut pas être négatif.',
         ];
     }
 
     /**
      * 🔄 Préparation Enterprise-Grade des données avant validation
      *
-     * Conversion format DATE français (DD/MM/YYYY) → ISO (YYYY-MM-DD)
-     * Compatible avec Carbon et PostgreSQL
-     * Gestion robuste des erreurs de parsing
+     * Pas de préparation avant validation - validation directe du format français
      */
     protected function prepareForValidation(): void
     {
@@ -127,7 +133,7 @@ class StoreAssignmentRequest extends FormRequest
                 $data['start_datetime'] = $startDate . ' ' . $data['start_time'];
             } catch (\Exception $e) {
                 // Fallback sécurisé (ne devrait jamais arriver après validation)
-                \Log::error('Erreur conversion start_date', [
+                \Log::error('Erreur conversion start_date lors update', [
                     'start_date' => $data['start_date'] ?? null,
                     'error' => $e->getMessage()
                 ]);
@@ -145,7 +151,7 @@ class StoreAssignmentRequest extends FormRequest
                 $data['end_datetime'] = $endDate . ' ' . $data['end_time'];
             } catch (\Exception $e) {
                 // Fallback sécurisé
-                \Log::error('Erreur conversion end_date', [
+                \Log::error('Erreur conversion end_date lors update', [
                     'end_date' => $data['end_date'] ?? null,
                     'error' => $e->getMessage()
                 ]);

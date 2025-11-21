@@ -82,6 +82,23 @@ class AssignmentObserver
                 array_merge($assignment->getAttributes(), ['status' => $calculatedStatus]),
                 true
             );
+
+            // 🔥 CORRECTION CRITIQUE : Si passage à 'completed', libérer les ressources
+            // Car la mise à jour directe en DB bypass le hook updated()
+            if ($calculatedStatus === Assignment::STATUS_COMPLETED) {
+                Log::info('[AssignmentObserver] 🔄 Auto-healing zombie → libération ressources', [
+                    'assignment_id' => $assignment->id,
+                    'old_status' => $storedStatus,
+                    'new_status' => $calculatedStatus
+                ]);
+
+                // Libérer les ressources (même logique que dans updated())
+                $this->releaseResourcesIfNoOtherActiveAssignment($assignment);
+
+                // Déclencher vérification post-terminaison (couche 4 de protection)
+                \App\Jobs\VerifyAssignmentResourcesReleased::dispatch($assignment->id)
+                    ->delay(now()->addSeconds(30));
+            }
         }
     }
 
@@ -98,6 +115,17 @@ class AssignmentObserver
      */
     public function saving(Assignment $assignment): void
     {
+        // 🔍 DIAGNOSTIC : Logger les données reçues dans l'observer
+        Log::info('[AssignmentObserver] 🔄 saving() triggered', [
+            'assignment_id' => $assignment->id,
+            'start_datetime' => $assignment->start_datetime,
+            'end_datetime' => $assignment->end_datetime,
+            'start_type' => gettype($assignment->start_datetime),
+            'end_type' => gettype($assignment->end_datetime),
+            'start_class' => is_object($assignment->start_datetime) ? get_class($assignment->start_datetime) : null,
+            'end_class' => is_object($assignment->end_datetime) ? get_class($assignment->end_datetime) : null,
+        ]);
+
         // Calculer le statut réel
         $correctStatus = $this->calculateActualStatus($assignment);
 
@@ -222,6 +250,17 @@ class AssignmentObserver
         // Si passage à 'completed' ou 'cancelled', libérer les ressources
         if (in_array($newStatus, [Assignment::STATUS_COMPLETED, Assignment::STATUS_CANCELLED])) {
             $this->releaseResourcesIfNoOtherActiveAssignment($assignment);
+
+            // CORRECTION #4: Vérification post-terminaison après 30 secondes
+            // Dispatch un job différé pour garantir la synchronisation status_id
+            \App\Jobs\VerifyAssignmentResourcesReleased::dispatch($assignment->id)
+                ->delay(now()->addSeconds(30));
+
+            Log::info('[AssignmentObserver] 🔍 Vérification synchronisation programmée', [
+                'assignment_id' => $assignment->id,
+                'check_at' => now()->addSeconds(30)->toIso8601String(),
+                'reason' => 'Couche 4 de protection - Garantie synchronisation à 100%'
+            ]);
         }
 
         // Si passage à 'active' ou 'scheduled', verrouiller les ressources
@@ -371,9 +410,18 @@ class AssignmentObserver
             return Assignment::STATUS_CANCELLED;
         }
 
+        // 🔥 CORRECTION : Forcer la conversion en Carbon pour garantir des comparaisons correctes
         $now = now();
-        $start = $assignment->start_datetime;
-        $end = $assignment->end_datetime;
+        $start = $assignment->start_datetime instanceof \Carbon\Carbon
+            ? $assignment->start_datetime
+            : \Carbon\Carbon::parse($assignment->start_datetime);
+
+        $end = null;
+        if ($assignment->end_datetime) {
+            $end = $assignment->end_datetime instanceof \Carbon\Carbon
+                ? $assignment->end_datetime
+                : \Carbon\Carbon::parse($assignment->end_datetime);
+        }
 
         // Programmée (pas encore commencée)
         if ($start && $start > $now) {
@@ -399,19 +447,52 @@ class AssignmentObserver
     private function validateBusinessRules(Assignment $assignment): void
     {
         // Règle 1 : Date de fin après date de début
-        if ($assignment->end_datetime && $assignment->start_datetime >= $assignment->end_datetime) {
-            throw new \InvalidArgumentException(
-                "La date de fin ({$assignment->end_datetime}) doit être postérieure " .
-                "à la date de début ({$assignment->start_datetime})"
-            );
+        // 🔥 CORRECTION : Forcer la conversion en Carbon pour garantir une comparaison correcte
+        if ($assignment->end_datetime) {
+            $start = $assignment->start_datetime instanceof \Carbon\Carbon
+                ? $assignment->start_datetime
+                : \Carbon\Carbon::parse($assignment->start_datetime);
+
+            $end = $assignment->end_datetime instanceof \Carbon\Carbon
+                ? $assignment->end_datetime
+                : \Carbon\Carbon::parse($assignment->end_datetime);
+
+            if ($start >= $end) {
+                // 🔍 DIAGNOSTIC : Logger les valeurs exactes pour comprendre le problème
+                Log::error('[AssignmentObserver] ❌ VALIDATION FAILED - Date comparison', [
+                    'start_datetime_raw' => $assignment->start_datetime,
+                    'end_datetime_raw' => $assignment->end_datetime,
+                    'start_datetime_carbon' => $start->toIso8601String(),
+                    'end_datetime_carbon' => $end->toIso8601String(),
+                    'start_timestamp' => $start->timestamp,
+                    'end_timestamp' => $end->timestamp,
+                    'difference_seconds' => $end->diffInSeconds($start, false),
+                ]);
+
+                throw new \InvalidArgumentException(
+                    "La date de début doit être antérieure à la date de fin. " .
+                    "Début: {$start->format('d/m/Y H:i')}, Fin: {$end->format('d/m/Y H:i')}"
+                );
+            }
         }
 
         // Règle 2 : Durée maximale de 2 ans
-        if ($assignment->end_datetime &&
-            $assignment->start_datetime->diffInDays($assignment->end_datetime) > 730) {
-            throw new \InvalidArgumentException(
-                "La durée d'affectation ne peut pas dépasser 2 ans (730 jours)"
-            );
+        // 🔥 CORRECTION : Utiliser les objets Carbon normalisés
+        if ($assignment->end_datetime) {
+            $start = $assignment->start_datetime instanceof \Carbon\Carbon
+                ? $assignment->start_datetime
+                : \Carbon\Carbon::parse($assignment->start_datetime);
+
+            $end = $assignment->end_datetime instanceof \Carbon\Carbon
+                ? $assignment->end_datetime
+                : \Carbon\Carbon::parse($assignment->end_datetime);
+
+            if ($start->diffInDays($end) > 730) {
+                throw new \InvalidArgumentException(
+                    "La durée d'affectation ne peut pas dépasser 2 ans (730 jours). " .
+                    "Durée demandée: " . $start->diffInDays($end) . " jours"
+                );
+            }
         }
 
         // Règle 3 : Si status=completed, ended_at doit être renseigné

@@ -46,12 +46,13 @@ class Kernel extends ConsoleKernel
                 \Log::error('[Scheduler] ❌ Transition Scheduled->Active: ÉCHEC');
             });
 
-        // 🧟 Détection et correction des zombies toutes les 30 minutes
+        // 🧟 Détection et correction des zombies toutes les 10 minutes
+        // CORRECTION #3: Fréquence augmentée (30min → 10min) pour meilleure réactivité
         // Correction des incohérences de statut et ressources bloquées
         $schedule->command('assignments:fix-zombies --force')
-            ->everyThirtyMinutes()
+            ->everyTenMinutes()
             ->name('fix-zombie-assignments')
-            ->withoutOverlapping(10)
+            ->withoutOverlapping(5)
             ->runInBackground()
             ->onSuccess(function () {
                 \Log::info('[Scheduler] 🧟 Correction zombies: SUCCÈS');

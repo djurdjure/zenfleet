@@ -383,6 +383,9 @@ Route::middleware(['auth', 'verified'])
             Route::patch('{assignment}/end', [AssignmentController::class, 'end'])->name('end');
             Route::get('{assignment}/details', [AssignmentController::class, 'details'])->name('details');
             Route::post('{assignment}/extend', [AssignmentController::class, 'extend'])->name('extend');
+
+            // 📄 Export PDF Enterprise-Grade - Micro-service PDF
+            Route::get('{assignment}/export/pdf', [AssignmentController::class, 'exportPdf'])->name('export.pdf');
         });
 
         // 🚗 API pour les ressources disponibles (via AssignmentController)

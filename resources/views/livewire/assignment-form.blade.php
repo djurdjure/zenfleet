@@ -544,6 +544,10 @@ function assignmentFormValidation() {
         endTimeSlimSelect: null,
         isUpdating: false,  // Flag anti-boucle infinie
 
+        // 🔥 CORRECTION CRITIQUE : Ajout propriétés pour validation enterprise
+        fieldErrors: {},      // État des erreurs par champ
+        touchedFields: {},    // Champs touchés par l'utilisateur
+
         init() {
             this.$nextTick(() => {
                 this.initSlimSelect();
@@ -732,17 +736,34 @@ function assignmentFormValidation() {
                 }
             }
 
-            // Observer pour réinitialiser le sélecteur de fin quand end_date change
-            Livewire.on('reinit-end-time', () => {
-                if (this.endTimeSlimSelect) {
-                    this.endTimeSlimSelect.destroy();
-                    this.endTimeSlimSelect = null;
-                }
-                setTimeout(() => this.initTimeSelects(), 100);
-            });
         },
 
         setupLivewireListeners() {
+            // 🔥 CORRECTION : Réinitialiser le sélecteur end_time quand end_date change
+            // Cela permet d'initialiser SlimSelect quand le champ apparaît dynamiquement
+            Livewire.on('reinit-end-time', () => {
+                console.log('🔄 Réinitialisation du sélecteur end_time...');
+
+                // Détruire l'ancien SlimSelect s'il existe
+                if (this.endTimeSlimSelect) {
+                    try {
+                        this.endTimeSlimSelect.destroy();
+                        this.endTimeSlimSelect = null;
+                        console.log('✅ Ancien SlimSelect end_time détruit');
+                    } catch (error) {
+                        console.error('❌ Erreur destruction end_time SlimSelect:', error);
+                    }
+                }
+
+                // Attendre que Livewire ait fini de mettre à jour le DOM
+                this.$nextTick(() => {
+                    setTimeout(() => {
+                        this.initTimeSelects();
+                        console.log('✅ Sélecteur end_time réinitialisé');
+                    }, 150);
+                });
+            });
+
             // Toast pour suggestions
             Livewire.on('suggestion-applied', (event) => {
                 this.showToast('Créneau appliqué avec succès', 'success');

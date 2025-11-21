@@ -50,7 +50,8 @@ class ReleaseVehicleAndDriver implements ShouldQueue
             'assignment_id' => $assignment->id,
             'vehicle_id' => $assignment->vehicle_id,
             'driver_id' => $assignment->driver_id,
-            'ended_by' => $event->endedBy,
+            'ended_by' => $event->userId, // CORRECTION: userId au lieu de endedBy
+            'end_type' => $event->endType,
         ]);
 
         DB::transaction(function () use ($assignment, $event) {

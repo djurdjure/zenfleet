@@ -689,6 +689,14 @@ class Assignment extends Model
 
     /**
      * Validation enterprise des règles métier
+     * 
+     * NOTE ENTERPRISE-GRADE:
+     * Les affectations rétroactives sont AUTORISÉES pour permettre:
+     * - Saisie d'affectations oubliées
+     * - Correction de données historiques
+     * - Conformité audit
+     * 
+     * Les conflits réels sont détectés par OverlapCheckService
      */
     public function validateBusinessRules(): array
     {
@@ -699,10 +707,8 @@ class Assignment extends Model
             $errors[] = 'La date de début doit être antérieure à la date de fin.';
         }
 
-        // Validation passé
-        if ($this->start_datetime < now()->subHour()) {
-            $errors[] = 'Les affectations ne peuvent pas commencer dans le passé.';
-        }
+        // ✅ SUPPRIMÉ: Validation stricte du passé (permet affectations rétroactives)
+        // Les conflits réels seront détectés par OverlapCheckService et RetroactiveAssignmentService
 
         // Validation durée maximale
         if ($this->end_datetime && $this->start_datetime->diffInDays($this->end_datetime) > 365) {

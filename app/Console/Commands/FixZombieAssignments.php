@@ -335,7 +335,18 @@ class FixZombieAssignments extends Command
                             ]);
                         $this->line("  ✅ Véhicule libéré");
                         $fixed = true;
-                        
+
+                        // CORRECTION #2: Synchroniser status_id immédiatement après libération
+                        if (class_exists('\\App\\Services\\ResourceStatusSynchronizer')) {
+                            try {
+                                $sync = app('\\App\\Services\\ResourceStatusSynchronizer');
+                                $sync->syncVehicleStatus($zombie->vehicle->fresh());
+                                $this->line("  ✅ status_id véhicule synchronisé");
+                            } catch (\Exception $e) {
+                                $this->error("  ⚠️ Erreur synchronisation status_id véhicule: " . $e->getMessage());
+                            }
+                        }
+
                         // Déclencher l'événement pour notifications
                         event(new \App\Events\VehicleStatusChanged($zombie->vehicle, 'available'));
                     } else {
@@ -356,7 +367,18 @@ class FixZombieAssignments extends Command
                             ]);
                         $this->line("  ✅ Chauffeur libéré");
                         $fixed = true;
-                        
+
+                        // CORRECTION #2: Synchroniser status_id immédiatement après libération
+                        if (class_exists('\\App\\Services\\ResourceStatusSynchronizer')) {
+                            try {
+                                $sync = app('\\App\\Services\\ResourceStatusSynchronizer');
+                                $sync->syncDriverStatus($zombie->driver->fresh());
+                                $this->line("  ✅ status_id chauffeur synchronisé");
+                            } catch (\Exception $e) {
+                                $this->error("  ⚠️ Erreur synchronisation status_id chauffeur: " . $e->getMessage());
+                            }
+                        }
+
                         // Déclencher l'événement pour notifications
                         event(new \App\Events\DriverStatusChanged($zombie->driver, 'available'));
                     } else {

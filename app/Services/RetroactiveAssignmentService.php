@@ -164,6 +164,10 @@ class RetroactiveAssignmentService
 
     /**
      * 🕐 Vérifie le statut historique d'un véhicule
+     * 
+     * ENTERPRISE-GRADE: Logique optimiste intelligente
+     * Si pas d'historique ET véhicule disponible actuellement ET pas de conflit
+     * → Considérer comme disponible historiquement (déduction raisonnable)
      */
     private function checkVehicleHistoricalStatus(int $vehicleId, Carbon $startDate, ?Carbon $endDate): array
     {
@@ -198,17 +202,37 @@ class RetroactiveAssignmentService
             ]);
         }
 
-        // Si pas d'historique, utiliser le statut actuel avec un warning
+        // ✅ LOGIQUE INTELLIGENTE ENTERPRISE-GRADE
+        // Si pas d'historique: Vérifier affectations durant cette période
+        $hadAssignmentsDuringPeriod = Assignment::where('vehicle_id', $vehicleId)
+            ->where(function($q) use ($startDate, $endDate) {
+                $q->whereBetween('start_datetime', [$startDate, $endDate ?? Carbon::now()])
+                  ->orWhereBetween('end_datetime', [$startDate, $endDate ?? Carbon::now()]);
+            })
+            ->exists();
+
+        // Si aucune affectation durant période ET véhicule disponible actuellement
+        // → Déduction raisonnable: était probablement disponible
+        $currentlyAvailable = $vehicle->status_id == 8 || $vehicle->is_available;
+        $wasLikelyAvailable = !$hadAssignmentsDuringPeriod && $currentlyAvailable;
+
         return [
-            'was_available' => $vehicle->status_id == 8 || $vehicle->is_available,
-            'status_at_date' => $vehicle->status_label ?? 'Statut actuel',
+            'was_available' => $wasLikelyAvailable,
+            'status_at_date' => $wasLikelyAvailable 
+                ? 'Disponible (déduit: pas d\'affectation durant période)'
+                : ($vehicle->status_label ?? 'Statut actuel'),
             'status_id' => $vehicle->status_id,
-            'warning' => 'Pas d\'historique disponible, utilisation du statut actuel'
+            'inference' => 'Statut déduit en l\'absence d\'historique (méthode enterprise-grade)',
+            'had_assignments' => $hadAssignmentsDuringPeriod
         ];
     }
 
     /**
      * 👤 Vérifie le statut historique d'un chauffeur
+     * 
+     * ENTERPRISE-GRADE: Logique optimiste intelligente
+     * Si pas d'historique ET chauffeur disponible actuellement ET pas de conflit
+     * → Considérer comme disponible historiquement (déduction raisonnable)
      */
     private function checkDriverHistoricalStatus(int $driverId, Carbon $startDate, ?Carbon $endDate): array
     {
@@ -243,12 +267,28 @@ class RetroactiveAssignmentService
             ]);
         }
 
-        // Si pas d'historique, utiliser le statut actuel
+        // ✅ LOGIQUE INTELLIGENTE ENTERPRISE-GRADE
+        // Si pas d'historique: Vérifier affectations durant cette période
+        $hadAssignmentsDuringPeriod = Assignment::where('driver_id', $driverId)
+            ->where(function($q) use ($startDate, $endDate) {
+                $q->whereBetween('start_datetime', [$startDate, $endDate ?? Carbon::now()])
+                  ->orWhereBetween('end_datetime', [$startDate, $endDate ?? Carbon::now()]);
+            })
+            ->exists();
+
+        // Si aucune affectation durant période ET chauffeur disponible actuellement
+        // → Déduction raisonnable: était probablement disponible
+        $currentlyAvailable = $driver->status_id == 9 || $driver->is_available;
+        $wasLikelyAvailable = !$hadAssignmentsDuringPeriod && $currentlyAvailable;
+
         return [
-            'was_available' => $driver->status_id == 9 || $driver->is_available,
-            'status_at_date' => $driver->status_label ?? 'Statut actuel',
+            'was_available' => $wasLikelyAvailable,
+            'status_at_date' => $wasLikelyAvailable 
+                ? 'Disponible (déduit: pas d\'affectation durant période)'
+                : ($driver->status_label ?? 'Statut actuel'),
             'status_id' => $driver->status_id,
-            'warning' => 'Pas d\'historique disponible, utilisation du statut actuel'
+            'inference' => 'Statut déduit en l\'absence d\'historique (méthode enterprise-grade)',
+            'had_assignments' => $hadAssignmentsDuringPeriod
         ];
     }
 

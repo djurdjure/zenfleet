@@ -368,6 +368,9 @@ class OverlapCheckService
 
     /**
      * Valide une affectation complète avec messages d'erreur explicites
+     * 
+     * ENTERPRISE-GRADE: Affectations rétroactives autorisées
+     * Seuls les conflits réels (chevauchements) sont bloquants
      */
     public function validateAssignment(
         int $vehicleId,
@@ -384,11 +387,11 @@ class OverlapCheckService
             $errors[] = 'La date de début doit être antérieure à la date de fin.';
         }
 
-        if ($start->lt(now()->subHour())) {
-            $errors[] = 'Les affectations ne peuvent pas commencer dans le passé.';
-        }
+        // ✅ SUPPRIMÉ: Validation stricte du passé (permet affectations rétroactives)
+        // Les affectations dans le passé sont autorisées pour saisie rétroactive
+        // Seuls les conflits réels (chevauchements) sont bloquants
 
-        // Vérification des chevauchements
+        // Vérification des chevauchements (critère unique de blocage)
         $overlapCheck = $this->checkOverlap($vehicleId, $driverId, $start, $end, $excludeId, $organizationId);
 
         if ($overlapCheck['has_conflicts']) {

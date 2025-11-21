@@ -10,7 +10,13 @@ class DriverRepository implements DriverRepositoryInterface
     public function getFiltered(array $filters): LengthAwarePaginator
     {
         $perPage = $filters['per_page'] ?? 15;
-        $query = Driver::query()->with(['driverStatus', 'user', 'organization']);
+        $query = Driver::query()->with([
+            'driverStatus',
+            'user',
+            'organization',
+            'activeAssignment.vehicle',  // ⚡ Charge l'affectation active avec le véhicule
+            'activeSanctions'             // ⚡ Charge les sanctions actives
+        ]);
 
         // Gestion de la visibilité (actifs/archivés/tous)
         $visibility = $filters['visibility'] ?? 'active';
