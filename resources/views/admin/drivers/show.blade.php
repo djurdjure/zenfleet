@@ -367,8 +367,10 @@
  </div>
 
  <div class="bg-green-50 rounded-lg p-4 text-center">
- <div class="text-2xl font-bold text-green-600">{{ $stats['active_assignments'] ?? 0 }}</div>
- <div class="text-xs text-green-700 uppercase tracking-wide mt-1">En cours</div>
+ <div class="text-2xl font-bold text-green-600">
+ {{ ($stats['has_active_assignment'] ?? false) ? 'Oui' : 'Non' }}
+ </div>
+ <div class="text-xs text-green-700 uppercase tracking-wide mt-1">Affectation en cours</div>
  </div>
 
  <div class="bg-amber-50 rounded-lg p-4 text-center">
@@ -377,9 +379,46 @@
  </div>
 
  <div class="bg-purple-50 rounded-lg p-4 text-center">
- <div class="text-2xl font-bold text-purple-600">{{ $stats['total_km'] ?? 0 }} km</div>
+ <div class="text-2xl font-bold text-purple-600">{{ number_format($stats['total_km'] ?? 0, 0, ',', ' ') }} km</div>
  <div class="text-xs text-purple-700 uppercase tracking-wide mt-1">Kilométrage total</div>
  </div>
+
+ @if(isset($stats['last_vehicle_info']) && $stats['last_vehicle_info'])
+ <div class="bg-indigo-50 rounded-lg p-4">
+ <div class="flex items-center justify-between">
+ <div class="flex-1">
+ <div class="text-sm font-semibold text-indigo-900 mb-1">Dernier véhicule affecté</div>
+ <div class="text-lg font-bold text-indigo-600">
+ {{ $stats['last_vehicle_info']['registration_number'] }}
+ </div>
+ <div class="text-xs text-indigo-700 mt-1">
+ {{ $stats['last_vehicle_info']['brand'] }} {{ $stats['last_vehicle_info']['model'] }}
+ </div>
+ @if($stats['last_vehicle_info']['is_active'])
+ <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 mt-2">
+ <x-iconify icon="heroicons:check-circle" class="w-3 h-3 mr-1" />
+ Actif
+ </span>
+ @else
+ <div class="text-xs text-indigo-600 mt-1">
+ Dernier utilisé: {{ \Carbon\Carbon::parse($stats['last_vehicle_info']['assignment_start'])->format('d/m/Y') }}
+ </div>
+ @endif
+ </div>
+ <div>
+ <a href="{{ route('admin.vehicles.show', $stats['last_vehicle_info']['id']) }}"
+ class="inline-flex items-center px-3 py-2 border border-indigo-300 rounded-md text-sm font-medium text-indigo-700 bg-white hover:bg-indigo-50 transition-colors">
+ <x-iconify icon="heroicons:eye" class="w-4 h-4 mr-1" />
+ Voir
+ </a>
+ </div>
+ </div>
+ </div>
+ @else
+ <div class="bg-gray-50 rounded-lg p-4 text-center">
+ <div class="text-sm text-gray-500">Aucun véhicule affecté</div>
+ </div>
+ @endif
  </div>
  @else
  <x-empty-state

@@ -346,25 +346,51 @@ class MileageUpdateComponent extends Component
     
     /**
      * Sauvegarder le relevé kilométrique
+     *
+     * ✅ VALIDATION ENTERPRISE V2.0:
+     * - Recharge les données fraîches du véhicule avec LOCK
+     * - Vérifie le kilométrage en temps réel (protection race conditions)
+     * - Gestion d'erreurs explicite
      */
     public function save()
     {
-        // Validation
+        // Validation des règles de base
         $this->validate();
-        
+
         // Vérifications de sécurité supplémentaires
         if (!$this->vehicleData) {
             $this->addError('vehicle_id', 'Veuillez sélectionner un véhicule valide.');
             return;
         }
-        
-        if ($this->mileage <= $this->vehicleData['current_mileage']) {
-            $this->addError('mileage', 'Le kilométrage doit être supérieur au dernier relevé.');
-            return;
-        }
-        
+
         try {
             DB::beginTransaction();
+
+            // ✅ VALIDATION ENTERPRISE V2.0: Recharger le véhicule avec LOCK
+            // pour obtenir les données les plus récentes et éviter les race conditions
+            $vehicle = Vehicle::where('id', $this->vehicleData['id'])
+                ->lockForUpdate()
+                ->first();
+
+            if (!$vehicle) {
+                DB::rollBack();
+                $this->addError('vehicle_id', 'Le véhicule sélectionné n\'existe plus.');
+                return;
+            }
+
+            // ✅ VALIDATION STRICTE avec données fraîches
+            $currentMileage = $vehicle->current_mileage ?? 0;
+
+            if ($this->mileage < $currentMileage) {
+                DB::rollBack();
+                $this->addError('mileage', sprintf(
+                    'Le kilométrage saisi (%s km) est inférieur au kilométrage actuel du véhicule (%s km). ' .
+                    'Veuillez saisir un kilométrage égal ou supérieur.',
+                    number_format($this->mileage, 0, ',', ' '),
+                    number_format($currentMileage, 0, ',', ' ')
+                ));
+                return;
+            }
             
             // ✅ CORRECTION ENTERPRISE V3: Parsing robuste multi-formats
             // Gestion de tous les cas possibles de date/heure
@@ -419,30 +445,29 @@ class MileageUpdateComponent extends Component
                 throw new \Exception("La date/heure du relevé ne peut pas être dans le futur.");
             }
             
-            // Créer le relevé
+            // ✅ CRÉATION DU RELEVÉ
+            // L'Observer vérifiera automatiquement et empêchera la création si invalide
             $reading = VehicleMileageReading::createManual(
                 organizationId: auth()->user()->organization_id,
-                vehicleId: $this->vehicleData['id'],
+                vehicleId: $vehicle->id,
                 mileage: $this->mileage,
                 recordedById: auth()->id(),
                 recordedAt: $recordedAt,
                 notes: $this->notes
             );
-            
-            // Mettre à jour le kilométrage du véhicule
-            Vehicle::where('id', $this->vehicleData['id'])
-                ->update(['current_mileage' => $this->mileage]);
-            
+
+            // ✅ L'Observer met à jour automatiquement le current_mileage du véhicule
+            // Pas besoin de le faire manuellement ici
+
             DB::commit();
-            
-            // Message de succès
-            $oldMileage = $this->vehicleData['current_mileage'];
-            $difference = $this->mileage - $oldMileage;
-            
+
+            // Message de succès avec données fraîches
+            $difference = $this->mileage - $currentMileage;
+
             session()->flash('success', sprintf(
                 'Kilométrage enregistré avec succès pour %s : %s km → %s km (+%s km)',
-                $this->vehicleData['registration_plate'],
-                number_format($oldMileage, 0, ',', ' '),
+                $vehicle->registration_plate,
+                number_format($currentMileage, 0, ',', ' '),
                 number_format($this->mileage, 0, ',', ' '),
                 number_format($difference, 0, ',', ' ')
             ));
@@ -484,71 +509,54 @@ class MileageUpdateComponent extends Component
     
     /**
      * Liste des véhicules disponibles pour la sélection
-     * 
-     * ✅ CORRECTION ENTERPRISE-GRADE:
-     * - Suppression du filtre whereNotNull('current_mileage') trop restrictif
-     * - Correction des statuts: 'Actif' et 'En maintenance' (au lieu de 'Disponible', 'En service')
-     * - Ajout d'un fallback si la relation vehicleStatus n'existe pas
+     *
+     * ✅ CORRECTION ENTERPRISE-GRADE V6.0 FINALE:
+     * - Affiche TOUS les véhicules de l'organisation (sauf archivés)
+     * - Pas de restriction par statut (le scope active() filtrait sur status_id=1 qui n'existe pas)
+     * - Pas de restriction par affectation ou dépôt
+     * - Retourne directement les objets Vehicle (pas des arrays)
+     * - Charge les relations nécessaires avec eager loading
      * - Gestion robuste des erreurs avec logs
      */
     public function getAvailableVehiclesProperty()
     {
         try {
             $user = auth()->user();
-            
+
             if (!$user || !$user->organization_id) {
                 \Log::warning('MileageUpdate: User not authenticated or no organization_id');
                 return collect([]);
             }
-            
+
+            // ✅ CORRECTION V6.0: TOUS les véhicules non archivés de l'organisation
+            // Sans restriction par statut, affectation ou dépôt
             $vehicles = Vehicle::where('organization_id', $user->organization_id)
-                ->where('is_archived', false)
-                // ✅ CORRECTION: Filtrer sur les statuts corrects
-                ->where(function ($query) {
-                    $query->whereHas('vehicleStatus', function ($statusQuery) {
-                        // Statuts réels: Actif, En maintenance (pas Inactif)
-                        $statusQuery->whereIn('name', ['Actif', 'En maintenance']);
-                    })
-                    // Fallback si pas de statut défini
-                    ->orWhereNull('status_id');
-                })
-                ->with(['category', 'vehicleType', 'vehicleStatus'])
+                ->where('is_archived', false)  // Uniquement non archivés
+                // ✅ SUPPRESSION du scope active() qui filtrait sur status_id=1 (inexistant)
+                ->with(['category', 'depot', 'vehicleType', 'fuelType', 'vehicleStatus'])
                 ->orderBy('registration_plate')
                 ->get();
-            
+
             // Log pour debug (seulement en local/dev)
             if (app()->environment(['local', 'development'])) {
-                \Log::info('MileageUpdate: Vehicles loaded', [
+                \Log::info('MileageUpdate V6.0: ALL vehicles loaded', [
                     'count' => $vehicles->count(),
-                    'organization_id' => $user->organization_id
+                    'organization_id' => $user->organization_id,
+                    'user_id' => $user->id,
+                    'user_role' => $user->roles->pluck('name')->first(),
+                    'sample_statuses' => $vehicles->take(5)->pluck('vehicleStatus.name', 'registration_plate')->toArray(),
                 ]);
             }
-            
-            return $vehicles->map(function ($vehicle) {
-                return [
-                    'id' => $vehicle->id,
-                    'label' => sprintf(
-                        '%s - %s %s (%s) - %s km',
-                        $vehicle->registration_plate,
-                        $vehicle->brand,
-                        $vehicle->model,
-                        $vehicle->category?->name ?? 'N/A',
-                        number_format($vehicle->current_mileage ?? 0, 0, ',', ' ')
-                    ),
-                    'registration_plate' => $vehicle->registration_plate,
-                    'brand' => $vehicle->brand,
-                    'model' => $vehicle->model,
-                    'current_mileage' => $vehicle->current_mileage ?? 0,
-                    'status' => $vehicle->vehicleStatus?->name ?? 'N/A',
-                ];
-            });
-            
+
+            // ✅ Retourner directement les objets Vehicle
+            return $vehicles;
+
         } catch (\Exception $e) {
             \Log::error('MileageUpdate: Error loading vehicles', [
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString()
             ]);
-            
+
             // En production, retourner collection vide au lieu de crasher
             return collect([]);
         }

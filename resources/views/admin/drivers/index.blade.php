@@ -217,12 +217,47 @@
                         </a>
                     @endif
 
-                    {{-- Export --}}
-                    <a href="{{ route('admin.drivers.export') }}"
-                       class="inline-flex items-center gap-2 px-4 py-2.5 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-all duration-200 shadow-sm hover:shadow-md">
-                        <x-iconify icon="lucide:download" class="w-5 h-5 text-gray-500" />
-                        <span class="hidden lg:inline font-medium text-gray-700">Export</span>
-                    </a>
+                    {{-- Export Dropdown --}}
+                    <div class="relative" x-data="{ exportOpen: false }">
+                        <button
+                            @click="exportOpen = !exportOpen"
+                            @click.away="exportOpen = false"
+                            type="button"
+                            class="inline-flex items-center gap-2 px-4 py-2.5 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-all duration-200 shadow-sm hover:shadow-md">
+                            <x-iconify icon="lucide:download" class="w-5 h-5 text-gray-500" />
+                            <span class="hidden lg:inline font-medium text-gray-700">Export</span>
+                            <x-iconify icon="heroicons:chevron-down" class="w-4 h-4 text-gray-400" />
+                        </button>
+
+                        <div
+                            x-show="exportOpen"
+                            x-transition:enter="transition ease-out duration-100"
+                            x-transition:enter-start="transform opacity-0 scale-95"
+                            x-transition:enter-end="transform opacity-100 scale-100"
+                            x-transition:leave="transition ease-in duration-75"
+                            x-transition:leave-start="transform opacity-100 scale-100"
+                            x-transition:leave-end="transform opacity-0 scale-95"
+                            class="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-lg bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
+                            style="display: none;">
+                            <div class="py-1">
+                                <a href="{{ route('admin.drivers.export.pdf', request()->all()) }}"
+                                   class="group flex items-center gap-2 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-100">
+                                    <x-iconify icon="lucide:file-text" class="w-4 h-4 text-red-600" />
+                                    <span>Export PDF</span>
+                                </a>
+                                <a href="{{ route('admin.drivers.export.csv', request()->all()) }}"
+                                   class="group flex items-center gap-2 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-100">
+                                    <x-iconify icon="lucide:file-spreadsheet" class="w-4 h-4 text-green-600" />
+                                    <span>Export CSV</span>
+                                </a>
+                                <a href="{{ route('admin.drivers.export.excel', request()->all()) }}"
+                                   class="group flex items-center gap-2 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-100">
+                                    <x-iconify icon="lucide:file-bar-chart" class="w-4 h-4 text-blue-600" />
+                                    <span>Export Excel</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
 
                     {{-- Import --}}
                     <a href="{{ route('admin.drivers.import.show') }}"
@@ -303,11 +338,12 @@
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1.5">Embauché après</label>
                             <input
-                                type="date"
+                                type="text"
                                 name="hired_after"
+                                id="hired_after_flatpickr"
                                 value="{{ request('hired_after') }}"
-                                max="{{ date('Y-m-d') }}"
-                                class="block w-full border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                placeholder="Sélectionner une date"
+                                class="block w-full border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white cursor-pointer">
                         </div>
                     </div>
 
@@ -421,35 +457,29 @@
                                 {{-- Statut --}}
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     @php
-                                        // Déterminer le statut réel du chauffeur
+                                        // 🔥 CORRECTION: Afficher UNIQUEMENT le statut prédéfini du chauffeur
+                                        // Les sanctions sont consultables dans la section dédiée
                                         $realStatus = 'Disponible';
                                         $statusLabel = 'Disponible';
-                                        
-                                        // Vérifier si sanctionné (priorité max)
-                                        if($driver->activeSanctions && $driver->activeSanctions->count() > 0) {
-                                            $realStatus = 'Sanctionné';
-                                            $statusLabel = 'Sanctionné';
-                                        }
-                                        // Vérifier si affecté à un véhicule
-                                        elseif($driver->activeAssignment && $driver->activeAssignment->vehicle) {
-                                            $realStatus = 'Affecté';
-                                            $statusLabel = 'Affecté';
-                                        }
-                                        // Sinon utiliser le statut du driver
-                                        elseif($driver->driverStatus) {
+
+                                        // Utiliser le statut du driver (statuts prédéfinis uniquement)
+                                        if($driver->driverStatus) {
                                             $realStatus = $driver->driverStatus->name;
                                             $statusLabel = $driver->driverStatus->name;
                                         }
-                                        
-                                        // Configuration des couleurs selon le statut
+                                        // Sinon si affecté à un véhicule, afficher "En mission"
+                                        elseif($driver->activeAssignment && $driver->activeAssignment->vehicle) {
+                                            $realStatus = 'En mission';
+                                            $statusLabel = 'En mission';
+                                        }
+
+                                        // Configuration des couleurs selon le statut (sans "Sanctionné")
                                         $statusConfig = [
                                             'Disponible' => ['bg' => 'bg-green-100', 'text' => 'text-green-800', 'icon' => 'lucide:check-circle'],
-                                            'Affecté' => ['bg' => 'bg-blue-100', 'text' => 'text-blue-800', 'icon' => 'lucide:briefcase'],
                                             'En mission' => ['bg' => 'bg-orange-100', 'text' => 'text-orange-800', 'icon' => 'lucide:truck'],
                                             'En repos' => ['bg' => 'bg-amber-100', 'text' => 'text-amber-800', 'icon' => 'lucide:pause-circle'],
                                             'En congé' => ['bg' => 'bg-purple-100', 'text' => 'text-purple-800', 'icon' => 'lucide:calendar-off'],
                                             'Maladie' => ['bg' => 'bg-red-100', 'text' => 'text-red-800', 'icon' => 'lucide:heart-pulse'],
-                                            'Sanctionné' => ['bg' => 'bg-red-100', 'text' => 'text-red-800', 'icon' => 'lucide:alert-triangle'],
                                             'Indisponible' => ['bg' => 'bg-gray-100', 'text' => 'text-gray-800', 'icon' => 'lucide:x-circle'],
                                         ];
                                         $config = $statusConfig[$realStatus] ?? ['bg' => 'bg-gray-100', 'text' => 'text-gray-800', 'icon' => 'lucide:circle'];
@@ -812,24 +842,45 @@ function confirmPermanentDeleteDriver(driverId) {
     const form = document.createElement('form');
     form.method = 'POST';
     form.action = `/admin/drivers/${driverId}/force-delete`;
-    
+
     // Ajouter le token CSRF (correctement généré par Blade)
     const csrfInput = document.createElement('input');
     csrfInput.type = 'hidden';
     csrfInput.name = '_token';
     csrfInput.value = '{{ csrf_token() }}';
     form.appendChild(csrfInput);
-    
+
     // Ajouter la méthode DELETE
     const methodInput = document.createElement('input');
     methodInput.type = 'hidden';
     methodInput.name = '_method';
     methodInput.value = 'DELETE';
     form.appendChild(methodInput);
-    
+
     document.body.appendChild(form);
     closeDriverModal();
     setTimeout(() => form.submit(), 200);
 }
+
+// ═══════════════════════════════════════════════════════════════════════════
+// 📅 FLATPICKR INITIALIZATION - ENTERPRISE-GRADE DATE PICKER
+// ═══════════════════════════════════════════════════════════════════════════
+document.addEventListener('DOMContentLoaded', function() {
+    const flatpickrConfig = {
+        dateFormat: 'Y-m-d',
+        altInput: true,
+        altFormat: 'd/m/Y',
+        locale: 'fr',
+        allowInput: true,
+        disableMobile: true,
+        maxDate: 'today'
+    };
+
+    const hiredAfterEl = document.getElementById('hired_after_flatpickr');
+
+    if (hiredAfterEl && typeof flatpickr !== 'undefined') {
+        flatpickr(hiredAfterEl, flatpickrConfig);
+    }
+});
 </script>
 @endpush

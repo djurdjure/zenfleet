@@ -160,6 +160,16 @@ return [
             'replace_placeholders' => true,
         ],
 
+        // 🔥 Alias pour compatibilité avec les contrôleurs
+        'error' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/errors/errors.log'),
+            'level' => 'error',
+            'days' => env('ERROR_RETENTION_DAYS', 60),
+            'permission' => 0640,
+            'replace_placeholders' => true,
+        ],
+
         'critical' => [
             'driver' => 'stack',
             'channels' => array_filter([

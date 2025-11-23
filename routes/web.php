@@ -316,6 +316,12 @@ Route::middleware(['auth', 'verified'])
             })->name('sanctions.index');
             
             Route::get('export', [DriverController::class, 'export'])->name('export');
+
+            // 🔥 EXPORT MULTIFORMATS ENTERPRISE-GRADE (PDF, CSV, Excel)
+            Route::get('export/csv', [DriverController::class, 'exportCsv'])->name('export.csv');
+            Route::get('export/excel', [DriverController::class, 'exportExcel'])->name('export.excel');
+            Route::get('export/pdf', [DriverController::class, 'exportPdf'])->name('export.pdf');
+
             Route::get('archived', [DriverController::class, 'archived'])->name('archived');
             Route::get('archived/export', [DriverController::class, 'exportArchived'])->name('archived.export');
             Route::post('archived/bulk-restore', [DriverController::class, 'bulkRestore'])->name('archived.bulk-restore');
@@ -646,6 +652,17 @@ Route::middleware(['auth', 'verified'])
         Route::prefix('automation')->name('automation.')->group(function () {
             Route::post('/check-schedules', [\App\Http\Controllers\Admin\MaintenanceController::class, 'triggerScheduleCheck'])->name('check-schedules');
             Route::post('/generate-alerts', [\App\Http\Controllers\Admin\MaintenanceController::class, 'generateAlerts'])->name('generate-alerts');
+        });
+
+        // 🏢 Gestion des Fournisseurs de Maintenance
+        Route::prefix('providers')->name('providers.')->group(function () {
+            Route::get('/', [\App\Http\Controllers\Admin\MaintenanceProviderController::class, 'index'])->name('index');
+            Route::get('/create', [\App\Http\Controllers\Admin\MaintenanceProviderController::class, 'create'])->name('create');
+            Route::post('/', [\App\Http\Controllers\Admin\MaintenanceProviderController::class, 'store'])->name('store');
+            Route::get('/{provider}', [\App\Http\Controllers\Admin\MaintenanceProviderController::class, 'show'])->name('show');
+            Route::get('/{provider}/edit', [\App\Http\Controllers\Admin\MaintenanceProviderController::class, 'edit'])->name('edit');
+            Route::put('/{provider}', [\App\Http\Controllers\Admin\MaintenanceProviderController::class, 'update'])->name('update');
+            Route::delete('/{provider}', [\App\Http\Controllers\Admin\MaintenanceProviderController::class, 'destroy'])->name('destroy');
         });
     });
 

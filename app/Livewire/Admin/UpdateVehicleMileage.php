@@ -264,34 +264,61 @@ class UpdateVehicleMileage extends Component
     
     /**
      * Sauvegarder le nouveau relevé kilométrique
-     * 
+     *
+     * ✅ VALIDATION ENTERPRISE V2.0:
+     * - Recharge les données fraîches du véhicule avec LOCK
+     * - Vérifie le kilométrage en temps réel (protection race conditions)
+     * - Gestion d'erreurs explicite
+     *
      * @return \Illuminate\Http\RedirectResponse|void
      */
     public function save()
     {
         // Validation
         $this->validate();
-        
+
         // Vérifications supplémentaires
         if (!$this->vehicleData) {
             session()->flash('error', 'Veuillez sélectionner un véhicule.');
             return;
         }
-        
-        if ($this->newMileage <= $this->vehicleData['current_mileage']) {
-            $this->addError('newMileage', 'Le kilométrage doit être supérieur au kilométrage actuel.');
-            return;
-        }
-        
+
         try {
             DB::beginTransaction();
-            
+
+            // ✅ VALIDATION ENTERPRISE V2.0: Recharger le véhicule avec LOCK
+            // pour obtenir les données les plus récentes et éviter les race conditions
+            $vehicle = Vehicle::where('id', $this->vehicleData['id'])
+                ->lockForUpdate()
+                ->first();
+
+            if (!$vehicle) {
+                DB::rollBack();
+                session()->flash('error', 'Le véhicule sélectionné n\'existe plus.');
+                return;
+            }
+
+            // ✅ VALIDATION STRICTE avec données fraîches
+            $currentMileage = $vehicle->current_mileage ?? 0;
+
+            if ($this->newMileage < $currentMileage) {
+                DB::rollBack();
+                $this->addError('newMileage', sprintf(
+                    'Le kilométrage saisi (%s km) est inférieur au kilométrage actuel du véhicule (%s km). ' .
+                    'Veuillez saisir un kilométrage égal ou supérieur.',
+                    number_format($this->newMileage, 0, ',', ' '),
+                    number_format($currentMileage, 0, ',', ' ')
+                ));
+                return;
+            }
+
             // Combiner la date et l'heure
             $recordedAt = Carbon::parse($this->recordedDate . ' ' . $this->recordedTime);
-            
-            // Créer le relevé
+
+            // ✅ CRÉATION DU RELEVÉ
+            // L'Observer vérifiera automatiquement et empêchera la création si invalide
             $reading = VehicleMileageReading::create([
-                'vehicle_id' => $this->vehicleData['id'],
+                'vehicle_id' => $vehicle->id,
                 'mileage' => $this->newMileage,
                 'recorded_at' => $recordedAt,
                 'recording_method' => 'manual',
@@ -299,23 +326,21 @@ class UpdateVehicleMileage extends Component
                 'recorded_by' => auth()->id(),
                 'organization_id' => auth()->user()->organization_id,
             ]);
-            
-            // Mettre à jour le kilométrage du véhicule
-            Vehicle::where('id', $this->vehicleData['id'])
-                ->update(['current_mileage' => $this->newMileage]);
-            
+
+            // ✅ L'Observer met à jour automatiquement le current_mileage du véhicule
+            // Pas besoin de le faire manuellement ici
+
             DB::commit();
-            
-            // Message de succès détaillé
-            $oldMileage = $this->vehicleData['current_mileage'];
-            $difference = $this->newMileage - $oldMileage;
+
+            // Message de succès détaillé avec données fraîches
+            $difference = $this->newMileage - $currentMileage;
             
             session()->flash('success', sprintf(
                 'Kilométrage mis à jour avec succès pour %s : %s km → %s km (+%s km)',
-                $this->vehicleData['registration_plate'],
-                number_format($oldMileage),
-                number_format($this->newMileage),
-                number_format($difference)
+                $vehicle->registration_plate,
+                number_format($currentMileage, 0, ',', ' '),
+                number_format($this->newMileage, 0, ',', ' '),
+                number_format($difference, 0, ',', ' ')
             ));
             
             // Émettre un événement pour rafraîchir les listes
@@ -377,29 +402,26 @@ class UpdateVehicleMileage extends Component
     
     /**
      * Liste des véhicules disponibles pour la sélection
+     *
+     * ✅ CORRECTION V6.0 FINALE: Affiche TOUS les véhicules de l'organisation
+     * Sans restriction par statut (scope active() supprimé), affectation ou dépôt
      */
     public function getAvailableVehiclesProperty()
     {
         if ($this->mode !== 'select') {
             return collect([]);
         }
-        
+
         $user = auth()->user();
-        
+
         $query = Vehicle::where('organization_id', $user->organization_id)
-            ->active()  // Utilise le scope active() qui filtre par status_id = 1
-            ->visible() // Utilise le scope visible() qui filtre par is_archived = false
-            ->with(['category', 'depot']);
-            
-        // Filtrage selon les permissions
-        if ($user->hasRole('Chauffeur')) {
-            $query->whereHas('currentAssignments', function ($q) use ($user) {
-                $q->where('driver_id', $user->driver_id);
-            });
-        } elseif ($user->hasAnyRole(['Supervisor', 'Chef de Parc']) && $user->depot_id) {
-            $query->where('depot_id', $user->depot_id);
-        }
-        
+            // ✅ SUPPRESSION du scope active() qui filtrait sur status_id=1 (inexistant)
+            ->where('is_archived', false) // Uniquement non archivés
+            ->with(['category', 'depot', 'vehicleStatus']);
+
+        // ✅ CORRECTION V6.0: Retrait des filtres de permissions restrictifs
+        // Tous les utilisateurs peuvent voir tous les véhicules de l'organisation
+
         // Recherche
         if ($this->vehicleSearch) {
             $search = '%' . $this->vehicleSearch . '%';
@@ -409,7 +431,7 @@ class UpdateVehicleMileage extends Component
                     ->orWhere('model', 'like', $search);
             });
         }
-        
+
         return $query->orderBy('registration_plate')->get();
     }
     

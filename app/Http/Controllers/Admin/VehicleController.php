@@ -850,32 +850,60 @@ class VehicleController extends Controller
     }
 
     /**
-     * Données de référence avec cache
+     * Données de référence avec cache optimisé Enterprise-Grade
+     *
+     * ✅ OPTIMISATIONS V2.0:
+     * - Cache séparé pour dépôts (TTL court: 5 min) pour mise à jour temps réel
+     * - Cache long pour autres données (TTL: 2h) car moins volatiles
+     * - Tags de cache pour invalidation granulaire
+     * - Synchronisation avec VehicleDepotObserver pour invalidation automatique
+     *
+     * @return array
      */
     private function getReferenceData(): array
     {
         $organizationId = Auth::user()->organization_id;
 
-        return Cache::remember("vehicle_reference_data_{$organizationId}", self::CACHE_TTL_LONG, function () use ($organizationId) {
-            return [
-                'vehicle_types' => VehicleType::orderBy('name')->get(),
-                'vehicle_statuses' => VehicleStatus::orderBy('name')->get(),
-                'fuel_types' => FuelType::orderBy('name')->get(),
-                'transmission_types' => TransmissionType::orderBy('name')->get(),
-                'categories' => \App\Models\VehicleCategory::forOrganization($organizationId)
-                    ->active()
-                    ->orderBy('sort_order')
-                    ->get(),
-                'depots' => \App\Models\VehicleDepot::forOrganization($organizationId)
+        // ✅ CACHE SÉPARÉ POUR DÉPÔTS (mise à jour temps réel)
+        // Utilise CACHE_TTL_SHORT (5 min) au lieu de CACHE_TTL_LONG (2h)
+        // pour que les nouveaux dépôts apparaissent rapidement dans les filtres
+        $depots = Cache::remember(
+            "vehicle_depots_{$organizationId}",
+            self::CACHE_TTL_SHORT, // 5 minutes au lieu de 2 heures
+            function () use ($organizationId) {
+                return \App\Models\VehicleDepot::forOrganization($organizationId)
                     ->active()
                     ->withCount('vehicles')
                     ->orderBy('name')
-                    ->get(),
-                'organizations' => Auth::user()->hasRole('Super Admin')
-                    ? Organization::orderBy('name')->get()
-                    : collect([Auth::user()->organization]),
-            ];
-        });
+                    ->get();
+            }
+        );
+
+        // ✅ CACHE LONG POUR AUTRES DONNÉES DE RÉFÉRENCE (peu volatiles)
+        $staticReferenceData = Cache::remember(
+            "vehicle_static_reference_data_{$organizationId}",
+            self::CACHE_TTL_LONG,
+            function () use ($organizationId) {
+                return [
+                    'vehicle_types' => VehicleType::orderBy('name')->get(),
+                    'vehicle_statuses' => VehicleStatus::orderBy('name')->get(),
+                    'fuel_types' => FuelType::orderBy('name')->get(),
+                    'transmission_types' => TransmissionType::orderBy('name')->get(),
+                    'categories' => \App\Models\VehicleCategory::forOrganization($organizationId)
+                        ->active()
+                        ->orderBy('sort_order')
+                        ->get(),
+                    'organizations' => Auth::user()->hasRole('Super Admin')
+                        ? Organization::orderBy('name')->get()
+                        : collect([Auth::user()->organization]),
+                ];
+            }
+        );
+
+        // ✅ FUSION DES DONNÉES avec dépôts en temps réel
+        return array_merge($staticReferenceData, [
+            'depots' => $depots
+        ]);
     }
 
     /**

@@ -18,6 +18,7 @@ use League\Csv\Reader;
 use League\Csv\Statement;
 use League\Csv\Writer;
 use Illuminate\Database\QueryException;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use App\Services\DriverService;
@@ -26,6 +27,8 @@ use App\Services\ImportExportService;
 
 class DriverController extends Controller
 {
+    use DriverControllerExtensions;
+
     protected DriverService $driverService;
     protected ImportExportService $importExportService;
 
@@ -552,6 +555,108 @@ class DriverController extends Controller
     }
 
     /**
+     * 📊 Calcul des statistiques réelles du chauffeur
+     *
+     * @param Driver $driver
+     * @return array
+     */
+    private function calculateDriverStatistics(Driver $driver): array
+    {
+        try {
+            // 1️⃣ Total des affectations (non supprimées)
+            $totalAssignments = $driver->assignments()
+                ->whereNull('deleted_at')
+                ->count();
+
+            // 2️⃣ Affectation active (en cours actuellement)
+            $activeAssignment = $driver->assignments()
+                ->whereNull('deleted_at')
+                ->where(function($query) {
+                    $query->whereNull('end_datetime')
+                          ->orWhere('end_datetime', '>', now());
+                })
+                ->where('start_datetime', '<=', now())
+                ->exists();
+
+            // 3️⃣ Kilométrage total parcouru
+            // Somme des distances (end_mileage - start_mileage) pour les affectations terminées
+            $totalMileage = $driver->assignments()
+                ->whereNull('deleted_at')
+                ->whereNotNull('end_mileage')
+                ->whereNotNull('start_mileage')
+                ->selectRaw('SUM(end_mileage - start_mileage) as total_km')
+                ->value('total_km') ?? 0;
+
+            // 4️⃣ Dernier véhicule affecté (priorité: actif > plus récent)
+            $lastAssignment = $driver->assignments()
+                ->with('vehicle')
+                ->whereNull('deleted_at')
+                ->orderByRaw('
+                    CASE
+                        WHEN end_datetime IS NULL OR end_datetime > NOW() THEN 0
+                        ELSE 1
+                    END ASC
+                ')
+                ->orderBy('start_datetime', 'desc')
+                ->first();
+
+            $lastVehicle = null;
+            $lastVehicleInfo = null;
+
+            if ($lastAssignment && $lastAssignment->vehicle) {
+                $vehicle = $lastAssignment->vehicle;
+                $lastVehicle = $vehicle->registration_number;
+                $lastVehicleInfo = [
+                    'id' => $vehicle->id,
+                    'registration_number' => $vehicle->registration_number,
+                    'brand' => $vehicle->brand ?? 'N/A',
+                    'model' => $vehicle->model ?? 'N/A',
+                    'is_active' => $lastAssignment->end_datetime === null ||
+                                   $lastAssignment->end_datetime > now(),
+                    'assignment_start' => $lastAssignment->start_datetime,
+                ];
+            }
+
+            // 5️⃣ Affectations terminées (avec date de fin dans le passé)
+            $completedAssignments = $driver->assignments()
+                ->whereNull('deleted_at')
+                ->whereNotNull('end_datetime')
+                ->where('end_datetime', '<=', now())
+                ->count();
+
+            return [
+                'total_assignments' => $totalAssignments,
+                'active_assignments' => $activeAssignment ? 1 : 0,
+                'has_active_assignment' => $activeAssignment,
+                'completed_trips' => $completedAssignments,
+                'total_distance' => (int) $totalMileage,
+                'total_km' => (int) $totalMileage, // Alias pour compatibilité vue
+                'last_vehicle' => $lastVehicle,
+                'last_vehicle_info' => $lastVehicleInfo,
+            ];
+
+        } catch (\Exception $e) {
+            // En cas d'erreur, retourner des statistiques par défaut
+            Log::channel('error')->error('Erreur calcul statistiques chauffeur', [
+                'driver_id' => $driver->id,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            return [
+                'total_assignments' => 0,
+                'active_assignments' => 0,
+                'has_active_assignment' => false,
+                'completed_trips' => 0,
+                'total_distance' => 0,
+                'total_km' => 0,
+                'last_vehicle' => null,
+                'last_vehicle_info' => null,
+            ];
+        }
+    }
+
+    /**
      * 👁️ Affichage détaillé d'un chauffeur
      */
     public function show(Driver $driver)
@@ -567,13 +672,8 @@ class DriverController extends Controller
             // Chargement des relations avec gestion d'erreurs
             $driver->load(['driverStatus', 'organization', 'user']);
 
-            // Statistiques de base
-            $stats = [
-                'total_assignments' => 0, // À implémenter selon les modèles d'affectations
-                'active_assignments' => 0,
-                'completed_trips' => 0,
-                'total_distance' => 0,
-            ];
+            // 📊 Calcul des statistiques réelles du chauffeur
+            $stats = $this->calculateDriverStatistics($driver);
 
             // Activité récente simulée (à remplacer par de vraies données)
             $recentActivity = collect([
@@ -2349,5 +2449,65 @@ class DriverController extends Controller
                 'is_global' => true
             ],
         ]);
+    }
+
+    // ============================================================
+    // 📊 MÉTHODES DE LOGGING ENTERPRISE-GRADE
+    // ============================================================
+
+    /**
+     * 📝 Logging sécurisé enterprise pour les actions utilisateur
+     *
+     * Cette méthode enregistre toutes les actions importantes des utilisateurs
+     * dans un canal d'audit dédié pour traçabilité et conformité.
+     *
+     * @param string $action Action effectuée (ex: 'driver.export.csv')
+     * @param Request|null $request Requête HTTP (optionnel)
+     * @param array $extra Données supplémentaires à logger
+     * @return void
+     */
+    private function logUserAction(string $action, ?Request $request = null, array $extra = []): void
+    {
+        $logData = [
+            'user_id' => Auth::id(),
+            'user_email' => Auth::user()?->email,
+            'action' => $action,
+            'ip_address' => $request?->ip(),
+            'user_agent' => $request?->userAgent(),
+            'timestamp' => now()->toISOString(),
+            'organization_id' => Auth::user()?->organization_id,
+        ];
+
+        Log::channel('audit')->info($action, array_merge($logData, $extra));
+    }
+
+    /**
+     * ⚠️ Gestion d'erreurs enterprise avec traçabilité complète
+     *
+     * Cette méthode enregistre les erreurs avec contexte complet pour
+     * faciliter le débogage et la résolution de problèmes.
+     *
+     * @param string $action Action qui a échoué
+     * @param \Exception $e Exception capturée
+     * @param Request|null $request Requête HTTP (optionnel)
+     * @param array $extra Données supplémentaires à logger
+     * @return void
+     */
+    private function logError(string $action, \Exception $e, ?Request $request = null, array $extra = []): void
+    {
+        $logData = [
+            'user_id' => Auth::id(),
+            'user_email' => Auth::user()?->email,
+            'action' => $action,
+            'error_message' => $e->getMessage(),
+            'error_file' => $e->getFile(),
+            'error_line' => $e->getLine(),
+            'error_trace' => $e->getTraceAsString(),
+            'request_data' => $request?->except(['password', '_token']),
+            'timestamp' => now()->toISOString(),
+            'organization_id' => Auth::user()?->organization_id,
+        ];
+
+        Log::channel('error')->error($action, array_merge($logData, $extra));
     }
 }

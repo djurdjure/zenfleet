@@ -77,19 +77,31 @@ class MaintenanceOperationController extends Controller
     {
         Gate::authorize('create', MaintenanceOperation::class);
 
-        $vehicles = Vehicle::select('id', 'registration_plate', 'brand', 'model')
+        $vehicles = Vehicle::select('id', 'registration_plate', 'brand', 'model', 'current_mileage')
             ->orderBy('registration_plate')
-            ->get();
+            ->get()
+            ->map(function ($vehicle) {
+                $vehicle->display_text = "{$vehicle->brand} {$vehicle->model} - {$vehicle->registration_plate}";
+                return $vehicle;
+            });
 
         // Les couleurs sont générées dynamiquement via getCategoryColor() basé sur 'category'
-        $maintenanceTypes = MaintenanceType::select('id', 'name', 'category', 'estimated_cost')
+        $maintenanceTypes = MaintenanceType::select('id', 'name', 'category', 'estimated_cost', 'description')
             ->orderBy('category')
             ->orderBy('name')
-            ->get();
+            ->get()
+            ->map(function ($type) {
+                $type->display_text = "{$type->name} ({$type->category})";
+                return $type;
+            });
 
         $providers = MaintenanceProvider::where('is_active', true)
             ->orderBy('name')
-            ->get();
+            ->get()
+            ->map(function ($provider) {
+                $provider->display_text = $provider->name;
+                return $provider;
+            });
 
         return view('admin.maintenance.operations.create', compact(
             'vehicles',

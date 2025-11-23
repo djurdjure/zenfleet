@@ -7,6 +7,8 @@ use Spatie\Permission\Contracts\PermissionsTeamResolver;
 use App\Services\OrganizationTeamResolver;
 use App\Models\VehicleMileageReading;
 use App\Observers\VehicleMileageReadingObserver;
+use App\Models\VehicleDepot;
+use App\Observers\VehicleDepotObserver;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -24,7 +26,11 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        // Register Observers
+        // ✅ Register Observers Enterprise-Grade
         VehicleMileageReading::observe(VehicleMileageReadingObserver::class);
+
+        // ✅ V2.0 - Observer pour invalidation automatique du cache des dépôts
+        // Garantit que le filtre des dépôts se met à jour en temps réel
+        VehicleDepot::observe(VehicleDepotObserver::class);
     }
 }

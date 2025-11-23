@@ -82,9 +82,35 @@ class AssignmentController extends Controller
             });
         }
 
-        // Pagination avec filtres
+        // 🔥 FILTRE PAR STATUT - Enterprise-Grade
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        // 🔥 FILTRE PAR PLAGE DE DATES - Enterprise-Grade
+        if ($request->filled('date_from')) {
+            $dateFrom = Carbon::parse($request->date_from)->startOfDay();
+            $query->where('start_datetime', '>=', $dateFrom);
+        }
+        if ($request->filled('date_to')) {
+            $dateTo = Carbon::parse($request->date_to)->endOfDay();
+            $query->where('start_datetime', '<=', $dateTo);
+        }
+
+        // 🔥 TRI DYNAMIQUE - Enterprise-Grade
+        $sortBy = $request->get('sort_by', 'created_at');
+        $sortOrder = $request->get('sort_order', 'desc');
+
+        // Colonnes autorisées pour le tri (sécurité)
+        $allowedSortColumns = ['status', 'start_datetime', 'created_at'];
+        if (!in_array($sortBy, $allowedSortColumns)) {
+            $sortBy = 'created_at';
+        }
+        $sortOrder = in_array(strtolower($sortOrder), ['asc', 'desc']) ? strtolower($sortOrder) : 'desc';
+
+        // Pagination avec filtres et tri
         $perPage = (int) $request->get('per_page', 15);
-        $assignments = $query->orderBy('created_at', 'desc')
+        $assignments = $query->orderBy($sortBy, $sortOrder)
                             ->paginate($perPage);
 
         // ✅ Récupérer tous les véhicules et chauffeurs pour les filtres

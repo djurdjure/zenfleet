@@ -173,7 +173,11 @@ DESIGN PRINCIPLES:
  x-transition:enter-end="opacity-100 max-h-96"
  class="bg-white rounded-lg border border-gray-200 p-6 shadow-sm">
  <form action="{{ route('admin.assignments.index') }}" method="GET">
- <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+ {{-- Conserver les paramètres de tri --}}
+ <input type="hidden" name="sort_by" value="{{ request('sort_by', 'created_at') }}">
+ <input type="hidden" name="sort_order" value="{{ request('sort_order', 'desc') }}">
+
+ <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
  {{-- Status Filter --}}
  <div>
  <label class="block text-sm font-medium text-gray-700 mb-2">Statut</label>
@@ -185,37 +189,23 @@ DESIGN PRINCIPLES:
  </select>
  </div>
 
- {{-- Vehicle Filter --}}
+ {{-- Période (Date Range) --}}
+ <div class="border border-gray-200 rounded-lg p-3 bg-gray-50">
+ <label class="block text-sm font-semibold text-gray-700 mb-3">Période</label>
+ <div class="grid grid-cols-2 gap-3">
  <div>
- <label class="block text-sm font-medium text-gray-700 mb-2">Véhicule</label>
- <select name="vehicle" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm">
- <option value="">Tous les véhicules</option>
- @foreach($vehicles as $vehicle)
- <option value="{{ $vehicle->id }}" {{ request('vehicle') == $vehicle->id ? 'selected' : '' }}>
- {{ $vehicle->registration_plate }} ({{ $vehicle->brand }})
- </option>
- @endforeach
- </select>
+ <label class="block text-xs text-gray-500 mb-1">Début</label>
+ <input type="text" name="date_from" id="filter_date_from" value="{{ request('date_from') }}"
+ placeholder="Sélectionner"
+ class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm bg-white cursor-pointer">
  </div>
-
- {{-- Driver Filter --}}
  <div>
- <label class="block text-sm font-medium text-gray-700 mb-2">Chauffeur</label>
- <select name="driver" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm">
- <option value="">Tous les chauffeurs</option>
- @foreach($drivers as $driver)
- <option value="{{ $driver->id }}" {{ request('driver') == $driver->id ? 'selected' : '' }}>
- {{ $driver->name }}
- </option>
- @endforeach
- </select>
+ <label class="block text-xs text-gray-500 mb-1">Fin</label>
+ <input type="text" name="date_to" id="filter_date_to" value="{{ request('date_to') }}"
+ placeholder="Sélectionner"
+ class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm bg-white cursor-pointer">
  </div>
-
- {{-- Date Range --}}
- <div>
- <label class="block text-sm font-medium text-gray-700 mb-2">Période</label>
- <input type="date" name="date_from" value="{{ request('date_from') }}"
- class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm">
+ </div>
  </div>
  </div>
 
@@ -255,13 +245,37 @@ DESIGN PRINCIPLES:
  Chauffeur
  </th>
  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+ <a href="{{ route('admin.assignments.index', array_merge(request()->except(['sort_by', 'sort_order']), ['sort_by' => 'start_datetime', 'sort_order' => request('sort_by') === 'start_datetime' && request('sort_order') === 'asc' ? 'desc' : 'asc'])) }}"
+ class="flex items-center gap-1 hover:text-gray-700 transition-colors">
  Période
+ @if(request('sort_by') === 'start_datetime')
+ <x-iconify icon="{{ request('sort_order') === 'asc' ? 'lucide:arrow-up' : 'lucide:arrow-down' }}" class="h-3 w-3 text-blue-600" />
+ @else
+ <x-iconify icon="lucide:arrow-up-down" class="h-3 w-3 text-gray-400" />
+ @endif
+ </a>
  </th>
  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+ <a href="{{ route('admin.assignments.index', array_merge(request()->except(['sort_by', 'sort_order']), ['sort_by' => 'created_at', 'sort_order' => request('sort_by') === 'created_at' && request('sort_order') === 'asc' ? 'desc' : 'asc'])) }}"
+ class="flex items-center gap-1 hover:text-gray-700 transition-colors">
  Créé le
+ @if(request('sort_by') === 'created_at' || !request('sort_by'))
+ <x-iconify icon="{{ request('sort_order', 'desc') === 'asc' ? 'lucide:arrow-up' : 'lucide:arrow-down' }}" class="h-3 w-3 text-blue-600" />
+ @else
+ <x-iconify icon="lucide:arrow-up-down" class="h-3 w-3 text-gray-400" />
+ @endif
+ </a>
  </th>
  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+ <a href="{{ route('admin.assignments.index', array_merge(request()->except(['sort_by', 'sort_order']), ['sort_by' => 'status', 'sort_order' => request('sort_by') === 'status' && request('sort_order') === 'asc' ? 'desc' : 'asc'])) }}"
+ class="flex items-center gap-1 hover:text-gray-700 transition-colors">
  Statut
+ @if(request('sort_by') === 'status')
+ <x-iconify icon="{{ request('sort_order') === 'asc' ? 'lucide:arrow-up' : 'lucide:arrow-down' }}" class="h-3 w-3 text-blue-600" />
+ @else
+ <x-iconify icon="lucide:arrow-up-down" class="h-3 w-3 text-gray-400" />
+ @endif
+ </a>
  </th>
  <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
  Actions
@@ -905,5 +919,29 @@ function closeModal() {
         setTimeout(() => modal.remove(), 200);
     }
 }
+
+/**
+ * Initialiser Flatpickr pour les filtres de date
+ */
+document.addEventListener('DOMContentLoaded', function() {
+    const flatpickrConfig = {
+        dateFormat: 'Y-m-d',
+        altInput: true,
+        altFormat: 'd/m/Y',
+        locale: 'fr',
+        allowInput: true,
+        disableMobile: true
+    };
+
+    const dateFromEl = document.getElementById('filter_date_from');
+    const dateToEl = document.getElementById('filter_date_to');
+
+    if (dateFromEl && typeof flatpickr !== 'undefined') {
+        flatpickr(dateFromEl, flatpickrConfig);
+    }
+    if (dateToEl && typeof flatpickr !== 'undefined') {
+        flatpickr(dateToEl, flatpickrConfig);
+    }
+});
 </script>
 @endpush
