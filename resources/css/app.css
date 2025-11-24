@@ -12,6 +12,9 @@
 /* ✅ Import des styles personnalisés pour les statuts de véhicules */
 @import './vehicle-status.css';
 
+/* ✅ Import des composants de formulaire (form-section, form-input, etc.) */
+@import './components/form-components.css';
+
 /* ✅ Import Tailwind CSS */
 @tailwind base;
 @tailwind components;

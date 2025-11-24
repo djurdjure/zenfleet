@@ -57,11 +57,11 @@ class SupplierEnterpriseController extends Controller
             ->where('organization_id', $organizationId)
             ->when($filters['search'], function($q, $search) {
                 $q->where(function($query) use ($search) {
-                    $query->where('name', 'like', "%{$search}%")
+                    $query->where('company_name', 'like', "%{$search}%")  // ✅ CORRECTION: company_name
                           ->orWhere('contact_email', 'like', "%{$search}%")
                           ->orWhere('phone', 'like', "%{$search}%")
-                          ->orWhere('nif_number', 'like', "%{$search}%")
-                          ->orWhere('rc_number', 'like', "%{$search}%");
+                          ->orWhere('nif', 'like', "%{$search}%")           // ✅ CORRECTION: nif (pas nif_number)
+                          ->orWhere('trade_register', 'like', "%{$search}%"); // ✅ CORRECTION: trade_register (pas rc_number)
                 });
             })
             ->when($filters['category'], fn($q) => $q->where('category', $filters['category']))
@@ -91,7 +91,7 @@ class SupplierEnterpriseController extends Controller
                 $suppliersQuery->latest();
                 break;
             default:
-                $suppliersQuery->orderBy('name');
+                $suppliersQuery->orderBy('company_name'); // ✅ CORRECTION: company_name (pas 'name')
         }
 
         // 📊 Statistiques enterprise avancées

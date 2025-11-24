@@ -71,43 +71,27 @@ class MaintenanceOperationController extends Controller
     }
 
     /**
-     * Formulaire création
+     * 🚀 Affiche le formulaire de création - ENTERPRISE EDITION V7 - LIVEWIRE
+     *
+     * Nouvelle architecture utilisant Livewire pour une gestion d'état optimale:
+     * - Composant Livewire MaintenanceOperationCreate
+     * - Chargement des données par le composant (vehicles, types, providers)
+     * - Validation temps réel côté serveur
+     * - Auto-complétion intelligente
+     * - UX enterprise-grade
+     *
+     * @return \Illuminate\View\View
+     * @throws \Illuminate\Auth\Access\AuthorizationException
+     *
+     * @version 7.0 - Refactorisation complète vers Livewire
+     * @since 2025-11-23
+     * @author ZenFleet Architecture Team - Expert Système Senior
      */
     public function create()
     {
-        Gate::authorize('create', MaintenanceOperation::class);
-
-        $vehicles = Vehicle::select('id', 'registration_plate', 'brand', 'model', 'current_mileage')
-            ->orderBy('registration_plate')
-            ->get()
-            ->map(function ($vehicle) {
-                $vehicle->display_text = "{$vehicle->brand} {$vehicle->model} - {$vehicle->registration_plate}";
-                return $vehicle;
-            });
-
-        // Les couleurs sont générées dynamiquement via getCategoryColor() basé sur 'category'
-        $maintenanceTypes = MaintenanceType::select('id', 'name', 'category', 'estimated_cost', 'description')
-            ->orderBy('category')
-            ->orderBy('name')
-            ->get()
-            ->map(function ($type) {
-                $type->display_text = "{$type->name} ({$type->category})";
-                return $type;
-            });
-
-        $providers = MaintenanceProvider::where('is_active', true)
-            ->orderBy('name')
-            ->get()
-            ->map(function ($provider) {
-                $provider->display_text = $provider->name;
-                return $provider;
-            });
-
-        return view('admin.maintenance.operations.create', compact(
-            'vehicles',
-            'maintenanceTypes',
-            'providers'
-        ));
+        // L'autorisation est gérée dans le composant Livewire
+        // Retourner simplement la vue wrapper
+        return view('admin.maintenance.operations.create');
     }
 
     /**
