@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\MaintenanceSchedule;
 use App\Models\MaintenanceType;
 use App\Models\Vehicle;
-use App\Models\MaintenanceProvider;
+use App\Models\Supplier;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
@@ -22,8 +22,7 @@ class MaintenanceScheduleController extends Controller
 
             $schedules = MaintenanceSchedule::with([
                 'vehicle:id,registration_plate,brand,model',
-                'maintenanceType:id,name,category',
-                'maintenanceProvider:id,name'
+                'maintenanceType:id,name,category'
             ])
             ->where('organization_id', $organizationId)
             ->orderBy('next_due_date', 'asc')
@@ -58,10 +57,10 @@ class MaintenanceScheduleController extends Controller
                               ->get(['id', 'registration_plate', 'brand', 'model', 'current_mileage']);
 
             // 🏢 Charger les fournisseurs actifs
-            $providers = MaintenanceProvider::where('organization_id', $organizationId)
-                                           ->where('is_active', true)
-                                           ->orderBy('name')
-                                           ->get(['id', 'name', 'phone', 'email']);
+            $providers = Supplier::where('organization_id', $organizationId)
+                                 ->where('is_active', true)
+                                 ->orderBy('company_name')
+                                 ->get(['id', 'company_name', 'contact_phone', 'contact_email']);
 
             return view('admin.maintenance.schedules.create', compact(
                 'maintenanceTypes',
@@ -95,8 +94,7 @@ class MaintenanceScheduleController extends Controller
         try {
             $schedule = MaintenanceSchedule::with([
                 'vehicle',
-                'maintenanceType',
-                'maintenanceProvider'
+                'maintenanceType'
             ])->findOrFail($id);
 
             // Vérifier que la planification appartient à l'organisation de l'utilisateur
@@ -136,10 +134,10 @@ class MaintenanceScheduleController extends Controller
                               ->orderBy('registration_plate')
                               ->get(['id', 'registration_plate', 'brand', 'model', 'current_mileage']);
 
-            $providers = MaintenanceProvider::where('organization_id', $organizationId)
-                                           ->where('is_active', true)
-                                           ->orderBy('name')
-                                           ->get(['id', 'name', 'phone']);
+            $providers = Supplier::where('organization_id', $organizationId)
+                                 ->where('is_active', true)
+                                 ->orderBy('company_name')
+                                 ->get(['id', 'company_name', 'contact_phone']);
 
             return view('admin.maintenance.schedules.edit', compact(
                 'schedule',

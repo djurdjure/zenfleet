@@ -8,7 +8,7 @@ use Livewire\Attributes\Validate;
 use Livewire\Attributes\Computed;
 use App\Models\MaintenanceOperation;
 use App\Models\MaintenanceSchedule;
-use App\Models\MaintenanceProvider;
+use App\Models\Supplier;
 use App\Models\MaintenanceType;
 use App\Models\MaintenanceDocument;
 use App\Models\Vehicle;
@@ -39,7 +39,7 @@ class OperationForm extends Component
     #[Validate('nullable|exists:maintenance_schedules,id')]
     public ?int $maintenance_schedule_id = null;
 
-    #[Validate('nullable|exists:maintenance_providers,id')]
+    #[Validate('nullable|exists:suppliers,id')]
     public ?int $provider_id = null;
 
     #[Validate('required|in:planned,in_progress,completed,cancelled')]
@@ -141,9 +141,9 @@ class OperationForm extends Component
     #[Computed]
     public function providers()
     {
-        return MaintenanceProvider::active()
-            ->orderBy('name')
-            ->get(['id', 'name', 'company_name', 'rating', 'specialties']);
+        return Supplier::active()
+            ->orderBy('company_name')
+            ->get(['id', 'company_name', 'rating', 'city']);
     }
 
     /**

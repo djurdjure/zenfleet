@@ -143,7 +143,7 @@ class MaintenanceOperation extends Model
      */
     public function provider(): BelongsTo
     {
-        return $this->belongsTo(MaintenanceProvider::class, 'provider_id');
+        return $this->belongsTo(Supplier::class, 'provider_id');
     }
 
     /**
@@ -417,7 +417,7 @@ class MaintenanceOperation extends Model
             'vehicle_id' => 'required|exists:vehicles,id',
             'maintenance_type_id' => 'required|exists:maintenance_types,id',
             'maintenance_schedule_id' => 'nullable|exists:maintenance_schedules,id',
-            'provider_id' => 'nullable|exists:maintenance_providers,id',
+            'provider_id' => 'nullable|exists:suppliers,id',
             'status' => 'required|in:' . implode(',', array_keys(self::STATUSES)),
             'scheduled_date' => 'nullable|date',
             'completed_date' => 'nullable|date|after_or_equal:scheduled_date',

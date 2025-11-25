@@ -7,7 +7,7 @@ use App\Services\Maintenance\MaintenanceService;
 use App\Models\MaintenanceOperation;
 use App\Models\Vehicle;
 use App\Models\MaintenanceType;
-use App\Models\MaintenanceProvider;
+use App\Models\Supplier;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 
@@ -56,9 +56,9 @@ class MaintenanceOperationController extends Controller
             ->orderBy('name')
             ->get();
 
-        $providers = MaintenanceProvider::select('id', 'name')
+        $providers = Supplier::select('id', 'company_name')
             ->where('is_active', true)
-            ->orderBy('name')
+            ->orderBy('company_name')
             ->get();
 
         return view('admin.maintenance.operations.index', compact(
@@ -155,8 +155,9 @@ class MaintenanceOperationController extends Controller
             ->orderBy('name')
             ->get();
 
-        $providers = MaintenanceProvider::where('is_active', true)
-            ->orderBy('name')
+        $providers = Supplier::select('id', 'company_name')
+            ->where('is_active', true)
+            ->orderBy('company_name')
             ->get();
 
         return view('admin.maintenance.operations.edit', compact(

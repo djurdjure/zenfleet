@@ -31,8 +31,8 @@ class MaintenanceService
         $query = MaintenanceOperation::with([
             'vehicle:id,registration_plate,brand,model,vehicle_type_id',
             'vehicle.vehicleType:id,name',
-            'maintenanceType:id,name,category,color',
-            'provider:id,name,contact_phone',
+            'maintenanceType:id,name,category',
+            'provider:id,company_name,contact_phone',
             'creator:id,name'
         ]);
 
@@ -49,7 +49,7 @@ class MaintenanceService
                     $q->where('name', 'ILIKE', "%{$search}%");
                 })
                 ->orWhereHas('provider', function($q) use ($search) {
-                    $q->where('name', 'ILIKE', "%{$search}%");
+                    $q->where('company_name', 'ILIKE', "%{$search}%");
                 })
                 ->orWhere('description', 'ILIKE', "%{$search}%");
             });
@@ -345,8 +345,8 @@ class MaintenanceService
         foreach ($statuses as $status) {
             $operations = MaintenanceOperation::with([
                 'vehicle:id,registration_plate,brand,model',
-                'maintenanceType:id,name,category,color',
-                'provider:id,name'
+                'maintenanceType:id,name,category',
+                'provider:id,company_name'
             ])
             ->where('status', $status)
             ->orderBy('scheduled_date', 'asc')
@@ -371,7 +371,7 @@ class MaintenanceService
     {
         return MaintenanceOperation::with([
             'vehicle:id,registration_plate,brand,model',
-            'maintenanceType:id,name,category,color'
+            'maintenanceType:id,name,category'
         ])
         ->whereBetween('scheduled_date', [$startDate, $endDate])
         ->whereIn('status', [MaintenanceOperation::STATUS_PLANNED, MaintenanceOperation::STATUS_IN_PROGRESS])
@@ -388,7 +388,7 @@ class MaintenanceService
                     'vehicle' => $operation->vehicle->registration_plate,
                     'type' => $operation->maintenanceType->name,
                     'status' => $operation->status,
-                    'provider' => $operation->provider?->name,
+                    'provider' => $operation->provider?->company_name,
                     'cost' => $operation->total_cost,
                 ],
             ];
@@ -444,7 +444,7 @@ class MaintenanceService
     private function getTopMaintenanceTypes(int $limit, array $filters): Collection
     {
         return MaintenanceOperation::select('maintenance_type_id', DB::raw('COUNT(*) as count'), DB::raw('SUM(total_cost) as total_cost'))
-            ->with('maintenanceType:id,name,category,color')
+            ->with('maintenanceType:id,name,category')
             ->groupBy('maintenance_type_id')
             ->orderByDesc('count')
             ->limit($limit)

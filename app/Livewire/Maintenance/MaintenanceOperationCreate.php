@@ -6,7 +6,6 @@ use App\Models\MaintenanceOperation;
 use App\Models\MaintenanceType;
 use App\Models\Vehicle;
 use App\Models\Supplier;
-use App\Models\MaintenanceProvider;
 use Livewire\Component;
 use Livewire\Attributes\Validate;
 use Carbon\Carbon;
@@ -22,7 +21,7 @@ use Illuminate\Support\Facades\Log;
  * - Auto-complétion intelligente depuis maintenance_types
  * - SlimSelect pour sélecteurs professionnels
  * - Kilométrage auto-chargé depuis véhicule
- * - Support Suppliers génériques et MaintenanceProviders
+ * - Support Suppliers génériques (architecture unifiée)
  * - UX optimisée avec statut visuel
  *
  * @version 1.0-Enterprise

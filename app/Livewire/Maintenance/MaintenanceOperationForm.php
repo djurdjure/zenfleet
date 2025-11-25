@@ -4,8 +4,8 @@ namespace App\Livewire\Maintenance;
 
 use App\Models\MaintenanceOperation;
 use App\Models\Vehicle;
-use App\Models\Maintenance\MaintenanceType;
-use App\Models\MaintenanceProvider;
+use App\Models\MaintenanceType;
+use App\Models\Supplier;
 use Livewire\Component;
 use Livewire\Attributes\Validate;
 use Carbon\Carbon;
@@ -36,7 +36,7 @@ class MaintenanceOperationForm extends Component
     #[Validate('required|exists:maintenance_types,id')]
     public ?int $maintenance_type_id = null;
 
-    #[Validate('required|exists:maintenance_providers,id')]
+    #[Validate('nullable|exists:suppliers,id')]
     public ?int $provider_id = null;
 
     #[Validate('required|date')]
@@ -145,17 +145,17 @@ class MaintenanceOperationForm extends Component
                 ];
             });
 
-        // Fournisseurs
-        $this->providers = MaintenanceProvider::where('organization_id', $organizationId)
+        // Fournisseurs (Suppliers)
+        $this->providers = Supplier::where('organization_id', $organizationId)
             ->where('is_active', true)
-            ->select('id', 'name', 'company_name', 'city')
-            ->orderBy('name')
+            ->select('id', 'company_name', 'city')
+            ->orderBy('company_name')
             ->get()
             ->map(function($provider) {
                 return [
                     'id' => $provider->id,
-                    'label' => $provider->name,
-                    'details' => $provider->company_name . ($provider->city ? ' (' . $provider->city . ')' : '')
+                    'label' => $provider->company_name,
+                    'details' => $provider->city ? '(' . $provider->city . ')' : ''
                 ];
             });
     }
