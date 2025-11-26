@@ -94,10 +94,13 @@ class User extends Authenticatable
     
     /**
      * La relation qui retourne les véhicules auxquels cet utilisateur a accès.
+     * Inclut les métadonnées de la table pivot pour tracer l'accès.
      */
     public function vehicles(): BelongsToMany
     {
-        return $this->belongsToMany(Vehicle::class, 'user_vehicle');
+        return $this->belongsToMany(Vehicle::class, 'user_vehicle')
+            ->withPivot('granted_at', 'granted_by', 'access_type')
+            ->withTimestamps();
     }
 
     /**

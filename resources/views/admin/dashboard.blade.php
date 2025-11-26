@@ -76,7 +76,8 @@
 @endpush
 
 @section('content')
-<div class="space-y-6">
+<div class="px-4 sm:px-6 lg:px-8">
+ <div class="space-y-6">
  {{-- Header avec salutation dynamique --}}
  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between">
  <div>
@@ -394,6 +395,7 @@
  </tr>
  </tbody>
  </table>
+ </div>
  </div>
  </div>
 </div>

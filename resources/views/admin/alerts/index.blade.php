@@ -28,7 +28,8 @@
 @endpush
 
 @section('content')
-<div class="space-y-8" x-data="alertsManager()" x-init="init()">
+<div class="px-4 sm:px-6 lg:px-8">
+ <div class="space-y-8" x-data="alertsManager()" x-init="init()">
  {{-- Header Enterprise avec statistiques en temps réel --}}
  <div class="bg-gradient-to-r from-slate-900 to-slate-800 rounded-2xl shadow-2xl p-8 text-white">
  <div class="flex items-center justify-between">
@@ -390,6 +391,7 @@
  <p class="text-sm">Toutes les demandes sont traitées</p>
  </div>
  @endif
+ </div>
  </div>
  </div>
 </div>

@@ -3,7 +3,8 @@
 @section('title', 'Dépenses Véhicules')
 
 @section('content')
-<div class="space-y-6">
+<div class="px-4 sm:px-6 lg:px-8">
+ <div class="space-y-6">
  {{-- Header avec actions --}}
  <div class="sm:flex sm:items-center sm:justify-between">
  <div>
@@ -239,6 +240,7 @@
  'date_to' => request('date_to')
  ]
  ])
+ </div>
 </div>
 
 @push('scripts')

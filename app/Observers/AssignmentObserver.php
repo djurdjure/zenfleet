@@ -205,6 +205,9 @@ class AssignmentObserver
                     'status' => $assignment->status
                 ]);
         }
+        
+        // Gérer l'accès véhicule pour le chauffeur
+        $this->manageDriverVehicleAccess($assignment);
     }
 
     /**
@@ -234,6 +237,30 @@ class AssignmentObserver
 
             // SYNCHRONISATION AUTOMATIQUE DES RESSOURCES ENTERPRISE-GRADE
             $this->syncResourcesBasedOnStatus($assignment, $oldStatus, $newStatus);
+        }
+
+        // Gérer l'accès véhicule pour le chauffeur (si statut, chauffeur ou véhicule a changé)
+        if ($assignment->wasChanged(['status', 'driver_id', 'vehicle_id'])) {
+            $this->manageDriverVehicleAccess($assignment);
+        }
+    }
+
+    /**
+     * Événement déclenché après la suppression
+     */
+    public function deleted(Assignment $assignment): void
+    {
+        if ($assignment->driver && $assignment->driver->user_id && $assignment->vehicle_id) {
+             \DB::table('user_vehicle')
+                ->where('user_id', $assignment->driver->user_id)
+                ->where('vehicle_id', $assignment->vehicle_id)
+                ->where('access_type', 'auto_driver')
+                ->delete();
+                
+             Log::info('[AssignmentObserver] 🗑️ Affectation supprimée -> Accès véhicule retiré', [
+                'driver_user_id' => $assignment->driver->user_id,
+                'vehicle_id' => $assignment->vehicle_id
+             ]);
         }
     }
 
@@ -546,6 +573,66 @@ class AssignmentObserver
                     'assignment_id' => $assignment->id,
                     'driver_id' => $assignment->driver_id,
                     'driver_is_available' => $assignment->driver->is_available,
+                ]);
+            }
+        }
+    }
+    /**
+     * Gère l'accès automatique du chauffeur au véhicule dans la table pivot user_vehicle
+     * 
+     * @param Assignment $assignment
+     * @return void
+     */
+    private function manageDriverVehicleAccess(Assignment $assignment): void
+    {
+        if (!$assignment->driver || !$assignment->driver->user_id || !$assignment->vehicle_id) {
+            return;
+        }
+
+        // Si l'affectation est active ou planifiée, on donne l'accès
+        $shouldHaveAccess = in_array($assignment->status, [Assignment::STATUS_ACTIVE, Assignment::STATUS_SCHEDULED]);
+        
+        if ($shouldHaveAccess) {
+            // Accorder l'accès (ou mettre à jour le timestamp)
+            // On utilise updateOrInsert pour ne pas écraser un accès 'manual' existant si on veut être prudent,
+            // mais ici la règle est: si assigné -> accès.
+            // On va supposer que 'auto_driver' peut coexister ou écraser. 
+            // Pour simplifier: on insère si n'existe pas, ou on update si existe.
+            
+            // Vérifier s'il existe déjà un accès manuel
+            $existingAccess = \DB::table('user_vehicle')
+                ->where('user_id', $assignment->driver->user_id)
+                ->where('vehicle_id', $assignment->vehicle_id)
+                ->first();
+                
+            if (!$existingAccess) {
+                \DB::table('user_vehicle')->insert([
+                    'user_id' => $assignment->driver->user_id,
+                    'vehicle_id' => $assignment->vehicle_id,
+                    'granted_at' => now(),
+                    'access_type' => 'auto_driver',
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+                
+                Log::info('[AssignmentObserver] 🔑 Accès véhicule accordé au chauffeur', [
+                    'driver_user_id' => $assignment->driver->user_id,
+                    'vehicle_id' => $assignment->vehicle_id
+                ]);
+            }
+        } else {
+            // Si l'affectation est terminée/annulée, on retire l'accès MAIS SEULEMENT si c'était un accès auto_driver
+            // Cela permet de ne pas retirer un accès qui aurait été donné manuellement en plus
+            $deleted = \DB::table('user_vehicle')
+                ->where('user_id', $assignment->driver->user_id)
+                ->where('vehicle_id', $assignment->vehicle_id)
+                ->where('access_type', 'auto_driver')
+                ->delete();
+                
+            if ($deleted) {
+                Log::info('[AssignmentObserver] 🔒 Accès véhicule retiré au chauffeur', [
+                    'driver_user_id' => $assignment->driver->user_id,
+                    'vehicle_id' => $assignment->vehicle_id
                 ]);
             }
         }

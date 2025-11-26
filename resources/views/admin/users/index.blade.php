@@ -213,6 +213,11 @@
  <i class="fas fa-building mr-2 text-gray-500"></i>
  {{ $user->organization->name ?? 'N/A' }}
  </span>
+ @if($user->vehicles_count > 0)
+ <span class="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+ <i class="fas fa-car mr-1"></i> {{ $user->vehicles_count }}
+ </span>
+ @endif
  </td>
  <td class="px-6 py-4">
  <div class="flex flex-wrap gap-1">
@@ -249,6 +254,15 @@
  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
  </svg>
+ </a>
+ @endcan
+
+ {{-- ✨ BOUTON ACCÈS VÉHICULES --}}
+ @can('edit users')
+ <a href="{{ route('admin.users.vehicles.manage', $user) }}"
+ title="Gérer l'accès aux véhicules"
+ class="p-2 rounded-lg text-green-600 hover:bg-green-100 transition-colors">
+ <i class="fas fa-car text-lg"></i>
  </a>
  @endcan
 

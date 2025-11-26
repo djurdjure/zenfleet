@@ -185,6 +185,10 @@ Route::middleware(['auth', 'verified'])
             Route::post('{user}/reset-password', [UserController::class, 'resetPassword'])->name('reset-password');
             Route::get('{user}/impersonate', [UserController::class, 'impersonate'])->name('impersonate');
             Route::get('export', [UserController::class, 'export'])->name('export');
+            
+            // 🔒 GESTION DES ACCÈS VÉHICULES
+            Route::get('{user}/vehicles', \App\Livewire\Admin\Users\VehicleAccessManager::class)
+                ->name('vehicles.manage');
         });
 
         // Rôles et Permissions
@@ -244,7 +248,7 @@ Route::middleware(['auth', 'verified'])
             Route::get('create', [VehicleController::class, 'create'])->name('create');
 
             // Routes CRUD principales
-            Route::get('/', [VehicleController::class, 'index'])->name('index');
+            Route::get('/', \App\Livewire\Admin\Vehicles\VehicleIndex::class)->name('index');
             Route::post('/', [VehicleController::class, 'store'])->name('store');
 
             // Routes avec paramètres {vehicle} - TOUJOURS EN DERNIER
@@ -821,6 +825,13 @@ Route::middleware(['auth', 'verified'])
 |--------------------------------------------------------------------------
 */
 require __DIR__.'/auth.php';
+
+/*
+|--------------------------------------------------------------------------
+| 🧪 ROUTE DE TEST RLS (Row Level Security)
+|--------------------------------------------------------------------------
+*/
+require __DIR__.'/rls_test.php';
 
 /*
 |--------------------------------------------------------------------------

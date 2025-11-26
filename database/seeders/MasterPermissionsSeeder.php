@@ -56,7 +56,14 @@ class MasterPermissionsSeeder extends Seeder
             'restore organizations',
             'export organizations',
             'manage organization settings',
+            'manage organization settings',
             'view organization statistics',
+
+            // Depots (COMPLET)
+            'view depots',
+            'create depots',
+            'edit depots',
+            'delete depots',
             
             // Users Management (COMPLET)
             'view users',
@@ -211,7 +218,13 @@ class MasterPermissionsSeeder extends Seeder
             'manage vehicle maintenance',
             'manage vehicle documents',
             'assign vehicles',
+            'assign vehicles',
             'edit vehicles',
+
+            // Depots
+            'view depots',
+            'create depots',
+            'edit depots',
             
             // Drivers
             'view drivers',

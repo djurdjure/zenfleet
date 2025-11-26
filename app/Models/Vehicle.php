@@ -6,6 +6,7 @@ use App\Models\Concerns\BelongsToOrganization;
 use App\Models\Concerns\HasStatusBadge;
 use App\Models\Maintenance\MaintenanceLog;
 use App\Models\Maintenance\MaintenancePlan;
+use App\Models\Scopes\UserVehicleAccessScope;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -17,6 +18,15 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Vehicle extends Model
 {
     use HasFactory, SoftDeletes, BelongsToOrganization, HasStatusBadge;
+
+    /**
+     * 🔒 The "booted" method of the model.
+     * Applique le Global Scope pour le contrôle d'accès utilisateur.
+     */
+    protected static function booted(): void
+    {
+        static::addGlobalScope(new UserVehicleAccessScope);
+    }
 
     protected $fillable = [
         'registration_plate', 'vin', 'brand', 'model', 'color', 'vehicle_type_id',
@@ -331,10 +341,13 @@ class Vehicle extends Model
 
     /**
      * La relation qui retourne les utilisateurs autorisés à utiliser ce véhicule.
+     * Inclut les métadonnées de la table pivot pour tracer l'accès.
      */
     public function users(): BelongsToMany
     {
-        return $this->belongsToMany(User::class, 'user_vehicle');
+        return $this->belongsToMany(User::class, 'user_vehicle')
+            ->withPivot('granted_at', 'granted_by', 'access_type')
+            ->withTimestamps();
     }
 
     // =========================================================================

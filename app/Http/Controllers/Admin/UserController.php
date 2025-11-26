@@ -21,7 +21,7 @@ class UserController extends Controller
     {
         $this->authorize('view users');
 
-        $query = User::with(['roles', 'organization']);
+        $query = User::with(['roles', 'organization'])->withCount('vehicles');
 
         // Si l'utilisateur n'est pas Super Admin, on filtre par son organisation
         if (!auth()->user()->hasRole('Super Admin')) {

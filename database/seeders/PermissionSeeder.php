@@ -25,6 +25,7 @@ class PermissionSeeder extends Seeder
             'view suppliers', 'create suppliers', 'edit suppliers', 'delete suppliers',
             'view documents', 'create documents', 'edit documents', 'delete documents',
             'manage document_categories',
+            'view depots', 'create depots', 'edit depots', 'delete depots',
         ];
 
         foreach ($permissions as $permission) {

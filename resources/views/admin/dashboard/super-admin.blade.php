@@ -3,9 +3,10 @@
 @section('title', 'Dashboard Super Admin')
 
 @section('content')
-<div class="dashboard-super-admin">
- 
- {{-- Header --}}
+<div class="px-4 sm:px-6 lg:px-8">
+    <div class="dashboard-super-admin">
+     
+     {{-- Header --}}
  <div class="mb-8">
  <div class="flex items-center justify-between">
  <div>
@@ -259,6 +260,7 @@
  </div>
  </div>
  </div>
+    </div>
 </div>
 @endsection
 
@@ -287,4 +289,3 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 @endpush
-

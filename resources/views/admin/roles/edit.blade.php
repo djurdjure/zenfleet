@@ -145,17 +145,27 @@
  <div class="space-y-6">
  @foreach ($orderedCategories as $category => $permissions)
  @php
- $categoryConfig = [
- 'view' => ['icon' => 'fa-eye', 'color' => 'blue', 'label' => 'Consultation'],
- 'create' => ['icon' => 'fa-plus-circle', 'color' => 'green', 'label' => 'Création'],
- 'edit' => ['icon' => 'fa-edit', 'color' => 'orange', 'label' => 'Modification'],
- 'delete' => ['icon' => 'fa-trash-alt', 'color' => 'red', 'label' => 'Suppression'],
- 'import' => ['icon' => 'fa-upload', 'color' => 'purple', 'label' => 'Importation'],
- 'export' => ['icon' => 'fa-download', 'color' => 'indigo', 'label' => 'Exportation'],
- 'manage' => ['icon' => 'fa-cogs', 'color' => 'gray', 'label' => 'Gestion'],
- 'end' => ['icon' => 'fa-stop-circle', 'color' => 'pink', 'label' => 'Fin'],
- ];
- $catConfig = $categoryConfig[$category] ?? ['icon' => 'fa-key', 'color' => 'gray', 'label' => ucfirst($category)];
+  $categoryConfig = [
+  'organizations' => ['icon' => 'fa-building', 'color' => 'indigo', 'label' => 'Organisations'],
+  'users' => ['icon' => 'fa-users', 'color' => 'blue', 'label' => 'Utilisateurs'],
+  'roles' => ['icon' => 'fa-user-shield', 'color' => 'purple', 'label' => 'Rôles & Permissions'],
+  'vehicles' => ['icon' => 'fa-car', 'color' => 'blue', 'label' => 'Véhicules'],
+  'drivers' => ['icon' => 'fa-id-card', 'color' => 'green', 'label' => 'Chauffeurs'],
+  'assignments' => ['icon' => 'fa-key', 'color' => 'yellow', 'label' => 'Affectations'],
+  'depots' => ['icon' => 'fa-warehouse', 'color' => 'gray', 'label' => 'Dépôts'],
+  'maintenance' => ['icon' => 'fa-wrench', 'color' => 'red', 'label' => 'Maintenance'],
+  'repairs' => ['icon' => 'fa-hammer', 'color' => 'orange', 'label' => 'Réparations'],
+  'mileage' => ['icon' => 'fa-tachometer-alt', 'color' => 'cyan', 'label' => 'Kilométrage'],
+  'suppliers' => ['icon' => 'fa-truck-loading', 'color' => 'teal', 'label' => 'Fournisseurs'],
+  'expenses' => ['icon' => 'fa-file-invoice-dollar', 'color' => 'emerald', 'label' => 'Dépenses'],
+  'documents' => ['icon' => 'fa-file-alt', 'color' => 'slate', 'label' => 'Documents'],
+  'alerts' => ['icon' => 'fa-bell', 'color' => 'rose', 'label' => 'Alertes'],
+  'sanctions' => ['icon' => 'fa-gavel', 'color' => 'red', 'label' => 'Sanctions'],
+  'reports' => ['icon' => 'fa-chart-line', 'color' => 'violet', 'label' => 'Rapports & Analytics'],
+  'audit' => ['icon' => 'fa-history', 'color' => 'gray', 'label' => 'Audit Logs'],
+  'autres' => ['icon' => 'fa-cog', 'color' => 'gray', 'label' => 'Autres'],
+  ];
+ $catConfig = $categoryConfig[$category] ?? ['icon' => 'fa-cube', 'color' => 'gray', 'label' => ucfirst($category)];
  @endphp
 
  <div class="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">

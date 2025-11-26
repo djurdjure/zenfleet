@@ -175,8 +175,8 @@
  </a>
  </li>
 
- {{-- Organisations --}}
- @can('view organizations')
+ {{-- Organisations (Super Admin uniquement) --}}
+ @hasrole('Super Admin')
  <li class="flex">
  <a href="{{ route('admin.organizations.index') }}"
  class="flex items-center w-full h-11 px-3.5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 {{ request()->routeIs('admin.organizations.*') ? 'bg-blue-600 text-white shadow-md' : 'text-gray-700 hover:bg-white hover:text-gray-900 hover:shadow-sm' }}">
@@ -184,10 +184,10 @@
  <span class="flex-1">Organisations</span>
  </a>
  </li>
- @endcan
+ @endhasrole
 
  {{-- Véhicules avec sous-menu --}}
- @canany(['view vehicles', 'view assignments'])
+ @hasanyrole('Super Admin|Admin|Gestionnaire Flotte')
  <li class="flex flex-col" x-data="{ open: {{ request()->routeIs('admin.vehicles.*', 'admin.assignments.*') ? 'true' : 'false' }} }">
  <button @click="open = !open"
  class="flex items-center w-full h-11 px-3.5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 {{ request()->routeIs('admin.vehicles.*', 'admin.assignments.*') ? 'bg-blue-600 text-white shadow-md' : 'text-gray-700 hover:bg-white hover:text-gray-900 hover:shadow-sm' }}">
@@ -209,28 +209,24 @@
  </div>
  </div>
  <div class="flex-1 min-w-0 space-y-1.5">
- @can('view vehicles')
  <a href="{{ route('admin.vehicles.index') }}"
  class="flex items-center w-full h-9 px-2.5 py-1.5 rounded-md text-sm font-medium transition-all duration-200 {{ request()->routeIs('admin.vehicles.index') ? 'bg-blue-100 text-blue-700' : 'text-gray-700 hover:bg-white/70 hover:text-gray-900' }}">
  <x-iconify icon="mdi:format-list-bulleted" class="w-4 h-4 mr-2.5 {{ request()->routeIs('admin.vehicles.index') ? 'text-blue-600' : 'text-gray-600' }}" />
  Gestion Véhicules
  </a>
- @endcan
- @can('view assignments')
  <a href="{{ route('admin.assignments.index') }}"
  class="flex items-center w-full h-9 px-2.5 py-1.5 rounded-md text-sm font-medium transition-all duration-200 {{ request()->routeIs('admin.assignments.*') ? 'bg-blue-100 text-blue-700' : 'text-gray-700 hover:bg-white/70 hover:text-gray-900' }}">
  <x-iconify icon="mdi:clipboard-text" class="w-4 h-4 mr-2.5 {{ request()->routeIs('admin.assignments.*') ? 'text-blue-600' : 'text-gray-600' }}" />
  Affectations
  </a>
- @endcan
  </div>
  </div>
  </div>
  </li>
- @endcanany
+ @endhasanyrole
 
  {{-- Chauffeurs avec sous-menu --}}
- @canany(['view drivers', 'view sanctions'])
+ @hasanyrole('Super Admin|Admin|Gestionnaire Flotte')
  <li class="flex flex-col" x-data="{ open: {{ request()->routeIs(['admin.drivers.*', 'admin.sanctions.*']) ? 'true' : 'false' }} }">
  <button @click="open = !open"
  class="flex items-center w-full h-11 px-3.5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 {{ request()->routeIs(['admin.drivers.*', 'admin.sanctions.*']) ? 'bg-blue-600 text-white shadow-md' : 'text-gray-700 hover:bg-white hover:text-gray-900 hover:shadow-sm' }}">
@@ -259,28 +255,24 @@
  </div>
  </div>
  <div class="flex-1 min-w-0 space-y-1">
- @can('view drivers')
  <a href="{{ route('admin.drivers.index') }}"
  class="flex items-center w-full h-9 px-2.5 py-1.5 rounded-md text-sm font-semibold transition-all duration-200 {{ request()->routeIs('admin.drivers.index') ? 'bg-blue-100 text-blue-700' : 'text-gray-700 hover:bg-white/70 hover:text-gray-900' }}">
  <x-iconify icon="mdi:view-list" class="w-4 h-4 mr-2.5 {{ request()->routeIs('admin.drivers.index') ? 'text-blue-600' : 'text-gray-600' }}" />
  Liste
  </a>
- @endcan
- @can('view sanctions')
  <a href="{{ route('admin.drivers.sanctions.index') }}"
  class="flex items-center w-full h-9 px-2.5 py-1.5 rounded-md text-sm font-semibold transition-all duration-200 {{ request()->routeIs('admin.drivers.sanctions.*') ? 'bg-blue-100 text-blue-700' : 'text-gray-700 hover:bg-white/70 hover:text-gray-900' }}">
  <x-iconify icon="mdi:gavel" class="w-4 h-4 mr-2.5 {{ request()->routeIs('admin.drivers.sanctions.*') ? 'text-blue-600' : 'text-gray-600' }}" />
  Sanctions
  </a>
- @endcan
  </div>
  </div>
  </div>
  </li>
- @endcanany
+ @endhasanyrole
 
  {{-- Dépôts - ENTERPRISE GRADE --}}
- @can('view depots')
+ @hasanyrole('Super Admin|Admin|Gestionnaire Flotte')
  <li class="flex">
  <a href="{{ route('admin.depots.index') }}"
  class="flex items-center w-full h-11 px-3.5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 {{ request()->routeIs('admin.depots.*') ? 'bg-blue-600 text-white shadow-md' : 'text-gray-700 hover:bg-white hover:text-gray-900 hover:shadow-sm' }}">
@@ -288,7 +280,7 @@
  <span class="flex-1">Dépôts</span>
  </a>
  </li>
- @endcan
+ @endhasanyrole
 
  {{-- Demandes de Réparation - Chauffeurs uniquement (menu séparé) --}}
  @hasrole('Chauffeur')
@@ -372,7 +364,7 @@
  @version 2.0 Ultra-Professional
  @since 2025-10-23
  ==================================================================== --}}
- @canany(['view maintenance', 'view team repair requests', 'view all repair requests', 'view own repair requests'])
+ @hasanyrole('Super Admin|Admin|Gestionnaire Flotte|Supervisor')
  <li class="flex flex-col" x-data="{ open: {{ request()->routeIs('admin.maintenance.*', 'admin.repair-requests.*') ? 'true' : 'false' }} }">
  <button @click="open = !open"
  class="flex items-center w-full h-11 px-3.5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 {{ request()->routeIs('admin.maintenance.*', 'admin.repair-requests.*') ? 'bg-blue-600 text-white shadow-md' : 'text-gray-700 hover:bg-white hover:text-gray-900 hover:shadow-sm' }}">
@@ -470,10 +462,10 @@
  </div>
  </div>
  </li>
- @endcanany
+ @endhasanyrole
 
  {{-- Alertes --}}
- @can('view alerts')
+ @hasanyrole('Super Admin|Admin|Gestionnaire Flotte|Supervisor')
  <li class="flex">
  <a href="{{ route('admin.alerts.index') }}"
  class="flex items-center w-full h-11 px-3.5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 {{ request()->routeIs('admin.alerts.*') ? 'bg-blue-600 text-white shadow-md' : 'text-gray-700 hover:bg-white hover:text-gray-900 hover:shadow-sm' }}">
@@ -481,10 +473,10 @@
  <span class="flex-1">Alertes</span>
  </a>
  </li>
- @endcan
+ @endhasanyrole
 
  {{-- Documents --}}
- @can('view documents')
+ @hasanyrole('Super Admin|Admin|Gestionnaire Flotte')
  <li class="flex">
  <a href="{{ route('admin.documents.index') }}"
  class="flex items-center w-full h-11 px-3.5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 {{ request()->routeIs('admin.documents.*') ? 'bg-blue-600 text-white shadow-md' : 'text-gray-700 hover:bg-white hover:text-gray-900 hover:shadow-sm' }}">
@@ -492,10 +484,10 @@
  <span class="flex-1">Documents</span>
  </a>
  </li>
- @endcan
+ @endhasanyrole
 
  {{-- Fournisseurs --}}
- @can('view suppliers')
+ @hasanyrole('Super Admin|Admin|Gestionnaire Flotte')
  <li class="flex">
  <a href="{{ route('admin.suppliers.index') }}"
  class="flex items-center w-full h-11 px-3.5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 {{ request()->routeIs('admin.suppliers.*') ? 'bg-blue-600 text-white shadow-md' : 'text-gray-700 hover:bg-white hover:text-gray-900 hover:shadow-sm' }}">
@@ -503,11 +495,11 @@
  <span class="flex-1">Fournisseurs</span>
  </a>
  </li>
- @endcan
+ @endhasanyrole
 
  {{-- ====================================================================
  💰 GESTION DES DÉPENSES - MENU ULTRA-PRO ENTERPRISE GRADE
- ====================================================================
+ ==================================================================== 
  Module complet de gestion financière surpassant Fleetio, Samsara, Geotab
  - Workflow d'approbation multi-niveaux
  - Analytics temps réel avec ML predictions
@@ -516,7 +508,7 @@
  @version 1.0 Enterprise Ultra-Pro
  @since 2025-10-27
  ==================================================================== --}}
- @canany(['view expenses', 'create expenses', 'approve expenses'])
+ @hasanyrole('Super Admin|Admin|Gestionnaire Flotte|Finance')
  <li class="flex flex-col" x-data="{ open: {{ request()->routeIs('admin.vehicle-expenses.*') ? 'true' : 'false' }} }">
  <button @click="open = !open"
  class="flex items-center w-full h-11 px-3.5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 {{ request()->routeIs('admin.vehicle-expenses.*') ? 'bg-blue-600 text-white shadow-md' : 'text-gray-700 hover:bg-white hover:text-gray-900 hover:shadow-sm' }}">
@@ -643,10 +635,10 @@
  </div>
  </div>
  </li>
- @endcanany
+ @endhasanyrole
 
  {{-- Rapports --}}
- @can('view analytics')
+ @hasanyrole('Super Admin|Admin|Gestionnaire Flotte')
  <li class="flex">
  <a href="{{ route('admin.reports.index') }}"
  class="flex items-center w-full h-11 px-3.5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 {{ request()->routeIs('admin.reports.*') ? 'bg-blue-600 text-white shadow-md' : 'text-gray-700 hover:bg-white hover:text-gray-900 hover:shadow-sm' }}">
@@ -654,10 +646,10 @@
  <span class="flex-1">Rapports</span>
  </a>
  </li>
- @endcan
+ @endhasanyrole
 
  {{-- Administration avec sous-menu --}}
- @canany(['view users', 'view roles', 'view audit logs'])
+ @hasanyrole('Super Admin|Admin')
  <li class="flex flex-col" x-data="{ open: {{ request()->routeIs('admin.users.*', 'admin.roles.*', 'admin.audit.*') ? 'true' : 'false' }} }">
  <button @click="open = !open"
  class="flex items-center w-full h-11 px-3.5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 {{ request()->routeIs('admin.users.*', 'admin.roles.*', 'admin.audit.*') ? 'bg-blue-600 text-white shadow-md' : 'text-gray-700 hover:bg-white hover:text-gray-900 hover:shadow-sm' }}">
@@ -686,21 +678,16 @@
  </div>
  </div>
  <div class="flex-1 min-w-0 space-y-1">
- @can('view users')
  <a href="{{ route('admin.users.index') }}"
  class="flex items-center w-full h-9 px-2.5 py-1.5 rounded-md text-sm font-semibold transition-all duration-200 {{ request()->routeIs('admin.users.*') ? 'bg-blue-100 text-blue-700' : 'text-gray-700 hover:bg-white/70 hover:text-gray-900' }}">
  <x-iconify icon="mdi:account-multiple" class="w-4 h-4 mr-2.5 {{ request()->routeIs('admin.users.*') ? 'text-blue-600' : 'text-gray-600' }}" />
  Utilisateurs
  </a>
- @endcan
- @can('view roles')
  <a href="{{ route('admin.roles.index') }}"
  class="flex items-center w-full h-9 px-2.5 py-1.5 rounded-md text-sm font-semibold transition-all duration-200 {{ request()->routeIs('admin.roles.*') ? 'bg-blue-100 text-blue-700' : 'text-gray-700 hover:bg-white/70 hover:text-gray-900' }}">
  <x-iconify icon="mdi:shield-check" class="w-4 h-4 mr-2.5 {{ request()->routeIs('admin.roles.*') ? 'text-blue-600' : 'text-gray-600' }}" />
  Rôles & Permissions
  </a>
- @endcan
- @can('view audit logs')
  @hasrole('Super Admin')
  <a href="{{ route('admin.audit.index') }}"
  class="flex items-center w-full h-9 px-2.5 py-1.5 rounded-md text-sm font-semibold transition-all duration-200 {{ request()->routeIs('admin.audit.*') ? 'bg-blue-100 text-blue-700' : 'text-gray-700 hover:bg-white/70 hover:text-gray-900' }}">
@@ -708,12 +695,11 @@
  Audit & Sécurité
  </a>
  @endhasrole
- @endcan
  </div>
  </div>
  </div>
  </li>
- @endcanany
+ @endhasanyrole
  </ul>
 
  {{-- Footer du menu supprimé --}}
@@ -1262,13 +1248,12 @@
                                      'text-yellow-500 hover:text-yellow-600 focus:ring-yellow-500': toast.type === 'warning'
                                  }">
                              <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                                 <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 0 010-1.414z" clip-rule="evenodd" />
+                                 <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
                              </svg>
                          </button>
                      </div>
                  </div>
-            </div>
-         </div>
+             </div>
          </div>
      </template>
  </div>

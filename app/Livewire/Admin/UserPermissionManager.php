@@ -78,7 +78,15 @@ class UserPermissionManager extends Component
             'Fournisseurs' => $this->allPermissions->filter(fn($p) => str_contains($p->name, 'supplier'))->values(),
             'Utilisateurs' => $this->allPermissions->filter(fn($p) => str_contains($p->name, 'user'))->values(),
             'Organisations' => $this->allPermissions->filter(fn($p) => str_contains($p->name, 'organization'))->values(),
-            'Rapports' => $this->allPermissions->filter(fn($p) => str_contains($p->name, 'report') || str_contains($p->name, 'dashboard'))->values(),
+            'Dépôts' => $this->allPermissions->filter(fn($p) => str_contains($p->name, 'depot'))->values(),
+            'Maintenance' => $this->allPermissions->filter(fn($p) => str_contains($p->name, 'maintenance'))->values(),
+            'Réparations' => $this->allPermissions->filter(fn($p) => str_contains($p->name, 'repair'))->values(),
+            'Alertes' => $this->allPermissions->filter(fn($p) => str_contains($p->name, 'alert'))->values(),
+            'Documents' => $this->allPermissions->filter(fn($p) => str_contains($p->name, 'document'))->values(),
+            'Dépenses' => $this->allPermissions->filter(fn($p) => str_contains($p->name, 'expense'))->values(),
+            'Kilométrage' => $this->allPermissions->filter(fn($p) => str_contains($p->name, 'mileage'))->values(),
+            'Sanctions' => $this->allPermissions->filter(fn($p) => str_contains($p->name, 'sanction'))->values(),
+            'Rapports' => $this->allPermissions->filter(fn($p) => str_contains($p->name, 'report') || str_contains($p->name, 'dashboard') || str_contains($p->name, 'analytics'))->values(),
             'Système' => $this->allPermissions->filter(fn($p) =>
                 str_contains($p->name, 'setting') ||
                 str_contains($p->name, 'audit') ||
@@ -88,8 +96,7 @@ class UserPermissionManager extends Component
 
         // Filtrer les catégories vides
         $this->permissionsByCategory = collect($this->permissionsByCategory)
-            ->filter(fn($perms) => $perms->count() > 0)
-            ->toArray();
+            ->filter(fn($perms) => $perms->count() > 0);
     }
 
     public function checkCustomPermissions()

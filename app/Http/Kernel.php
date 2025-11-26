@@ -30,6 +30,7 @@ class Kernel extends HttpKernel
             \Illuminate\View\Middleware\ShareErrorsFromSession::class,
             \App\Http\Middleware\VerifyCsrfToken::class,
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
+            \App\Http\Middleware\SetTenantSession::class, // ✅ RLS Session Injection
         ],
 
         'api' => [
@@ -64,7 +65,7 @@ class Kernel extends HttpKernel
         // 🛡️ MIDDLEWARE SÉCURITÉ PERSONNALISÉS (nouveaux)
         'prevent.escalation' => \App\Http\Middleware\PreventPrivilegeEscalation::class,
         'audit.log' => \App\Http\Middleware\AuditUserActions::class,
-        'organization.scope' => \App\Http\Middleware\OrganizationScope::class,
+        'tenant.session' => \App\Http\Middleware\SetTenantSession::class, // ✅ RLS Session
         'super.admin.only' => \App\Http\Middleware\SuperAdminOnly::class,
         'same.organization' => \App\Http\Middleware\SameOrganization::class,
 

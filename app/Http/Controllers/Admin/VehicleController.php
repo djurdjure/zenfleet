@@ -219,37 +219,13 @@ class VehicleController extends Controller
     /**
      * 📋 Liste enterprise des véhicules avec filtrage avancé
      */
-    public function index(Request $request): View
+    /**
+     * 📋 Liste enterprise des véhicules avec filtrage avancé
+     * @deprecated Replaced by Livewire Component VehicleIndex
+     */
+    public function index(Request $request): \Illuminate\Http\RedirectResponse
     {
-        $this->logUserAction('vehicle.index.accessed', $request);
-
-        try {
-            // Construction de la requête avec filtres enterprise
-            $query = $this->buildAdvancedQuery($request);
-
-            // Pagination avec métadonnées adaptative enterprise
-            $vehicles = $query->paginate($this->getOptimalPaginationSize($request))
-                ->withQueryString()
-                ->through(function ($vehicle) {
-                    return $this->enrichVehicleData($vehicle);
-                });
-
-            // Statistiques et KPIs pour le dashboard
-            $analytics = $this->getVehicleAnalytics();
-
-            // Données de référence pour les filtres
-            $referenceData = $this->getReferenceData();
-
-            return view('admin.vehicles.index', compact(
-                'vehicles',
-                'analytics',
-                'referenceData'
-            ));
-
-        } catch (\Exception $e) {
-            $this->logError('vehicle.index.error', $e, $request);
-            return $this->handleErrorResponse($e, 'vehicles.index');
-        }
+        return redirect()->route('admin.vehicles.index');
     }
 
     /**
@@ -692,162 +668,7 @@ class VehicleController extends Controller
         }
     }
 
-    // ============================================================
-    // MÉTHODES PRIVÉES ENTERPRISE
-    // ============================================================
 
-    /**
-     * Construction de requête avancée avec filtres intelligents
-     */
-    private function buildAdvancedQuery(Request $request): \Illuminate\Database\Eloquent\Builder
-    {
-        $query = Vehicle::with([
-            'vehicleType', 'fuelType', 'transmissionType', 'vehicleStatus',
-            'organization', 'depot', 'category',
-            // Eager loading des affectations actives avec chauffeur et utilisateur (optimisation N+1)
-            // 🔧 FIX CRITIQUE: Ajout de whereNull('deleted_at') pour respecter le soft delete
-            'assignments' => function ($query) {
-                $query->whereNull('deleted_at')  // ✅ CORRECTION ENTERPRISE-GRADE: Respect du soft delete
-                      ->where('status', 'active')
-                      ->where('start_datetime', '<=', now())
-                      ->where(function($q) {
-                          $q->whereNull('end_datetime')
-                            ->orWhere('end_datetime', '>=', now());
-                      })
-                      ->with('driver.user')
-                      ->limit(1);
-            }
-        ]);
-
-        // Filtre par organisation pour sécurité
-        if (!Auth::user()->hasRole('Super Admin')) {
-            $query->where('organization_id', Auth::user()->organization_id);
-        }
-
-        // Filtre archivage - Par défaut, afficher uniquement les véhicules non archivés
-        $archived = $request->get('archived', 'false');
-        if ($archived === 'true') {
-            $query->where('is_archived', true);
-        } elseif ($archived === 'all') {
-            // Afficher tous les véhicules (archivés et non archivés)
-        } else {
-            // Par défaut, afficher uniquement les véhicules non archivés (visibles)
-            $query->where('is_archived', false);
-        }
-
-        // Filtres avancés
-        if ($request->filled('search')) {
-            $search = $request->get('search');
-            $query->where(function ($q) use ($search) {
-                $q->where('registration_plate', 'ilike', "%{$search}%")
-                  ->orWhere('vin', 'ilike', "%{$search}%")
-                  ->orWhere('brand', 'ilike', "%{$search}%")
-                  ->orWhere('model', 'ilike', "%{$search}%");
-            });
-        }
-
-        if ($request->filled('status_id')) {
-            $query->where('status_id', $request->get('status_id'));
-        }
-
-        if ($request->filled('vehicle_type_id')) {
-            $query->where('vehicle_type_id', $request->get('vehicle_type_id'));
-        }
-
-        if ($request->filled('fuel_type_id')) {
-            $query->where('fuel_type_id', $request->get('fuel_type_id'));
-        }
-
-        // Filtre par dépôt - Enterprise-Grade
-        if ($request->filled('depot_id')) {
-            $query->where('depot_id', $request->get('depot_id'));
-        }
-
-        // Filtres par date
-        if ($request->filled('acquisition_from')) {
-            $query->where('acquisition_date', '>=', $request->get('acquisition_from'));
-        }
-
-        if ($request->filled('acquisition_to')) {
-            $query->where('acquisition_date', '<=', $request->get('acquisition_to'));
-        }
-
-        // Tri intelligent
-        $sortBy = $request->get('sort_by', 'created_at');
-        $sortDirection = $request->get('sort_direction', 'desc');
-
-        $allowedSorts = [
-            'registration_plate', 'brand', 'model', 'manufacturing_year',
-            'acquisition_date', 'current_mileage', 'created_at'
-        ];
-
-        if (in_array($sortBy, $allowedSorts)) {
-            $query->orderBy($sortBy, $sortDirection);
-        }
-
-        return $query;
-    }
-
-    /**
-     * Enrichissement des données véhicule avec calculs enterprise
-     */
-    private function enrichVehicleData(Vehicle $vehicle): Vehicle
-    {
-        // Calculs automatiques
-        $vehicle->age_years = Carbon::now()->diffInYears($vehicle->acquisition_date);
-        $vehicle->depreciation_rate = $this->calculateDepreciation($vehicle);
-        $vehicle->utilization_rate = $this->calculateUtilization($vehicle);
-        $vehicle->maintenance_cost_total = $this->calculateMaintenanceCosts($vehicle);
-
-        return $vehicle;
-    }
-
-    /**
-     * Analytics enterprise des véhicules
-     */
-    private function getVehicleAnalytics(): array
-    {
-        return Cache::tags(['analytics'])->remember('vehicle_analytics', self::CACHE_TTL_MEDIUM, function () {
-            $query = Vehicle::query();
-
-            if (!Auth::user()->hasRole('Super Admin')) {
-                $query->where('organization_id', Auth::user()->organization_id);
-            }
-
-            // Par défaut, exclure les véhicules archivés des statistiques
-            $query->where('is_archived', false);
-
-            return [
-                'total_vehicles' => $query->count(),
-                'available_vehicles' => (clone $query)->whereHas('vehicleStatus', fn($q) =>
-                    $q->where('name', 'ILIKE', '%disponible%')
-                      ->orWhere('name', 'ILIKE', '%available%')
-                )->count(),
-                'assigned_vehicles' => (clone $query)->whereHas('vehicleStatus', fn($q) =>
-                    $q->where('name', 'ILIKE', '%affecté%')
-                      ->orWhere('name', 'ILIKE', '%affectée%')
-                      ->orWhere('name', 'ILIKE', '%assigned%')
-                )->count(),
-                'maintenance_vehicles' => (clone $query)->whereHas('vehicleStatus', fn($q) =>
-                    $q->where('name', 'ILIKE', '%maintenance%')
-                      ->orWhere('name', 'ILIKE', '%réparation%')
-                      ->orWhere('name', 'ILIKE', '%repair%')
-                      ->orWhere('name', 'ILIKE', '%révision%')
-                      ->orWhere('name', 'ILIKE', '%service%')
-                )->count(),
-                'archived_vehicles' => Vehicle::where('is_archived', true)
-                    ->when(!Auth::user()->hasRole('Super Admin'), fn($q) =>
-                        $q->where('organization_id', Auth::user()->organization_id)
-                    )->count(),
-                'avg_age_years' => round((clone $query)->avg(DB::raw('EXTRACT(YEAR FROM AGE(NOW(), acquisition_date))')) ?? 0, 1),
-                'total_value' => (clone $query)->sum('current_value'),
-                'avg_mileage' => round((clone $query)->avg('current_mileage') ?? 0),
-                'fuel_distribution' => $this->getFuelDistribution(),
-                'type_distribution' => $this->getTypeDistribution(),
-                'monthly_acquisitions' => $this->getMonthlyAcquisitions(),
-            ];
-        });
-    }
 
     /**
      * Données de référence avec cache optimisé Enterprise-Grade
@@ -3086,37 +2907,7 @@ class VehicleController extends Controller
     // ============================================================
 
     /**
-     * 📊 Détermine la taille de pagination optimale selon le contexte
-     * Adapte automatiquement selon l'appareil, rôle et préférences utilisateur
-     */
-    private function getOptimalPaginationSize(Request $request): int
-    {
-        // Détection du type d'appareil via User-Agent
-        $userAgent = $request->userAgent() ?? '';
-        $isMobile = preg_match('/(Mobile|Android|iPhone|iPad)/', $userAgent);
 
-        // Vérification des préférences utilisateur (pagination enterprise: 20/50/100)
-        $userPreference = $request->get('per_page');
-        if ($userPreference && in_array($userPreference, [20, 50, 100])) {
-            return (int) $userPreference;
-        }
-
-        // Configuration selon le rôle et type d'organisation
-        $user = Auth::user();
-        $organizationType = $user->organization?->type ?? 'standard';
-        $userRole = $user->roles->first()?->name ?? 'user';
-
-        // Logique de détermination enterprise
-        if ($isMobile) {
-            return self::PAGINATION_SIZE_MOBILE;
-        }
-
-        if (in_array($userRole, ['Super Admin', 'Admin']) && $organizationType === 'enterprise') {
-            return self::PAGINATION_SIZE_ENTERPRISE;
-        }
-
-        return self::PAGINATION_SIZE_DESKTOP;
-    }
 
     /**
      * 📎 Détermine la taille maximale d'import selon le plan utilisateur

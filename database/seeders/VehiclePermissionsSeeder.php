@@ -65,7 +65,7 @@ class VehiclePermissionsSeeder extends Seeder
         'Admin' => ['basic', 'advanced', 'management'],       // Toutes les permissions
         'Gestionnaire Flotte' => ['basic', 'management'],     // CRUD + gestion
         'Superviseur' => ['basic'],                           // Lecture + création
-        'Comptable' => [],                                    // Aucune permission véhicule
+        'Comptable' => ['basic', 'management'],               // Lecture + historique + maintenance
         'Chauffeur' => [],                                    // Aucune permission véhicule
     ];
 
