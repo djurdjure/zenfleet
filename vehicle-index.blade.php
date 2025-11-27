@@ -109,26 +109,14 @@
 
                 {{-- Actions --}}
                 <div class="flex items-center gap-2">
-                    @if($archived)
-                        <button wire:click="setArchived(false)" 
-                                wire:key="btn-show-active"
-                                wire:loading.attr="disabled"
-                                wire:loading.class="opacity-50 cursor-not-allowed"
-                                wire:target="setArchived"
-                                class="inline-flex items-center gap-2 px-4 py-2.5 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-all shadow-sm">
-                            <x-iconify icon="lucide:list" class="w-5 h-5" wire:loading.remove wire:target="setArchived" />
-                            <x-iconify icon="lucide:loader-2" class="w-5 h-5 animate-spin" wire:loading wire:target="setArchived" />
+                    @if($archived === 'true')
+                        <button wire:click="$set('archived', 'false')" class="inline-flex items-center gap-2 px-4 py-2.5 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-all shadow-sm">
+                            <x-iconify icon="lucide:list" class="w-5 h-5" />
                             <span class="hidden lg:inline font-medium">Voir Actifs</span>
                         </button>
                     @else
-                        <button wire:click="setArchived(true)" 
-                                wire:key="btn-show-archived"
-                                wire:loading.attr="disabled"
-                                wire:loading.class="opacity-50 cursor-not-allowed"
-                                wire:target="setArchived"
-                                class="inline-flex items-center gap-2 px-4 py-2.5 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-all shadow-sm">
-                            <x-iconify icon="lucide:archive" class="w-5 h-5 text-amber-600" wire:loading.remove wire:target="setArchived" />
-                            <x-iconify icon="lucide:loader-2" class="w-5 h-5 text-amber-600 animate-spin" wire:loading wire:target="setArchived" />
+                        <button wire:click="$set('archived', 'true')" class="inline-flex items-center gap-2 px-4 py-2.5 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-all shadow-sm">
+                            <x-iconify icon="lucide:archive" class="w-5 h-5 text-amber-600" />
                             <span class="hidden lg:inline font-medium text-gray-700">Voir Archives</span>
                         </button>
                     @endif
@@ -232,7 +220,7 @@
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-200">
                         @forelse($vehicles as $vehicle)
-                            <tr wire:key="vehicle-{{ $vehicle->id }}" class="hover:bg-gray-50 transition-colors duration-150 {{ in_array($vehicle->id, $selectedVehicles) ? 'bg-blue-50' : '' }}">
+                            <tr class="hover:bg-gray-50 transition-colors duration-150 {{ in_array($vehicle->id, $selectedVehicles) ? 'bg-blue-50' : '' }}">
                                 <td class="px-3 py-2 whitespace-nowrap">
                                     <input type="checkbox" wire:click="toggleSelection({{ $vehicle->id }})" @checked(in_array($vehicle->id, $selectedVehicles)) class="h-4 w-4 text-blue-600 border-gray-300 rounded">
                                 </td>
@@ -340,56 +328,40 @@
                                                  x-transition:leave-end="transform opacity-0 scale-95"
                                                  class="absolute right-0 z-50 mt-2 w-48 rounded-lg shadow-lg bg-white ring-1 ring-black ring-opacity-5 divide-y divide-gray-100">
                                                 <div class="py-1">
-                                                    @if($archived)
-                                                        {{-- Restore --}}
-                                                        <button wire:click="confirmRestore({{ $vehicle->id }})"
-                                                                class="flex w-full items-center px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
-                                                            <x-iconify icon="lucide:rotate-ccw" class="w-4 h-4 mr-2 text-green-600" />
-                                                            Restaurer
-                                                        </button>
-                                                        
-                                                        {{-- Force Delete --}}
-                                                        <button wire:click="confirmForceDelete({{ $vehicle->id }})"
-                                                                class="flex w-full items-center px-3 py-2 text-sm text-gray-700 hover:bg-red-50 transition-colors">
-                                                            <x-iconify icon="lucide:trash-2" class="w-4 h-4 mr-2 text-red-600" />
-                                                            Supprimer
-                                                        </button>
-                                                    @else
-                                                        {{-- Duplicate --}}
-                                                        @can('create vehicles')
-                                                            <a href="{{ route('admin.vehicles.duplicate', $vehicle) }}"
-                                                               class="flex items-center px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
-                                                                <x-iconify icon="lucide:copy" class="w-4 h-4 mr-2 text-purple-600" />
-                                                                Dupliquer
-                                                            </a>
-                                                        @endcan
-                                                        
-                                                        {{-- History --}}
-                                                        <a href="{{ route('admin.vehicles.history', $vehicle) }}"
+                                                    {{-- Duplicate --}}
+                                                    @can('create vehicles')
+                                                        <a href="{{ route('admin.vehicles.duplicate', $vehicle) }}"
                                                            class="flex items-center px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
-                                                            <x-iconify icon="lucide:clock" class="w-4 h-4 mr-2 text-cyan-600" />
-                                                            Historique
+                                                            <x-iconify icon="lucide:copy" class="w-4 h-4 mr-2 text-purple-600" />
+                                                            Dupliquer
                                                         </a>
-                                                        
-                                                        {{-- Export PDF --}}
-                                                        <a href="{{ route('admin.vehicles.export.single.pdf', $vehicle) }}"
-                                                           class="flex items-center px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
-                                                            <x-iconify icon="lucide:file-text" class="w-4 h-4 mr-2 text-emerald-600" />
-                                                            Exporter PDF
-                                                        </a>
-                                                        
-                                                        {{-- Archive --}}
-                                                        @can('delete vehicles')
-                                                            <div class="border-t border-gray-100">
-                                                                <button wire:click="confirmArchive({{ $vehicle->id }})"
-                                                                        @click="open = false"
-                                                                        class="flex w-full items-center px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
-                                                                    <x-iconify icon="lucide:archive" class="w-4 h-4 mr-2 text-orange-600" />
-                                                                    Archiver
-                                                                </button>
-                                                            </div>
-                                                        @endcan
-                                                    @endif
+                                                    @endcan
+                                                    
+                                                    {{-- History --}}
+                                                    <a href="{{ route('admin.vehicles.history', $vehicle) }}"
+                                                       class="flex items-center px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
+                                                        <x-iconify icon="lucide:clock" class="w-4 h-4 mr-2 text-cyan-600" />
+                                                        Historique
+                                                    </a>
+                                                    
+                                                    {{-- Export PDF --}}
+                                                    <a href="{{ route('admin.vehicles.export.single.pdf', $vehicle) }}"
+                                                       class="flex items-center px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
+                                                        <x-iconify icon="lucide:file-text" class="w-4 h-4 mr-2 text-emerald-600" />
+                                                        Exporter PDF
+                                                    </a>
+                                                    
+                                                    {{-- Archive --}}
+                                                    @can('delete vehicles')
+                                                        <div class="border-t border-gray-100">
+                                                            <button wire:click="archiveVehicle({{ $vehicle->id }})"
+                                                                    @click="open = false"
+                                                                    class="flex w-full items-center px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
+                                                                <x-iconify icon="lucide:archive" class="w-4 h-4 mr-2 text-orange-600" />
+                                                                Archiver
+                                                            </button>
+                                                        </div>
+                                                    @endcan
                                                 </div>
                                             </div>
                                         </div>
@@ -451,7 +423,7 @@
             <div class="flex items-center gap-3">
                 {{-- Assign to Depot --}}
                 <button 
-                    wire:click="$set('showBulkDepotModal', true)" 
+                    @click="$dispatch('open-depot-assignment-modal')" 
                     class="inline-flex items-center gap-2 px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white font-medium rounded-lg transition-colors shadow-sm">
                     <x-iconify icon="lucide:building-2" class="w-4 h-4" />
                     <span class="hidden sm:inline">Affecter Dépôt</span>
@@ -459,7 +431,7 @@
 
                 {{-- Change Status --}}
                 <button 
-                    wire:click="$set('showBulkStatusModal', true)" 
+                    @click="$dispatch('open-status-change-modal')" 
                     class="inline-flex items-center gap-2 px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white font-medium rounded-lg transition-colors shadow-sm">
                     <x-iconify icon="lucide:refresh-cw" class="w-4 h-4" />
                     <span class="hidden sm:inline">Changer Statut</span>
@@ -467,7 +439,7 @@
 
                 {{-- Archive --}}
                 <button 
-                    wire:click="$set('showBulkArchiveModal', true)" 
+                    @click="$dispatch('open-archive-modal')" 
                     class="inline-flex items-center gap-2 px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white font-medium rounded-lg transition-colors shadow-sm">
                     <x-iconify icon="lucide:archive" class="w-4 h-4" />
                     <span class="hidden sm:inline">Archiver</span>
@@ -488,11 +460,15 @@
     📋 MODALS FOR BULK ACTIONS
     ================================================================ --}}
     
-    {{-- Depot Assignment Modal - Pure Livewire --}}
-    @if($showBulkDepotModal)
-    <div class="fixed inset-0 z-50 overflow-y-auto" wire:key="bulk-depot-modal">
+    {{-- Depot Assignment Modal --}}
+    <div x-data="{ open: false }" 
+         @open-depot-assignment-modal.window="open = true"
+         x-show="open"
+         x-cloak
+         class="fixed inset-0 z-50 overflow-y-auto"
+         style="display: none;">
         <div class="flex items-center justify-center min-h-screen px-4">
-            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" wire:click="$set('showBulkDepotModal', false)"></div>
+            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" @click="open = false"></div>
             
             <div class="relative bg-white rounded-lg shadow-xl max-w-md w-full p-6">
                 <div class="flex items-center justify-between mb-4">
@@ -500,7 +476,7 @@
                         <x-iconify icon="lucide:building-2" class="w-5 h-5 text-purple-600" />
                         Affecter à un Dépôt
                     </h3>
-                    <button wire:click="$set('showBulkDepotModal', false)" class="text-gray-400 hover:text-gray-500">
+                    <button @click="open = false" class="text-gray-400 hover:text-gray-500">
                         <x-iconify icon="lucide:x" class="w-5 h-5" />
                     </button>
                 </div>
@@ -516,28 +492,29 @@
                 </div>
                 
                 <div class="flex gap-3 justify-end">
-                    <button wire:click="$set('showBulkDepotModal', false)" 
-                            class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200">
+                    <button @click="open = false" class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200">
                         Annuler
                     </button>
-                    <button wire:click="bulkAssignDepot" 
-                            wire:loading.attr="disabled"
-                            wire:loading.class="opacity-50 cursor-not-allowed"
-                            class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 inline-flex items-center gap-2">
-                        <x-iconify icon="lucide:loader-2" class="w-4 h-4 animate-spin" wire:loading wire:target="bulkAssignDepot" />
+                    <button 
+                        wire:click="bulkAssignDepot($wire.bulkDepotId)" 
+                        @click="open = false"
+                        class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700">
                         Affecter
                     </button>
                 </div>
             </div>
         </div>
     </div>
-    @endif
 
-    {{-- Status Change Modal - Pure Livewire --}}
-    @if($showBulkStatusModal)
-    <div class="fixed inset-0 z-50 overflow-y-auto" wire:key="bulk-status-modal">
+    {{-- Status Change Modal --}}
+    <div x-data="{ open: false }" 
+         @open-status-change-modal.window="open = true"
+         x-show="open"
+         x-cloak
+         class="fixed inset-0 z-50 overflow-y-auto"
+         style="display: none;">
         <div class="flex items-center justify-center min-h-screen px-4">
-            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" wire:click="$set('showBulkStatusModal', false)"></div>
+            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" @click="open = false"></div>
             
             <div class="relative bg-white rounded-lg shadow-xl max-w-md w-full p-6">
                 <div class="flex items-center justify-between mb-4">
@@ -545,7 +522,7 @@
                         <x-iconify icon="lucide:refresh-cw" class="w-5 h-5 text-amber-600" />
                         Changer le Statut
                     </h3>
-                    <button wire:click="$set('showBulkStatusModal', false)" class="text-gray-400 hover:text-gray-500">
+                    <button @click="open = false" class="text-gray-400 hover:text-gray-500">
                         <x-iconify icon="lucide:x" class="w-5 h-5" />
                     </button>
                 </div>
@@ -561,28 +538,29 @@
                 </div>
                 
                 <div class="flex gap-3 justify-end">
-                    <button wire:click="$set('showBulkStatusModal', false)" 
-                            class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200">
+                    <button @click="open = false" class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200">
                         Annuler
                     </button>
-                    <button wire:click="bulkChangeStatus" 
-                            wire:loading.attr="disabled"
-                            wire:loading.class="opacity-50 cursor-not-allowed"
-                            class="px-4 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 inline-flex items-center gap-2">
-                        <x-iconify icon="lucide:loader-2" class="w-4 h-4 animate-spin" wire:loading wire:target="bulkChangeStatus" />
+                    <button 
+                        wire:click="bulkChangeStatus($wire.bulkStatusId)" 
+                        @click="open = false"
+                        class="px-4 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700">
                         Modifier
                     </button>
                 </div>
             </div>
         </div>
     </div>
-    @endif
 
-    {{-- Archive Confirmation Modal - Pure Livewire --}}
-    @if($showBulkArchiveModal)
-    <div class="fixed inset-0 z-50 overflow-y-auto" wire:key="bulk-archive-modal">
+    {{-- Archive Confirmation Modal --}}
+    <div x-data="{ open: false }" 
+         @open-archive-modal.window="open = true"
+         x-show="open"
+         x-cloak
+         class="fixed inset-0 z-50 overflow-y-auto"
+         style="display: none;">
         <div class="flex items-center justify-center min-h-screen px-4">
-            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" wire:click="$set('showBulkArchiveModal', false)"></div>
+            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" @click="open = false"></div>
             
             <div class="relative bg-white rounded-lg shadow-xl max-w-md w-full p-6">
                 <div class="flex items-center justify-between mb-4">
@@ -590,7 +568,7 @@
                         <x-iconify icon="lucide:archive" class="w-5 h-5 text-gray-600" />
                         Archiver les Véhicules
                     </h3>
-                    <button wire:click="$set('showBulkArchiveModal', false)" class="text-gray-400 hover:text-gray-500">
+                    <button @click="open = false" class="text-gray-400 hover:text-gray-500">
                         <x-iconify icon="lucide:x" class="w-5 h-5" />
                     </button>
                 </div>
@@ -602,7 +580,7 @@
                             <div>
                                 <p class="text-sm font-medium text-amber-900">Attention</p>
                                 <p class="text-sm text-amber-700 mt-1">
-                                    Vous êtes sur le point d'archiver <span class="font-bold">{{ count($selectedVehicles) }}</span> véhicule(s).
+                                    Vous êtes sur le point d'archiver <span class="font-bold" x-text="@js($this->selectedVehicles).length"></span> véhicule(s).
                                     Cette action peut être annulée ultérieurement.
                                 </p>
                             </div>
@@ -611,160 +589,17 @@
                 </div>
                 
                 <div class="flex gap-3 justify-end">
-                    <button wire:click="$set('showBulkArchiveModal', false)" 
-                            class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200">
+                    <button @click="open = false" class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200">
                         Annuler
                     </button>
-                    <button wire:click="bulkArchive" 
-                            wire:loading.attr="disabled"
-                            wire:loading.class="opacity-50 cursor-not-allowed"
-                            class="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 inline-flex items-center gap-2">
-                        <x-iconify icon="lucide:loader-2" class="w-4 h-4 animate-spin" wire:loading wire:target="bulkArchive" />
+                    <button 
+                        wire:click="bulkArchive" 
+                        @click="open = false"
+                        class="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700">
                         Archiver
                     </button>
                 </div>
             </div>
         </div>
     </div>
-    @endif
-
-    {{-- Restore Confirmation Modal - Pure Livewire --}}
-    @if($showRestoreModal)
-    <div class="fixed inset-0 z-50 overflow-y-auto" wire:key="restore-modal">
-        <div class="flex items-center justify-center min-h-screen px-4">
-            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" wire:click="cancelRestore"></div>
-            
-            <div class="relative bg-white rounded-lg shadow-xl max-w-md w-full p-6">
-                <div class="flex items-center justify-between mb-4">
-                    <h3 class="text-lg font-semibold text-gray-900 flex items-center gap-2">
-                        <x-iconify icon="lucide:rotate-ccw" class="w-5 h-5 text-green-600" />
-                        Restaurer le Véhicule
-                    </h3>
-                    <button wire:click="cancelRestore" class="text-gray-400 hover:text-gray-500">
-                        <x-iconify icon="lucide:x" class="w-5 h-5" />
-                    </button>
-                </div>
-                
-                <div class="mb-6">
-                    <p class="text-sm text-gray-600">
-                        Êtes-vous sûr de vouloir restaurer ce véhicule ?
-                        <br><br>
-                        Il sera de nouveau visible dans la liste des véhicules actifs.
-                    </p>
-                </div>
-                
-                <div class="flex gap-3 justify-end">
-                    <button wire:click="cancelRestore" 
-                            wire:loading.attr="disabled"
-                            class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200">
-                        Annuler
-                    </button>
-                    <button wire:click="restoreVehicle" 
-                            wire:loading.attr="disabled"
-                            wire:loading.class="opacity-50 cursor-not-allowed"
-                            class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 inline-flex items-center gap-2">
-                        <x-iconify icon="lucide:loader-2" class="w-4 h-4 animate-spin" wire:loading wire:target="restoreVehicle" />
-                        Restaurer
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-    @endif
-
-    {{-- Force Delete Confirmation Modal - Pure Livewire --}}
-    @if($showForceDeleteModal)
-    <div class="fixed inset-0 z-50 overflow-y-auto" wire:key="force-delete-modal">
-        <div class="flex items-center justify-center min-h-screen px-4">
-            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" wire:click="cancelForceDelete"></div>
-            
-            <div class="relative bg-white rounded-lg shadow-xl max-w-md w-full p-6">
-                <div class="flex items-center justify-between mb-4">
-                    <h3 class="text-lg font-semibold text-gray-900 flex items-center gap-2">
-                        <x-iconify icon="lucide:trash-2" class="w-5 h-5 text-red-600" />
-                        Suppression Définitive
-                    </h3>
-                    <button wire:click="cancelForceDelete" class="text-gray-400 hover:text-gray-500">
-                        <x-iconify icon="lucide:x" class="w-5 h-5" />
-                    </button>
-                </div>
-                
-                <div class="mb-6">
-                    <div class="bg-red-50 border border-red-200 rounded-lg p-4">
-                        <div class="flex items-start gap-3">
-                            <x-iconify icon="lucide:alert-triangle" class="w-5 h-5 text-red-600 mt-0.5" />
-                            <div>
-                                <p class="text-sm font-medium text-red-900">Attention : Action Irréversible</p>
-                                <p class="text-sm text-red-700 mt-1">
-                                    Vous êtes sur le point de supprimer définitivement ce véhicule.
-                                    <br>
-                                    Toutes les données associées seront perdues.
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="flex gap-3 justify-end">
-                    <button wire:click="cancelForceDelete" 
-                            wire:loading.attr="disabled"
-                            class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200">
-                        Annuler
-                    </button>
-                    <button wire:click="forceDeleteVehicle" 
-                            wire:loading.attr="disabled"
-                            wire:loading.class="opacity-50 cursor-not-allowed"
-                            class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 inline-flex items-center gap-2">
-                        <x-iconify icon="lucide:loader-2" class="w-4 h-4 animate-spin" wire:loading wire:target="forceDeleteVehicle" />
-                        Supprimer
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-    @endif
-
-    {{-- Archive Individual Confirmation Modal - Pure Livewire --}}
-    @if($showArchiveModal)
-    <div class="fixed inset-0 z-50 overflow-y-auto" wire:key="archive-modal">
-        <div class="flex items-center justify-center min-h-screen px-4">
-            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" wire:click="cancelArchive"></div>
-            
-            <div class="relative bg-white rounded-lg shadow-xl max-w-md w-full p-6">
-                <div class="flex items-center justify-between mb-4">
-                    <h3 class="text-lg font-semibold text-gray-900 flex items-center gap-2">
-                        <x-iconify icon="lucide:archive" class="w-5 h-5 text-orange-600" />
-                        Archiver le Véhicule
-                    </h3>
-                    <button wire:click="cancelArchive" class="text-gray-400 hover:text-gray-500">
-                        <x-iconify icon="lucide:x" class="w-5 h-5" />
-                    </button>
-                </div>
-                
-                <div class="mb-6">
-                    <p class="text-sm text-gray-600">
-                        Êtes-vous sûr de vouloir archiver ce véhicule ?
-                        <br><br>
-                        Il sera déplacé dans la liste des véhicules archivés et ne sera plus sélectionnable pour de nouvelles affectations.
-                    </p>
-                </div>
-                
-                <div class="flex gap-3 justify-end">
-                    <button wire:click="cancelArchive" 
-                            wire:loading.attr="disabled"
-                            class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200">
-                        Annuler
-                    </button>
-                    <button wire:click="archiveVehicle" 
-                            wire:loading.attr="disabled"
-                            wire:loading.class="opacity-50 cursor-not-allowed"
-                            class="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 inline-flex items-center gap-2">
-                        <x-iconify icon="lucide:loader-2" class="w-4 h-4 animate-spin" wire:loading wire:target="archiveVehicle" />
-                        Archiver
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-    @endif
 </div>

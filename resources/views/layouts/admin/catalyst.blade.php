@@ -1181,7 +1181,11 @@
  </script>
 
  @stack('scripts')
- <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+ {{-- 
+    ⚠️ ATTENTION: Alpine.js est déjà chargé via Livewire 3 dans resources/js/admin/app.js
+    NE PAS AJOUTER de CDN Alpine.js ici - cela cause des conflits de double initialisation
+    avec les composants Livewire (@entangle, wire:click, etc.)
+ --}}
 
  {{-- ====================================================================
  🔔 TOAST NOTIFICATION SYSTEM - Enterprise Grade

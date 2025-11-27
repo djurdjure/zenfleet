@@ -56,7 +56,9 @@ class AssignmentController extends Controller
         $this->authorize('view assignments');
 
         // Construction de la requête avec filtres
-        $query = Assignment::with(['vehicle', 'driver', 'creator'])
+        $query = Assignment::with(['vehicle' => function ($query) {
+                $query->withoutGlobalScope(\App\Models\Scopes\UserVehicleAccessScope::class);
+            }, 'driver', 'creator'])
             ->where('organization_id', auth()->user()->organization_id);
 
         // Application des filtres - RECHERCHE INSENSIBLE À LA CASSE ULTRA-PRO
