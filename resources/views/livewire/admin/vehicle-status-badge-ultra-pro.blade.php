@@ -1,7 +1,4 @@
-<div class="relative inline-block" x-data="{ 
-    open: @entangle('showDropdown').live,
-    confirmModal: @entangle('showConfirmModal').live 
-}">
+<div class="relative inline-block" x-data="statusBadgeComponent()" wire:ignore.self>
     {{-- 🎯 Badge de Statut Ultra-Professionnel - Enterprise Grade --}}
     @if($canUpdate && count($allowedStatuses) > 0)
         <button
@@ -262,3 +259,43 @@
         </div>
     </div>
 </div>
+
+@push('scripts')
+<script>
+/**
+ * 🎯 COMPOSANT ALPINE.JS POUR VEHICLE STATUS BADGE ULTRA PRO
+ * Version: Enterprise-Grade - Compatible Livewire 3
+ *
+ * CORRECTION: Utilise wire:model et événements Livewire au lieu de entangle()
+ * pour éviter les erreurs "Cannot read properties of undefined"
+ */
+function statusBadgeComponent() {
+    return {
+        open: @json($showDropdown),
+        confirmModal: @json($showConfirmModal),
+        componentId: '{{ $this->getId() }}',
+
+        init() {
+            const component = this;
+
+            // Écouter les changements Livewire - Alpine vers Livewire
+            this.$watch('open', value => {
+                component.$wire.set('showDropdown', value, false);
+            });
+
+            this.$watch('confirmModal', value => {
+                component.$wire.set('showConfirmModal', value, false);
+            });
+
+            // Écouter les mises à jour depuis Livewire - Livewire vers Alpine
+            Livewire.hook('morph.updated', ({ el, component: livewireComponent }) => {
+                if (livewireComponent.id === component.componentId) {
+                    component.open = livewireComponent.get('showDropdown');
+                    component.confirmModal = livewireComponent.get('showConfirmModal');
+                }
+            });
+        }
+    }
+}
+</script>
+@endpush

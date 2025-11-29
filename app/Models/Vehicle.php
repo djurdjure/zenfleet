@@ -59,6 +59,26 @@ class Vehicle extends Model
 
     // CORRECTION : Ajout du bon type de retour (HasMany)
     public function assignments(): HasMany { return $this->hasMany(Assignment::class); }
+
+    /**
+     * 👤 Relation avec l'affectation actuelle (Active)
+     * Optimisé pour éviter le N+1 problem avec limit(1) dans eager loading
+     */
+    public function currentAssignment(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(Assignment::class)->ofMany([
+            'start_datetime' => 'max',
+            'id' => 'max',
+        ], function ($query) {
+            $query->whereNull('deleted_at')
+                  ->where('status', 'active')
+                  ->where('start_datetime', '<=', now())
+                  ->where(function($q) {
+                      $q->whereNull('end_datetime')
+                        ->orWhere('end_datetime', '>=', now());
+                  });
+        });
+    }
     public function maintenancePlans(): HasMany { return $this->hasMany(MaintenancePlan::class); }
     public function maintenanceLogs(): HasMany { return $this->hasMany(MaintenanceLog::class); }
     public function repairRequests(): HasMany { return $this->hasMany(RepairRequest::class); }

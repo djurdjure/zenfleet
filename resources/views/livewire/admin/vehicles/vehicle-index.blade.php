@@ -276,7 +276,7 @@
                                 </td>
                                 <td class="px-3 py-2 whitespace-nowrap">
                                     @php
-                                        $assignment = $vehicle->assignments->first();
+                                        $assignment = $vehicle->currentAssignment;
                                         $driver = $assignment ? $assignment->driver : null;
                                     @endphp
                                     @if($driver)
@@ -449,29 +449,54 @@
 
             {{-- Actions --}}
             <div class="flex items-center gap-3">
-                {{-- Assign to Depot --}}
-                <button 
-                    wire:click="$set('showBulkDepotModal', true)" 
-                    class="inline-flex items-center gap-2 px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white font-medium rounded-lg transition-colors shadow-sm">
-                    <x-iconify icon="lucide:building-2" class="w-4 h-4" />
-                    <span class="hidden sm:inline">Affecter Dépôt</span>
-                </button>
+                @if($archived)
+                    {{-- Restore --}}
+                    <button 
+                        wire:click="bulkRestore" 
+                        wire:loading.attr="disabled"
+                        wire:loading.class="opacity-50 cursor-not-allowed"
+                        class="inline-flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg transition-colors shadow-sm">
+                        <x-iconify icon="lucide:rotate-ccw" class="w-4 h-4" wire:loading.remove wire:target="bulkRestore" />
+                        <x-iconify icon="lucide:loader-2" class="w-4 h-4 animate-spin" wire:loading wire:target="bulkRestore" />
+                        <span class="hidden sm:inline">Restaurer</span>
+                    </button>
 
-                {{-- Change Status --}}
-                <button 
-                    wire:click="$set('showBulkStatusModal', true)" 
-                    class="inline-flex items-center gap-2 px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white font-medium rounded-lg transition-colors shadow-sm">
-                    <x-iconify icon="lucide:refresh-cw" class="w-4 h-4" />
-                    <span class="hidden sm:inline">Changer Statut</span>
-                </button>
+                    {{-- Force Delete --}}
+                    <button 
+                        wire:click="bulkForceDelete" 
+                        wire:confirm="Êtes-vous sûr de vouloir supprimer définitivement ces véhicules ? Cette action est irréversible."
+                        wire:loading.attr="disabled"
+                        wire:loading.class="opacity-50 cursor-not-allowed"
+                        class="inline-flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-medium rounded-lg transition-colors shadow-sm">
+                        <x-iconify icon="lucide:trash-2" class="w-4 h-4" wire:loading.remove wire:target="bulkForceDelete" />
+                        <x-iconify icon="lucide:loader-2" class="w-4 h-4 animate-spin" wire:loading wire:target="bulkForceDelete" />
+                        <span class="hidden sm:inline">Supprimer Définitivement</span>
+                    </button>
+                @else
+                    {{-- Assign to Depot --}}
+                    <button 
+                        wire:click="$set('showBulkDepotModal', true)" 
+                        class="inline-flex items-center gap-2 px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white font-medium rounded-lg transition-colors shadow-sm">
+                        <x-iconify icon="lucide:building-2" class="w-4 h-4" />
+                        <span class="hidden sm:inline">Affecter Dépôt</span>
+                    </button>
 
-                {{-- Archive --}}
-                <button 
-                    wire:click="$set('showBulkArchiveModal', true)" 
-                    class="inline-flex items-center gap-2 px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white font-medium rounded-lg transition-colors shadow-sm">
-                    <x-iconify icon="lucide:archive" class="w-4 h-4" />
-                    <span class="hidden sm:inline">Archiver</span>
-                </button>
+                    {{-- Change Status --}}
+                    <button 
+                        wire:click="$set('showBulkStatusModal', true)" 
+                        class="inline-flex items-center gap-2 px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white font-medium rounded-lg transition-colors shadow-sm">
+                        <x-iconify icon="lucide:refresh-cw" class="w-4 h-4" />
+                        <span class="hidden sm:inline">Changer Statut</span>
+                    </button>
+
+                    {{-- Archive --}}
+                    <button 
+                        wire:click="$set('showBulkArchiveModal', true)" 
+                        class="inline-flex items-center gap-2 px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white font-medium rounded-lg transition-colors shadow-sm">
+                        <x-iconify icon="lucide:archive" class="w-4 h-4" />
+                        <span class="hidden sm:inline">Archiver</span>
+                    </button>
+                @endif
 
                 {{-- Clear Selection --}}
                 <button 

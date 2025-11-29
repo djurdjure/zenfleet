@@ -332,7 +332,7 @@ Route::middleware(['auth', 'verified'])
             Route::get('create', [DriverController::class, 'create'])->name('create');
 
             // Routes CRUD principales
-            Route::get('/', [DriverController::class, 'index'])->name('index');
+            Route::get('/', \App\Livewire\Admin\Drivers\DriverIndex::class)->name('index');
             Route::post('/', [DriverController::class, 'store'])->name('store');
 
             // Routes avec paramètres {driver} - TOUJOURS EN DERNIER

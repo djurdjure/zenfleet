@@ -216,17 +216,8 @@ class VehicleController extends Controller
         ]);
     }
 
-    /**
-     * 📋 Liste enterprise des véhicules avec filtrage avancé
-     */
-    /**
-     * 📋 Liste enterprise des véhicules avec filtrage avancé
-     * @deprecated Replaced by Livewire Component VehicleIndex
-     */
-    public function index(Request $request): \Illuminate\Http\RedirectResponse
-    {
-        return redirect()->route('admin.vehicles.index');
-    }
+
+
 
     /**
      * 📝 Formulaire de création avec assistance intelligente

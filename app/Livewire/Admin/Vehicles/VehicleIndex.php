@@ -13,6 +13,7 @@ use Livewire\WithPagination;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Validation\Rule;
 
 /**
  * 🚗 VEHICLE INDEX - ENTERPRISE LIVEWIRE COMPONENT
@@ -134,7 +135,7 @@ class VehicleIndex extends Component
     public function bulkAssignDepot()
     {
         $this->validate([
-            'bulkDepotId' => 'required|exists:depots,id',
+            'bulkDepotId' => ['required', Rule::exists(Depot::class, 'id')],
             'selectedVehicles' => 'required|array|min:1'
         ]);
 
@@ -156,7 +157,7 @@ class VehicleIndex extends Component
     public function bulkChangeStatus()
     {
         $this->validate([
-            'bulkStatusId' => 'required|exists:vehicle_statuses,id',
+            'bulkStatusId' => ['required', Rule::exists(VehicleStatus::class, 'id')],
             'selectedVehicles' => 'required|array|min:1'
         ]);
 
@@ -363,17 +364,7 @@ class VehicleIndex extends Component
                 'vehicleStatus',
                 'depot',
                 // Optimisation N+1 pour le chauffeur actif
-                'assignments' => function ($q) {
-                    $q->whereNull('deleted_at')
-                      ->where('status', 'active')
-                      ->where('start_datetime', '<=', now())
-                      ->where(function($sq) {
-                          $sq->whereNull('end_datetime')
-                             ->orWhere('end_datetime', '>=', now());
-                      })
-                      ->with('driver.user')
-                      ->limit(1);
-                }
+                'currentAssignment.driver.user'
             ]);
 
         // Security Scope is now handled by UserVehicleAccessScope + RLS

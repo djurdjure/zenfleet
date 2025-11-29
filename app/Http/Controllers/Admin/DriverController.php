@@ -46,92 +46,12 @@ class DriverController extends Controller
     /**
      * 📊 Liste des chauffeurs avec filtrage avancé
      */
-    public function index(Request $request): View
+    /**
+     * @deprecated Replaced by Livewire component \App\Livewire\Admin\Drivers\DriverIndex
+     */
+    public function index(): RedirectResponse
     {
-        $this->authorize('view drivers');
-
-        try {
-            $filters = $request->only(['search', 'status_id', 'per_page', 'view_deleted', 'visibility', 'license_category', 'hired_after']);
-            $drivers = $this->driverService->getFilteredDrivers($filters);
-            $driverStatuses = $this->getDriverStatuses();
-
-            // Calculer les analytics en fonction du filtre visibility
-            $visibility = $request->input('visibility', 'active');
-            $baseQuery = Driver::query();
-            
-            // Appliquer le filtre de visibilité aux analytics
-            if ($visibility === 'archived') {
-                $baseQuery->onlyTrashed();
-            } elseif ($visibility === 'all') {
-                $baseQuery->withTrashed();
-            }
-            // Sinon 'active' par défaut - seulement les non-supprimés
-            
-            // Déterminer la base de données pour utiliser les bonnes fonctions
-            $driver = config('database.default');
-            $isPostgres = $driver === 'pgsql';
-            
-            // Fonctions SQL pour calcul d'âge (compatible MySQL et PostgreSQL)
-            $ageFormula = $isPostgres 
-                ? 'EXTRACT(YEAR FROM AGE(CURRENT_DATE, birth_date))' 
-                : 'TIMESTAMPDIFF(YEAR, birth_date, CURDATE())';
-            $seniorityFormula = $isPostgres 
-                ? 'EXTRACT(YEAR FROM AGE(CURRENT_DATE, recruitment_date))' 
-                : 'TIMESTAMPDIFF(YEAR, recruitment_date, CURDATE())';
-            
-            $analytics = [
-                'total_drivers' => (clone $baseQuery)->count(),
-                'available_drivers' => (clone $baseQuery)->whereHas('driverStatus', function($q) {
-                    $q->where('name', 'Disponible');
-                })->count(),
-                'active_drivers' => (clone $baseQuery)->whereHas('driverStatus', function($q) {
-                    $q->where('name', 'En mission');
-                })->count(),
-                'resting_drivers' => (clone $baseQuery)->whereHas('driverStatus', function($q) {
-                    $q->where('name', 'En repos');
-                })->count(),
-                'avg_age' => (clone $baseQuery)->selectRaw("AVG({$ageFormula}) as avg")->value('avg') ?? 0,
-                'valid_licenses' => (clone $baseQuery)->where('license_expiry_date', '>', now())->count(),
-                'valid_licenses_percent' => (clone $baseQuery)->count() > 0 
-                    ? ((clone $baseQuery)->where('license_expiry_date', '>', now())->count() / (clone $baseQuery)->count() * 100) 
-                    : 0,
-                'avg_seniority' => (clone $baseQuery)->selectRaw("AVG({$seniorityFormula}) as avg")->value('avg') ?? 0,
-            ];
-
-            return view('admin.drivers.index', compact('drivers', 'driverStatuses', 'filters', 'analytics'));
-
-        } catch (\Exception $e) {
-            Log::error('Drivers index error: ' . $e->getMessage(), [
-                'error' => $e->getMessage(),
-                'file' => $e->getFile(),
-                'line' => $e->getLine(),
-                'user_id' => auth()->id()
-            ]);
-
-            // Fallback en cas d'erreur avec gestion sécurisée
-            try {
-                $drivers = Driver::with(['organization', 'user'])
-                    ->when(auth()->user()->hasRole('Super Admin') === false, function ($query) {
-                        return $query->where('organization_id', auth()->user()->organization_id);
-                    })
-                    ->paginate(15);
-
-                $driverStatuses = $this->getDriverStatuses();
-                $filters = [];
-
-                return view('admin.drivers.index', compact('drivers', 'driverStatuses', 'filters'))
-                    ->with('warning', 'Chargement en mode dégradé. Certaines fonctionnalités peuvent être limitées.');
-
-            } catch (\Exception $fallbackError) {
-                Log::error('Drivers fallback failed: ' . $fallbackError->getMessage());
-
-                return view('admin.drivers.index', [
-                    'drivers' => collect(),
-                    'driverStatuses' => collect(),
-                    'filters' => []
-                ])->withErrors(['error' => 'Service temporairement indisponible. Veuillez contacter l\'administrateur.']);
-            }
-        }
+        return redirect()->route('admin.drivers.index');
     }
 
     /**

@@ -230,7 +230,7 @@
  @endcanany
 
  {{-- Chauffeurs avec sous-menu --}}
- @canany(['view drivers', 'view sanctions'])
+ @canany(['view drivers', 'view all driver sanctions', 'view team driver sanctions', 'view own driver sanctions'])
  <li class="flex flex-col" x-data="{ open: {{ request()->routeIs(['admin.drivers.*', 'admin.sanctions.*']) ? 'true' : 'false' }} }">
  <button @click="open = !open"
  class="flex items-center w-full h-11 px-3.5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 {{ request()->routeIs(['admin.drivers.*', 'admin.sanctions.*']) ? 'bg-blue-600 text-white shadow-md' : 'text-gray-700 hover:bg-white hover:text-gray-900 hover:shadow-sm' }}">
@@ -266,13 +266,13 @@
  Liste
  </a>
  @endcan
- @can('view sanctions')
+ @canany(['view all driver sanctions', 'view team driver sanctions', 'view own driver sanctions'])
  <a href="{{ route('admin.drivers.sanctions.index') }}"
  class="flex items-center w-full h-9 px-2.5 py-1.5 rounded-md text-sm font-semibold transition-all duration-200 {{ request()->routeIs('admin.drivers.sanctions.*') ? 'bg-blue-100 text-blue-700' : 'text-gray-700 hover:bg-white/70 hover:text-gray-900' }}">
  <x-iconify icon="mdi:gavel" class="w-4 h-4 mr-2.5 {{ request()->routeIs('admin.drivers.sanctions.*') ? 'text-blue-600' : 'text-gray-600' }}" />
  Sanctions
  </a>
- @endcan
+ @endcanany
  </div>
  </div>
  </div>
