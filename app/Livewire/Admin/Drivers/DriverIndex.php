@@ -60,6 +60,17 @@ class DriverIndex extends Component
     public ?int $archivingDriverId = null;
     public bool $showArchiveModal = false;
 
+    // 🧠 Computed Properties
+    #[\Livewire\Attributes\Computed]
+    public function confirmingDriver()
+    {
+        $id = $this->archivingDriverId ?? $this->restoringDriverId ?? $this->forceDeletingDriverId;
+        
+        if (!$id) return null;
+
+        return Driver::withTrashed()->find($id);
+    }
+
     // Services
     protected DriverService $driverService;
 
@@ -212,11 +223,37 @@ class DriverIndex extends Component
     {
         if (!$this->archivingDriverId) return;
 
-        $driver = Driver::find($this->archivingDriverId);
-        if ($driver && $this->driverService->archiveDriver($driver)) {
+        // Utiliser withTrashed() pour éviter les erreurs si déjà supprimé (race condition)
+        $driver = Driver::withTrashed()->find($this->archivingDriverId);
+
+        if (!$driver) {
+            $this->dispatch('toast', ['type' => 'error', 'message' => 'Chauffeur introuvable.']);
+            $this->cancelArchive();
+            return;
+        }
+
+        // 🔍 Vérification pré-archivage pour UX détaillée
+        $activeAssignment = $driver->assignments()
+            ->where(function ($query) {
+                $query->whereNull('end_datetime')
+                      ->orWhere('end_datetime', '>', now());
+            })
+            ->first();
+
+        if ($activeAssignment) {
+            $this->dispatch('toast', [
+                'type' => 'error', 
+                'message' => "Impossible d'archiver : Affectation #{$activeAssignment->id} en cours (Début : " . $activeAssignment->start_datetime->format('d/m/Y H:i') . ")"
+            ]);
+            $this->cancelArchive();
+            return;
+        }
+
+        if ($this->driverService->archiveDriver($driver)) {
             $this->dispatch('toast', ['type' => 'success', 'message' => 'Chauffeur archivé avec succès']);
         } else {
-            $this->dispatch('toast', ['type' => 'error', 'message' => 'Impossible d\'archiver (affectations actives ?)']);
+            // Fallback si le service bloque pour une autre raison
+            $this->dispatch('toast', ['type' => 'error', 'message' => 'Erreur lors de l\'archivage.']);
         }
         $this->cancelArchive();
     }

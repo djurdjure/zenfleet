@@ -128,8 +128,16 @@ class DriverService
 
     public function archiveDriver(Driver $driver): bool
     {
-        // RÈGLE MÉTIER : On ne peut pas archiver un chauffeur avec des affectations.
-        if ($driver->assignments()->exists()) {
+        // RÈGLE MÉTIER : On ne peut pas archiver un chauffeur avec des affectations EN COURS.
+        // On autorise l'archivage si le chauffeur a seulement des affectations passées (terminées).
+        $hasActiveAssignments = $driver->assignments()
+            ->where(function ($query) {
+                $query->whereNull('end_datetime')
+                      ->orWhere('end_datetime', '>', now());
+            })
+            ->exists();
+
+        if ($hasActiveAssignments) {
             return false;
         }
         return $this->driverRepository->delete($driver);

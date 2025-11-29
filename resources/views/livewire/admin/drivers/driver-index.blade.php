@@ -407,7 +407,14 @@
                         <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
                             <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-title">Archiver le chauffeur</h3>
                             <div class="mt-2">
-                                <p class="text-sm text-gray-500">Êtes-vous sûr de vouloir archiver ce chauffeur ? Il ne sera plus visible dans la liste active.</p>
+                                <p class="text-sm text-gray-500">
+                                    Êtes-vous sûr de vouloir archiver le chauffeur 
+                                    <span class="font-bold text-gray-900">{{ $this->confirmingDriver?->full_name }}</span> 
+                                    (<span class="font-medium">#{{ $this->confirmingDriver?->employee_number }}</span>) ?
+                                </p>
+                                <p class="mt-2 text-sm text-gray-500">
+                                    Il ne sera plus visible dans la liste active, mais pourra être restauré ultérieurement.
+                                </p>
                             </div>
                         </div>
                     </div>
@@ -438,7 +445,14 @@
                         <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
                             <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-title">Restaurer le chauffeur</h3>
                             <div class="mt-2">
-                                <p class="text-sm text-gray-500">Êtes-vous sûr de vouloir restaurer ce chauffeur ? Il réapparaîtra dans la liste active.</p>
+                                <p class="text-sm text-gray-500">
+                                    Êtes-vous sûr de vouloir restaurer le chauffeur 
+                                    <span class="font-bold text-gray-900">{{ $this->confirmingDriver?->full_name }}</span> 
+                                    (<span class="font-medium">#{{ $this->confirmingDriver?->employee_number }}</span>) ?
+                                </p>
+                                <p class="mt-2 text-sm text-gray-500">
+                                    Il réapparaîtra dans la liste active et pourra être affecté à nouveau.
+                                </p>
                             </div>
                         </div>
                     </div>
@@ -469,7 +483,28 @@
                         <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
                             <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-title">Suppression définitive</h3>
                             <div class="mt-2">
-                                <p class="text-sm text-gray-500">Êtes-vous sûr de vouloir supprimer définitivement ce chauffeur ? Cette action est irréversible et supprimera toutes les données associées.</p>
+                                <p class="text-sm text-gray-500">
+                                    Êtes-vous sûr de vouloir supprimer définitivement le chauffeur 
+                                    <span class="font-bold text-gray-900">{{ $this->confirmingDriver?->full_name }}</span> 
+                                    (<span class="font-medium">#{{ $this->confirmingDriver?->employee_number }}</span>) ?
+                                </p>
+                                <div class="mt-3 bg-red-50 border border-red-200 rounded-md p-3">
+                                    <div class="flex">
+                                        <div class="flex-shrink-0">
+                                            <x-iconify icon="lucide:alert-triangle" class="h-5 w-5 text-red-400" />
+                                        </div>
+                                        <div class="ml-3">
+                                            <h3 class="text-sm font-medium text-red-800">Attention : Action irréversible</h3>
+                                            <div class="mt-2 text-sm text-red-700">
+                                                <ul role="list" class="list-disc pl-5 space-y-1">
+                                                    <li>Toutes les données personnelles seront effacées.</li>
+                                                    <li>L'historique des affectations sera détaché.</li>
+                                                    <li>Cette action ne peut pas être annulée.</li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
