@@ -136,6 +136,7 @@
 
  @vite(['resources/js/admin/app.js'])
  @stack('styles')
+    @livewireStyles
 </head>
 <body class="h-full">
  <div class="min-h-full">
@@ -1313,5 +1314,6 @@
      }
  }
  </script>
+    @livewireScriptConfig
 </body>
 </html>

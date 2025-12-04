@@ -380,7 +380,7 @@ Route::middleware(['auth', 'verified'])
                 ->name('heal');
 
             // Routes CRUD (index, store, show, edit, update, destroy)
-            Route::get('/', [AssignmentController::class, 'index'])->name('index');
+            Route::get('/', \App\Livewire\Admin\Assignments\AssignmentIndex::class)->name('index');
             Route::post('/', [AssignmentController::class, 'store'])->name('store');
             Route::get('{assignment}', [AssignmentController::class, 'show'])->name('show');
             Route::get('{assignment}/edit', [AssignmentController::class, 'edit'])->name('edit');

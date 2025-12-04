@@ -4,7 +4,9 @@ namespace App\Livewire;
 
 use App\Models\Assignment;
 use App\Models\Vehicle;
+use App\Models\VehicleStatus;
 use App\Models\Driver;
+use App\Models\DriverStatus;
 use App\Services\OverlapCheckService;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -73,6 +75,8 @@ class AssignmentTable extends Component
 
     // Données pour terminer une affectation
     public string $terminateDateTime = '';
+    public string $terminateDate = '';
+    public string $terminateTime = '';
     public string $terminateNotes = '';
 
     public function mount()
@@ -81,6 +85,8 @@ class AssignmentTable extends Component
 
         // Initialiser la date de terminaison à maintenant
         $this->terminateDateTime = now()->format('Y-m-d\TH:i');
+        $this->terminateDate = now()->format('d/m/Y');
+        $this->terminateTime = now()->format('H:i');
     }
 
     public function render()
@@ -282,6 +288,8 @@ class AssignmentTable extends Component
         }
 
         $this->terminateDateTime = now()->format('Y-m-d\TH:i');
+        $this->terminateDate = now()->format('d/m/Y');
+        $this->terminateTime = now()->format('H:i');
         $this->terminateNotes = '';
         $this->showTerminateModal = true;
     }
@@ -308,6 +316,9 @@ class AssignmentTable extends Component
      */
     public function terminateAssignment(): void
     {
+        // Combiner date et heure
+        $this->terminateDateTime = $this->combineDateTimeForTermination();
+        
         $this->validate([
             'terminateDateTime' => 'required|date|after_or_equal:' . $this->selectedAssignment->start_datetime,
             'terminateNotes' => 'nullable|string|max:1000'
@@ -336,10 +347,36 @@ class AssignmentTable extends Component
      */
     public function deleteAssignment(): void
     {
+        // 1. Récupérer le véhicule et le chauffeur associés
+        $vehicle = $this->selectedAssignment->vehicle;
+        $driver = $this->selectedAssignment->driver;
+
+        // 2. Mettre à jour le statut du véhicule vers 'parking' (si disponible)
+        if ($vehicle) {
+            $parkingStatus = VehicleStatus::where('slug', 'parking')->first();
+            // Fallback si 'parking' n'existe pas, essayer 'available'
+            if (!$parkingStatus) {
+                $parkingStatus = VehicleStatus::where('slug', 'available')->first();
+            }
+            
+            if ($parkingStatus) {
+                $vehicle->update(['status_id' => $parkingStatus->id]);
+            }
+        }
+
+        // 3. Mettre à jour le statut du chauffeur vers 'available'
+        if ($driver) {
+            $availableStatus = DriverStatus::where('slug', 'available')->first();
+            if ($availableStatus) {
+                $driver->update(['status_id' => $availableStatus->id]);
+            }
+        }
+
+        // 4. Supprimer l'affectation (Soft Delete)
         $this->selectedAssignment->delete();
 
         $this->dispatch('assignment-deleted', [
-            'message' => 'Affectation supprimée avec succès.',
+            'message' => 'Affectation supprimée avec succès. Les statuts du véhicule et du chauffeur ont été mis à jour.',
             'assignment_id' => $this->selectedAssignment->id
         ]);
 

@@ -25,28 +25,38 @@ use Maatwebsite\Excel\Facades\Excel;
 trait VehicleControllerExtensions
 {
     // START: Tâche 1 - Méthodes d'Exportation
-    
+
     /**
-     * 📊 Export des véhicules en CSV
+     * 📊 Export des véhicules en CSV (depuis session)
+     * 
+     * Pattern cohérent avec exportPdf() - récupère filtres depuis session
      */
-    public function exportCsv(Request $request)
+    public function exportCsv()
     {
-        $this->logUserAction('vehicle.export.csv', $request);
+        // Autorisation pour voir la liste des véhicules
+        $this->authorize('viewAny', Vehicle::class);
+        $this->logUserAction('vehicle.export_csv_list.requested');
 
         try {
-            // Vérifier les permissions
-            if (!Auth::user()->can('export vehicles')) {
-                abort(403, 'Non autorisé à exporter les véhicules');
-            }
+            // Récupération des filtres depuis la session (stockés par Livewire)
+            $filters = session('vehicle_export_filters', []);
 
-            $filters = $request->all();
             $csvExport = new VehiclesCsvExport($filters);
-            
+
+            $this->logUserAction('vehicle.export_csv_list.success', null, [
+                'filters' => $filters
+            ]);
+
+            // Nettoyage de la session
+            session()->forget('vehicle_export_filters');
+
             return $csvExport->download();
-            
         } catch (\Exception $e) {
-            $this->logError('vehicle.export.csv.error', $e, $request, ['request_data' => $request->all()]);
-            return back()->with('error', 'Erreur lors de l\'export CSV: ' . $e->getMessage());
+            $this->logError('vehicle.export_csv_list.error', $e);
+
+            return redirect()
+                ->route('admin.vehicles.index')
+                ->with('error', 'Erreur lors de l\'export CSV: ' . $e->getMessage());
         }
     }
 
@@ -65,9 +75,8 @@ trait VehicleControllerExtensions
 
             $filters = $request->all();
             $fileName = 'vehicles_export_' . date('Y-m-d_H-i-s') . '.xlsx';
-            
+
             return Excel::download(new VehiclesExport($filters), $fileName);
-            
         } catch (\Exception $e) {
             $this->logError('vehicle.export.excel.error', $e, $request, ['request_data' => $request->all()]);
             return back()->with('error', 'Erreur lors de l\'export Excel: ' . $e->getMessage());
@@ -89,9 +98,8 @@ trait VehicleControllerExtensions
 
             $filters = $request->all();
             $pdfService = new VehiclePdfExportService($filters);
-            
+
             return $pdfService->exportList();
-            
         } catch (\Exception $e) {
             $this->logError('vehicle.export.pdf.error', $e, $request, ['request_data' => $request->all()]);
             return back()->with('error', 'Erreur lors de l\'export PDF: ' . $e->getMessage());
@@ -117,9 +125,8 @@ trait VehicleControllerExtensions
             }
 
             $pdfService = new VehiclePdfExportService();
-            
+
             return $pdfService->exportSingle($vehicle->id);
-            
         } catch (\Exception $e) {
             $this->logError('vehicle.export.single.pdf.error', $e, null, ['vehicle_id' => $vehicle->id]);
             return back()->with('error', 'Erreur lors de l\'export PDF: ' . $e->getMessage());
@@ -173,20 +180,20 @@ trait VehicleControllerExtensions
             } while ($exists);
 
             $newVehicle->registration_plate = $newRegistration;
-            
+
             // Générer un nouveau VIN si présent
             if ($vehicle->vin) {
                 $newVehicle->vin = $vehicle->vin . '-COPY';
             }
-            
+
             // Reset certaines valeurs
             $newVehicle->current_mileage = 0;
             $newVehicle->is_archived = false;
-            
+
             // Ajouter une note sur la duplication
-            $newVehicle->notes = 'Dupliqué depuis ' . $vehicle->registration_plate . ' le ' . now()->format('d/m/Y à H:i') . 
-                                 ($vehicle->notes ? "\n\nNotes originales:\n" . $vehicle->notes : '');
-            
+            $newVehicle->notes = 'Dupliqué depuis ' . $vehicle->registration_plate . ' le ' . now()->format('d/m/Y à H:i') .
+                ($vehicle->notes ? "\n\nNotes originales:\n" . $vehicle->notes : '');
+
             // Sauvegarder le nouveau véhicule
             $newVehicle->save();
 
@@ -211,7 +218,6 @@ trait VehicleControllerExtensions
             return redirect()
                 ->route('admin.vehicles.edit', $newVehicle)
                 ->with('success', 'Véhicule dupliqué avec succès. Veuillez mettre à jour les informations nécessaires.');
-
         } catch (\Exception $e) {
             DB::rollBack();
             $this->logError('vehicle.duplicate.error', $e, null, ['vehicle_id' => $vehicle->id]);
@@ -241,23 +247,23 @@ trait VehicleControllerExtensions
 
             // Charger l'historique complet
             $vehicle->load([
-                'assignments' => function($q) {
+                'assignments' => function ($q) {
                     $q->with('driver.user')
-                      ->orderBy('assigned_at', 'desc');
+                        ->orderBy('assigned_at', 'desc');
                 },
-                'maintenances' => function($q) {
+                'maintenances' => function ($q) {
                     $q->orderBy('scheduled_date', 'desc');
                 },
-                'mileageReadings' => function($q) {
+                'mileageReadings' => function ($q) {
                     $q->orderBy('recorded_at', 'desc')
-                      ->limit(50);
+                        ->limit(50);
                 },
-                'documents' => function($q) {
+                'documents' => function ($q) {
                     $q->orderBy('created_at', 'desc');
                 },
-                'expenses' => function($q) {
+                'expenses' => function ($q) {
                     $q->orderBy('expense_date', 'desc')
-                      ->limit(50);
+                        ->limit(50);
                 }
             ]);
 
@@ -307,7 +313,6 @@ trait VehicleControllerExtensions
             $timeline = $timeline->sortByDesc('date')->values();
 
             return view('admin.vehicles.history', compact('vehicle', 'timeline'));
-
         } catch (\Exception $e) {
             $this->logError('vehicle.history.error', $e, null, ['vehicle_id' => $vehicle->id]);
             return back()->with('error', 'Erreur lors du chargement de l\'historique');

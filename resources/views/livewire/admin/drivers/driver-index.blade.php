@@ -341,25 +341,53 @@
                                     @endif
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                    <div class="flex items-center justify-end gap-2">
-                                        @if($driver->deleted_at)
-                                            <button wire:click="confirmRestore({{ $driver->id }})" class="text-green-600 hover:text-green-900" title="Restaurer">
-                                                <x-iconify icon="lucide:rotate-ccw" class="w-5 h-5" />
+                                    <div class="flex items-center justify-end" x-data="{ open: false }">
+                                        <div class="relative">
+                                            <button @click="open = !open" @click.away="open = false" class="text-gray-400 hover:text-gray-600 p-1 rounded-full hover:bg-gray-100 transition-colors">
+                                                <x-iconify icon="lucide:more-vertical" class="w-5 h-5" />
                                             </button>
-                                            <button wire:click="confirmForceDelete({{ $driver->id }})" class="text-red-600 hover:text-red-900" title="Supprimer définitivement">
-                                                <x-iconify icon="lucide:trash-2" class="w-5 h-5" />
-                                            </button>
-                                        @else
-                                            <a href="{{ route('admin.drivers.show', $driver) }}" class="text-blue-600 hover:text-blue-900" title="Voir">
-                                                <x-iconify icon="lucide:eye" class="w-5 h-5" />
-                                            </a>
-                                            <a href="{{ route('admin.drivers.edit', $driver) }}" class="text-gray-600 hover:text-gray-900" title="Modifier">
-                                                <x-iconify icon="lucide:edit" class="w-5 h-5" />
-                                            </a>
-                                            <button wire:click="confirmArchive({{ $driver->id }})" class="text-orange-600 hover:text-orange-900" title="Archiver">
-                                                <x-iconify icon="lucide:archive" class="w-5 h-5" />
-                                            </button>
-                                        @endif
+
+                                            <div x-show="open" 
+                                                 x-transition:enter="transition ease-out duration-100"
+                                                 x-transition:enter-start="transform opacity-0 scale-95"
+                                                 x-transition:enter-end="transform opacity-100 scale-100"
+                                                 x-transition:leave="transition ease-in duration-75"
+                                                 x-transition:leave-start="transform opacity-100 scale-100"
+                                                 x-transition:leave-end="transform opacity-0 scale-95"
+                                                 class="absolute right-0 z-20 mt-2 w-48 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none" 
+                                                 style="display: none;">
+                                                <div class="py-1">
+                                                    @if($driver->deleted_at)
+                                                        <button wire:click="confirmRestore({{ $driver->id }}); open = false" class="group flex w-full items-center px-4 py-2 text-sm text-green-700 hover:bg-green-50">
+                                                            <x-iconify icon="lucide:rotate-ccw" class="mr-3 h-4 w-4 text-green-500" />
+                                                            Restaurer
+                                                        </button>
+                                                        <button wire:click="confirmForceDelete({{ $driver->id }}); open = false" class="group flex w-full items-center px-4 py-2 text-sm text-red-700 hover:bg-red-50">
+                                                            <x-iconify icon="lucide:trash" class="mr-3 h-4 w-4 text-red-500" />
+                                                            Supprimer
+                                                        </button>
+                                                    @else
+                                                        <a href="{{ route('admin.drivers.show', $driver) }}" class="group flex w-full items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                                            <x-iconify icon="lucide:eye" class="mr-3 h-4 w-4 text-blue-500" />
+                                                            Voir détails
+                                                        </a>
+                                                        <a href="{{ route('admin.drivers.edit', $driver) }}" class="group flex w-full items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                                            <x-iconify icon="lucide:edit" class="mr-3 h-4 w-4 text-gray-500" />
+                                                            Modifier
+                                                        </a>
+                                                        <button wire:click="exportPdf({{ $driver->id }}); open = false" class="group flex w-full items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                                            <x-iconify icon="lucide:file-text" class="mr-3 h-4 w-4 text-red-500" />
+                                                            Exporter PDF
+                                                        </button>
+                                                        <div class="border-t border-gray-100 my-1"></div>
+                                                        <button wire:click="confirmArchive({{ $driver->id }}); open = false" class="group flex w-full items-center px-4 py-2 text-sm text-orange-700 hover:bg-orange-50">
+                                                            <x-iconify icon="lucide:archive" class="mr-3 h-4 w-4 text-orange-500" />
+                                                            Archiver
+                                                        </button>
+                                                    @endif
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
                                 </td>
                             </tr>

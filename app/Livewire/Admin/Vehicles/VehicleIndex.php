@@ -12,6 +12,7 @@ use Livewire\Attributes\Url;
 use Livewire\WithPagination;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Validation\Rule;
 
@@ -31,9 +32,7 @@ class VehicleIndex extends Component
     public $vehicle_type_id = '';
     public $fuel_type_id = '';
     public $depot_id = '';
-
-    #[Url(except: false)]
-    public bool $archived = false;
+    public $visibility = 'active'; // active, archived
 
     public $per_page = 20;
 
@@ -44,7 +43,7 @@ class VehicleIndex extends Component
     // 📦 Sélection & Bulk Actions
     public $selectedVehicles = [];
     public $selectAll = false;
-    
+
     // 🛡️ Modal States (Entangled)
     public $bulkDepotId = '';
     public $bulkStatusId = null;
@@ -55,12 +54,38 @@ class VehicleIndex extends Component
     // Individual Actions States - Boolean flags + ID storage
     public ?int $restoringVehicleId = null;
     public bool $showRestoreModal = false;
-    
+
     public ?int $forceDeletingVehicleId = null;
     public bool $showForceDeleteModal = false;
-    
+
     public ?int $archivingVehicleId = null;
     public bool $showArchiveModal = false;
+
+    // 🔄 Individual Status Change State
+    public ?int $individualStatusVehicleId = null;
+    public ?int $individualStatusId = null;
+    public bool $showIndividualStatusModal = false;
+
+    // 🧠 Computed Properties for Modals
+    public function getRestoringVehicleProperty()
+    {
+        return $this->restoringVehicleId ? Vehicle::withTrashed()->find($this->restoringVehicleId) : null;
+    }
+
+    public function getForceDeletingVehicleProperty()
+    {
+        return $this->forceDeletingVehicleId ? Vehicle::withTrashed()->find($this->forceDeletingVehicleId) : null;
+    }
+
+    public function getArchivingVehicleProperty()
+    {
+        return $this->archivingVehicleId ? Vehicle::find($this->archivingVehicleId) : null;
+    }
+
+    public function getIndividualStatusVehicleProperty()
+    {
+        return $this->individualStatusVehicleId ? Vehicle::find($this->individualStatusVehicleId) : null;
+    }
 
     // 🔄 Query String
     protected $queryString = [
@@ -69,6 +94,7 @@ class VehicleIndex extends Component
         'vehicle_type_id' => ['except' => ''],
         'fuel_type_id' => ['except' => ''],
         'depot_id' => ['except' => ''],
+        'visibility' => ['except' => 'active'],
         'sortField' => ['except' => 'created_at'],
         'sortDirection' => ['except' => 'desc'],
     ];
@@ -78,7 +104,7 @@ class VehicleIndex extends Component
         $this->resetPage();
     }
 
-    public function updatedArchived()
+    public function updatedVisibility()
     {
         $this->resetPage();
     }
@@ -93,7 +119,7 @@ class VehicleIndex extends Component
         $this->vehicle_type_id = '';
         $this->fuel_type_id = '';
         $this->depot_id = '';
-        $this->archived = false;
+        $this->visibility = 'active';
         $this->sortField = 'created_at';
         $this->sortDirection = 'desc';
         $this->resetPage();
@@ -145,12 +171,12 @@ class VehicleIndex extends Component
         }
 
         Vehicle::whereIn('id', $this->selectedVehicles)->update(['depot_id' => $this->bulkDepotId]);
-        
+
         $this->dispatch('toast', [
-            'type' => 'success', 
+            'type' => 'success',
             'message' => count($this->selectedVehicles) . ' véhicule(s) affecté(s) au dépôt'
         ]);
-        
+
         $this->resetBulkState();
     }
 
@@ -167,12 +193,12 @@ class VehicleIndex extends Component
         }
 
         Vehicle::whereIn('id', $this->selectedVehicles)->update(['status_id' => $this->bulkStatusId]);
-        
+
         $this->dispatch('toast', [
-            'type' => 'success', 
+            'type' => 'success',
             'message' => count($this->selectedVehicles) . ' véhicule(s) mis à jour'
         ]);
-        
+
         $this->resetBulkState();
     }
 
@@ -184,12 +210,12 @@ class VehicleIndex extends Component
         }
 
         Vehicle::whereIn('id', $this->selectedVehicles)->update(['is_archived' => true]);
-        
+
         $this->dispatch('toast', [
-            'type' => 'success', 
+            'type' => 'success',
             'message' => count($this->selectedVehicles) . ' véhicule(s) archivé(s)'
         ]);
-        
+
         $this->resetBulkState();
     }
 
@@ -201,12 +227,12 @@ class VehicleIndex extends Component
         }
 
         Vehicle::withTrashed()->whereIn('id', $this->selectedVehicles)->update(['is_archived' => false]);
-        
+
         $this->dispatch('toast', [
-            'type' => 'success', 
+            'type' => 'success',
             'message' => count($this->selectedVehicles) . ' véhicule(s) restauré(s)'
         ]);
-        
+
         $this->resetBulkState();
     }
 
@@ -218,16 +244,16 @@ class VehicleIndex extends Component
         }
 
         $vehicles = Vehicle::withTrashed()->whereIn('id', $this->selectedVehicles)->get();
-        
+
         foreach ($vehicles as $vehicle) {
             $vehicle->forceDelete();
         }
-        
+
         $this->dispatch('toast', [
-            'type' => 'success', 
+            'type' => 'success',
             'message' => count($this->selectedVehicles) . ' véhicule(s) supprimé(s) définitivement'
         ]);
-        
+
         $this->resetBulkState();
     }
 
@@ -240,16 +266,17 @@ class VehicleIndex extends Component
         $this->showBulkDepotModal = false;
         $this->showBulkStatusModal = false;
         $this->showBulkArchiveModal = false;
+        $this->showIndividualStatusModal = false;
     }
 
     // --- INDIVIDUAL ACTIONS ---
 
     /**
-     * Toggle archived view
+     * Toggle visibility view
      */
-    public function setArchived(bool $value): void
+    public function setVisibility(string $value): void
     {
-        $this->archived = $value;
+        $this->visibility = $value;
         $this->resetPage();
     }
 
@@ -275,14 +302,14 @@ class VehicleIndex extends Component
         }
 
         $vehicle = Vehicle::where('is_archived', true)->find($this->restoringVehicleId);
-        
+
         if ($vehicle) {
             $vehicle->update(['is_archived' => false]);
             $this->dispatch('toast', ['type' => 'success', 'message' => 'Véhicule restauré avec succès']);
         } else {
             $this->dispatch('toast', ['type' => 'error', 'message' => 'Véhicule introuvable']);
         }
-        
+
         $this->cancelRestore();
     }
 
@@ -308,14 +335,14 @@ class VehicleIndex extends Component
         }
 
         $vehicle = Vehicle::withTrashed()->find($this->forceDeletingVehicleId);
-        
+
         if ($vehicle) {
             $vehicle->forceDelete();
             $this->dispatch('toast', ['type' => 'success', 'message' => 'Véhicule supprimé définitivement']);
         } else {
             $this->dispatch('toast', ['type' => 'error', 'message' => 'Véhicule introuvable']);
         }
-        
+
         $this->cancelForceDelete();
     }
 
@@ -341,7 +368,7 @@ class VehicleIndex extends Component
         }
 
         $vehicle = Vehicle::where('is_archived', false)->find($this->archivingVehicleId);
-        
+
         if ($vehicle) {
             $vehicle->update(['is_archived' => true]);
             $this->dispatch('toast', ['type' => 'success', 'message' => 'Véhicule archivé avec succès']);
@@ -352,15 +379,141 @@ class VehicleIndex extends Component
         $this->cancelArchive();
     }
 
+    // --- INDIVIDUAL ACTIONS: CHANGE STATUS ---
+
+    public function confirmIndividualStatusChange(int $id): void
+    {
+        $this->individualStatusVehicleId = $id;
+        $vehicle = Vehicle::find($id);
+        $this->individualStatusId = $vehicle ? $vehicle->status_id : null;
+        $this->showIndividualStatusModal = true;
+    }
+
+    public function cancelIndividualStatusChange(): void
+    {
+        $this->individualStatusVehicleId = null;
+        $this->individualStatusId = null;
+        $this->showIndividualStatusModal = false;
+    }
+
+    public function updateIndividualStatus(): void
+    {
+        $this->validate([
+            'individualStatusId' => ['required', Rule::exists(VehicleStatus::class, 'id')],
+        ]);
+
+        if (!$this->individualStatusVehicleId) {
+            $this->cancelIndividualStatusChange();
+            return;
+        }
+
+        $vehicle = Vehicle::find($this->individualStatusVehicleId);
+
+        if ($vehicle) {
+            $vehicle->update(['status_id' => $this->individualStatusId]);
+            $this->dispatch('toast', ['type' => 'success', 'message' => 'Statut du véhicule mis à jour']);
+        } else {
+            $this->dispatch('toast', ['type' => 'error', 'message' => 'Véhicule introuvable']);
+        }
+
+        $this->cancelIndividualStatusChange();
+    }
+
+    // --- EXPORT ACTIONS ---
+
+    /**
+     * 📊 Helper to gather current filters for exports
+     */
+    protected function getFilters(): array
+    {
+        return [
+            'search' => $this->search,
+            'status_id' => $this->status_id,
+            'vehicle_type_id' => $this->vehicle_type_id,
+            'fuel_type_id' => $this->fuel_type_id,
+            'depot_id' => $this->depot_id,
+            'visibility' => $this->visibility,
+            'sort_by' => $this->sortField,
+            'sort_direction' => $this->sortDirection,
+            'vehicles' => $this->selectedVehicles // Support for exporting selected only
+        ];
+    }
+
+    /**
+     * 📄 Export to PDF using Microservice Enterprise (via Controller)
+     * 
+     * Solution: Livewire ne peut pas retourner du contenu binaire directement.
+     * On redirige vers un contrôleur qui gère le téléchargement.
+     */
+    public function exportPdf()
+    {
+        try {
+            // Stocker les filtres en session pour le contrôleur
+            session(['vehicle_export_filters' => $this->getFilters()]);
+
+            // Rediriger vers la route de téléchargement
+            return redirect()->route('admin.vehicles.export.pdf');
+        } catch (\Exception $e) {
+            Log::error('Export PDF véhicules échoué', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            $this->dispatch('toast', [
+                'type' => 'error',
+                'message' => 'Erreur lors de l\'export PDF: ' . $e->getMessage()
+            ]);
+        }
+    }
+
+    /**
+     * 📗 Export to Excel using Maatwebsite
+     */
+    public function exportExcel()
+    {
+        try {
+            return \Maatwebsite\Excel\Facades\Excel::download(
+                new \App\Exports\VehiclesExport($this->getFilters()),
+                'vehicules_' . date('Y-m-d_H-i') . '.xlsx'
+            );
+        } catch (\Exception $e) {
+            $this->dispatch('toast', [
+                'type' => 'error',
+                'message' => 'Erreur lors de l\'export Excel: ' . $e->getMessage()
+            ]);
+        }
+    }
+
+    /**
+     * 📊 Export to CSV - Redirect to Controller
+     * 
+     * Même pattern que PDF pour cohérence et fiabilité
+     */
+    public function exportCsv()
+    {
+        try {
+            // Stocker les filtres en session pour le contrôleur
+            session(['vehicle_export_filters' => $this->getFilters()]);
+
+            // Rediriger vers la route de téléchargement
+            return redirect()->route('admin.vehicles.export.csv');
+        } catch (\Exception $e) {
+            $this->dispatch('toast', [
+                'type' => 'error',
+                'message' => 'Erreur lors de l\'export CSV: ' . $e->getMessage()
+            ]);
+        }
+    }
+
     // --- DATA FETCHING ---
 
     public function getVehiclesQuery(): Builder
     {
         $query = Vehicle::query()
             ->with([
-                'vehicleType', 
-                'fuelType', 
-                'transmissionType', 
+                'vehicleType',
+                'fuelType',
+                'transmissionType',
                 'vehicleStatus',
                 'depot',
                 // Optimisation N+1 pour le chauffeur actif
@@ -384,8 +537,8 @@ class VehicleIndex extends Component
         $query->when($this->fuel_type_id, fn($q) => $q->where('fuel_type_id', $this->fuel_type_id));
         $query->when($this->depot_id, fn($q) => $q->where('depot_id', $this->depot_id));
 
-        // Archived Filter
-        if ($this->archived) {
+        // Visibility Filter
+        if ($this->visibility === 'archived') {
             $query->where('is_archived', true);
         } else {
             $query->where('is_archived', false);
@@ -403,7 +556,10 @@ class VehicleIndex extends Component
         $vehicleStatuses = Cache::remember('vehicle_statuses', 3600, fn() => VehicleStatus::orderBy('name')->get());
         $vehicleTypes = Cache::remember('vehicle_types', 3600, fn() => VehicleType::orderBy('name')->get());
         $fuelTypes = Cache::remember('fuel_types', 3600, fn() => FuelType::orderBy('name')->get());
-        $depots = Cache::remember('depots_list_' . Auth::user()->organization_id, 3600, fn() => 
+        $depots = Cache::remember(
+            'depots_list_' . Auth::user()->organization_id,
+            3600,
+            fn() =>
             Depot::where('organization_id', Auth::user()->organization_id)->orderBy('name')->get()
         );
 

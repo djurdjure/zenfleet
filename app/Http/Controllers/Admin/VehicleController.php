@@ -67,7 +67,7 @@ use Carbon\Carbon;
 class VehicleController extends Controller
 {
     use VehicleControllerExtensions;
-    
+
     // ============================================================
     // CONFIGURATION ENTERPRISE ULTRA-PROFESSIONNELLE
     // ============================================================
@@ -228,13 +228,13 @@ class VehicleController extends Controller
 
         try {
             $referenceData = $this->getReferenceData();
-            
+
             // Extraction des variables pour la vue conforme au design system
             $vehicleTypes = $referenceData['vehicle_types'];
             $vehicleStatuses = $referenceData['vehicle_statuses'];
             $fuelTypes = $referenceData['fuel_types'];
             $transmissionTypes = $referenceData['transmission_types'];
-            
+
             // Récupération des utilisateurs de l'organisation
             $users = \App\Models\User::where('organization_id', Auth::user()->organization_id)
                 ->orderBy('name')
@@ -247,7 +247,6 @@ class VehicleController extends Controller
                 'transmissionTypes',
                 'users'
             ));
-
         } catch (\Exception $e) {
             $this->logError('vehicle.create.error', $e);
             return $this->handleErrorResponse($e, 'vehicles.index');
@@ -297,13 +296,11 @@ class VehicleController extends Controller
                 ->route('admin.vehicles.show', $vehicle)
                 ->with('success', "Véhicule {$vehicle->registration_plate} créé avec succès")
                 ->with('vehicle_created', true);
-
         } catch (\Illuminate\Validation\ValidationException $e) {
             return back()
                 ->withErrors($e->errors())
                 ->withInput()
                 ->with('error', 'Veuillez corriger les erreurs de validation');
-
         } catch (\Exception $e) {
             $this->logError('vehicle.store.error', $e, $request);
             return $this->handleErrorResponse($e, 'vehicles.create');
@@ -321,13 +318,17 @@ class VehicleController extends Controller
             // Chargement optimisé des relations
             // 🔧 FIX CRITIQUE: Filtrage explicite des affectations non soft-deleted
             $vehicle->load([
-                'vehicleType', 'fuelType', 'transmissionType', 'vehicleStatus',
+                'vehicleType',
+                'fuelType',
+                'transmissionType',
+                'vehicleStatus',
                 'assignments' => function ($query) {
                     $query->whereNull('deleted_at')  // ✅ CORRECTION ENTERPRISE-GRADE: Respect du soft delete
-                          ->with('driver.user')
-                          ->orderBy('start_datetime', 'desc');
+                        ->with('driver.user')
+                        ->orderBy('start_datetime', 'desc');
                 },
-                'maintenancePlans', 'maintenanceLogs'
+                'maintenancePlans',
+                'maintenanceLogs'
             ]);
 
             // Analytics spécifiques au véhicule
@@ -345,7 +346,6 @@ class VehicleController extends Controller
                 'timeline',
                 'recommendations'
             ));
-
         } catch (\Exception $e) {
             $this->logError('vehicle.show.error', $e, null, ['vehicle_id' => $vehicle->id]);
             return $this->handleErrorResponse($e, 'vehicles.index');
@@ -390,7 +390,6 @@ class VehicleController extends Controller
                 'users',
                 'changeRecommendations'
             ));
-
         } catch (\Exception $e) {
             $this->logError('vehicle.edit.error', $e, null, ['vehicle_id' => $vehicle->id]);
             return $this->handleErrorResponse($e, 'vehicles.show', $vehicle);
@@ -443,13 +442,11 @@ class VehicleController extends Controller
                 ->route('admin.vehicles.show', $vehicle)
                 ->with('success', "Véhicule {$vehicle->registration_plate} mis à jour avec succès")
                 ->with('vehicle_updated', true);
-
         } catch (\Illuminate\Validation\ValidationException $e) {
             return back()
                 ->withErrors($e->errors())
                 ->withInput()
                 ->with('error', 'Veuillez corriger les erreurs de validation');
-
         } catch (\Exception $e) {
             $this->logError('vehicle.update.error', $e, $request, ['vehicle_id' => $vehicle->id]);
             return $this->handleErrorResponse($e, 'vehicles.edit', $vehicle);
@@ -483,7 +480,6 @@ class VehicleController extends Controller
                 ->route('admin.vehicles.index')
                 ->with('success', "Véhicule {$registrationPlate} supprimé avec succès")
                 ->with('vehicle_deleted', true);
-
         } catch (\Exception $e) {
             $this->logError('vehicle.destroy.error', $e, null, ['vehicle_id' => $vehicle->id]);
             return $this->handleErrorResponse($e, 'vehicles.show', $vehicle);
@@ -511,7 +507,6 @@ class VehicleController extends Controller
             return redirect()
                 ->back()
                 ->with('success', "Véhicule {$vehicle->registration_plate} archivé avec succès");
-
         } catch (\Exception $e) {
             $this->logError('vehicle.archive.error', $e, null, ['vehicle_id' => $vehicle->id]);
             return redirect()->back()->with('error', 'Erreur lors de l\'archivage du véhicule');
@@ -539,7 +534,6 @@ class VehicleController extends Controller
             return redirect()
                 ->back()
                 ->with('success', "Véhicule {$vehicle->registration_plate} désarchivé avec succès");
-
         } catch (\Exception $e) {
             $this->logError('vehicle.unarchive.error', $e, null, ['vehicle_id' => $vehicle->id]);
             return redirect()->back()->with('error', 'Erreur lors du désarchivage du véhicule');
@@ -579,7 +573,6 @@ class VehicleController extends Controller
             return redirect()
                 ->route('admin.vehicles.index')
                 ->with('success', "{$count} véhicule(s) archivé(s) avec succès");
-
         } catch (\Exception $e) {
             $this->logError('vehicle.batch_archive.error', $e, $request);
             return redirect()->back()->with('error', 'Erreur lors de l\'archivage en masse');
@@ -624,7 +617,6 @@ class VehicleController extends Controller
             return redirect()
                 ->route('admin.vehicles.index')
                 ->with('success', "{$count} véhicule(s) mis à jour avec le statut \"{$statusName}\"");
-
         } catch (\Exception $e) {
             $this->logError('vehicle.batch_status.error', $e, $request);
             return redirect()->back()->with('error', 'Erreur lors du changement de statut en masse');
@@ -652,10 +644,118 @@ class VehicleController extends Controller
             ]);
 
             return $exporter->download($filename);
-
         } catch (\Exception $e) {
             $this->logError('vehicle.export.error', $e, $request);
             throw $e;
+        }
+    }
+
+    /**
+     * 📄 Export liste véhicules en PDF via Microservice Puppeteer
+     * 
+     * Méthode appelée depuis Livewire via redirection pour éviter
+     * les problèmes d'encodage UTF-8 avec le contenu binaire PDF.
+     * 
+     * @return \Illuminate\Http\Response
+     */
+    public function exportPdf(): \Illuminate\Http\Response
+    {
+        // Autorisation pour voir la liste des véhicules (viewAny, pas view)
+        $this->authorize('viewAny', Vehicle::class);
+        $this->logUserAction('vehicle.export_pdf_list.requested');
+
+        try {
+            // Récupération des filtres depuis la session (stockés par Livewire)
+            $filters = session('vehicle_export_filters', []);
+
+            // Construction de la requête avec filtres
+            $query = Vehicle::query()
+                ->where('organization_id', Auth::user()->organization_id)
+                ->with([
+                    'vehicleType',
+                    'vehicleStatus',
+                    'fuelType',
+                    'transmissionType',
+                    'depot',
+                    'currentAssignment.driver.user' // Charger le chauffeur actif
+                ]);
+
+            // Application des filtres (logique identique à VehicleIndex)
+            if (!empty($filters['search'])) {
+                $search = $filters['search'];
+                $query->where(function ($q) use ($search) {
+                    $q->where('registration_plate', 'ILIKE', "%{$search}%")
+                        ->orWhere('brand', 'ILIKE', "%{$search}%")
+                        ->orWhere('model', 'ILIKE', "%{$search}%")
+                        ->orWhere('vin', 'ILIKE', "%{$search}%");
+                });
+            }
+
+            if (!empty($filters['status'])) {
+                $query->where('status_id', $filters['status']);
+            }
+
+            if (!empty($filters['type'])) {
+                $query->where('vehicle_type_id', $filters['type']);
+            }
+
+            if (!empty($filters['depot'])) {
+                $query->where('depot_id', $filters['depot']);
+            }
+
+            if (!empty($filters['archived'])) {
+                $query->where('is_archived', $filters['archived'] === 'archived');
+            }
+
+            $vehicles = $query->orderBy('created_at', 'desc')->get();
+
+            // Préparation des données pour le template PDF  
+            $data = [
+                'vehicles' => $vehicles,
+                'organization' => Auth::user()->organization,
+                'filters' => $filters,
+                'generatedAt' => now(),
+                'user' => Auth::user(),
+                'analytics' => [
+                    'total' => $vehicles->count(),
+                    'active' => $vehicles->where('is_archived', false)->count(),
+                ]
+            ];
+
+            // Génération du HTML depuis la vue Blade
+            $html = view('exports.pdf.vehicles-list', $data)->render();
+
+            // Utilisation du microservice PDF (Puppeteer)
+            $pdfService = new \App\Services\PdfGenerationService();
+            $pdfContent = $pdfService->generateFromHtml($html);
+
+            // Nom de fichier professionnel
+            $filename = sprintf(
+                'Vehicules_Export_%s_%s.pdf',
+                Auth::user()->organization->slug ?? 'zenfleet',
+                now()->format('Y-m-d_H-i')
+            );
+
+            $this->logUserAction('vehicle.export_pdf_list.success', null, [
+                'filename' => $filename,
+                'vehicle_count' => $vehicles->count()
+            ]);
+
+            // Nettoyage de la session
+            session()->forget('vehicle_export_filters');
+
+            return response($pdfContent)
+                ->header('Content-Type', 'application/pdf')
+                ->header('Content-Disposition', 'attachment; filename="' . $filename . '"')
+                ->header('Cache-Control', 'no-cache, no-store, must-revalidate')
+                ->header('Pragma', 'no-cache')
+                ->header('Expires', '0');
+        } catch (\Exception $e) {
+            $this->logError('vehicle.export_pdf_list.error', $e);
+
+            return redirect()
+                ->route('admin.vehicles.index')
+                ->with('error', 'Erreur lors de l\'export PDF: ' . $e->getMessage());
         }
     }
 
@@ -889,14 +989,36 @@ class VehicleController extends Controller
     }
 
     // Méthodes utilitaires (simplifiées pour l'exemple)
-    private function calculateDepreciation(Vehicle $vehicle): float { return 0.15; }
-    private function calculateUtilization(Vehicle $vehicle): float { return 0.75; }
-    private function calculateMaintenanceCosts(Vehicle $vehicle): float { return 15000.0; }
-    private function getFuelDistribution(): array { return []; }
-    private function getTypeDistribution(): array { return []; }
-    private function getMonthlyAcquisitions(): array { return []; }
-    private function validateVinFormat(string $vin): bool { return strlen($vin) === 17; }
-    private function enrichVehicleCreationData(array $data): array {
+    private function calculateDepreciation(Vehicle $vehicle): float
+    {
+        return 0.15;
+    }
+    private function calculateUtilization(Vehicle $vehicle): float
+    {
+        return 0.75;
+    }
+    private function calculateMaintenanceCosts(Vehicle $vehicle): float
+    {
+        return 15000.0;
+    }
+    private function getFuelDistribution(): array
+    {
+        return [];
+    }
+    private function getTypeDistribution(): array
+    {
+        return [];
+    }
+    private function getMonthlyAcquisitions(): array
+    {
+        return [];
+    }
+    private function validateVinFormat(string $vin): bool
+    {
+        return strlen($vin) === 17;
+    }
+    private function enrichVehicleCreationData(array $data): array
+    {
         $data['organization_id'] = Auth::user()->organization_id;
 
         // Définir le statut par défaut si non spécifié
@@ -1149,7 +1271,6 @@ class VehicleController extends Controller
                 'importRecommendations',
                 'importLimits'
             ));
-
         } catch (\Exception $e) {
             $this->logError('vehicle.import.form_error', $e);
             return $this->handleErrorResponse($e, 'vehicles.index');
@@ -1209,13 +1330,11 @@ class VehicleController extends Controller
             return redirect()
                 ->route('admin.vehicles.import.results')
                 ->with('success', 'Importation terminée avec succès');
-
         } catch (\Illuminate\Validation\ValidationException $e) {
             return back()
                 ->withErrors($e->errors())
                 ->withInput()
                 ->with('error', 'Veuillez corriger les erreurs de validation');
-
         } catch (\Exception $e) {
             $this->logError('vehicle.import.error', $e, $request);
             return back()
@@ -1250,7 +1369,6 @@ class VehicleController extends Controller
                 ->filter();
 
             return view('admin.vehicles.import-results', compact('result', 'recentlyImported'));
-
         } catch (\Exception $e) {
             $this->logError('vehicle.import.results_error', $e);
             return $this->handleErrorResponse($e, 'vehicles.index');
@@ -1276,7 +1394,6 @@ class VehicleController extends Controller
                     'Content-Disposition' => 'attachment; filename="zenfleet_vehicles_import_template.csv"'
                 ]
             )->deleteFileAfterSend();
-
         } catch (\Exception $e) {
             $this->logError('vehicle.import.template_error', $e);
             throw $e;
@@ -1327,14 +1444,12 @@ class VehicleController extends Controller
             ]);
 
             return response()->json($validation_result);
-
         } catch (\Illuminate\Validation\ValidationException $e) {
             return response()->json([
                 'valid' => false,
                 'error' => 'Erreur de validation',
                 'details' => $e->errors()
             ], 422);
-
         } catch (\Exception $e) {
             $this->logError('vehicle.import.prevalidation_error', $e, $request);
             return response()->json([
@@ -1400,7 +1515,6 @@ class VehicleController extends Controller
                         } elseif ($processResult['action'] === 'skipped') {
                             $result['skipped_duplicates']++;
                         }
-
                     } catch (\Exception $e) {
                         $result['failed_imports']++;
                         $result['errors'][] = [
@@ -1414,7 +1528,6 @@ class VehicleController extends Controller
 
             // Nettoyage du cache après importation
             Cache::tags(['vehicles', 'analytics'])->flush();
-
         } catch (\Exception $e) {
             throw new \Exception('Erreur lors du traitement: ' . $e->getMessage());
         }
@@ -1476,7 +1589,7 @@ class VehicleController extends Controller
 
                 // Conversion d'encodage si nécessaire
                 if ($encoding && $encoding !== 'UTF-8') {
-                    $rawRow = array_map(function($cell) use ($encoding) {
+                    $rawRow = array_map(function ($cell) use ($encoding) {
                         return mb_convert_encoding($cell, 'UTF-8', $encoding);
                     }, $rawRow);
                 }
@@ -1485,7 +1598,7 @@ class VehicleController extends Controller
 
                 if ($headers === null) {
                     // Nettoyage des en-têtes (suppression BOM et caractères invisibles)
-                    $headers = array_map(function($header) {
+                    $headers = array_map(function ($header) {
                         // Suppression BOM UTF-8
                         $header = str_replace("\xEF\xBB\xBF", '', $header);
                         // Suppression caractères de contrôle
@@ -1565,7 +1678,7 @@ class VehicleController extends Controller
         $requiredColumns = $this->getRequiredImportColumns();
 
         // Nettoyage des en-têtes pour supprimer les caractères invisibles
-        $cleanHeaders = array_map(function($header) {
+        $cleanHeaders = array_map(function ($header) {
             return trim(preg_replace('/[\x00-\x1F\x7F-\xFF]/', '', $header));
         }, $headers);
 
@@ -1596,7 +1709,7 @@ class VehicleController extends Controller
         $organizationId = Auth::user()->organization_id;
 
         $existingVehicle = Vehicle::where('organization_id', $organizationId)
-            ->where(function($query) use ($vehicleData) {
+            ->where(function ($query) use ($vehicleData) {
                 $query->where('registration_plate', $vehicleData['registration_plate']);
 
                 // Si VIN fourni, vérifier aussi le VIN dans la même organisation
@@ -1631,7 +1744,6 @@ class VehicleController extends Controller
         try {
             $vehicle = Vehicle::create($vehicleData);
             return ['action' => 'imported', 'vehicle_id' => $vehicle->id];
-
         } catch (\Illuminate\Database\QueryException $e) {
             // Capturer les erreurs de contrainte unique PostgreSQL pour messages clairs
             if (str_contains($e->getMessage(), 'vehicles_registration_plate_organization_unique')) {
@@ -1714,8 +1826,14 @@ class VehicleController extends Controller
         return $tempFile;
     }
 
-    private function generateExportFilename(string $format): string { return "vehicles_" . date('Y-m-d_H-i-s') . ".{$format}"; }
-    private function createVehicleExporter(string $format, array $filters): object { return new \stdClass(); }
+    private function generateExportFilename(string $format): string
+    {
+        return "vehicles_" . date('Y-m-d_H-i-s') . ".{$format}";
+    }
+    private function createVehicleExporter(string $format, array $filters): object
+    {
+        return new \stdClass();
+    }
 
     /**
      * 🗄️ Affiche les véhicules archivés avec interface enterprise
@@ -1746,7 +1864,6 @@ class VehicleController extends Controller
             ];
 
             return view('admin.vehicles.archived', compact('vehicles', 'stats'));
-
         } catch (\Exception $e) {
             $this->logError('vehicles.archived.error', $e);
             return $this->handleErrorResponse($e, 'vehicles.index');
@@ -1778,7 +1895,6 @@ class VehicleController extends Controller
                 ->route('admin.vehicles.archived')
                 ->with('success', "Véhicule {$registrationPlate} restauré avec succès")
                 ->with('vehicle_restored', true);
-
         } catch (\Exception $e) {
             $this->logError('vehicle.restore.error', $e, null, ['vehicle_id' => $vehicle->id]);
             return back()->withErrors(['error' => 'Erreur lors de la restauration du véhicule.']);
@@ -1876,11 +1992,25 @@ class VehicleController extends Controller
     private function getRequiredImportColumns(): array
     {
         return [
-            'registration_plate', 'vin', 'brand', 'model', 'color',
-            'vehicle_type', 'fuel_type', 'transmission_type', 'status',
-            'manufacturing_year', 'acquisition_date', 'purchase_price',
-            'current_value', 'initial_mileage', 'current_mileage',
-            'engine_displacement_cc', 'power_hp', 'seats', 'notes'
+            'registration_plate',
+            'vin',
+            'brand',
+            'model',
+            'color',
+            'vehicle_type',
+            'fuel_type',
+            'transmission_type',
+            'status',
+            'manufacturing_year',
+            'acquisition_date',
+            'purchase_price',
+            'current_value',
+            'initial_mileage',
+            'current_mileage',
+            'engine_displacement_cc',
+            'power_hp',
+            'seats',
+            'notes'
         ];
     }
 
@@ -1936,22 +2066,67 @@ class VehicleController extends Controller
     {
         return [
             [
-                'AB-123-CD', '1HGCM82633A123456', 'Toyota', 'Corolla', 'Blanc',
-                'Berline', 'Essence', 'Manuelle', 'Parking',
-                '2020', '2020-01-15', '25000.00', '20000.00',
-                '5000', '15000', '1600', '120', '5', 'Véhicule en excellent état'
+                'AB-123-CD',
+                '1HGCM82633A123456',
+                'Toyota',
+                'Corolla',
+                'Blanc',
+                'Berline',
+                'Essence',
+                'Manuelle',
+                'Parking',
+                '2020',
+                '2020-01-15',
+                '25000.00',
+                '20000.00',
+                '5000',
+                '15000',
+                '1600',
+                '120',
+                '5',
+                'Véhicule en excellent état'
             ],
             [
-                'EF-456-GH', '2HGCM82633A789012', 'Peugeot', '308', 'Noir',
-                'Berline', 'Diesel', 'Automatique', 'En mission',
-                '2019', '2019-06-20', '30000.00', '22000.00',
-                '10000', '45000', '1600', '130', '5', 'Maintenance régulière effectuée'
+                'EF-456-GH',
+                '2HGCM82633A789012',
+                'Peugeot',
+                '308',
+                'Noir',
+                'Berline',
+                'Diesel',
+                'Automatique',
+                'En mission',
+                '2019',
+                '2019-06-20',
+                '30000.00',
+                '22000.00',
+                '10000',
+                '45000',
+                '1600',
+                '130',
+                '5',
+                'Maintenance régulière effectuée'
             ],
             [
-                'IJ-789-KL', '3HGCM82633A345678', 'Renault', 'Clio', 'Rouge',
-                'Berline', 'Essence', 'Manuelle', 'Parking',
-                '2021', '2021-03-10', '18000.00', '16000.00',
-                '0', '8500', '1200', '75', '5', 'Véhicule neuf avec garantie'
+                'IJ-789-KL',
+                '3HGCM82633A345678',
+                'Renault',
+                'Clio',
+                'Rouge',
+                'Berline',
+                'Essence',
+                'Manuelle',
+                'Parking',
+                '2021',
+                '2021-03-10',
+                '18000.00',
+                '16000.00',
+                '0',
+                '8500',
+                '1200',
+                '75',
+                '5',
+                'Véhicule neuf avec garantie'
             ]
         ];
     }
@@ -2032,8 +2207,8 @@ class VehicleController extends Controller
             // Message d'erreur user-friendly avec suggestions
             throw new \Exception(
                 "Format de date invalide: '{$dateString}'. " .
-                "Formats acceptés: AAAA-MM-JJ, JJ/MM/AAAA, JJ-MM-AAAA, JJ.MM.AAAA. " .
-                "Exemple: 2019-06-20 ou 20/06/2019"
+                    "Formats acceptés: AAAA-MM-JJ, JJ/MM/AAAA, JJ-MM-AAAA, JJ.MM.AAAA. " .
+                    "Exemple: 2019-06-20 ou 20/06/2019"
             );
         }
     }
@@ -2049,7 +2224,7 @@ class VehicleController extends Controller
 
         // Initialisation du cache des types
         if ($vehicleTypesCache === null) {
-            $vehicleTypesCache = VehicleType::pluck('id', 'name')->map(function($id, $name) {
+            $vehicleTypesCache = VehicleType::pluck('id', 'name')->map(function ($id, $name) {
                 return ['id' => $id, 'name_lower' => strtolower(trim($name))];
             })->keyBy('name_lower');
         }
@@ -2121,17 +2296,17 @@ class VehicleController extends Controller
         }
 
         // 3. Recherche par correspondance partielle intelligente
-        $partialMatches = $vehicleTypesCache->filter(function($item) use ($searchName) {
+        $partialMatches = $vehicleTypesCache->filter(function ($item) use ($searchName) {
             $itemName = $item['name_lower'];
             // Correspondance bidirectionnelle
             return str_contains($itemName, $searchName) ||
-                   str_contains($searchName, $itemName) ||
-                   levenshtein($searchName, $itemName) <= 2; // Distance de Levenshtein
+                str_contains($searchName, $itemName) ||
+                levenshtein($searchName, $itemName) <= 2; // Distance de Levenshtein
         });
 
         if ($partialMatches->isNotEmpty()) {
             // Prendre la meilleure correspondance (plus courte distance)
-            $bestMatch = $partialMatches->sortBy(function($item) use ($searchName) {
+            $bestMatch = $partialMatches->sortBy(function ($item) use ($searchName) {
                 return levenshtein($searchName, $item['name_lower']);
             })->first();
 
@@ -2205,7 +2380,7 @@ class VehicleController extends Controller
         static $fuelTypesCache = null;
 
         if ($fuelTypesCache === null) {
-            $fuelTypesCache = FuelType::pluck('id', 'name')->map(function($id, $name) {
+            $fuelTypesCache = FuelType::pluck('id', 'name')->map(function ($id, $name) {
                 return ['id' => $id, 'name_lower' => strtolower(trim($name))];
             })->keyBy('name_lower');
         }
@@ -2241,7 +2416,7 @@ class VehicleController extends Controller
         static $transmissionTypesCache = null;
 
         if ($transmissionTypesCache === null) {
-            $transmissionTypesCache = TransmissionType::pluck('id', 'name')->map(function($id, $name) {
+            $transmissionTypesCache = TransmissionType::pluck('id', 'name')->map(function ($id, $name) {
                 return ['id' => $id, 'name_lower' => strtolower(trim($name))];
             })->keyBy('name_lower');
         }
@@ -2276,7 +2451,7 @@ class VehicleController extends Controller
         static $statusTypesCache = null;
 
         if ($statusTypesCache === null) {
-            $statusTypesCache = VehicleStatus::pluck('id', 'name')->map(function($id, $name) {
+            $statusTypesCache = VehicleStatus::pluck('id', 'name')->map(function ($id, $name) {
                 return ['id' => $id, 'name_lower' => strtolower(trim($name))];
             })->keyBy('name_lower');
         }
@@ -2431,7 +2606,6 @@ class VehicleController extends Controller
                 ->route('admin.vehicles.archived')
                 ->with('success', "Véhicule {$registrationPlate} supprimé définitivement")
                 ->with('vehicle_force_deleted', true);
-
         } catch (\Exception $e) {
             $this->logError('vehicle.force_delete.error', $e, null, ['vehicle_id' => $vehicle->id]);
             return back()->withErrors(['error' => 'Erreur lors de la suppression définitive du véhicule.']);
@@ -2519,7 +2693,6 @@ class VehicleController extends Controller
 
                 // Statistiques de qualité
                 $this->collectDataQualityStats($vehicleData, $stats, $vins, $plates, $index + 1);
-
             } catch (\Exception $e) {
                 $sampleErrors[] = [
                     'row' => $index + 1,
@@ -2735,7 +2908,6 @@ class VehicleController extends Controller
 
             // Logging structuré pour monitoring
             Log::channel('analytics')->info('Vehicle action tracked', $metrics);
-
         } catch (\Exception $e) {
             // Logging d'échec d'analytics sans interrompre le flow principal
             Log::warning('Analytics tracking failed', [
@@ -2836,7 +3008,6 @@ class VehicleController extends Controller
             }
 
             $report['statistics'] = $this->calculateReportStatistics($report['data']);
-
         } catch (\Exception $e) {
             $report['error'] = [
                 'message' => $e->getMessage(),
@@ -2884,7 +3055,6 @@ class VehicleController extends Controller
                 'cascade' => $cascade,
                 'user_id' => Auth::id()
             ]);
-
         } catch (\Exception $e) {
             Log::warning('Cache invalidation failed', [
                 'error' => $e->getMessage(),
@@ -3041,8 +3211,20 @@ class VehicleController extends Controller
     }
 
     // Méthodes placeholder pour les rapports (implémentation future)
-    private function generateImportSummaryData(array $filters): array { return []; }
-    private function generateQualityAssessmentData(array $filters): array { return []; }
-    private function generateComplianceAuditData(array $filters): array { return []; }
-    private function calculateReportStatistics(array $data): array { return []; }
+    private function generateImportSummaryData(array $filters): array
+    {
+        return [];
+    }
+    private function generateQualityAssessmentData(array $filters): array
+    {
+        return [];
+    }
+    private function generateComplianceAuditData(array $filters): array
+    {
+        return [];
+    }
+    private function calculateReportStatistics(array $data): array
+    {
+        return [];
+    }
 }

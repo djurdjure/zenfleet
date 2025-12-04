@@ -34,7 +34,6 @@ class VehicleStatusBadgeUltraPro extends Component
     // ✅ FIX: Utiliser l'ID au lieu de l'objet complet pour la réactivité
     public int $vehicleId;
     public Vehicle $vehicle;
-    public bool $showDropdown = false;
     public bool $showConfirmModal = false;
     public ?string $pendingStatus = null;
     public ?VehicleStatusEnum $pendingStatusEnum = null;
@@ -161,24 +160,7 @@ class VehicleStatusBadgeUltraPro extends Component
         return null;
     }
 
-    /**
-     * Toggle du dropdown avec vérification des permissions
-     */
-    public function toggleDropdown()
-    {
-        // Vérification permission avec message explicite
-        if (!$this->canUpdateStatus()) {
-            $this->dispatch('toast', [
-                'type' => 'error',
-                'title' => 'Accès refusé',
-                'message' => 'Vous n\'avez pas la permission de modifier les statuts de véhicule.',
-                'duration' => 5000
-            ]);
-            return;
-        }
 
-        $this->showDropdown = !$this->showDropdown;
-    }
 
     /**
      * Prépare le changement de statut avec confirmation
@@ -198,8 +180,7 @@ class VehicleStatusBadgeUltraPro extends Component
             // Construire le message de confirmation contextuel
             $this->confirmMessage = $this->buildConfirmationMessage($currentEnum, $this->pendingStatusEnum);
             
-            // Fermer le dropdown et ouvrir la modal
-            $this->showDropdown = false;
+            // Ouvrir la modal
             $this->showConfirmModal = true;
 
         } catch (\Exception $e) {

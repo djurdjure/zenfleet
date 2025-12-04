@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\Http;
 
 /**
  * 👨‍💼 DRIVER INDEX - ENTERPRISE LIVEWIRE COMPONENT
@@ -306,6 +307,53 @@ class DriverIndex extends Component
             $this->dispatch('toast', ['type' => 'error', 'message' => 'Erreur lors de la suppression']);
         }
         $this->cancelForceDelete();
+    }
+
+    // --- EXPORT PDF (MICROSERVICE) ---
+    public function exportPdf(int $id)
+    {
+        $driver = Driver::with(['driverStatus', 'user', 'organization', 'assignments.vehicle', 'supervisor'])
+            ->withTrashed()
+            ->find($id);
+
+        if (!$driver) {
+            $this->dispatch('toast', ['type' => 'error', 'message' => 'Chauffeur introuvable']);
+            return;
+        }
+
+        // 1. Générer le HTML
+        $html = view('pdf.driver-profile', ['driver' => $driver])->render();
+
+        // 2. Appeler le microservice PDF
+        try {
+            $response = Http::timeout(30)->post('http://pdf-service:3000/generate-pdf', [
+                'html' => $html,
+                'options' => [
+                    'format' => 'A4',
+                    'printBackground' => true,
+                    'margin' => [
+                        'top' => '10mm',
+                        'right' => '10mm',
+                        'bottom' => '10mm',
+                        'left' => '10mm'
+                    ]
+                ]
+            ]);
+
+            if ($response->successful()) {
+                $filename = 'Fiche_Chauffeur_' . $driver->employee_number . '.pdf';
+                
+                return response()->streamDownload(function () use ($response) {
+                    echo $response->body();
+                }, $filename);
+            } else {
+                \Illuminate\Support\Facades\Log::error('PDF Service Error', ['body' => $response->body()]);
+                $this->dispatch('toast', ['type' => 'error', 'message' => 'Erreur du service PDF: ' . $response->status()]);
+            }
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('PDF Service Exception', ['error' => $e->getMessage()]);
+            $this->dispatch('toast', ['type' => 'error', 'message' => 'Service PDF indisponible']);
+        }
     }
 
     // --- DATA FETCHING ---

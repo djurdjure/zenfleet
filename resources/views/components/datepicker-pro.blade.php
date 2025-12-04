@@ -284,7 +284,6 @@
     @push('scripts')
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/fr.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/imask/6.4.3/imask.min.js"></script>
     
     <script>
         // Fonction globale pour nettoyer un champ date
@@ -316,15 +315,6 @@
                 const maxDate = el.getAttribute('data-max-date');
                 const dateFormat = el.getAttribute('data-date-format') || 'd/m/Y';
                 const defaultToday = el.getAttribute('data-default-today') === 'true';
-                
-                // Appliquer le masque de saisie avec IMask
-                const maskOptions = {
-                    mask: '00/00/0000',
-                    lazy: false,
-                    placeholderChar: '_'
-                };
-                
-                const mask = IMask(el, maskOptions);
                 
                 // Initialiser Flatpickr
                 const fp = flatpickr(el, {
@@ -364,11 +354,6 @@
                         
                         // Mettre à jour le bouton clear
                         updateClearButton(el);
-                        
-                        // Mettre à jour le masque
-                        if (dateStr) {
-                            mask.value = dateStr;
-                        }
                     },
                     onClose: function(selectedDates, dateStr, instance) {
                         // Valider le format de la date saisie manuellement

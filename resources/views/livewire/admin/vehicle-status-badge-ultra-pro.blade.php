@@ -1,8 +1,21 @@
-<div class="relative inline-block" x-data="statusBadgeComponent()" wire:ignore.self>
+<div class="relative inline-block" 
+     x-data="{ 
+         open: false, 
+         confirmModal: @entangle('showConfirmModal').live,
+         toggle() { this.open = !this.open; },
+         close() { this.open = false; },
+         selectStatus(status) { 
+             this.open = false; 
+             $wire.prepareStatusChange(status); 
+         }
+     }" 
+     @click.stop
+     x-init="$watch('confirmModal', value => { if (value) open = false; })">
     {{-- 🎯 Badge de Statut Ultra-Professionnel - Enterprise Grade --}}
     @if($canUpdate && count($allowedStatuses) > 0)
         <button
-            wire:click="toggleDropdown"
+            @click.stop="toggle"
+            @click.away="close"
             type="button"
             class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold 
                    transition-all duration-200 hover:shadow-md hover:scale-105 cursor-pointer 
@@ -44,71 +57,83 @@
         </span>
     @endif
 
-    {{-- 🎯 Dropdown des Statuts Disponibles - Design Premium --}}
+    {{-- 🎯 Popover des Statuts Disponibles - Option A (Contextuel & Élégant) --}}
     @if($canUpdate && count($allowedStatuses) > 0)
         <div
             x-show="open"
-            @click.away="open = false"
             x-transition:enter="transition ease-out duration-200"
-            x-transition:enter-start="transform opacity-0 scale-95"
-            x-transition:enter-end="transform opacity-100 scale-100"
+            x-transition:enter-start="transform opacity-0 scale-95 translate-y-2"
+            x-transition:enter-end="transform opacity-100 scale-100 translate-y-0"
             x-transition:leave="transition ease-in duration-150"
-            x-transition:leave-start="transform opacity-100 scale-100"
-            x-transition:leave-end="transform opacity-0 scale-95"
-            class="absolute left-0 mt-2 w-64 rounded-xl shadow-2xl bg-white ring-1 ring-black ring-opacity-5 z-50 overflow-hidden"
+            x-transition:leave-start="transform opacity-100 scale-100 translate-y-0"
+            x-transition:leave-end="transform opacity-0 scale-95 translate-y-2"
+            class="absolute left-0 mt-3 w-72 rounded-xl shadow-[0_10px_40px_-10px_rgba(0,0,0,0.2)] bg-white ring-1 ring-black/5 z-50 overflow-visible"
             style="display: none;">
+            
+            {{-- Flèche du Popover --}}
+            <div class="absolute -top-2 left-6 w-4 h-4 bg-white transform rotate-45 border-t border-l border-gray-100 shadow-sm"></div>
 
-            {{-- Header du dropdown --}}
-            <div class="px-4 py-3 bg-gradient-to-r from-gray-50 to-gray-100 border-b border-gray-200">
-                <div class="flex items-center justify-between">
-                    <span class="text-xs font-semibold text-gray-600 uppercase tracking-wide">
-                        Changer le statut
-                    </span>
-                    <button @click="open = false" class="text-gray-400 hover:text-gray-600 transition-colors">
-                        <x-iconify icon="lucide:x" class="w-4 h-4" />
-                    </button>
+            <div class="relative bg-white rounded-xl overflow-hidden">
+                {{-- Header du popover --}}
+                <div class="px-4 py-3 bg-gradient-to-r from-gray-50 to-white border-b border-gray-100">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-bold text-gray-800 uppercase tracking-wider flex items-center gap-2">
+                            <x-iconify icon="lucide:git-branch" class="w-3.5 h-3.5 text-blue-500" />
+                            Changer le statut
+                        </span>
+                        <button @click="close" class="text-gray-400 hover:text-gray-600 transition-colors p-1 hover:bg-gray-100 rounded-full">
+                            <x-iconify icon="lucide:x" class="w-3.5 h-3.5" />
+                        </button>
+                    </div>
                 </div>
-            </div>
-
-            {{-- Liste des statuts disponibles --}}
-            <div class="py-2 max-h-64 overflow-y-auto">
-                @forelse($allowedStatuses as $status)
-                    <button
-                        wire:click="prepareStatusChange('{{ $status->value }}')"
-                        type="button"
-                        class="w-full flex items-center justify-between px-4 py-2.5 hover:bg-gray-50 
-                               transition-all duration-150 group focus:outline-none focus:bg-gray-50">
-                        <div class="flex items-center gap-3">
-                            {{-- Badge du statut --}}
-                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium 
-                                       {{ $status->badgeClasses() }} group-hover:shadow-sm transition-all">
-                                <x-iconify icon="{{ $status->icon() }}" class="w-3 h-3" />
-                                {{ $status->label() }}
-                            </span>
+    
+                {{-- Liste des statuts disponibles --}}
+                <div class="py-2 max-h-[300px] overflow-y-auto custom-scrollbar">
+                    @forelse($allowedStatuses as $status)
+                        <button
+                            @click.stop="selectStatus('{{ $status->value }}')"
+                            type="button"
+                            class="w-full flex items-center justify-between px-4 py-3 hover:bg-blue-50/50 
+                                   transition-all duration-200 group focus:outline-none border-l-2 border-transparent hover:border-blue-500">
+                            <div class="flex items-center gap-3">
+                                {{-- Badge du statut --}}
+                                <span class="inline-flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-xs font-semibold 
+                                           {{ $status->badgeClasses() }} shadow-sm group-hover:shadow transition-all">
+                                    <x-iconify icon="{{ $status->icon() }}" class="w-3.5 h-3.5" />
+                                    {{ $status->label() }}
+                                </span>
+                            </div>
+                            {{-- Flèche d'action --}}
+                            <div class="w-6 h-6 rounded-full bg-transparent group-hover:bg-blue-100 flex items-center justify-center transition-all">
+                                <x-iconify icon="lucide:arrow-right" 
+                                          class="w-3.5 h-3.5 text-gray-300 group-hover:text-blue-600 
+                                                 group-hover:translate-x-0.5 transition-all" />
+                            </div>
+                        </button>
+                    @empty
+                        <div class="px-4 py-8 text-center">
+                            <div class="w-10 h-10 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-2">
+                                <x-iconify icon="lucide:lock" class="w-5 h-5 text-gray-400" />
+                            </div>
+                            <p class="text-sm text-gray-500 font-medium">Aucune transition possible</p>
+                            <p class="text-xs text-gray-400 mt-1">Le statut actuel est terminal</p>
                         </div>
-                        {{-- Flèche d'action --}}
-                        <x-iconify icon="lucide:chevron-right" 
-                                  class="w-4 h-4 text-gray-400 group-hover:text-blue-600 
-                                         group-hover:translate-x-1 transition-all" />
-                    </button>
-                @empty
-                    <div class="px-4 py-3 text-center text-sm text-gray-500">
-                        Aucune transition disponible
-                    </div>
-                @endforelse
-            </div>
-
-            {{-- Footer avec info contextuelle --}}
-            @if($currentEnum)
-                <div class="px-4 py-3 bg-gray-50 border-t border-gray-200">
-                    <div class="flex items-start gap-2">
-                        <x-iconify icon="lucide:info-circle" class="w-4 h-4 text-gray-400 mt-0.5 flex-shrink-0" />
-                        <p class="text-xs text-gray-600 leading-relaxed">
-                            {{ $currentEnum->description() }}
-                        </p>
-                    </div>
+                    @endforelse
                 </div>
-            @endif
+    
+                {{-- Footer avec info contextuelle --}}
+                @if($currentEnum)
+                    <div class="px-4 py-3 bg-gray-50/80 border-t border-gray-100 backdrop-blur-sm">
+                        <div class="flex items-start gap-2.5">
+                            <x-iconify icon="lucide:info" class="w-4 h-4 text-blue-500 mt-0.5 flex-shrink-0" />
+                            <p class="text-xs text-gray-600 leading-relaxed">
+                                <span class="font-medium text-gray-900">Note:</span>
+                                {{ $currentEnum->description() }}
+                            </p>
+                        </div>
+                    </div>
+                @endif
+            </div>
         </div>
     @endif
 
@@ -224,6 +249,7 @@
                 {{-- Footer avec actions --}}
                 <div class="bg-gray-50 px-6 py-4 flex items-center justify-end gap-3">
                     <button wire:click="cancelStatusChange"
+                            @click="confirmModal = false"
                             type="button"
                             class="inline-flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 
                                    rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 
@@ -259,43 +285,3 @@
         </div>
     </div>
 </div>
-
-@push('scripts')
-<script>
-/**
- * 🎯 COMPOSANT ALPINE.JS POUR VEHICLE STATUS BADGE ULTRA PRO
- * Version: Enterprise-Grade - Compatible Livewire 3
- *
- * CORRECTION: Utilise wire:model et événements Livewire au lieu de entangle()
- * pour éviter les erreurs "Cannot read properties of undefined"
- */
-function statusBadgeComponent() {
-    return {
-        open: @json($showDropdown),
-        confirmModal: @json($showConfirmModal),
-        componentId: '{{ $this->getId() }}',
-
-        init() {
-            const component = this;
-
-            // Écouter les changements Livewire - Alpine vers Livewire
-            this.$watch('open', value => {
-                component.$wire.set('showDropdown', value, false);
-            });
-
-            this.$watch('confirmModal', value => {
-                component.$wire.set('showConfirmModal', value, false);
-            });
-
-            // Écouter les mises à jour depuis Livewire - Livewire vers Alpine
-            Livewire.hook('morph.updated', ({ el, component: livewireComponent }) => {
-                if (livewireComponent.id === component.componentId) {
-                    component.open = livewireComponent.get('showDropdown');
-                    component.confirmModal = livewireComponent.get('showConfirmModal');
-                }
-            });
-        }
-    }
-}
-</script>
-@endpush
