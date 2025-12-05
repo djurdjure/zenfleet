@@ -48,12 +48,16 @@ class VehiclePdfExportService
                     'transmissionType',
                     'depot',
                     'category',
-                    'assignments.driver.user'
+                    'assignments' => function ($q) {
+                        $q->where('status', 'active')
+                            ->with('driver.user')
+                            ->limit(1);
+                    }
                 ])
                 ->findOrFail($vehicleId);
 
             $html = $this->generateSingleVehicleHtml($vehicle);
-            
+
             return $this->generatePdf($html, "vehicle_{$vehicle->registration_plate}.pdf");
         } catch (\Exception $e) {
             Log::error('Export PDF véhicule unique échoué', ['error' => $e->getMessage()]);
@@ -69,7 +73,7 @@ class VehiclePdfExportService
         try {
             $vehicles = $this->getVehicles();
             $html = $this->generateListHtml($vehicles);
-            
+
             return $this->generatePdf($html, 'vehicles_list_' . date('Y-m-d') . '.pdf');
         } catch (\Exception $e) {
             Log::error('Export PDF liste véhicules échoué', ['error' => $e->getMessage()]);
@@ -95,15 +99,15 @@ class VehiclePdfExportService
                 'transmissionType',
                 'depot',
                 'category',
-                'assignments' => function($q) {
+                'assignments' => function ($q) {
                     $q->where('status', 'active')
-                      ->where('start_datetime', '<=', now())
-                      ->where(function($query) {
-                          $query->whereNull('end_datetime')
+                        ->where('start_datetime', '<=', now())
+                        ->where(function ($query) {
+                            $query->whereNull('end_datetime')
                                 ->orWhere('end_datetime', '>=', now());
-                      })
-                      ->with('driver.user')
-                      ->limit(1);
+                        })
+                        ->with('driver.user')
+                        ->limit(1);
                 }
             ]);
 
@@ -135,11 +139,11 @@ class VehiclePdfExportService
         // Filtre recherche
         if (isset($this->filters['search']) && !empty($this->filters['search'])) {
             $search = $this->filters['search'];
-            $query->where(function($q) use ($search) {
+            $query->where(function ($q) use ($search) {
                 $q->where('registration_plate', 'ilike', "%{$search}%")
-                  ->orWhere('vin', 'ilike', "%{$search}%")
-                  ->orWhere('brand', 'ilike', "%{$search}%")
-                  ->orWhere('model', 'ilike', "%{$search}%");
+                    ->orWhere('vin', 'ilike', "%{$search}%")
+                    ->orWhere('brand', 'ilike', "%{$search}%")
+                    ->orWhere('model', 'ilike', "%{$search}%");
             });
         }
 
@@ -177,8 +181,13 @@ class VehiclePdfExportService
         $sortDirection = $this->filters['sort_direction'] ?? 'desc';
 
         $allowedSorts = [
-            'registration_plate', 'brand', 'model', 'manufacturing_year',
-            'acquisition_date', 'current_mileage', 'created_at'
+            'registration_plate',
+            'brand',
+            'model',
+            'manufacturing_year',
+            'acquisition_date',
+            'current_mileage',
+            'created_at'
         ];
 
         if (in_array($sortBy, $allowedSorts)) {
@@ -281,7 +290,6 @@ class VehiclePdfExportService
                 'X-Frame-Options' => 'DENY',
                 'X-PDF-Service' => 'Enterprise Microservice v2.0'
             ]);
-
         } catch (\Exception $e) {
             Log::error('Erreur génération PDF véhicules', [
                 'error' => $e->getMessage(),

@@ -201,7 +201,7 @@
  </h3>
 
  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
- <x-tom-select
+ <x-slim-select
  name="vehicle_type_id"
  label="Type de Véhicule"
  :options="$vehicleTypes->pluck('name', 'id')->toArray()"
@@ -212,7 +212,7 @@
  @change="validateField('vehicle_type_id', $event.target.value)"
  />
 
- <x-tom-select
+ <x-slim-select
  name="fuel_type_id"
  label="Type de Carburant"
  :options="$fuelTypes->pluck('name', 'id')->toArray()"
@@ -223,7 +223,7 @@
  @change="validateField('fuel_type_id', $event.target.value)"
  />
 
- <x-tom-select
+ <x-slim-select
  name="transmission_type_id"
  label="Type de Transmission"
  :options="$transmissionTypes->pluck('name', 'id')->toArray()"
@@ -353,7 +353,7 @@
  />
 
  <div class="md:col-span-2">
- <x-tom-select
+ <x-slim-select
  name="status_id"
  label="Statut Initial"
  :options="$vehicleStatuses->pluck('name', 'id')->toArray()"
@@ -367,7 +367,7 @@
  </div>
 
  <div class="md:col-span-2">
- <x-tom-select
+ <x-slim-select
  name="users"
  label="Utilisateurs Autorisés"
  :options="$users->mapWithKeys(fn($user) => [$user->id => $user->name . ' (' . $user->email . ')'])->toArray()"
@@ -562,12 +562,12 @@ function vehicleFormValidation() {
  // Marquer le champ comme en erreur
  this.fieldErrors[fieldName] = true;
 
- // Ajouter classe ts-error pour TomSelect
+ // Ajouter classe slimselect-error pour SlimSelect
  const input = document.querySelector(`[name="${fieldName}"]`);
  if (input) {
- const tsWrapper = input.closest('.ts-wrapper');
+ const tsWrapper = input.closest('.ss-main');
  if (tsWrapper) {
- tsWrapper.classList.add('ts-error');
+ tsWrapper.classList.add('slimselect-error');
  }
  }
  } else {
@@ -657,10 +657,10 @@ function vehicleFormValidation() {
  // Ajouter animation shake (temporaire)
  input.classList.add('animate-shake');
 
- // Gérer TomSelect (wrapper avec classe .ts-wrapper)
- const tsWrapper = input.closest('.ts-wrapper');
+ // Gérer SlimSelect (wrapper avec classe .ss-main)
+ const tsWrapper = input.closest('.ss-main');
  if (tsWrapper) {
- tsWrapper.classList.add('ts-error');
+ tsWrapper.classList.add('slimselect-error');
  }
 
  // Retirer seulement l'animation shake après 500ms
@@ -678,12 +678,12 @@ function vehicleFormValidation() {
  clearFieldError(fieldName) {
  delete this.fieldErrors[fieldName];
 
- // Retirer la classe ts-error si c'est un TomSelect
+ // Retirer la classe slimselect-error si c'est un SlimSelect
  const input = document.querySelector(`[name="${fieldName}"]`);
  if (input) {
- const tsWrapper = input.closest('.ts-wrapper');
+ const tsWrapper = input.closest('.ss-main');
  if (tsWrapper) {
- tsWrapper.classList.remove('ts-error');
+ tsWrapper.classList.remove('slimselect-error');
  }
  }
  },
