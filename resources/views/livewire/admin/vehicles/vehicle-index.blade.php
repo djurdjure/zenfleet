@@ -210,7 +210,7 @@
 
             {{-- Filters Panel --}}
             <div x-show="showFilters" x-collapse class="mt-4 bg-white rounded-lg border border-gray-200 p-6 shadow-sm">
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                     {{-- Depot --}}
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Dépôt</label>
@@ -252,16 +252,6 @@
                             @foreach($fuelTypes as $fuel)
                             <option value="{{ $fuel->id }}">{{ $fuel->name }}</option>
                             @endforeach
-                        </select>
-                    </div>
-
-                    {{-- Per Page --}}
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Par page</label>
-                        <select wire:model.live="per_page" class="block w-full border-gray-300 rounded-lg text-sm">
-                            <option value="20">20</option>
-                            <option value="50">50</option>
-                            <option value="100">100</option>
                         </select>
                     </div>
                 </div>
@@ -483,7 +473,20 @@
                 </table>
             </div>
             <div class="px-4 py-3 border-t border-gray-200">
-                {{ $vehicles->links() }}
+                <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
+                    <div class="flex-1 w-full sm:w-auto">
+                        {{ $vehicles->links() }}
+                    </div>
+                    <div class="flex items-center gap-2 flex-shrink-0">
+                        <span class="text-sm text-gray-500 whitespace-nowrap">Lignes par page:</span>
+                        <select wire:model.live="per_page" 
+                            class="border-gray-300 rounded-md text-sm py-1.5 pl-2 pr-8 focus:ring-blue-500 focus:border-blue-500 shadow-sm">
+                            <option value="20">20</option>
+                            <option value="50">50</option>
+                            <option value="100">100</option>
+                        </select>
+                    </div>
+                </div>
             </div>
         </x-card>
     </div>
