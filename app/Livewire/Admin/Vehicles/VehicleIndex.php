@@ -566,10 +566,10 @@ class VehicleIndex extends Component
         // Analytics (Simplified for now)
         $analytics = [
             'total_vehicles' => Vehicle::count(),
-            'available_vehicles' => Vehicle::whereHas('vehicleStatus', fn($q) => $q->where('slug', 'available'))->count(),
+            'available_vehicles' => Vehicle::whereHas('vehicleStatus', fn($q) => $q->where('name', 'Parking'))->count(),
             'assigned_vehicles' => Vehicle::whereHas('assignments', fn($q) => $q->where('status', 'active'))->count(),
-            'maintenance_vehicles' => Vehicle::whereHas('vehicleStatus', fn($q) => $q->where('slug', 'maintenance'))->count(),
-            'archived_vehicles' => Vehicle::where('is_archived', true)->count(),
+            'maintenance_vehicles' => Vehicle::whereHas('vehicleStatus', fn($q) => $q->where('name', 'En maintenance'))->count(),
+            'broken_vehicles' => Vehicle::whereHas('vehicleStatus', fn($q) => $q->where('name', 'En panne'))->count(),
         ];
 
         return view('livewire.admin.vehicles.vehicle-index', [

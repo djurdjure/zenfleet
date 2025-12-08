@@ -58,23 +58,23 @@
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-xs font-medium text-gray-600">En maintenance</p>
-                        <p class="text-xl font-bold text-red-600 mt-1">{{ $analytics['maintenance_vehicles'] }}</p>
+                        <p class="text-xl font-bold text-amber-600 mt-1">{{ $analytics['maintenance_vehicles'] }}</p>
                     </div>
-                    <div class="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center">
-                        <x-iconify icon="lucide:wrench" class="w-5 h-5 text-red-600" />
+                    <div class="w-10 h-10 bg-amber-100 rounded-lg flex items-center justify-center">
+                        <x-iconify icon="lucide:wrench" class="w-5 h-5 text-amber-600" />
                     </div>
                 </div>
             </div>
 
-            {{-- Archivés --}}
+            {{-- En Panne --}}
             <div class="bg-white rounded-lg border border-gray-200 p-4 hover:shadow-lg transition-shadow duration-300">
                 <div class="flex items-center justify-between">
                     <div>
-                        <p class="text-xs font-medium text-gray-600">Archivés</p>
-                        <p class="text-xl font-bold text-gray-500 mt-1">{{ $analytics['archived_vehicles'] }}</p>
+                        <p class="text-xs font-medium text-gray-600">En panne</p>
+                        <p class="text-xl font-bold text-rose-600 mt-1">{{ $analytics['broken_vehicles'] }}</p>
                     </div>
-                    <div class="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center">
-                        <x-iconify icon="lucide:archive" class="w-5 h-5 text-gray-500" />
+                    <div class="w-10 h-10 bg-rose-100 rounded-lg flex items-center justify-center">
+                        <x-iconify icon="lucide:alert-triangle" class="w-5 h-5 text-rose-600" />
                     </div>
                 </div>
             </div>
@@ -109,17 +109,19 @@
 
                 {{-- Actions --}}
                 <div class="flex items-center gap-2">
+
+
                     @if($visibility === 'archived')
                     <button wire:click="$set('visibility', 'active')"
-                        class="inline-flex items-center gap-2 px-4 py-2.5 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-all shadow-sm">
+                        class="inline-flex items-center gap-2 px-4 py-2.5 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-all shadow-sm"
+                        title="Voir Actifs">
                         <x-iconify icon="lucide:list" class="w-5 h-5" />
-                        <span class="hidden lg:inline font-medium">Voir Actifs</span>
                     </button>
                     @else
                     <button wire:click="$set('visibility', 'archived')"
-                        class="inline-flex items-center gap-2 px-4 py-2.5 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-all shadow-sm">
+                        class="inline-flex items-center gap-2 px-4 py-2.5 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-all shadow-sm"
+                        title="Voir Archives">
                         <x-iconify icon="lucide:archive" class="w-5 h-5 text-amber-600" />
-                        <span class="hidden lg:inline font-medium text-gray-700">Voir Archives</span>
                     </button>
                     @endif
 
@@ -254,6 +256,12 @@
                             @endforeach
                         </select>
                     </div>
+                </div>
+
+                <div class="mt-4 flex gap-2 justify-end">
+                    <button wire:click="resetFilters" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors text-sm font-medium">
+                        Réinitialiser
+                    </button>
                 </div>
             </div>
         </div>
@@ -478,8 +486,7 @@
                         {{ $vehicles->links() }}
                     </div>
                     <div class="flex items-center gap-2 flex-shrink-0">
-                        <span class="text-sm text-gray-500 whitespace-nowrap">Lignes par page:</span>
-                        <select wire:model.live="per_page" 
+                        <select wire:model.live="per_page"
                             class="border-gray-300 rounded-md text-sm py-1.5 pl-2 pr-8 focus:ring-blue-500 focus:border-blue-500 shadow-sm">
                             <option value="20">20</option>
                             <option value="50">50</option>

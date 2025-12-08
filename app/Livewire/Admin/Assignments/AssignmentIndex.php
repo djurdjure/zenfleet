@@ -29,20 +29,20 @@ class AssignmentIndex extends Component
     // 🔍 Filters
     #[Url(as: 'q')]
     public $search = '';
-    
+
     #[Url]
     public $status = '';
-    
+
     #[Url]
     public $date_from = '';
-    
+
     #[Url]
     public $date_to = '';
 
     // ↕️ Sorting
     #[Url]
     public $sort_by = 'created_at';
-    
+
     #[Url]
     public $sort_order = 'desc';
 
@@ -62,6 +62,9 @@ class AssignmentIndex extends Component
     public $deletingAssignmentId = null;
     public $deletingAssignmentDescription = '';
 
+    // 🔢 Pagination
+    public $per_page = 20;
+
     // 🔄 Query String Configuration
     protected $queryString = [
         'search' => ['except' => ''],
@@ -70,6 +73,7 @@ class AssignmentIndex extends Component
         'date_to' => ['except' => ''],
         'sort_by' => ['except' => 'created_at'],
         'sort_order' => ['except' => 'desc'],
+        'per_page' => ['except' => 20],
     ];
 
     public function mount()
@@ -93,6 +97,11 @@ class AssignmentIndex extends Component
         $this->resetPage();
     }
 
+    public function updatedPerPage()
+    {
+        $this->resetPage();
+    }
+
     public function resetFilters()
     {
         $this->search = '';
@@ -101,8 +110,11 @@ class AssignmentIndex extends Component
         $this->date_to = '';
         $this->sort_by = 'created_at';
         $this->sort_order = 'desc';
+        $this->per_page = 20;
         $this->resetPage();
     }
+
+    // ... (rest of methods)
 
     public function sortBy($field)
     {
@@ -119,7 +131,7 @@ class AssignmentIndex extends Component
     public function confirmEndAssignment($id)
     {
         $assignment = Assignment::with(['vehicle', 'driver'])->find($id);
-        
+
         if (!$assignment || !$assignment->canBeEnded()) {
             $this->dispatch('toast', ['type' => 'error', 'message' => 'Cette affectation ne peut pas être terminée.']);
             return;
@@ -129,13 +141,13 @@ class AssignmentIndex extends Component
         $this->endingAssignmentVehicle = $assignment->vehicle->registration_plate ?? 'N/A';
         $this->endingAssignmentDriver = $assignment->driver->full_name ?? 'N/A';
         $this->endingAssignmentCurrentMileage = $assignment->vehicle->current_mileage;
-        
+
         // ✅ MODIFIÉ: Défaut séparé pour date et heure
         $this->endDate = now()->format('Y-m-d');
         $this->endTime = now()->format('H:i');
         $this->endMileage = '';
         $this->endNotes = '';
-        
+
         $this->showEndModal = true;
     }
 
@@ -160,7 +172,7 @@ class AssignmentIndex extends Component
         try {
             // ✅ MODIFIÉ: Combiner date + heure avant parsing
             $fullDateTime = "{$this->endDate} {$this->endTime}";
-            
+
             $assignment->end(
                 Carbon::parse($fullDateTime),
                 $this->endMileage ? (int)$this->endMileage : null,
@@ -170,7 +182,6 @@ class AssignmentIndex extends Component
             $this->dispatch('toast', ['type' => 'success', 'message' => 'Affectation terminée avec succès.']);
             $this->showEndModal = false;
             $this->reset(['endingAssignmentId', 'endDate', 'endTime', 'endMileage', 'endNotes']);
-            
         } catch (\Exception $e) {
             Log::error('Error ending assignment via Livewire', [
                 'id' => $this->endingAssignmentId,
@@ -235,14 +246,14 @@ class AssignmentIndex extends Component
             $query->where(function ($q) use ($search) {
                 $q->whereHas('vehicle', function ($vehicleQuery) use ($search) {
                     $vehicleQuery->where('registration_plate', 'ILIKE', "%{$search}%")
-                                ->orWhere('brand', 'ILIKE', "%{$search}%")
-                                ->orWhere('model', 'ILIKE', "%{$search}%");
+                        ->orWhere('brand', 'ILIKE', "%{$search}%")
+                        ->orWhere('model', 'ILIKE', "%{$search}%");
                 })
-                ->orWhereHas('driver', function ($driverQuery) use ($search) {
-                    $driverQuery->where('first_name', 'ILIKE', "%{$search}%")
-                               ->orWhere('last_name', 'ILIKE', "%{$search}%")
-                               ->orWhereRaw("(first_name || ' ' || last_name) ILIKE ?", ["%{$search}%"]);
-                });
+                    ->orWhereHas('driver', function ($driverQuery) use ($search) {
+                        $driverQuery->where('first_name', 'ILIKE', "%{$search}%")
+                            ->orWhere('last_name', 'ILIKE', "%{$search}%")
+                            ->orWhereRaw("(first_name || ' ' || last_name) ILIKE ?", ["%{$search}%"]);
+                    });
             });
         }
 
@@ -255,10 +266,10 @@ class AssignmentIndex extends Component
         if ($this->date_from) {
             try {
                 // Support both Y-m-d and d/m/Y formats
-                $date = str_contains($this->date_from, '/') 
-                    ? Carbon::createFromFormat('d/m/Y', $this->date_from) 
+                $date = str_contains($this->date_from, '/')
+                    ? Carbon::createFromFormat('d/m/Y', $this->date_from)
                     : Carbon::parse($this->date_from);
-                
+
                 $query->where('start_datetime', '>=', $date->startOfDay());
             } catch (\Exception $e) {
                 // Ignore invalid dates
@@ -266,10 +277,10 @@ class AssignmentIndex extends Component
         }
         if ($this->date_to) {
             try {
-                $date = str_contains($this->date_to, '/') 
-                    ? Carbon::createFromFormat('d/m/Y', $this->date_to) 
+                $date = str_contains($this->date_to, '/')
+                    ? Carbon::createFromFormat('d/m/Y', $this->date_to)
                     : Carbon::parse($this->date_to);
-                    
+
                 $query->where('start_datetime', '<=', $date->endOfDay());
             } catch (\Exception $e) {
                 // Ignore invalid dates
@@ -279,7 +290,7 @@ class AssignmentIndex extends Component
         // Sorting
         $query->orderBy($this->sort_by, $this->sort_order);
 
-        return $query->paginate(15);
+        return $query->paginate($this->per_page);
     }
 
     public function render()

@@ -59,15 +59,15 @@ class VehiclesExport implements FromCollection, WithHeadings, WithMapping, WithS
                 'transmissionType',
                 'depot',
                 'category',
-                'assignments' => function($q) {
+                'assignments' => function ($q) {
                     $q->where('status', 'active')
-                      ->where('start_datetime', '<=', now())
-                      ->where(function($query) {
-                          $query->whereNull('end_datetime')
+                        ->where('start_datetime', '<=', now())
+                        ->where(function ($query) {
+                            $query->whereNull('end_datetime')
                                 ->orWhere('end_datetime', '>=', now());
-                      })
-                      ->with('driver.user')
-                      ->limit(1);
+                        })
+                        ->with('driver.user')
+                        ->limit(1);
                 }
             ]);
 
@@ -98,11 +98,11 @@ class VehiclesExport implements FromCollection, WithHeadings, WithMapping, WithS
         // Filtre recherche
         if (isset($this->filters['search']) && !empty($this->filters['search'])) {
             $search = $this->filters['search'];
-            $query->where(function($q) use ($search) {
+            $query->where(function ($q) use ($search) {
                 $q->where('registration_plate', 'ilike', "%{$search}%")
-                  ->orWhere('vin', 'ilike', "%{$search}%")
-                  ->orWhere('brand', 'ilike', "%{$search}%")
-                  ->orWhere('model', 'ilike', "%{$search}%");
+                    ->orWhere('vin', 'ilike', "%{$search}%")
+                    ->orWhere('brand', 'ilike', "%{$search}%")
+                    ->orWhere('model', 'ilike', "%{$search}%");
             });
         }
 
@@ -140,8 +140,13 @@ class VehiclesExport implements FromCollection, WithHeadings, WithMapping, WithS
         $sortDirection = $this->filters['sort_direction'] ?? 'desc';
 
         $allowedSorts = [
-            'registration_plate', 'brand', 'model', 'manufacturing_year',
-            'acquisition_date', 'current_mileage', 'created_at'
+            'registration_plate',
+            'brand',
+            'model',
+            'manufacturing_year',
+            'acquisition_date',
+            'current_mileage',
+            'created_at'
         ];
 
         if (in_array($sortBy, $allowedSorts)) {
@@ -214,12 +219,14 @@ class VehiclesExport implements FromCollection, WithHeadings, WithMapping, WithS
 
     /**
      * Mapper les données d'un véhicule
+     * 
+     * 🔧 FIX: Utilise directement les champs du modèle Driver (first_name, last_name, personal_phone, email)
+     * au lieu de passer par la relation User qui peut être null.
      */
     public function map($vehicle): array
     {
         $activeAssignment = $vehicle->assignments->first();
         $driver = $activeAssignment ? $activeAssignment->driver : null;
-        $user = $driver ? $driver->user : null;
 
         return [
             $vehicle->id,
@@ -234,9 +241,9 @@ class VehiclesExport implements FromCollection, WithHeadings, WithMapping, WithS
             $vehicle->current_mileage,
             $vehicle->color,
             $vehicle->vin,
-            $user ? $user->name . ' ' . ($user->last_name ?? '') : 'Non affecté',
-            $driver ? ($driver->phone ?? $user->phone ?? 'N/A') : 'N/A',
-            $user ? $user->email : 'N/A',
+            $driver ? $driver->first_name . ' ' . $driver->last_name : 'Non affecté',
+            $driver ? ($driver->personal_phone ?? 'N/A') : 'N/A',
+            $driver ? ($driver->email ?? $driver->personal_email ?? 'N/A') : 'N/A',
             optional($vehicle->depot)->name ?? 'N/A',
             optional($vehicle->category)->name ?? 'N/A',
             $vehicle->acquisition_date ? $vehicle->acquisition_date->format('d/m/Y') : 'N/A',
@@ -331,16 +338,16 @@ class VehiclesExport implements FromCollection, WithHeadings, WithMapping, WithS
     public function registerEvents(): array
     {
         return [
-            AfterSheet::class => function(AfterSheet $event) {
+            AfterSheet::class => function (AfterSheet $event) {
                 // Figer la première ligne (en-tête)
                 $event->sheet->freezePane('A2');
-                
+
                 // Activer les filtres automatiques
                 $event->sheet->setAutoFilter('A1:V1');
-                
+
                 // Ajuster la hauteur de la ligne d'en-tête
                 $event->sheet->getDelegate()->getRowDimension('1')->setRowHeight(25);
-                
+
                 // Ajouter un titre au-dessus du tableau
                 $event->sheet->insertNewRowBefore(1, 2);
                 $event->sheet->mergeCells('A1:V1');

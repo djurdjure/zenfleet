@@ -6,6 +6,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Liste des Véhicules - {{ $organization->name }}</title>
     <style>
+        /**
+         * 🖨️ ENTERPRISE PDF TEMPLATE - MONOCHROME OPTIMIZED
+         * 
+         * Design principles:
+         * - High contrast black/white for laser printing
+         * - No gradients, no colors (except grayscale)
+         * - Border-based visual hierarchy
+         * - Professional, minimalist aesthetic
+         */
+
+        @page {
+            size: A4 landscape;
+            margin: 15mm;
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -13,127 +28,196 @@
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-            color: #1f2937;
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Arial, sans-serif;
+            color: #000;
             line-height: 1.4;
-            font-size: 11px;
+            font-size: 9pt;
+            background: #fff;
         }
 
+        /* === HEADER === */
         .header {
-            background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%);
-            color: white;
-            padding: 20px;
-            margin-bottom: 20px;
-        }
-
-        .header h1 {
-            font-size: 24px;
-            font-weight: bold;
-            margin-bottom: 5px;
-        }
-
-        .header .subtitle {
-            font-size: 14px;
-            opacity: 0.9;
-        }
-
-        .stats {
+            background: #1a1a1a;
+            color: #fff;
+            padding: 16px 20px;
+            margin-bottom: 16px;
             display: flex;
-            justify-content: space-around;
-            margin-bottom: 20px;
-            gap: 10px;
+            justify-content: space-between;
+            align-items: center;
         }
 
-        .stat-card {
+        .header-left h1 {
+            font-size: 18pt;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            margin-bottom: 2px;
+        }
+
+        .header-left .subtitle {
+            font-size: 9pt;
+            opacity: 0.85;
+            font-weight: 400;
+        }
+
+        .header-right {
+            text-align: right;
+            font-size: 8pt;
+            opacity: 0.85;
+        }
+
+        /* === STATISTICS BAR === */
+        .stats-bar {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .stat-box {
             flex: 1;
-            background: #f9fafb;
-            border: 1px solid #e5e7eb;
-            border-radius: 6px;
-            padding: 10px;
+            border: 1.5px solid #000;
+            padding: 10px 12px;
             text-align: center;
         }
 
         .stat-value {
-            font-size: 20px;
-            font-weight: bold;
-            color: #1f2937;
+            font-size: 16pt;
+            font-weight: 700;
+            color: #000;
         }
 
         .stat-label {
-            font-size: 10px;
-            color: #6b7280;
+            font-size: 7pt;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #333;
             margin-top: 2px;
         }
 
+        /* === TABLE === */
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 10px;
+            border: 1.5px solid #000;
         }
 
         thead {
-            background: #f3f4f6;
+            background: #f0f0f0;
         }
 
         th {
             padding: 8px 6px;
             text-align: left;
             font-weight: 600;
-            color: #374151;
-            border-bottom: 2px solid #e5e7eb;
-            font-size: 10px;
+            color: #000;
+            font-size: 7pt;
             text-transform: uppercase;
+            letter-spacing: 0.3px;
+            border-bottom: 2px solid #000;
+            border-right: 1px solid #ccc;
+        }
+
+        th:last-child {
+            border-right: none;
         }
 
         td {
             padding: 6px;
-            border-bottom: 1px solid #f3f4f6;
-            color: #1f2937;
+            border-bottom: 1px solid #ddd;
+            border-right: 1px solid #eee;
+            vertical-align: top;
         }
 
-        tr:hover {
-            background: #f9fafb;
+        td:last-child {
+            border-right: none;
         }
 
+        tr:nth-child(even) {
+            background: #f9f9f9;
+        }
+
+        /* === BADGES (Monochrome) === */
         .badge {
             display: inline-block;
             padding: 2px 8px;
-            border-radius: 999px;
-            font-size: 9px;
+            font-size: 7pt;
+            font-weight: 600;
+            border: 1px solid #000;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .badge-disponible {
+            background: #fff;
+            color: #000;
+        }
+
+        .badge-affecte {
+            background: #e5e5e5;
+            color: #000;
+        }
+
+        .badge-maintenance {
+            background: #000;
+            color: #fff;
+        }
+
+        .badge-horsservice,
+        .badge-hors-service {
+            background: #666;
+            color: #fff;
+        }
+
+        .badge-default {
+            background: #ccc;
+            color: #000;
+        }
+
+        /* === DRIVER CELL === */
+        .driver-name {
             font-weight: 600;
         }
 
-        .badge-green {
-            background: #dcfce7;
-            color: #166534;
+        .driver-phone {
+            font-size: 7pt;
+            color: #666;
         }
 
-        .badge-orange {
-            background: #fed7aa;
-            color: #9a3412;
+        .not-assigned {
+            color: #888;
+            font-style: italic;
         }
 
-        .badge-red {
-            background: #fee2e2;
-            color: #991b1b;
-        }
-
-        .badge-gray {
-            background: #f3f4f6;
-            color: #374151;
-        }
-
+        /* === FOOTER === */
         .footer {
-            margin-top: 30px;
-            padding-top: 15px;
-            border-top: 1px solid #e5e7eb;
-            text-align: center;
-            font-size: 10px;
-            color: #6b7280;
+            margin-top: 16px;
+            padding-top: 12px;
+            border-top: 2px solid #000;
+            display: flex;
+            justify-content: space-between;
+            font-size: 8pt;
+            color: #333;
         }
 
+        .footer-left {
+            font-weight: 500;
+        }
+
+        /* === PAGE BREAK === */
         .page-break {
             page-break-after: always;
+        }
+
+        /* === PRINT OPTIMIZATION === */
+        @media print {
+            body {
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            .header {
+                background: #000 !important;
+                color: #fff !important;
+            }
         }
     </style>
 </head>
@@ -141,96 +225,121 @@
 <body>
     {{-- Header --}}
     <div class="header">
-        <h1>Liste des Véhicules</h1>
-        <div class="subtitle">{{ $organization->name }} - Généré le {{ now()->format('d/m/Y à H:i') }}</div>
+        <div class="header-left">
+            <h1>LISTE DES VÉHICULES</h1>
+            <div class="subtitle">{{ $organization->name }}</div>
+        </div>
+        <div class="header-right">
+            <strong>{{ now()->format('d/m/Y') }}</strong><br>
+            {{ now()->format('H:i') }}
+        </div>
     </div>
 
-    {{-- Statistiques --}}
-    <div class="stats">
-        <div class="stat-card">
+    {{-- Statistics Bar --}}
+    <div class="stats-bar">
+        <div class="stat-box">
             <div class="stat-value">{{ $vehicles->count() }}</div>
-            <div class="stat-label">Total Véhicules</div>
+            <div class="stat-label">Total</div>
         </div>
-        <div class="stat-card">
-            <div class="stat-value">{{ $vehicles->where('vehicleStatus.name', 'Disponible')->count() }}</div>
+        <div class="stat-box">
+            @php
+            $availableCount = $vehicles->filter(function($v) {
+            $statusName = optional($v->vehicleStatus)->name ?? '';
+            return in_array(strtolower($statusName), ['disponible', 'available']);
+            })->count();
+            @endphp
+            <div class="stat-value">{{ $availableCount }}</div>
             <div class="stat-label">Disponibles</div>
         </div>
-        <div class="stat-card">
-            <div class="stat-value">{{ $vehicles->whereNotNull('assignments')->count() }}</div>
+        <div class="stat-box">
+            @php
+            $assignedCount = $vehicles->filter(function($v) {
+            return $v->assignments->isNotEmpty();
+            })->count();
+            @endphp
+            <div class="stat-value">{{ $assignedCount }}</div>
             <div class="stat-label">Affectés</div>
         </div>
-        <div class="stat-card">
-            <div class="stat-value">{{ $vehicles->where('vehicleStatus.name', 'Maintenance')->count() }}</div>
-            <div class="stat-label">En Maintenance</div>
+        <div class="stat-box">
+            @php
+            $maintenanceCount = $vehicles->filter(function($v) {
+            $statusName = optional($v->vehicleStatus)->name ?? '';
+            return strtolower($statusName) === 'maintenance';
+            })->count();
+            @endphp
+            <div class="stat-value">{{ $maintenanceCount }}</div>
+            <div class="stat-label">Maintenance</div>
         </div>
     </div>
 
-    {{-- Table des véhicules --}}
+    {{-- Vehicle Table --}}
     <table>
         <thead>
             <tr>
-                <th>Immatriculation</th>
-                <th>Véhicule</th>
-                <th>Chauffeur</th>
-                <th>Type</th>
-                <th>Statut</th>
-                <th>Kilométrage</th>
-                <th>Dépôt</th>
+                <th style="width: 12%">Immatriculation</th>
+                <th style="width: 18%">Véhicule</th>
+                <th style="width: 18%">Chauffeur</th>
+                <th style="width: 10%">Type</th>
+                <th style="width: 12%">Statut</th>
+                <th style="width: 10%">Kilométrage</th>
+                <th style="width: 10%">Dépôt</th>
+                <th style="width: 10%">Carburant</th>
             </tr>
         </thead>
         <tbody>
             @foreach($vehicles as $vehicle)
             @php
-            // Utiliser l'attribut currentAssignment (chargé eager loading)
-            $activeAssignment = $vehicle->currentAssignment;
-            $driver = $activeAssignment?->driver;
-            $user = $driver?->user;
+            // 🔧 FIX: Utilise directement les champs du modèle Driver
+            $activeAssignment = $vehicle->assignments->first();
+            $driver = $activeAssignment ? $activeAssignment->driver : null;
 
-            $statusColors = [
-            'Disponible' => 'badge-green',
-            'Affecté' => 'badge-orange',
-            'Maintenance' => 'badge-red',
-            'Hors service' => 'badge-gray'
-            ];
+            // Status badge class
             $statusName = optional($vehicle->vehicleStatus)->name ?? 'Inconnu';
-            $badgeClass = $statusColors[$statusName] ?? 'badge-gray';
+            $statusSlug = strtolower(str_replace([' ', 'é', 'è'], ['', 'e', 'e'], $statusName));
+            $badgeClass = match(true) {
+            str_contains($statusSlug, 'disponible') => 'badge-disponible',
+            str_contains($statusSlug, 'affect') => 'badge-affecte',
+            str_contains($statusSlug, 'maintenance') => 'badge-maintenance',
+            str_contains($statusSlug, 'hors') => 'badge-horsservice',
+            default => 'badge-default'
+            };
             @endphp
             <tr>
-                <td style="font-weight: 600;">{{ $vehicle->registration_plate }}</td>
+                <td><strong>{{ $vehicle->registration_plate }}</strong></td>
                 <td>
                     {{ $vehicle->brand }} {{ $vehicle->model }}<br>
-                    <span style="font-size: 9px; color: #6b7280;">{{ $vehicle->manufacturing_year }}</span>
+                    <span style="font-size: 7pt; color: #666;">{{ $vehicle->manufacturing_year }}</span>
                 </td>
                 <td>
-                    @if($user)
-                    {{$user->name }} {{ $user->last_name ?? '' }}<br>
-                    <span style="font-size: 9px; color: #6b7280;">{{ $driver->phone ?? $user->phone ?? '' }}</span>
+                    @if($driver)
+                    <span class="driver-name">{{ $driver->first_name }} {{ $driver->last_name }}</span><br>
+                    <span class="driver-phone">{{ $driver->personal_phone ?? '' }}</span>
                     @else
-                    <span style="color: #9ca3af; font-style: italic;">Non affecté</span>
+                    <span class="not-assigned">Non affecté</span>
                     @endif
                 </td>
                 <td>{{ optional($vehicle->vehicleType)->name ?? 'N/A' }}</td>
-                <td>
-                    <span class="badge {{ $badgeClass }}">{{ $statusName }}</span>
-                </td>
-                <td>{{ number_format($vehicle->current_mileage) }} km</td>
+                <td><span class="badge {{ $badgeClass }}">{{ $statusName }}</span></td>
+                <td style="text-align: right;">{{ number_format($vehicle->current_mileage, 0, ',', ' ') }} km</td>
                 <td>{{ optional($vehicle->depot)->name ?? 'N/A' }}</td>
+                <td>{{ optional($vehicle->fuelType)->name ?? 'N/A' }}</td>
             </tr>
 
-            @if(($loop->iteration % 20) == 0 && !$loop->last)
+            @if(($loop->iteration % 18) == 0 && !$loop->last)
         </tbody>
     </table>
     <div class="page-break"></div>
     <table>
         <thead>
             <tr>
-                <th>Immatriculation</th>
-                <th>Véhicule</th>
-                <th>Chauffeur</th>
-                <th>Type</th>
-                <th>Statut</th>
-                <th>Kilométrage</th>
-                <th>Dépôt</th>
+                <th style="width: 12%">Immatriculation</th>
+                <th style="width: 18%">Véhicule</th>
+                <th style="width: 18%">Chauffeur</th>
+                <th style="width: 10%">Type</th>
+                <th style="width: 12%">Statut</th>
+                <th style="width: 10%">Kilométrage</th>
+                <th style="width: 10%">Dépôt</th>
+                <th style="width: 10%">Carburant</th>
             </tr>
         </thead>
         <tbody>
@@ -241,16 +350,19 @@
 
     {{-- Footer --}}
     <div class="footer">
-        <p>Total: {{ $vehicles->count() }} véhicule(s)
+        <div class="footer-left">
+            {{ $vehicles->count() }} véhicule(s) —
             @if(isset($filters['archived']) && $filters['archived'] === 'true')
-            - Véhicules archivés
+            Archives
             @elseif(isset($filters['archived']) && $filters['archived'] === 'all')
-            - Tous les véhicules
+            Tous
             @else
-            - Véhicules actifs
+            Actifs uniquement
             @endif
-        </p>
-        <p>{{ $organization->name }} - ZenFleet © {{ date('Y') }} - Document confidentiel</p>
+        </div>
+        <div class="footer-right">
+            {{ $organization->name }} • ZenFleet © {{ date('Y') }} • Document confidentiel
+        </div>
     </div>
 </body>
 

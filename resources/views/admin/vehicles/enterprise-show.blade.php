@@ -1,1152 +1,1230 @@
 {{-- resources/views/admin/vehicles/enterprise-show.blade.php --}}
-{{-- 🏆 ENTERPRISE-GRADE VEHICLE MANAGEMENT - ZENFLEET 2025 --}}
+{{-- 🏆 ZENFLEET ENTERPRISE - FICHE VÉHICULE ULTRA-PROFESSIONNELLE --}}
+{{-- Monochrome-Optimized | Print-Ready | Rich Analytics --}}
 @extends('layouts.admin.catalyst')
 @section('title', $vehicle->registration_plate . ' - Fiche Véhicule')
 
 @push('styles')
 <style>
-/* ========================================================================
-   ENTERPRISE DESIGN SYSTEM - PROFESSIONAL FLEET MANAGEMENT
-   ======================================================================== */
+    /* ========================================================================
+       ZENFLEET ENTERPRISE DESIGN SYSTEM - MONOCHROME PROFESSIONAL
+       Optimized for B&W printing and official document presentation
+       ======================================================================== */
 
-:root {
-    --color-primary: #2563eb;
-    --color-primary-dark: #1e40af;
-    --color-success: #10b981;
-    --color-warning: #f59e0b;
-    --color-danger: #ef4444;
-    --color-info: #06b6d4;
-    --color-purple: #8b5cf6;
-    --shadow-xs: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-    --shadow-sm: 0 1px 3px 0 rgb(0 0 0 / 0.1);
-    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
-    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
-    --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1);
-    --radius: 0.75rem;
-    --radius-lg: 1rem;
-    --spacing-unit: 1.5rem;
-}
+    :root {
+        /* Monochrome Palette */
+        --zf-black: #1a1a1a;
+        --zf-dark: #333333;
+        --zf-mid: #666666;
+        --zf-light: #999999;
+        --zf-pale: #e5e5e5;
+        --zf-white: #ffffff;
 
-/* Reset & Base */
-* {
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-}
+        /* Accent (for interactive elements only - not printed) */
+        --zf-accent: #1e40af;
 
-/* Animations professionnelles */
-@keyframes fadeInUp {
-    from {
-        opacity: 0;
-        transform: translateY(30px);
+        /* Spacing */
+        --zf-space-xs: 0.25rem;
+        --zf-space-sm: 0.5rem;
+        --zf-space-md: 1rem;
+        --zf-space-lg: 1.5rem;
+        --zf-space-xl: 2rem;
+
+        /* Borders */
+        --zf-border-thin: 1px solid var(--zf-pale);
+        --zf-border-medium: 1.5px solid var(--zf-dark);
+        --zf-border-thick: 2px solid var(--zf-black);
     }
-    to {
-        opacity: 1;
-        transform: translateY(0);
+
+    /* === BASE LAYOUT === */
+    .vehicle-document {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: var(--zf-space-lg);
+        background: var(--zf-white);
+        font-family: 'Segoe UI', -apple-system, Arial, sans-serif;
+        color: var(--zf-black);
+        line-height: 1.5;
     }
-}
 
-@keyframes slideInRight {
-    from {
-        opacity: 0;
-        transform: translateX(20px);
+    /* === DOCUMENT HEADER === */
+    .doc-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        padding-bottom: var(--zf-space-md);
+        border-bottom: var(--zf-border-thick);
+        margin-bottom: var(--zf-space-lg);
     }
-    to {
-        opacity: 1;
-        transform: translateX(0);
+
+    .doc-org {
+        max-width: 60%;
     }
-}
 
-.fade-in {
-    animation: fadeInUp 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.slide-in {
-    animation: slideInRight 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-/* Hero Section - Enterprise Grade */
-.vehicle-hero {
-    background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 50%, #06b6d4 100%);
-    border-radius: var(--radius-lg);
-    position: relative;
-    overflow: hidden;
-    box-shadow: var(--shadow-xl);
-}
-
-.vehicle-hero::before {
-    content: '';
-    position: absolute;
-    top: -50%;
-    right: -10%;
-    width: 500px;
-    height: 500px;
-    background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, transparent 70%);
-    border-radius: 50%;
-}
-
-.vehicle-hero::after {
-    content: '';
-    position: absolute;
-    bottom: -30%;
-    left: -5%;
-    width: 400px;
-    height: 400px;
-    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
-    border-radius: 50%;
-}
-
-/* Glass Card Effect */
-.glass-card {
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    border-radius: var(--radius);
-    box-shadow: var(--shadow-sm);
-}
-
-/* Professional Card */
-.pro-card {
-    background: white;
-    border-radius: var(--radius);
-    padding: var(--spacing-unit);
-    box-shadow: var(--shadow-sm);
-    border: 1px solid #f1f5f9;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.pro-card:hover {
-    box-shadow: var(--shadow-md);
-    border-color: #e2e8f0;
-    transform: translateY(-2px);
-}
-
-/* Section Header - Professional */
-.section-header {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    margin-bottom: 1.25rem;
-    padding-bottom: 0.75rem;
-    border-bottom: 2px solid #f1f5f9;
-}
-
-.section-title {
-    font-size: 1.125rem;
-    font-weight: 700;
-    color: #1e293b;
-    letter-spacing: -0.01em;
-}
-
-.section-icon {
-    width: 2.5rem;
-    height: 2.5rem;
-    border-radius: 0.625rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-}
-
-/* Metric Cards - Enterprise */
-.metric-card {
-    background: white;
-    border-radius: var(--radius);
-    padding: 1.5rem;
-    border: 1px solid #e5e7eb;
-    transition: all 0.3s ease;
-    position: relative;
-    overflow: hidden;
-}
-
-.metric-card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 4px;
-    height: 100%;
-    background: var(--accent-color, var(--color-primary));
-    opacity: 0;
-    transition: opacity 0.3s ease;
-}
-
-.metric-card:hover::before {
-    opacity: 1;
-}
-
-.metric-card:hover {
-    border-color: var(--accent-color, var(--color-primary));
-    box-shadow: var(--shadow-md);
-    transform: translateY(-3px);
-}
-
-.metric-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 0.75rem;
-}
-
-.metric-label {
-    font-size: 0.8125rem;
-    font-weight: 600;
-    color: #64748b;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-}
-
-.metric-icon {
-    width: 2.5rem;
-    height: 2.5rem;
-    border-radius: 0.5rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-}
-
-.metric-value {
-    font-size: 2rem;
-    font-weight: 800;
-    line-height: 1;
-    color: #1e293b;
-    letter-spacing: -0.02em;
-}
-
-.metric-subtext {
-    font-size: 0.75rem;
-    color: #64748b;
-    font-weight: 500;
-    margin-top: 0.5rem;
-}
-
-/* Info Grid - Professional Layout */
-.info-grid {
-    display: grid;
-    gap: 1rem;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-}
-
-.info-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 1rem 1.25rem;
-    background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
-    border-radius: 0.625rem;
-    border: 1px solid #f1f5f9;
-    transition: all 0.2s ease;
-}
-
-.info-row:hover {
-    background: linear-gradient(135deg, #f1f5f9 0%, #ffffff 100%);
-    border-color: #e2e8f0;
-}
-
-.info-row-label {
-    font-size: 0.875rem;
-    font-weight: 600;
-    color: #64748b;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-.info-row-value {
-    font-size: 0.9375rem;
-    font-weight: 700;
-    color: #1e293b;
-    text-align: right;
-}
-
-/* Status Badge - Modern */
-.status-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.5rem 1rem;
-    border-radius: 9999px;
-    font-size: 0.8125rem;
-    font-weight: 700;
-    letter-spacing: 0.025em;
-    text-transform: uppercase;
-    border: 2px solid;
-}
-
-.status-pulse {
-    width: 0.5rem;
-    height: 0.5rem;
-    border-radius: 50%;
-    animation: pulse-animation 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-}
-
-@keyframes pulse-animation {
-    0%, 100% {
-        opacity: 1;
-        transform: scale(1);
+    .doc-org-name {
+        font-size: 1.25rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: var(--zf-black);
+        margin-bottom: 2px;
     }
-    50% {
-        opacity: 0.5;
-        transform: scale(1.1);
+
+    .doc-org-address {
+        font-size: 0.75rem;
+        color: var(--zf-mid);
     }
-}
 
-/* Stats Display */
-.stat-display {
-    text-align: center;
-    padding: 1.5rem;
-    background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
-    border-radius: var(--radius);
-    border: 1px solid #e5e7eb;
-    transition: all 0.3s ease;
-}
+    .doc-meta {
+        text-align: right;
+    }
 
-.stat-display:hover {
-    border-color: var(--color-primary);
-    box-shadow: var(--shadow-md);
-}
+    .doc-title {
+        font-size: 0.875rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: var(--zf-black);
+        background: var(--zf-pale);
+        padding: 4px 12px;
+        margin-bottom: 4px;
+    }
 
-.stat-value-large {
-    font-size: 2.25rem;
-    font-weight: 900;
-    line-height: 1;
-    background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-info) 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    letter-spacing: -0.02em;
-}
+    .doc-date {
+        font-size: 0.75rem;
+        color: var(--zf-mid);
+    }
 
-.stat-label-large {
-    font-size: 0.875rem;
-    color: #64748b;
-    font-weight: 600;
-    margin-top: 0.5rem;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-}
+    /* === VEHICLE IDENTITY BLOCK === */
+    .vehicle-identity {
+        background: var(--zf-pale);
+        border: var(--zf-border-medium);
+        padding: var(--zf-space-lg);
+        margin-bottom: var(--zf-space-lg);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
 
-/* Timeline - Professional */
-.timeline {
-    position: relative;
-    padding-left: 2.5rem;
-}
+    .vehicle-main {
+        flex: 1;
+    }
 
-.timeline::before {
-    content: '';
-    position: absolute;
-    left: 0.625rem;
-    top: 0.5rem;
-    bottom: 0.5rem;
-    width: 2px;
-    background: linear-gradient(180deg, var(--color-primary) 0%, #e2e8f0 100%);
-}
+    .registration-plate {
+        font-size: 1.75rem;
+        font-weight: 900;
+        font-family: 'Consolas', 'Monaco', monospace;
+        letter-spacing: 3px;
+        border: 3px solid var(--zf-black);
+        padding: 6px 16px;
+        display: inline-block;
+        background: var(--zf-white);
+        margin-bottom: 8px;
+    }
 
-.timeline-item {
-    position: relative;
-    padding-bottom: 1.75rem;
-}
+    .vehicle-desc {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: var(--zf-black);
+    }
 
-.timeline-item:last-child {
-    padding-bottom: 0;
-}
+    .vehicle-vin {
+        font-size: 0.75rem;
+        color: var(--zf-mid);
+        font-family: monospace;
+        margin-top: 4px;
+    }
 
-.timeline-dot {
-    position: absolute;
-    left: -2rem;
-    top: 0.375rem;
-    width: 1.5rem;
-    height: 1.5rem;
-    border-radius: 50%;
-    background: white;
-    border: 3px solid var(--color-primary);
-    box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
-    z-index: 1;
-}
+    .vehicle-status {
+        text-align: right;
+    }
 
-.timeline-content {
-    background: #f8fafc;
-    padding: 1rem 1.25rem;
-    border-radius: 0.625rem;
-    border-left: 3px solid var(--color-primary);
-    transition: all 0.2s ease;
-}
+    .status-badge {
+        display: inline-block;
+        padding: 8px 16px;
+        border: 2px solid var(--zf-black);
+        font-size: 0.875rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        background: var(--zf-white);
+    }
 
-.timeline-content:hover {
-    background: #f1f5f9;
-    border-left-width: 4px;
-    transform: translateX(2px);
-}
+    /* === KPI DASHBOARD === */
+    .kpi-grid {
+        display: grid;
+        grid-template-columns: repeat(6, 1fr);
+        gap: var(--zf-space-sm);
+        margin-bottom: var(--zf-space-lg);
+    }
 
-.timeline-title {
-    font-weight: 700;
-    color: #1e293b;
-    font-size: 0.9375rem;
-    margin-bottom: 0.25rem;
-}
+    .kpi-box {
+        border: var(--zf-border-medium);
+        padding: var(--zf-space-md);
+        text-align: center;
+        background: var(--zf-white);
+    }
 
-.timeline-date {
-    font-size: 0.75rem;
-    color: #64748b;
-    font-weight: 600;
-}
+    .kpi-value {
+        font-size: 1.5rem;
+        font-weight: 900;
+        color: var(--zf-black);
+        line-height: 1.1;
+    }
 
-/* Action Buttons - Enterprise */
-.btn-enterprise {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-    padding: 0.875rem 1.5rem;
-    background: white;
-    border: 2px solid #e5e7eb;
-    border-radius: 0.625rem;
-    font-weight: 700;
-    font-size: 0.875rem;
-    color: #374151;
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-    cursor: pointer;
-    text-transform: uppercase;
-    letter-spacing: 0.025em;
-}
+    .kpi-unit {
+        font-size: 0.75rem;
+        font-weight: 600;
+        color: var(--zf-mid);
+    }
 
-.btn-enterprise:hover {
-    background: #f9fafb;
-    border-color: var(--color-primary);
-    color: var(--color-primary);
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-md);
-}
+    .kpi-label {
+        font-size: 0.625rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: var(--zf-mid);
+        margin-top: 4px;
+    }
 
-.btn-enterprise:active {
-    transform: translateY(0);
-}
-
-.btn-primary {
-    background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
-    color: white;
-    border-color: var(--color-primary);
-}
-
-.btn-primary:hover {
-    background: linear-gradient(135deg, var(--color-primary-dark) 0%, #1e3a8a 100%);
-    color: white;
-    border-color: var(--color-primary-dark);
-}
-
-/* Badge - Professional */
-.badge-pro {
-    display: inline-flex;
-    align-items: center;
-    padding: 0.375rem 0.875rem;
-    border-radius: 0.5rem;
-    font-size: 0.8125rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-}
-
-/* Progress Bar - Modern */
-.progress-container {
-    width: 100%;
-    height: 0.625rem;
-    background: #e5e7eb;
-    border-radius: 9999px;
-    overflow: hidden;
-    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1);
-}
-
-.progress-bar {
-    height: 100%;
-    background: linear-gradient(90deg, var(--color-primary) 0%, var(--color-info) 100%);
-    border-radius: 9999px;
-    transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
-    position: relative;
-    overflow: hidden;
-}
-
-.progress-bar::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
-    animation: shimmer 2s infinite;
-}
-
-@keyframes shimmer {
-    0% { transform: translateX(-100%); }
-    100% { transform: translateX(100%); }
-}
-
-/* Breadcrumb - Professional */
-.breadcrumb-pro {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    font-size: 0.875rem;
-    color: #64748b;
-    margin-bottom: 1.5rem;
-    font-weight: 500;
-}
-
-.breadcrumb-pro a {
-    color: #64748b;
-    transition: color 0.2s ease;
-    font-weight: 600;
-}
-
-.breadcrumb-pro a:hover {
-    color: var(--color-primary);
-}
-
-/* Icon Gradients */
-.icon-blue { background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); }
-.icon-green { background: linear-gradient(135deg, #10b981 0%, #059669 100%); }
-.icon-orange { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); }
-.icon-red { background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); }
-.icon-purple { background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%); }
-.icon-cyan { background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%); }
-.icon-indigo { background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%); }
-
-/* Responsive Grid */
-.metrics-grid {
-    display: grid;
-    gap: 1.5rem;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-}
-
-.content-grid {
-    display: grid;
-    gap: 2rem;
-}
-
-@media (min-width: 1024px) {
+    /* === CONTENT GRID === */
     .content-grid {
-        grid-template-columns: 1fr 380px;
+        display: grid;
+        grid-template-columns: 1fr 320px;
+        gap: var(--zf-space-lg);
     }
-}
 
-/* Hover Lift Effect */
-.hover-lift {
-    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
+    .content-full {
+        grid-column: 1 / -1;
+    }
 
-.hover-lift:hover {
-    transform: translateY(-4px);
-    box-shadow: var(--shadow-lg);
-}
+    /* === SECTION CARDS === */
+    .section {
+        border: var(--zf-border-medium);
+        margin-bottom: var(--zf-space-md);
+        page-break-inside: avoid;
+    }
 
-/* Divider */
-.divider {
-    height: 1px;
-    background: linear-gradient(90deg, transparent, #e5e7eb, transparent);
-    margin: 1.5rem 0;
-}
+    .section-header {
+        background: var(--zf-pale);
+        padding: 10px 16px;
+        border-bottom: var(--zf-border-medium);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .section-header h2 {
+        font-size: 0.8125rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: var(--zf-black);
+        margin: 0;
+    }
+
+    .section-header .count {
+        font-size: 0.6875rem;
+        color: var(--zf-mid);
+        font-weight: 600;
+    }
+
+    .section-body {
+        padding: var(--zf-space-md);
+    }
+
+    /* === INFO TABLES === */
+    .info-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .info-table tr {
+        border-bottom: 1px solid var(--zf-pale);
+    }
+
+    .info-table tr:last-child {
+        border-bottom: none;
+    }
+
+    .info-table th,
+    .info-table td {
+        padding: 8px 0;
+        text-align: left;
+        font-size: 0.8125rem;
+        vertical-align: top;
+    }
+
+    .info-table th {
+        font-weight: 600;
+        color: var(--zf-mid);
+        width: 45%;
+    }
+
+    .info-table td {
+        font-weight: 600;
+        color: var(--zf-black);
+    }
+
+    /* === DATA TABLES === */
+    .data-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.75rem;
+    }
+
+    .data-table thead th {
+        background: var(--zf-pale);
+        padding: 8px 6px;
+        text-align: left;
+        font-weight: 700;
+        text-transform: uppercase;
+        font-size: 0.625rem;
+        letter-spacing: 0.3px;
+        border-bottom: var(--zf-border-medium);
+    }
+
+    .data-table tbody td {
+        padding: 6px;
+        border-bottom: 1px solid var(--zf-pale);
+        vertical-align: top;
+    }
+
+    .data-table tbody tr:last-child td {
+        border-bottom: none;
+    }
+
+    .data-table .text-right {
+        text-align: right;
+    }
+
+    .data-table .font-mono {
+        font-family: 'Consolas', monospace;
+    }
+
+    .data-table .text-bold {
+        font-weight: 700;
+    }
+
+    .data-table tfoot td {
+        background: var(--zf-pale);
+        padding: 8px 6px;
+        font-weight: 800;
+        border-top: var(--zf-border-medium);
+    }
+
+    /* === DRIVER CARD === */
+    .driver-card {
+        display: flex;
+        align-items: center;
+        gap: var(--zf-space-md);
+        padding: var(--zf-space-md);
+        background: var(--zf-pale);
+        border: 1px solid var(--zf-dark);
+    }
+
+    .driver-avatar {
+        width: 48px;
+        height: 48px;
+        background: var(--zf-dark);
+        color: var(--zf-white);
+        font-weight: 800;
+        font-size: 1rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+
+    .driver-name {
+        font-weight: 800;
+        font-size: 0.9375rem;
+        color: var(--zf-black);
+    }
+
+    .driver-meta {
+        font-size: 0.75rem;
+        color: var(--zf-mid);
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: var(--zf-space-lg);
+        color: var(--zf-light);
+        font-style: italic;
+        font-size: 0.8125rem;
+        border: 2px dashed var(--zf-pale);
+    }
+
+    /* === ALERTS === */
+    .alert-box {
+        padding: var(--zf-space-sm) var(--zf-space-md);
+        border-left: 4px solid var(--zf-black);
+        background: var(--zf-pale);
+        margin-bottom: var(--zf-space-sm);
+        font-size: 0.75rem;
+    }
+
+    .alert-box.warning {
+        border-left-color: var(--zf-dark);
+    }
+
+    .alert-box.danger {
+        border-left-color: var(--zf-black);
+        background: var(--zf-dark);
+        color: var(--zf-white);
+    }
+
+    .alert-title {
+        font-weight: 700;
+        text-transform: uppercase;
+        font-size: 0.6875rem;
+        letter-spacing: 0.5px;
+    }
+
+    /* === COST SUMMARY === */
+    .cost-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: var(--zf-space-sm);
+    }
+
+    .cost-item {
+        text-align: center;
+        padding: var(--zf-space-md);
+        background: var(--zf-pale);
+        border: 1px solid var(--zf-dark);
+    }
+
+    .cost-value {
+        font-size: 1.125rem;
+        font-weight: 900;
+        color: var(--zf-black);
+    }
+
+    .cost-label {
+        font-size: 0.625rem;
+        font-weight: 700;
+        color: var(--zf-mid);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-top: 4px;
+    }
+
+    /* === QUICK STATS === */
+    .stat-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 8px 0;
+        border-bottom: 1px solid var(--zf-pale);
+        font-size: 0.8125rem;
+    }
+
+    .stat-row:last-child {
+        border-bottom: none;
+    }
+
+    .stat-label {
+        color: var(--zf-mid);
+    }
+
+    .stat-value {
+        font-weight: 800;
+        color: var(--zf-black);
+    }
+
+    /* === TIMELINE === */
+    .timeline {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .timeline-item {
+        display: flex;
+        gap: var(--zf-space-sm);
+        padding-bottom: var(--zf-space-md);
+        border-left: 2px solid var(--zf-pale);
+        margin-left: 6px;
+        padding-left: var(--zf-space-md);
+        position: relative;
+    }
+
+    .timeline-item:last-child {
+        border-left-color: transparent;
+        padding-bottom: 0;
+    }
+
+    .timeline-dot {
+        position: absolute;
+        left: -7px;
+        top: 2px;
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background: var(--zf-dark);
+        border: 2px solid var(--zf-white);
+    }
+
+    .timeline-title {
+        font-size: 0.75rem;
+        font-weight: 700;
+        color: var(--zf-black);
+    }
+
+    .timeline-date {
+        font-size: 0.6875rem;
+        color: var(--zf-light);
+    }
+
+    /* === ACTION BUTTONS (Screen Only) === */
+    .action-bar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: var(--zf-space-lg);
+        padding-bottom: var(--zf-space-md);
+        border-bottom: 1px solid var(--zf-pale);
+    }
+
+    .breadcrumb {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 0.8125rem;
+        color: var(--zf-mid);
+    }
+
+    .breadcrumb a {
+        color: var(--zf-accent);
+        text-decoration: none;
+        font-weight: 600;
+    }
+
+    .breadcrumb a:hover {
+        text-decoration: underline;
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 8px;
+    }
+
+    .btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 10px 16px;
+        font-size: 0.8125rem;
+        font-weight: 700;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: all 0.2s;
+        text-decoration: none;
+        border: none;
+    }
+
+    .btn-primary {
+        background: var(--zf-accent);
+        color: var(--zf-white);
+    }
+
+    .btn-primary:hover {
+        background: #1e3a8a;
+    }
+
+    .btn-secondary {
+        background: var(--zf-white);
+        color: var(--zf-dark);
+        border: 1px solid var(--zf-dark);
+    }
+
+    .btn-secondary:hover {
+        background: var(--zf-pale);
+    }
+
+    /* === DOCUMENT FOOTER === */
+    .doc-footer {
+        margin-top: var(--zf-space-xl);
+        padding-top: var(--zf-space-md);
+        border-top: var(--zf-border-thick);
+        text-align: center;
+        font-size: 0.6875rem;
+        color: var(--zf-mid);
+    }
+
+    /* ========================================================================
+       PRINT STYLES - FULLY MONOCHROME
+       ======================================================================== */
+    @media print {
+        * {
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+        }
+
+        body {
+            background: white !important;
+            font-size: 9pt !important;
+        }
+
+        .no-print {
+            display: none !important;
+        }
+
+        .vehicle-document {
+            padding: 0;
+            max-width: 100%;
+        }
+
+        .section,
+        .kpi-box,
+        .vehicle-identity {
+            box-shadow: none !important;
+            break-inside: avoid;
+        }
+
+        .kpi-grid {
+            grid-template-columns: repeat(6, 1fr);
+        }
+
+        .content-grid {
+            display: block;
+        }
+
+        .content-grid>div {
+            margin-bottom: 1rem;
+        }
+
+        .driver-avatar {
+            background: #333 !important;
+        }
+
+        .timeline-dot {
+            background: #333 !important;
+        }
+
+        @page {
+            margin: 1.5cm;
+            size: A4;
+        }
+    }
+
+    /* === RESPONSIVE === */
+    @media (max-width: 1024px) {
+        .content-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .kpi-grid {
+            grid-template-columns: repeat(3, 1fr);
+        }
+    }
+
+    @media (max-width: 640px) {
+        .kpi-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .cost-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .vehicle-identity {
+            flex-direction: column;
+            text-align: center;
+        }
+
+        .vehicle-status {
+            text-align: center;
+            margin-top: var(--zf-space-md);
+        }
+    }
 </style>
 @endpush
 
 @section('content')
-<div class="fade-in max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-    {{-- Breadcrumb --}}
-    <nav class="breadcrumb-pro">
-        <a href="{{ route('admin.vehicles.index') }}" class="hover:text-primary-600 inline-flex items-center">
-            <svg class="w-4 h-4 mr-1.5" fill="currentColor" viewBox="0 0 20 20">
-                <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"/>
-            </svg>
-            Gestion de Flotte
-        </a>
-        <svg class="w-4 h-4 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-            <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
-        </svg>
-        <a href="{{ route('admin.vehicles.index') }}" class="hover:text-primary-600">Véhicules</a>
-        <svg class="w-4 h-4 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-            <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
-        </svg>
-        <span class="text-gray-900 font-bold">{{ $vehicle->registration_plate }}</span>
-    </nav>
+<div class="vehicle-document">
 
-    {{-- Hero Section - Enterprise Grade --}}
-    <div class="vehicle-hero p-8 mb-8 text-white">
-        <div class="relative z-10">
-            {{-- Header avec actions --}}
-            <div class="flex items-start justify-between mb-8">
-                <div class="flex items-center gap-5">
-                    <div class="w-20 h-20 bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center border-2 border-white/40 shadow-xl">
-                        <svg class="w-10 h-10 text-white" fill="currentColor" viewBox="0 0 20 20">
-                            <path d="M8 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM15 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z"/>
-                            <path d="M3 4a1 1 0 00-1 1v10a1 1 0 001 1h1.05a2.5 2.5 0 014.9 0H10a1 1 0 001-1V5a1 1 0 00-1-1H3zM14 7a1 1 0 00-1 1v6.05A2.5 2.5 0 0115.95 16H17a1 1 0 001-1V8a1 1 0 00-1-1h-3z"/>
-                        </svg>
+    {{-- ========== DOCUMENT HEADER ========== --}}
+    <div class="doc-header">
+        <div class="doc-org">
+            <div class="doc-org-name">{{ Auth::user()->organization->name ?? 'ZenFleet' }}</div>
+            @if(Auth::user()->organization->address ?? null)
+            <div class="doc-org-address">{{ Auth::user()->organization->address }}</div>
+            @endif
+        </div>
+        <div class="doc-meta">
+            <div class="doc-title">Fiche Véhicule</div>
+            <div class="doc-date">{{ now()->format('d/m/Y à H:i') }}</div>
+        </div>
+    </div>
+
+    {{-- ========== ACTION BAR (Screen Only) ========== --}}
+    <div class="action-bar no-print">
+        <nav class="breadcrumb">
+            <a href="{{ route('admin.vehicles.index') }}">Véhicules</a>
+            <x-iconify icon="lucide:chevron-right" class="w-4 h-4" />
+            <span style="color: var(--zf-black); font-weight: 700;">{{ $vehicle->registration_plate }}</span>
+        </nav>
+        <div class="action-buttons">
+            <a href="{{ route('admin.vehicles.export.single.pdf', $vehicle) }}" class="btn btn-primary">
+                <x-iconify icon="lucide:file-text" class="w-4 h-4" />
+                Exporter PDF
+            </a>
+            <button onclick="window.print()" class="btn btn-secondary">
+                <x-iconify icon="lucide:printer" class="w-4 h-4" />
+                Imprimer
+            </button>
+            @can('edit vehicles')
+            <a href="{{ route('admin.vehicles.edit', $vehicle) }}" class="btn btn-secondary">
+                <x-iconify icon="lucide:edit" class="w-4 h-4" />
+                Modifier
+            </a>
+            @endcan
+            <a href="{{ route('admin.vehicles.index') }}" class="btn btn-secondary">
+                <x-iconify icon="lucide:arrow-left" class="w-4 h-4" />
+                Retour
+            </a>
+        </div>
+    </div>
+
+    {{-- ========== VEHICLE IDENTITY ========== --}}
+    <div class="vehicle-identity">
+        <div class="vehicle-main">
+            <div class="registration-plate">{{ $vehicle->registration_plate }}</div>
+            <div class="vehicle-desc">{{ $vehicle->brand }} {{ $vehicle->model }} — {{ $vehicle->manufacturing_year }}</div>
+            <div class="vehicle-vin">VIN: {{ $vehicle->vin ?? 'Non renseigné' }}</div>
+        </div>
+        <div class="vehicle-status">
+            <span class="status-badge">{{ optional($vehicle->vehicleStatus)->name ?? 'Inconnu' }}</span>
+        </div>
+    </div>
+
+    {{-- ========== KPI DASHBOARD (6 Metrics) ========== --}}
+    <div class="kpi-grid">
+        <div class="kpi-box">
+            <div class="kpi-value">{{ number_format($vehicle->current_mileage ?? 0, 0, ',', ' ') }}</div>
+            <div class="kpi-label">Kilométrage <span class="kpi-unit">km</span></div>
+        </div>
+        <div class="kpi-box">
+            <div class="kpi-value">{{ $analytics['days_in_service'] ?? 0 }}</div>
+            <div class="kpi-label">Jours en Service</div>
+        </div>
+        <div class="kpi-box">
+            <div class="kpi-value">{{ number_format($analytics['maintenance_cost_total'] ?? 0, 0, ',', ' ') }}</div>
+            <div class="kpi-label">Coût Maintenance <span class="kpi-unit">DA</span></div>
+        </div>
+        <div class="kpi-box">
+            <div class="kpi-value">{{ number_format($analytics['total_km_driven'] ?? 0, 0, ',', ' ') }}</div>
+            <div class="kpi-label">Distance Parcourue <span class="kpi-unit">km</span></div>
+        </div>
+        <div class="kpi-box">
+            <div class="kpi-value">{{ $analytics['maintenance_count'] ?? 0 }}</div>
+            <div class="kpi-label">Interventions</div>
+        </div>
+        <div class="kpi-box">
+            <div class="kpi-value">{{ number_format($analytics['cost_per_km'] ?? 0, 2, ',', ' ') }}</div>
+            <div class="kpi-label">Coût/km <span class="kpi-unit">DA</span></div>
+        </div>
+    </div>
+
+    {{-- ========== DOCUMENT ALERTS ========== --}}
+    @php
+    $insuranceExpired = $vehicle->insurance_expiry_date && $vehicle->insurance_expiry_date->isPast();
+    $insuranceSoon = $vehicle->insurance_expiry_date && $vehicle->insurance_expiry_date->isFuture() && $vehicle->insurance_expiry_date->diffInDays(now()) <= 30;
+        $technicalExpired=$vehicle->technical_control_expiry_date && $vehicle->technical_control_expiry_date->isPast();
+        $technicalSoon = $vehicle->technical_control_expiry_date && $vehicle->technical_control_expiry_date->isFuture() && $vehicle->technical_control_expiry_date->diffInDays(now()) <= 30;
+            @endphp
+            @if($insuranceExpired || $insuranceSoon || $technicalExpired || $technicalSoon)
+            <div style="margin-bottom: var(--zf-space-lg);">
+            @if($insuranceExpired)
+            <div class="alert-box danger">
+                <span class="alert-title">⚠ ASSURANCE EXPIRÉE</span> — Expirée le {{ $vehicle->insurance_expiry_date->format('d/m/Y') }}
+            </div>
+            @elseif($insuranceSoon)
+            <div class="alert-box warning">
+                <span class="alert-title">ASSURANCE</span> — Expire le {{ $vehicle->insurance_expiry_date->format('d/m/Y') }} ({{ $vehicle->insurance_expiry_date->diffInDays(now()) }} jours)
+            </div>
+            @endif
+            @if($technicalExpired)
+            <div class="alert-box danger">
+                <span class="alert-title">⚠ CONTRÔLE TECHNIQUE EXPIRÉ</span> — Expiré le {{ $vehicle->technical_control_expiry_date->format('d/m/Y') }}
+            </div>
+            @elseif($technicalSoon)
+            <div class="alert-box warning">
+                <span class="alert-title">CONTRÔLE TECHNIQUE</span> — Expire le {{ $vehicle->technical_control_expiry_date->format('d/m/Y') }} ({{ $vehicle->technical_control_expiry_date->diffInDays(now()) }} jours)
+            </div>
+            @endif
+</div>
+@endif
+
+{{-- ========== MAIN CONTENT GRID ========== --}}
+<div class="content-grid">
+    {{-- LEFT COLUMN --}}
+    <div>
+        {{-- General Information --}}
+        <div class="section">
+            <div class="section-header">
+                <x-iconify icon="lucide:info" class="w-4 h-4" />
+                <h2>Informations Générales</h2>
+            </div>
+            <div class="section-body">
+                <table class="info-table">
+                    <tr>
+                        <th>Marque / Modèle</th>
+                        <td>{{ $vehicle->brand }} {{ $vehicle->model }}</td>
+                    </tr>
+                    <tr>
+                        <th>Immatriculation</th>
+                        <td>{{ $vehicle->registration_plate }}</td>
+                    </tr>
+                    <tr>
+                        <th>Numéro VIN</th>
+                        <td>{{ $vehicle->vin ?? 'Non renseigné' }}</td>
+                    </tr>
+                    <tr>
+                        <th>Année</th>
+                        <td>{{ $vehicle->manufacturing_year }}</td>
+                    </tr>
+                    <tr>
+                        <th>Couleur</th>
+                        <td>{{ $vehicle->color ?? 'N/A' }}</td>
+                    </tr>
+                    <tr>
+                        <th>Type</th>
+                        <td>{{ optional($vehicle->vehicleType)->name ?? 'N/A' }}</td>
+                    </tr>
+                    <tr>
+                        <th>Places</th>
+                        <td>{{ $vehicle->seats ?? 'N/A' }}</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        {{-- Technical Specifications --}}
+        <div class="section">
+            <div class="section-header">
+                <x-iconify icon="lucide:settings" class="w-4 h-4" />
+                <h2>Spécifications Techniques</h2>
+            </div>
+            <div class="section-body">
+                <table class="info-table">
+                    <tr>
+                        <th>Carburant</th>
+                        <td>{{ optional($vehicle->fuelType)->name ?? 'N/A' }}</td>
+                    </tr>
+                    <tr>
+                        <th>Transmission</th>
+                        <td>{{ optional($vehicle->transmissionType)->name ?? 'N/A' }}</td>
+                    </tr>
+                    <tr>
+                        <th>Cylindrée</th>
+                        <td>{{ number_format($vehicle->engine_displacement_cc ?? 0) }} cc</td>
+                    </tr>
+                    <tr>
+                        <th>Puissance</th>
+                        <td>{{ number_format($vehicle->power_hp ?? 0) }} CV</td>
+                    </tr>
+                    <tr>
+                        <th>Kilométrage initial</th>
+                        <td>{{ number_format($vehicle->initial_mileage ?? 0, 0, ',', ' ') }} km</td>
+                    </tr>
+                    <tr>
+                        <th>Kilométrage actuel</th>
+                        <td><strong>{{ number_format($vehicle->current_mileage ?? 0, 0, ',', ' ') }} km</strong></td>
+                    </tr>
+                    <tr>
+                        <th>Distance parcourue</th>
+                        <td>{{ number_format($analytics['total_km_driven'] ?? 0, 0, ',', ' ') }} km</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        {{-- Financial Information --}}
+        <div class="section">
+            <div class="section-header">
+                <x-iconify icon="lucide:banknote" class="w-4 h-4" />
+                <h2>Informations Financières</h2>
+            </div>
+            <div class="section-body">
+                <table class="info-table">
+                    <tr>
+                        <th>Date d'acquisition</th>
+                        <td>{{ $vehicle->acquisition_date ? $vehicle->acquisition_date->format('d/m/Y') : 'N/A' }}</td>
+                    </tr>
+                    <tr>
+                        <th>Prix d'achat</th>
+                        <td>{{ number_format($vehicle->purchase_price ?? 0, 0, ',', ' ') }} DA</td>
+                    </tr>
+                    <tr>
+                        <th>Valeur actuelle</th>
+                        <td>{{ number_format($vehicle->current_value ?? 0, 0, ',', ' ') }} DA</td>
+                    </tr>
+                    <tr>
+                        <th>Dépôt</th>
+                        <td>{{ optional($vehicle->depot)->name ?? 'N/A' }}</td>
+                    </tr>
+                    <tr>
+                        <th>Catégorie</th>
+                        <td>{{ optional($vehicle->category)->name ?? 'N/A' }}</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        {{-- Administrative Documents --}}
+        <div class="section">
+            <div class="section-header">
+                <x-iconify icon="lucide:file-check" class="w-4 h-4" />
+                <h2>Documents Administratifs</h2>
+            </div>
+            <div class="section-body">
+                <table class="info-table">
+                    <tr>
+                        <th>Assurance</th>
+                        <td>
+                            @if($vehicle->insurance_expiry_date)
+                            {{ $vehicle->insurance_expiry_date->format('d/m/Y') }}
+                            @if($insuranceExpired)
+                            <strong style="color: #991b1b;">(EXPIRÉ)</strong>
+                            @elseif($insuranceSoon)
+                            <strong>({{ $vehicle->insurance_expiry_date->diffInDays(now()) }}j)</strong>
+                            @endif
+                            @else
+                            N/A
+                            @endif
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Contrôle technique</th>
+                        <td>
+                            @if($vehicle->technical_control_expiry_date)
+                            {{ $vehicle->technical_control_expiry_date->format('d/m/Y') }}
+                            @if($technicalExpired)
+                            <strong style="color: #991b1b;">(EXPIRÉ)</strong>
+                            @elseif($technicalSoon)
+                            <strong>({{ $vehicle->technical_control_expiry_date->diffInDays(now()) }}j)</strong>
+                            @endif
+                            @else
+                            N/A
+                            @endif
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Prochaine maintenance</th>
+                        <td>{{ $vehicle->next_maintenance_date ? $vehicle->next_maintenance_date->format('d/m/Y') : 'N/A' }}</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        {{-- Maintenance Cost Summary --}}
+        <div class="section">
+            <div class="section-header">
+                <x-iconify icon="lucide:wrench" class="w-4 h-4" />
+                <h2>Résumé Coûts Maintenance</h2>
+            </div>
+            <div class="section-body">
+                <div class="cost-grid">
+                    <div class="cost-item">
+                        <div class="cost-value">{{ number_format($analytics['maintenance_cost_total'] ?? 0, 0, ',', ' ') }} DA</div>
+                        <div class="cost-label">Total</div>
                     </div>
+                    <div class="cost-item">
+                        <div class="cost-value">{{ number_format($analytics['maintenance_cost_preventive'] ?? 0, 0, ',', ' ') }} DA</div>
+                        <div class="cost-label">Préventive</div>
+                    </div>
+                    <div class="cost-item">
+                        <div class="cost-value">{{ number_format($analytics['maintenance_cost_corrective'] ?? 0, 0, ',', ' ') }} DA</div>
+                        <div class="cost-label">Corrective</div>
+                    </div>
+                </div>
+                <div style="margin-top: 1rem;">
+                    <div class="stat-row">
+                        <span class="stat-label">Nombre d'interventions</span>
+                        <span class="stat-value">{{ $analytics['maintenance_count'] ?? 0 }}</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">Dernière maintenance</span>
+                        <span class="stat-value">{{ $analytics['last_maintenance_date'] ?? 'Aucune' }}</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">Coût moyen par km</span>
+                        <span class="stat-value">{{ number_format($analytics['cost_per_km'] ?? 0, 2, ',', ' ') }} DA</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {{-- Recent Maintenance Operations --}}
+        @php
+        $maintenanceOps = $vehicle->maintenanceOperations()
+        ->with('supplier')
+        ->orderBy('completed_date', 'desc')
+        ->limit(10)
+        ->get();
+        @endphp
+        @if($maintenanceOps->count() > 0)
+        <div class="section">
+            <div class="section-header">
+                <x-iconify icon="lucide:tool" class="w-4 h-4" />
+                <h2>Opérations de Maintenance</h2>
+                <span class="count">({{ $analytics['maintenance_count'] ?? $maintenanceOps->count() }} total)</span>
+            </div>
+            <div class="section-body" style="padding: 0;">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Description</th>
+                            <th>Fournisseur</th>
+                            <th class="text-right">Coût</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($maintenanceOps as $op)
+                        <tr>
+                            <td style="white-space: nowrap;">{{ $op->completed_date ? $op->completed_date->format('d/m/Y') : 'N/A' }}</td>
+                            <td>{{ Str::limit($op->description ?? $op->notes ?? 'N/A', 40) }}</td>
+                            <td>{{ optional($op->supplier)->name ?? 'N/A' }}</td>
+                            <td class="text-right font-mono text-bold">{{ number_format($op->total_cost ?? 0, 0, ',', ' ') }} DA</td>
+                        </tr>
+                        @endforeach
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="3" class="text-right"><strong>TOTAL</strong></td>
+                            <td class="text-right font-mono">{{ number_format($maintenanceOps->sum('total_cost'), 0, ',', ' ') }} DA</td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+        @endif
+
+        {{-- Expenses section removed - relationship doesn't exist on Vehicle model --}}
+
+        {{-- Assignment History --}}
+        @php
+        $assignments = $vehicle->assignments()
+        ->with('driver')
+        ->orderBy('start_datetime', 'desc')
+        ->limit(10)
+        ->get();
+        @endphp
+        @if($assignments->count() > 0)
+        <div class="section">
+            <div class="section-header">
+                <x-iconify icon="lucide:users" class="w-4 h-4" />
+                <h2>Historique des Affectations</h2>
+                <span class="count">({{ $analytics['assignments_count'] ?? $assignments->count() }} total)</span>
+            </div>
+            <div class="section-body" style="padding: 0;">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Chauffeur</th>
+                            <th>Début</th>
+                            <th>Fin</th>
+                            <th class="text-center">Statut</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($assignments as $assignment)
+                        <tr>
+                            <td class="text-bold">
+                                {{ $assignment->driver ? $assignment->driver->first_name . ' ' . $assignment->driver->last_name : 'N/A' }}
+                            </td>
+                            <td>{{ $assignment->start_datetime->format('d/m/Y') }}</td>
+                            <td>{{ $assignment->end_datetime ? $assignment->end_datetime->format('d/m/Y') : '—' }}</td>
+                            <td class="text-center">
+                                @if($assignment->end_datetime)
+                                <span style="padding: 2px 8px; border: 1px solid var(--zf-mid); font-size: 0.625rem; text-transform: uppercase;">Terminée</span>
+                                @else
+                                <span style="padding: 2px 8px; border: 2px solid var(--zf-black); font-weight: 700; font-size: 0.625rem; text-transform: uppercase;">En cours</span>
+                                @endif
+                            </td>
+                        </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        @endif
+
+        {{-- Notes --}}
+        @if($vehicle->notes)
+        <div class="section">
+            <div class="section-header">
+                <x-iconify icon="lucide:file-text" class="w-4 h-4" />
+                <h2>Notes</h2>
+            </div>
+            <div class="section-body">
+                <p style="white-space: pre-wrap; font-size: 0.8125rem; color: var(--zf-dark);">{{ $vehicle->notes }}</p>
+            </div>
+        </div>
+        @endif
+    </div>
+
+    {{-- RIGHT COLUMN (SIDEBAR) --}}
+    <div>
+        {{-- Current Driver --}}
+        @php
+        $currentAssignment = $analytics['active_assignment'] ?? null;
+        @endphp
+        <div class="section">
+            <div class="section-header">
+                <x-iconify icon="lucide:user" class="w-4 h-4" />
+                <h2>Chauffeur Actuel</h2>
+            </div>
+            <div class="section-body">
+                @if($currentAssignment && $currentAssignment->driver)
+                <div class="driver-card">
+                    @if($currentAssignment->driver->photo)
+                    <img src="{{ asset('storage/' . $currentAssignment->driver->photo) }}"
+                        alt="{{ $currentAssignment->driver->first_name }}"
+                        style="width: 48px; height: 48px; object-fit: cover;">
+                    @else
+                    <div class="driver-avatar">
+                        {{ strtoupper(substr($currentAssignment->driver->first_name, 0, 1)) }}{{ strtoupper(substr($currentAssignment->driver->last_name, 0, 1)) }}
+                    </div>
+                    @endif
                     <div>
-                        <h1 class="text-4xl font-black mb-2 tracking-tight">{{ $vehicle->brand }} {{ $vehicle->model }}</h1>
-                        <div class="flex items-center gap-4 text-white/90">
-                            <span class="text-xl font-bold">{{ $vehicle->registration_plate }}</span>
-                            <span class="text-white/60">•</span>
-                            <span class="text-lg">VIN: {{ $vehicle->vin }}</span>
-                        </div>
+                        <div class="driver-name">{{ $currentAssignment->driver->first_name }} {{ $currentAssignment->driver->last_name }}</div>
+                        <div class="driver-meta">{{ $currentAssignment->driver->personal_phone ?? 'Pas de téléphone' }}</div>
+                        <div class="driver-meta">Depuis {{ $currentAssignment->start_datetime->format('d/m/Y') }}</div>
                     </div>
                 </div>
-                <div class="flex gap-3">
-                    @can('edit_vehicles')
-                    <a href="{{ route('admin.vehicles.edit', $vehicle) }}" class="btn-enterprise btn-primary">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
-                        </svg>
-                        Modifier
-                    </a>
-                    @endcan
-                    <a href="{{ route('admin.vehicles.index') }}" class="btn-enterprise bg-white/20 border-white/40 text-white hover:bg-white/30 hover:text-white">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
-                        </svg>
-                        Retour
-                    </a>
-                </div>
+                @else
+                <div class="empty-state">Aucun chauffeur affecté</div>
+                @endif
             </div>
+        </div>
 
-            {{-- Quick Stats --}}
-            <div class="grid grid-cols-4 gap-4">
-                @php
-                    $statusName = $vehicle->vehicleStatus->name ?? 'Inconnu';
-                    $statusConfig = [
-                        'Disponible' => ['bg' => 'bg-green-500/20', 'border' => 'border-green-400/50', 'text' => 'text-green-100', 'pulse' => 'bg-green-300'],
-                        'Affecté' => ['bg' => 'bg-yellow-500/20', 'border' => 'border-yellow-400/50', 'text' => 'text-yellow-100', 'pulse' => 'bg-yellow-300'],
-                        'Maintenance' => ['bg' => 'bg-red-500/20', 'border' => 'border-red-400/50', 'text' => 'text-red-100', 'pulse' => 'bg-red-300'],
-                    ];
-                    $status = $statusConfig[$statusName] ?? ['bg' => 'bg-gray-500/20', 'border' => 'border-gray-400/50', 'text' => 'text-gray-100', 'pulse' => 'bg-gray-300'];
-
-                    // ✅ CORRECTION : Calcul correct de l'âge basé sur l'année de fabrication
-                    $vehicleAge = date('Y') - $vehicle->manufacturing_year;
-                @endphp
-
-                <div class="glass-card p-5">
-                    <div class="text-white/70 text-xs font-bold uppercase tracking-wider mb-2">Statut Actuel</div>
-                    <div class="status-badge {{ $status['bg'] }} {{ $status['border'] }} {{ $status['text'] }}">
-                        <span class="status-pulse {{ $status['pulse'] }}"></span>
-                        {{ $statusName }}
-                    </div>
+        {{-- Assigned Depot --}}
+        @if($vehicle->depot)
+        <div class="section">
+            <div class="section-header">
+                <x-iconify icon="lucide:building-2" class="w-4 h-4" />
+                <h2>Dépôt Affecté</h2>
+            </div>
+            <div class="section-body">
+                <div style="font-weight: 800; font-size: 1rem; margin-bottom: 4px;">{{ $vehicle->depot->name }}</div>
+                @if($vehicle->depot->code)
+                <div style="font-size: 0.75rem; color: var(--zf-mid);">Code: {{ $vehicle->depot->code }}</div>
+                @endif
+                @if($vehicle->depot->city)
+                <div style="font-size: 0.75rem; color: var(--zf-mid); margin-top: 4px; display: flex; align-items: center; gap: 4px;">
+                    <x-iconify icon="lucide:map-pin" class="w-3 h-3" />
+                    {{ $vehicle->depot->city }}{{ $vehicle->depot->wilaya ? ', ' . $vehicle->depot->wilaya : '' }}
                 </div>
+                @endif
+            </div>
+        </div>
+        @endif
 
-                <div class="glass-card p-5">
-                    <div class="text-white/70 text-xs font-bold uppercase tracking-wider mb-2">Kilométrage</div>
-                    <div class="text-3xl font-black">{{ number_format($vehicle->current_mileage, 0, ',', ' ') }}</div>
-                    <div class="text-white/70 text-sm font-semibold mt-1">kilomètres</div>
+        {{-- Quick Stats --}}
+        <div class="section">
+            <div class="section-header">
+                <x-iconify icon="lucide:bar-chart-3" class="w-4 h-4" />
+                <h2>Statistiques</h2>
+            </div>
+            <div class="section-body">
+                <div class="stat-row">
+                    <span class="stat-label">Taux d'utilisation</span>
+                    <span class="stat-value">{{ $analytics['utilization_rate'] ?? 0 }}%</span>
                 </div>
-
-                <div class="glass-card p-5">
-                    <div class="text-white/70 text-xs font-bold uppercase tracking-wider mb-2">Âge du Véhicule</div>
-                    <div class="text-3xl font-black">{{ $vehicleAge }}</div>
-                    <div class="text-white/70 text-sm font-semibold mt-1">{{ $vehicleAge > 1 ? 'ans' : 'an' }} ({{ $vehicle->manufacturing_year }})</div>
+                <div class="stat-row">
+                    <span class="stat-label">Âge du véhicule</span>
+                    <span class="stat-value">{{ $analytics['vehicle_age'] ?? 0 }} an(s)</span>
                 </div>
-
-                <div class="glass-card p-5">
-                    <div class="text-white/70 text-xs font-bold uppercase tracking-wider mb-2">Distance Parcourue</div>
-                    <div class="text-3xl font-black">{{ number_format(($vehicle->current_mileage - $vehicle->initial_mileage), 0, ',', ' ') }}</div>
-                    <div class="text-white/70 text-sm font-semibold mt-1">km parcourus</div>
+                <div class="stat-row">
+                    <span class="stat-label">Moyenne km/mois</span>
+                    <span class="stat-value">{{ number_format($analytics['avg_km_per_month'] ?? 0, 0, ',', ' ') }}</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">Affectations totales</span>
+                    <span class="stat-value">{{ $analytics['assignments_count'] ?? 0 }}</span>
                 </div>
             </div>
         </div>
-    </div>
 
-    {{-- Métriques Clés - Enterprise Grade --}}
-    <div class="metrics-grid mb-8">
-        <div class="metric-card hover-lift" style="--accent-color: #3b82f6;">
-            <div class="metric-header">
-                <span class="metric-label">Affectations</span>
-                <div class="metric-icon icon-blue">
-                    <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
-                        <path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z"/>
-                    </svg>
-                </div>
+        {{-- Activity Timeline --}}
+        @if(!empty($timeline))
+        <div class="section">
+            <div class="section-header">
+                <x-iconify icon="lucide:clock" class="w-4 h-4" />
+                <h2>Activité Récente</h2>
             </div>
-            <div class="metric-value">{{ $vehicle->assignments()->count() }}</div>
-            <div class="metric-subtext">Affectations totales depuis l'acquisition</div>
-        </div>
-
-        <div class="metric-card hover-lift" style="--accent-color: #10b981;">
-            <div class="metric-header">
-                <span class="metric-label">Taux d'Utilisation</span>
-                <div class="metric-icon icon-green">
-                    <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
-                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-                    </svg>
-                </div>
-            </div>
-            @php
-                $utilizationRate = isset($analytics['utilization_rate']) ? round($analytics['utilization_rate'] * 100) : 85;
-            @endphp
-            <div class="metric-value">{{ $utilizationRate }}%</div>
-            <div class="metric-subtext">Performance d'utilisation du véhicule</div>
-        </div>
-
-        <div class="metric-card hover-lift" style="--accent-color: #f59e0b;">
-            <div class="metric-header">
-                <span class="metric-label">Valeur Estimée</span>
-                <div class="metric-icon icon-orange">
-                    <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
-                        <path d="M8.433 7.418c.155-.103.346-.196.567-.267v1.698a2.305 2.305 0 01-.567-.267C8.07 8.34 8 8.114 8 8c0-.114.07-.34.433-.582zM11 12.849v-1.698c.22.071.412.164.567.267.364.243.433.468.433.582 0 .114-.07.34-.433.582a2.305 2.305 0 01-.567.267z"/>
-                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-13a1 1 0 10-2 0v.092a4.535 4.535 0 00-1.676.662C6.602 6.234 6 7.009 6 8c0 .99.602 1.765 1.324 2.246.48.32 1.054.545 1.676.662v1.941c-.391-.127-.68-.317-.843-.504a1 1 0 10-1.51 1.31c.562.649 1.413 1.076 2.353 1.253V15a1 1 0 102 0v-.092a4.535 4.535 0 001.676-.662C13.398 13.766 14 12.991 14 12c0-.99-.602-1.765-1.324-2.246A4.535 4.535 0 0011 9.092V7.151c.391.127.68.317.843.504a1 1 0 101.511-1.31c-.563-.649-1.413-1.076-2.354-1.253V5z" clip-rule="evenodd"/>
-                    </svg>
-                </div>
-            </div>
-            <div class="metric-value">{{ number_format($vehicle->current_value ?? $vehicle->purchase_price * 0.7, 0, ',', ' ') }} €</div>
-            <div class="metric-subtext">Valeur actuelle du véhicule</div>
-        </div>
-
-        <div class="metric-card hover-lift" style="--accent-color: #ef4444;">
-            <div class="metric-header">
-                <span class="metric-label">Coût Maintenance</span>
-                <div class="metric-icon icon-red">
-                    <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
-                        <path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd"/>
-                    </svg>
-                </div>
-            </div>
-            @php
-                $maintenanceCost = isset($analytics['maintenance_cost_total']) ? $analytics['maintenance_cost_total'] : $vehicle->maintenanceOperations()->where('status', 'completed')->sum('total_cost');
-            @endphp
-            <div class="metric-value">{{ number_format($maintenanceCost, 0, ',', ' ') }} €</div>
-            <div class="metric-subtext">Total des coûts de maintenance</div>
-        </div>
-    </div>
-
-    {{-- Contenu Principal --}}
-    <div class="content-grid">
-        {{-- Colonne Principale --}}
-        <div class="space-y-6">
-            {{-- Informations Générales --}}
-            <div class="pro-card slide-in">
-                <div class="section-header">
-                    <div class="section-icon icon-blue">
-                        <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
-                        </svg>
-                    </div>
-                    <h2 class="section-title">Informations Générales</h2>
-                </div>
-                <div class="info-grid">
-                    <div class="info-row">
-                        <span class="info-row-label">
-                            <svg class="w-4 h-4 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-                            </svg>
-                            Immatriculation
-                        </span>
-                        <span class="info-row-value">{{ $vehicle->registration_plate }}</span>
-                    </div>
-
-                    <div class="info-row">
-                        <span class="info-row-label">
-                            <svg class="w-4 h-4 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
-                                <path d="M8 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM15 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z"/>
-                                <path d="M3 4a1 1 0 00-1 1v10a1 1 0 001 1h1.05a2.5 2.5 0 014.9 0H10a1 1 0 001-1V5a1 1 0 00-1-1H3zM14 7a1 1 0 00-1 1v6.05A2.5 2.5 0 0115.95 16H17a1 1 0 001-1V8a1 1 0 00-1-1h-3z"/>
-                            </svg>
-                            Marque & Modèle
-                        </span>
-                        <span class="info-row-value">{{ $vehicle->brand }} {{ $vehicle->model }}</span>
-                    </div>
-
-                    <div class="info-row">
-                        <span class="info-row-label">
-                            <svg class="w-4 h-4 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"/>
-                            </svg>
-                            Année de Fabrication
-                        </span>
-                        <span class="info-row-value">{{ $vehicle->manufacturing_year }}</span>
-                    </div>
-
-                    <div class="info-row">
-                        <span class="info-row-label">
-                            <svg class="w-4 h-4 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M4 2a2 2 0 00-2 2v11a3 3 0 106 0V4a2 2 0 00-2-2H4zm1 14a1 1 0 100-2 1 1 0 000 2zm5-1.757l4.9-4.9a2 2 0 000-2.828L13.485 5.1a2 2 0 00-2.828 0L10 5.757v8.486zM16 18H9.071l6-6H16a2 2 0 012 2v2a2 2 0 01-2 2z" clip-rule="evenodd"/>
-                            </svg>
-                            Couleur
-                        </span>
-                        <span class="info-row-value">{{ $vehicle->color }}</span>
-                    </div>
-
-                    <div class="info-row">
-                        <span class="info-row-label">
-                            <svg class="w-4 h-4 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M17.707 9.293a1 1 0 010 1.414l-7 7a1 1 0 01-1.414 0l-7-7A.997.997 0 012 10V5a3 3 0 013-3h5c.256 0 .512.098.707.293l7 7zM5 6a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd"/>
-                            </svg>
-                            Type de Véhicule
-                        </span>
-                        <span class="badge-pro bg-blue-100 text-blue-800">{{ $vehicle->vehicleType->name ?? 'N/A' }}</span>
-                    </div>
-
-                    <div class="info-row">
-                        <span class="info-row-label">
-                            <svg class="w-4 h-4 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
-                                <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3zM6 8a2 2 0 11-4 0 2 2 0 014 0zM16 18v-3a5.972 5.972 0 00-.75-2.906A3.005 3.005 0 0119 15v3h-3zM4.75 12.094A5.973 5.973 0 004 15v3H1v-3a3 3 0 013.75-2.906z"/>
-                            </svg>
-                            Capacité
-                        </span>
-                        <span class="info-row-value">{{ $vehicle->seats }} places</span>
-                    </div>
-                </div>
-            </div>
-
-            {{-- Spécifications Techniques --}}
-            <div class="pro-card slide-in" style="animation-delay: 0.1s;">
-                <div class="section-header">
-                    <div class="section-icon icon-purple">
-                        <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd"/>
-                        </svg>
-                    </div>
-                    <h2 class="section-title">Spécifications Techniques</h2>
-                </div>
-                <div class="grid grid-cols-2 gap-4">
-                    <div class="info-row">
-                        <span class="info-row-label">
-                            <svg class="w-4 h-4 text-purple-600" fill="currentColor" viewBox="0 0 20 20">
-                                <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"/>
-                                <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"/>
-                            </svg>
-                            Carburant
-                        </span>
-                        <span class="info-row-value">{{ $vehicle->fuelType->name ?? 'N/A' }}</span>
-                    </div>
-
-                    <div class="info-row">
-                        <span class="info-row-label">
-                            <svg class="w-4 h-4 text-purple-600" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd"/>
-                            </svg>
-                            Transmission
-                        </span>
-                        <span class="info-row-value">{{ $vehicle->transmissionType->name ?? 'N/A' }}</span>
-                    </div>
-
-                    <div class="info-row">
-                        <span class="info-row-label">
-                            <svg class="w-4 h-4 text-purple-600" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"/>
-                            </svg>
-                            Cylindrée
-                        </span>
-                        <span class="info-row-value">{{ number_format($vehicle->engine_displacement_cc) }} cc</span>
-                    </div>
-
-                    <div class="info-row">
-                        <span class="info-row-label">
-                            <svg class="w-4 h-4 text-purple-600" fill="currentColor" viewBox="0 0 20 20">
-                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
-                            </svg>
-                            Puissance
-                        </span>
-                        <span class="info-row-value">{{ number_format($vehicle->power_hp) }} CV</span>
-                    </div>
-
-                    <div class="info-row">
-                        <span class="info-row-label">
-                            <svg class="w-4 h-4 text-purple-600" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"/>
-                            </svg>
-                            Kilométrage Initial
-                        </span>
-                        <span class="info-row-value">{{ number_format($vehicle->initial_mileage, 0, ',', ' ') }} km</span>
-                    </div>
-
-                    <div class="info-row">
-                        <span class="info-row-label">
-                            <svg class="w-4 h-4 text-purple-600" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"/>
-                            </svg>
-                            Kilométrage Actuel
-                        </span>
-                        <span class="info-row-value text-blue-600">{{ number_format($vehicle->current_mileage, 0, ',', ' ') }} km</span>
-                    </div>
-                </div>
-            </div>
-
-            {{-- Dépôt Affecté --}}
-            @if($vehicle->depot)
-            <div class="pro-card slide-in" style="animation-delay: 0.2s;">
-                <div class="section-header">
-                    <div class="section-icon icon-indigo">
-                        <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M4 4a2 2 0 012-2h8a2 2 0 012 2v12a1 1 0 110 2h-3a1 1 0 01-1-1v-2a1 1 0 00-1-1H9a1 1 0 00-1 1v2a1 1 0 01-1 1H4a1 1 0 110-2V4zm3 1h2v2H7V5zm2 4H7v2h2V9zm2-4h2v2h-2V5zm2 4h-2v2h2V9z" clip-rule="evenodd"/>
-                        </svg>
-                    </div>
-                    <h2 class="section-title">Dépôt Affecté</h2>
-                </div>
-                <div class="bg-gradient-to-br from-indigo-50 to-blue-50 border-2 border-indigo-200 rounded-xl p-6">
-                    <div class="flex items-center justify-between mb-4">
+            <div class="section-body">
+                <ul class="timeline">
+                    @foreach(array_slice($timeline, 0, 6) as $event)
+                    <li class="timeline-item">
+                        <span class="timeline-dot"></span>
                         <div>
-                            <h3 class="text-2xl font-black text-indigo-900 mb-1">{{ $vehicle->depot->name }}</h3>
-                            <span class="badge-pro bg-indigo-100 text-indigo-800">{{ $vehicle->depot->code }}</span>
-                        </div>
-                        @if($vehicle->depot->capacity)
-                        @php
-                            $percentage = $vehicle->depot->capacity > 0 ? ($vehicle->depot->current_count / $vehicle->depot->capacity) * 100 : 0;
-                            $colorClass = $percentage >= 100 ? 'text-red-600' : ($percentage >= 80 ? 'text-orange-600' : 'text-green-600');
-                        @endphp
-                        <div class="text-center">
-                            <div class="text-4xl font-black {{ $colorClass }}">{{ round($percentage) }}%</div>
-                            <div class="text-xs font-bold text-indigo-600 uppercase tracking-wider">Occupation</div>
-                        </div>
-                        @endif
-                    </div>
-
-                    <div class="grid grid-cols-2 gap-3 mb-4">
-                        @if($vehicle->depot->city)
-                        <div class="flex items-center text-gray-700">
-                            <svg class="w-4 h-4 mr-2 text-indigo-600" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"/>
-                            </svg>
-                            <span class="font-semibold">{{ $vehicle->depot->city }}{{ $vehicle->depot->wilaya ? ', ' . $vehicle->depot->wilaya : '' }}</span>
-                        </div>
-                        @endif
-                        @if($vehicle->depot->phone)
-                        <div class="flex items-center text-gray-700">
-                            <svg class="w-4 h-4 mr-2 text-indigo-600" fill="currentColor" viewBox="0 0 20 20">
-                                <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z"/>
-                            </svg>
-                            <span class="font-semibold">{{ $vehicle->depot->phone }}</span>
-                        </div>
-                        @endif
-                        @if($vehicle->depot->manager_name)
-                        <div class="flex items-center text-gray-700">
-                            <svg class="w-4 h-4 mr-2 text-indigo-600" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"/>
-                            </svg>
-                            <span class="font-semibold">{{ $vehicle->depot->manager_name }}</span>
-                        </div>
-                        @endif
-                        @if($vehicle->depot->capacity)
-                        <div class="flex items-center text-gray-700">
-                            <svg class="w-4 h-4 mr-2 text-indigo-600" fill="currentColor" viewBox="0 0 20 20">
-                                <path d="M3 1a1 1 0 000 2h1.22l.305 1.222a.997.997 0 00.01.042l1.358 5.43-.893.892C3.74 11.846 4.632 14 6.414 14H15a1 1 0 000-2H6.414l1-1H14a1 1 0 00.894-.553l3-6A1 1 0 0017 3H6.28l-.31-1.243A1 1 0 005 1H3zM16 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM6.5 18a1.5 1.5 0 100-3 1.5 1.5 0 000 3z"/>
-                            </svg>
-                            <span class="font-semibold">{{ $vehicle->depot->current_count }} / {{ $vehicle->depot->capacity }} véhicules</span>
-                        </div>
-                        @endif
-                    </div>
-
-                    @if($vehicle->depot->capacity)
-                    <div class="progress-container">
-                        <div class="progress-bar" style="width: {{ min($percentage, 100) }}%"></div>
-                    </div>
-                    @endif
-                </div>
-            </div>
-            @endif
-
-            {{-- Informations Financières --}}
-            <div class="pro-card slide-in" style="animation-delay: 0.3s;">
-                <div class="section-header">
-                    <div class="section-icon icon-green">
-                        <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
-                            <path d="M8.433 7.418c.155-.103.346-.196.567-.267v1.698a2.305 2.305 0 01-.567-.267C8.07 8.34 8 8.114 8 8c0-.114.07-.34.433-.582zM11 12.849v-1.698c.22.071.412.164.567.267.364.243.433.468.433.582 0 .114-.07.34-.433.582a2.305 2.305 0 01-.567.267z"/>
-                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-13a1 1 0 10-2 0v.092a4.535 4.535 0 00-1.676.662C6.602 6.234 6 7.009 6 8c0 .99.602 1.765 1.324 2.246.48.32 1.054.545 1.676.662v1.941c-.391-.127-.68-.317-.843-.504a1 1 0 10-1.51 1.31c.562.649 1.413 1.076 2.353 1.253V15a1 1 0 102 0v-.092a4.535 4.535 0 001.676-.662C13.398 13.766 14 12.991 14 12c0-.99-.602-1.765-1.324-2.246A4.535 4.535 0 0011 9.092V7.151c.391.127.68.317.843.504a1 1 0 101.511-1.31c-.563-.649-1.413-1.076-2.354-1.253V5z" clip-rule="evenodd"/>
-                        </svg>
-                    </div>
-                    <h2 class="section-title">Informations Financières</h2>
-                </div>
-                <div class="grid grid-cols-3 gap-4">
-                    <div class="stat-display">
-                        <div class="stat-value-large">{{ number_format($vehicle->purchase_price, 0, ',', ' ') }}€</div>
-                        <div class="stat-label-large">Prix d'Achat</div>
-                    </div>
-                    @if($vehicle->current_value)
-                    <div class="stat-display">
-                        <div class="stat-value-large">{{ number_format($vehicle->current_value, 0, ',', ' ') }}€</div>
-                        <div class="stat-label-large">Valeur Actuelle</div>
-                    </div>
-                    @endif
-                    <div class="stat-display">
-                        <div class="stat-value-large text-base">{{ $vehicle->acquisition_date ? $vehicle->acquisition_date->format('d/m/Y') : 'N/A' }}</div>
-                        <div class="stat-label-large">Date d'Acquisition</div>
-                    </div>
-                </div>
-            </div>
-
-            {{-- Notes --}}
-            @if($vehicle->notes)
-            <div class="pro-card slide-in" style="animation-delay: 0.4s;">
-                <div class="section-header">
-                    <div class="section-icon icon-orange">
-                        <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M18 13V5a2 2 0 00-2-2H4a2 2 0 00-2 2v8a2 2 0 002 2h3l3 3 3-3h3a2 2 0 002-2zM5 7a1 1 0 011-1h8a1 1 0 110 2H6a1 1 0 01-1-1zm1 3a1 1 0 100 2h3a1 1 0 100-2H6z" clip-rule="evenodd"/>
-                        </svg>
-                    </div>
-                    <h2 class="section-title">Notes et Observations</h2>
-                </div>
-                <div class="bg-amber-50 border-l-4 border-amber-400 p-5 rounded-lg">
-                    <p class="text-sm text-gray-800 leading-relaxed font-medium whitespace-pre-wrap">{{ $vehicle->notes }}</p>
-                </div>
-            </div>
-            @endif
-        </div>
-
-        {{-- Sidebar --}}
-        <div class="space-y-6">
-            {{-- Actions Rapides --}}
-            <div class="pro-card slide-in" style="animation-delay: 0.5s;">
-                <div class="section-header">
-                    <div class="section-icon icon-cyan">
-                        <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
-                            <path d="M13 7H7v6h6V7z"/>
-                            <path fill-rule="evenodd" d="M7 2a1 1 0 012 0v1h2V2a1 1 0 112 0v1h2a2 2 0 012 2v2h1a1 1 0 110 2h-1v2h1a1 1 0 110 2h-1v2a2 2 0 01-2 2h-2v1a1 1 0 11-2 0v-1H9v1a1 1 0 11-2 0v-1H5a2 2 0 01-2-2v-2H2a1 1 0 110-2h1V9H2a1 1 0 010-2h1V5a2 2 0 012-2h2V2zM5 5h10v10H5V5z" clip-rule="evenodd"/>
-                        </svg>
-                    </div>
-                    <h3 class="section-title">Actions Rapides</h3>
-                </div>
-                <div class="space-y-3">
-                    <button class="w-full btn-enterprise hover:border-blue-600 hover:text-blue-600">
-                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                            <path d="M8 9a3 3 0 100-6 3 3 0 000 6zM8 11a6 6 0 016 6H2a6 6 0 016-6z"/>
-                        </svg>
-                        Affecter Chauffeur
-                    </button>
-                    <button class="w-full btn-enterprise hover:border-orange-600 hover:text-orange-600">
-                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd"/>
-                        </svg>
-                        Programmer Maintenance
-                    </button>
-                    <button class="w-full btn-enterprise hover:border-purple-600 hover:text-purple-600">
-                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clip-rule="evenodd"/>
-                        </svg>
-                        Générer Rapport
-                    </button>
-                    <a href="{{ route('admin.vehicles.mileage-history', $vehicle) }}" class="w-full btn-enterprise hover:border-cyan-600 hover:text-cyan-600">
-                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"/>
-                        </svg>
-                        Historique Kilométrique
-                    </a>
-                </div>
-            </div>
-
-            {{-- Affectation Actuelle --}}
-            @php
-                $currentAssignment = $vehicle->assignments()->whereNull('end_datetime')->with('driver')->first();
-            @endphp
-            @if($currentAssignment)
-            <div class="pro-card slide-in" style="animation-delay: 0.6s;">
-                <div class="section-header">
-                    <div class="section-icon icon-blue">
-                        <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
-                            <path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z"/>
-                        </svg>
-                    </div>
-                    <h3 class="section-title">Affectation Actuelle</h3>
-                </div>
-                <div class="bg-gradient-to-br from-blue-50 to-cyan-50 border-2 border-blue-200 rounded-xl p-5">
-                    <div class="flex items-center gap-4 mb-4">
-                        <div class="w-14 h-14 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center text-white font-black text-xl shadow-lg">
-                            {{ strtoupper(substr($currentAssignment->driver->first_name, 0, 1)) }}{{ strtoupper(substr($currentAssignment->driver->last_name, 0, 1)) }}
-                        </div>
-                        <div>
-                            <div class="font-black text-gray-900 text-lg">{{ $currentAssignment->driver->first_name }} {{ $currentAssignment->driver->last_name }}</div>
-                            <div class="text-sm text-gray-600 font-semibold">{{ $currentAssignment->driver->personal_phone ?? 'N/A' }}</div>
-                        </div>
-                    </div>
-                    <div class="divider"></div>
-                    <div class="flex items-center justify-between text-sm">
-                        <span class="text-gray-600 font-semibold">Début d'affectation:</span>
-                        <span class="font-black text-gray-900">{{ $currentAssignment->start_datetime->format('d/m/Y H:i') }}</span>
-                    </div>
-                </div>
-            </div>
-            @endif
-
-            {{-- Timeline d'Activité --}}
-            @if(isset($timeline) && !empty($timeline))
-            <div class="pro-card slide-in" style="animation-delay: 0.7s;">
-                <div class="section-header">
-                    <div class="section-icon icon-purple">
-                        <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"/>
-                        </svg>
-                    </div>
-                    <h3 class="section-title">Activité Récente</h3>
-                </div>
-                <div class="timeline">
-                    @foreach(array_slice($timeline, 0, 5) as $event)
-                    <div class="timeline-item">
-                        <div class="timeline-dot"></div>
-                        <div class="timeline-content">
                             <div class="timeline-title">{{ $event['title'] }}</div>
                             <div class="timeline-date">{{ $event['date'] }}</div>
-                            @if(isset($event['description']))
-                            <div class="text-xs text-gray-600 mt-2 font-medium">{{ $event['description'] }}</div>
+                            @if(!empty($event['description']))
+                            <div style="font-size: 0.6875rem; color: var(--zf-light); margin-top: 2px;">{{ $event['description'] }}</div>
                             @endif
                         </div>
-                    </div>
+                    </li>
                     @endforeach
+                </ul>
+            </div>
+        </div>
+        @endif
+
+        {{-- Quick Actions (Screen Only) --}}
+        <div class="section no-print">
+            <div class="section-header">
+                <x-iconify icon="lucide:zap" class="w-4 h-4" />
+                <h2>Actions Rapides</h2>
+            </div>
+            <div class="section-body">
+                <div style="display: flex; flex-direction: column; gap: 8px;">
+                    <a href="{{ route('admin.vehicles.mileage-history', $vehicle) }}" class="btn btn-secondary" style="justify-content: flex-start;">
+                        <x-iconify icon="lucide:gauge" class="w-4 h-4" />
+                        Historique kilométrique
+                    </a>
+                    <a href="{{ route('admin.vehicles.history', $vehicle) }}" class="btn btn-secondary" style="justify-content: flex-start;">
+                        <x-iconify icon="lucide:history" class="w-4 h-4" />
+                        Historique complet
+                    </a>
                 </div>
             </div>
-            @endif
+        </div>
 
-            {{-- Informations Système --}}
-            <div class="pro-card slide-in" style="animation-delay: 0.8s;">
-                <div class="section-header">
-                    <div class="section-icon bg-gray-600">
-                        <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M3 5a2 2 0 012-2h10a2 2 0 012 2v8a2 2 0 01-2 2h-2.22l.123.489.804.804A1 1 0 0113 18H7a1 1 0 01-.707-1.707l.804-.804L7.22 15H5a2 2 0 01-2-2V5zm5.771 7H5V5h10v7H8.771z" clip-rule="evenodd"/>
-                        </svg>
-                    </div>
-                    <h3 class="section-title">Système</h3>
+        {{-- System Info --}}
+        <div class="section" style="font-size: 0.6875rem;">
+            <div class="section-header">
+                <x-iconify icon="lucide:database" class="w-4 h-4" />
+                <h2>Système</h2>
+            </div>
+            <div class="section-body">
+                <div class="stat-row" style="font-size: 0.6875rem;">
+                    <span class="stat-label">ID</span>
+                    <span class="stat-value" style="font-family: monospace;">#{{ $vehicle->id }}</span>
                 </div>
-                <div class="space-y-3 text-xs">
-                    <div class="flex justify-between items-center p-2 bg-gray-50 rounded-lg">
-                        <span class="text-gray-600 font-semibold">ID Véhicule:</span>
-                        <span class="font-mono font-bold text-gray-900">#{{ $vehicle->id }}</span>
-                    </div>
-                    <div class="flex justify-between items-center p-2 bg-gray-50 rounded-lg">
-                        <span class="text-gray-600 font-semibold">Créé le:</span>
-                        <span class="font-bold text-gray-900">{{ $vehicle->created_at->format('d/m/Y H:i') }}</span>
-                    </div>
-                    <div class="flex justify-between items-center p-2 bg-gray-50 rounded-lg">
-                        <span class="text-gray-600 font-semibold">Modifié le:</span>
-                        <span class="font-bold text-gray-900">{{ $vehicle->updated_at->format('d/m/Y H:i') }}</span>
-                    </div>
-                    @if($vehicle->organization)
-                    <div class="flex justify-between items-center p-2 bg-gray-50 rounded-lg">
-                        <span class="text-gray-600 font-semibold">Organisation:</span>
-                        <span class="font-bold text-gray-900">{{ $vehicle->organization->name }}</span>
-                    </div>
-                    @endif
+                <div class="stat-row" style="font-size: 0.6875rem;">
+                    <span class="stat-label">Créé le</span>
+                    <span class="stat-value">{{ $vehicle->created_at->format('d/m/Y H:i') }}</span>
+                </div>
+                <div class="stat-row" style="font-size: 0.6875rem;">
+                    <span class="stat-label">Modifié le</span>
+                    <span class="stat-value">{{ $vehicle->updated_at->format('d/m/Y H:i') }}</span>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+{{-- ========== DOCUMENT FOOTER ========== --}}
+<div class="doc-footer">
+    Document généré par ZenFleet • {{ $vehicle->registration_plate }} • {{ $vehicle->brand }} {{ $vehicle->model }} • {{ now()->format('d/m/Y H:i') }}
+</div>
+</div>
 @endsection
-
-@push('scripts')
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script>
-// Enterprise-grade animations
-document.addEventListener('DOMContentLoaded', function() {
-    // Staggered animation for metrics
-    const metrics = document.querySelectorAll('.metric-card');
-    metrics.forEach((card, index) => {
-        card.style.animationDelay = `${index * 0.05}s`;
-    });
-
-    // Smooth scroll behavior
-    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-        anchor.addEventListener('click', function (e) {
-            e.preventDefault();
-            const target = document.querySelector(this.getAttribute('href'));
-            if (target) {
-                target.scrollIntoView({
-                    behavior: 'smooth',
-                    block: 'start'
-                });
-            }
-        });
-    });
-});
-</script>
-@endpush

@@ -49,20 +49,62 @@ class VehiclePdfExportService
                     'depot',
                     'category',
                     'assignments' => function ($q) {
-                        $q->where('status', 'active')
-                            ->with('driver.user')
-                            ->limit(1);
+                        $q->orderBy('start_datetime', 'desc')
+                            ->with('driver')
+                            ->limit(5);
+                    },
+                    'maintenanceOperations' => function ($q) {
+                        $q->orderBy('operation_date', 'desc')
+                            ->with('supplier')
+                            ->limit(5);
+                    },
+                    'expenses' => function ($q) {
+                        $q->orderBy('expense_date', 'desc')
+                            ->limit(5);
                     }
                 ])
                 ->findOrFail($vehicleId);
 
-            $html = $this->generateSingleVehicleHtml($vehicle);
+            // Calculate analytics for the PDF
+            $analytics = $this->calculateVehicleAnalytics($vehicle);
 
-            return $this->generatePdf($html, "vehicle_{$vehicle->registration_plate}.pdf");
+            $html = $this->generateSingleVehicleHtml($vehicle, $analytics);
+
+            return $this->generatePdf($html, "fiche_vehicule_{$vehicle->registration_plate}.pdf");
         } catch (\Exception $e) {
             Log::error('Export PDF véhicule unique échoué', ['error' => $e->getMessage()]);
             throw $e;
         }
+    }
+
+    /**
+     * Calculate comprehensive analytics for a vehicle
+     */
+    protected function calculateVehicleAnalytics(Vehicle $vehicle): array
+    {
+        $maintenanceCostTotal = $vehicle->maintenanceOperations->sum('total_cost') ?? 0;
+        $expenseTotal = $vehicle->expenses->sum('amount') ?? 0;
+        $assignmentsCount = $vehicle->assignments->count();
+        $activeAssignment = $vehicle->assignments->first(function ($a) {
+            return $a->status === 'active' && !$a->end_datetime;
+        });
+        $daysInService = $vehicle->acquisition_date
+            ? $vehicle->acquisition_date->diffInDays(now())
+            : 0;
+        $totalKmDriven = ($vehicle->current_mileage ?? 0) - ($vehicle->initial_mileage ?? 0);
+        $costPerKm = $totalKmDriven > 0 ? ($maintenanceCostTotal + $expenseTotal) / $totalKmDriven : 0;
+
+        return [
+            'maintenance_cost_total' => $maintenanceCostTotal,
+            'expense_total' => $expenseTotal,
+            'assignments_count' => $assignmentsCount,
+            'active_assignment' => $activeAssignment,
+            'days_in_service' => $daysInService,
+            'total_km_driven' => $totalKmDriven,
+            'cost_per_km' => $costPerKm,
+            'maintenance_count' => $vehicle->maintenanceOperations->count(),
+            'last_maintenance_date' => $vehicle->maintenanceOperations->first()?->operation_date?->format('d/m/Y'),
+        ];
     }
 
     /**
@@ -236,18 +278,22 @@ class VehiclePdfExportService
 
     /**
      * Générer HTML pour un véhicule unique
+     * 
+     * 🔧 FIX: Utilise directement le modèle Driver sans passer par User
      */
-    protected function generateSingleVehicleHtml($vehicle)
+    protected function generateSingleVehicleHtml($vehicle, array $analytics = [])
     {
-        $activeAssignment = $vehicle->assignments->where('status', 'active')->first();
+        $activeAssignment = $analytics['active_assignment'] ?? $vehicle->assignments->first(function ($a) {
+            return $a->status === 'active' && !$a->end_datetime;
+        });
         $driver = $activeAssignment ? $activeAssignment->driver : null;
-        $user = $driver ? $driver->user : null;
 
         return view('exports.pdf.vehicle-single', [
             'vehicle' => $vehicle,
             'driver' => $driver,
-            'user' => $user,
-            'organization' => Auth::user()->organization
+            'organization' => Auth::user()->organization,
+            'analytics' => $analytics,
+            'generatedAt' => now(),
         ])->render();
     }
 

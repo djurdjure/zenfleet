@@ -316,14 +316,13 @@ class VehicleController extends Controller
 
         try {
             // Chargement optimisé des relations
-            // 🔧 FIX CRITIQUE: Filtrage explicite des affectations non soft-deleted
             $vehicle->load([
                 'vehicleType',
                 'fuelType',
                 'transmissionType',
                 'vehicleStatus',
                 'assignments' => function ($query) {
-                    $query->whereNull('deleted_at')  // ✅ CORRECTION ENTERPRISE-GRADE: Respect du soft delete
+                    $query->whereNull('deleted_at')
                         ->with('driver.user')
                         ->orderBy('start_datetime', 'desc');
                 },
@@ -1099,15 +1098,110 @@ class VehicleController extends Controller
         return $recommendations;
     }
 
+    /**
+     * 📊 Enterprise-Grade Vehicle Analytics
+     * 
+     * Provides comprehensive analytics for the vehicle view page including:
+     * - Maintenance costs (total, preventive, corrective)
+     * - Expense tracking
+     * - Assignment history
+     * - Usage statistics
+     */
     private function getVehicleSpecificAnalytics(Vehicle $vehicle): array
     {
+        // === MAINTENANCE COSTS ===
+        $maintenanceCostTotal = $vehicle->maintenanceOperations()
+            ->where('status', 'completed')
+            ->sum('total_cost') ?? 0;
+
+        $maintenanceCostPreventive = $vehicle->maintenanceOperations()
+            ->where('status', 'completed')
+            ->whereHas('maintenanceType', fn($q) => $q->where('category', 'preventive'))
+            ->sum('total_cost') ?? 0;
+
+        $maintenanceCostCorrective = $vehicle->maintenanceOperations()
+            ->where('status', 'completed')
+            ->whereHas('maintenanceType', fn($q) => $q->where('category', 'corrective'))
+            ->sum('total_cost') ?? 0;
+
+        $maintenanceCount = $vehicle->maintenanceOperations()->count();
+
+        // Last maintenance date
+        $lastMaintenance = $vehicle->maintenanceOperations()
+            ->where('status', 'completed')
+            ->latest('completed_date')
+            ->first();
+
+        // === EXPENSES ===
+        // Note: expenses() relationship doesn't exist on Vehicle model
+        // Set to 0 for now - can be added later if relationship is created
+        $expenseTotal = 0;
+
+        // === ASSIGNMENTS ===
+        $assignmentsCount = $vehicle->assignments()->count();
+        $activeAssignment = $vehicle->assignments()
+            ->where('status', 'active')
+            ->where(function ($query) {
+                $query->whereNull('end_datetime')
+                    ->orWhere('end_datetime', '>=', now());
+            })
+            ->with('driver')
+            ->first();
+
+        // === VEHICLE AGE & TIME IN SERVICE ===
+        $vehicleAge = $vehicle->acquisition_date
+            ? Carbon::now()->diffInYears($vehicle->acquisition_date)
+            : 0;
+
+        $daysInService = $vehicle->acquisition_date
+            ? Carbon::now()->diffInDays($vehicle->acquisition_date)
+            : 0;
+
+        // === USAGE METRICS ===
+        $totalKmDriven = ($vehicle->current_mileage ?? 0) - ($vehicle->initial_mileage ?? 0);
+
+        $totalCosts = $maintenanceCostTotal; // Only maintenance costs for now
+        $costPerKm = $totalKmDriven > 0 ? $totalCosts / $totalKmDriven : 0;
+
+        // Average km per month
+        $monthsInService = max($daysInService / 30, 1);
+        $avgKmPerMonth = $totalKmDriven / $monthsInService;
+
+        // Utilization rate (based on assignments)
+        $utilizationRate = $daysInService > 0
+            ? min(100, ($assignmentsCount * 30 / $daysInService) * 100)
+            : 0;
+
         return [
-            'age_years' => Carbon::now()->diffInYears($vehicle->acquisition_date),
-            'utilization_rate' => $this->calculateUtilization($vehicle),
+            // Core metrics
+            'vehicle_age' => $vehicleAge,
+            'days_in_service' => $daysInService,
+            'total_km_driven' => $totalKmDriven,
+
+            // Maintenance
+            'maintenance_cost_total' => $maintenanceCostTotal,
+            'maintenance_cost_preventive' => $maintenanceCostPreventive,
+            'maintenance_cost_corrective' => $maintenanceCostCorrective,
+            'maintenance_count' => $maintenanceCount,
+            'last_maintenance_date' => $lastMaintenance?->completed_date?->format('d/m/Y'),
+
+            // Expenses
+            'expense_total' => $expenseTotal,
+
+            // Assignments
+            'assignments_count' => $assignmentsCount,
+            'active_assignment' => $activeAssignment,
+
+            // Usage metrics
+            'cost_per_km' => round($costPerKm, 2),
+            'avg_km_per_month' => round($avgKmPerMonth, 0),
+            'utilization_rate' => round($utilizationRate, 0),
+
+            // Deprecated (kept for backwards compatibility)
+            'age_years' => $vehicleAge,
             'depreciation_rate' => $this->calculateDepreciation($vehicle),
-            'maintenance_cost_total' => $this->calculateMaintenanceCosts($vehicle),
             'efficiency_score' => $this->calculateEfficiencyScore($vehicle),
-            'carbon_footprint' => $this->calculateCarbonFootprint($vehicle)
+            'carbon_footprint' => $this->calculateCarbonFootprint($vehicle),
         ];
     }
 

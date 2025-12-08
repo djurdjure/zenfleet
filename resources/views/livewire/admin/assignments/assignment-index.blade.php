@@ -92,8 +92,7 @@
                         wire:model.live.debounce.300ms="search"
                         placeholder="Rechercher..."
                         class="pl-10 pr-4 py-2.5 block w-full border-gray-300 rounded-lg
-                               focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm shadow-sm"
-                    />
+                               focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm shadow-sm" />
                     <div wire:loading wire:target="search" class="absolute inset-y-0 right-0 pr-3 flex items-center">
                         <x-iconify icon="lucide:loader-2" class="w-4 h-4 text-blue-500 animate-spin" />
                     </div>
@@ -112,7 +111,7 @@
 
                     {{-- Nouvelle Affectation Button --}}
                     <a href="{{ route('admin.assignments.create') }}"
-                       class="inline-flex items-center gap-2 px-4 py-2.5 bg-blue-600 text-white
+                        class="inline-flex items-center gap-2 px-4 py-2.5 bg-blue-600 text-white
                               rounded-lg hover:bg-blue-700 transition-all duration-200 shadow-sm hover:shadow-md flex-1 md:flex-none justify-center font-medium">
                         <x-iconify icon="lucide:plus-circle" class="w-5 h-5" />
                         <span>Nouvelle affectation</span>
@@ -122,21 +121,23 @@
 
             {{-- Collapsible Filter Panel --}}
             <div x-show="showFilters"
-                 x-collapse
-                 x-cloak
-                 class="w-full bg-white rounded-lg border border-gray-200 p-6 shadow-sm mb-6">
-                
+                x-collapse
+                x-cloak
+                class="w-full bg-white rounded-lg border border-gray-200 p-6 shadow-sm mb-6">
+
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {{-- Status Filter --}}
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Statut</label>
-                        <select wire:model.live="status" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm">
+                        <x-slim-select
+                            name="status"
+                            wire:model.live="status"
+                            placeholder="Tous les statuts">
                             <option value="">Tous les statuts</option>
                             <option value="scheduled">Planifiée</option>
                             <option value="active">Active</option>
                             <option value="completed">Complétée</option>
                             <option value="cancelled">Annulée</option>
-                        </select>
+                        </x-slim-select>
                     </div>
 
                     {{-- Période (Date Range) --}}
@@ -148,8 +149,7 @@
                                 <x-datepicker-pro
                                     name="date_from"
                                     wire:model.live="date_from"
-                                    placeholder="JJ/MM/AAAA"
-                                />
+                                    placeholder="JJ/MM/AAAA" />
                             </div>
                             <div>
                                 <label class="block text-xs text-gray-500 mb-1">Fin</label>
@@ -157,8 +157,7 @@
                                     name="date_to"
                                     wire:model.live="date_to"
                                     :minDate="$date_from"
-                                    placeholder="JJ/MM/AAAA"
-                                />
+                                    placeholder="JJ/MM/AAAA" />
                             </div>
                         </div>
                     </div>
@@ -177,8 +176,8 @@
              ===================================================================== --}}
         <div class="relative">
             {{-- Loading Overlay --}}
-            <div wire:loading.flex wire:target="search, status, date_from, date_to, resetFilters, sortBy, page" 
-                 class="absolute inset-0 bg-white/50 backdrop-blur-[1px] z-10 items-center justify-center rounded-lg">
+            <div wire:loading.flex wire:target="search, status, date_from, date_to, resetFilters, sortBy, page"
+                class="absolute inset-0 bg-white/50 backdrop-blur-[1px] z-10 items-center justify-center rounded-lg">
                 <div class="flex items-center gap-3 bg-white px-4 py-2 rounded-full shadow-lg border border-gray-100">
                     <x-iconify icon="lucide:loader-2" class="w-5 h-5 text-blue-600 animate-spin" />
                     <span class="text-sm font-medium text-gray-600">Chargement...</span>
@@ -186,237 +185,249 @@
             </div>
 
             @if($assignments->count() > 0)
-                <x-card padding="p-0" margin="mb-6">
-                    <div class="overflow-x-auto">
-                        <table class="min-w-full divide-y divide-gray-200">
-                            {{-- Table Header --}}
-                            <thead class="bg-gray-50">
-                                <tr>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Réf</th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Véhicule</th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Chauffeur</th>
-                                    
-                                    {{-- Sortable Columns --}}
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer group" wire:click="sortBy('start_datetime')">
-                                        <div class="flex items-center gap-1">
-                                            Période
-                                            @if($sort_by === 'start_datetime')
-                                                <x-iconify icon="{{ $sort_order === 'asc' ? 'lucide:arrow-up' : 'lucide:arrow-down' }}" class="h-3 w-3 text-blue-600" />
-                                            @else
-                                                <x-iconify icon="lucide:arrow-up-down" class="h-3 w-3 text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity" />
-                                            @endif
-                                        </div>
-                                    </th>
-                                    
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer group" wire:click="sortBy('created_at')">
-                                        <div class="flex items-center gap-1">
-                                            Créé le
-                                            @if($sort_by === 'created_at')
-                                                <x-iconify icon="{{ $sort_order === 'asc' ? 'lucide:arrow-up' : 'lucide:arrow-down' }}" class="h-3 w-3 text-blue-600" />
-                                            @else
-                                                <x-iconify icon="lucide:arrow-up-down" class="h-3 w-3 text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity" />
-                                            @endif
-                                        </div>
-                                    </th>
-                                    
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer group" wire:click="sortBy('status')">
-                                        <div class="flex items-center gap-1">
-                                            Statut
-                                            @if($sort_by === 'status')
-                                                <x-iconify icon="{{ $sort_order === 'asc' ? 'lucide:arrow-up' : 'lucide:arrow-down' }}" class="h-3 w-3 text-blue-600" />
-                                            @else
-                                                <x-iconify icon="lucide:arrow-up-down" class="h-3 w-3 text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity" />
-                                            @endif
-                                        </div>
-                                    </th>
-                                    
-                                    <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-                                </tr>
-                            </thead>
+            <x-card padding="p-0" margin="mb-6">
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        {{-- Table Header --}}
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Réf</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Véhicule</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Chauffeur</th>
 
-                            {{-- Table Body --}}
-                            <tbody class="bg-white divide-y divide-gray-200">
-                                @foreach($assignments as $assignment)
-                                    <tr class="hover:bg-gray-50 transition-colors duration-150">
-                                        {{-- Référence --}}
-                                        <td class="px-6 py-4 whitespace-nowrap">
-                                            <div class="text-sm font-semibold text-gray-900">#{{ $assignment->id }}</div>
-                                        </td>
+                                {{-- Sortable Columns --}}
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer group" wire:click="sortBy('start_datetime')">
+                                    <div class="flex items-center gap-1">
+                                        Période
+                                        @if($sort_by === 'start_datetime')
+                                        <x-iconify icon="{{ $sort_order === 'asc' ? 'lucide:arrow-up' : 'lucide:arrow-down' }}" class="h-3 w-3 text-blue-600" />
+                                        @else
+                                        <x-iconify icon="lucide:arrow-up-down" class="h-3 w-3 text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity" />
+                                        @endif
+                                    </div>
+                                </th>
 
-                                        {{-- Véhicule --}}
-                                        <td class="px-6 py-4 whitespace-nowrap">
-                                            <div class="flex items-center">
-                                                <div class="flex-shrink-0 h-10 w-10">
-                                                    <div class="h-10 w-10 rounded-lg bg-gray-100 flex items-center justify-center">
-                                                        <x-iconify icon="lucide:car" class="h-5 w-5 text-gray-500" />
-                                                    </div>
-                                                </div>
-                                                <div class="ml-4">
-                                                    <div class="text-sm font-semibold text-gray-900">
-                                                        {{ $assignment->vehicle->registration_plate ?? 'N/A' }}
-                                                    </div>
-                                                    <div class="text-sm text-gray-500">
-                                                        {{ $assignment->vehicle->brand ?? '' }} {{ $assignment->vehicle->model ?? '' }}
-                                                    </div>
-                                                </div>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer group" wire:click="sortBy('created_at')">
+                                    <div class="flex items-center gap-1">
+                                        Créé le
+                                        @if($sort_by === 'created_at')
+                                        <x-iconify icon="{{ $sort_order === 'asc' ? 'lucide:arrow-up' : 'lucide:arrow-down' }}" class="h-3 w-3 text-blue-600" />
+                                        @else
+                                        <x-iconify icon="lucide:arrow-up-down" class="h-3 w-3 text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity" />
+                                        @endif
+                                    </div>
+                                </th>
+
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer group" wire:click="sortBy('status')">
+                                    <div class="flex items-center gap-1">
+                                        Statut
+                                        @if($sort_by === 'status')
+                                        <x-iconify icon="{{ $sort_order === 'asc' ? 'lucide:arrow-up' : 'lucide:arrow-down' }}" class="h-3 w-3 text-blue-600" />
+                                        @else
+                                        <x-iconify icon="lucide:arrow-up-down" class="h-3 w-3 text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity" />
+                                        @endif
+                                    </div>
+                                </th>
+
+                                <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                            </tr>
+                        </thead>
+
+                        {{-- Table Body --}}
+                        <tbody class="bg-white divide-y divide-gray-200">
+                            @foreach($assignments as $assignment)
+                            <tr class="hover:bg-gray-50 transition-colors duration-150">
+                                {{-- Référence --}}
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="text-sm font-semibold text-gray-900">#{{ $assignment->id }}</div>
+                                </td>
+
+                                {{-- Véhicule --}}
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="flex items-center">
+                                        <div class="flex-shrink-0 h-10 w-10">
+                                            <div class="h-10 w-10 rounded-lg bg-gray-100 flex items-center justify-center">
+                                                <x-iconify icon="lucide:car" class="h-5 w-5 text-gray-500" />
                                             </div>
-                                        </td>
-
-                                        {{-- Chauffeur --}}
-                                        <td class="px-6 py-4 whitespace-nowrap">
-                                            @if($assignment->driver)
-                                                <div class="flex items-center">
-                                                    <div class="flex-shrink-0 h-10 w-10">
-                                                        @if($assignment->driver->photo)
-                                                            <img src="{{ Storage::url($assignment->driver->photo) }}"
-                                                                 alt="{{ $assignment->driver->full_name }}"
-                                                                 class="h-10 w-10 rounded-full object-cover ring-2 ring-blue-100 shadow-sm">
-                                                        @else
-                                                            <div class="h-10 w-10 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center ring-2 ring-blue-100 shadow-sm">
-                                                                <span class="text-sm font-bold text-white">
-                                                                    {{ strtoupper(substr($assignment->driver->first_name, 0, 1)) }}{{ strtoupper(substr($assignment->driver->last_name, 0, 1)) }}
-                                                                </span>
-                                                            </div>
-                                                        @endif
-                                                    </div>
-                                                    <div class="ml-3">
-                                                        <div class="text-sm font-semibold text-gray-900">{{ $assignment->driver->full_name }}</div>
-                                                        <div class="flex items-center gap-1 text-xs text-gray-500">
-                                                            <x-iconify icon="lucide:phone" class="w-3.5 h-3.5" />
-                                                            <span>{{ $assignment->driver->personal_phone ?? $assignment->driver->professional_phone ?? 'N/A' }}</span>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            @else
-                                                <div class="flex items-center gap-2 text-sm text-gray-400">
-                                                    <x-iconify icon="lucide:user-x" class="w-5 h-5" />
-                                                    <span class="italic">Non assigné</span>
-                                                </div>
-                                            @endif
-                                        </td>
-
-                                        {{-- Période --}}
-                                        <td class="px-6 py-4 whitespace-nowrap">
-                                            <div class="text-sm text-gray-900">
-                                                <x-iconify icon="lucide:calendar-check" class="w-4 h-4 inline mr-1 text-green-600" />
-                                                {{ $assignment->start_datetime?->format('d/m/Y H:i') ?? '-' }}
+                                        </div>
+                                        <div class="ml-4">
+                                            <div class="text-sm font-semibold text-gray-900">
+                                                {{ $assignment->vehicle->registration_plate ?? 'N/A' }}
                                             </div>
                                             <div class="text-sm text-gray-500">
-                                                <x-iconify icon="lucide:calendar-x" class="w-4 h-4 inline mr-1 text-orange-600" />
-                                                {{ $assignment->end_datetime?->format('d/m/Y H:i') ?? 'Indéterminé' }}
+                                                {{ $assignment->vehicle->brand ?? '' }} {{ $assignment->vehicle->model ?? '' }}
                                             </div>
-                                        </td>
+                                        </div>
+                                    </div>
+                                </td>
 
-                                        {{-- Créé le --}}
-                                        <td class="px-6 py-4 whitespace-nowrap">
-                                            <div class="text-sm text-gray-900">{{ $assignment->created_at->format('d/m/Y') }}</div>
-                                            <div class="text-xs text-gray-500">{{ $assignment->created_at->format('H:i') }}</div>
-                                        </td>
+                                {{-- Chauffeur --}}
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    @if($assignment->driver)
+                                    <div class="flex items-center">
+                                        <div class="flex-shrink-0 h-10 w-10">
+                                            @if($assignment->driver->photo)
+                                            <img src="{{ Storage::url($assignment->driver->photo) }}"
+                                                alt="{{ $assignment->driver->full_name }}"
+                                                class="h-10 w-10 rounded-full object-cover ring-2 ring-blue-100 shadow-sm">
+                                            @else
+                                            <div class="h-10 w-10 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center ring-2 ring-blue-100 shadow-sm">
+                                                <span class="text-sm font-bold text-white">
+                                                    {{ strtoupper(substr($assignment->driver->first_name, 0, 1)) }}{{ strtoupper(substr($assignment->driver->last_name, 0, 1)) }}
+                                                </span>
+                                            </div>
+                                            @endif
+                                        </div>
+                                        <div class="ml-3">
+                                            <div class="text-sm font-semibold text-gray-900">{{ $assignment->driver->full_name }}</div>
+                                            <div class="flex items-center gap-1 text-xs text-gray-500">
+                                                <x-iconify icon="lucide:phone" class="w-3.5 h-3.5" />
+                                                <span>{{ $assignment->driver->personal_phone ?? $assignment->driver->professional_phone ?? 'N/A' }}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    @else
+                                    <div class="flex items-center gap-2 text-sm text-gray-400">
+                                        <x-iconify icon="lucide:user-x" class="w-5 h-5" />
+                                        <span class="italic">Non assigné</span>
+                                    </div>
+                                    @endif
+                                </td>
 
-                                        {{-- Statut --}}
-                                        <td class="px-6 py-4 whitespace-nowrap">
-                                            @php
-                                                $statusConfig = [
-                                                    'scheduled' => ['badge' => 'bg-purple-100 text-purple-800', 'icon' => 'lucide:clock', 'label' => 'Planifiée'],
-                                                    'active' => ['badge' => 'bg-green-100 text-green-800', 'icon' => 'lucide:play-circle', 'label' => 'Active'],
-                                                    'completed' => ['badge' => 'bg-blue-100 text-blue-800', 'icon' => 'lucide:check-circle', 'label' => 'Terminée'],
-                                                    'cancelled' => ['badge' => 'bg-red-100 text-red-800', 'icon' => 'lucide:x-circle', 'label' => 'Annulée'],
-                                                ];
-                                                $status = $statusConfig[$assignment->status] ?? ['badge' => 'bg-gray-100 text-gray-800', 'icon' => 'lucide:help-circle', 'label' => $assignment->status];
-                                            @endphp
-                                            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium {{ $status['badge'] }}">
-                                                <x-iconify :icon="$status['icon']" class="w-3.5 h-3.5" />
-                                                {{ $status['label'] }}
-                                            </span>
-                                        </td>
+                                {{-- Période --}}
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="text-sm text-gray-900">
+                                        <x-iconify icon="lucide:calendar-check" class="w-4 h-4 inline mr-1 text-green-600" />
+                                        {{ $assignment->start_datetime?->format('d/m/Y H:i') ?? '-' }}
+                                    </div>
+                                    <div class="text-sm text-gray-500">
+                                        <x-iconify icon="lucide:calendar-x" class="w-4 h-4 inline mr-1 text-orange-600" />
+                                        {{ $assignment->end_datetime?->format('d/m/Y H:i') ?? 'Indéterminé' }}
+                                    </div>
+                                </td>
 
-                                        {{-- Actions --}}
-                                        <td class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
-                                            <div class="flex items-center justify-center gap-1">
-                                                {{-- Terminer Button --}}
-                                                @if($assignment->canBeEnded())
-                                                    <button wire:click="confirmEndAssignment({{ $assignment->id }})"
-                                                            class="inline-flex items-center p-1.5 text-orange-600 hover:text-orange-700 hover:bg-orange-50 rounded-lg transition-all duration-200"
-                                                            title="Terminer l'affectation">
-                                                        <x-iconify icon="lucide:flag-triangle-right" class="w-4 h-4" />
+                                {{-- Créé le --}}
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="text-sm text-gray-900">{{ $assignment->created_at->format('d/m/Y') }}</div>
+                                    <div class="text-xs text-gray-500">{{ $assignment->created_at->format('H:i') }}</div>
+                                </td>
+
+                                {{-- Statut --}}
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    @php
+                                    $statusConfig = [
+                                    'scheduled' => ['badge' => 'bg-purple-100 text-purple-800', 'icon' => 'lucide:clock', 'label' => 'Planifiée'],
+                                    'active' => ['badge' => 'bg-green-100 text-green-800', 'icon' => 'lucide:play-circle', 'label' => 'Active'],
+                                    'completed' => ['badge' => 'bg-blue-100 text-blue-800', 'icon' => 'lucide:check-circle', 'label' => 'Terminée'],
+                                    'cancelled' => ['badge' => 'bg-red-100 text-red-800', 'icon' => 'lucide:x-circle', 'label' => 'Annulée'],
+                                    ];
+                                    $status = $statusConfig[$assignment->status] ?? ['badge' => 'bg-gray-100 text-gray-800', 'icon' => 'lucide:help-circle', 'label' => $assignment->status];
+                                    @endphp
+                                    <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium {{ $status['badge'] }}">
+                                        <x-iconify :icon="$status['icon']" class="w-3.5 h-3.5" />
+                                        {{ $status['label'] }}
+                                    </span>
+                                </td>
+
+                                {{-- Actions --}}
+                                <td class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
+                                    <div class="flex items-center justify-center gap-1">
+                                        {{-- Terminer Button --}}
+                                        @if($assignment->canBeEnded())
+                                        <button wire:click="confirmEndAssignment({{ $assignment->id }})"
+                                            class="inline-flex items-center p-1.5 text-orange-600 hover:text-orange-700 hover:bg-orange-50 rounded-lg transition-all duration-200"
+                                            title="Terminer l'affectation">
+                                            <x-iconify icon="lucide:flag-triangle-right" class="w-4 h-4" />
+                                        </button>
+                                        @endif
+
+                                        {{-- View Button --}}
+                                        <a href="{{ route('admin.assignments.show', $assignment) }}"
+                                            class="inline-flex items-center p-1.5 text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-lg transition-all duration-200"
+                                            title="Voir détails">
+                                            <x-iconify icon="lucide:eye" class="w-4 h-4" />
+                                        </a>
+
+                                        {{-- Three-Dot Menu --}}
+                                        <div class="relative inline-block text-left" x-data="{ open: false }">
+                                            <button @click="open = !open" @click.away="open = false"
+                                                type="button"
+                                                class="inline-flex items-center p-1.5 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-all duration-200">
+                                                <x-iconify icon="lucide:more-vertical" class="w-4 h-4" />
+                                            </button>
+
+                                            <div x-show="open" x-cloak
+                                                x-transition:enter="transition ease-out duration-100"
+                                                x-transition:enter-start="transform opacity-0 scale-95"
+                                                x-transition:enter-end="transform opacity-100 scale-100"
+                                                x-transition:leave="transition ease-in duration-75"
+                                                x-transition:leave-start="transform opacity-100 scale-100"
+                                                x-transition:leave-end="transform opacity-0 scale-95"
+                                                class="absolute right-0 z-50 mt-2 w-56 rounded-lg shadow-lg bg-white ring-1 ring-black ring-opacity-5 divide-y divide-gray-100">
+                                                <div class="py-1">
+                                                    @if($assignment->canBeEdited())
+                                                    <a href="{{ route('admin.assignments.edit', $assignment) }}"
+                                                        class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
+                                                        <x-iconify icon="lucide:edit" class="w-4 h-4 mr-3 text-amber-600" />
+                                                        Modifier
+                                                    </a>
+                                                    @endif
+
+                                                    <button onclick="alert('Fonctionnalité PDF à venir')"
+                                                        class="flex w-full items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
+                                                        <x-iconify icon="lucide:file-text" class="w-4 h-4 mr-3 text-emerald-600" />
+                                                        Exporter PDF
                                                     </button>
-                                                @endif
 
-                                                {{-- View Button --}}
-                                                <a href="{{ route('admin.assignments.show', $assignment) }}"
-                                                   class="inline-flex items-center p-1.5 text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-lg transition-all duration-200"
-                                                   title="Voir détails">
-                                                    <x-iconify icon="lucide:eye" class="w-4 h-4" />
-                                                </a>
-
-                                                {{-- Three-Dot Menu --}}
-                                                <div class="relative inline-block text-left" x-data="{ open: false }">
-                                                    <button @click="open = !open" @click.away="open = false"
-                                                            type="button"
-                                                            class="inline-flex items-center p-1.5 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-all duration-200">
-                                                        <x-iconify icon="lucide:more-vertical" class="w-4 h-4" />
-                                                    </button>
-
-                                                    <div x-show="open" x-cloak
-                                                         x-transition:enter="transition ease-out duration-100"
-                                                         x-transition:enter-start="transform opacity-0 scale-95"
-                                                         x-transition:enter-end="transform opacity-100 scale-100"
-                                                         x-transition:leave="transition ease-in duration-75"
-                                                         x-transition:leave-start="transform opacity-100 scale-100"
-                                                         x-transition:leave-end="transform opacity-0 scale-95"
-                                                         class="absolute right-0 z-50 mt-2 w-56 rounded-lg shadow-lg bg-white ring-1 ring-black ring-opacity-5 divide-y divide-gray-100">
-                                                        <div class="py-1">
-                                                            @if($assignment->canBeEdited())
-                                                                <a href="{{ route('admin.assignments.edit', $assignment) }}"
-                                                                   class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
-                                                                    <x-iconify icon="lucide:edit" class="w-4 h-4 mr-3 text-amber-600" />
-                                                                    Modifier
-                                                                </a>
-                                                            @endif
-
-                                                            <button onclick="alert('Fonctionnalité PDF à venir')"
-                                                                    class="flex w-full items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
-                                                                <x-iconify icon="lucide:file-text" class="w-4 h-4 mr-3 text-emerald-600" />
-                                                                Exporter PDF
-                                                            </button>
-
-                                                            @if($assignment->canBeDeleted())
-                                                                <div class="border-t border-gray-100 mt-1 pt-1">
-                                                                    <button wire:click="confirmDelete({{ $assignment->id }})"
-                                                                            class="flex w-full items-center px-4 py-2 text-sm text-gray-700 hover:bg-red-50 transition-colors">
-                                                                        <x-iconify icon="lucide:trash-2" class="w-4 h-4 mr-3 text-red-600" />
-                                                                        Supprimer
-                                                                    </button>
-                                                                </div>
-                                                            @endif
-                                                        </div>
+                                                    @if($assignment->canBeDeleted())
+                                                    <div class="border-t border-gray-100 mt-1 pt-1">
+                                                        <button wire:click="confirmDelete({{ $assignment->id }})"
+                                                            class="flex w-full items-center px-4 py-2 text-sm text-gray-700 hover:bg-red-50 transition-colors">
+                                                            <x-iconify icon="lucide:trash-2" class="w-4 h-4 mr-3 text-red-600" />
+                                                            Supprimer
+                                                        </button>
                                                     </div>
+                                                    @endif
                                                 </div>
                                             </div>
-                                        </td>
-                                    </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-                    </div>
-                </x-card>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            </x-card>
 
-                {{-- Pagination --}}
-                <div class="mt-6">
-                    {{ $assignments->links() }}
-                </div>
-            @else
-                {{-- Empty State --}}
-                <div class="text-center py-12 bg-white rounded-lg border border-gray-200">
-                    <x-iconify icon="lucide:calendar-clock" class="mx-auto h-12 w-12 text-gray-400" />
-                    <h3 class="mt-2 text-sm font-medium text-gray-900">Aucune affectation trouvée</h3>
-                    <p class="mt-1 text-sm text-gray-500">Essayez de modifier vos filtres ou créez une nouvelle affectation.</p>
-                    <div class="mt-6">
-                        <button wire:click="resetFilters" class="text-blue-600 hover:text-blue-800 font-medium text-sm">
-                            Réinitialiser les filtres
-                        </button>
+            {{-- Pagination & Per Page --}}
+            <div class="mt-6 px-4 py-3 border-t border-gray-200">
+                <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
+                    <div class="flex-1 w-full sm:w-auto">
+                        {{ $assignments->links() }}
+                    </div>
+                    <div class="flex items-center gap-2 flex-shrink-0">
+                        <select wire:model.live="per_page"
+                            class="border-gray-300 rounded-md text-sm py-1.5 pl-2 pr-8 focus:ring-blue-500 focus:border-blue-500 shadow-sm">
+                            <option value="20">20</option>
+                            <option value="50">50</option>
+                            <option value="100">100</option>
+                        </select>
                     </div>
                 </div>
+            </div>
+            @else
+            {{-- Empty State --}}
+            <div class="text-center py-12 bg-white rounded-lg border border-gray-200">
+                <x-iconify icon="lucide:calendar-clock" class="mx-auto h-12 w-12 text-gray-400" />
+                <h3 class="mt-2 text-sm font-medium text-gray-900">Aucune affectation trouvée</h3>
+                <p class="mt-1 text-sm text-gray-500">Essayez de modifier vos filtres ou créez une nouvelle affectation.</p>
+                <div class="mt-6">
+                    <button wire:click="resetFilters" class="text-blue-600 hover:text-blue-800 font-medium text-sm">
+                        Réinitialiser les filtres
+                    </button>
+                </div>
+            </div>
             @endif
         </div>
     </div>
@@ -427,31 +438,31 @@
 
     {{-- End Assignment Modal --}}
     <div x-data="{ show: @entangle('showEndModal') }"
-         x-show="show"
-         x-cloak
-         class="fixed inset-0 z-50 overflow-y-auto"
-         aria-labelledby="modal-title" role="dialog" aria-modal="true">
+        x-show="show"
+        x-cloak
+        class="fixed inset-0 z-50 overflow-y-auto"
+        aria-labelledby="modal-title" role="dialog" aria-modal="true">
         <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
             <div x-show="show"
-                 x-transition:enter="ease-out duration-300"
-                 x-transition:enter-start="opacity-0"
-                 x-transition:enter-end="opacity-100"
-                 x-transition:leave="ease-in duration-200"
-                 x-transition:leave-start="opacity-100"
-                 x-transition:leave-end="opacity-0"
-                 class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity backdrop-blur-sm"></div>
+                x-transition:enter="ease-out duration-300"
+                x-transition:enter-start="opacity-0"
+                x-transition:enter-end="opacity-100"
+                x-transition:leave="ease-in duration-200"
+                x-transition:leave-start="opacity-100"
+                x-transition:leave-end="opacity-0"
+                class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity backdrop-blur-sm"></div>
 
             <span class="hidden sm:inline-block sm:align-middle sm:h-screen">&#8203;</span>
 
             <div x-show="show"
-                 x-transition:enter="ease-out duration-300"
-                 x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-                 x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
-                 x-transition:leave="ease-in duration-200"
-                 x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
-                 x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-                 class="inline-block align-bottom bg-white rounded-2xl px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full sm:p-6">
-                
+                x-transition:enter="ease-out duration-300"
+                x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
+                x-transition:leave="ease-in duration-200"
+                x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
+                x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                class="inline-block align-bottom bg-white rounded-2xl px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full sm:p-6">
+
                 <div class="sm:flex sm:items-start">
                     <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-orange-100 sm:mx-0 sm:h-10 sm:w-10">
                         <x-iconify icon="lucide:flag-triangle-right" class="h-6 w-6 text-orange-600" />
@@ -494,8 +505,7 @@
                                             wire:model.live="endDate"
                                             :maxDate="date('Y-m-d')"
                                             placeholder="Sélectionner..."
-                                            required
-                                        />
+                                            required />
                                         @error('endDate') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
                                     </div>
 
@@ -508,15 +518,15 @@
                                             <select id="modal_end_time" class="w-full border-gray-300 rounded-lg">
                                                 <option value="">Sélectionner...</option>
                                                 @php
-                                                    // Générer les options de temps par pas de 30 minutes
-                                                    for ($h = 0; $h < 24; $h++) {
-                                                        for ($m = 0; $m < 60; $m += 30) {
-                                                            $time = sprintf('%02d:%02d', $h, $m);
-                                                            $selected = ($endTime === $time) ? 'selected' : '';
-                                                            echo "<option value=\"{$time}\" {$selected}>{$time}</option>";
-                                                        }
+                                                // Générer les options de temps par pas de 30 minutes
+                                                for ($h = 0; $h < 24; $h++) {
+                                                    for ($m=0; $m < 60; $m +=30) {
+                                                    $time=sprintf('%02d:%02d', $h, $m);
+                                                    $selected=($endTime===$time) ? 'selected' : '' ;
+                                                    echo "<option value=\" {$time}\" {$selected}>{$time}</option>";
                                                     }
-                                                @endphp
+                                                    }
+                                                    @endphp
                                             </select>
                                         </div>
                                         @error('endTime') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
@@ -546,7 +556,7 @@
                                         Kilométrage de fin (optionnel)
                                     </label>
                                     <input type="number" wire:model="endMileage" placeholder="Ex: 125000"
-                                           class="block w-full border-gray-300 rounded-lg focus:ring-orange-500 focus:border-orange-500 text-sm">
+                                        class="block w-full border-gray-300 rounded-lg focus:ring-orange-500 focus:border-orange-500 text-sm">
                                     @error('endMileage') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
                                 </div>
 
@@ -556,7 +566,7 @@
                                         Observations (optionnel)
                                     </label>
                                     <textarea wire:model="endNotes" rows="2" maxlength="1000"
-                                              class="block w-full border-gray-300 rounded-lg focus:ring-orange-500 focus:border-orange-500 text-sm"></textarea>
+                                        class="block w-full border-gray-300 rounded-lg focus:ring-orange-500 focus:border-orange-500 text-sm"></textarea>
                                 </div>
                             </div>
                         </div>
@@ -564,12 +574,12 @@
                 </div>
                 <div class="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse gap-3">
                     <button type="button" wire:click="endAssignment" wire:loading.attr="disabled"
-                            class="w-full inline-flex justify-center items-center rounded-lg border border-transparent shadow-sm px-4 py-2 bg-orange-600 hover:bg-orange-700 text-base font-medium text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 sm:ml-3 sm:w-auto sm:text-sm transition-colors disabled:opacity-50">
+                        class="w-full inline-flex justify-center items-center rounded-lg border border-transparent shadow-sm px-4 py-2 bg-orange-600 hover:bg-orange-700 text-base font-medium text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 sm:ml-3 sm:w-auto sm:text-sm transition-colors disabled:opacity-50">
                         <x-iconify icon="lucide:loader-2" class="w-4 h-4 mr-2 animate-spin" wire:loading wire:target="endAssignment" />
                         Confirmer la fin
                     </button>
                     <button type="button" @click="show = false"
-                            class="mt-3 w-full inline-flex justify-center rounded-lg border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:mt-0 sm:w-auto sm:text-sm transition-colors">
+                        class="mt-3 w-full inline-flex justify-center rounded-lg border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:mt-0 sm:w-auto sm:text-sm transition-colors">
                         Annuler
                     </button>
                 </div>
@@ -579,31 +589,31 @@
 
     {{-- Delete Confirmation Modal --}}
     <div x-data="{ show: @entangle('showDeleteModal') }"
-         x-show="show"
-         x-cloak
-         class="fixed inset-0 z-50 overflow-y-auto"
-         aria-labelledby="modal-title" role="dialog" aria-modal="true">
+        x-show="show"
+        x-cloak
+        class="fixed inset-0 z-50 overflow-y-auto"
+        aria-labelledby="modal-title" role="dialog" aria-modal="true">
         <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
             <div x-show="show"
-                 x-transition:enter="ease-out duration-300"
-                 x-transition:enter-start="opacity-0"
-                 x-transition:enter-end="opacity-100"
-                 x-transition:leave="ease-in duration-200"
-                 x-transition:leave-start="opacity-100"
-                 x-transition:leave-end="opacity-0"
-                 class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity backdrop-blur-sm"></div>
+                x-transition:enter="ease-out duration-300"
+                x-transition:enter-start="opacity-0"
+                x-transition:enter-end="opacity-100"
+                x-transition:leave="ease-in duration-200"
+                x-transition:leave-start="opacity-100"
+                x-transition:leave-end="opacity-0"
+                class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity backdrop-blur-sm"></div>
 
             <span class="hidden sm:inline-block sm:align-middle sm:h-screen">&#8203;</span>
 
             <div x-show="show"
-                 x-transition:enter="ease-out duration-300"
-                 x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-                 x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
-                 x-transition:leave="ease-in duration-200"
-                 x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
-                 x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-                 class="inline-block align-bottom bg-white rounded-2xl px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full sm:p-6">
-                
+                x-transition:enter="ease-out duration-300"
+                x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
+                x-transition:leave="ease-in duration-200"
+                x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
+                x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                class="inline-block align-bottom bg-white rounded-2xl px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full sm:p-6">
+
                 <div class="sm:flex sm:items-start">
                     <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
                         <x-iconify icon="lucide:alert-triangle" class="h-6 w-6 text-red-600" />
@@ -627,12 +637,12 @@
                 </div>
                 <div class="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse gap-3">
                     <button type="button" wire:click="deleteAssignment" wire:loading.attr="disabled"
-                            class="w-full inline-flex justify-center items-center rounded-lg border border-transparent shadow-sm px-4 py-2 bg-red-600 hover:bg-red-700 text-base font-medium text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:ml-3 sm:w-auto sm:text-sm transition-colors disabled:opacity-50">
+                        class="w-full inline-flex justify-center items-center rounded-lg border border-transparent shadow-sm px-4 py-2 bg-red-600 hover:bg-red-700 text-base font-medium text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:ml-3 sm:w-auto sm:text-sm transition-colors disabled:opacity-50">
                         <x-iconify icon="lucide:loader-2" class="w-4 h-4 mr-2 animate-spin" wire:loading wire:target="deleteAssignment" />
                         Supprimer
                     </button>
                     <button type="button" @click="show = false"
-                            class="mt-3 w-full inline-flex justify-center rounded-lg border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:mt-0 sm:w-auto sm:text-sm transition-colors">
+                        class="mt-3 w-full inline-flex justify-center rounded-lg border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:mt-0 sm:w-auto sm:text-sm transition-colors">
                         Annuler
                     </button>
                 </div>
@@ -644,53 +654,56 @@
 
 @push('scripts')
 <script>
-/**
- * ✅ SLIMSELECT INITIALIZATION - MODAL END TIME PICKER
- * Initializes SlimSelect for the assignment termination modal time selector
- * Syncs with Livewire endTime property
- */
-document.addEventListener('livewire:initialized', () => {
-    let modalEndTimeSlimSelect = null;
+    /**
+     * ✅ SLIMSELECT INITIALIZATION - MODAL END TIME PICKER
+     * Initializes SlimSelect for the assignment termination modal time selector
+     * Syncs with Livewire endTime property
+     */
+    document.addEventListener('livewire:initialized', () => {
+        let modalEndTimeSlimSelect = null;
 
-    // Initialize SlimSelect when modal opens
-    Livewire.hook('morph.updated', ({ el, component }) => {
-        const modalTimeSelect = document.getElementById('modal_end_time');
-        
-        if (modalTimeSelect && !modalEndTimeSlimSelect) {
-            try {
-                modalEndTimeSlimSelect = new SlimSelect({
-                    select: modalTimeSelect,
-                    settings: {
-                        showSearch: true,
-                        searchHighlight: true,
-                        closeOnSelect: true,
-                        allowDeselect: false,
-                        placeholderText: 'Sélectionner l\'heure',
-                    },
-                    events: {
-                        afterChange: (newVal) => {
-                            if (newVal && newVal[0]) {
-                                const value = newVal[0].value || '';
-                                // Sync with Livewire
-                                @this.set('endTime', value, false);
+        // Initialize SlimSelect when modal opens
+        Livewire.hook('morph.updated', ({
+            el,
+            component
+        }) => {
+            const modalTimeSelect = document.getElementById('modal_end_time');
+
+            if (modalTimeSelect && !modalEndTimeSlimSelect) {
+                try {
+                    modalEndTimeSlimSelect = new SlimSelect({
+                        select: modalTimeSelect,
+                        settings: {
+                            showSearch: true,
+                            searchHighlight: true,
+                            closeOnSelect: true,
+                            allowDeselect: false,
+                            placeholderText: 'Sélectionner l\'heure',
+                        },
+                        events: {
+                            afterChange: (newVal) => {
+                                if (newVal && newVal[0]) {
+                                    const value = newVal[0].value || '';
+                                    // Sync with Livewire
+                                    @this.set('endTime', value, false);
+                                }
                             }
                         }
-                    }
-                });
-                console.log('✅ Modal End Time SlimSelect initialized');
-            } catch (error) {
-                console.error('❌ Error initializing modal end time SlimSelect:', error);
+                    });
+                    console.log('✅ Modal End Time SlimSelect initialized');
+                } catch (error) {
+                    console.error('❌ Error initializing modal end time SlimSelect:', error);
+                }
             }
-        }
-    });
+        });
 
-    // Cleanup SlimSelect when modal closes
-    Livewire.on('closeEndModal', () => {
-        if (modalEndTimeSlimSelect) {
-            modalEndTimeSlimSelect.destroy();
-            modalEndTimeSlimSelect = null;
-        }
+        // Cleanup SlimSelect when modal closes
+        Livewire.on('closeEndModal', () => {
+            if (modalEndTimeSlimSelect) {
+                modalEndTimeSlimSelect.destroy();
+                modalEndTimeSlimSelect = null;
+            }
+        });
     });
-});
 </script>
 @endpush

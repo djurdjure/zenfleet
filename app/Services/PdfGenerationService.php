@@ -2,10 +2,21 @@
 
 namespace App\Services;
 
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Http\Client\RequestException;
 use Illuminate\Support\Facades\Log;
 
+/**
+ * 📑 Enterprise PDF Generation Service
+ *
+ * Architecture hybride avec:
+ * - Microservice Node.js (Puppeteer) comme solution primaire
+ * - DomPDF comme fallback fiable pour développement local
+ *
+ * @package App\Services
+ * @version 3.0 - Hybrid Architecture with DomPDF Fallback
+ */
 class PdfGenerationService
 {
     protected string $serviceUrl;
@@ -13,34 +24,78 @@ class PdfGenerationService
     protected int $timeout;
     protected int $retries;
     protected string $apiKey;
+    protected bool $useFallback;
 
     public function __construct()
     {
         $this->serviceUrl = config('services.pdf.url', 'http://pdf-service:3000/generate-pdf');
         $this->healthUrl = config('services.pdf.health_url', 'http://pdf-service:3000/health');
-        $this->timeout = (int) config('services.pdf.timeout', 120);
-        $this->retries = (int) config('services.pdf.retries', 3);
+        $this->timeout = (int) config('services.pdf.timeout', 60);
+        $this->retries = (int) config('services.pdf.retries', 2);
         $this->apiKey = config('services.pdf.api_key', '');
+        // Allow forcing fallback via env variable
+        $this->useFallback = config('services.pdf.use_fallback', false);
     }
 
+    /**
+     * Generate PDF from HTML content
+     * 
+     * Strategy:
+     * 1. Try microservice if available and not in fallback mode
+     * 2. Use DomPDF as fallback
+     */
     public function generateFromHtml(string $html): string
     {
-        if (!$this->isServiceHealthy()) {
-            throw new \Exception("Le service PDF n'est pas disponible après plusieurs tentatives.");
+        // If fallback is forced or microservice is unhealthy, use DomPDF directly
+        if ($this->useFallback || !$this->isServiceHealthy()) {
+            Log::info('PDF Generation: Using DomPDF fallback');
+            return $this->generateWithDomPdf($html);
         }
 
+        try {
+            return $this->generateWithMicroservice($html);
+        } catch (\Exception $e) {
+            Log::warning('Microservice PDF failed, falling back to DomPDF', [
+                'error' => $e->getMessage()
+            ]);
+            return $this->generateWithDomPdf($html);
+        }
+    }
+
+    /**
+     * Generate PDF using DomPDF (Laravel package)
+     */
+    protected function generateWithDomPdf(string $html): string
+    {
+        $pdf = Pdf::loadHTML($html);
+
+        // Configure for A4 professional output
+        $pdf->setPaper('a4', 'portrait');
+        $pdf->setOption([
+            'isHtml5ParserEnabled' => true,
+            'isRemoteEnabled' => true,
+            'defaultFont' => 'sans-serif',
+            'dpi' => 150,
+            'debugKeepTemp' => false,
+        ]);
+
+        return $pdf->output();
+    }
+
+    /**
+     * Generate PDF using Microservice (Puppeteer/Chrome)
+     */
+    protected function generateWithMicroservice(string $html): string
+    {
         $httpClient = Http::timeout($this->timeout);
-        
-        // Configuration SSL sécurisée pour production vs développement
+
         if (app()->environment('production')) {
-            // En production, vérifier les certificats SSL
             $httpClient = $httpClient->withOptions([
                 'verify' => true,
                 'cert' => config('services.pdf.client_cert'),
                 'ssl_key' => config('services.pdf.client_key'),
             ]);
         } else {
-            // En développement local, on peut désactiver la vérification SSL pour les services internes
             $httpClient = $httpClient->withoutVerifying();
         }
 
@@ -57,10 +112,10 @@ class PdfGenerationService
                 'options' => [
                     'format' => 'A4',
                     'margin' => [
-                        'top' => '20mm',
-                        'right' => '15mm',
-                        'bottom' => '20mm',
-                        'left' => '15mm'
+                        'top' => '15mm',
+                        'right' => '12mm',
+                        'bottom' => '15mm',
+                        'left' => '12mm'
                     ],
                     'printBackground' => true,
                     'preferCSSPageSize' => true
@@ -68,51 +123,39 @@ class PdfGenerationService
             ]);
 
         if (!$response->successful()) {
-            Log::error('PDF Generation failed', [
-                'status' => $response->status(),
-                'body' => $response->body(),
-                'url' => $this->serviceUrl
-            ]);
-            throw new \Exception("Échec de la génération PDF: " . $response->body());
+            throw new \Exception("Microservice PDF failed: " . $response->body());
         }
 
         return $response->body();
     }
 
+    /**
+     * Check if microservice is healthy (with quick timeout)
+     */
     private function isServiceHealthy(): bool
     {
-        for ($i = 0; $i < $this->retries; $i++) {
-            try {
-                $httpClient = Http::timeout(5);
-                
-                if (app()->environment('production')) {
-                    $httpClient = $httpClient->withOptions(['verify' => true]);
-                } else {
-                    $httpClient = $httpClient->withoutVerifying();
-                }
+        try {
+            $httpClient = Http::timeout(3); // Quick timeout for health check
 
-                $response = $httpClient->get($this->healthUrl);
-
-                if ($response->successful() && in_array($response->json('status'), ['OK', 'healthy'])) {
-                    return true;
-                }
-            } catch (RequestException $e) {
-                Log::warning('Tentative de connexion au service PDF échouée.', [
-                    'attempt' => $i + 1, 
-                    'error' => $e->getMessage(),
-                    'url' => $this->healthUrl
-                ]);
-                
-                if ($i < $this->retries - 1) {
-                    sleep(min(pow(2, $i), 5)); // Backoff exponentiel avec max 5s
-                }
+            if (!app()->environment('production')) {
+                $httpClient = $httpClient->withoutVerifying();
             }
+
+            $response = $httpClient->get($this->healthUrl);
+
+            if ($response->successful()) {
+                $status = $response->json('status');
+                return in_array($status, ['OK', 'healthy', 'ok']);
+            }
+        } catch (\Exception $e) {
+            Log::debug('PDF Microservice health check failed', ['error' => $e->getMessage()]);
         }
+
         return false;
     }
 
     /**
-     * Génère un PDF depuis une vue Blade
+     * Generate PDF from a Blade view
      */
     public function generateFromView(string $view, array $data = []): string
     {
@@ -121,15 +164,15 @@ class PdfGenerationService
     }
 
     /**
-     * Sauvegarde un PDF dans le storage
+     * Generate and store PDF in filesystem
      */
     public function generateAndStore(string $html, string $filename, string $disk = 'local'): string
     {
         $pdfContent = $this->generateFromHtml($html);
-        
+
         $path = 'pdfs/' . date('Y/m/') . $filename;
         \Storage::disk($disk)->put($path, $pdfContent);
-        
+
         return $path;
     }
 }

@@ -105,7 +105,6 @@ class EnterpriseVehicleController extends Controller
                 'analytics',
                 'referenceData'
             ));
-
         } catch (\Exception $e) {
             $this->logError('vehicle.index.error', $e, $request);
             return $this->handleErrorResponse($e, 'vehicles.index');
@@ -127,7 +126,6 @@ class EnterpriseVehicleController extends Controller
                 'referenceData',
                 'recommendations'
             ));
-
         } catch (\Exception $e) {
             $this->logError('vehicle.create.error', $e);
             return $this->handleErrorResponse($e, 'vehicles.index');
@@ -169,13 +167,11 @@ class EnterpriseVehicleController extends Controller
                 ->route('admin.vehicles.show', $vehicle)
                 ->with('success', "Véhicule {$vehicle->registration_plate} créé avec succès")
                 ->with('vehicle_created', true);
-
         } catch (\Illuminate\Validation\ValidationException $e) {
             return back()
                 ->withErrors($e->errors())
                 ->withInput()
                 ->with('error', 'Veuillez corriger les erreurs de validation');
-
         } catch (\Exception $e) {
             $this->logError('vehicle.store.error', $e, $request);
             return $this->handleErrorResponse($e, 'vehicles.create');
@@ -192,8 +188,13 @@ class EnterpriseVehicleController extends Controller
         try {
             // Chargement optimisé des relations
             $vehicle->load([
-                'vehicleType', 'fuelType', 'transmissionType', 'vehicleStatus',
-                'assignments.driver.user', 'maintenancePlans', 'maintenanceLogs'
+                'vehicleType',
+                'fuelType',
+                'transmissionType',
+                'vehicleStatus',
+                'assignments.driver.user',
+                'maintenancePlans',
+                'maintenanceLogs'
             ]);
 
             // Analytics spécifiques au véhicule
@@ -211,7 +212,6 @@ class EnterpriseVehicleController extends Controller
                 'timeline',
                 'recommendations'
             ));
-
         } catch (\Exception $e) {
             $this->logError('vehicle.show.error', $e, null, ['vehicle_id' => $vehicle->id]);
             return $this->handleErrorResponse($e, 'vehicles.index');
@@ -234,7 +234,6 @@ class EnterpriseVehicleController extends Controller
                 'referenceData',
                 'changeRecommendations'
             ));
-
         } catch (\Exception $e) {
             $this->logError('vehicle.edit.error', $e, null, ['vehicle_id' => $vehicle->id]);
             return $this->handleErrorResponse($e, 'vehicles.show', $vehicle);
@@ -279,13 +278,11 @@ class EnterpriseVehicleController extends Controller
                 ->route('admin.vehicles.show', $vehicle)
                 ->with('success', "Véhicule {$vehicle->registration_plate} mis à jour avec succès")
                 ->with('vehicle_updated', true);
-
         } catch (\Illuminate\Validation\ValidationException $e) {
             return back()
                 ->withErrors($e->errors())
                 ->withInput()
                 ->with('error', 'Veuillez corriger les erreurs de validation');
-
         } catch (\Exception $e) {
             $this->logError('vehicle.update.error', $e, $request, ['vehicle_id' => $vehicle->id]);
             return $this->handleErrorResponse($e, 'vehicles.edit', $vehicle);
@@ -319,7 +316,6 @@ class EnterpriseVehicleController extends Controller
                 ->route('admin.vehicles.index')
                 ->with('success', "Véhicule {$registrationPlate} supprimé avec succès")
                 ->with('vehicle_deleted', true);
-
         } catch (\Exception $e) {
             $this->logError('vehicle.destroy.error', $e, null, ['vehicle_id' => $vehicle->id]);
             return $this->handleErrorResponse($e, 'vehicles.show', $vehicle);
@@ -347,7 +343,6 @@ class EnterpriseVehicleController extends Controller
             ]);
 
             return $exporter->download($filename);
-
         } catch (\Exception $e) {
             $this->logError('vehicle.export.error', $e, $request);
             throw $e;
@@ -364,7 +359,10 @@ class EnterpriseVehicleController extends Controller
     private function buildAdvancedQuery(Request $request): \Illuminate\Database\Eloquent\Builder
     {
         $query = Vehicle::with([
-            'vehicleType', 'fuelType', 'transmissionType', 'vehicleStatus',
+            'vehicleType',
+            'fuelType',
+            'transmissionType',
+            'vehicleStatus',
             'organization'
         ]);
 
@@ -378,9 +376,9 @@ class EnterpriseVehicleController extends Controller
             $search = $request->get('search');
             $query->where(function ($q) use ($search) {
                 $q->where('registration_plate', 'ilike', "%{$search}%")
-                  ->orWhere('vin', 'ilike', "%{$search}%")
-                  ->orWhere('brand', 'ilike', "%{$search}%")
-                  ->orWhere('model', 'ilike', "%{$search}%");
+                    ->orWhere('vin', 'ilike', "%{$search}%")
+                    ->orWhere('brand', 'ilike', "%{$search}%")
+                    ->orWhere('model', 'ilike', "%{$search}%");
             });
         }
 
@@ -410,8 +408,13 @@ class EnterpriseVehicleController extends Controller
         $sortDirection = $request->get('sort_direction', 'desc');
 
         $allowedSorts = [
-            'registration_plate', 'brand', 'model', 'manufacturing_year',
-            'acquisition_date', 'current_mileage', 'created_at'
+            'registration_plate',
+            'brand',
+            'model',
+            'manufacturing_year',
+            'acquisition_date',
+            'current_mileage',
+            'created_at'
         ];
 
         if (in_array($sortBy, $allowedSorts)) {
@@ -449,9 +452,10 @@ class EnterpriseVehicleController extends Controller
 
             return [
                 'total_vehicles' => $query->count(),
-                'available_vehicles' => $query->whereHas('vehicleStatus', fn($q) => $q->where('name', 'Disponible'))->count(),
+                'available_vehicles' => $query->whereHas('vehicleStatus', fn($q) => $q->where('name', 'Parking'))->count(),
                 'assigned_vehicles' => $query->whereHas('vehicleStatus', fn($q) => $q->where('name', 'Affecté'))->count(),
-                'maintenance_vehicles' => $query->whereHas('vehicleStatus', fn($q) => $q->where('name', 'Maintenance'))->count(),
+                'maintenance_vehicles' => $query->whereHas('vehicleStatus', fn($q) => $q->where('name', 'En maintenance'))->count(),
+                'broken_vehicles' => $query->whereHas('vehicleStatus', fn($q) => $q->where('name', 'En panne'))->count(),
                 'avg_age_years' => round($query->avg(DB::raw('EXTRACT(YEAR FROM AGE(NOW(), acquisition_date))')), 1),
                 'total_value' => $query->sum('current_value'),
                 'avg_mileage' => round($query->avg('current_mileage')),
@@ -584,14 +588,36 @@ class EnterpriseVehicleController extends Controller
     }
 
     // Méthodes utilitaires (simplifiées pour l'exemple)
-    private function calculateDepreciation(Vehicle $vehicle): float { return 0.15; }
-    private function calculateUtilization(Vehicle $vehicle): float { return 0.75; }
-    private function calculateMaintenanceCosts(Vehicle $vehicle): float { return 15000.0; }
-    private function getFuelDistribution(): array { return []; }
-    private function getTypeDistribution(): array { return []; }
-    private function getMonthlyAcquisitions(): array { return []; }
-    private function validateVinFormat(string $vin): bool { return strlen($vin) === 17; }
-    private function enrichVehicleCreationData(array $data): array {
+    private function calculateDepreciation(Vehicle $vehicle): float
+    {
+        return 0.15;
+    }
+    private function calculateUtilization(Vehicle $vehicle): float
+    {
+        return 0.75;
+    }
+    private function calculateMaintenanceCosts(Vehicle $vehicle): float
+    {
+        return 15000.0;
+    }
+    private function getFuelDistribution(): array
+    {
+        return [];
+    }
+    private function getTypeDistribution(): array
+    {
+        return [];
+    }
+    private function getMonthlyAcquisitions(): array
+    {
+        return [];
+    }
+    private function validateVinFormat(string $vin): bool
+    {
+        return strlen($vin) === 17;
+    }
+    private function enrichVehicleCreationData(array $data): array
+    {
         $data['organization_id'] = Auth::user()->organization_id;
         return $data;
     }
@@ -599,11 +625,223 @@ class EnterpriseVehicleController extends Controller
     private function performPostUpdateActions(Vehicle $vehicle): void {}
     private function createAuditTrail(Vehicle $vehicle, array $original, array $changes): void {}
     private function validateVehicleDeletion(Vehicle $vehicle): void {}
-    private function getCreationRecommendations(): array { return []; }
-    private function getEditRecommendations(Vehicle $vehicle): array { return []; }
-    private function getVehicleSpecificAnalytics(Vehicle $vehicle): array { return []; }
-    private function getVehicleTimeline(Vehicle $vehicle): array { return []; }
-    private function getVehicleRecommendations(Vehicle $vehicle): array { return []; }
-    private function generateExportFilename(string $format): string { return "vehicles_" . date('Y-m-d_H-i-s') . ".{$format}"; }
-    private function createVehicleExporter(string $format, array $filters): object { return new \stdClass(); }
+    private function getCreationRecommendations(): array
+    {
+        return [];
+    }
+    private function getEditRecommendations(Vehicle $vehicle): array
+    {
+        return [];
+    }
+
+    /**
+     * 📊 Analytics spécifiques au véhicule - ENTERPRISE GRADE
+     */
+    private function getVehicleSpecificAnalytics(Vehicle $vehicle): array
+    {
+        // Calcul des coûts de maintenance
+        $maintenanceCostTotal = $vehicle->maintenanceOperations()
+            ->where('status', 'completed')
+            ->sum('total_cost') ?? 0;
+
+        $maintenanceCostPreventive = $vehicle->maintenanceOperations()
+            ->where('status', 'completed')
+            ->whereHas('maintenanceType', fn($q) => $q->where('category', 'preventive'))
+            ->sum('total_cost') ?? 0;
+
+        $maintenanceCostCorrective = $maintenanceCostTotal - $maintenanceCostPreventive;
+
+        // Nombre de maintenances
+        $maintenanceCount = $vehicle->maintenanceOperations()
+            ->where('status', 'completed')
+            ->count();
+
+        // Nombre d'affectations
+        $assignmentsCount = $vehicle->assignments()->count();
+        $activeAssignment = $vehicle->assignments()
+            ->whereNull('end_datetime')
+            ->with('driver')
+            ->first();
+
+        // Kilométrage parcouru
+        $totalKmDriven = $vehicle->current_mileage - $vehicle->initial_mileage;
+
+        // Coût par km
+        $costPerKm = $totalKmDriven > 0 ? round($maintenanceCostTotal / $totalKmDriven, 2) : 0;
+
+        // Âge du véhicule
+        $acquisitionDate = $vehicle->acquisition_date ?? now();
+        $vehicleAge = Carbon::parse($acquisitionDate)->diffInYears(now());
+        $daysInService = Carbon::parse($acquisitionDate)->diffInDays(now());
+
+        // Taux d'utilisation (basé sur les affectations)
+        $daysAssigned = $vehicle->assignments()
+            ->selectRaw('SUM(EXTRACT(DAY FROM COALESCE(end_datetime, NOW()) - start_datetime)) as total_days')
+            ->value('total_days') ?? 0;
+        $utilizationRate = $daysInService > 0 ? min(round(($daysAssigned / $daysInService) * 100, 1), 100) : 0;
+
+        // Moyenne km par mois
+        $monthsInService = max(1, Carbon::parse($acquisitionDate)->diffInMonths(now()));
+        $avgKmPerMonth = round($totalKmDriven / $monthsInService);
+
+        // Dernière maintenance
+        $lastMaintenance = $vehicle->maintenanceOperations()
+            ->where('status', 'completed')
+            ->orderBy('completed_at', 'desc')
+            ->first();
+
+        return [
+            'maintenance_cost_total' => $maintenanceCostTotal,
+            'maintenance_cost_preventive' => $maintenanceCostPreventive,
+            'maintenance_cost_corrective' => $maintenanceCostCorrective,
+            'maintenance_count' => $maintenanceCount,
+            'assignments_count' => $assignmentsCount,
+            'active_assignment' => $activeAssignment,
+            'total_km_driven' => $totalKmDriven,
+            'cost_per_km' => $costPerKm,
+            'vehicle_age' => $vehicleAge,
+            'days_in_service' => $daysInService,
+            'utilization_rate' => $utilizationRate,
+            'avg_km_per_month' => $avgKmPerMonth,
+            'last_maintenance' => $lastMaintenance,
+            'last_maintenance_date' => $lastMaintenance?->completed_at?->format('d/m/Y'),
+        ];
+    }
+
+    /**
+     * 📅 Timeline d'activité du véhicule - ENTERPRISE GRADE
+     */
+    private function getVehicleTimeline(Vehicle $vehicle): array
+    {
+        $timeline = collect();
+
+        // Dernières affectations
+        $assignments = $vehicle->assignments()
+            ->with('driver')
+            ->orderBy('start_datetime', 'desc')
+            ->limit(5)
+            ->get();
+
+        foreach ($assignments as $assignment) {
+            $driverName = $assignment->driver
+                ? $assignment->driver->first_name . ' ' . $assignment->driver->last_name
+                : 'Chauffeur inconnu';
+
+            $timeline->push([
+                'type' => 'assignment',
+                'title' => "Affectation: {$driverName}",
+                'date' => $assignment->start_datetime->format('d/m/Y H:i'),
+                'timestamp' => $assignment->start_datetime,
+                'description' => $assignment->end_datetime
+                    ? 'Terminée le ' . $assignment->end_datetime->format('d/m/Y')
+                    : 'En cours',
+                'icon' => 'user',
+                'color' => $assignment->end_datetime ? 'gray' : 'blue',
+            ]);
+        }
+
+        // Dernières maintenances
+        $maintenances = $vehicle->maintenanceOperations()
+            ->with('maintenanceType')
+            ->orderBy('scheduled_date', 'desc')
+            ->limit(5)
+            ->get();
+
+        foreach ($maintenances as $maintenance) {
+            $timeline->push([
+                'type' => 'maintenance',
+                'title' => $maintenance->maintenanceType?->name ?? 'Maintenance',
+                'date' => $maintenance->scheduled_date?->format('d/m/Y') ?? 'N/A',
+                'timestamp' => $maintenance->scheduled_date ?? now(),
+                'description' => number_format($maintenance->total_cost ?? 0, 0, ',', ' ') . ' DA',
+                'icon' => 'wrench',
+                'color' => $maintenance->status === 'completed' ? 'green' : 'orange',
+            ]);
+        }
+
+        // Changements de statut récents
+        $statusHistory = $vehicle->statusHistory()
+            ->with('status')
+            ->orderBy('created_at', 'desc')
+            ->limit(5)
+            ->get();
+
+        foreach ($statusHistory as $history) {
+            $timeline->push([
+                'type' => 'status_change',
+                'title' => 'Statut: ' . ($history->status?->name ?? 'Inconnu'),
+                'date' => $history->created_at->format('d/m/Y H:i'),
+                'timestamp' => $history->created_at,
+                'description' => $history->reason ?? '',
+                'icon' => 'refresh',
+                'color' => 'purple',
+            ]);
+        }
+
+        // Trier par date décroissante et prendre les 10 premiers
+        return $timeline
+            ->sortByDesc('timestamp')
+            ->take(10)
+            ->values()
+            ->toArray();
+    }
+
+    /**
+     * 💡 Recommandations intelligentes pour le véhicule
+     */
+    private function getVehicleRecommendations(Vehicle $vehicle): array
+    {
+        $recommendations = [];
+
+        // Vérifier si maintenance nécessaire
+        $lastMaintenance = $vehicle->maintenanceOperations()
+            ->where('status', 'completed')
+            ->orderBy('completed_at', 'desc')
+            ->first();
+
+        if (!$lastMaintenance || $lastMaintenance->completed_at->diffInMonths(now()) > 6) {
+            $recommendations[] = [
+                'type' => 'warning',
+                'title' => 'Maintenance recommandée',
+                'description' => 'Aucune maintenance depuis plus de 6 mois.',
+                'action' => 'Programmer une révision',
+            ];
+        }
+
+        // Vérifier kilométrage élevé
+        $kmDriven = $vehicle->current_mileage - $vehicle->initial_mileage;
+        if ($kmDriven > 100000) {
+            $recommendations[] = [
+                'type' => 'info',
+                'title' => 'Kilométrage élevé',
+                'description' => 'Le véhicule a parcouru plus de 100 000 km.',
+                'action' => 'Envisager un contrôle approfondi',
+            ];
+        }
+
+        // Vérifier âge du véhicule
+        $vehicleAge = $vehicle->manufacturing_year
+            ? date('Y') - $vehicle->manufacturing_year
+            : 0;
+
+        if ($vehicleAge > 10) {
+            $recommendations[] = [
+                'type' => 'info',
+                'title' => 'Véhicule ancien',
+                'description' => "Le véhicule a {$vehicleAge} ans.",
+                'action' => 'Évaluer le renouvellement',
+            ];
+        }
+
+        return $recommendations;
+    }
+
+    private function generateExportFilename(string $format): string
+    {
+        return "vehicles_" . date('Y-m-d_H-i-s') . ".{$format}";
+    }
+    private function createVehicleExporter(string $format, array $filters): object
+    {
+        return new \stdClass();
+    }
 }

@@ -238,12 +238,14 @@ class VehiclesCsvExport
 
     /**
      * Mapper les données d'un véhicule
+     * 
+     * 🔧 FIX: Utilise directement les champs du modèle Driver (first_name, last_name, personal_phone)
+     * au lieu de passer par la relation User qui peut être null.
      */
     protected function mapVehicleData($vehicle): array
     {
         $activeAssignment = $vehicle->assignments->first();
         $driver = $activeAssignment ? $activeAssignment->driver : null;
-        $user = $driver ? $driver->user : null;
 
         return [
             $vehicle->id,
@@ -258,8 +260,8 @@ class VehiclesCsvExport
             $vehicle->current_mileage,
             $vehicle->color,
             $vehicle->vin,
-            $user ? $user->name . ' ' . ($user->last_name ?? '') : 'Non affecté',
-            $driver ? ($driver->phone ?? $user->phone ?? 'N/A') : 'N/A',
+            $driver ? $driver->first_name . ' ' . $driver->last_name : 'Non affecté',
+            $driver ? ($driver->personal_phone ?? 'N/A') : 'N/A',
             optional($vehicle->depot)->name ?? 'N/A',
             optional($vehicle->category)->name ?? 'N/A',
             $vehicle->acquisition_date ? $vehicle->acquisition_date->format('d/m/Y') : 'N/A',
