@@ -641,4 +641,58 @@ if (ssWrapper) {
 
 ---
 
-> **Note**: Ce guide est basé sur l'implémentation actuelle dans ZenFleet v2.1 Ultra-Pro. Consultez les fichiers de référence pour les dernières mises à jour.
+
+---
+
+## 10. Migration Pitfalls & Debugging (Added 2025-12-08)
+
+### ⚠️ Syntaxe PHP : Opérateur Objet (`->`)
+
+Lors de la migration ou du refactoring de vues Blade complexes, une erreur de syntaxe subtile peut s'introduire : l'ajout d'espaces autour de l'opérateur flèche (`->`).
+
+**Erreur (ParseError):**
+```php
+// PROVOQUE: syntax error, unexpected token ">"
+@if($errors - > any())
+const errors = @json($errors - > keys());
+```
+
+**Correction:**
+Assurez-vous qu'il n'y a **AUCUN espace** dans l'opérateur :
+```php
+@if($errors->any())
+const errors = @json($errors->keys());
+```
+
+### ⚠️ Initialisation Alpine.js et Blade Echos
+
+Alpine.js (`x-data`) est très sensible à la syntaxe JavaScript générée par Blade. Si un `echo` Blade s'étend sur plusieurs lignes dans le code source, il peut générer un saut de ligne dans le JS, invalidant la syntaxe d'objet.
+
+**Erreur (Provoque "ReferenceError: component is not defined"):**
+```javascript
+// Le navigateur voit ceci comme une erreur de syntaxe
+currentStep: {
+    {
+        old('current_step', 1)
+    }
+},
+```
+
+**Correction (Forcer une seule ligne):**
+```javascript
+// Correct
+currentStep: {{ old('current_step', 1) }},
+```
+
+### 🎨 Recommandations d'Icônes (Iconify)
+
+Pour maintenir une cohérence visuelle dans les formulaires multi-étapes (Steppers), voici les icônes recommandées :
+
+| Étape du Formulaire | Icône Recommandée (Iconify) | Usage |
+|---------------------|-----------------------------|-------|
+| Informations Perso  | `heroicons:user` ou `lucide:user` | Identité du chauffeur |
+| Info Professionnelle| `heroicons:briefcase` ou `lucide:briefcase` | Contrat, matricule |
+| **Permis de Conduire** | **`heroicons:identification`** ou **`lucide:id-card`** | **Permis, catégories** |
+| Compte & Urgence    | `heroicons:link` ou `lucide:link` | Connexion compte utilisateur |
+
+> **Note**: Pour le Permis de Conduire, l'icône `heroicons:identification` est utilisée dans le formulaire de création actuel.

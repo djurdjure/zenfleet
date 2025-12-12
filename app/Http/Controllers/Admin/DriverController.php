@@ -75,7 +75,6 @@ class DriverController extends Controller
                 ->get();
 
             return view('admin.drivers.create', compact('driverStatuses', 'linkableUsers'));
-
         } catch (\Exception $e) {
             Log::error('Driver create form error: ' . $e->getMessage());
 
@@ -123,9 +122,9 @@ class DriverController extends Controller
             ];
 
             return redirect()
-                ->route('admin.drivers.create') // ✅ RETOUR AU FORMULAIRE pour afficher popup
+                ->route('admin.drivers.index') // ✅ REDIRECTION vers la liste des chauffeurs
+                ->with('success', 'Le chauffeur ' . $driver->first_name . ' ' . $driver->last_name . ' a été créé avec succès.')
                 ->with('driver_success', $sessionData);
-
         } catch (\Exception $e) {
             Log::error('Driver store error: ' . $e->getMessage(), [
                 'trace' => $e->getTraceAsString()
@@ -166,7 +165,6 @@ class DriverController extends Controller
                 ->get();
 
             return view('admin.drivers.edit', compact('driver', 'driverStatuses', 'linkableUsers'));
-
         } catch (\Exception $e) {
             Log::error('Driver edit form error: ' . $e->getMessage(), [
                 'driver_id' => $driver->id,
@@ -190,7 +188,24 @@ class DriverController extends Controller
                 abort(403, 'Vous n\'avez pas l\'autorisation de modifier ce chauffeur.');
             }
 
-            $updatedDriver = $this->driverService->updateDriver($driver, $request->validated());
+            // 🔍 DEBUG: Logger les données reçues AVANT validation
+            Log::info('[DriverController] === DEBUG license_categories ===', [
+                'driver_id' => $driver->id,
+                'raw_license_categories' => $request->input('license_categories'),
+                'license_categories_type' => gettype($request->input('license_categories')),
+            ]);
+
+            $validatedData = $request->validated();
+
+            // 🔍 DEBUG: Logger les données APRÈS validation
+            Log::info('[DriverController] Validated data', [
+                'driver_id' => $driver->id,
+                'has_license_categories' => isset($validatedData['license_categories']),
+                'license_categories_value' => $validatedData['license_categories'] ?? 'NOT_SET',
+                'license_categories_type' => isset($validatedData['license_categories']) ? gettype($validatedData['license_categories']) : 'N/A',
+            ]);
+
+            $updatedDriver = $this->driverService->updateDriver($driver, $validatedData);
 
             Log::info('Driver updated successfully', [
                 'driver_id' => $driver->id,
@@ -201,7 +216,6 @@ class DriverController extends Controller
             return redirect()
                 ->route('admin.drivers.index')
                 ->with('success', "Le chauffeur {$updatedDriver->first_name} {$updatedDriver->last_name} a été mis à jour avec succès.");
-
         } catch (\Exception $e) {
             Log::error('Driver update error: ' . $e->getMessage());
 
@@ -251,7 +265,6 @@ class DriverController extends Controller
             return redirect()
                 ->back()
                 ->with('error', 'Impossible d\'archiver ce chauffeur car il est lié à des affectations actives.');
-
         } catch (\Exception $e) {
             Log::error('Driver destroy error: ' . $e->getMessage());
 
@@ -308,7 +321,6 @@ class DriverController extends Controller
             return redirect()
                 ->route('admin.drivers.index')
                 ->with('success', "Le chauffeur {$driverName} a été restauré avec succès et est maintenant actif.");
-
         } catch (\Exception $e) {
             Log::error('Driver restore error', [
                 'driver_id' => $driverId,
@@ -357,7 +369,6 @@ class DriverController extends Controller
             return redirect()
                 ->back()
                 ->with('error', 'Impossible de supprimer définitivement ce chauffeur car il est lié à un historique d\'affectations.');
-
         } catch (\Exception $e) {
             Log::error('Driver force delete error: ' . $e->getMessage());
 
@@ -394,7 +405,6 @@ class DriverController extends Controller
                 new \App\Exports\ArchivedDriversExport($filters),
                 $filename
             );
-
         } catch (\Exception $e) {
             Log::error('Archived drivers export error: ' . $e->getMessage());
 
@@ -443,7 +453,6 @@ class DriverController extends Controller
                         'driver_name' => $driver->first_name . ' ' . $driver->last_name,
                         'restored_by' => auth()->id(),
                     ]);
-
                 } catch (\Exception $e) {
                     Log::error("Driver bulk restore error for ID {$driverId}: " . $e->getMessage());
                     $errors++;
@@ -464,7 +473,6 @@ class DriverController extends Controller
             return redirect()
                 ->back()
                 ->with('error', 'Impossible de restaurer les chauffeurs sélectionnés.');
-
         } catch (\Exception $e) {
             Log::error('Bulk restore error: ' . $e->getMessage());
 
@@ -491,9 +499,9 @@ class DriverController extends Controller
             // 2️⃣ Affectation active (en cours actuellement)
             $activeAssignment = $driver->assignments()
                 ->whereNull('deleted_at')
-                ->where(function($query) {
+                ->where(function ($query) {
                     $query->whereNull('end_datetime')
-                          ->orWhere('end_datetime', '>', now());
+                        ->orWhere('end_datetime', '>', now());
                 })
                 ->where('start_datetime', '<=', now())
                 ->exists();
@@ -532,7 +540,7 @@ class DriverController extends Controller
                     'brand' => $vehicle->brand ?? 'N/A',
                     'model' => $vehicle->model ?? 'N/A',
                     'is_active' => $lastAssignment->end_datetime === null ||
-                                   $lastAssignment->end_datetime > now(),
+                        $lastAssignment->end_datetime > now(),
                     'assignment_start' => $lastAssignment->start_datetime,
                 ];
             }
@@ -554,7 +562,6 @@ class DriverController extends Controller
                 'last_vehicle' => $lastVehicle,
                 'last_vehicle_info' => $lastVehicleInfo,
             ];
-
         } catch (\Exception $e) {
             // En cas d'erreur, retourner des statistiques par défaut
             Log::channel('error')->error('Erreur calcul statistiques chauffeur', [
@@ -612,7 +619,6 @@ class DriverController extends Controller
             ]);
 
             return view('admin.drivers.show', compact('driver', 'stats', 'recentActivity'));
-
         } catch (\Exception $e) {
             Log::error('Driver show error: ' . $e->getMessage());
 
@@ -634,7 +640,6 @@ class DriverController extends Controller
             $format = $request->input('format', 'xlsx');
 
             return $this->importExportService->exportDrivers($filters, $format);
-
         } catch (\Exception $e) {
             Log::error('Driver export error: ' . $e->getMessage());
 
@@ -677,7 +682,6 @@ class DriverController extends Controller
             ];
 
             return view('admin.drivers.statistics', compact('stats'));
-
         } catch (\Exception $e) {
             Log::error('Driver statistics error: ' . $e->getMessage());
 
@@ -773,25 +777,64 @@ class DriverController extends Controller
             // 🎯 Exemples réalistes multiples pour l'Algérie
             $examples = [
                 [
-                    'Benali', 'Ahmed', '1985-03-15', 'EMP-2024-001', 'Disponible',
-                    '2024-01-15', '2026-12-31', '0550123456', 'ahmed.benali@email.dz',
-                    '25 Rue Didouche Mourad, 16000 Alger', 'P-DZ-2020-001234', 'B,C',
-                    '2020-06-15', '2030-06-14', 'Wilaya d\'Alger', 'Benali Fatima',
-                    '0661234567', 'O+'
+                    'Benali',
+                    'Ahmed',
+                    '1985-03-15',
+                    'EMP-2024-001',
+                    'Disponible',
+                    '2024-01-15',
+                    '2026-12-31',
+                    '0550123456',
+                    'ahmed.benali@email.dz',
+                    '25 Rue Didouche Mourad, 16000 Alger',
+                    'P-DZ-2020-001234',
+                    'B,C',
+                    '2020-06-15',
+                    '2030-06-14',
+                    'Wilaya d\'Alger',
+                    'Benali Fatima',
+                    '0661234567',
+                    'O+'
                 ],
                 [
-                    'Kaddour', 'Amina', '1990-07-22', 'EMP-2024-002', 'En formation',
-                    '2024-02-01', '', '0770987654', 'amina.kaddour@gmail.com',
-                    '18 Boulevard Mohamed V, 31000 Oran', 'P-DZ-2021-005678', 'B',
-                    '2021-09-10', '2031-09-09', 'Wilaya d\'Oran', 'Kaddour Mohamed',
-                    '0552987654', 'A+'
+                    'Kaddour',
+                    'Amina',
+                    '1990-07-22',
+                    'EMP-2024-002',
+                    'En formation',
+                    '2024-02-01',
+                    '',
+                    '0770987654',
+                    'amina.kaddour@gmail.com',
+                    '18 Boulevard Mohamed V, 31000 Oran',
+                    'P-DZ-2021-005678',
+                    'B',
+                    '2021-09-10',
+                    '2031-09-09',
+                    'Wilaya d\'Oran',
+                    'Kaddour Mohamed',
+                    '0552987654',
+                    'A+'
                 ],
                 [
-                    'Slimani', 'Youcef', '1982-11-08', 'EMP-2024-003', 'Disponible',
-                    '2024-01-20', '2025-12-31', '0665555444', 'y.slimani@outlook.com',
-                    '42 Rue Larbi Ben M\'hidi, 25000 Constantine', 'P-DZ-2019-009876', 'B,C,D',
-                    '2019-04-20', '2029-04-19', 'Wilaya de Constantine', 'Slimani Aicha',
-                    '0771555444', 'B-'
+                    'Slimani',
+                    'Youcef',
+                    '1982-11-08',
+                    'EMP-2024-003',
+                    'Disponible',
+                    '2024-01-20',
+                    '2025-12-31',
+                    '0665555444',
+                    'y.slimani@outlook.com',
+                    '42 Rue Larbi Ben M\'hidi, 25000 Constantine',
+                    'P-DZ-2019-009876',
+                    'B,C,D',
+                    '2019-04-20',
+                    '2029-04-19',
+                    'Wilaya de Constantine',
+                    'Slimani Aicha',
+                    '0771555444',
+                    'B-'
                 ]
             ];
 
@@ -850,7 +893,6 @@ class DriverController extends Controller
                 'Pragma' => 'no-cache',
                 'Expires' => '0'
             ]);
-
         } catch (\Exception $e) {
             Log::error('Driver template download error', [
                 'error_message' => $e->getMessage(),
@@ -961,7 +1003,7 @@ class DriverController extends Controller
                 ->where(function ($query) {
                     $organizationId = auth()->user()->organization_id;
                     $query->whereNull('organization_id')
-                          ->orWhere('organization_id', $organizationId);
+                        ->orWhere('organization_id', $organizationId);
                 })
                 ->pluck('id', 'name');
             $defaultStatusId = $statuses->get('Disponible');
@@ -1030,7 +1072,6 @@ class DriverController extends Controller
                         'organization_id' => $newDriver->organization_id,
                         'timestamp' => now()->toISOString()
                     ]);
-
                 } catch (QueryException $e) {
                     $databaseError = $this->formatDatabaseError($e);
 
@@ -1053,7 +1094,6 @@ class DriverController extends Controller
                         'error_code' => $e->getCode(),
                         'timestamp' => now()->format('H:i:s')
                     ];
-
                 } catch (\Exception $e) {
                     $criticalError = sprintf(
                         "Erreur critique: %s dans %s ligne %d",
@@ -1119,7 +1159,6 @@ class DriverController extends Controller
                 ->with('processingTime', $processingTime)
                 ->with('successRate', $successRate)
                 ->with('totalRecords', count($records));
-                
         } catch (\Exception $e) {
             $processingTime = round((microtime(true) - $startTime) * 1000, 2);
 
@@ -1169,25 +1208,25 @@ class DriverController extends Controller
                 ->withInput();
         }
     }
-    
+
     /**
      * Affiche les résultats de l'importation.
      */
     public function showImportResults(): View
     {
         $this->authorize('create drivers');
-        
+
         $successCount = session('successCount', 0);
         $errorRows = session('errorRows', []);
         $importId = session('importId', null);
         $fileName = session('fileName', 'Fichier CSV');
         $encoding = session('encoding', 'utf8');
-        
+
         return view('admin.drivers.import-results', compact(
-            'successCount', 
-            'errorRows', 
-            'importId', 
-            'fileName', 
+            'successCount',
+            'errorRows',
+            'importId',
+            'fileName',
             'encoding'
         ));
     }
@@ -1239,8 +1278,8 @@ class DriverController extends Controller
                 $search = strtolower($request->search);
                 $query->where(function ($q) use ($search) {
                     $q->whereRaw('LOWER(first_name) LIKE ?', ["%{$search}%"])
-                      ->orWhereRaw('LOWER(last_name) LIKE ?', ["%{$search}%"])
-                      ->orWhereRaw('LOWER(employee_number) LIKE ?', ["%{$search}%"]);
+                        ->orWhereRaw('LOWER(last_name) LIKE ?', ["%{$search}%"])
+                        ->orWhereRaw('LOWER(employee_number) LIKE ?', ["%{$search}%"]);
                 });
             }
 
@@ -1255,12 +1294,12 @@ class DriverController extends Controller
             // Déterminer la base de données pour utiliser les bonnes fonctions
             $driver = config('database.default');
             $isPostgres = $driver === 'pgsql';
-            
+
             // Formule SQL pour calcul d'ancienneté (compatible MySQL et PostgreSQL)
-            $seniorityFormula = $isPostgres 
-                ? 'EXTRACT(YEAR FROM AGE(CURRENT_DATE, recruitment_date))' 
+            $seniorityFormula = $isPostgres
+                ? 'EXTRACT(YEAR FROM AGE(CURRENT_DATE, recruitment_date))'
                 : 'TIMESTAMPDIFF(YEAR, recruitment_date, CURDATE())';
-            
+
             $stats = [
                 'total_archived' => $archivedQuery->count(),
                 'archived_this_month' => (clone $archivedQuery)
@@ -1289,7 +1328,6 @@ class DriverController extends Controller
             $filters = $request->only(['archived_from', 'archived_to', 'status_id', 'search']);
 
             return view('admin.drivers.archived', compact('drivers', 'stats', 'driverStatuses', 'filters'));
-
         } catch (\Exception $e) {
             // Log d'erreur avec contexte complet
             Log::error('Driver archives access error', [
@@ -1324,67 +1362,70 @@ class DriverController extends Controller
     {
         // Liste des encodages à tester dans l'ordre de priorité
         $encodings = ['UTF-8', 'ISO-8859-1', 'Windows-1252'];
-        
+
         foreach ($encodings as $encoding) {
             $sample = mb_convert_encoding($content, 'UTF-8', $encoding);
-            
+
             // Si la conversion ne génère pas de caractères invalides, c'est probablement le bon encodage
             if (!preg_match('/\p{Cc}(?!\n|\t|\r)/u', $sample)) {
                 switch ($encoding) {
-                    case 'UTF-8': return 'utf8';
-                    case 'ISO-8859-1': return 'iso';
-                    case 'Windows-1252': return 'windows';
+                    case 'UTF-8':
+                        return 'utf8';
+                    case 'ISO-8859-1':
+                        return 'iso';
+                    case 'Windows-1252':
+                        return 'windows';
                 }
             }
         }
-        
+
         // Par défaut, on suppose Windows-1252 (encodage courant pour les CSV générés par Excel)
         return 'windows';
     }
-    
+
     /**
      * Convertit un contenu vers UTF-8 depuis un encodage spécifié.
      */
     private function convertToUtf8(string $content, string $fromEncoding): string
     {
-        $sourceEncoding = match($fromEncoding) {
+        $sourceEncoding = match ($fromEncoding) {
             'iso' => 'ISO-8859-1',
             'windows' => 'Windows-1252',
             default => 'UTF-8'
         };
-        
+
         return mb_convert_encoding($content, 'UTF-8', $sourceEncoding);
     }
-    
+
     /**
      * Nettoie les données d'un enregistrement CSV.
      */
     private function sanitizeRecord(array $record): array
     {
         $sanitized = [];
-        
+
         foreach ($record as $key => $value) {
             // Nettoyage des clés (y compris le BOM UTF-8)
             $cleanKey = trim($key);
             if (str_starts_with($cleanKey, "\xef\xbb\xbf")) {
                 $cleanKey = substr($cleanKey, 3);
             }
-            
+
             // Nettoyage des valeurs
             if (is_string($value)) {
                 // Suppression des caractères invisibles et normalisation des espaces
                 $cleanValue = trim(preg_replace('/\s+/', ' ', $value));
-                
+
                 // Conversion des chaînes vides en NULL
                 $sanitized[$cleanKey] = $cleanValue === '' ? null : $cleanValue;
             } else {
                 $sanitized[$cleanKey] = $value;
             }
         }
-        
+
         return $sanitized;
     }
-    
+
     /**
      * Detects the format of the import file based on its content.
      *
@@ -1497,7 +1538,6 @@ class DriverController extends Controller
             $records = \League\Csv\Statement::create()->process($csv);
 
             return iterator_to_array($records, true);
-
         } catch (\League\Csv\SyntaxError $e) {
             Log::error('CSV parsing syntax error', [
                 'error' => $e->getMessage(),
@@ -1557,9 +1597,9 @@ class DriverController extends Controller
             'notes' => 'notes',
             'remarques' => 'notes',
         ];
-        
+
         $dataToValidate = [];
-        
+
         foreach ($map as $csvHeader => $dbField) {
             if (array_key_exists($csvHeader, $record)) {
                 $value = trim((string)$record[$csvHeader]);
@@ -1571,8 +1611,12 @@ class DriverController extends Controller
 
                 // 🗓️ Traitement spécifique pour les dates
                 if (in_array($dbField, [
-                    'birth_date', 'license_issue_date', 'recruitment_date',
-                    'contract_end_date', 'hire_date', 'driver_license_expiry_date'
+                    'birth_date',
+                    'license_issue_date',
+                    'recruitment_date',
+                    'contract_end_date',
+                    'hire_date',
+                    'driver_license_expiry_date'
                 ]) && $value) {
                     $value = $this->formatDate($value);
                 }
@@ -1658,14 +1702,14 @@ class DriverController extends Controller
         // Rechercher le statut dans la base
         // 🔧 CORRECTION: Utiliser withoutGlobalScope pour accéder aux statuts globaux
         $status = \App\Models\DriverStatus::withoutGlobalScope('organization')
-            ->where(function($query) {
+            ->where(function ($query) {
                 $organizationId = auth()->user()->organization_id;
                 $query->whereNull('organization_id')
-                      ->orWhere('organization_id', $organizationId);
+                    ->orWhere('organization_id', $organizationId);
             })
-            ->where(function($query) use ($statusName, $normalizedText) {
+            ->where(function ($query) use ($statusName, $normalizedText) {
                 $query->whereRaw('LOWER(name) = ?', [strtolower($statusName)])
-                      ->orWhereRaw('LOWER(name) = ?', [$normalizedText]);
+                    ->orWhereRaw('LOWER(name) = ?', [$normalizedText]);
             })
             ->first();
 
@@ -1677,10 +1721,10 @@ class DriverController extends Controller
         // Si aucun statut trouvé, utiliser le statut par défaut 'Disponible'
         // 🔧 CORRECTION: Utiliser withoutGlobalScope pour accéder aux statuts globaux
         $defaultStatus = \App\Models\DriverStatus::withoutGlobalScope('organization')
-            ->where(function($query) {
+            ->where(function ($query) {
                 $organizationId = auth()->user()->organization_id;
                 $query->whereNull('organization_id')
-                      ->orWhere('organization_id', $organizationId);
+                    ->orWhere('organization_id', $organizationId);
             })
             ->where('name', 'Disponible')
             ->first();
@@ -1707,9 +1751,15 @@ class DriverController extends Controller
         }
 
         $formats = [
-            'd/m/Y', 'd-m-Y', 'd.m.Y',
-            'Y/m/d', 'Y-m-d', 'Y.m.d',
-            'd/m/y', 'd-m-y', 'd.m.y'
+            'd/m/Y',
+            'd-m-Y',
+            'd.m.Y',
+            'Y/m/d',
+            'Y-m-d',
+            'Y.m.d',
+            'd/m/y',
+            'd-m-y',
+            'd.m.y'
         ];
 
         foreach ($formats as $format) {
@@ -1727,7 +1777,7 @@ class DriverController extends Controller
         // et retourne un message d'erreur clair à l'utilisateur.
         return $dateString;
     }
-    
+
     /**
      * Formate une erreur de base de données de manière conviviale.
      */
@@ -1772,7 +1822,7 @@ class DriverController extends Controller
         // Erreur par défaut
         return "Erreur de base de données: " . Str::limit($e->getMessage(), 150);
     }
-    
+
     /**
      * Règles de validation pour l'importation de chauffeurs.
      */
@@ -1945,7 +1995,7 @@ class DriverController extends Controller
             }
 
             // Nettoyage et normalisation des en-têtes
-            $cleanHeaders = array_map(function($header) {
+            $cleanHeaders = array_map(function ($header) {
                 return strtolower(trim($header));
             }, $headers);
 
@@ -2012,9 +2062,9 @@ class DriverController extends Controller
     private function validateHeadersEnterprise(array $csvHeaders, array $detectedHeaders): void
     {
         // Nettoyage des en-têtes CSV
-        $cleanCsvHeaders = array_map(function($header) {
+        $cleanCsvHeaders = array_map(function ($header) {
             return strtolower(trim($header));
-        }, array_filter($csvHeaders, function($header) {
+        }, array_filter($csvHeaders, function ($header) {
             return !empty(trim($header)) && !str_starts_with(trim($header), '#');
         }));
 
@@ -2026,7 +2076,7 @@ class DriverController extends Controller
 
         // Vérification des doublons avec algorithme avancé
         $headerCounts = array_count_values($cleanCsvHeaders);
-        $duplicates = array_filter($headerCounts, function($count) {
+        $duplicates = array_filter($headerCounts, function ($count) {
             return $count > 1;
         });
 
@@ -2091,7 +2141,7 @@ class DriverController extends Controller
                     'method' => 'getDriverStatuses',
                     'timestamp' => now()->toISOString()
                 ]);
-                
+
                 // Exécuter le seeder en urgence
                 $this->runEmergencyStatusSeeder();
             }
@@ -2115,11 +2165,11 @@ class DriverController extends Controller
                     if ($user->hasRole('Super Admin')) {
                         // Super Admin: tous les statuts (globaux + spécifiques)
                         $query->whereNull('organization_id')
-                              ->orWhereNotNull('organization_id');
+                            ->orWhereNotNull('organization_id');
                     } else {
                         // Autres: globaux + spécifiques à leur organisation
                         $query->whereNull('organization_id')
-                              ->orWhere('organization_id', $organizationId);
+                            ->orWhere('organization_id', $organizationId);
                     }
                 })
                 ->orderBy('sort_order')
@@ -2133,19 +2183,19 @@ class DriverController extends Controller
                     'user_id' => $user->id,
                     'user_role' => $user->getRoleNames()->first()
                 ]);
-                
+
                 $this->createDefaultDriverStatuses($organizationId);
-                
+
                 // Recharger les statuts après création
                 $statuses = DriverStatus::withoutGlobalScope('organization')
                     ->where('is_active', true)
                     ->where(function ($query) use ($organizationId, $user) {
                         if ($user->hasRole('Super Admin')) {
                             $query->whereNull('organization_id')
-                                  ->orWhereNotNull('organization_id');
+                                ->orWhereNotNull('organization_id');
                         } else {
                             $query->whereNull('organization_id')
-                                  ->orWhere('organization_id', $organizationId);
+                                ->orWhere('organization_id', $organizationId);
                         }
                     })
                     ->orderBy('sort_order')
@@ -2186,7 +2236,6 @@ class DriverController extends Controller
 
                 return $statuses;
             }
-
         } catch (\Exception $e) {
             Log::error('❌ Critical error fetching driver statuses - using emergency fallback', [
                 'error_message' => $e->getMessage(),
@@ -2211,17 +2260,16 @@ class DriverController extends Controller
     {
         try {
             Log::info('🚨 Running emergency DriverStatusesSeeder');
-            
+
             $seeder = new \Database\Seeders\DriverStatusesSeeder();
             $seeder->run();
-            
+
             Log::info('✅ Emergency seeder completed successfully');
-            
         } catch (\Exception $e) {
             Log::error('❌ Emergency seeder failed', [
                 'error' => $e->getMessage()
             ]);
-            
+
             // Alternative: créer directement les statuts
             $this->createDefaultDriverStatuses();
         }
@@ -2302,7 +2350,6 @@ class DriverController extends Controller
                 'organization_id' => $organizationId,
                 'count' => count($defaultStatuses)
             ]);
-
         } catch (\Exception $e) {
             Log::error('Failed to create default driver statuses', [
                 'error' => $e->getMessage(),
@@ -2321,7 +2368,7 @@ class DriverController extends Controller
             'user_id' => auth()->id(),
             'timestamp' => now()->toISOString()
         ]);
-        
+
         // Créer une collection de statuts minimaux compatible avec Alpine.js
         return collect([
             [

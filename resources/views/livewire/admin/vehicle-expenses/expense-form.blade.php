@@ -5,15 +5,15 @@
             <h1 class="text-2xl font-bold text-gray-900 dark:text-white">
                 {{ $isEditMode ? 'Modifier la dépense' : 'Nouvelle dépense' }}
             </h1>
-            
+
             <div class="flex items-center gap-3">
-                <button type="button" 
-                        wire:click="cancel"
-                        class="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition">
+                <button type="button"
+                    wire:click="cancel"
+                    class="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition">
                     Annuler
                 </button>
-                <button type="submit" 
-                        class="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition">
+                <button type="submit"
+                    class="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition">
                     {{ $isEditMode ? 'Mettre à jour' : 'Créer' }}
                 </button>
             </div>
@@ -28,31 +28,29 @@
 
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div>
-                        <x-label for="expense_number" value="N° Dépense *" />
-                        <x-input 
+                        <x-input-label for="expense_number" value="N° Dépense *" />
+                        <x-input
                             id="expense_number"
                             wire:model="expense_number"
                             :disabled="$isEditMode"
                             class="w-full"
-                            required
-                        />
+                            required />
                         @error('expense_number') <span class="text-sm text-red-500">{{ $message }}</span> @enderror
                     </div>
 
                     <div>
-                        <x-label for="expense_date" value="Date de dépense *" />
-                        <x-input 
+                        <x-input-label for="expense_date" value="Date de dépense *" />
+                        <x-input
                             id="expense_date"
                             type="date"
                             wire:model="expense_date"
                             class="w-full"
-                            required
-                        />
+                            required />
                         @error('expense_date') <span class="text-sm text-red-500">{{ $message }}</span> @enderror
                     </div>
 
                     <div>
-                        <x-label for="priority_level" value="Priorité" />
+                        <x-input-label for="priority_level" value="Priorité" />
                         <x-select id="priority_level" wire:model="priority_level" class="w-full">
                             <option value="low">Faible</option>
                             <option value="normal">Normale</option>
@@ -64,7 +62,7 @@
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                        <x-label for="vehicle_id" value="Véhicule *" />
+                        <x-input-label for="vehicle_id" value="Véhicule *" />
                         <x-select id="vehicle_id" wire:model.live="vehicle_id" class="w-full" required>
                             <option value="">Sélectionner un véhicule</option>
                             @foreach($vehicles as $vehicle)
@@ -77,7 +75,7 @@
                     </div>
 
                     <div>
-                        <x-label for="driver_id" value="Chauffeur" />
+                        <x-input-label for="driver_id" value="Chauffeur" />
                         <x-select id="driver_id" wire:model="driver_id" class="w-full">
                             <option value="">Sélectionner un chauffeur</option>
                             @foreach($drivers as $driver)
@@ -91,7 +89,7 @@
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                        <x-label for="category" value="Catégorie *" />
+                        <x-input-label for="category" value="Catégorie *" />
                         <x-select id="category" wire:model.live="category" class="w-full" required>
                             <option value="">Sélectionner une catégorie</option>
                             @foreach(\App\Models\VehicleExpense::EXPENSE_CATEGORIES as $key => $label)
@@ -102,7 +100,7 @@
                     </div>
 
                     <div>
-                        <x-label for="sub_category" value="Sous-catégorie" />
+                        <x-input-label for="sub_category" value="Sous-catégorie" />
                         @if(count($subcategories) > 0)
                         <x-select id="sub_category" wire:model="sub_category" class="w-full">
                             <option value="">Sélectionner une sous-catégorie</option>
@@ -111,48 +109,44 @@
                             @endforeach
                         </x-select>
                         @else
-                        <x-input 
+                        <x-input
                             id="sub_category"
                             wire:model="sub_category"
                             placeholder="Entrer une sous-catégorie"
-                            class="w-full"
-                        />
+                            class="w-full" />
                         @endif
                     </div>
                 </div>
 
                 <div>
-                    <x-label for="description" value="Description *" />
-                    <x-textarea 
+                    <x-input-label for="description" value="Description *" />
+                    <x-textarea
                         id="description"
                         wire:model="description"
                         class="w-full"
                         rows="3"
-                        required
-                    />
+                        required />
                     @error('description') <span class="text-sm text-red-500">{{ $message }}</span> @enderror
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                        <x-label for="odometer_reading" value="Kilométrage actuel" />
-                        <x-input 
+                        <x-input-label for="odometer_reading" value="Kilométrage actuel" />
+                        <x-input
                             id="odometer_reading"
                             type="number"
                             wire:model="odometer_reading"
                             class="w-full"
-                            min="0"
-                        />
+                            min="0" />
                     </div>
 
                     <div>
-                        <x-label for="location" value="Lieu" />
-                        <x-input 
+                        <x-input-label for="location" value="Lieu" />
+                        <x-input
                             id="location"
                             wire:model="location"
                             placeholder="Ex: Alger, Station Shell..."
-                            class="w-full"
-                        />
+                            class="w-full" />
                     </div>
                 </div>
             </div>
@@ -167,101 +161,94 @@
 
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div>
-                        <x-label for="quantity" value="Quantité" />
-                        <x-input 
+                        <x-input-label for="quantity" value="Quantité" />
+                        <x-input
                             id="quantity"
                             type="number"
                             wire:model.live="quantity"
                             class="w-full"
                             min="0.01"
-                            step="0.01"
-                        />
+                            step="0.01" />
                     </div>
 
                     <div>
-                        <x-label for="unit_price" value="Prix unitaire" />
-                        <x-input 
+                        <x-input-label for="unit_price" value="Prix unitaire" />
+                        <x-input
                             id="unit_price"
                             type="number"
                             wire:model.live="unit_price"
                             class="w-full"
                             min="0"
-                            step="0.01"
-                        />
+                            step="0.01" />
                     </div>
 
                     <div>
-                        <x-label for="amount" value="Montant HT *" />
-                        <x-input 
+                        <x-input-label for="amount" value="Montant HT *" />
+                        <x-input
                             id="amount"
                             type="number"
                             wire:model.live="amount"
                             class="w-full"
                             min="0"
                             step="0.01"
-                            required
-                        />
+                            required />
                         @error('amount') <span class="text-sm text-red-500">{{ $message }}</span> @enderror
                     </div>
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
                     <div>
-                        <x-label for="tax_rate" value="Taux TVA (%)" />
-                        <x-input 
+                        <x-input-label for="tax_rate" value="Taux TVA (%)" />
+                        <x-input
                             id="tax_rate"
                             type="number"
                             wire:model.live="tax_rate"
                             class="w-full"
                             min="0"
                             max="100"
-                            step="0.01"
-                        />
+                            step="0.01" />
                     </div>
 
                     <div>
-                        <x-label for="tax_amount" value="Montant TVA" />
-                        <x-input 
+                        <x-input-label for="tax_amount" value="Montant TVA" />
+                        <x-input
                             id="tax_amount"
                             type="number"
                             wire:model="tax_amount"
                             class="w-full bg-gray-50 dark:bg-gray-800"
-                            readonly
-                        />
+                            readonly />
                     </div>
 
                     <div>
-                        <x-label for="discount_amount" value="Remise" />
-                        <x-input 
+                        <x-input-label for="discount_amount" value="Remise" />
+                        <x-input
                             id="discount_amount"
                             type="number"
                             wire:model.live="discount_amount"
                             class="w-full"
                             min="0"
-                            step="0.01"
-                        />
+                            step="0.01" />
                     </div>
 
                     <div>
-                        <x-label for="total_amount" value="Total TTC" />
-                        <x-input 
+                        <x-input-label for="total_amount" value="Total TTC" />
+                        <x-input
                             id="total_amount"
                             type="number"
                             wire:model="total_amount"
                             class="w-full bg-gray-50 dark:bg-gray-800 font-bold text-lg"
-                            readonly
-                        />
+                            readonly />
                     </div>
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                        <x-label for="expense_group_id" value="Groupe de dépenses" />
+                        <x-input-label for="expense_group_id" value="Groupe de dépenses" />
                         <x-select id="expense_group_id" wire:model="expense_group_id" class="w-full">
                             <option value="">Sélectionner un groupe</option>
                             @foreach($expenseGroups as $group)
                             <option value="{{ $group->id }}">
-                                {{ $group->name }} 
+                                {{ $group->name }}
                                 @if($group->budget_allocated > 0)
                                 (Budget: {{ number_format($group->budget_remaining, 2) }} / {{ number_format($group->budget_allocated, 2) }} DZD)
                                 @endif
@@ -271,13 +258,12 @@
                     </div>
 
                     <div>
-                        <x-label for="cost_center" value="Centre de coût" />
-                        <x-input 
+                        <x-input-label for="cost_center" value="Centre de coût" />
+                        <x-input
                             id="cost_center"
                             wire:model="cost_center"
                             placeholder="Ex: DEP-001, PROJ-2025"
-                            class="w-full"
-                        />
+                            class="w-full" />
                     </div>
                 </div>
             </div>
@@ -292,7 +278,7 @@
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                        <x-label for="supplier_id" value="Fournisseur" />
+                        <x-input-label for="supplier_id" value="Fournisseur" />
                         <x-select id="supplier_id" wire:model="supplier_id" class="w-full">
                             <option value="">Sélectionner un fournisseur</option>
                             @foreach($suppliers as $supplier)
@@ -302,39 +288,36 @@
                     </div>
 
                     <div>
-                        <x-label for="invoice_number" value="N° Facture" />
-                        <x-input 
+                        <x-input-label for="invoice_number" value="N° Facture" />
+                        <x-input
                             id="invoice_number"
                             wire:model="invoice_number"
-                            class="w-full"
-                        />
+                            class="w-full" />
                     </div>
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                        <x-label for="reference_number" value="N° Référence" />
-                        <x-input 
+                        <x-input-label for="reference_number" value="N° Référence" />
+                        <x-input
                             id="reference_number"
                             wire:model="reference_number"
-                            class="w-full"
-                        />
+                            class="w-full" />
                     </div>
 
                     <div>
-                        <x-label for="external_reference" value="Référence externe" />
-                        <x-input 
+                        <x-input-label for="external_reference" value="Référence externe" />
+                        <x-input
                             id="external_reference"
                             wire:model="external_reference"
                             placeholder="Ex: PO-12345, CMD-2025"
-                            class="w-full"
-                        />
+                            class="w-full" />
                     </div>
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                        <x-label for="payment_method" value="Méthode de paiement" />
+                        <x-input-label for="payment_method" value="Méthode de paiement" />
                         <x-select id="payment_method" wire:model="payment_method" class="w-full">
                             @foreach(\App\Models\VehicleExpense::PAYMENT_METHODS as $key => $label)
                             <option value="{{ $key }}">{{ $label }}</option>
@@ -343,7 +326,7 @@
                     </div>
 
                     <div>
-                        <x-label for="payment_status" value="Statut de paiement" />
+                        <x-input-label for="payment_status" value="Statut de paiement" />
                         <x-select id="payment_status" wire:model="payment_status" class="w-full">
                             <option value="unpaid">Non payé</option>
                             <option value="paid">Payé</option>
@@ -356,23 +339,21 @@
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                        <x-label for="payment_date" value="Date de paiement" />
-                        <x-input 
+                        <x-input-label for="payment_date" value="Date de paiement" />
+                        <x-input
                             id="payment_date"
                             type="date"
                             wire:model="payment_date"
-                            class="w-full"
-                        />
+                            class="w-full" />
                     </div>
 
                     <div>
-                        <x-label for="due_date" value="Date d'échéance" />
-                        <x-input 
+                        <x-input-label for="due_date" value="Date d'échéance" />
+                        <x-input
                             id="due_date"
                             type="date"
                             wire:model="due_date"
-                            class="w-full"
-                        />
+                            class="w-full" />
                     </div>
                 </div>
             </div>
@@ -386,19 +367,18 @@
                 </h3>
 
                 <div>
-                    <x-label for="attachments" value="Pièces jointes" />
-                    <input 
+                    <x-input-label for="attachments" value="Pièces jointes" />
+                    <input
                         id="attachments"
                         type="file"
                         wire:model="attachments"
                         multiple
                         accept=".pdf,.jpg,.jpeg,.png,.doc,.docx,.xls,.xlsx"
-                        class="block w-full text-sm text-gray-900 dark:text-white border border-gray-300 dark:border-gray-600 rounded-lg cursor-pointer bg-gray-50 dark:bg-gray-700 focus:outline-none"
-                    />
+                        class="block w-full text-sm text-gray-900 dark:text-white border border-gray-300 dark:border-gray-600 rounded-lg cursor-pointer bg-gray-50 dark:bg-gray-700 focus:outline-none" />
                     <p class="mt-1 text-sm text-gray-500">PDF, JPG, PNG, DOC, XLS (Max. 10MB par fichier)</p>
-                    
-                    @error('attachments.*') 
-                    <span class="text-sm text-red-500">{{ $message }}</span> 
+
+                    @error('attachments.*')
+                    <span class="text-sm text-red-500">{{ $message }}</span>
                     @enderror
 
                     {{-- Affichage des pièces jointes existantes --}}
@@ -411,8 +391,8 @@
                                 {{ $attachment['name'] ?? 'Fichier' }}
                             </span>
                             <button type="button"
-                                    wire:click="removeAttachment({{ $index }})"
-                                    class="text-red-600 hover:text-red-700">
+                                wire:click="removeAttachment({{ $index }})"
+                                class="text-red-600 hover:text-red-700">
                                 <x-iconify icon="solar:trash-bin-2-bold" class="w-4 h-4" />
                             </button>
                         </div>
@@ -422,27 +402,26 @@
                 </div>
 
                 <div>
-                    <x-label for="notes" value="Notes" />
-                    <x-textarea 
+                    <x-input-label for="notes" value="Notes" />
+                    <x-textarea
                         id="notes"
                         wire:model="notes"
                         class="w-full"
                         rows="4"
-                        placeholder="Ajouter des notes ou commentaires..."
-                    />
+                        placeholder="Ajouter des notes ou commentaires..." />
                 </div>
             </div>
         </x-card>
 
         {{-- Boutons d'action (répétés pour visibilité) --}}
         <div class="flex items-center justify-end gap-3">
-            <button type="button" 
-                    wire:click="cancel"
-                    class="px-6 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition">
+            <button type="button"
+                wire:click="cancel"
+                class="px-6 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition">
                 Annuler
             </button>
-            <button type="submit" 
-                    class="px-6 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition">
+            <button type="submit"
+                class="px-6 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition">
                 <span wire:loading.remove>
                     {{ $isEditMode ? 'Mettre à jour' : 'Créer la dépense' }}
                 </span>

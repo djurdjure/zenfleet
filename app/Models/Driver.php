@@ -17,25 +17,43 @@ class Driver extends Model
 
     protected $fillable = [
         // Champs de base
-        'user_id', 'organization_id', 'first_name', 'last_name', 'email',
+        'user_id',
+        'organization_id',
+        'first_name',
+        'last_name',
+        'email',
 
         // Informations personnelles
-        'employee_number', 'birth_date', 'blood_type',
-        'personal_phone', 'personal_email', 'address', 'city', 'postal_code',
+        'employee_number',
+        'birth_date',
+        'blood_type',
+        'personal_phone',
+        'personal_email',
+        'address',
+        'city',
+        'postal_code',
 
         // Permis de conduire
-        'license_number', 'license_category', 'license_categories',
+        'license_number',
+        'license_categories',
         'license_expiry_date', // ✅ CORRECTION: Nom de colonne réel dans la DB
-        'license_issue_date', 'license_authority',
+        'license_issue_date',
+        'license_authority',
+        'license_verified',
 
         // Emploi et statut
-        'recruitment_date', 'contract_end_date', 'status_id',
+        'recruitment_date',
+        'contract_end_date',
+        'status_id',
 
         // Contact d'urgence
-        'emergency_contact_name', 'emergency_contact_phone', 'emergency_contact_relationship',
+        'emergency_contact_name',
+        'emergency_contact_phone',
+        'emergency_contact_relationship',
 
         // Photo et documents
-        'photo', 'notes',
+        'photo',
+        'notes',
 
         // Superviseur
         'supervisor_id',
@@ -48,6 +66,7 @@ class Driver extends Model
         'license_expiry_date' => 'date', // ✅ CORRECTION: Nom de colonne réel dans la DB
         'license_issue_date' => 'date',
         'license_categories' => 'array', // Cast JSON pour les catégories multiples
+        'license_verified' => 'boolean',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
         'deleted_at' => 'datetime',
@@ -149,7 +168,7 @@ class Driver extends Model
      */
     public function isCurrentlyAssigned(): bool
     {
-       return $this->assignments()->whereNull('end_datetime')->exists();
+        return $this->assignments()->whereNull('end_datetime')->exists();
     }
 
     /**

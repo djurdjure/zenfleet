@@ -41,7 +41,7 @@ class DriverIndex extends Component
     #[Url(except: '')]
     public $visibility = 'active'; // active, archived, all
 
-    public $per_page = 15;
+    public $per_page = 20;
 
     // ↕️ Tri
     public $sortField = 'created_at';
@@ -66,7 +66,7 @@ class DriverIndex extends Component
     public function confirmingDriver()
     {
         $id = $this->archivingDriverId ?? $this->restoringDriverId ?? $this->forceDeletingDriverId;
-        
+
         if (!$id) return null;
 
         return Driver::withTrashed()->find($id);
@@ -81,9 +81,18 @@ class DriverIndex extends Component
     }
 
     // 🔄 Lifecycle Hooks
-    public function updatingSearch() { $this->resetPage(); }
-    public function updatingVisibility() { $this->resetPage(); }
-    public function updatingStatusId() { $this->resetPage(); }
+    public function updatingSearch()
+    {
+        $this->resetPage();
+    }
+    public function updatingVisibility()
+    {
+        $this->resetPage();
+    }
+    public function updatingStatusId()
+    {
+        $this->resetPage();
+    }
 
     /**
      * 🔄 Réinitialiser les filtres
@@ -237,13 +246,13 @@ class DriverIndex extends Component
         $activeAssignment = $driver->assignments()
             ->where(function ($query) {
                 $query->whereNull('end_datetime')
-                      ->orWhere('end_datetime', '>', now());
+                    ->orWhere('end_datetime', '>', now());
             })
             ->first();
 
         if ($activeAssignment) {
             $this->dispatch('toast', [
-                'type' => 'error', 
+                'type' => 'error',
                 'message' => "Impossible d'archiver : Affectation #{$activeAssignment->id} en cours (Début : " . $activeAssignment->start_datetime->format('d/m/Y H:i') . ")"
             ]);
             $this->cancelArchive();
@@ -342,7 +351,7 @@ class DriverIndex extends Component
 
             if ($response->successful()) {
                 $filename = 'Fiche_Chauffeur_' . $driver->employee_number . '.pdf';
-                
+
                 return response()->streamDownload(function () use ($response) {
                     echo $response->body();
                 }, $filename);

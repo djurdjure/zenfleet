@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Services;
 
 use App\Models\Driver;
@@ -13,8 +14,14 @@ use Illuminate\Support\Str;
 class DriverService
 {
     protected DriverRepositoryInterface $driverRepository;
-    public function __construct(DriverRepositoryInterface $driverRepository) { $this->driverRepository = $driverRepository; }
-    public function getFilteredDrivers(array $filters): LengthAwarePaginator { return $this->driverRepository->getFiltered($filters); }
+    public function __construct(DriverRepositoryInterface $driverRepository)
+    {
+        $this->driverRepository = $driverRepository;
+    }
+    public function getFilteredDrivers(array $filters): LengthAwarePaginator
+    {
+        return $this->driverRepository->getFiltered($filters);
+    }
 
     /**
      * 🚀 CRÉATION ENTERPRISE DE CHAUFFEUR AVEC USER AUTO
@@ -101,6 +108,15 @@ class DriverService
                 $user = User::find($data['user_id']);
             }
 
+            // ✅ FIX: S'assurer que license_categories est bien un array propre
+            if (isset($data['license_categories'])) {
+                if (!is_array($data['license_categories'])) {
+                    $data['license_categories'] = json_decode($data['license_categories'], true) ?? [];
+                }
+                // Nettoyer le tableau : supprimer les valeurs vides et réindexer
+                $data['license_categories'] = array_values(array_filter($data['license_categories'], fn($v) => !empty($v)));
+            }
+
             // 🚗 CRÉER LE CHAUFFEUR
             $driver = $this->driverRepository->create($data);
 
@@ -122,6 +138,15 @@ class DriverService
             $photoPath = $data['photo']->store('drivers/photos', 'public');
             $data['photo'] = $photoPath;
         }
+
+        // ✅ FIX: S'assurer que license_categories est bien un array
+        if (isset($data['license_categories']) && !is_array($data['license_categories'])) {
+            $data['license_categories'] = json_decode($data['license_categories'], true) ?? [];
+        }
+
+        // ✅ FIX: Gérer la checkbox license_verified (si non coché, mettre false)
+        $data['license_verified'] = $data['license_verified'] ?? false;
+
         $this->driverRepository->update($driver, $data);
         return $driver->fresh(); // Retourne l'objet Driver mis à jour
     }
@@ -133,7 +158,7 @@ class DriverService
         $hasActiveAssignments = $driver->assignments()
             ->where(function ($query) {
                 $query->whereNull('end_datetime')
-                      ->orWhere('end_datetime', '>', now());
+                    ->orWhere('end_datetime', '>', now());
             })
             ->exists();
 
@@ -152,14 +177,14 @@ class DriverService
         return null;
     }
 
-   public function forceDeleteDriver(int $driverId): bool
+    public function forceDeleteDriver(int $driverId): bool
     {
         $driver = $this->driverRepository->findTrashed($driverId);
 
         if ($driver) {
             return DB::transaction(function () use ($driver) {
                 // ⚠️ SUPPRESSION EN CASCADE - TOUS LES ENREGISTREMENTS LIÉS
-                
+
                 // 1. Supprimer les affectations (assignments)
                 if ($driver->assignments()->exists()) {
                     \Log::info('Deleting assignments for driver', [

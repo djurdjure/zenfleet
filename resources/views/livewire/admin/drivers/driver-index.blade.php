@@ -16,7 +16,7 @@
                     ({{ $drivers->total() }})
                 </span>
             </h1>
-            
+
             {{-- Loading Indicator --}}
             <div wire:loading class="flex items-center gap-2 text-blue-600">
                 <x-iconify icon="lucide:loader-2" class="w-5 h-5 animate-spin" />
@@ -115,17 +115,17 @@
                 <div class="flex items-center gap-2">
                     {{-- Toggle Archives --}}
                     @if($visibility === 'archived')
-                        <button wire:click="$set('visibility', 'active')"
-                           class="inline-flex items-center gap-2 px-4 py-2.5 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-all duration-200 shadow-sm hover:shadow-md">
-                            <x-iconify icon="lucide:list" class="w-5 h-5" />
-                            <span class="hidden lg:inline font-medium">Voir Actifs</span>
-                        </button>
+                    <button wire:click="$set('visibility', 'active')"
+                        class="inline-flex items-center gap-2 px-4 py-2.5 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-all duration-200 shadow-sm hover:shadow-md">
+                        <x-iconify icon="lucide:list" class="w-5 h-5" />
+                        <span class="hidden lg:inline font-medium">Voir Actifs</span>
+                    </button>
                     @else
-                        <button wire:click="$set('visibility', 'archived')"
-                           class="inline-flex items-center gap-2 px-4 py-2.5 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-all duration-200 shadow-sm hover:shadow-md">
-                            <x-iconify icon="lucide:archive" class="w-5 h-5 text-amber-600" />
-                            <span class="hidden lg:inline font-medium text-gray-700">Voir Archives</span>
-                        </button>
+                    <button wire:click="$set('visibility', 'archived')"
+                        class="inline-flex items-center gap-2 px-4 py-2.5 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-all duration-200 shadow-sm hover:shadow-md">
+                        <x-iconify icon="lucide:archive" class="w-5 h-5 text-amber-600" />
+                        <span class="hidden lg:inline font-medium text-gray-700">Voir Archives</span>
+                    </button>
                     @endif
 
                     {{-- Export Dropdown --}}
@@ -163,14 +163,14 @@
 
                     {{-- Import --}}
                     <a href="{{ route('admin.drivers.import.show') }}"
-                       class="inline-flex items-center gap-2 px-4 py-2.5 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-all duration-200 shadow-sm hover:shadow-md">
+                        class="inline-flex items-center gap-2 px-4 py-2.5 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-all duration-200 shadow-sm hover:shadow-md">
                         <x-iconify icon="lucide:upload" class="w-5 h-5" />
                         <span class="font-medium">Importer</span>
                     </a>
 
                     {{-- Nouveau Chauffeur --}}
                     <a href="{{ route('admin.drivers.create') }}"
-                       class="inline-flex items-center gap-2 px-4 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all duration-200 shadow-sm hover:shadow-md">
+                        class="inline-flex items-center gap-2 px-4 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all duration-200 shadow-sm hover:shadow-md">
                         <x-iconify icon="lucide:plus" class="w-5 h-5" />
                         <span class="font-medium">Nouveau Chauffeur</span>
                     </a>
@@ -187,10 +187,10 @@
                     {{-- Statut --}}
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1.5">Statut</label>
-                        <select wire:model.live="status_id" class="block w-full border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                            <option value="">Tous les statuts</option>
+                        <select wire:model.live="status_id" class="slimselect-field w-full" data-slimselect="true" data-placeholder="Tous les statuts">
+                            <option value="" data-placeholder="true">Tous les statuts</option>
                             @foreach($driverStatuses as $status)
-                                <option value="{{ $status->id }}">{{ $status->name }}</option>
+                            <option value="{{ $status->id }}">{{ $status->name }}</option>
                             @endforeach
                         </select>
                     </div>
@@ -198,10 +198,10 @@
                     {{-- Catégorie Permis --}}
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1.5">Catégorie permis</label>
-                        <select wire:model.live="license_category" class="block w-full border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                            <option value="">Toutes les catégories</option>
+                        <select wire:model.live="license_category" class="slimselect-field w-full" data-slimselect="true" data-placeholder="Toutes les catégories">
+                            <option value="" data-placeholder="true">Toutes les catégories</option>
                             @foreach(['A1', 'A', 'B', 'BE', 'C1', 'C1E', 'C', 'CE', 'D', 'DE', 'F'] as $cat)
-                                <option value="{{ $cat }}">{{ $cat }}</option>
+                            <option value="{{ $cat }}">{{ $cat }}</option>
                             @endforeach
                         </select>
                     </div>
@@ -221,33 +221,33 @@
             TABLE DES CHAUFFEURS (Enterprise-Grade)
         =============================================== --}}
         <div class="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden relative">
-            
+
             {{-- Bulk Actions Floating Menu --}}
             @if(count($selectedDrivers) > 0)
-                <div class="absolute top-0 left-0 right-0 z-10 bg-blue-50 p-2 flex items-center justify-between border-b border-blue-100 animate-fade-in-down">
-                    <div class="flex items-center gap-3 px-4">
-                        <span class="font-medium text-blue-900">{{ count($selectedDrivers) }} sélectionné(s)</span>
-                        <button wire:click="$set('selectedDrivers', [])" class="text-sm text-blue-600 hover:text-blue-800 underline">
-                            Annuler
-                        </button>
-                    </div>
-                    <div class="flex items-center gap-2 px-4">
-                        @if($visibility === 'archived')
-                            <button wire:click="bulkRestore" class="inline-flex items-center gap-1 px-3 py-1.5 bg-green-600 text-white text-sm font-medium rounded hover:bg-green-700">
-                                <x-iconify icon="lucide:rotate-ccw" class="w-4 h-4" /> Restaurer
-                            </button>
-                            <button wire:click="bulkForceDelete" 
-                                onclick="confirm('Êtes-vous sûr de vouloir supprimer définitivement ces chauffeurs ?') || event.stopImmediatePropagation()"
-                                class="inline-flex items-center gap-1 px-3 py-1.5 bg-red-600 text-white text-sm font-medium rounded hover:bg-red-700">
-                                <x-iconify icon="lucide:trash-2" class="w-4 h-4" /> Supprimer
-                            </button>
-                        @else
-                            <button wire:click="bulkArchive" class="inline-flex items-center gap-1 px-3 py-1.5 bg-orange-600 text-white text-sm font-medium rounded hover:bg-orange-700">
-                                <x-iconify icon="lucide:archive" class="w-4 h-4" /> Archiver
-                            </button>
-                        @endif
-                    </div>
+            <div class="absolute top-0 left-0 right-0 z-10 bg-blue-50 p-2 flex items-center justify-between border-b border-blue-100 animate-fade-in-down">
+                <div class="flex items-center gap-3 px-4">
+                    <span class="font-medium text-blue-900">{{ count($selectedDrivers) }} sélectionné(s)</span>
+                    <button wire:click="$set('selectedDrivers', [])" class="text-sm text-blue-600 hover:text-blue-800 underline">
+                        Annuler
+                    </button>
                 </div>
+                <div class="flex items-center gap-2 px-4">
+                    @if($visibility === 'archived')
+                    <button wire:click="bulkRestore" class="inline-flex items-center gap-1 px-3 py-1.5 bg-green-600 text-white text-sm font-medium rounded hover:bg-green-700">
+                        <x-iconify icon="lucide:rotate-ccw" class="w-4 h-4" /> Restaurer
+                    </button>
+                    <button wire:click="bulkForceDelete"
+                        onclick="confirm('Êtes-vous sûr de vouloir supprimer définitivement ces chauffeurs ?') || event.stopImmediatePropagation()"
+                        class="inline-flex items-center gap-1 px-3 py-1.5 bg-red-600 text-white text-sm font-medium rounded hover:bg-red-700">
+                        <x-iconify icon="lucide:trash-2" class="w-4 h-4" /> Supprimer
+                    </button>
+                    @else
+                    <button wire:click="bulkArchive" class="inline-flex items-center gap-1 px-3 py-1.5 bg-orange-600 text-white text-sm font-medium rounded hover:bg-orange-700">
+                        <x-iconify icon="lucide:archive" class="w-4 h-4" /> Archiver
+                    </button>
+                    @endif
+                </div>
+            </div>
             @endif
 
             <div class="overflow-x-auto">
@@ -260,7 +260,7 @@
                             <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer" wire:click="sortBy('last_name')">
                                 Chauffeur
                                 @if($sortField === 'last_name')
-                                    <x-iconify icon="{{ $sortDirection === 'asc' ? 'lucide:arrow-up' : 'lucide:arrow-down' }}" class="w-3 h-3 inline ml-1" />
+                                <x-iconify icon="{{ $sortDirection === 'asc' ? 'lucide:arrow-up' : 'lucide:arrow-down' }}" class="w-3 h-3 inline ml-1" />
                                 @endif
                             </th>
                             <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Contact</th>
@@ -272,147 +272,156 @@
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-200">
                         @forelse($drivers as $driver)
-                            <tr wire:key="driver-{{ $driver->id }}" class="hover:bg-gray-50 transition-colors duration-150 {{ in_array($driver->id, $selectedDrivers) ? 'bg-blue-50' : '' }}">
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <input type="checkbox" wire:click="toggleSelection({{ $driver->id }})" @if(in_array($driver->id, $selectedDrivers)) checked @endif class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="flex items-center">
-                                        <div class="flex-shrink-0 h-10 w-10 rounded-full overflow-hidden">
-                                            @if($driver->photo)
-                                                <img src="{{ asset('storage/' . $driver->photo) }}" class="h-full w-full object-cover">
-                                            @else
-                                                <div class="h-10 w-10 bg-gradient-to-br from-blue-100 to-indigo-100 rounded-full flex items-center justify-center">
-                                                    <span class="text-sm font-semibold text-blue-700">
-                                                        {{ strtoupper(substr($driver->first_name, 0, 1) . substr($driver->last_name, 0, 1)) }}
-                                                    </span>
-                                                </div>
-                                            @endif
+                        <tr wire:key="driver-{{ $driver->id }}" class="hover:bg-gray-50 transition-colors duration-150 {{ in_array($driver->id, $selectedDrivers) ? 'bg-blue-50' : '' }}">
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <input type="checkbox" wire:click="toggleSelection({{ $driver->id }})" @if(in_array($driver->id, $selectedDrivers)) checked @endif class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="flex items-center">
+                                    <div class="flex-shrink-0 h-10 w-10 rounded-full overflow-hidden">
+                                        @if($driver->photo)
+                                        <img src="{{ asset('storage/' . $driver->photo) }}" class="h-full w-full object-cover">
+                                        @else
+                                        <div class="h-10 w-10 bg-gradient-to-br from-blue-100 to-indigo-100 rounded-full flex items-center justify-center">
+                                            <span class="text-sm font-semibold text-blue-700">
+                                                {{ strtoupper(substr($driver->first_name, 0, 1) . substr($driver->last_name, 0, 1)) }}
+                                            </span>
                                         </div>
-                                        <div class="ml-4">
-                                            <div class="text-sm font-medium text-gray-900">
-                                                {{ $driver->first_name }} {{ $driver->last_name }}
-                                            </div>
-                                            <div class="text-sm text-gray-500">#{{ $driver->employee_number }}</div>
+                                        @endif
+                                    </div>
+                                    <div class="ml-4">
+                                        <div class="text-sm font-medium text-gray-900">
+                                            {{ $driver->first_name }} {{ $driver->last_name }}
                                         </div>
+                                        <div class="text-sm text-gray-500">#{{ $driver->employee_number }}</div>
                                     </div>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="text-sm text-gray-900 flex items-center gap-1.5">
-                                        <x-iconify icon="lucide:phone" class="w-4 h-4 text-gray-400" /> {{ $driver->personal_phone ?? 'N/A' }}
-                                    </div>
-                                    <div class="text-sm text-gray-500 flex items-center gap-1.5">
-                                        <x-iconify icon="lucide:mail" class="w-4 h-4 text-gray-400" /> {{ $driver->personal_email ?? 'N/A' }}
-                                    </div>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="text-sm font-medium text-gray-900">{{ $driver->license_number }}</div>
-                                    @if($driver->license_category)
-                                        <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800">
-                                            Catégorie {{ $driver->license_category }}
-                                        </span>
-                                    @endif
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    @php
-                                        $statusName = $driver->driverStatus->name ?? 'N/A';
-                                        $colors = [
-                                            'Disponible' => 'bg-green-100 text-green-800',
-                                            'En mission' => 'bg-orange-100 text-orange-800',
-                                            'En repos' => 'bg-amber-100 text-amber-800',
-                                            'En congé' => 'bg-purple-100 text-purple-800',
-                                            'Maladie' => 'bg-red-100 text-red-800',
-                                            'Indisponible' => 'bg-gray-100 text-gray-800',
-                                        ];
-                                        $colorClass = $colors[$statusName] ?? 'bg-gray-100 text-gray-800';
-                                    @endphp
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $colorClass }}">
-                                        {{ $statusName }}
-                                    </span>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                    @if($driver->activeAssignment && $driver->activeAssignment->vehicle)
-                                        <div class="flex items-center gap-1.5">
-                                            <x-iconify icon="lucide:car" class="w-4 h-4 text-blue-600" />
-                                            <span class="font-medium text-gray-900">{{ $driver->activeAssignment->vehicle->registration_plate }}</span>
-                                        </div>
-                                    @else
-                                        <span class="text-gray-400 italic">Aucun véhicule</span>
-                                    @endif
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                    <div class="flex items-center justify-end" x-data="{ open: false }">
-                                        <div class="relative">
-                                            <button @click="open = !open" @click.away="open = false" class="text-gray-400 hover:text-gray-600 p-1 rounded-full hover:bg-gray-100 transition-colors">
-                                                <x-iconify icon="lucide:more-vertical" class="w-5 h-5" />
-                                            </button>
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm text-gray-900 flex items-center gap-1.5">
+                                    <x-iconify icon="lucide:phone" class="w-4 h-4 text-gray-400" /> {{ $driver->personal_phone ?? 'N/A' }}
+                                </div>
+                                <div class="text-sm text-gray-500 flex items-center gap-1.5">
+                                    <x-iconify icon="lucide:mail" class="w-4 h-4 text-gray-400" /> {{ $driver->personal_email ?? 'N/A' }}
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm font-medium text-gray-900">{{ $driver->license_number }}</div>
+                                @if($driver->license_category)
+                                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800">
+                                    Catégorie {{ $driver->license_category }}
+                                </span>
+                                @endif
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                @php
+                                $statusName = $driver->driverStatus->name ?? 'N/A';
+                                $colors = [
+                                'Disponible' => 'bg-green-100 text-green-800',
+                                'En mission' => 'bg-orange-100 text-orange-800',
+                                'En repos' => 'bg-amber-100 text-amber-800',
+                                'En congé' => 'bg-purple-100 text-purple-800',
+                                'Maladie' => 'bg-red-100 text-red-800',
+                                'Indisponible' => 'bg-gray-100 text-gray-800',
+                                ];
+                                $colorClass = $colors[$statusName] ?? 'bg-gray-100 text-gray-800';
+                                @endphp
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $colorClass }}">
+                                    {{ $statusName }}
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                @if($driver->activeAssignment && $driver->activeAssignment->vehicle)
+                                <div class="flex items-center gap-1.5">
+                                    <x-iconify icon="lucide:car" class="w-4 h-4 text-blue-600" />
+                                    <span class="font-medium text-gray-900">{{ $driver->activeAssignment->vehicle->registration_plate }}</span>
+                                </div>
+                                @else
+                                <span class="text-gray-400 italic">Aucun véhicule</span>
+                                @endif
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                <div class="flex items-center justify-end" x-data="{ open: false }">
+                                    <div class="relative">
+                                        <button @click="open = !open" @click.away="open = false" class="text-gray-400 hover:text-gray-600 p-1 rounded-full hover:bg-gray-100 transition-colors">
+                                            <x-iconify icon="lucide:more-vertical" class="w-5 h-5" />
+                                        </button>
 
-                                            <div x-show="open" 
-                                                 x-transition:enter="transition ease-out duration-100"
-                                                 x-transition:enter-start="transform opacity-0 scale-95"
-                                                 x-transition:enter-end="transform opacity-100 scale-100"
-                                                 x-transition:leave="transition ease-in duration-75"
-                                                 x-transition:leave-start="transform opacity-100 scale-100"
-                                                 x-transition:leave-end="transform opacity-0 scale-95"
-                                                 class="absolute right-0 z-20 mt-2 w-48 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none" 
-                                                 style="display: none;">
-                                                <div class="py-1">
-                                                    @if($driver->deleted_at)
-                                                        <button wire:click="confirmRestore({{ $driver->id }}); open = false" class="group flex w-full items-center px-4 py-2 text-sm text-green-700 hover:bg-green-50">
-                                                            <x-iconify icon="lucide:rotate-ccw" class="mr-3 h-4 w-4 text-green-500" />
-                                                            Restaurer
-                                                        </button>
-                                                        <button wire:click="confirmForceDelete({{ $driver->id }}); open = false" class="group flex w-full items-center px-4 py-2 text-sm text-red-700 hover:bg-red-50">
-                                                            <x-iconify icon="lucide:trash" class="mr-3 h-4 w-4 text-red-500" />
-                                                            Supprimer
-                                                        </button>
-                                                    @else
-                                                        <a href="{{ route('admin.drivers.show', $driver) }}" class="group flex w-full items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                                                            <x-iconify icon="lucide:eye" class="mr-3 h-4 w-4 text-blue-500" />
-                                                            Voir détails
-                                                        </a>
-                                                        <a href="{{ route('admin.drivers.edit', $driver) }}" class="group flex w-full items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                                                            <x-iconify icon="lucide:edit" class="mr-3 h-4 w-4 text-gray-500" />
-                                                            Modifier
-                                                        </a>
-                                                        <button wire:click="exportPdf({{ $driver->id }}); open = false" class="group flex w-full items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                                                            <x-iconify icon="lucide:file-text" class="mr-3 h-4 w-4 text-red-500" />
-                                                            Exporter PDF
-                                                        </button>
-                                                        <div class="border-t border-gray-100 my-1"></div>
-                                                        <button wire:click="confirmArchive({{ $driver->id }}); open = false" class="group flex w-full items-center px-4 py-2 text-sm text-orange-700 hover:bg-orange-50">
-                                                            <x-iconify icon="lucide:archive" class="mr-3 h-4 w-4 text-orange-500" />
-                                                            Archiver
-                                                        </button>
-                                                    @endif
-                                                </div>
+                                        <div x-show="open"
+                                            x-transition:enter="transition ease-out duration-100"
+                                            x-transition:enter-start="transform opacity-0 scale-95"
+                                            x-transition:enter-end="transform opacity-100 scale-100"
+                                            x-transition:leave="transition ease-in duration-75"
+                                            x-transition:leave-start="transform opacity-100 scale-100"
+                                            x-transition:leave-end="transform opacity-0 scale-95"
+                                            class="absolute right-0 z-20 mt-2 w-48 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
+                                            style="display: none;">
+                                            <div class="py-1">
+                                                @if($driver->deleted_at)
+                                                <button wire:click="confirmRestore({{ $driver->id }}); open = false" class="group flex w-full items-center px-4 py-2 text-sm text-green-700 hover:bg-green-50">
+                                                    <x-iconify icon="lucide:rotate-ccw" class="mr-3 h-4 w-4 text-green-500" />
+                                                    Restaurer
+                                                </button>
+                                                <button wire:click="confirmForceDelete({{ $driver->id }}); open = false" class="group flex w-full items-center px-4 py-2 text-sm text-red-700 hover:bg-red-50">
+                                                    <x-iconify icon="lucide:trash" class="mr-3 h-4 w-4 text-red-500" />
+                                                    Supprimer
+                                                </button>
+                                                @else
+                                                <a href="{{ route('admin.drivers.show', $driver) }}" class="group flex w-full items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                                    <x-iconify icon="lucide:eye" class="mr-3 h-4 w-4 text-blue-500" />
+                                                    Voir détails
+                                                </a>
+                                                <a href="{{ route('admin.drivers.edit', $driver) }}" class="group flex w-full items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                                    <x-iconify icon="lucide:edit" class="mr-3 h-4 w-4 text-gray-500" />
+                                                    Modifier
+                                                </a>
+                                                <button wire:click="exportPdf({{ $driver->id }}); open = false" class="group flex w-full items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                                    <x-iconify icon="lucide:file-text" class="mr-3 h-4 w-4 text-red-500" />
+                                                    Exporter PDF
+                                                </button>
+                                                <div class="border-t border-gray-100 my-1"></div>
+                                                <button wire:click="confirmArchive({{ $driver->id }}); open = false" class="group flex w-full items-center px-4 py-2 text-sm text-orange-700 hover:bg-orange-50">
+                                                    <x-iconify icon="lucide:archive" class="mr-3 h-4 w-4 text-orange-500" />
+                                                    Archiver
+                                                </button>
+                                                @endif
                                             </div>
                                         </div>
                                     </div>
-                                </td>
-                            </tr>
+                                </div>
+                            </td>
+                        </tr>
                         @empty
-                            <tr>
-                                <td colspan="7" class="px-6 py-12 text-center">
-                                    <div class="flex flex-col items-center justify-center">
-                                        <x-iconify icon="lucide:users" class="w-16 h-16 text-gray-300 mb-4" />
-                                        <h3 class="text-lg font-medium text-gray-900 mb-2">Aucun chauffeur trouvé</h3>
-                                        <p class="text-sm text-gray-500 mb-4">Essayez de modifier vos filtres ou ajoutez un nouveau chauffeur.</p>
-                                        <a href="{{ route('admin.drivers.create') }}" class="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
-                                            <x-iconify icon="lucide:plus" class="w-5 h-5" />
-                                            Ajouter un chauffeur
-                                        </a>
-                                    </div>
-                                </td>
-                            </tr>
+                        <tr>
+                            <td colspan="7" class="px-6 py-12 text-center">
+                                <div class="flex flex-col items-center justify-center">
+                                    <x-iconify icon="lucide:users" class="w-16 h-16 text-gray-300 mb-4" />
+                                    <h3 class="text-lg font-medium text-gray-900 mb-2">Aucun chauffeur trouvé</h3>
+                                    <p class="text-sm text-gray-500 mb-4">Essayez de modifier vos filtres ou ajoutez un nouveau chauffeur.</p>
+                                    <a href="{{ route('admin.drivers.create') }}" class="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                                        <x-iconify icon="lucide:plus" class="w-5 h-5" />
+                                        Ajouter un chauffeur
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
                         @endforelse
                     </tbody>
                 </table>
             </div>
 
             {{-- Pagination --}}
-            <div class="bg-white px-4 py-3 border-t border-gray-200 sm:px-6">
-                {{ $drivers->links() }}
+            <div class="bg-white px-4 py-3 border-t border-gray-200 sm:px-6 flex flex-col sm:flex-row justify-between items-center gap-4">
+                <div class="flex-1">
+                    {{ $drivers->links() }}
+                </div>
+                <div class="flex items-center gap-2">
+                    <select wire:model.live="per_page" class="border-gray-300 rounded-md text-sm py-1.5 pl-2 pr-8 focus:ring-blue-500 focus:border-blue-500 shadow-sm cursor-pointer hover:bg-gray-50">
+                        <option value="20">20</option>
+                        <option value="50">50</option>
+                        <option value="100">100</option>
+                    </select>
+                </div>
             </div>
         </div>
     </div>
@@ -423,130 +432,130 @@
 
     {{-- Archive Modal --}}
     @if($showArchiveModal)
-        <div class="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
-            <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-                <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" wire:click="cancelArchive"></div>
-                <span class="hidden sm:inline-block sm:align-middle sm:h-screen">&#8203;</span>
-                <div class="inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full sm:p-6">
-                    <div class="sm:flex sm:items-start">
-                        <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-orange-100 sm:mx-0 sm:h-10 sm:w-10">
-                            <x-iconify icon="lucide:archive" class="w-6 h-6 text-orange-600" />
-                        </div>
-                        <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
-                            <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-title">Archiver le chauffeur</h3>
-                            <div class="mt-2">
-                                <p class="text-sm text-gray-500">
-                                    Êtes-vous sûr de vouloir archiver le chauffeur 
-                                    <span class="font-bold text-gray-900">{{ $this->confirmingDriver?->full_name }}</span> 
-                                    (<span class="font-medium">#{{ $this->confirmingDriver?->employee_number }}</span>) ?
-                                </p>
-                                <p class="mt-2 text-sm text-gray-500">
-                                    Il ne sera plus visible dans la liste active, mais pourra être restauré ultérieurement.
-                                </p>
-                            </div>
+    <div class="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+        <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" wire:click="cancelArchive"></div>
+            <span class="hidden sm:inline-block sm:align-middle sm:h-screen">&#8203;</span>
+            <div class="inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full sm:p-6">
+                <div class="sm:flex sm:items-start">
+                    <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-orange-100 sm:mx-0 sm:h-10 sm:w-10">
+                        <x-iconify icon="lucide:archive" class="w-6 h-6 text-orange-600" />
+                    </div>
+                    <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+                        <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-title">Archiver le chauffeur</h3>
+                        <div class="mt-2">
+                            <p class="text-sm text-gray-500">
+                                Êtes-vous sûr de vouloir archiver le chauffeur
+                                <span class="font-bold text-gray-900">{{ $this->confirmingDriver?->full_name }}</span>
+                                (<span class="font-medium">#{{ $this->confirmingDriver?->employee_number }}</span>) ?
+                            </p>
+                            <p class="mt-2 text-sm text-gray-500">
+                                Il ne sera plus visible dans la liste active, mais pourra être restauré ultérieurement.
+                            </p>
                         </div>
                     </div>
-                    <div class="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse">
-                        <button wire:click="archiveDriver" type="button" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-orange-600 text-base font-medium text-white hover:bg-orange-700 focus:outline-none sm:ml-3 sm:w-auto sm:text-sm">
-                            Archiver
-                        </button>
-                        <button wire:click="cancelArchive" type="button" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none sm:mt-0 sm:w-auto sm:text-sm">
-                            Annuler
-                        </button>
-                    </div>
+                </div>
+                <div class="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse">
+                    <button wire:click="archiveDriver" type="button" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-orange-600 text-base font-medium text-white hover:bg-orange-700 focus:outline-none sm:ml-3 sm:w-auto sm:text-sm">
+                        Archiver
+                    </button>
+                    <button wire:click="cancelArchive" type="button" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none sm:mt-0 sm:w-auto sm:text-sm">
+                        Annuler
+                    </button>
                 </div>
             </div>
         </div>
+    </div>
     @endif
 
     {{-- Restore Modal --}}
     @if($showRestoreModal)
-        <div class="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
-            <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-                <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" wire:click="cancelRestore"></div>
-                <span class="hidden sm:inline-block sm:align-middle sm:h-screen">&#8203;</span>
-                <div class="inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full sm:p-6">
-                    <div class="sm:flex sm:items-start">
-                        <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-green-100 sm:mx-0 sm:h-10 sm:w-10">
-                            <x-iconify icon="lucide:rotate-ccw" class="w-6 h-6 text-green-600" />
-                        </div>
-                        <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
-                            <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-title">Restaurer le chauffeur</h3>
-                            <div class="mt-2">
-                                <p class="text-sm text-gray-500">
-                                    Êtes-vous sûr de vouloir restaurer le chauffeur 
-                                    <span class="font-bold text-gray-900">{{ $this->confirmingDriver?->full_name }}</span> 
-                                    (<span class="font-medium">#{{ $this->confirmingDriver?->employee_number }}</span>) ?
-                                </p>
-                                <p class="mt-2 text-sm text-gray-500">
-                                    Il réapparaîtra dans la liste active et pourra être affecté à nouveau.
-                                </p>
-                            </div>
+    <div class="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+        <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" wire:click="cancelRestore"></div>
+            <span class="hidden sm:inline-block sm:align-middle sm:h-screen">&#8203;</span>
+            <div class="inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full sm:p-6">
+                <div class="sm:flex sm:items-start">
+                    <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-green-100 sm:mx-0 sm:h-10 sm:w-10">
+                        <x-iconify icon="lucide:rotate-ccw" class="w-6 h-6 text-green-600" />
+                    </div>
+                    <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+                        <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-title">Restaurer le chauffeur</h3>
+                        <div class="mt-2">
+                            <p class="text-sm text-gray-500">
+                                Êtes-vous sûr de vouloir restaurer le chauffeur
+                                <span class="font-bold text-gray-900">{{ $this->confirmingDriver?->full_name }}</span>
+                                (<span class="font-medium">#{{ $this->confirmingDriver?->employee_number }}</span>) ?
+                            </p>
+                            <p class="mt-2 text-sm text-gray-500">
+                                Il réapparaîtra dans la liste active et pourra être affecté à nouveau.
+                            </p>
                         </div>
                     </div>
-                    <div class="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse">
-                        <button wire:click="restoreDriver" type="button" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-green-600 text-base font-medium text-white hover:bg-green-700 focus:outline-none sm:ml-3 sm:w-auto sm:text-sm">
-                            Restaurer
-                        </button>
-                        <button wire:click="cancelRestore" type="button" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none sm:mt-0 sm:w-auto sm:text-sm">
-                            Annuler
-                        </button>
-                    </div>
+                </div>
+                <div class="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse">
+                    <button wire:click="restoreDriver" type="button" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-green-600 text-base font-medium text-white hover:bg-green-700 focus:outline-none sm:ml-3 sm:w-auto sm:text-sm">
+                        Restaurer
+                    </button>
+                    <button wire:click="cancelRestore" type="button" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none sm:mt-0 sm:w-auto sm:text-sm">
+                        Annuler
+                    </button>
                 </div>
             </div>
         </div>
+    </div>
     @endif
 
     {{-- Force Delete Modal --}}
     @if($showForceDeleteModal)
-        <div class="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
-            <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-                <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" wire:click="cancelForceDelete"></div>
-                <span class="hidden sm:inline-block sm:align-middle sm:h-screen">&#8203;</span>
-                <div class="inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full sm:p-6">
-                    <div class="sm:flex sm:items-start">
-                        <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
-                            <x-iconify icon="lucide:trash-2" class="w-6 h-6 text-red-600" />
-                        </div>
-                        <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
-                            <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-title">Suppression définitive</h3>
-                            <div class="mt-2">
-                                <p class="text-sm text-gray-500">
-                                    Êtes-vous sûr de vouloir supprimer définitivement le chauffeur 
-                                    <span class="font-bold text-gray-900">{{ $this->confirmingDriver?->full_name }}</span> 
-                                    (<span class="font-medium">#{{ $this->confirmingDriver?->employee_number }}</span>) ?
-                                </p>
-                                <div class="mt-3 bg-red-50 border border-red-200 rounded-md p-3">
-                                    <div class="flex">
-                                        <div class="flex-shrink-0">
-                                            <x-iconify icon="lucide:alert-triangle" class="h-5 w-5 text-red-400" />
-                                        </div>
-                                        <div class="ml-3">
-                                            <h3 class="text-sm font-medium text-red-800">Attention : Action irréversible</h3>
-                                            <div class="mt-2 text-sm text-red-700">
-                                                <ul role="list" class="list-disc pl-5 space-y-1">
-                                                    <li>Toutes les données personnelles seront effacées.</li>
-                                                    <li>L'historique des affectations sera détaché.</li>
-                                                    <li>Cette action ne peut pas être annulée.</li>
-                                                </ul>
-                                            </div>
+    <div class="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+        <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" wire:click="cancelForceDelete"></div>
+            <span class="hidden sm:inline-block sm:align-middle sm:h-screen">&#8203;</span>
+            <div class="inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full sm:p-6">
+                <div class="sm:flex sm:items-start">
+                    <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
+                        <x-iconify icon="lucide:trash-2" class="w-6 h-6 text-red-600" />
+                    </div>
+                    <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+                        <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-title">Suppression définitive</h3>
+                        <div class="mt-2">
+                            <p class="text-sm text-gray-500">
+                                Êtes-vous sûr de vouloir supprimer définitivement le chauffeur
+                                <span class="font-bold text-gray-900">{{ $this->confirmingDriver?->full_name }}</span>
+                                (<span class="font-medium">#{{ $this->confirmingDriver?->employee_number }}</span>) ?
+                            </p>
+                            <div class="mt-3 bg-red-50 border border-red-200 rounded-md p-3">
+                                <div class="flex">
+                                    <div class="flex-shrink-0">
+                                        <x-iconify icon="lucide:alert-triangle" class="h-5 w-5 text-red-400" />
+                                    </div>
+                                    <div class="ml-3">
+                                        <h3 class="text-sm font-medium text-red-800">Attention : Action irréversible</h3>
+                                        <div class="mt-2 text-sm text-red-700">
+                                            <ul role="list" class="list-disc pl-5 space-y-1">
+                                                <li>Toutes les données personnelles seront effacées.</li>
+                                                <li>L'historique des affectations sera détaché.</li>
+                                                <li>Cette action ne peut pas être annulée.</li>
+                                            </ul>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <div class="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse">
-                        <button wire:click="forceDeleteDriver" type="button" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none sm:ml-3 sm:w-auto sm:text-sm">
-                            Supprimer
-                        </button>
-                        <button wire:click="cancelForceDelete" type="button" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none sm:mt-0 sm:w-auto sm:text-sm">
-                            Annuler
-                        </button>
-                    </div>
+                </div>
+                <div class="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse">
+                    <button wire:click="forceDeleteDriver" type="button" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none sm:ml-3 sm:w-auto sm:text-sm">
+                        Supprimer
+                    </button>
+                    <button wire:click="cancelForceDelete" type="button" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none sm:mt-0 sm:w-auto sm:text-sm">
+                        Annuler
+                    </button>
                 </div>
             </div>
         </div>
+    </div>
     @endif
 
 </div>
