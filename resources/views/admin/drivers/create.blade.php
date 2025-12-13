@@ -318,52 +318,37 @@
                                         :error="$errors->first('license_number')"
                                         helpText="Numéro du permis de conduire" />
 
-                                    {{-- Catégories de permis - Solution Enterprise avec checkboxes --}}
+                                    {{-- Catégories de permis - Solution Enterprise SlimSelect Multi-Select --}}
                                     @php
                                     $licenseOptions = [
-                                    'A1' => 'A1 - Motocyclettes légères',
-                                    'A' => 'A - Motocyclettes',
-                                    'B' => 'B - Véhicules légers',
-                                    'BE' => 'B(E) - Véhicules légers avec remorque',
-                                    'C1' => 'C1 - Poids lourds légers',
-                                    'C1E' => 'C1(E) - Poids lourds légers avec remorque',
-                                    'C' => 'C - Poids lourds',
-                                    'CE' => 'C(E) - Poids lourds avec remorque',
-                                    'D' => 'D - Transport de personnes',
-                                    'DE' => 'D(E) - Transport de personnes avec remorque',
-                                    'F' => 'F - Véhicules agricoles'
+                                        'A1' => 'A1 - Motocyclettes légères',
+                                        'A' => 'A - Motocyclettes',
+                                        'B' => 'B - Véhicules légers',
+                                        'BE' => 'B(E) - Véhicules légers avec remorque',
+                                        'C1' => 'C1 - Poids lourds légers',
+                                        'C1E' => 'C1(E) - Poids lourds légers avec remorque',
+                                        'C' => 'C - Poids lourds',
+                                        'CE' => 'C(E) - Poids lourds avec remorque',
+                                        'D' => 'D - Transport de personnes',
+                                        'DE' => 'D(E) - Transport de personnes avec remorque',
+                                        'F' => 'F - Véhicules agricoles'
                                     ];
-                                    $oldCategories = old('license_categories', []);
-                                    if (!is_array($oldCategories)) $oldCategories = [];
+                                    $selectedCategories = old('license_categories', []);
+                                    if (!is_array($selectedCategories)) $selectedCategories = [];
                                     @endphp
 
                                     <div>
-                                        <label class="block text-sm font-medium text-gray-700 mb-2">
-                                            Catégories de permis <span class="text-red-500">*</span>
-                                        </label>
-
-                                        {{-- Grille de checkboxes pour sélection multiple --}}
-                                        <div class="grid grid-cols-2 md:grid-cols-3 gap-3 p-4 bg-gray-50 rounded-lg border border-gray-200">
-                                            @foreach($licenseOptions as $value => $label)
-                                            <label class="flex items-center gap-2 cursor-pointer hover:bg-white p-2 rounded transition-colors">
-                                                <input
-                                                    type="checkbox"
-                                                    name="license_categories[]"
-                                                    value="{{ $value }}"
-                                                    class="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                                                    {{ in_array($value, $oldCategories) ? 'checked' : '' }}>
-                                                <span class="text-sm text-gray-700">{{ $label }}</span>
-                                            </label>
-                                            @endforeach
-                                        </div>
-
-                                        @error('license_categories')
-                                        <p class="mt-1.5 text-sm text-red-600 flex items-center gap-1">
-                                            <x-iconify icon="heroicons:exclamation-circle" class="w-4 h-4" />
-                                            {{ $message }}
-                                        </p>
-                                        @enderror
-                                        <p class="mt-1 text-xs text-gray-500">Cochez les catégories de permis détenues par le chauffeur</p>
+                                        <x-slim-select
+                                            name="license_categories[]"
+                                            label="Catégories de permis"
+                                            :options="$licenseOptions"
+                                            :selected="$selectedCategories"
+                                            placeholder="Sélectionnez les catégories de permis..."
+                                            multiple="true"
+                                            required
+                                            :error="$errors->first('license_categories')"
+                                            @change="validateField('license_categories', $event.target.value)"
+                                            helpText="Sélectionnez toutes les catégories de permis détenues par le chauffeur" />
                                     </div>
 
                                     <x-datepicker
