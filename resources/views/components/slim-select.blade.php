@@ -13,7 +13,7 @@
 ])
 
 @php
-$selectId = 'slimselect-' . $name . '-' . uniqid();
+$selectId = 'slimselect-' . \Illuminate\Support\Str::slug($name) . '-' . uniqid();
 @endphp
 
 <div {{ $attributes->merge(['class' => '']) }}>
@@ -80,127 +80,5 @@ $selectId = 'slimselect-' . $name . '-' . uniqid();
 @push('styles')
 @include('partials.slimselect-styles')
 @endpush
-
-@push('scripts')
-<script>
-    /**
-     * ====================================================================
-     * 🎯 SLIMSELECT ENTERPRISE INITIALIZATION
-     * ====================================================================
-     * Initialisation globale de SlimSelect avec style ZenFleet
-     */
-    function initializeSlimSelects() {
-        document.querySelectorAll('[data-slimselect="true"]').forEach(function(el) {
-            // Skip si déjà initialisé
-            if (el.slimSelectInstance) return;
-
-            const placeholder = el.getAttribute('data-placeholder') || 'Sélectionnez...';
-            const isSearchable = el.getAttribute('data-searchable') !== 'false';
-
-            try {
-                const instance = new SlimSelect({
-                    select: el,
-                    settings: {
-                        showSearch: isSearchable,
-                        searchPlaceholder: 'Rechercher...',
-                        searchText: 'Aucun résultat',
-                        searchingText: 'Recherche...',
-                        allowDeselect: true,
-                        placeholderText: placeholder,
-                        hideSelected: false,
-                        contentLocation: document.body,
-                        contentPosition: 'absolute'
-                    },
-                    events: {
-                        afterChange: function(newVal) {
-                            // ✅ FIX: Synchroniser les valeurs avec l'élément select original
-                            syncSlimSelectValues(el, newVal);
-                            // Dispatch change event pour Alpine.js et autres listeners
-                            el.dispatchEvent(new Event('change', {
-                                bubbles: true
-                            }));
-                        },
-                        afterOpen: function() {
-                            // Focus sur le champ de recherche
-                            var searchInput = document.querySelector('.ss-search input');
-                            if (searchInput) {
-                                setTimeout(function() {
-                                    searchInput.focus();
-                                }, 50);
-                            }
-                        }
-                    }
-                });
-
-                // Stocker l'instance pour référence
-                el.slimSelectInstance = instance;
-            } catch (e) {
-                console.error('SlimSelect init error:', e);
-            }
-        });
-
-        // ✅ FIX: Attacher handler de soumission aux formulaires contenant des SlimSelect
-        attachFormSubmitHandlers();
-    }
-
-    /**
-     * ✅ FIX ENTERPRISE: Synchronise les valeurs SlimSelect avec l'élément select natif
-     */
-    function syncSlimSelectValues(selectEl, values) {
-        if (!selectEl || !values) return;
-
-        // Reset all options
-        Array.from(selectEl.options).forEach(function(opt) {
-            opt.selected = false;
-        });
-
-        // Select the new values
-        var valueArray = Array.isArray(values) ? values : [values];
-        valueArray.forEach(function(val) {
-            var value = typeof val === 'object' ? val.value : val;
-            var option = selectEl.querySelector('option[value="' + value + '"]');
-            if (option) {
-                option.selected = true;
-            }
-        });
-    }
-
-    /**
-     * ✅ FIX ENTERPRISE: Attache un handler aux formulaires pour synchroniser avant soumission
-     */
-    function attachFormSubmitHandlers() {
-        document.querySelectorAll('form').forEach(function(form) {
-            if (form.dataset.slimSelectHandlerAttached) return;
-            form.dataset.slimSelectHandlerAttached = 'true';
-
-            form.addEventListener('submit', function(e) {
-                // Synchroniser tous les SlimSelect du formulaire avant soumission
-                form.querySelectorAll('[data-slimselect="true"]').forEach(function(selectEl) {
-                    if (selectEl.slimSelectInstance) {
-                        var selectedValues = selectEl.slimSelectInstance.getSelected();
-                        syncSlimSelectValues(selectEl, selectedValues);
-                        console.log('[SlimSelect] Synced values before submit:', selectEl.name, selectedValues);
-                    }
-                });
-            }, true); // Capture phase pour s'exécuter avant autres handlers
-        });
-    }
-
-    // Initialiser au chargement du DOM
-    document.addEventListener('DOMContentLoaded', initializeSlimSelects);
-
-    // Réinitialiser après navigation Livewire
-    document.addEventListener('livewire:navigated', initializeSlimSelects);
-
-    // Support Alpine.js
-    document.addEventListener('alpine:init', function() {
-        Alpine.magic('slimselect', function(el) {
-            return function() {
-                var selectEl = el.querySelector('[data-slimselect="true"]');
-                return selectEl ? selectEl.slimSelectInstance : null;
-            };
-        });
-    });
-</script>
-@endpush
+{{-- Script removed: Logic moved to ZenFleetSelect.js --}}
 @endonce

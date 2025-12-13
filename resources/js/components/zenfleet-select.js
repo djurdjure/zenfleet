@@ -93,7 +93,7 @@ class ZenFleetSelect {
         if (this.element.hasAttribute('wire:model') || this.element.hasAttribute('wire:model.live')) {
             merged.livewireSync = true;
             merged.livewireProperty = this.element.getAttribute('wire:model') ||
-                                     this.element.getAttribute('wire:model.live');
+                this.element.getAttribute('wire:model.live');
         }
 
         // Auto-détection multi-select
@@ -147,6 +147,9 @@ class ZenFleetSelect {
                 multiple: this.element.hasAttribute('multiple')
             });
 
+            // ✅ Enterprise Fix: Ensure robust sync with original select
+            this.setupFormSync();
+
         } catch (error) {
             this.logError('Initialization failed', error);
             this.handleError(error);
@@ -181,6 +184,9 @@ class ZenFleetSelect {
             // Événement après changement
             afterChange: (newVal) => {
                 this.log('debug', 'Value changed', { newValue: newVal });
+
+                // ✅ Enterprise Fix: Sync immediately on change
+                this.syncToOriginalSelect();
 
                 // Callback utilisateur
                 if (this.options.events.afterChange) {
@@ -279,6 +285,61 @@ class ZenFleetSelect {
             // Match tous les termes
             return searchTerms.every(term => textLower.includes(term));
         });
+    }
+
+    /**
+     * ✅ Enterprise Logic: Setup Form Synchronization
+     * Ensures that values are forcefully synced to the original select before submit
+     */
+    setupFormSync() {
+        const form = this.element.closest('form');
+        if (form && !form.dataset.zenfleetSelectHandlerAttached) {
+            form.dataset.zenfleetSelectHandlerAttached = 'true';
+
+            // Capture phase event listener to run before other handlers
+            form.addEventListener('submit', () => {
+                form.querySelectorAll('select').forEach(select => {
+                    if (select.zenfleetSelect) {
+                        select.zenfleetSelect.syncToOriginalSelect();
+                    }
+                });
+            }, true);
+
+            this.log('debug', 'Form submit handler attached');
+        }
+    }
+
+    /**
+     * ✅ Enterprise Logic: Force Sync to Original Select
+     * Critical for multi-selects where DOM state might desync
+     */
+    syncToOriginalSelect() {
+        if (!this.slimInstance) return;
+
+        const selectedValues = this.slimInstance.getSelected();
+        const valueArray = Array.isArray(selectedValues) ? selectedValues : [selectedValues];
+
+        // Reset all options
+        Array.from(this.element.options).forEach(opt => {
+            opt.selected = false;
+        });
+
+        // Set selected options
+        valueArray.forEach(val => {
+            // Handle both primitive values and object values from SlimSelect
+            const value = (val && typeof val === 'object' && 'value' in val) ? val.value : val;
+
+            // Find specific option to handle special characters in values safely
+            // We use attribute selector for exact match
+            const option = Array.from(this.element.options).find(opt => opt.value === String(value));
+
+            if (option) {
+                option.selected = true;
+                option.setAttribute('selected', 'selected'); // Force attribute update for serialization
+            }
+        });
+
+        this.log('debug', 'Synced to original select', { values: valueArray });
     }
 
     /**
