@@ -112,7 +112,7 @@ $selectId = 'slimselect-' . $name . '-' . uniqid();
                         contentPosition: 'absolute'
                     },
                     events: {
-                        afterChange: (newVal) => {
+                        afterChange: function(newVal) {
                             // ✅ FIX: Synchroniser les valeurs avec l'élément select original
                             syncSlimSelectValues(el, newVal);
                             // Dispatch change event pour Alpine.js et autres listeners
@@ -120,11 +120,13 @@ $selectId = 'slimselect-' . $name . '-' . uniqid();
                                 bubbles: true
                             }));
                         },
-                        afterOpen: () => {
+                        afterOpen: function() {
                             // Focus sur le champ de recherche
-                            const searchInput = document.querySelector('.ss-search input');
+                            var searchInput = document.querySelector('.ss-search input');
                             if (searchInput) {
-                                setTimeout(() => searchInput.focus(), 50);
+                                setTimeout(function() {
+                                    searchInput.focus();
+                                }, 50);
                             }
                         }
                     }
@@ -148,15 +150,15 @@ $selectId = 'slimselect-' . $name . '-' . uniqid();
         if (!selectEl || !values) return;
 
         // Reset all options
-        Array.from(selectEl.options).forEach(opt => {
+        Array.from(selectEl.options).forEach(function(opt) {
             opt.selected = false;
         });
 
         // Select the new values
-        const valueArray = Array.isArray(values) ? values : [values];
-        valueArray.forEach(val => {
-            const value = typeof val === 'object' ? val.value : val;
-            const option = selectEl.querySelector(`option[value="${value}"]`);
+        var valueArray = Array.isArray(values) ? values : [values];
+        valueArray.forEach(function(val) {
+            var value = typeof val === 'object' ? val.value : val;
+            var option = selectEl.querySelector('option[value="' + value + '"]');
             if (option) {
                 option.selected = true;
             }
@@ -167,15 +169,15 @@ $selectId = 'slimselect-' . $name . '-' . uniqid();
      * ✅ FIX ENTERPRISE: Attache un handler aux formulaires pour synchroniser avant soumission
      */
     function attachFormSubmitHandlers() {
-        document.querySelectorAll('form').forEach(form => {
+        document.querySelectorAll('form').forEach(function(form) {
             if (form.dataset.slimSelectHandlerAttached) return;
             form.dataset.slimSelectHandlerAttached = 'true';
 
             form.addEventListener('submit', function(e) {
                 // Synchroniser tous les SlimSelect du formulaire avant soumission
-                form.querySelectorAll('[data-slimselect="true"]').forEach(selectEl => {
+                form.querySelectorAll('[data-slimselect="true"]').forEach(function(selectEl) {
                     if (selectEl.slimSelectInstance) {
-                        const selectedValues = selectEl.slimSelectInstance.getSelected();
+                        var selectedValues = selectEl.slimSelectInstance.getSelected();
                         syncSlimSelectValues(selectEl, selectedValues);
                         console.log('[SlimSelect] Synced values before submit:', selectEl.name, selectedValues);
                     }
@@ -192,10 +194,10 @@ $selectId = 'slimselect-' . $name . '-' . uniqid();
 
     // Support Alpine.js
     document.addEventListener('alpine:init', function() {
-        Alpine.magic('slimselect', (el) => {
-            return () => {
-                const selectEl = el.querySelector('[data-slimselect="true"]');
-                return selectEl?.slimSelectInstance;
+        Alpine.magic('slimselect', function(el) {
+            return function() {
+                var selectEl = el.querySelector('[data-slimselect="true"]');
+                return selectEl ? selectEl.slimSelectInstance : null;
             };
         });
     });
