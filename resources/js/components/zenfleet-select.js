@@ -60,15 +60,7 @@ class ZenFleetSelect {
         this.options = this.mergeOptions(options);
         this.slimInstance = null;
         this.livewireComponent = null;
-        this.observers = [];
-        this.performanceMetrics = {
-            initTime: 0,
-            renderTime: 0,
-            searchTime: 0,
-            lastSearchQuery: '',
-            searchCount: 0
-        };
-
+        this.fallbackInput = null;
         this.init();
     }
 
@@ -101,6 +93,21 @@ class ZenFleetSelect {
             merged.settings.closeOnSelect = false;
         }
 
+        // ✅ Auto-configuration depuis les attributs DOM
+        const placeholder = this.element.getAttribute('data-placeholder') || this.element.getAttribute('placeholder');
+        if (placeholder) {
+            merged.settings.placeholderText = placeholder;
+            // Si pas de searchPlaceholder spécifique, utiliser une valeur par défaut cohérente
+            if (!merged.settings.searchPlaceholder) {
+                merged.settings.searchPlaceholder = 'Rechercher...';
+            }
+        }
+
+        const searchable = this.element.getAttribute('data-searchable');
+        if (searchable === 'false') {
+            merged.settings.showSearch = false;
+        }
+
         return merged;
     }
 
@@ -111,6 +118,15 @@ class ZenFleetSelect {
         const startTime = performance.now();
 
         try {
+            // ✅ Detection du champ fallback (hidden input)
+            // Doit être le précédent sibling immédiat avec le même nom (sans [])
+            const inputName = this.element.name.replace('[]', '');
+            const prevEl = this.element.previousElementSibling;
+            if (prevEl && prevEl.tagName === 'INPUT' && prevEl.type === 'hidden' && prevEl.name === inputName) {
+                this.fallbackInput = prevEl;
+                this.log('debug', 'Fallback input found', { name: inputName });
+            }
+
             // Préparation des données
             const data = this.prepareData();
 
@@ -147,8 +163,9 @@ class ZenFleetSelect {
                 multiple: this.element.hasAttribute('multiple')
             });
 
-            // ✅ Enterprise Fix: Ensure robust sync with original select
+            // ✅ Enterprise Fix: Ensure robust sync with original select AND fallback input initialization
             this.setupFormSync();
+            this.manageFallbackInput(); // Init state based on current selection
 
         } catch (error) {
             this.logError('Initialization failed', error);
@@ -156,9 +173,6 @@ class ZenFleetSelect {
         }
     }
 
-    /**
-     * Préparation des données depuis le select
-     */
     prepareData() {
         if (this.options.data) {
             return this.options.data;
@@ -171,7 +185,7 @@ class ZenFleetSelect {
             value: opt.value,
             selected: opt.selected,
             disabled: opt.disabled,
-            placeholder: opt.value === '' && opt.textContent.trim() === 'Sélectionner',
+            placeholder: (opt.value === '' && opt.textContent.trim() === 'Sélectionner') || opt.hasAttribute('data-placeholder'),
             data: opt.dataset ? Object.assign({}, opt.dataset) : {}
         })).filter(item => !item.placeholder);
     }
@@ -187,6 +201,9 @@ class ZenFleetSelect {
 
                 // ✅ Enterprise Fix: Sync immediately on change
                 this.syncToOriginalSelect();
+
+                // ✅ Update fallback input state
+                this.manageFallbackInput();
 
                 // Callback utilisateur
                 if (this.options.events.afterChange) {
@@ -340,6 +357,28 @@ class ZenFleetSelect {
         });
 
         this.log('debug', 'Synced to original select', { values: valueArray });
+    }
+
+    /**
+     * ✅ Enterprise Logic: Manage Fallback Hidden Input
+     * Disables the fallback hidden input if items are selected to prevent
+     * redundant/conflicting data submission (e.g. overwriting with empty string).
+     */
+    manageFallbackInput() {
+        if (!this.fallbackInput) return;
+
+        const selectedValues = this.slimInstance ? this.slimInstance.getSelected() : [];
+        const hasSelection = Array.isArray(selectedValues) ? selectedValues.length > 0 : !!selectedValues;
+
+        if (hasSelection) {
+            // Desactiver le fallback car le select enverra les données
+            this.fallbackInput.disabled = true;
+            this.log('debug', 'Fallback input DISABLED (selection active)');
+        } else {
+            // Activer le fallback pour envoyer use valeur vide
+            this.fallbackInput.disabled = false;
+            this.log('debug', 'Fallback input ENABLED (no selection)');
+        }
     }
 
     /**

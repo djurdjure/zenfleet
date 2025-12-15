@@ -30,6 +30,9 @@ const initializeGlobals = () => {
     window.flatpickr = flatpickr;
 };
 
+// Expose globals immediately
+initializeGlobals();
+
 // ✅ NOUVEAU: Enregistrement directive Alpine.js pour ZenFleetSelect
 zenfleetSelectDirective(Alpine);
 
@@ -43,7 +46,7 @@ Alpine.data('zenfleet', () => ({
     user: null,
     loading: false,
     notifications: [],
-    
+
     // Initialisation
     init() {
         console.log(`🚀 ZenFleet v${this.version} - Alpine.js initialized`);
@@ -51,7 +54,7 @@ Alpine.data('zenfleet', () => ({
         this.loadUserData();
         this.initializeComponents();
     },
-    
+
     // ✅ AMÉLIORATION: Gestionnaires globaux optimisés
     setupGlobalHandlers() {
         this.handleAlerts();
@@ -59,7 +62,7 @@ Alpine.data('zenfleet', () => ({
         this.setupKeyboardShortcuts();
         this.setupErrorHandling();
     },
-    
+
     // Gestion des alertes avec animation
     handleAlerts() {
         const alerts = document.querySelectorAll('.alert:not(.alert-permanent)');
@@ -67,13 +70,13 @@ Alpine.data('zenfleet', () => ({
             // Animation d'entrée
             alert.style.opacity = '0';
             alert.style.transform = 'translateX(100%)';
-            
+
             setTimeout(() => {
                 alert.style.transition = 'all 0.3s ease';
                 alert.style.opacity = '1';
                 alert.style.transform = 'translateX(0)';
             }, index * 100);
-            
+
             // Auto-dismiss après 5 secondes
             setTimeout(() => {
                 alert.style.opacity = '0';
@@ -82,16 +85,16 @@ Alpine.data('zenfleet', () => ({
             }, 5000 + (index * 100));
         });
     },
-    
+
     // ✅ AMÉLIORATION: Validation de formulaire avancée
     setupFormValidation() {
         const fields = document.querySelectorAll('input[required], select[required], textarea[required]');
-        
+
         fields.forEach(field => {
             // Validation en temps réel
             field.addEventListener('blur', this.validateField.bind(this));
             field.addEventListener('input', this.clearValidationErrors.bind(this));
-            
+
             // Indicateur de validation visuelle
             const wrapper = field.closest('.form-group, .field-wrapper') || field.parentElement;
             if (wrapper && !wrapper.querySelector('.validation-icon')) {
@@ -102,36 +105,36 @@ Alpine.data('zenfleet', () => ({
             }
         });
     },
-    
+
     // Validation individuelle de champ
     validateField(event) {
         const field = event.target;
         const isValid = field.value.trim() !== '';
         const wrapper = field.closest('.form-group, .field-wrapper') || field.parentElement;
         const icon = wrapper.querySelector('.validation-icon');
-        
+
         // Classes de validation
         field.classList.toggle('border-danger-500', !isValid);
         field.classList.toggle('border-success-500', isValid);
         field.classList.toggle('ring-danger-200', !isValid);
         field.classList.toggle('ring-success-200', isValid);
-        
+
         // Icône de validation
         if (icon) {
-            icon.innerHTML = isValid 
+            icon.innerHTML = isValid
                 ? '<i class="fas fa-check text-success-500"></i>'
                 : '<i class="fas fa-times text-danger-500"></i>';
         }
-        
+
         return isValid;
     },
-    
+
     // Effacer les erreurs de validation
     clearValidationErrors(event) {
         const field = event.target;
         field.classList.remove('border-danger-500', 'ring-danger-200');
     },
-    
+
     // ✅ NOUVEAU: Raccourcis clavier
     setupKeyboardShortcuts() {
         document.addEventListener('keydown', (e) => {
@@ -144,7 +147,7 @@ Alpine.data('zenfleet', () => ({
                     searchInput.select();
                 }
             }
-            
+
             // Échapper pour fermer les modales
             if (e.key === 'Escape') {
                 const openModals = document.querySelectorAll('.modal:not(.hidden)');
@@ -155,20 +158,20 @@ Alpine.data('zenfleet', () => ({
             }
         });
     },
-    
+
     // ✅ NOUVEAU: Gestion globale des erreurs
     setupErrorHandling() {
         window.addEventListener('error', (e) => {
             console.error('ZenFleet Error:', e.error);
             this.notify('Une erreur inattendue s\'est produite', 'danger');
         });
-        
+
         window.addEventListener('unhandledrejection', (e) => {
             console.error('ZenFleet Unhandled Promise:', e.reason);
             this.notify('Erreur de communication avec le serveur', 'warning');
         });
     },
-    
+
     // Chargement des données utilisateur
     async loadUserData() {
         try {
@@ -181,7 +184,7 @@ Alpine.data('zenfleet', () => ({
             console.warn('Impossible de charger les données utilisateur:', error);
         }
     },
-    
+
     // ✅ AMÉLIORATION: Initialisation des composants optimisée
     initializeComponents() {
         // ZenFleetSelect (SlimSelect) avec configuration ultra-pro
@@ -224,14 +227,14 @@ Alpine.data('zenfleet', () => ({
             }
         });
     },
-    
+
     // Configuration Flatpickr
     initializeFlatpickr() {
         document.querySelectorAll('input[type="date"], .datepicker, .datetime-picker').forEach(input => {
             if (input.flatpickr) return;
-            
+
             const isDateTime = input.classList.contains('datetime-picker');
-            
+
             flatpickr(input, {
                 dateFormat: isDateTime ? "d/m/Y H:i" : "d/m/Y",
                 locale: "fr",
@@ -244,12 +247,12 @@ Alpine.data('zenfleet', () => ({
             });
         });
     },
-    
+
     // Configuration Sortable
     initializeSortable() {
         document.querySelectorAll('.sortable').forEach(list => {
             if (list.sortable) return;
-            
+
             Sortable.create(list, {
                 animation: 150,
                 ghostClass: 'bg-primary-100 opacity-50',
@@ -265,15 +268,15 @@ Alpine.data('zenfleet', () => ({
             });
         });
     },
-    
+
     // Initialisation des graphiques
     initializeCharts() {
         document.querySelectorAll('.chart-container[data-chart-type]').forEach(container => {
             if (container.chart) return;
-            
+
             const chartType = container.getAttribute('data-chart-type');
             const chartData = JSON.parse(container.getAttribute('data-chart-data') || '{}');
-            
+
             // Configuration par défaut ZenFleet
             const defaultOptions = {
                 theme: {
@@ -287,20 +290,20 @@ Alpine.data('zenfleet', () => ({
                     background: 'transparent',
                 },
             };
-            
+
             const chart = new ApexCharts(container, { ...defaultOptions, ...chartData });
             chart.render();
             container.chart = chart;
         });
     },
-    
+
     // Sauvegarde de l'ordre des listes
     async saveListOrder(url, list) {
         const items = Array.from(list.children).map((item, index) => ({
             id: item.getAttribute('data-id'),
             order: index
         }));
-        
+
         try {
             await window.axios.post(url, { items });
             this.notify('Ordre sauvegardé', 'success');
@@ -309,7 +312,7 @@ Alpine.data('zenfleet', () => ({
             this.notify('Erreur lors de la sauvegarde', 'danger');
         }
     },
-    
+
     // ✅ AMÉLIORATION: Système de notifications avancé
     notify(message, type = 'info', options = {}) {
         const notification = {
@@ -319,10 +322,10 @@ Alpine.data('zenfleet', () => ({
             duration: options.duration || 4000,
             actions: options.actions || null
         };
-        
+
         this.notifications.push(notification);
         this.renderNotification(notification);
-        
+
         // Auto-remove
         if (notification.duration > 0) {
             setTimeout(() => {
@@ -330,19 +333,19 @@ Alpine.data('zenfleet', () => ({
             }, notification.duration);
         }
     },
-    
+
     // Rendu des notifications
     renderNotification(notification) {
         const container = this.getNotificationContainer();
         const element = document.createElement('div');
-        
+
         element.id = `notification-${notification.id}`;
         element.className = `
             notification animate-fade-in transform transition-all duration-300
             ${this.getNotificationClasses(notification.type)}
             fixed top-4 right-4 p-4 rounded-lg shadow-zenfleet-lg z-50 max-w-sm
         `;
-        
+
         element.innerHTML = `
             <div class="flex items-start">
                 <div class="flex-shrink-0">
@@ -358,10 +361,10 @@ Alpine.data('zenfleet', () => ({
                 </button>
             </div>
         `;
-        
+
         container.appendChild(element);
     },
-    
+
     // Classes CSS pour les notifications
     getNotificationClasses(type) {
         const classes = {
@@ -372,7 +375,7 @@ Alpine.data('zenfleet', () => ({
         };
         return classes[type] || classes.info;
     },
-    
+
     // Icônes pour les notifications
     getNotificationIcon(type) {
         const icons = {
@@ -383,7 +386,7 @@ Alpine.data('zenfleet', () => ({
         };
         return icons[type] || icons.info;
     },
-    
+
     // Container pour les notifications
     getNotificationContainer() {
         let container = document.getElementById('notifications-container');
@@ -395,7 +398,7 @@ Alpine.data('zenfleet', () => ({
         }
         return container;
     },
-    
+
     // Suppression des notifications
     removeNotification(id) {
         const element = document.getElementById(`notification-${id}`);
@@ -404,7 +407,7 @@ Alpine.data('zenfleet', () => ({
             element.style.transform = 'translateX(100%)';
             setTimeout(() => element.remove(), 300);
         }
-        
+
         this.notifications = this.notifications.filter(n => n.id !== id);
     },
 }));
@@ -412,11 +415,11 @@ Alpine.data('zenfleet', () => ({
 // ✅ OPTIMISATION: Configuration globale ZenFleet ultra-moderne
 window.ZenFleet = {
     version: '2.1',
-    
+
     // Utilitaires de formatage
     formatDate(date, format = 'dd/MM/yyyy') {
         if (!date) return '';
-        
+
         try {
             if (window.flatpickr) {
                 return window.flatpickr.formatDate(new Date(date), format);
@@ -427,10 +430,10 @@ window.ZenFleet = {
             return date.toString();
         }
     },
-    
+
     formatCurrency(amount, currency = 'EUR') {
         if (amount === null || amount === undefined) return '';
-        
+
         try {
             return new Intl.NumberFormat('fr-FR', {
                 style: 'currency',
@@ -441,10 +444,10 @@ window.ZenFleet = {
             return `${amount} ${currency}`;
         }
     },
-    
+
     formatNumber(number, decimals = 0) {
         if (number === null || number === undefined) return '';
-        
+
         try {
             return new Intl.NumberFormat('fr-FR', {
                 minimumFractionDigits: decimals,
@@ -455,7 +458,7 @@ window.ZenFleet = {
             return number.toString();
         }
     },
-    
+
     // Utilitaires de confirmation
     confirm(message, callback, options = {}) {
         const confirmed = confirm(message);
@@ -464,7 +467,7 @@ window.ZenFleet = {
         }
         return confirmed;
     },
-    
+
     // Utilitaires de stockage local
     storage: {
         set(key, value) {
@@ -474,7 +477,7 @@ window.ZenFleet = {
                 console.error('Erreur de sauvegarde locale:', error);
             }
         },
-        
+
         get(key, defaultValue = null) {
             try {
                 const item = localStorage.getItem(`zenfleet_${key}`);
@@ -484,7 +487,7 @@ window.ZenFleet = {
                 return defaultValue;
             }
         },
-        
+
         remove(key) {
             try {
                 localStorage.removeItem(`zenfleet_${key}`);
@@ -496,18 +499,16 @@ window.ZenFleet = {
 };
 
 // ✅ INITIALISATION: Configuration et démarrage
-document.addEventListener('DOMContentLoaded', function() {
-    // Initialiser les objets globaux
-    initializeGlobals();
-    
+document.addEventListener('DOMContentLoaded', function () {
+
     // Démarrer Alpine.js
     Alpine.start();
-    
+
     // Log de démarrage
     console.log('🚀 ZenFleet Application loaded successfully');
     console.log(`📊 Version: ${window.ZenFleet.version}`);
     console.log('🎨 Thème: Tailwind CSS + Alpine.js');
-    
+
     // Notification de bienvenue (développement seulement)
     if (import.meta.env.DEV) {
         setTimeout(() => {

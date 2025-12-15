@@ -157,7 +157,7 @@
                                         :error="$errors->first('personal_email')" />
 
                                     {{-- Groupe sanguin avec affichage de la valeur actuelle --}}
-                                    <x-select
+                                    <x-slim-select
                                         name="blood_type"
                                         label="Groupe sanguin"
                                         :options="[
@@ -172,6 +172,7 @@
                                             'O-' => 'O-'
                                         ]"
                                         :selected="old('blood_type', $driver->blood_type)"
+                                        placeholder="Sélectionnez un groupe sanguin..."
                                         :error="$errors->first('blood_type')" />
 
 
@@ -319,48 +320,6 @@
                                         :error="$errors->first('license_number')" />
 
                                     {{-- Catégories de permis - Solution Enterprise avec SlimSelect Multi-Select --}}
-                                    @php
-                                    $licenseOptions = [
-                                        'A1' => 'A1 - Motocyclettes légères',
-                                        'A' => 'A - Motocyclettes',
-                                        'B' => 'B - Véhicules légers',
-                                        'BE' => 'B(E) - Véhicules légers avec remorque',
-                                        'C1' => 'C1 - Poids lourds légers',
-                                        'C1E' => 'C1(E) - Poids lourds légers avec remorque',
-                                        'C' => 'C - Poids lourds',
-                                        'CE' => 'C(E) - Poids lourds avec remorque',
-                                        'D' => 'D - Transport de personnes',
-                                        'DE' => 'D(E) - Transport de personnes avec remorque',
-                                        'F' => 'F - Véhicules agricoles'
-                                    ];
-                                    $selectedCategories = old('license_categories', $driver->license_categories ?? []);
-                                    if (!is_array($selectedCategories)) $selectedCategories = [];
-                                    @endphp
-
-                                    <div>
-                                        <x-slim-select
-                                            name="license_categories[]"
-                                            label="Catégories de permis"
-                                            :options="$licenseOptions"
-                                            :selected="$selectedCategories"
-                                            placeholder="Sélectionnez les catégories de permis..."
-                                            multiple="true"
-                                            required
-                                            :error="$errors->first('license_categories')"
-                                            @change="validateField('license_categories', $event.target.value)"
-                                            helpText="Sélectionnez toutes les catégories de permis détenues par le chauffeur">
-                                            
-                                            @if($driver->license_categories && count($driver->license_categories) > 0)
-                                            <x-slot name="label">
-                                                Catégories de permis <span class="text-red-500">*</span>
-                                                <span class="ml-2 text-xs text-gray-500 font-normal">
-                                                    (Actuelles: {{ implode(', ', $driver->license_categories) }})
-                                                </span>
-                                            </x-slot>
-                                            @endif
-                                        </x-slim-select>
-                                    </div>
-
                                     <x-datepicker
                                         name="license_issue_date"
                                         label="Date de délivrance"
@@ -423,39 +382,30 @@
 
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     {{-- Compte utilisateur avec SlimSelect --}}
-                                    <div>
-                                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                                    @php
+                                    $userOptions = isset($linkableUsers)
+                                    ? $linkableUsers->mapWithKeys(function($user) {
+                                    return [$user->id => $user->name . ' (' . $user->email . ')'];
+                                    })->toArray()
+                                    : [];
+                                    @endphp
+                                    <x-slim-select
+                                        name="user_id"
+                                        label="Compte utilisateur"
+                                        :options="$userOptions"
+                                        :selected="old('user_id', $driver->user_id)"
+                                        placeholder="Rechercher un utilisateur..."
+                                        :error="$errors->first('user_id')"
+                                        helpText="Sélectionnez un compte existant ou laissez vide (optionnel)">
+                                        @if($driver->user)
+                                        <x-slot name="label">
                                             Compte utilisateur
-                                            @if($driver->user)
                                             <span class="ml-2 text-xs text-gray-500 font-normal">
                                                 (Actuel: {{ $driver->user->name }})
                                             </span>
-                                            @endif
-                                        </label>
-                                        @php
-                                        $userOptions = isset($linkableUsers)
-                                        ? $linkableUsers->mapWithKeys(function($user) {
-                                        return [$user->id => $user->name . ' (' . $user->email . ')'];
-                                        })->toArray()
-                                        : [];
-                                        @endphp
-                                        <x-slim-select
-                                            name="user_id"
-                                            :options="$userOptions"
-                                            :selected="old('user_id', $driver->user_id)"
-                                            placeholder="Rechercher un utilisateur..."
-                                            :error="$errors->first('user_id')"
-                                            helpText="Sélectionnez un compte existant ou laissez vide (optionnel)" />
-                                        @error('user_id')
-                                        <p class="mt-1.5 text-sm text-red-600 flex items-center gap-1">
-                                            <x-iconify icon="heroicons:exclamation-circle" class="w-4 h-4" />
-                                            {{ $message }}
-                                        </p>
-                                        @enderror
-                                        <p class="mt-1 text-xs text-gray-500">
-                                            Sélectionnez un compte existant ou laissez vide (optionnel)
-                                        </p>
-                                    </div>
+                                        </x-slot>
+                                        @endif
+                                    </x-slim-select>
                                 </div>
                             </div>
 
@@ -547,7 +497,11 @@
 <script>
     document.addEventListener('alpine:init', () => {
         Alpine.data('driverFormValidation', () => ({
-            currentStep: {{ old('current_step', 1) }},
+            currentStep: {
+                {
+                    old('current_step', 1)
+                }
+            },
             photoPreview: null,
             fieldErrors: {},
             touchedFields: {},
@@ -561,7 +515,7 @@
                     personal_phone: '',
                     birth_date: '',
                     license_number: '',
-                    license_categories: '',
+
                     license_issue_date: '',
                     license_expiry_date: '',
                     recruitment_date: '',
@@ -576,7 +530,7 @@
                     personal_phone: false,
                     birth_date: false,
                     license_number: false,
-                    license_categories: false,
+
                     license_issue_date: false,
                     license_expiry_date: false,
                     recruitment_date: false,
@@ -584,8 +538,8 @@
                     user_id: false
                 };
 
-                @if($errors->any())
-                this.handleValidationErrors(@json($errors->messages()));
+                @if($errors - > any())
+                this.handleValidationErrors(@json($errors - > messages()));
                 @endif
             },
 
@@ -603,9 +557,7 @@
             validateField(fieldName, value = null) {
                 this.touchedFields[fieldName] = true;
                 // Logique de validation simple côté client (optionnel mais recommandé pour l'UX immédiate)
-                if (fieldName === 'license_categories' && (!value || value.length === 0)) {
-                    this.fieldErrors[fieldName] = 'Au moins une catégorie est requise.';
-                } else if (value === '') {
+                if (value === '') {
                     // Reset error if value is provided (very basic)
                     this.fieldErrors[fieldName] = '';
                 }
