@@ -313,13 +313,34 @@
                                     <x-input
                                         name="license_number"
                                         label="Numéro de permis"
-                                        icon="identification"
+                                        icon="id-card"
                                         placeholder="Ex: 123456789"
                                         :value="old('license_number', $driver->license_number)"
-                                        required
-                                        :error="$errors->first('license_number')" />
+                                        :error="$errors->first('license_number')"
+                                        required />
 
-                                    {{-- Catégories de permis - Solution Enterprise avec SlimSelect Multi-Select --}}
+                                    {{-- Catégories de permis avec SlimSelect (Multi-sélection) --}}
+                                    @php
+                                        // Liste simplifiée à un seul élément comme demandé
+                                        $licenseCategories = [
+                                            'B' => 'B (Véhicules légers)',
+                                        ];
+                                        $selectedCategories = old('license_categories', $driver->license_categories ?? []);
+                                        // Assurez-vous que $selectedCategories est un tableau pour la multi-sélection
+                                        if (!is_array($selectedCategories)) {
+                                            $selectedCategories = explode(',', $selectedCategories);
+                                        }
+                                    @endphp
+                                    <x-slim-select
+                                        name="license_categories[]"
+                                        label="Catégories de permis"
+                                        :options="$licenseCategories"
+                                        :selected="$selectedCategories"
+                                        placeholder="Sélectionnez les catégories de permis..."
+                                        :error="$errors->first('license_categories')"
+                                        multiple
+                                        required />
+
                                     <x-datepicker
                                         name="license_issue_date"
                                         label="Date de délivrance"
@@ -327,7 +348,6 @@
                                         format="d/m/Y"
                                         :error="$errors->first('license_issue_date')"
                                         placeholder="Choisir une date"
-                                        :maxDate="date('Y-m-d')"
                                         required />
 
                                     <x-datepicker
@@ -374,7 +394,7 @@
                         style="display: none;">
                         <div class="space-y-6">
                             {{-- Compte Utilisateur --}}
-                            <div>
+                            <div class="space-y-6">
                                 <h3 class="text-lg font-medium text-gray-900 mb-4 flex items-center gap-2">
                                     <x-iconify icon="heroicons:user-circle" class="w-5 h-5 text-blue-600" />
                                     Compte Utilisateur (Optionnel)
@@ -497,11 +517,7 @@
 <script>
     document.addEventListener('alpine:init', () => {
         Alpine.data('driverFormValidation', () => ({
-            currentStep: {
-                {
-                    old('current_step', 1)
-                }
-            },
+            currentStep: {{ old('current_step', 1) }},
             photoPreview: null,
             fieldErrors: {},
             touchedFields: {},
@@ -513,9 +529,9 @@
                     last_name: '',
                     email: '',
                     personal_phone: '',
-                    birth_date: '',
-                    license_number: '',
-
+                    'birth_date': '',
+                    'license_number': '',
+                    'license_categories': '',
                     license_issue_date: '',
                     license_expiry_date: '',
                     recruitment_date: '',
@@ -528,9 +544,9 @@
                     last_name: false,
                     email: false,
                     personal_phone: false,
-                    birth_date: false,
-                    license_number: false,
-
+                    'birth_date': false,
+                    'license_number': false,
+                    'license_categories': false,
                     license_issue_date: false,
                     license_expiry_date: false,
                     recruitment_date: false,
@@ -538,8 +554,8 @@
                     user_id: false
                 };
 
-                @if($errors - > any())
-                this.handleValidationErrors(@json($errors - > messages()));
+                @if($errors->any())
+                this.handleValidationErrors(@json($errors->messages()));
                 @endif
             },
 
