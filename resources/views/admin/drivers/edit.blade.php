@@ -319,27 +319,35 @@
                                         :error="$errors->first('license_number')"
                                         required />
 
-                                    {{-- Catégories de permis avec SlimSelect (Multi-sélection) --}}
+                                    {{-- Catégorie de permis avec SlimSelect (Simple sélection) --}}
                                     @php
-                                        // Liste simplifiée à un seul élément comme demandé
+                                        // Liste complète des catégories de permis disponibles (sélection unique)
                                         $licenseCategories = [
-                                            'B' => 'B (Véhicules légers)',
+                                            '' => 'Sélectionner une catégorie',
+                                            'A1' => 'A1 (Motos légères ≤125cc)',
+                                            'A' => 'A (Motos illimitées)',
+                                            'B' => 'B (Véhicules légers ≤3500kg)',
+                                            'BE' => 'BE (Remorques catégorie B)',
+                                            'C1' => 'C1 (Véhicules moyens 3500-7500kg)',
+                                            'C1E' => 'C1E (Remorques catégorie C1)',
+                                            'C' => 'C (Poids lourds >7500kg)',
+                                            'CE' => 'CE (Remorques catégorie C)',
+                                            'D' => 'D (Autobus >16 places)',
+                                            'DE' => 'DE (Remorques catégorie D)',
+                                            'F' => 'F (Tracteurs agricoles)',
                                         ];
-                                        $selectedCategories = old('license_categories', $driver->license_categories ?? []);
-                                        // Assurez-vous que $selectedCategories est un tableau pour la multi-sélection
-                                        if (!is_array($selectedCategories)) {
-                                            $selectedCategories = explode(',', $selectedCategories);
-                                        }
+                                        // Récupération de la valeur actuelle (une seule catégorie)
+                                        $selectedCategory = old('license_category', $driver->license_category);
                                     @endphp
                                     <x-slim-select
-                                        name="license_categories[]"
-                                        label="Catégories de permis"
+                                        name="license_category"
+                                        label="Catégorie de permis"
                                         :options="$licenseCategories"
-                                        :selected="$selectedCategories"
-                                        placeholder="Sélectionnez les catégories de permis..."
-                                        :error="$errors->first('license_categories')"
-                                        multiple
-                                        required />
+                                        :selected="$selectedCategory"
+                                        placeholder="Sélectionnez une catégorie de permis..."
+                                        :error="$errors->first('license_category')"
+                                        required
+                                        helpText="Sélectionnez la catégorie principale du permis de conduire" />
 
                                     <x-datepicker
                                         name="license_issue_date"
@@ -531,7 +539,7 @@
                     personal_phone: '',
                     'birth_date': '',
                     'license_number': '',
-                    'license_categories': '',
+                    'license_category': '', // Modifié: licence_categories[] → license_category
                     license_issue_date: '',
                     license_expiry_date: '',
                     recruitment_date: '',
@@ -546,7 +554,7 @@
                     personal_phone: false,
                     'birth_date': false,
                     'license_number': false,
-                    'license_categories': false,
+                    'license_category': false, // Modifié: licence_categories[] → license_category
                     license_issue_date: false,
                     license_expiry_date: false,
                     recruitment_date: false,
@@ -661,7 +669,7 @@
                     'status_id': 2,
                     'notes': 2,
                     'license_number': 3,
-                    'license_categories': 3,
+                    'license_category': 3, // Modifié: licence_categories → license_category
                     'license_issue_date': 3,
                     'license_expiry_date': 3,
                     'license_authority': 3,

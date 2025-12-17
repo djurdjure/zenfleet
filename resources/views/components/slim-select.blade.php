@@ -32,6 +32,7 @@ $selectId = 'slimselect-' . $name . '-' . uniqid();
         class="slimselect-field w-full"
         data-slimselect="true"
         data-placeholder="{{ $placeholder }}"
+        data-settings="{{ isset($config) ? $config : '' }}"
         @if($disabled) disabled @endif
         @if($multiple) multiple @endif
         {{ $attributes->except(['class']) }}>
@@ -97,6 +98,19 @@ $selectId = 'slimselect-' . $name . '-' . uniqid();
             const placeholder = el.getAttribute('data-placeholder') || 'Sélectionnez...';
             const isSearchable = el.getAttribute('data-searchable') !== 'false';
 
+            // Parse custom settings from data-settings attribute
+            let customSettings = {};
+            try {
+                const settingsAttr = el.getAttribute('data-settings');
+                if (settingsAttr) {
+                    // Fix potentially malformed JSON (e.g. unquoted keys) if passed directly from blade slot
+                    // This is a simple safe-guard, relying on valid JSON from backend is better but flexibility helps
+                    customSettings = JSON.parse(settingsAttr);
+                }
+            } catch (e) {
+                console.warn('SlimSelect: Invalid custom settings JSON', e);
+            }
+
             try {
                 const instance = new SlimSelect({
                     select: el,
@@ -109,7 +123,8 @@ $selectId = 'slimselect-' . $name . '-' . uniqid();
                         placeholderText: placeholder,
                         hideSelected: false,
                         contentLocation: document.body,
-                        contentPosition: 'absolute'
+                        contentPosition: 'absolute',
+                        ...customSettings // Merge custom settings overriding defaults
                     },
                     events: {
                         afterChange: (newVal) => {
