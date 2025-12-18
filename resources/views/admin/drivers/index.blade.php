@@ -187,12 +187,12 @@
                     <x-iconify icon="lucide:filter" class="w-5 h-5 text-gray-500" />
                     <span class="font-medium text-gray-700">Filtres</span>
                     @php
-                        $activeFiltersCount = count(request()->except(['page', 'per_page', 'search']));
+                    $activeFiltersCount = count(request()->except(['page', 'per_page', 'search']));
                     @endphp
                     @if($activeFiltersCount > 0)
-                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                            {{ $activeFiltersCount }}
-                        </span>
+                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                        {{ $activeFiltersCount }}
+                    </span>
                     @endif
                     <x-iconify
                         icon="heroicons:chevron-down"
@@ -204,17 +204,17 @@
                 <div class="flex items-center gap-2">
                     {{-- Bouton Archives (filtre visibility=archived) --}}
                     @if(request('visibility') === 'archived')
-                        <a href="{{ route('admin.drivers.index') }}"
-                           class="inline-flex items-center gap-2 px-4 py-2.5 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-all duration-200 shadow-sm hover:shadow-md">
-                            <x-iconify icon="lucide:list" class="w-5 h-5" />
-                            <span class="hidden lg:inline font-medium">Voir Actifs</span>
-                        </a>
+                    <a href="{{ route('admin.drivers.index') }}"
+                        class="inline-flex items-center gap-2 px-4 py-2.5 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-all duration-200 shadow-sm hover:shadow-md">
+                        <x-iconify icon="lucide:list" class="w-5 h-5" />
+                        <span class="hidden lg:inline font-medium">Voir Actifs</span>
+                    </a>
                     @else
-                        <a href="{{ route('admin.drivers.index', ['visibility' => 'archived']) }}"
-                           class="inline-flex items-center gap-2 px-4 py-2.5 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-all duration-200 shadow-sm hover:shadow-md">
-                            <x-iconify icon="lucide:archive" class="w-5 h-5 text-amber-600" />
-                            <span class="hidden lg:inline font-medium text-gray-700">Voir Archives</span>
-                        </a>
+                    <a href="{{ route('admin.drivers.index', ['visibility' => 'archived']) }}"
+                        class="inline-flex items-center gap-2 px-4 py-2.5 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-all duration-200 shadow-sm hover:shadow-md">
+                        <x-iconify icon="lucide:archive" class="w-5 h-5 text-amber-600" />
+                        <span class="hidden lg:inline font-medium text-gray-700">Voir Archives</span>
+                    </a>
                     @endif
 
                     {{-- Export Dropdown --}}
@@ -241,17 +241,17 @@
                             style="display: none;">
                             <div class="py-1">
                                 <a href="{{ route('admin.drivers.export.pdf', request()->all()) }}"
-                                   class="group flex items-center gap-2 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-100">
+                                    class="group flex items-center gap-2 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-100">
                                     <x-iconify icon="lucide:file-text" class="w-4 h-4 text-red-600" />
                                     <span>Export PDF</span>
                                 </a>
                                 <a href="{{ route('admin.drivers.export.csv', request()->all()) }}"
-                                   class="group flex items-center gap-2 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-100">
+                                    class="group flex items-center gap-2 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-100">
                                     <x-iconify icon="lucide:file-spreadsheet" class="w-4 h-4 text-green-600" />
                                     <span>Export CSV</span>
                                 </a>
                                 <a href="{{ route('admin.drivers.export.excel', request()->all()) }}"
-                                   class="group flex items-center gap-2 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-100">
+                                    class="group flex items-center gap-2 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-100">
                                     <x-iconify icon="lucide:file-bar-chart" class="w-4 h-4 text-blue-600" />
                                     <span>Export Excel</span>
                                 </a>
@@ -261,14 +261,14 @@
 
                     {{-- Import --}}
                     <a href="{{ route('admin.drivers.import.show') }}"
-                       class="inline-flex items-center gap-2 px-4 py-2.5 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-all duration-200 shadow-sm hover:shadow-md">
+                        class="inline-flex items-center gap-2 px-4 py-2.5 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-all duration-200 shadow-sm hover:shadow-md">
                         <x-iconify icon="lucide:upload" class="w-5 h-5" />
                         <span class="font-medium">Importer</span>
                     </a>
 
                     {{-- Nouveau Chauffeur --}}
                     <a href="{{ route('admin.drivers.create') }}"
-                       class="inline-flex items-center gap-2 px-4 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all duration-200 shadow-sm hover:shadow-md">
+                        class="inline-flex items-center gap-2 px-4 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all duration-200 shadow-sm hover:shadow-md">
                         <x-iconify icon="lucide:plus" class="w-5 h-5" />
                         <span class="font-medium">Nouveau Chauffeur</span>
                     </a>
@@ -295,30 +295,30 @@
                                 <x-iconify icon="lucide:eye" class="w-4 h-4 inline mr-1" />
                                 Visibilité
                             </label>
-                            <select name="visibility" class="block w-full border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                            <x-slim-select name="visibility" placeholder="Actifs uniquement">
                                 <option value="active" {{ request('visibility', 'active') == 'active' ? 'selected' : '' }}>Actifs uniquement</option>
                                 <option value="archived" {{ request('visibility') == 'archived' ? 'selected' : '' }}>Archivés uniquement</option>
                                 <option value="all" {{ request('visibility') == 'all' ? 'selected' : '' }}>Tous</option>
-                            </select>
+                            </x-slim-select>
                         </div>
 
                         {{-- Statut --}}
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1.5">Statut</label>
-                            <select name="status_id" class="block w-full border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                            <x-slim-select name="status_id" placeholder="Tous les statuts">
                                 <option value="">Tous les statuts</option>
                                 @foreach($driverStatuses ?? [] as $status)
-                                    <option value="{{ $status['id'] ?? $status->id }}" {{ request('status_id') == ($status['id'] ?? $status->id) ? 'selected' : '' }}>
-                                        {{ $status['name'] ?? $status->name }}
-                                    </option>
+                                <option value="{{ $status['id'] ?? $status->id }}" {{ request('status_id') == ($status['id'] ?? $status->id) ? 'selected' : '' }}>
+                                    {{ $status['name'] ?? $status->name }}
+                                </option>
                                 @endforeach
-                            </select>
+                            </x-slim-select>
                         </div>
 
                         {{-- Catégorie Permis --}}
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1.5">Catégorie permis</label>
-                            <select name="license_category" class="block w-full border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                            <x-slim-select name="license_category" placeholder="Toutes les catégories">
                                 <option value="">Toutes les catégories</option>
                                 <option value="A1" {{ request('license_category') == 'A1' ? 'selected' : '' }}>A1</option>
                                 <option value="A" {{ request('license_category') == 'A' ? 'selected' : '' }}>A</option>
@@ -331,7 +331,7 @@
                                 <option value="D" {{ request('license_category') == 'D' ? 'selected' : '' }}>D</option>
                                 <option value="DE" {{ request('license_category') == 'DE' ? 'selected' : '' }}>DE</option>
                                 <option value="F" {{ request('license_category') == 'F' ? 'selected' : '' }}>F</option>
-                            </select>
+                            </x-slim-select>
                         </div>
 
                         {{-- Date d'embauche --}}
@@ -349,7 +349,7 @@
 
                     <div class="flex items-center justify-between mt-4 pt-4 border-t border-gray-200">
                         <a href="{{ route('admin.drivers.index') }}"
-                           class="text-sm font-medium text-gray-600 hover:text-gray-900">
+                            class="text-sm font-medium text-gray-600 hover:text-gray-900">
                             Réinitialiser
                         </a>
                         <button
@@ -393,174 +393,173 @@
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-200">
                         @forelse($drivers as $driver)
-                            <tr class="hover:bg-gray-50 transition-colors duration-150">
-                                {{-- Chauffeur --}}
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="flex items-center">
-                                        <div class="flex-shrink-0 h-10 w-10 rounded-full overflow-hidden">
-                                            @if($driver->photo)
-                                                <img 
-                                                    src="{{ asset('storage/' . $driver->photo) }}" 
-                                                    alt="{{ $driver->first_name }} {{ $driver->last_name }}"
-                                                    class="h-full w-full object-cover {{ $driver->deleted_at ? 'opacity-50 grayscale' : '' }}"
-                                                    onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\'h-10 w-10 bg-gradient-to-br from-blue-100 to-indigo-100 rounded-full flex items-center justify-center\'><span class=\'text-sm font-semibold text-blue-700\'>{{ strtoupper(substr($driver->first_name, 0, 1) . substr($driver->last_name, 0, 1)) }}</span></div>';"
-                                                />
-                                            @else
-                                                <div class="h-10 w-10 {{ $driver->deleted_at ? 'bg-gradient-to-br from-gray-300 to-gray-400 opacity-70' : 'bg-gradient-to-br from-blue-100 to-indigo-100' }} rounded-full flex items-center justify-center">
-                                                    <span class="text-sm font-semibold {{ $driver->deleted_at ? 'text-gray-600' : 'text-blue-700' }}">
-                                                        {{ strtoupper(substr($driver->first_name, 0, 1) . substr($driver->last_name, 0, 1)) }}
-                                                    </span>
-                                                </div>
-                                            @endif
-                                        </div>
-                                        <div class="ml-4">
-                                            <div class="text-sm font-medium {{ $driver->deleted_at ? 'text-gray-500' : 'text-gray-900' }} flex items-center gap-2">
-                                                {{ $driver->first_name }} {{ $driver->last_name }}
-                                                @if($driver->deleted_at)
-                                                    <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-orange-100 text-orange-700">
-                                                        <x-iconify icon="lucide:archive" class="w-3 h-3 mr-1" />
-                                                        Archivé
-                                                    </span>
-                                                @endif
-                                            </div>
-                                            <div class="text-sm {{ $driver->deleted_at ? 'text-gray-400' : 'text-gray-500' }}">
-                                                #{{ $driver->employee_number ?? 'N/A' }}
-                                            </div>
-                                        </div>
-                                    </div>
-                                </td>
-
-                                {{-- Contact --}}
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="text-sm text-gray-900 flex items-center gap-1.5">
-                                        <x-iconify icon="lucide:phone" class="w-4 h-4 text-gray-400" />
-                                        {{ $driver->personal_phone ?? 'N/A' }}
-                                    </div>
-                                    <div class="text-sm text-gray-500 flex items-center gap-1.5">
-                                        <x-iconify icon="lucide:mail" class="w-4 h-4 text-gray-400" />
-                                        {{ $driver->personal_email ?? 'N/A' }}
-                                    </div>
-                                </td>
-
-                                {{-- Permis --}}
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="text-sm font-medium text-gray-900">
-                                        {{ $driver->license_number }}
-                                    </div>
-                                    @if($driver->license_category)
-                                        <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800">
-                                            Catégorie {{ $driver->license_category }}
-                                        </span>
-                                    @endif
-                                </td>
-
-                                {{-- Statut --}}
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    @php
-                                        // 🔥 CORRECTION: Afficher UNIQUEMENT le statut prédéfini du chauffeur
-                                        // Les sanctions sont consultables dans la section dédiée
-                                        $realStatus = 'Disponible';
-                                        $statusLabel = 'Disponible';
-
-                                        // Utiliser le statut du driver (statuts prédéfinis uniquement)
-                                        if($driver->driverStatus) {
-                                            $realStatus = $driver->driverStatus->name;
-                                            $statusLabel = $driver->driverStatus->name;
-                                        }
-                                        // Sinon si affecté à un véhicule, afficher "En mission"
-                                        elseif($driver->activeAssignment && $driver->activeAssignment->vehicle) {
-                                            $realStatus = 'En mission';
-                                            $statusLabel = 'En mission';
-                                        }
-
-                                        // Configuration des couleurs selon le statut (sans "Sanctionné")
-                                        $statusConfig = [
-                                            'Disponible' => ['bg' => 'bg-green-100', 'text' => 'text-green-800', 'icon' => 'lucide:check-circle'],
-                                            'En mission' => ['bg' => 'bg-orange-100', 'text' => 'text-orange-800', 'icon' => 'lucide:truck'],
-                                            'En repos' => ['bg' => 'bg-amber-100', 'text' => 'text-amber-800', 'icon' => 'lucide:pause-circle'],
-                                            'En congé' => ['bg' => 'bg-purple-100', 'text' => 'text-purple-800', 'icon' => 'lucide:calendar-off'],
-                                            'Maladie' => ['bg' => 'bg-red-100', 'text' => 'text-red-800', 'icon' => 'lucide:heart-pulse'],
-                                            'Indisponible' => ['bg' => 'bg-gray-100', 'text' => 'text-gray-800', 'icon' => 'lucide:x-circle'],
-                                        ];
-                                        $config = $statusConfig[$realStatus] ?? ['bg' => 'bg-gray-100', 'text' => 'text-gray-800', 'icon' => 'lucide:circle'];
-                                    @endphp
-                                    <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium {{ $config['bg'] }} {{ $config['text'] }}">
-                                        <x-iconify :icon="$config['icon']" class="w-3.5 h-3.5" />
-                                        {{ $statusLabel }}
-                                    </span>
-                                </td>
-
-                                {{-- Véhicule Actuel --}}
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                    @if($driver->activeAssignment && $driver->activeAssignment->vehicle)
-                                        <div class="flex items-center gap-1.5">
-                                            <x-iconify icon="lucide:car" class="w-4 h-4 text-blue-600" />
-                                            <span class="font-medium text-gray-900">
-                                                {{ $driver->activeAssignment->vehicle->registration_plate }}
+                        <tr class="hover:bg-gray-50 transition-colors duration-150">
+                            {{-- Chauffeur --}}
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="flex items-center">
+                                    <div class="flex-shrink-0 h-10 w-10 rounded-full overflow-hidden">
+                                        @if($driver->photo)
+                                        <img
+                                            src="{{ asset('storage/' . $driver->photo) }}"
+                                            alt="{{ $driver->first_name }} {{ $driver->last_name }}"
+                                            class="h-full w-full object-cover {{ $driver->deleted_at ? 'opacity-50 grayscale' : '' }}"
+                                            onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\'h-10 w-10 bg-gradient-to-br from-blue-100 to-indigo-100 rounded-full flex items-center justify-center\'><span class=\'text-sm font-semibold text-blue-700\'>{{ strtoupper(substr($driver->first_name, 0, 1) . substr($driver->last_name, 0, 1)) }}</span></div>';" />
+                                        @else
+                                        <div class="h-10 w-10 {{ $driver->deleted_at ? 'bg-gradient-to-br from-gray-300 to-gray-400 opacity-70' : 'bg-gradient-to-br from-blue-100 to-indigo-100' }} rounded-full flex items-center justify-center">
+                                            <span class="text-sm font-semibold {{ $driver->deleted_at ? 'text-gray-600' : 'text-blue-700' }}">
+                                                {{ strtoupper(substr($driver->first_name, 0, 1) . substr($driver->last_name, 0, 1)) }}
                                             </span>
                                         </div>
-                                        <div class="text-xs text-gray-400 mt-0.5">
-                                            {{ $driver->activeAssignment->vehicle->brand ?? '' }} {{ $driver->activeAssignment->vehicle->model ?? '' }}
-                                        </div>
-                                    @else
-                                        <span class="text-gray-400 italic">Aucun véhicule</span>
-                                    @endif
-                                </td>
-
-                                {{-- Actions --}}
-                                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                    <div class="flex items-center justify-end gap-2">
-                                        @if($driver->deleted_at)
-                                            {{-- Actions pour chauffeurs ARCHIVÉS --}}
-                                            <button
-                                                onclick="restoreDriver({{ $driver->id }}, '{{ $driver->first_name }} {{ $driver->last_name }}', '{{ $driver->employee_number }}')"
-                                                class="inline-flex items-center p-1.5 text-green-600 hover:text-green-900 hover:bg-green-50 rounded-lg transition-colors"
-                                                title="Restaurer">
-                                                <x-iconify icon="lucide:rotate-ccw" class="w-5 h-5" />
-                                            </button>
-                                            <button
-                                                onclick="permanentDeleteDriver({{ $driver->id }}, '{{ $driver->first_name }} {{ $driver->last_name }}', '{{ $driver->employee_number }}')"
-                                                class="inline-flex items-center p-1.5 text-red-600 hover:text-red-900 hover:bg-red-50 rounded-lg transition-colors"
-                                                title="Supprimer définitivement">
-                                                <x-iconify icon="lucide:trash-2" class="w-5 h-5" />
-                                            </button>
-                                        @else
-                                            {{-- Actions pour chauffeurs ACTIFS --}}
-                                            <a href="{{ route('admin.drivers.show', $driver) }}"
-                                               class="inline-flex items-center p-1.5 text-blue-600 hover:text-blue-900 hover:bg-blue-50 rounded-lg transition-colors"
-                                               title="Voir">
-                                                <x-iconify icon="lucide:eye" class="w-5 h-5" />
-                                            </a>
-                                            <a href="{{ route('admin.drivers.edit', $driver) }}"
-                                               class="inline-flex items-center p-1.5 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
-                                               title="Modifier">
-                                                <x-iconify icon="lucide:edit" class="w-5 h-5" />
-                                            </a>
-                                            <button
-                                                onclick="archiveDriver({{ $driver->id }}, '{{ $driver->first_name }} {{ $driver->last_name }}', '{{ $driver->employee_number }}')"
-                                                class="inline-flex items-center p-1.5 text-orange-600 hover:text-orange-900 hover:bg-orange-50 rounded-lg transition-colors"
-                                                title="Archiver">
-                                                <x-iconify icon="lucide:archive" class="w-5 h-5" />
-                                            </button>
                                         @endif
                                     </div>
-                                </td>
-                            </tr>
-                        @empty
-                            <tr>
-                                <td colspan="6" class="px-6 py-12 text-center">
-                                    <div class="flex flex-col items-center justify-center">
-                                        <x-iconify icon="lucide:users" class="w-16 h-16 text-gray-300 mb-4" />
-                                        <h3 class="text-lg font-medium text-gray-900 mb-2">Aucun chauffeur trouvé</h3>
-                                        <p class="text-sm text-gray-500 mb-4">Commencez par ajouter votre premier chauffeur</p>
-                                        <a href="{{ route('admin.drivers.create') }}"
-                                           class="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
-                                            <x-iconify icon="lucide:plus" class="w-5 h-5" />
-                                            Ajouter un chauffeur
-                                        </a>
+                                    <div class="ml-4">
+                                        <div class="text-sm font-medium {{ $driver->deleted_at ? 'text-gray-500' : 'text-gray-900' }} flex items-center gap-2">
+                                            {{ $driver->first_name }} {{ $driver->last_name }}
+                                            @if($driver->deleted_at)
+                                            <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-orange-100 text-orange-700">
+                                                <x-iconify icon="lucide:archive" class="w-3 h-3 mr-1" />
+                                                Archivé
+                                            </span>
+                                            @endif
+                                        </div>
+                                        <div class="text-sm {{ $driver->deleted_at ? 'text-gray-400' : 'text-gray-500' }}">
+                                            #{{ $driver->employee_number ?? 'N/A' }}
+                                        </div>
                                     </div>
-                                </td>
-                            </tr>
+                                </div>
+                            </td>
+
+                            {{-- Contact --}}
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm text-gray-900 flex items-center gap-1.5">
+                                    <x-iconify icon="lucide:phone" class="w-4 h-4 text-gray-400" />
+                                    {{ $driver->personal_phone ?? 'N/A' }}
+                                </div>
+                                <div class="text-sm text-gray-500 flex items-center gap-1.5">
+                                    <x-iconify icon="lucide:mail" class="w-4 h-4 text-gray-400" />
+                                    {{ $driver->personal_email ?? 'N/A' }}
+                                </div>
+                            </td>
+
+                            {{-- Permis --}}
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm font-medium text-gray-900">
+                                    {{ $driver->license_number }}
+                                </div>
+                                @if($driver->license_category)
+                                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800">
+                                    Catégorie {{ $driver->license_category }}
+                                </span>
+                                @endif
+                            </td>
+
+                            {{-- Statut --}}
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                @php
+                                // 🔥 CORRECTION: Afficher UNIQUEMENT le statut prédéfini du chauffeur
+                                // Les sanctions sont consultables dans la section dédiée
+                                $realStatus = 'Disponible';
+                                $statusLabel = 'Disponible';
+
+                                // Utiliser le statut du driver (statuts prédéfinis uniquement)
+                                if($driver->driverStatus) {
+                                $realStatus = $driver->driverStatus->name;
+                                $statusLabel = $driver->driverStatus->name;
+                                }
+                                // Sinon si affecté à un véhicule, afficher "En mission"
+                                elseif($driver->activeAssignment && $driver->activeAssignment->vehicle) {
+                                $realStatus = 'En mission';
+                                $statusLabel = 'En mission';
+                                }
+
+                                // Configuration des couleurs selon le statut (sans "Sanctionné")
+                                $statusConfig = [
+                                'Disponible' => ['bg' => 'bg-green-100', 'text' => 'text-green-800', 'icon' => 'lucide:check-circle'],
+                                'En mission' => ['bg' => 'bg-orange-100', 'text' => 'text-orange-800', 'icon' => 'lucide:truck'],
+                                'En repos' => ['bg' => 'bg-amber-100', 'text' => 'text-amber-800', 'icon' => 'lucide:pause-circle'],
+                                'En congé' => ['bg' => 'bg-purple-100', 'text' => 'text-purple-800', 'icon' => 'lucide:calendar-off'],
+                                'Maladie' => ['bg' => 'bg-red-100', 'text' => 'text-red-800', 'icon' => 'lucide:heart-pulse'],
+                                'Indisponible' => ['bg' => 'bg-gray-100', 'text' => 'text-gray-800', 'icon' => 'lucide:x-circle'],
+                                ];
+                                $config = $statusConfig[$realStatus] ?? ['bg' => 'bg-gray-100', 'text' => 'text-gray-800', 'icon' => 'lucide:circle'];
+                                @endphp
+                                <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium {{ $config['bg'] }} {{ $config['text'] }}">
+                                    <x-iconify :icon="$config['icon']" class="w-3.5 h-3.5" />
+                                    {{ $statusLabel }}
+                                </span>
+                            </td>
+
+                            {{-- Véhicule Actuel --}}
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                @if($driver->activeAssignment && $driver->activeAssignment->vehicle)
+                                <div class="flex items-center gap-1.5">
+                                    <x-iconify icon="lucide:car" class="w-4 h-4 text-blue-600" />
+                                    <span class="font-medium text-gray-900">
+                                        {{ $driver->activeAssignment->vehicle->registration_plate }}
+                                    </span>
+                                </div>
+                                <div class="text-xs text-gray-400 mt-0.5">
+                                    {{ $driver->activeAssignment->vehicle->brand ?? '' }} {{ $driver->activeAssignment->vehicle->model ?? '' }}
+                                </div>
+                                @else
+                                <span class="text-gray-400 italic">Aucun véhicule</span>
+                                @endif
+                            </td>
+
+                            {{-- Actions --}}
+                            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                <div class="flex items-center justify-end gap-2">
+                                    @if($driver->deleted_at)
+                                    {{-- Actions pour chauffeurs ARCHIVÉS --}}
+                                    <button
+                                        onclick="restoreDriver({{ $driver->id }}, '{{ $driver->first_name }} {{ $driver->last_name }}', '{{ $driver->employee_number }}')"
+                                        class="inline-flex items-center p-1.5 text-green-600 hover:text-green-900 hover:bg-green-50 rounded-lg transition-colors"
+                                        title="Restaurer">
+                                        <x-iconify icon="lucide:rotate-ccw" class="w-5 h-5" />
+                                    </button>
+                                    <button
+                                        onclick="permanentDeleteDriver({{ $driver->id }}, '{{ $driver->first_name }} {{ $driver->last_name }}', '{{ $driver->employee_number }}')"
+                                        class="inline-flex items-center p-1.5 text-red-600 hover:text-red-900 hover:bg-red-50 rounded-lg transition-colors"
+                                        title="Supprimer définitivement">
+                                        <x-iconify icon="lucide:trash-2" class="w-5 h-5" />
+                                    </button>
+                                    @else
+                                    {{-- Actions pour chauffeurs ACTIFS --}}
+                                    <a href="{{ route('admin.drivers.show', $driver) }}"
+                                        class="inline-flex items-center p-1.5 text-blue-600 hover:text-blue-900 hover:bg-blue-50 rounded-lg transition-colors"
+                                        title="Voir">
+                                        <x-iconify icon="lucide:eye" class="w-5 h-5" />
+                                    </a>
+                                    <a href="{{ route('admin.drivers.edit', $driver) }}"
+                                        class="inline-flex items-center p-1.5 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
+                                        title="Modifier">
+                                        <x-iconify icon="lucide:edit" class="w-5 h-5" />
+                                    </a>
+                                    <button
+                                        onclick="archiveDriver({{ $driver->id }}, '{{ $driver->first_name }} {{ $driver->last_name }}', '{{ $driver->employee_number }}')"
+                                        class="inline-flex items-center p-1.5 text-orange-600 hover:text-orange-900 hover:bg-orange-50 rounded-lg transition-colors"
+                                        title="Archiver">
+                                        <x-iconify icon="lucide:archive" class="w-5 h-5" />
+                                    </button>
+                                    @endif
+                                </div>
+                            </td>
+                        </tr>
+                        @empty
+                        <tr>
+                            <td colspan="6" class="px-6 py-12 text-center">
+                                <div class="flex flex-col items-center justify-center">
+                                    <x-iconify icon="lucide:users" class="w-16 h-16 text-gray-300 mb-4" />
+                                    <h3 class="text-lg font-medium text-gray-900 mb-2">Aucun chauffeur trouvé</h3>
+                                    <p class="text-sm text-gray-500 mb-4">Commencez par ajouter votre premier chauffeur</p>
+                                    <a href="{{ route('admin.drivers.create') }}"
+                                        class="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                                        <x-iconify icon="lucide:plus" class="w-5 h-5" />
+                                        Ajouter un chauffeur
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
                         @endforelse
                     </tbody>
                 </table>
@@ -568,9 +567,9 @@
 
             {{-- Pagination --}}
             @if($drivers->hasPages())
-                <div class="bg-white px-4 py-3 border-t border-gray-200 sm:px-6">
-                    {{ $drivers->links() }}
-                </div>
+            <div class="bg-white px-4 py-3 border-t border-gray-200 sm:px-6">
+                {{ $drivers->links() }}
+            </div>
             @endif
         </div>
     </div>
@@ -579,18 +578,18 @@
 
 @push('scripts')
 <script>
-// ═══════════════════════════════════════════════════════════════════════════
-// SUPPRESSION CHAUFFEUR AVEC MODAL STYLÉE - STANDARD ENTERPRISE
-// ═══════════════════════════════════════════════════════════════════════════
+    // ═══════════════════════════════════════════════════════════════════════════
+    // SUPPRESSION CHAUFFEUR AVEC MODAL STYLÉE - STANDARD ENTERPRISE
+    // ═══════════════════════════════════════════════════════════════════════════
 
-function archiveDriver(driverId, driverName, employeeNumber) {
-    const modal = document.createElement('div');
-    modal.className = 'fixed inset-0 z-50 overflow-y-auto';
-    modal.setAttribute('aria-labelledby', 'modal-title');
-    modal.setAttribute('role', 'dialog');
-    modal.setAttribute('aria-modal', 'true');
+    function archiveDriver(driverId, driverName, employeeNumber) {
+        const modal = document.createElement('div');
+        modal.className = 'fixed inset-0 z-50 overflow-y-auto';
+        modal.setAttribute('aria-labelledby', 'modal-title');
+        modal.setAttribute('role', 'dialog');
+        modal.setAttribute('aria-modal', 'true');
 
-    modal.innerHTML = `
+        modal.innerHTML = `
         <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
             <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity backdrop-blur-sm" onclick="closeDriverModal()"></div>
             <span class="hidden sm:inline-block sm:align-middle sm:h-screen">&#8203;</span>
@@ -643,54 +642,54 @@ function archiveDriver(driverId, driverName, employeeNumber) {
         </div>
     `;
 
-    document.body.appendChild(modal);
-}
-
-function confirmArchiveDriver(driverId) {
-    const form = document.createElement('form');
-    form.method = 'POST';
-    form.action = `/admin/drivers/${driverId}`;
-    
-    // Ajouter le token CSRF (correctement généré par Blade)
-    const csrfInput = document.createElement('input');
-    csrfInput.type = 'hidden';
-    csrfInput.name = '_token';
-    csrfInput.value = '{{ csrf_token() }}';
-    form.appendChild(csrfInput);
-    
-    // Ajouter la méthode DELETE
-    const methodInput = document.createElement('input');
-    methodInput.type = 'hidden';
-    methodInput.name = '_method';
-    methodInput.value = 'DELETE';
-    form.appendChild(methodInput);
-    
-    document.body.appendChild(form);
-    closeDriverModal();
-    setTimeout(() => form.submit(), 200);
-}
-
-function closeDriverModal() {
-    const modal = document.querySelector('.fixed.inset-0.z-50');
-    if (modal) {
-        modal.style.opacity = '0';
-        modal.style.transform = 'scale(0.95)';
-        setTimeout(() => modal.remove(), 200);
+        document.body.appendChild(modal);
     }
-}
 
-// ═══════════════════════════════════════════════════════════════════════════
-// RESTAURATION CHAUFFEUR - MODAL ULTRA PRO
-// ═══════════════════════════════════════════════════════════════════════════
+    function confirmArchiveDriver(driverId) {
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = `/admin/drivers/${driverId}`;
 
-function restoreDriver(driverId, driverName, employeeNumber) {
-    const modal = document.createElement('div');
-    modal.className = 'fixed inset-0 z-50 overflow-y-auto';
-    modal.setAttribute('aria-labelledby', 'modal-title');
-    modal.setAttribute('role', 'dialog');
-    modal.setAttribute('aria-modal', 'true');
+        // Ajouter le token CSRF (correctement généré par Blade)
+        const csrfInput = document.createElement('input');
+        csrfInput.type = 'hidden';
+        csrfInput.name = '_token';
+        csrfInput.value = '{{ csrf_token() }}';
+        form.appendChild(csrfInput);
 
-    modal.innerHTML = `
+        // Ajouter la méthode DELETE
+        const methodInput = document.createElement('input');
+        methodInput.type = 'hidden';
+        methodInput.name = '_method';
+        methodInput.value = 'DELETE';
+        form.appendChild(methodInput);
+
+        document.body.appendChild(form);
+        closeDriverModal();
+        setTimeout(() => form.submit(), 200);
+    }
+
+    function closeDriverModal() {
+        const modal = document.querySelector('.fixed.inset-0.z-50');
+        if (modal) {
+            modal.style.opacity = '0';
+            modal.style.transform = 'scale(0.95)';
+            setTimeout(() => modal.remove(), 200);
+        }
+    }
+
+    // ═══════════════════════════════════════════════════════════════════════════
+    // RESTAURATION CHAUFFEUR - MODAL ULTRA PRO
+    // ═══════════════════════════════════════════════════════════════════════════
+
+    function restoreDriver(driverId, driverName, employeeNumber) {
+        const modal = document.createElement('div');
+        modal.className = 'fixed inset-0 z-50 overflow-y-auto';
+        modal.setAttribute('aria-labelledby', 'modal-title');
+        modal.setAttribute('role', 'dialog');
+        modal.setAttribute('aria-modal', 'true');
+
+        modal.innerHTML = `
         <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
             <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity backdrop-blur-sm" onclick="closeDriverModal()"></div>
             <span class="hidden sm:inline-block sm:align-middle sm:h-screen">&#8203;</span>
@@ -743,45 +742,45 @@ function restoreDriver(driverId, driverName, employeeNumber) {
         </div>
     `;
 
-    document.body.appendChild(modal);
-}
+        document.body.appendChild(modal);
+    }
 
-function confirmRestoreDriver(driverId) {
-    const form = document.createElement('form');
-    form.method = 'POST';
-    form.action = `/admin/drivers/${driverId}/restore`;
-    
-    // Ajouter le token CSRF (correctement généré par Blade)
-    const csrfInput = document.createElement('input');
-    csrfInput.type = 'hidden';
-    csrfInput.name = '_token';
-    csrfInput.value = '{{ csrf_token() }}';
-    form.appendChild(csrfInput);
-    
-    // Ajouter la méthode PATCH
-    const methodInput = document.createElement('input');
-    methodInput.type = 'hidden';
-    methodInput.name = '_method';
-    methodInput.value = 'PATCH';
-    form.appendChild(methodInput);
-    
-    document.body.appendChild(form);
-    closeDriverModal();
-    setTimeout(() => form.submit(), 200);
-}
+    function confirmRestoreDriver(driverId) {
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = `/admin/drivers/${driverId}/restore`;
 
-// ═══════════════════════════════════════════════════════════════════════════
-// SUPPRESSION DÉFINITIVE CHAUFFEUR - MODAL ULTRA PRO
-// ═══════════════════════════════════════════════════════════════════════════
+        // Ajouter le token CSRF (correctement généré par Blade)
+        const csrfInput = document.createElement('input');
+        csrfInput.type = 'hidden';
+        csrfInput.name = '_token';
+        csrfInput.value = '{{ csrf_token() }}';
+        form.appendChild(csrfInput);
 
-function permanentDeleteDriver(driverId, driverName, employeeNumber) {
-    const modal = document.createElement('div');
-    modal.className = 'fixed inset-0 z-50 overflow-y-auto';
-    modal.setAttribute('aria-labelledby', 'modal-title');
-    modal.setAttribute('role', 'dialog');
-    modal.setAttribute('aria-modal', 'true');
+        // Ajouter la méthode PATCH
+        const methodInput = document.createElement('input');
+        methodInput.type = 'hidden';
+        methodInput.name = '_method';
+        methodInput.value = 'PATCH';
+        form.appendChild(methodInput);
 
-    modal.innerHTML = `
+        document.body.appendChild(form);
+        closeDriverModal();
+        setTimeout(() => form.submit(), 200);
+    }
+
+    // ═══════════════════════════════════════════════════════════════════════════
+    // SUPPRESSION DÉFINITIVE CHAUFFEUR - MODAL ULTRA PRO
+    // ═══════════════════════════════════════════════════════════════════════════
+
+    function permanentDeleteDriver(driverId, driverName, employeeNumber) {
+        const modal = document.createElement('div');
+        modal.className = 'fixed inset-0 z-50 overflow-y-auto';
+        modal.setAttribute('aria-labelledby', 'modal-title');
+        modal.setAttribute('role', 'dialog');
+        modal.setAttribute('aria-modal', 'true');
+
+        modal.innerHTML = `
         <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
             <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity backdrop-blur-sm" onclick="closeDriverModal()"></div>
             <span class="hidden sm:inline-block sm:align-middle sm:h-screen">&#8203;</span>
@@ -835,52 +834,52 @@ function permanentDeleteDriver(driverId, driverName, employeeNumber) {
         </div>
     `;
 
-    document.body.appendChild(modal);
-}
-
-function confirmPermanentDeleteDriver(driverId) {
-    const form = document.createElement('form');
-    form.method = 'POST';
-    form.action = `/admin/drivers/${driverId}/force-delete`;
-
-    // Ajouter le token CSRF (correctement généré par Blade)
-    const csrfInput = document.createElement('input');
-    csrfInput.type = 'hidden';
-    csrfInput.name = '_token';
-    csrfInput.value = '{{ csrf_token() }}';
-    form.appendChild(csrfInput);
-
-    // Ajouter la méthode DELETE
-    const methodInput = document.createElement('input');
-    methodInput.type = 'hidden';
-    methodInput.name = '_method';
-    methodInput.value = 'DELETE';
-    form.appendChild(methodInput);
-
-    document.body.appendChild(form);
-    closeDriverModal();
-    setTimeout(() => form.submit(), 200);
-}
-
-// ═══════════════════════════════════════════════════════════════════════════
-// 📅 FLATPICKR INITIALIZATION - ENTERPRISE-GRADE DATE PICKER
-// ═══════════════════════════════════════════════════════════════════════════
-document.addEventListener('DOMContentLoaded', function() {
-    const flatpickrConfig = {
-        dateFormat: 'Y-m-d',
-        altInput: true,
-        altFormat: 'd/m/Y',
-        locale: 'fr',
-        allowInput: true,
-        disableMobile: true,
-        maxDate: 'today'
-    };
-
-    const hiredAfterEl = document.getElementById('hired_after_flatpickr');
-
-    if (hiredAfterEl && typeof flatpickr !== 'undefined') {
-        flatpickr(hiredAfterEl, flatpickrConfig);
+        document.body.appendChild(modal);
     }
-});
+
+    function confirmPermanentDeleteDriver(driverId) {
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = `/admin/drivers/${driverId}/force-delete`;
+
+        // Ajouter le token CSRF (correctement généré par Blade)
+        const csrfInput = document.createElement('input');
+        csrfInput.type = 'hidden';
+        csrfInput.name = '_token';
+        csrfInput.value = '{{ csrf_token() }}';
+        form.appendChild(csrfInput);
+
+        // Ajouter la méthode DELETE
+        const methodInput = document.createElement('input');
+        methodInput.type = 'hidden';
+        methodInput.name = '_method';
+        methodInput.value = 'DELETE';
+        form.appendChild(methodInput);
+
+        document.body.appendChild(form);
+        closeDriverModal();
+        setTimeout(() => form.submit(), 200);
+    }
+
+    // ═══════════════════════════════════════════════════════════════════════════
+    // 📅 FLATPICKR INITIALIZATION - ENTERPRISE-GRADE DATE PICKER
+    // ═══════════════════════════════════════════════════════════════════════════
+    document.addEventListener('DOMContentLoaded', function() {
+        const flatpickrConfig = {
+            dateFormat: 'Y-m-d',
+            altInput: true,
+            altFormat: 'd/m/Y',
+            locale: 'fr',
+            allowInput: true,
+            disableMobile: true,
+            maxDate: 'today'
+        };
+
+        const hiredAfterEl = document.getElementById('hired_after_flatpickr');
+
+        if (hiredAfterEl && typeof flatpickr !== 'undefined') {
+            flatpickr(hiredAfterEl, flatpickrConfig);
+        }
+    });
 </script>
 @endpush

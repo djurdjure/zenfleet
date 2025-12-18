@@ -81,6 +81,7 @@
         </div>
 
         {{-- FILTERS & ACTIONS --}}
+        {{-- FILTERS & ACTIONS --}}
         <div class="mb-6" x-data="{ showFilters: false }">
             <div class="flex flex-col lg:flex-row items-start lg:items-center gap-3">
                 {{-- Search --}}
@@ -101,25 +102,24 @@
                 <button
                     @click="showFilters = !showFilters"
                     type="button"
-                    class="inline-flex items-center gap-2 px-4 py-2.5 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-all duration-200 shadow-sm">
+                    title="Filtres"
+                    class="inline-flex items-center gap-2 p-2.5 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-all duration-200 shadow-sm">
                     <x-iconify icon="lucide:filter" class="w-5 h-5 text-gray-500" />
-                    <span class="font-medium text-gray-700">Filtres</span>
                     <x-iconify icon="heroicons:chevron-down" class="w-4 h-4 text-gray-400" x-bind:class="showFilters ? 'rotate-180' : ''" />
                 </button>
 
                 {{-- Actions --}}
                 <div class="flex items-center gap-2">
 
-
                     @if($visibility === 'archived')
                     <button wire:click="$set('visibility', 'active')"
-                        class="inline-flex items-center gap-2 px-4 py-2.5 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-all shadow-sm"
+                        class="inline-flex items-center gap-2 p-2.5 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-all shadow-sm"
                         title="Voir Actifs">
                         <x-iconify icon="lucide:list" class="w-5 h-5" />
                     </button>
                     @else
                     <button wire:click="$set('visibility', 'archived')"
-                        class="inline-flex items-center gap-2 px-4 py-2.5 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-all shadow-sm"
+                        class="inline-flex items-center gap-2 p-2.5 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-all shadow-sm"
                         title="Voir Archives">
                         <x-iconify icon="lucide:archive" class="w-5 h-5 text-amber-600" />
                     </button>
@@ -131,9 +131,9 @@
                             @click="open = !open"
                             @click.away="open = false"
                             type="button"
-                            class="inline-flex items-center gap-2 px-4 py-2.5 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-all shadow-sm">
+                            title="Exporter"
+                            class="inline-flex items-center gap-2 p-2.5 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-all shadow-sm">
                             <x-iconify icon="lucide:download" class="w-5 h-5 text-gray-500" />
-                            <span class="hidden lg:inline font-medium text-gray-700">Exporter</span>
                             <x-iconify icon="lucide:chevron-down" class="w-4 h-4 text-gray-400" x-bind:class="open ? 'rotate-180' : ''" />
                         </button>
 
@@ -202,9 +202,18 @@
                     </div>
 
                     @can('create vehicles')
-                    <a href="{{ route('admin.vehicles.create') }}" class="inline-flex items-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors shadow-sm">
+                    {{-- Import --}}
+                    <a href="{{ route('admin.vehicles.import.show') }}"
+                        title="Importer"
+                        class="inline-flex items-center gap-2 p-2.5 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg transition-colors shadow-sm">
+                        <x-iconify icon="lucide:upload" class="w-5 h-5" />
+                    </a>
+
+                    {{-- Nouveau Véhicule --}}
+                    <a href="{{ route('admin.vehicles.create') }}"
+                        title="Nouveau véhicule"
+                        class="inline-flex items-center gap-2 p-2.5 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors shadow-sm">
                         <x-iconify icon="lucide:plus-circle" class="w-5 h-5" />
-                        <span class="hidden sm:inline">Nouveau véhicule</span>
                     </a>
                     @endcan
                 </div>
@@ -216,45 +225,45 @@
                     {{-- Depot --}}
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Dépôt</label>
-                        <select wire:model.live="depot_id" class="block w-full border-gray-300 rounded-lg text-sm">
-                            <option value="">Tous les dépôts</option>
+                        <x-slim-select wire:model.live="depot_id" name="depot_id" placeholder="Tous les dépôts">
+                            <option value="" data-placeholder="true">Tous les dépôts</option>
                             @foreach($depots as $depot)
                             <option value="{{ $depot->id }}">{{ $depot->name }}</option>
                             @endforeach
-                        </select>
+                        </x-slim-select>
                     </div>
 
                     {{-- Status --}}
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Statut</label>
-                        <select wire:model.live="status_id" class="block w-full border-gray-300 rounded-lg text-sm">
-                            <option value="">Tous les statuts</option>
+                        <x-slim-select wire:model.live="status_id" name="status_id" placeholder="Tous les statuts">
+                            <option value="" data-placeholder="true">Tous les statuts</option>
                             @foreach($vehicleStatuses as $status)
                             <option value="{{ $status->id }}">{{ $status->name }}</option>
                             @endforeach
-                        </select>
+                        </x-slim-select>
                     </div>
 
                     {{-- Type --}}
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Type</label>
-                        <select wire:model.live="vehicle_type_id" class="block w-full border-gray-300 rounded-lg text-sm">
-                            <option value="">Tous les types</option>
+                        <x-slim-select wire:model.live="vehicle_type_id" name="vehicle_type_id" placeholder="Tous les types">
+                            <option value="" data-placeholder="true">Tous les types</option>
                             @foreach($vehicleTypes as $type)
                             <option value="{{ $type->id }}">{{ $type->name }}</option>
                             @endforeach
-                        </select>
+                        </x-slim-select>
                     </div>
 
                     {{-- Fuel --}}
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Carburant</label>
-                        <select wire:model.live="fuel_type_id" class="block w-full border-gray-300 rounded-lg text-sm">
-                            <option value="">Tous les carburants</option>
+                        <x-slim-select wire:model.live="fuel_type_id" name="fuel_type_id" placeholder="Tous les carburants">
+                            <option value="" data-placeholder="true">Tous les carburants</option>
                             @foreach($fuelTypes as $fuel)
                             <option value="{{ $fuel->id }}">{{ $fuel->name }}</option>
                             @endforeach
-                        </select>
+                        </x-slim-select>
                     </div>
                 </div>
 
@@ -319,7 +328,7 @@
                                 </span>
                             </td>
                             <td class="px-3 py-2 whitespace-nowrap">
-                                <div class="flex items-center text-sm">
+                                <div class="flex items-center text-xs">
                                     <x-iconify icon="lucide:gauge" class="h-3.5 w-3.5 text-gray-400 mr-1.5" />
                                     <span class="font-medium text-gray-900">{{ number_format($vehicle->current_mileage) }}</span>
                                     <span class="text-gray-500 ml-1">km</span>
@@ -332,7 +341,7 @@
                                 @if($vehicle->depot)
                                 <div class="flex items-center gap-1.5">
                                     <x-iconify icon="lucide:building-2" class="w-3.5 h-3.5 text-purple-600" />
-                                    <span class="text-sm text-gray-900">{{ $vehicle->depot->name }}</span>
+                                    <span class="text-xs text-gray-900">{{ $vehicle->depot->name }}</span>
                                 </div>
                                 @else
                                 <span class="text-xs text-gray-400 italic">Non assigné</span>
@@ -355,9 +364,9 @@
                                     </div>
                                     @endif
                                     <div class="flex flex-col">
-                                        <span class="text-sm font-medium text-gray-900">{{ $driver->first_name }} {{ $driver->last_name }}</span>
+                                        <span class="text-xs font-medium text-gray-900">{{ $driver->first_name }} {{ $driver->last_name }}</span>
                                         @if($driver->employee_number)
-                                        <span class="text-xs text-gray-500">{{ $driver->employee_number }}</span>
+                                        <span class="text-[10px] text-gray-500">{{ $driver->employee_number }}</span>
                                         @endif
                                     </div>
                                 </div>

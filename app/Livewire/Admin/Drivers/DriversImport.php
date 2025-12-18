@@ -42,20 +42,20 @@ class DriversImport extends Component
     public $totalRows = 0;
     public $validRows = 0;
     public $invalidRows = 0;
-    
+
     // Options d'importation
     public bool $skipDuplicates = true;
     public bool $updateExisting = false;
     public bool $dryRun = false;
     public bool $sendNotifications = true;
-    
+
     // État du processus
     public string $step = 'upload'; // upload, preview, processing, complete
     public int $progress = 0;
     public array $importResults = [];
-    public array $errors = [];
+
     public array $warnings = [];
-    
+
     // ===============================================
     // RÈGLES DE VALIDATION
     // ===============================================
@@ -80,11 +80,11 @@ class DriversImport extends Component
     public function updatedImportFile(): void
     {
         $this->validateOnly('importFile');
-        
+
         if ($this->importFile) {
             $this->fileName = $this->importFile->getClientOriginalName();
             $this->fileSize = $this->importFile->getSize();
-            
+
             $this->dispatch('notification', [
                 'type' => 'success',
                 'message' => 'Fichier sélectionné avec succès'
@@ -106,34 +106,33 @@ class DriversImport extends Component
         try {
             $this->step = 'preview';
             $this->progress = 25;
-            
+
             // Lire le fichier
             $fileContent = $this->readImportFile($this->importFile);
-            
+
             if (empty($fileContent)) {
                 throw new \Exception('Le fichier est vide ou illisible');
             }
 
             // Valider les données
             $this->validateImportData($fileContent);
-            
+
             // Générer l'aperçu (premières 5 lignes)
             $this->previewData = array_slice($fileContent, 0, 5);
             $this->totalRows = count($fileContent);
-            
+
             $this->progress = 50;
-            
+
             $this->dispatch('notification', [
                 'type' => 'success',
                 'message' => "Fichier analysé : {$this->totalRows} chauffeur(s) détecté(s)"
             ]);
-            
         } catch (\Exception $e) {
             $this->dispatch('notification', [
                 'type' => 'error',
                 'message' => 'Erreur lors de l\'analyse : ' . $e->getMessage()
             ]);
-            
+
             $this->resetImport();
         }
     }
@@ -146,10 +145,10 @@ class DriversImport extends Component
         try {
             $this->step = 'processing';
             $this->progress = 60;
-            
+
             // Lire à nouveau le fichier
             $fileContent = $this->readImportFile($this->importFile);
-            
+
             if ($this->dryRun) {
                 // Mode test : validation uniquement
                 $this->importResults = $this->validateOnly($fileContent);
@@ -157,24 +156,23 @@ class DriversImport extends Component
                 // Import réel
                 $this->importResults = $this->processImport($fileContent);
             }
-            
+
             $this->progress = 100;
             $this->step = 'complete';
-            
+
             $successCount = $this->importResults['successful_imports'] ?? 0;
             $errorCount = count($this->importResults['errors'] ?? []);
-            
+
             $this->dispatch('notification', [
                 'type' => 'success',
                 'message' => "Importation terminée : {$successCount} réussis, {$errorCount} erreurs"
             ]);
-            
         } catch (\Exception $e) {
             $this->dispatch('notification', [
                 'type' => 'error',
                 'message' => 'Erreur lors de l\'importation : ' . $e->getMessage()
             ]);
-            
+
             $this->step = 'preview';
         }
     }
@@ -186,7 +184,7 @@ class DriversImport extends Component
     {
         $extension = $file->getClientOriginalExtension();
         $path = $file->getRealPath();
-        
+
         if ($extension === 'csv') {
             return $this->readCsvFile($path);
         } else {
@@ -201,19 +199,19 @@ class DriversImport extends Component
     {
         $data = [];
         $headers = [];
-        
+
         if (($handle = fopen($path, 'r')) !== false) {
             $lineNumber = 0;
-            
+
             while (($row = fgetcsv($handle, 1000, ';')) !== false) {
                 $lineNumber++;
-                
+
                 if ($lineNumber === 1) {
                     // En-têtes
                     $headers = array_map('trim', $row);
                     continue;
                 }
-                
+
                 // Combiner en-têtes et valeurs
                 if (count($row) === count($headers)) {
                     $rowData = array_combine($headers, array_map('trim', $row));
@@ -221,10 +219,10 @@ class DriversImport extends Component
                     $data[] = $rowData;
                 }
             }
-            
+
             fclose($handle);
         }
-        
+
         return $data;
     }
 
@@ -235,31 +233,31 @@ class DriversImport extends Component
     {
         // Note: Nécessite PhpSpreadsheet
         // composer require phpoffice/phpspreadsheet
-        
+
         if (!class_exists('\PhpOffice\PhpSpreadsheet\IOFactory')) {
             throw new \Exception('PhpSpreadsheet non installé. Utilisez un fichier CSV.');
         }
-        
+
         $spreadsheet = \PhpOffice\PhpSpreadsheet\IOFactory::load($path);
         $worksheet = $spreadsheet->getActiveSheet();
         $rows = $worksheet->toArray();
-        
+
         $data = [];
         $headers = [];
-        
+
         foreach ($rows as $index => $row) {
             if ($index === 0) {
                 $headers = array_map('trim', $row);
                 continue;
             }
-            
+
             if (count(array_filter($row))) { // Ignorer lignes vides
                 $rowData = array_combine($headers, array_map(fn($v) => trim((string)$v), $row));
                 $rowData['_line'] = $index + 1;
                 $data[] = $rowData;
             }
         }
-        
+
         return $data;
     }
 
@@ -269,23 +267,23 @@ class DriversImport extends Component
     protected function validateImportData(array $data): void
     {
         $requiredColumns = ['first_name', 'last_name', 'license_number'];
-        
+
         if (empty($data)) {
             throw new \Exception('Aucune donnée trouvée dans le fichier');
         }
-        
+
         $firstRow = $data[0];
         $columns = array_keys($firstRow);
-        
+
         foreach ($requiredColumns as $required) {
             if (!in_array($required, $columns)) {
                 throw new \Exception("Colonne obligatoire manquante : {$required}");
             }
         }
-        
+
         $this->validRows = 0;
         $this->invalidRows = 0;
-        
+
         foreach ($data as $row) {
             if ($this->validateRow($row)) {
                 $this->validRows++;
@@ -308,7 +306,7 @@ class DriversImport extends Component
             'personal_phone' => 'nullable|string|max:20',
             'birth_date' => 'nullable|date_format:Y-m-d',
         ]);
-        
+
         return !$validator->fails();
     }
 
@@ -324,14 +322,14 @@ class DriversImport extends Component
             'errors' => [],
             'warnings' => [],
         ];
-        
+
         DB::beginTransaction();
-        
+
         try {
             foreach ($data as $row) {
                 try {
                     $result = $this->importDriver($row);
-                    
+
                     if ($result['status'] === 'created') {
                         $results['successful_imports']++;
                     } elseif ($result['status'] === 'updated') {
@@ -339,14 +337,13 @@ class DriversImport extends Component
                     } elseif ($result['status'] === 'skipped') {
                         $results['skipped_duplicates']++;
                     }
-                    
+
                     if (!empty($result['warnings'])) {
                         $results['warnings'][] = [
                             'row' => $row['_line'],
                             'warnings' => $result['warnings'],
                         ];
                     }
-                    
                 } catch (\Exception $e) {
                     $results['errors'][] = [
                         'row' => $row['_line'],
@@ -355,14 +352,13 @@ class DriversImport extends Component
                     ];
                 }
             }
-            
+
             DB::commit();
-            
         } catch (\Exception $e) {
             DB::rollBack();
             throw $e;
         }
-        
+
         return $results;
     }
 
@@ -372,21 +368,21 @@ class DriversImport extends Component
     protected function importDriver(array $data): array
     {
         $warnings = [];
-        
+
         // Vérifier les doublons
         $existing = Driver::where('license_number', $data['license_number'])->first();
-        
+
         if ($existing) {
             if ($this->skipDuplicates && !$this->updateExisting) {
                 return ['status' => 'skipped'];
             }
-            
+
             if ($this->updateExisting) {
                 $this->updateDriver($existing, $data);
                 return ['status' => 'updated', 'warnings' => $warnings];
             }
         }
-        
+
         // Créer le chauffeur
         $driver = new Driver();
         $driver->first_name = $data['first_name'];
@@ -395,7 +391,7 @@ class DriversImport extends Component
         $driver->personal_email = $data['personal_email'] ?? null;
         $driver->personal_phone = $data['personal_phone'] ?? null;
         $driver->employee_number = $data['employee_number'] ?? null;
-        
+
         // Date de naissance
         if (!empty($data['birth_date'])) {
             try {
@@ -404,15 +400,15 @@ class DriversImport extends Component
                 $warnings[] = 'Date de naissance invalide';
             }
         }
-        
+
         // Statut par défaut
         $driver->status_id = $this->getDefaultStatusId();
-        
+
         // Organisation
         $driver->organization_id = auth()->user()->organization_id;
-        
+
         $driver->save();
-        
+
         return ['status' => 'created', 'warnings' => $warnings];
     }
 
@@ -424,19 +420,19 @@ class DriversImport extends Component
         if (!empty($data['first_name'])) {
             $driver->first_name = $data['first_name'];
         }
-        
+
         if (!empty($data['last_name'])) {
             $driver->last_name = $data['last_name'];
         }
-        
+
         if (!empty($data['personal_email'])) {
             $driver->personal_email = $data['personal_email'];
         }
-        
+
         if (!empty($data['personal_phone'])) {
             $driver->personal_phone = $data['personal_phone'];
         }
-        
+
         $driver->save();
     }
 
@@ -448,7 +444,7 @@ class DriversImport extends Component
         $status = DriverStatus::where('name', 'Disponible')
             ->orWhere('name', 'LIKE', '%disponible%')
             ->first();
-        
+
         return $status?->id ?? DriverStatus::first()->id ?? 1;
     }
 
@@ -472,11 +468,11 @@ class DriversImport extends Component
             'license_category',
             'address',
         ];
-        
+
         $csv = implode(';', $headers) . "\n";
         $csv .= "Ahmed;Benali;123456789;ahmed@email.com;0555123456;1990-05-15;EMP001;B;Alger, Algérie\n";
         $csv .= "Fatima;Zohra;987654321;fatima@email.com;0666987654;1985-08-20;EMP002;C;Oran, Algérie\n";
-        
+
         $this->dispatch('download-template', ['csv' => $csv, 'filename' => 'modele-import-chauffeurs.csv']);
     }
 
@@ -503,7 +499,7 @@ class DriversImport extends Component
         $this->validRows = 0;
         $this->invalidRows = 0;
         $this->importResults = [];
-        $this->errors = [];
+
         $this->warnings = [];
     }
 
@@ -526,7 +522,7 @@ class DriversImport extends Component
     public function render()
     {
         $driverStatuses = DriverStatus::all();
-        
+
         return view('livewire.admin.drivers.drivers-import', [
             'driverStatuses' => $driverStatuses,
         ]);

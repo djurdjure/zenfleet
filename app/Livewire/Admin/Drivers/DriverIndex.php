@@ -387,7 +387,7 @@ class DriverIndex extends Component
 
         // Filters
         $query->when($this->status_id, fn($q) => $q->where('status_id', $this->status_id));
-        $query->when($this->license_category, fn($q) => $q->where('license_category', $this->license_category));
+        $query->when($this->license_category, fn($q) => $q->whereJsonContains('license_categories', $this->license_category));
 
         // Visibility (Soft Deletes)
         if ($this->visibility === 'archived') {
