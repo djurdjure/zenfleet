@@ -41,10 +41,8 @@
         if (this.selected.length === 0) {
             return '{{ $placeholder }}';
         }
-        // Utiliser une fonction pour mapper les valeurs sélectionnées aux labels
-        const allOptions = @js($options);
-        const labels = this.selected.map(value => allOptions[value] || value);
-        return labels.join(', ');
+        // Afficher uniquement les abréviations (valeurs) pour optimiser l'affichage
+        return this.selected.join(', ');
     }
 }" 
 x-init="
@@ -123,8 +121,9 @@ x-init="
         </ul>
     </div>
 
-    <!-- Champ caché pour la validation Alpine.js (si nécessaire) -->
-    <input type="hidden" :name="'{{ $name }}'" :value="selected.join(',')" x-ref="hiddenInput">
+    <!-- Le champ caché qui envoyait une chaîne de caractères a été supprimé. 
+    La soumission est maintenant gérée par les checkboxes cachées avec name="{{ $name }}[]", 
+    ce qui assure que le serveur reçoit un tableau comme requis par la validation. -->
 
     @if($error)
     <p class="mt-2 text-sm text-red-600 flex items-start">
