@@ -1,23 +1,33 @@
 @props([
-    'name' => '',
-    'label' => null,
-    'error' => null,
-    'helpText' => null,
-    'required' => false,
-    'disabled' => false,
-    'options' => [],
-    'selected' => [], // Doit être un tableau d'IDs/valeurs
-    'placeholder' => 'Sélectionnez...',
+'name' => '',
+'label' => null,
+'error' => null,
+'helpText' => null,
+'required' => false,
+'disabled' => false,
+'options' => [],
+'selected' => [], // Doit être un tableau d'IDs/valeurs
+'placeholder' => 'Sélectionnez...',
 ])
 
 @php
-    $fieldId = 'multi-select-' . $name . '-' . uniqid();
-    // Assurer que $selected est un tableau pour la logique de pré-sélection
-    $selectedValues = is_array($selected) ? $selected : (is_string($selected) ? json_decode($selected, true) : []);
-    if (is_null($selectedValues)) $selectedValues = [];
-    
-    // Convertir les clés des options en tableau simple pour Alpine.js
-    $optionKeys = array_keys($options);
+$fieldId = 'multi-select-' . $name . '-' . uniqid();
+
+// Logique de pré-sélection : Priorité à old() > $selected
+$oldValues = old($name);
+
+if (!is_null($oldValues)) {
+// Si des valeurs 'old' existent (retour de validation), on les utilise
+$selectedValues = is_array($oldValues) ? $oldValues : [];
+} else {
+// Sinon on utilise les valeurs passées en prop
+$selectedValues = is_array($selected) ? $selected : (is_string($selected) ? json_decode($selected, true) : []);
+}
+
+if (is_null($selectedValues)) $selectedValues = [];
+
+// Convertir les clés des options en tableau simple pour Alpine.js
+$optionKeys = array_keys($options);
 @endphp
 
 <div x-data="{ 
@@ -44,16 +54,9 @@
         // Afficher uniquement les abréviations (valeurs) pour optimiser l'affichage
         return this.selected.join(', ');
     }
-}" 
-x-init="
-    // Initialisation pour gérer les valeurs 'old' après une erreur de validation
-    const oldValues = @js(old($name));
-    if (oldValues && oldValues.length > 0) {
-        selected = oldValues;
-    }
-"
-@click.outside="open = false"
-{{ $attributes->merge(['class' => 'relative']) }}>
+}"
+    @click.outside="open = false"
+    {{ $attributes->merge(['class' => 'relative']) }}>
 
     @if($label)
     <label for="{{ $fieldId }}" class="block mb-2 text-sm font-medium text-gray-900">
@@ -65,9 +68,9 @@ x-init="
     @endif
 
     <!-- Bouton d'affichage -->
-    <button type="button" 
-        @click="open = !open" 
-        :aria-expanded="open" 
+    <button type="button"
+        @click="open = !open"
+        :aria-expanded="open"
         aria-haspopup="true"
         class="w-full bg-white border border-gray-300 rounded-lg shadow-sm px-4 py-2 text-left cursor-default focus:outline-none focus:ring-1 focus:ring-zenfleet-primary focus:border-zenfleet-primary sm:text-sm transition duration-150 ease-in-out"
         :class="{ 'border-red-500': '{{ $error }}' }">
@@ -80,26 +83,26 @@ x-init="
     </button>
 
     <!-- Liste des options -->
-    <div x-show="open" 
-        x-transition:enter="transition ease-out duration-100" 
-        x-transition:enter-start="transform opacity-0 scale-95" 
-        x-transition:enter-end="transform opacity-100 scale-100" 
-        x-transition:leave="transition ease-in duration-75" 
-        x-transition:leave-start="transform opacity-100 scale-100" 
-        x-transition:leave-end="transform opacity-0 scale-95" 
+    <div x-show="open"
+        x-transition:enter="transition ease-out duration-100"
+        x-transition:enter-start="transform opacity-0 scale-95"
+        x-transition:enter-end="transform opacity-100 scale-100"
+        x-transition:leave="transition ease-in duration-75"
+        x-transition:leave-start="transform opacity-100 scale-100"
+        x-transition:leave-end="transform opacity-0 scale-95"
         class="absolute z-10 mt-1 w-full rounded-lg bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none max-h-60 overflow-auto"
         style="display: none;">
-        
+
         <ul class="py-1 text-base ring-1 ring-gray-200 rounded-lg">
             @foreach($options as $value => $label)
             <li class="text-gray-900 cursor-default select-none relative py-2 pl-3 pr-9 hover:bg-gray-100 transition duration-100 ease-in-out"
                 @click.stop="toggle('{{ $value }}')">
-                
+
                 <div class="flex items-center">
                     <!-- Case à cocher invisible pour la soumission -->
-                    <input type="checkbox" 
-                        name="{{ $name }}[]" 
-                        value="{{ $value }}" 
+                    <input type="checkbox"
+                        name="{{ $name }}[]"
+                        value="{{ $value }}"
                         :checked="isSelected('{{ $value }}')"
                         class="hidden"
                         :id="'{{ $fieldId . '-' . $value }}'">
