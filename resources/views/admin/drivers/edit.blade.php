@@ -336,18 +336,19 @@
                                             'DE' => 'DE (Remorques catégorie D)',
                                             'F' => 'F (Tracteurs agricoles)',
                                         ];
-                                        // Récupération de la valeur actuelle (une seule catégorie)
-                                        $selectedCategory = old('license_category', $driver->license_category);
+                                        // Récupération des valeurs actuelles (multiples catégories)
+                                        $selectedCategories = old('license_categories', $driver->license_categories ?? []);
+                                        if (!is_array($selectedCategories)) $selectedCategories = [];
                                     @endphp
-                                    <x-slim-select
-                                        name="license_category"
-                                        label="Catégorie de permis"
+                                    <x-multi-checkbox-select
+                                        name="license_categories"
+                                        label="Catégories de permis"
                                         :options="$licenseCategories"
-                                        :selected="$selectedCategory"
-                                        placeholder="Sélectionnez une catégorie de permis..."
-                                        :error="$errors->first('license_category')"
+                                        :selected="$selectedCategories"
+                                        placeholder="Sélectionnez les catégories de permis..."
+                                        :error="$errors->first('license_categories')"
                                         required
-                                        helpText="Sélectionnez la catégorie principale du permis de conduire" />
+                                        helpText="Sélectionnez toutes les catégories de permis détenues par le chauffeur" />
 
                                     <x-datepicker
                                         name="license_issue_date"
@@ -554,7 +555,7 @@
                     personal_phone: false,
                     'birth_date': false,
                     'license_number': false,
-                    'license_category': false, // Modifié: licence_categories[] → license_category
+                    'license_categories': false,
                     license_issue_date: false,
                     license_expiry_date: false,
                     recruitment_date: false,
@@ -581,7 +582,14 @@
             validateField(fieldName, value = null) {
                 this.touchedFields[fieldName] = true;
                 // Logique de validation simple côté client (optionnel mais recommandé pour l'UX immédiate)
-                if (value === '') {
+                if (fieldName === 'license_categories') {
+                    // Pour license_categories, value est un tableau (selected)
+                    if (!value || value.length === 0) {
+                        this.fieldErrors.license_categories = 'Au moins une catégorie de permis est obligatoire';
+                    } else {
+                        this.fieldErrors.license_categories = '';
+                    }
+                } else if (value === '') {
                     // Reset error if value is provided (very basic)
                     this.fieldErrors[fieldName] = '';
                 }
@@ -669,7 +677,7 @@
                     'status_id': 2,
                     'notes': 2,
                     'license_number': 3,
-                    'license_category': 3, // Modifié: licence_categories → license_category
+                    'license_categories': 3,
                     'license_issue_date': 3,
                     'license_expiry_date': 3,
                     'license_authority': 3,

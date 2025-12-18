@@ -338,16 +338,15 @@
                                     @endphp
 
                                     <div>
-                                        <x-slim-select
-                                            name="license_categories[]"
+                                        <x-multi-checkbox-select
+                                            name="license_categories"
                                             label="Catégories de permis"
                                             :options="$licenseOptions"
                                             :selected="$selectedCategories"
                                             placeholder="Sélectionnez les catégories de permis..."
-                                            multiple="true"
                                             required
                                             :error="$errors->first('license_categories')"
-                                            @change="validateField('license_categories', $event.target.value)"
+                                            @change="validateField('license_categories', $event.detail.selected)"
                                             helpText="Sélectionnez toutes les catégories de permis détenues par le chauffeur" />
                                     </div>
 
@@ -725,6 +724,7 @@
                         break;
 
                     case 'license_categories':
+                        // La valeur passée est le tableau 'selected' de l'événement custom
                         if (!value || value.length === 0) {
                             this.fieldErrors.license_categories = 'Au moins une catégorie de permis est obligatoire';
                             this.showFieldError(fieldName, this.fieldErrors.license_categories);
