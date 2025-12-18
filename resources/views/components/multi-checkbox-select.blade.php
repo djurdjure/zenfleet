@@ -72,8 +72,8 @@ $optionKeys = array_keys($options);
         @click="open = !open"
         :aria-expanded="open"
         aria-haspopup="true"
-        class="w-full bg-white border border-gray-300 rounded-lg shadow-sm px-4 py-2 text-left cursor-default focus:outline-none focus:ring-1 focus:ring-zenfleet-primary focus:border-zenfleet-primary sm:text-sm transition duration-150 ease-in-out"
-        :class="{ 'border-red-500': '{{ $error }}' }">
+        class="w-full bg-gray-50 border border-gray-300 text-gray-900 rounded-lg shadow-sm px-4 py-2.5 text-left cursor-default focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition duration-150 ease-in-out"
+        :class="{ 'border-red-500 focus:ring-red-500 focus:border-red-500': '{{ $error }}' }">
         <span x-text="selectedLabels" class="block truncate" :class="{ 'text-gray-500': selected.length === 0 }"></span>
         <span class="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
             <svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
@@ -109,7 +109,7 @@ $optionKeys = array_keys($options);
 
                     <!-- Affichage de la case à cocher custom -->
                     <div class="w-4 h-4 rounded border border-gray-300 flex items-center justify-center mr-3 transition duration-150 ease-in-out"
-                        :class="{ 'bg-zenfleet-primary border-zenfleet-primary': isSelected('{{ $value }}'), 'bg-white': !isSelected('{{ $value }}') }">
+                        :class="{ 'bg-blue-600 border-blue-600': isSelected('{{ $value }}'), 'bg-white': !isSelected('{{ $value }}') }">
                         <svg x-show="isSelected('{{ $value }}')" class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
                         </svg>
