@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use App\Models\Concerns\BelongsToOrganization;
+use Illuminate\Support\Str;
 
 /**
  * 🚛 MODÈLE DRIVER STATUS - Version Enterprise-Grade
@@ -145,7 +146,7 @@ class DriverStatus extends Model
     {
         return $query->where(function ($q) use ($organizationId) {
             $q->whereNull('organization_id')
-              ->orWhere('organization_id', $organizationId);
+                ->orWhere('organization_id', $organizationId);
         });
     }
 
@@ -190,7 +191,7 @@ class DriverStatus extends Model
      */
     public function getActiveDriversCount(): int
     {
-        return $this->drivers()->where('status', 'active')->count();
+        return $this->drivers()->count();
     }
 
     /**
@@ -249,7 +250,7 @@ class DriverStatus extends Model
      */
     public static function getDefault($organizationId = null): ?self
     {
-        return static::where('slug', 'active')
+        return static::where('slug', 'disponible')
             ->forOrganization($organizationId)
             ->first();
     }
