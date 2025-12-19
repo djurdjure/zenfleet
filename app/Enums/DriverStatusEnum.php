@@ -39,6 +39,11 @@ enum DriverStatusEnum: string
      */
     case AUTRE = 'autre';
 
+    /**
+     * Chauffeur en formation.
+     */
+    case EN_FORMATION = 'en_formation';
+
     // =========================================================================
     // MÉTHODES HELPER - BUSINESS LOGIC
     // =========================================================================
@@ -48,10 +53,11 @@ enum DriverStatusEnum: string
      */
     public function label(): string
     {
-        return match($this) {
+        return match ($this) {
             self::DISPONIBLE => 'Disponible',
             self::EN_MISSION => 'En mission',
             self::EN_CONGE => 'En congé',
+            self::EN_FORMATION => 'En formation',
             self::AUTRE => 'Autre',
         };
     }
@@ -61,10 +67,11 @@ enum DriverStatusEnum: string
      */
     public function description(): string
     {
-        return match($this) {
+        return match ($this) {
             self::DISPONIBLE => 'Chauffeur disponible, peut recevoir une affectation de véhicule',
             self::EN_MISSION => 'Chauffeur actuellement en mission avec un véhicule affecté',
             self::EN_CONGE => 'Chauffeur en congé, indisponible pour affectation',
+            self::EN_FORMATION => 'Chauffeur en période de formation',
             self::AUTRE => 'Statut spécial : sanctionné, en formation, en maladie, etc.',
         };
     }
@@ -74,10 +81,11 @@ enum DriverStatusEnum: string
      */
     public function color(): string
     {
-        return match($this) {
+        return match ($this) {
             self::DISPONIBLE => 'green',
             self::EN_MISSION => 'blue',
             self::EN_CONGE => 'orange',
+            self::EN_FORMATION => 'indigo',
             self::AUTRE => 'gray',
         };
     }
@@ -87,10 +95,11 @@ enum DriverStatusEnum: string
      */
     public function hexColor(): string
     {
-        return match($this) {
+        return match ($this) {
             self::DISPONIBLE => '#10b981',  // Vert
             self::EN_MISSION => '#3b82f6',  // Bleu
             self::EN_CONGE => '#f59e0b',    // Orange
+            self::EN_FORMATION => '#6366f1', // Indigo
             self::AUTRE => '#6b7280',       // Gris
         };
     }
@@ -100,11 +109,12 @@ enum DriverStatusEnum: string
      */
     public function icon(): string
     {
-        return match($this) {
+        return match ($this) {
             self::DISPONIBLE => 'user-check',
-            self::EN_MISSION => 'road',
-            self::EN_CONGE => 'calendar-times',
-            self::AUTRE => 'info-circle',
+            self::EN_MISSION => 'truck',
+            self::EN_CONGE => 'palmtree',
+            self::EN_FORMATION => 'graduation-cap',
+            self::AUTRE => 'help-circle',
         };
     }
 
@@ -115,10 +125,11 @@ enum DriverStatusEnum: string
     {
         $base = 'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium';
 
-        $colorClasses = match($this) {
+        $colorClasses = match ($this) {
             self::DISPONIBLE => 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200',
             self::EN_MISSION => 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200',
             self::EN_CONGE => 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200',
+            self::EN_FORMATION => 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-200',
             self::AUTRE => 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300',
         };
 
@@ -150,7 +161,7 @@ enum DriverStatusEnum: string
      */
     public function isTemporarilyUnavailable(): bool
     {
-        return in_array($this, [self::EN_CONGE, self::AUTRE]);
+        return in_array($this, [self::EN_CONGE, self::EN_FORMATION, self::AUTRE]);
     }
 
     /**
@@ -180,10 +191,11 @@ enum DriverStatusEnum: string
      */
     public function allowedTransitions(): array
     {
-        return match($this) {
-            self::DISPONIBLE => [self::EN_MISSION, self::EN_CONGE, self::AUTRE],
+        return match ($this) {
+            self::DISPONIBLE => [self::EN_MISSION, self::EN_CONGE, self::EN_FORMATION, self::AUTRE],
             self::EN_MISSION => [self::DISPONIBLE], // Seulement retour après fin de mission
             self::EN_CONGE => [self::DISPONIBLE, self::AUTRE],
+            self::EN_FORMATION => [self::DISPONIBLE, self::AUTRE],
             self::AUTRE => [self::DISPONIBLE, self::EN_CONGE],
         };
     }
@@ -209,7 +221,7 @@ enum DriverStatusEnum: string
         $allowedStr = implode(', ', $allowed);
 
         return "Transition impossible de '{$this->label()}' vers '{$newStatus->label()}'. "
-             . "Transitions autorisées : {$allowedStr}.";
+            . "Transitions autorisées : {$allowedStr}.";
     }
 
     // =========================================================================
@@ -297,11 +309,12 @@ enum DriverStatusEnum: string
      */
     public function sortOrder(): int
     {
-        return match($this) {
+        return match ($this) {
             self::DISPONIBLE => 1,
             self::EN_MISSION => 2,
             self::EN_CONGE => 3,
-            self::AUTRE => 4,
+            self::EN_FORMATION => 4,
+            self::AUTRE => 5,
         };
     }
 }

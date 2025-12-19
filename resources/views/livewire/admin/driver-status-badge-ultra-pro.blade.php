@@ -1,0 +1,260 @@
+<div class="relative inline-block"
+    x-data="{ 
+         open: false, 
+         confirmModal: @entangle('showConfirmModal').live,
+         toggle() { this.open = !this.open; },
+         close() { this.open = false; },
+         selectStatus(status) { 
+             this.open = false; 
+             $wire.prepareStatusChange(status); 
+         }
+     }"
+    @click.stop
+    x-init="$watch('confirmModal', value => { if (value) open = false; })">
+    {{-- 🎯 Badge de Statut Chauffeur Ultra-Professionnel - Enterprise Grade --}}
+    @if($canUpdate && count($allowedStatuses) > 0)
+    <button
+        @click.stop="toggle"
+        @click.away="close"
+        type="button"
+        class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold 
+                   transition-all duration-200 hover:shadow-md hover:scale-105 cursor-pointer 
+                   {{ $currentEnum ? $currentEnum->badgeClasses() : 'bg-gray-100 text-gray-700 ring-1 ring-gray-200' }}
+                   focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+        title="Cliquer pour modifier le statut">
+        {{-- Icône du statut --}}
+        @if($currentEnum)
+        <x-iconify icon="lucide:{{ $currentEnum->icon() }}" class="w-3.5 h-3.5" />
+        @else
+        <x-iconify icon="lucide:help-circle" class="w-3.5 h-3.5" />
+        @endif
+
+        {{-- Label du statut --}}
+        <span>{{ $currentEnum ? $currentEnum->label() : 'Non défini' }}</span>
+
+        {{-- Indicateur de dropdown --}}
+        <svg class="w-3 h-3 opacity-60 transition-transform duration-200"
+            :class="{ 'rotate-180': open }"
+            fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+        </svg>
+    </button>
+    @else
+    {{-- Badge non-interactif (lecture seule) --}}
+    <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold 
+                     {{ $currentEnum ? $currentEnum->badgeClasses() : 'bg-gray-100 text-gray-700 ring-1 ring-gray-200' }}">
+        @if($currentEnum)
+        <x-iconify icon="lucide:{{ $currentEnum->icon() }}" class="w-3.5 h-3.5" />
+        @else
+        <x-iconify icon="lucide:help-circle" class="w-3.5 h-3.5" />
+        @endif
+        {{ $currentEnum ? $currentEnum->label() : 'Non défini' }}
+    </span>
+    @endif
+
+    {{-- 🎯 Popover des Statuts Disponibles --}}
+    @if($canUpdate && count($allowedStatuses) > 0)
+    <div
+        x-show="open"
+        x-transition:enter="transition ease-out duration-200"
+        x-transition:enter-start="transform opacity-0 scale-95 translate-y-2"
+        x-transition:enter-end="transform opacity-100 scale-100 translate-y-0"
+        x-transition:leave="transition ease-in duration-150"
+        x-transition:leave-start="transform opacity-100 scale-100 translate-y-0"
+        x-transition:leave-end="transform opacity-0 scale-95 translate-y-2"
+        class="absolute left-0 mt-3 w-72 rounded-xl shadow-[0_10px_40px_-10px_rgba(0,0,0,0.2)] bg-white ring-1 ring-black/5 z-50 overflow-visible"
+        style="display: none;">
+
+        {{-- Flèche du Popover --}}
+        <div class="absolute -top-2 left-6 w-4 h-4 bg-white transform rotate-45 border-t border-l border-gray-100 shadow-sm"></div>
+
+        <div class="relative bg-white rounded-xl overflow-hidden">
+            {{-- Header du popover --}}
+            <div class="px-4 py-3 bg-gradient-to-r from-gray-50 to-white border-b border-gray-100">
+                <div class="flex items-center justify-between">
+                    <span class="text-xs font-bold text-gray-800 uppercase tracking-wider flex items-center gap-2">
+                        <x-iconify icon="lucide:git-branch" class="w-3.5 h-3.5 text-blue-500" />
+                        Changer le statut
+                    </span>
+                    <button @click="close" class="text-gray-400 hover:text-gray-600 transition-colors p-1 hover:bg-gray-100 rounded-full">
+                        <x-iconify icon="lucide:x" class="w-3.5 h-3.5" />
+                    </button>
+                </div>
+            </div>
+
+            {{-- Liste des statuts disponibles --}}
+            <div class="py-2 max-h-[300px] overflow-y-auto custom-scrollbar">
+                @forelse($allowedStatuses as $status)
+                <button
+                    @click.stop="selectStatus('{{ $status->value }}')"
+                    type="button"
+                    class="w-full flex items-center justify-between px-4 py-3 hover:bg-blue-50/50 
+                                   transition-all duration-200 group focus:outline-none border-l-2 border-transparent hover:border-blue-500">
+                    <div class="flex items-center gap-3">
+                        {{-- Badge du statut --}}
+                        <span class="inline-flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-xs font-semibold 
+                                           {{ $status->badgeClasses() }} shadow-sm group-hover:shadow transition-all">
+                            <x-iconify icon="lucide:{{ $status->icon() }}" class="w-3.5 h-3.5" />
+                            {{ $status->label() }}
+                        </span>
+                    </div>
+                    {{-- Flèche d'action --}}
+                    <div class="w-6 h-6 rounded-full bg-transparent group-hover:bg-blue-100 flex items-center justify-center transition-all">
+                        <x-iconify icon="lucide:arrow-right"
+                            class="w-3.5 h-3.5 text-gray-300 group-hover:text-blue-600 
+                                                 group-hover:translate-x-0.5 transition-all" />
+                    </div>
+                </button>
+                @empty
+                <div class="px-4 py-8 text-center">
+                    <div class="w-10 h-10 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-2">
+                        <x-iconify icon="lucide:lock" class="w-5 h-5 text-gray-400" />
+                    </div>
+                    <p class="text-sm text-gray-500 font-medium">Aucune transition possible</p>
+                    <p class="text-xs text-gray-400 mt-1">Le statut actuel ne permet pas de changement direct.</p>
+                </div>
+                @endforelse
+            </div>
+
+            {{-- Footer avec info contextuelle --}}
+            @if($currentEnum)
+            <div class="px-4 py-3 bg-gray-50/80 border-t border-gray-100 backdrop-blur-sm">
+                <div class="flex items-start gap-2.5">
+                    <x-iconify icon="lucide:info" class="w-4 h-4 text-blue-500 mt-0.5 flex-shrink-0" />
+                    <p class="text-xs text-gray-600 leading-relaxed">
+                        <span class="font-medium text-gray-900">Note:</span>
+                        {{ $currentEnum->description() }}
+                    </p>
+                </div>
+            </div>
+            @endif
+        </div>
+    </div>
+    @endif
+
+    {{-- 🎯 Modal de Confirmation - Design Enterprise Ultra-Pro --}}
+    <div x-show="confirmModal"
+        x-cloak
+        class="fixed inset-0 z-50 overflow-y-auto"
+        aria-labelledby="modal-title"
+        role="dialog"
+        aria-modal="true">
+
+        {{-- Overlay avec blur effect --}}
+        <div x-show="confirmModal"
+            x-transition:enter="ease-out duration-300"
+            x-transition:enter-start="opacity-0"
+            x-transition:enter-end="opacity-100"
+            x-transition:leave="ease-in duration-200"
+            x-transition:leave-start="opacity-100"
+            x-transition:leave-end="opacity-0"
+            class="fixed inset-0 bg-gray-900 bg-opacity-50 backdrop-blur-sm transition-opacity">
+        </div>
+
+        {{-- Modal Container --}}
+        <div class="flex min-h-full items-center justify-center p-4 text-center sm:p-0">
+            <div x-show="confirmModal"
+                x-transition:enter="ease-out duration-300"
+                x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
+                x-transition:leave="ease-in duration-200"
+                x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
+                x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                class="relative transform overflow-hidden rounded-2xl bg-white text-left shadow-2xl transition-all sm:my-8 sm:w-full sm:max-w-lg">
+
+                {{-- Header avec gradient --}}
+                <div class="bg-gradient-to-r from-blue-500 to-blue-600 px-6 py-4">
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-lg font-semibold text-white flex items-center gap-2">
+                            <x-iconify icon="lucide:alert-circle" class="w-5 h-5" />
+                            Confirmation de changement de statut
+                        </h3>
+                        <button @click="confirmModal = false; $wire.cancelStatusChange()"
+                            class="text-white/80 hover:text-white transition-colors">
+                            <x-iconify icon="lucide:x" class="w-5 h-5" />
+                        </button>
+                    </div>
+                </div>
+
+                {{-- Body --}}
+                <div class="px-6 py-5">
+                    {{-- Message de confirmation --}}
+                    <div class="mb-4">
+                        <p class="text-sm text-gray-700 whitespace-pre-line">{{ $confirmMessage }}</p>
+                    </div>
+
+                    {{-- Informations du chauffeur --}}
+                    <div class="bg-gray-50 rounded-lg p-4 mb-4">
+                        <div class="grid grid-cols-2 gap-3 text-sm">
+                            <div>
+                                <span class="text-gray-500">Chauffeur:</span>
+                                <p class="font-medium text-gray-900">{{ $driver->first_name }} {{ $driver->last_name }}</p>
+                            </div>
+                            <div>
+                                <span class="text-gray-500">Matricule:</span>
+                                <p class="font-medium text-gray-900">{{ $driver->employee_number ?? 'N/A' }}</p>
+                            </div>
+                            @if($currentEnum)
+                            <div>
+                                <span class="text-gray-500">Statut actuel:</span>
+                                <p class="mt-1">
+                                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium {{ $currentEnum->badgeClasses() }}">
+                                        <x-iconify icon="lucide:{{ $currentEnum->icon() }}" class="w-3 h-3" />
+                                        {{ $currentEnum->label() }}
+                                    </span>
+                                </p>
+                            </div>
+                            @endif
+                            @if($pendingStatusEnum)
+                            <div>
+                                <span class="text-gray-500">Nouveau statut:</span>
+                                <p class="mt-1">
+                                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium {{ $pendingStatusEnum->badgeClasses() }}">
+                                        <x-iconify icon="lucide:{{ $pendingStatusEnum->icon() }}" class="w-3 h-3" />
+                                        {{ $pendingStatusEnum->label() }}
+                                    </span>
+                                </p>
+                            </div>
+                            @endif
+                        </div>
+                    </div>
+                </div>
+
+                {{-- Footer avec actions --}}
+                <div class="bg-gray-50 px-6 py-4 flex items-center justify-end gap-3">
+                    <button wire:click="cancelStatusChange"
+                        @click="confirmModal = false"
+                        type="button"
+                        class="inline-flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 
+                                   rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 
+                                   focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 
+                                   transition-all duration-150">
+                        <x-iconify icon="lucide:x" class="w-4 h-4" />
+                        Annuler
+                    </button>
+
+                    <button wire:click="confirmStatusChange"
+                        type="button"
+                        wire:loading.attr="disabled"
+                        wire:loading.class="opacity-50 cursor-not-allowed"
+                        class="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 
+                                   text-white rounded-lg text-sm font-medium 
+                                   focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500
+                                   transition-all duration-150 shadow-sm hover:shadow-md">
+                        <span wire:loading.remove wire:target="confirmStatusChange">
+                            <x-iconify icon="lucide:check" class="w-4 h-4" />
+                        </span>
+                        <span wire:loading wire:target="confirmStatusChange">
+                            <svg class="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+                            </svg>
+                        </span>
+                        <span wire:loading.remove wire:target="confirmStatusChange">Confirmer</span>
+                        <span wire:loading wire:target="confirmStatusChange">Traitement...</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

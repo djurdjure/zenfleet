@@ -316,21 +316,7 @@
                                 @endif
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
-                                @php
-                                $statusName = $driver->driverStatus->name ?? 'N/A';
-                                $colors = [
-                                'Disponible' => 'bg-green-100 text-green-800',
-                                'En mission' => 'bg-orange-100 text-orange-800',
-                                'En repos' => 'bg-amber-100 text-amber-800',
-                                'En congé' => 'bg-purple-100 text-purple-800',
-                                'Maladie' => 'bg-red-100 text-red-800',
-                                'Indisponible' => 'bg-gray-100 text-gray-800',
-                                ];
-                                $colorClass = $colors[$statusName] ?? 'bg-gray-100 text-gray-800';
-                                @endphp
-                                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium {{ $colorClass }}">
-                                    {{ $statusName }}
-                                </span>
+                                @livewire('admin.driver-status-badge-ultra-pro', ['driver' => $driver], key('status-'.$driver->id))
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-xs text-gray-500">
                                 @if($driver->activeAssignment && $driver->activeAssignment->vehicle)

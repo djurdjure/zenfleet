@@ -455,38 +455,7 @@
 
                             {{-- Statut --}}
                             <td class="px-6 py-4 whitespace-nowrap">
-                                @php
-                                // 🔥 CORRECTION: Afficher UNIQUEMENT le statut prédéfini du chauffeur
-                                // Les sanctions sont consultables dans la section dédiée
-                                $realStatus = 'Disponible';
-                                $statusLabel = 'Disponible';
-
-                                // Utiliser le statut du driver (statuts prédéfinis uniquement)
-                                if($driver->driverStatus) {
-                                $realStatus = $driver->driverStatus->name;
-                                $statusLabel = $driver->driverStatus->name;
-                                }
-                                // Sinon si affecté à un véhicule, afficher "En mission"
-                                elseif($driver->activeAssignment && $driver->activeAssignment->vehicle) {
-                                $realStatus = 'En mission';
-                                $statusLabel = 'En mission';
-                                }
-
-                                // Configuration des couleurs selon le statut (sans "Sanctionné")
-                                $statusConfig = [
-                                'Disponible' => ['bg' => 'bg-green-100', 'text' => 'text-green-800', 'icon' => 'lucide:check-circle'],
-                                'En mission' => ['bg' => 'bg-orange-100', 'text' => 'text-orange-800', 'icon' => 'lucide:truck'],
-                                'En repos' => ['bg' => 'bg-amber-100', 'text' => 'text-amber-800', 'icon' => 'lucide:pause-circle'],
-                                'En congé' => ['bg' => 'bg-purple-100', 'text' => 'text-purple-800', 'icon' => 'lucide:calendar-off'],
-                                'Maladie' => ['bg' => 'bg-red-100', 'text' => 'text-red-800', 'icon' => 'lucide:heart-pulse'],
-                                'Indisponible' => ['bg' => 'bg-gray-100', 'text' => 'text-gray-800', 'icon' => 'lucide:x-circle'],
-                                ];
-                                $config = $statusConfig[$realStatus] ?? ['bg' => 'bg-gray-100', 'text' => 'text-gray-800', 'icon' => 'lucide:circle'];
-                                @endphp
-                                <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium {{ $config['bg'] }} {{ $config['text'] }}">
-                                    <x-iconify :icon="$config['icon']" class="w-3.5 h-3.5" />
-                                    {{ $statusLabel }}
-                                </span>
+                                @livewire('admin.driver-status-badge-ultra-pro', ['driver' => $driver], key('status-'.$driver->id))
                             </td>
 
                             {{-- Véhicule Actuel --}}
