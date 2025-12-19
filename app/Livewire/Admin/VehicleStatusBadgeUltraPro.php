@@ -43,8 +43,9 @@ class VehicleStatusBadgeUltraPro extends Component
     protected $listeners = [
         'refreshComponent' => '$refresh',
         'vehicleStatusUpdated' => 'refreshVehicleData',
+        'vehicleStatusUpdated' => 'refreshVehicleData',
         'vehicleStatusChanged' => 'handleStatusChanged',
-        'echo:vehicles,VehicleStatusChanged' => 'onVehicleStatusChanged' // Real-time via WebSocket
+        // 'echo:vehicles,VehicleStatusChanged' => 'onVehicleStatusChanged' // Real-time via WebSocket (Disabled: Echo not installed)
     ];
 
     /**
@@ -92,7 +93,7 @@ class VehicleStatusBadgeUltraPro extends Component
             'component' => 'VehicleStatusBadgeUltraPro'
         ]);
     }
-    
+
     /**
      * Gère l'événement de changement de statut
      * ✅ FIX: Utilise maintenant vehicleId au lieu de vehicle->id
@@ -176,13 +177,12 @@ class VehicleStatusBadgeUltraPro extends Component
 
             $this->pendingStatus = $newStatus;
             $currentEnum = $this->getCurrentStatusEnum();
-            
+
             // Construire le message de confirmation contextuel
             $this->confirmMessage = $this->buildConfirmationMessage($currentEnum, $this->pendingStatusEnum);
-            
+
             // Ouvrir la modal
             $this->showConfirmModal = true;
-
         } catch (\Exception $e) {
             $this->dispatch('toast', [
                 'type' => 'error',
@@ -199,7 +199,7 @@ class VehicleStatusBadgeUltraPro extends Component
     protected function buildConfirmationMessage(?VehicleStatusEnum $current, VehicleStatusEnum $new): string
     {
         $vehicleInfo = "{$this->vehicle->brand} {$this->vehicle->model} ({$this->vehicle->registration_plate})";
-        
+
         // Messages contextuels selon le nouveau statut
         $contextMessages = [
             'disponible' => "Le véhicule sera marqué comme disponible et pourra être affecté à un chauffeur.",
@@ -215,7 +215,7 @@ class VehicleStatusBadgeUltraPro extends Component
 
         $context = $contextMessages[$new->value] ?? "Le statut du véhicule sera modifié.";
         $currentLabel = $current ? $current->label() : 'Non défini';
-        
+
         return "Êtes-vous sûr de vouloir changer le statut du véhicule {$vehicleInfo} de \"{$currentLabel}\" vers \"{$new->label()}\" ?\n\n{$context}";
     }
 
@@ -262,10 +262,10 @@ class VehicleStatusBadgeUltraPro extends Component
             // Sauvegarder le label du nouveau statut avant de réinitialiser
             $newStatusLabel = $this->pendingStatusEnum->label();
             $newStatusValue = $this->pendingStatusEnum->value;
-            
+
             // Fermer la modal
             $this->showConfirmModal = false;
-            
+
             // Notification de succès avec détails
             $this->dispatch('toast', [
                 'type' => 'success',
@@ -276,14 +276,14 @@ class VehicleStatusBadgeUltraPro extends Component
 
             // Rafraîchir immédiatement les données du véhicule
             $this->refreshVehicleData();
-            
+
             // Émettre l'événement pour que tous les badges de ce véhicule se rafraîchissent
             $this->dispatch('vehicleStatusChanged', [
                 'vehicleId' => $this->vehicle->id,
                 'newStatus' => $newStatusValue,
                 'timestamp' => now()->toIso8601String()
             ]);
-            
+
             // Réinitialiser les variables temporaires APRÈS avoir envoyé les notifications
             $this->pendingStatus = null;
             $this->pendingStatusEnum = null;
@@ -297,7 +297,6 @@ class VehicleStatusBadgeUltraPro extends Component
                 'user_name' => auth()->user()->name,
                 'component' => 'VehicleStatusBadgeUltraPro'
             ]);
-
         } catch (\InvalidArgumentException $e) {
             // Erreur de validation de transition
             $this->showConfirmModal = false;
@@ -307,7 +306,6 @@ class VehicleStatusBadgeUltraPro extends Component
                 'message' => $e->getMessage(),
                 'duration' => 6000
             ]);
-            
         } catch (\Exception $e) {
             // Erreur générique
             $this->showConfirmModal = false;
@@ -344,10 +342,10 @@ class VehicleStatusBadgeUltraPro extends Component
     protected function canUpdateStatus(): bool
     {
         // Vérifier plusieurs permissions possibles
-        return auth()->user()->can('update vehicles') || 
-               auth()->user()->can('update-vehicle-status') ||
-               auth()->user()->can('manage vehicles') ||
-               auth()->user()->hasRole(['admin', 'super-admin', 'fleet-manager']);
+        return auth()->user()->can('update vehicles') ||
+            auth()->user()->can('update-vehicle-status') ||
+            auth()->user()->can('manage vehicles') ||
+            auth()->user()->hasRole(['admin', 'super-admin', 'fleet-manager']);
     }
 
     /**
@@ -356,10 +354,10 @@ class VehicleStatusBadgeUltraPro extends Component
     public function getAllowedStatuses(): array
     {
         $currentEnum = $this->getCurrentStatusEnum();
-        
+
         if (!$currentEnum) {
             // Si pas de statut actuel, permettre tous sauf réformé
-            return array_filter(VehicleStatusEnum::cases(), function($status) {
+            return array_filter(VehicleStatusEnum::cases(), function ($status) {
                 return $status !== VehicleStatusEnum::REFORME;
             });
         }

@@ -48,6 +48,12 @@ enum VehicleStatusEnum: string
      */
     case REFORME = 'reforme';
 
+    /**
+     * Véhicule vendu, sorti de la flotte active.
+     * État terminal - aucune transition possible.
+     */
+    case VENDU = 'vendu';
+
     // =========================================================================
     // MÉTHODES HELPER - BUSINESS LOGIC
     // =========================================================================
@@ -57,12 +63,13 @@ enum VehicleStatusEnum: string
      */
     public function label(): string
     {
-        return match($this) {
+        return match ($this) {
             self::PARKING => 'Parking',
             self::AFFECTE => 'Affecté',
             self::EN_PANNE => 'En panne',
             self::EN_MAINTENANCE => 'En maintenance',
             self::REFORME => 'Réformé',
+            self::VENDU => 'Vendu',
         };
     }
 
@@ -71,12 +78,13 @@ enum VehicleStatusEnum: string
      */
     public function description(): string
     {
-        return match($this) {
+        return match ($this) {
             self::PARKING => 'Véhicule disponible au parking, prêt pour affectation',
             self::AFFECTE => 'Véhicule affecté à un chauffeur, en service',
             self::EN_PANNE => 'Véhicule en panne, nécessite intervention technique',
             self::EN_MAINTENANCE => 'Véhicule en cours de réparation chez le réparateur',
             self::REFORME => 'Véhicule réformé, hors service définitif',
+            self::VENDU => 'Véhicule vendu et retiré de la flotte',
         };
     }
 
@@ -85,12 +93,13 @@ enum VehicleStatusEnum: string
      */
     public function color(): string
     {
-        return match($this) {
+        return match ($this) {
             self::PARKING => 'sky',        // Bleu ciel pour disponibilité
             self::AFFECTE => 'emerald',    // Vert émeraude pour actif
             self::EN_PANNE => 'rose',       // Rouge rosé pour urgence
             self::EN_MAINTENANCE => 'amber', // Ambre pour maintenance
             self::REFORME => 'slate',      // Gris ardoise pour archivé
+            self::VENDU => 'gray',         // Gris pour vendu
         };
     }
 
@@ -99,12 +108,13 @@ enum VehicleStatusEnum: string
      */
     public function hexColor(): string
     {
-        return match($this) {
+        return match ($this) {
             self::PARKING => '#0ea5e9',     // Sky-500 - Disponible
             self::AFFECTE => '#10b981',     // Emerald-500 - Actif
             self::EN_PANNE => '#f43f5e',    // Rose-500 - Panne
             self::EN_MAINTENANCE => '#f59e0b', // Amber-500 - Maintenance
             self::REFORME => '#64748b',     // Slate-500 - Réformé
+            self::VENDU => '#9ca3af',       // Gray-400 - Vendu
         };
     }
 
@@ -113,12 +123,13 @@ enum VehicleStatusEnum: string
      */
     public function icon(): string
     {
-        return match($this) {
+        return match ($this) {
             self::PARKING => 'lucide:square-parking',    // Parking
             self::AFFECTE => 'lucide:user-check',        // Assigné à un chauffeur
             self::EN_PANNE => 'lucide:alert-triangle',   // Alerte panne
             self::EN_MAINTENANCE => 'lucide:wrench',     // En réparation
             self::REFORME => 'lucide:archive',           // Archivé/Réformé
+            self::VENDU => 'lucide:badge-dollar-sign',   // Vendu
         };
     }
 
@@ -127,7 +138,7 @@ enum VehicleStatusEnum: string
      */
     public function badgeClasses(): string
     {
-        $colorClasses = match($this) {
+        $colorClasses = match ($this) {
             // Parking: Bleu clair professionnel - Disponible
             self::PARKING => 'bg-blue-50 text-blue-700 ring-1 ring-blue-200',
 
@@ -142,6 +153,9 @@ enum VehicleStatusEnum: string
 
             // Réformé: Gris neutre - Archivé/inactif
             self::REFORME => 'bg-gray-100 text-gray-600 ring-1 ring-gray-200',
+
+            // Vendu: Gris foncé - Inactif
+            self::VENDU => 'bg-gray-100 text-gray-800 ring-1 ring-gray-300',
         };
 
         return $colorClasses;
@@ -188,7 +202,7 @@ enum VehicleStatusEnum: string
      */
     public function isTerminal(): bool
     {
-        return $this === self::REFORME;
+        return in_array($this, [self::REFORME, self::VENDU]);
     }
 
     // =========================================================================
@@ -202,12 +216,13 @@ enum VehicleStatusEnum: string
      */
     public function allowedTransitions(): array
     {
-        return match($this) {
-            self::PARKING => [self::AFFECTE, self::EN_PANNE],
+        return match ($this) {
+            self::PARKING => [self::AFFECTE, self::EN_PANNE, self::VENDU],
             self::AFFECTE => [self::PARKING, self::EN_PANNE],
-            self::EN_PANNE => [self::EN_MAINTENANCE, self::PARKING], // Parking si panne mineure résolue
-            self::EN_MAINTENANCE => [self::PARKING, self::REFORME],
+            self::EN_PANNE => [self::EN_MAINTENANCE, self::PARKING, self::VENDU], // Parking si panne mineure résolue, Vendu si on décide de vendre en panne
+            self::EN_MAINTENANCE => [self::PARKING, self::REFORME, self::VENDU],
             self::REFORME => [], // État terminal
+            self::VENDU => [],   // État terminal
         };
     }
 
@@ -229,14 +244,14 @@ enum VehicleStatusEnum: string
         }
 
         if ($this->isTerminal()) {
-            return "Un véhicule réformé ne peut plus changer de statut.";
+            return "Un véhicule réformé ou vendu ne peut plus changer de statut.";
         }
 
         $allowed = array_map(fn($s) => $s->label(), $this->allowedTransitions());
         $allowedStr = implode(', ', $allowed);
 
         return "Transition impossible de '{$this->label()}' vers '{$newStatus->label()}'. "
-             . "Transitions autorisées : {$allowedStr}.";
+            . "Transitions autorisées : {$allowedStr}.";
     }
 
     // =========================================================================
@@ -290,12 +305,13 @@ enum VehicleStatusEnum: string
      */
     public function sortOrder(): int
     {
-        return match($this) {
+        return match ($this) {
             self::PARKING => 1,
             self::AFFECTE => 2,
             self::EN_PANNE => 3,
             self::EN_MAINTENANCE => 4,
             self::REFORME => 5,
+            self::VENDU => 6,
         };
     }
 }
