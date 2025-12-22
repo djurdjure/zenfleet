@@ -183,34 +183,44 @@
 
                 <section class="mt-6">
                     <h2 class="text-base font-bold mb-3 text-gray-800 uppercase tracking-wider border-b pb-1">Checklist de Contrôle</h2>
-                    <div class="space-y-4 text-xs">
+
+                    <div class="space-y-6">
+                        @foreach($checklist as $categoryName => $details)
                         @php
-                        $isMoto = $handoverForm->assignment->vehicle->vehicleType->name === 'Moto';
-                        $rows = $isMoto ? [
-                        ['Papiers & Accessoires', 'État Général']
-                        ] : [
-                        ['Papiers du véhicule', 'Pneumatiques'],
-                        ['Accessoires Intérieur', 'État Extérieur']
-                        ];
+                        $categoryConfig = $checklistStructure[$categoryName] ?? [];
+                        $type = $categoryConfig['type'] ?? 'condition';
+                        $statuses = $type === 'binary' ? ['Oui', 'Non', 'N/A'] : ['Bon', 'Moyen', 'Mauvais', 'N/A'];
                         @endphp
 
-                        @foreach($rows as $row)
-                        <div class="grid grid-cols-2 gap-x-8">
-                            @foreach($row as $categoryName)
-                            @if(isset($checklist[$categoryName]))
-                            <div class="break-inside-avoid">
-                                <h3 class="font-semibold text-gray-700 mb-2 border-b">{{ $categoryName }}</h3>
-                                <div class="space-y-1">
-                                    @foreach($checklist[$categoryName] as $detail)
-                                    <div class="flex justify-between border-b border-dotted">
-                                        <span>{{ $detail->item }}</span>
-                                        <span class="font-bold">{{ $detail->status }}</span>
-                                    </div>
+                        <div class="break-inside-avoid border rounded-lg overflow-hidden">
+                            <table class="min-w-full text-xs">
+                                <thead class="bg-gray-100 border-b">
+                                    <tr>
+                                        <th class="text-left py-2 px-3 font-semibold text-gray-700 w-1/3">{{ $categoryName }}</th>
+                                        @foreach($statuses as $status)
+                                        <th class="text-center py-2 px-1 font-semibold text-gray-600 w-16">{{ $status }}</th>
+                                        @endforeach
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-gray-200">
+                                    @foreach($details as $detail)
+                                    <tr class="hover:bg-gray-50">
+                                        <td class="py-2 px-3 text-gray-800">{{ $detail->item }}</td>
+                                        @foreach($statuses as $status)
+                                        <td class="text-center py-2 px-1">
+                                            @if($detail->status === $status)
+                                            <div class="inline-flex items-center justify-center w-5 h-5 bg-blue-600 text-white rounded shadow-sm mx-auto">
+                                                <x-iconify icon="lucide:check" class="w-3.5 h-3.5" />
+                                            </div>
+                                            @else
+                                            <div class="inline-block w-4 h-4 border border-gray-300 rounded mx-auto bg-gray-50"></div>
+                                            @endif
+                                        </td>
+                                        @endforeach
+                                    </tr>
                                     @endforeach
-                                </div>
-                            </div>
-                            @endif
-                            @endforeach
+                                </tbody>
+                            </table>
                         </div>
                         @endforeach
                     </div>

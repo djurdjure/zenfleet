@@ -154,16 +154,20 @@ class VehicleHandoverController extends Controller
      * @param VehicleHandoverForm $handover
      * @return View
      */
-    public function show(VehicleHandoverForm $handover): View
+    public function show(VehicleHandoverForm $handover, HandoverChecklistService $checklistService): View
     {
         $this->authorize('view handovers');
 
         $handover->load(['assignment.vehicle.vehicleType', 'assignment.driver', 'assignment.organization', 'details']);
         $checklist = $handover->details->groupBy('category');
 
+        // Get structure to know types (binary/condition) for rendering correct columns
+        $checklistStructure = $checklistService->getTemplateStructure($handover->assignment->vehicle);
+
         return view('admin.handovers.vehicles.show', [
             'handoverForm' => $handover,
             'checklist' => $checklist,
+            'checklistStructure' => $checklistStructure,
         ]);
     }
 
@@ -348,7 +352,7 @@ class VehicleHandoverController extends Controller
      * @param PdfGenerationService $pdfService
      * @return Response|RedirectResponse
      */
-    public function downloadPdf(VehicleHandoverForm $handover, PdfGenerationService $pdfService)
+    public function downloadPdf(VehicleHandoverForm $handover, PdfGenerationService $pdfService, HandoverChecklistService $checklistService)
     {
         $this->authorize('view handovers');
 
@@ -367,9 +371,13 @@ class VehicleHandoverController extends Controller
             $vehicleSketchBase64 = 'data:image/png;base64,' . base64_encode($fileContent);
         }
 
+        // Get structure for PDF table rendering
+        $checklistStructure = $checklistService->getTemplateStructure($handover->assignment->vehicle);
+
         $html = view('admin.handovers.vehicles.pdf', [
             'handoverForm' => $handover,
             'checklist' => $checklist,
+            'checklistStructure' => $checklistStructure,
             'vehicle_sketch_base64' => $vehicleSketchBase64,
         ])->render();
 

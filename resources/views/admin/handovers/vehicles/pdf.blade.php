@@ -15,346 +15,390 @@
 
         body {
             font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-            font-size: 10pt;
-            color: #333;
-            background-color: #fff;
-            -webkit-print-color-adjust: exact;
-            print-color-adjust: exact;
-        }
-
-        #print-area {
-            width: 210mm;
-            min-height: 297mm;
-            padding: 15mm;
-            margin: 0 auto;
-            display: flex;
-            flex-direction: column;
-        }
-
-        h1,
-        h2,
-        h3 {
-            font-weight: bold;
-            color: #000;
-        }
-
-        h1 {
-            font-size: 20pt;
-            margin-bottom: 5mm;
-        }
-
-        h2 {
-            font-size: 14pt;
-            margin-bottom: 4mm;
-            border-bottom: 1px solid #eee;
-            padding-bottom: 2mm;
-        }
-
-        h3 {
-            font-size: 11pt;
-            margin-bottom: 2mm;
-            color: #444;
-        }
-
-        /* En-tête */
-        header {
-            border-bottom: 2px solid #000;
-            padding-bottom: 5mm;
-        }
-
-        header .header-details {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-        }
-
-        header .meta {
             font-size: 9pt;
-            color: #666;
+            color: #333;
+            background: #fff;
+            line-height: 1.3;
         }
 
-        header .company-info p,
-        header .document-info p {
-            margin: 0;
+        /* Layout Principal */
+        #print-area {
+            width: 100%;
+            padding: 10mm;
+            margin: 0 auto;
         }
 
-        header .company-info {
-            font-weight: bold;
-            font-size: 12pt;
+        /* Helpers */
+        .row {
+            display: table;
+            width: 100%;
+            clear: both;
+            margin-bottom: 3mm;
         }
 
-        header .document-info {
-            text-align: right;
-        }
-
-        /* Contenu Principal */
-        main {
-            flex-grow: 1;
-            margin-top: 8mm;
-        }
-
-        /* Section des Parties (Conducteur/Véhicule) */
-        #parties {
-            display: flex;
-            justify-content: space-between;
-            background-color: #f8f9fa;
-            padding: 4mm;
-            border-radius: 4px;
-            border: 1px solid #dee2e6;
-        }
-
-        .party-info {
+        .col-half {
+            float: left;
             width: 48%;
         }
 
-        .party-info .name {
-            font-weight: bold;
-            font-size: 11pt;
+        .col-half:last-child {
+            float: right;
         }
 
-        .party-info .role {
-            font-size: 8pt;
-            color: #555;
-            text-transform: uppercase;
-            margin-bottom: 1mm;
+        .clearfix::after {
+            content: "";
+            display: table;
+            clear: both;
         }
 
-        .party-info .contact {
-            font-size: 9pt;
-            color: #666;
-        }
-
-        .party-info.vehicle {
+        .text-right {
             text-align: right;
         }
 
-        /* Section d'Inspection */
-        #inspection {
-            margin-top: 8mm;
-            display: flex;
-            gap: 8mm;
-            align-items: flex-start;
-        }
-
-        .visuals {
-            flex: 1;
-        }
-
-        .visuals .content {
-            display: flex;
-            gap: 5mm;
-            border: 1px solid #dee2e6;
-            padding: 4mm;
-            border-radius: 4px;
-        }
-
-        .sketch {
-            flex: 0 0 45%;
+        .text-center {
             text-align: center;
         }
 
-        .sketch img {
-            max-width: 100%;
-            border: 1px solid #ccc;
+        .font-bold {
+            font-weight: bold;
         }
 
-        .sketch .caption {
+        .uppercase {
+            text-transform: uppercase;
+        }
+
+        .text-small {
             font-size: 8pt;
-            color: #777;
+        }
+
+        .mb-2 {
+            margin-bottom: 2mm;
+        }
+
+        .mt-2 {
             margin-top: 2mm;
         }
 
-        .observations {
-            flex: 1;
+        /* Header Compact */
+        header {
+            border-bottom: 1px solid #333;
+            padding-bottom: 1mm;
+            margin-bottom: 1mm;
+            /* Reduced from 2mm */
         }
 
-        .observations strong {
+        h1 {
             font-size: 10pt;
+            /* Reduced from 13pt/14pt */
+            margin: 0;
+            color: #000;
+            text-transform: uppercase;
         }
 
-        .observation-text {
-            background-color: #f8f9fa;
+        /* ... existing styles ... */
+
+        /* Checkbox simulée */
+        .checkbox {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border: 1px solid #333;
+            background: #fff;
+            margin: 0 auto;
+        }
+
+        .checkbox.checked {
+            background: #fff;
+            /* Keep white background for X */
+            position: relative;
+        }
+
+        .checkbox.checked::after {
+            content: "X";
+            color: #000;
+            font-size: 8px;
+            font-weight: bold;
+            position: absolute;
+            top: -1px;
+            left: 1px;
+            line-height: 1;
+        }
+
+        /* ... existing styles ... */
+
+        /* Footer */
+        footer {
+            margin-top: 3mm;
+            border-top: 1px solid #ccc;
+            padding-top: 2mm;
+        }
+
+        .meta-info {
+            font-size: 8pt;
+            color: #666;
+            margin-top: 1mm;
+        }
+
+        /* Sections */
+        .section-box {
+            border: 1px solid #ddd;
             padding: 3mm;
             border-radius: 3px;
-            min-height: 40mm;
-            font-size: 9pt;
-            white-space: pre-wrap;
-            margin-top: 1mm;
-            border: 1px solid #e9ecef;
+            background-color: #fbfbfb;
+            margin-bottom: 3mm;
         }
 
-        .checklist {
-            flex: 1;
-        }
-
-        .checklist .categories {
-            column-count: 1;
-        }
-
-        .checklist .category {
-            break-inside: avoid;
-            margin-bottom: 5mm;
-        }
-
-        .checklist ul {
-            list-style: none;
-        }
-
-        .checklist li {
-            display: flex;
-            justify-content: space-between;
-            padding: 1.5mm 0;
-            border-bottom: 1px dotted #ccc;
-        }
-
-        .checklist .item {
-            color: #333;
-        }
-
-        .checklist .status {
+        .section-title {
+            font-size: 10pt;
             font-weight: bold;
-            color: #000;
+            border-bottom: 1px solid #ccc;
+            padding-bottom: 1mm;
+            margin-bottom: 2mm;
+            color: #444;
+            text-transform: uppercase;
         }
 
-        /* Pied de page */
-        footer {
-            margin-top: auto;
-            padding-top: 10mm;
+        /* Tables de Checklist */
+        table.checklist-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 8pt;
+            margin-bottom: 4mm;
         }
 
-        .signatures {
-            display: flex;
-            justify-content: space-between;
+        table.checklist-table th {
+            background-color: #eee;
+            border: 1px solid #ccc;
+            padding: 2px 4px;
             text-align: center;
         }
 
-        .signature-box {
-            width: 30%;
-            padding-top: 5mm;
-            border-top: 1.5px solid #000;
+        table.checklist-table th.item-col {
+            text-align: left;
+            width: 40%;
         }
 
-        .signature-box .name {
+        table.checklist-table td {
+            border: 1px solid #eee;
+            padding: 2px 4px;
+            vertical-align: middle;
+        }
+
+        table.checklist-table td.status-cell {
+            text-align: center;
+            width: 15%;
+            border-left: 1px solid #ccc;
+        }
+
+        /* Checkbox simulée */
+        .checkbox {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border: 1px solid #333;
+            background: #fff;
+            margin: 0 auto;
+        }
+
+        .checkbox.checked {
+            background: #fff;
+            position: relative;
+        }
+
+        .checkbox.checked::after {
+            content: "X";
+            color: #000;
+            font-size: 8px;
             font-weight: bold;
-            margin-bottom: 1mm;
-            min-height: 12pt;
+            position: absolute;
+            top: -1px;
+            left: 1px;
+            line-height: 1;
         }
 
-        .signature-box .role {
-            font-size: 8pt;
+        /* Vehicle & Driver Info Grid */
+        table.info-table {
+            width: 100%;
+            margin-bottom: 0;
+        }
+
+        table.info-table td {
+            padding: 1mm;
+            vertical-align: top;
+        }
+
+        table.info-table .label {
             color: #666;
+            font-size: 7pt;
+            text-transform: uppercase;
         }
 
-        /* Media print pour ajustements fins */
-        @media print {
-            body {
-                background-color: white;
-            }
+        table.info-table .value {
+            font-weight: bold;
+            font-size: 9pt;
+        }
 
-            #print-area {
-                margin: 0;
-                padding: 10mm;
-                /* Marges d'impression */
-                box-shadow: none;
-                width: 100%;
-                height: auto;
-                min-height: 0;
-            }
+        /* Sketch & Obs */
+        .sketch-container {
+            text-align: center;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid #eee;
+            background: #fff;
+            padding: 2mm;
+        }
+
+        .sketch-container img {
+            max-height: 40mm;
+            max-width: 100%;
+        }
+
+        .obs-box {
+            border: 1px solid #eee;
+            padding: 2mm;
+            background: #fff;
+            height: 40mm;
+            font-size: 8pt;
+        }
+
+        /* Footer */
+        footer {
+            margin-top: 3mm;
+            border-top: 1px solid #ccc;
+            padding-top: 2mm;
+        }
+
+        .signature-area {
+            height: 12mm;
+            border-bottom: 1px dotted #ccc;
+            margin-top: 2mm;
         }
     </style>
 </head>
 
 <body>
-
-    {{-- Ce conteneur représente la page A4 et contient tout le contenu à imprimer. --}}
     <div id="print-area">
-
+        <!-- Header -->
         <header>
-            <h1>FICHE DE REMISE VÉHICULE</h1>
-            <div class="header-details">
-                <div class="company-info">
-                    <p>{{ $handoverForm->assignment->organization->name }}</p>
-                    <p class="meta">Affectation N°: {{ $handoverForm->assignment->id }}</p>
+            <div class="row" style="margin-bottom: 0;">
+                <div style="float:left; width: 60%;">
+                    <h1>FICHE DE REMISE VÉHICULE</h1>
+                    <div class="meta-info">
+                        Affectation N°: <strong>{{ $handoverForm->assignment->id }}</strong>
+                    </div>
                 </div>
-                <div class="document-info">
-                    <p class="meta">Document généré le {{ now()->format('d/m/Y') }}</p>
+                <div style="float:right; width: 40%; text-align: right;">
+                    <div style="font-size: 10pt; font-weight: bold;">{{ $handoverForm->assignment->organization->name }}</div>
                 </div>
             </div>
         </header>
 
-        <main>
-            <section id="parties">
-                <div class="party-info driver">
-                    <p class="name">{{ $handoverForm->assignment->driver->first_name }} {{ $handoverForm->assignment->driver->last_name }}</p>
-                    <p class="role">Conducteur</p>
-                    <p class="contact">{{ $handoverForm->assignment->driver->personal_phone ?? 'N/A' }}</p>
-                </div>
-                <div class="party-info vehicle">
-                    <p class="name">{{ $handoverForm->assignment->vehicle->brand }} {{ $handoverForm->assignment->vehicle->model }} ({{ $handoverForm->assignment->vehicle->registration_plate }})</p>
-                    <p class="role">Véhicule</p>
-                    <p class="contact">Remis le: {{ $handoverForm->issue_date->format('d/m/Y') }} | {{ number_format($handoverForm->current_mileage, 0, ',', ' ') }} km</p>
-                </div>
-            </section>
+        <!-- Info Grid (Driver & Vehicle) -->
+        <div class="row">
+            <div class="col-half section-box">
+                <div class="section-title">CONDUCTEUR</div>
+                <table class="info-table">
+                    <tr>
+                        <td>
+                            <div class="label">Nom & Prénom</div>
+                            <div class="value">{{ $handoverForm->assignment->driver->first_name }} {{ $handoverForm->assignment->driver->last_name }}</div>
+                            <div class="text-small" style="color: #555; margin-top: 1mm;">
+                                <em>Depuis le: {{ $handoverForm->assignment->start_datetime->format('d/m/Y') }}</em>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="label">Téléphone</div>
+                            <div class="value">{{ $handoverForm->assignment->driver->personal_phone ?? '-' }}</div>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            <div class="col-half section-box">
+                <div class="section-title">VÉHICULE</div>
+                <table class="info-table">
+                    <tr>
+                        <td>
+                            <div class="label">Véhicule</div>
+                            <div class="value">{{ $handoverForm->assignment->vehicle->brand }} {{ $handoverForm->assignment->vehicle->model }}</div>
+                            <div class="text-small text-gray-500">{{ $handoverForm->assignment->vehicle->registration_plate }}</div>
+                        </td>
+                        <td class="text-right">
+                            <div class="label">Kilométrage</div>
+                            <div class="value">{{ number_format($handoverForm->current_mileage, 0, ',', ' ') }} km</div>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
 
-            <section id="inspection">
-                <div class="visuals">
-                    <h2>État Visuel et Observations</h2>
-                    <div class="content">
-                        <div class="sketch">
-                            @php
-                            // La conversion en base64 se fera dans le contrôleur
-                            $sketchAsset = $handoverForm->assignment->vehicle->vehicleType->name === 'Moto' ? 'images/scooter_sketch.png' : 'images/car_sketch.png';
-                            @endphp
-                            <img src="{{ $vehicle_sketch_base64 ?? '' }}" alt="Croquis du véhicule">
-                            <p class="caption">Cocher les défauts constatés</p>
-                        </div>
-                        <div class="observations">
-                            <strong>Observations générales:</strong>
-                            <p class="observation-text">{{ $handoverForm->general_observations ?: 'Aucune observation particulière.' }}</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="checklist">
-                    <h2>Checklist de Contrôle</h2>
-                    <div class="categories">
-                        @foreach($checklist as $category => $items)
-                        <div class="category">
-                            <h3>{{ $category }}</h3>
-                            <ul>
-                                @foreach($items as $detail)
-                                <li>
-                                    <span class="item">{{ $detail->item }}</span>
-                                    <span class="status">{{ $detail->status }}</span>
-                                </li>
-                                @endforeach
-                            </ul>
-                        </div>
-                        @endforeach
-                    </div>
-                </div>
-            </section>
-        </main>
-
-        <footer>
-            <div class="signatures">
-                <div class="signature-box">
-                    <p class="name">{{ $handoverForm->assignment->driver->first_name }} {{ $handoverForm->assignment->driver->last_name }}</p>
-                    <p class="role">(Chauffeur)</p>
-                </div>
-                <div class="signature-box">
-                    <p class="name">(Nom & Prénom)</p>
-                    <p class="role">(Responsable Hiérarchique)</p>
-                </div>
-                <div class="signature-box">
-                    <p class="name">(Nom & Prénom)</p>
-                    <p class="role">(Responsable Parc)</p>
+        <!-- Sketch & Observations -->
+        <div class="row">
+            <div class="col-half">
+                <div class="section-title" style="margin-bottom:1mm;">ÉTAT CARROSSERIE</div>
+                <div class="sketch-container">
+                    <img src="{{ $vehicle_sketch_base64 ?? '' }}" alt="Croquis">
                 </div>
             </div>
+            <div class="col-half">
+                <div class="section-title" style="margin-bottom:1mm;">OBSERVATIONS GÉNÉRALES</div>
+                <div class="obs-box">
+                    {{ $handoverForm->general_observations ?: 'R.A.S' }}
+                </div>
+            </div>
+        </div>
+
+        <!-- Checklist Grid -->
+        <div class="row">
+            <div class="section-title">CHECKLIST DE CONTRÔLE</div>
+
+            @php
+            // Split categories into two columns for better layout
+            $categories = $checklist->keys();
+            $half = ceil($categories->count() / 2);
+            $leftCats = $categories->slice(0, $half);
+            $rightCats = $categories->slice($half);
+            @endphp
+
+            <!-- Left Column -->
+            <div class="col-half" style="width: 49%; margin-right: 1%;">
+                @foreach($leftCats as $cat)
+                @include('admin.handovers.vehicles.partials.pdf-checklist-table', ['category' => $cat, 'details' => $checklist[$cat], 'config' => $checklistStructure[$cat] ?? []])
+                @endforeach
+            </div>
+
+            <!-- Right Column -->
+            <div class="col-half" style="width: 49%;">
+                @foreach($rightCats as $cat)
+                @include('admin.handovers.vehicles.partials.pdf-checklist-table', ['category' => $cat, 'details' => $checklist[$cat], 'config' => $checklistStructure[$cat] ?? []])
+                @endforeach
+            </div>
+        </div>
+
+        <!-- Signatures -->
+        <footer>
+            <div class="row">
+                <div style="float:left; width: 32%; text-align: center;">
+                    <div class="font-bold text-small">Le Conducteur</div>
+                    <div class="text-small" style="color:#666;">(Lu et approuvé)</div>
+                    <div class="signature-area"></div>
+                    <div class="text-small">{{ $handoverForm->assignment->driver->first_name }} {{ $handoverForm->assignment->driver->last_name }}</div>
+                </div>
+                <div style="float:left; width: 32%; margin-left:2%; text-align: center;">
+                    <div class="font-bold text-small">Responsable Parc</div>
+                    <div class="signature-area"></div>
+                </div>
+                <div style="float:right; width: 32%; text-align: center;">
+                    <div class="font-bold text-small">Responsable Hiérarchique</div>
+                    <div class="signature-area"></div>
+                </div>
+            </div>
+            <div class="text-center text-small" style="color:#999; margin-top:2mm;">
+                Document généré automatiquement le {{ now()->format('d/m/Y H:i') }} | Page 1/1
+            </div>
         </footer>
-
     </div>
-
 </body>
 
 </html>
