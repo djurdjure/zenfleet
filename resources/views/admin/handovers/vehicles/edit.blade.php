@@ -1,163 +1,174 @@
-<x-app-layout>
- <x-slot name="header">
- <h2 class="font-semibold text-xl text-gray-800 leading-tight">
- {{ __("Modifier la Fiche de Remise N°") }} {{ $handover->id }}
- </h2>
- </x-slot>
+@extends('layouts.admin.catalyst')
 
- <div class="py-12">
- <div class="max-w-5xl mx-auto sm:px-6 lg:px-8">
- <form action="{{ route('admin.handovers.vehicles.update', $handover) }}" method="POST" class="space-y-6">
- @csrf
- @method('PUT')
+@section('title', 'Modifier Fiche Remise N° ' . $handover->assignment->id)
 
- {{-- CARTE 1: INFORMATIONS GÉNÉRALES --}}
- <div class="bg-white p-6 shadow-sm sm:rounded-lg">
- <div class="text-center mb-6">
- <h3 class="text-3xl font-bold text-gray-900 mb-2">MODIFICATION FICHE DE REMISE</h3>
- <p class="text-sm text-gray-500">Pour l'Affectation N° {{ $handover->assignment->id }}</p>
- </div>
+@section('content')
+<div class="py-6">
+    <div class="max-w-5xl mx-auto sm:px-6 lg:px-8">
+        <div class="flex justify-between items-center mb-6">
+            <div>
+                <h1 class="text-2xl font-bold text-gray-900">
+                    Modifier la Fiche de Remise
+                </h1>
+                <p class="mt-1 text-sm text-gray-600">
+                    Affectation N° {{ $handover->assignment->id }} — {{ $handover->assignment->vehicle->registration_plate }}
+                </p>
+            </div>
+            <a href="{{ route('admin.handovers.vehicles.show', $handover) }}" class="inline-flex items-center px-4 py-2 bg-white border border-gray-300 rounded-md font-semibold text-xs text-gray-700 uppercase tracking-widest shadow-sm hover:bg-gray-50 transition ease-in-out duration-150">
+                <x-iconify icon="lucide:arrow-left" class="h-4 w-4 mr-2" />
+                Retour
+            </a>
+        </div>
 
- <div class="flex flex-col md:flex-row justify-between gap-x-8 text-sm">
- 
- <div class="flex-grow">
- <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6 border rounded-md p-6">
- <div>
- <p class="text-gray-500 font-semibold">Chauffeur</p>
- <p class="font-bold text-lg text-gray-900">{{ $handover->assignment->driver->first_name }} {{ $handover->assignment->driver->last_name }}</p>
- <p class="text-gray-600">Matricule: {{ $handover->assignment->driver->employee_number ?? 'N/A' }}</p>
- <p class="text-gray-600">Téléphone: {{ $handover->assignment->driver->personal_phone ?? 'N/A' }}</p>
- </div>
- <div>
- <p class="text-gray-500 font-semibold">Véhicule</p>
- <p class="font-bold text-lg text-gray-900">{{ $handover->assignment->vehicle->brand }} {{ $handover->assignment->vehicle->model }}</p>
- <p class="text-gray-600 font-mono">{{ $handover->assignment->vehicle->registration_plate }}</p>
- <p class="text-gray-600">Kilométrage (à la remise): {{ $handover->current_mileage }} km</p>
- </div>
- </div>
- </div>
+        <form action="{{ route('admin.handovers.vehicles.update', $handover) }}" method="POST" class="space-y-6">
+            @csrf
+            @method('PUT')
 
- <div class="flex-shrink-0 w-full md:w-1/3 mt-6 md:mt-0">
- <div class="border rounded-md p-6 h-full">
- <label for="issue_date" class="block font-medium text-sm text-gray-700">Date de Remise <span class="text-red-500">*</span></label>
- <x-text-input id="issue_date" name="issue_date" type="date" class="mt-1 block w-full" :value="old('issue_date', $handover->issue_date->format('Y-m-d'))" required />
- <x-input-error :messages="$errors->get('issue_date')" class="mt-2" />
- </div>
- </div>
+            {{-- Affichage des erreurs globales --}}
+            @if ($errors->any())
+            <div class="rounded-md bg-red-50 p-4 mb-6 border border-red-200">
+                <div class="flex">
+                    <div class="flex-shrink-0">
+                        <x-iconify icon="lucide:x-circle" class="h-5 w-5 text-red-400" />
+                    </div>
+                    <div class="ml-3">
+                        <h3 class="text-sm font-medium text-red-800">
+                            Veuillez corriger les erreurs suivantes :
+                        </h3>
+                        <div class="mt-2 text-sm text-red-700">
+                            <ul role="list" class="list-disc pl-5 space-y-1">
+                                @foreach ($errors->all() as $error)
+                                @if(is_array($error))
+                                @foreach($error as $subError)
+                                <li>{{ $subError }}</li>
+                                @endforeach
+                                @else
+                                <li>{{ $error }}</li>
+                                @endif
+                                @endforeach
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            @endif
 
- </div>
- </div>
+            {{-- CARTE 1: INFORMATIONS GÉNÉRALES --}}
+            <div class="bg-white p-6 shadow-sm sm:rounded-lg border border-gray-200">
+                <h3 class="text-lg font-semibold text-gray-900 border-b border-gray-200 pb-4 mb-6 flex items-center gap-2">
+                    <x-iconify icon="lucide:info" class="w-5 h-5 text-blue-600" />
+                    Informations Générales
+                </h3>
 
- {{-- CARTE 2: ÉTAT VISUEL ET OBSERVATIONS --}}
- <div class="bg-white p-6 shadow-sm sm:rounded-lg">
- <h3 class="text-lg font-semibold text-gray-900 border-b border-gray-200 pb-4 mb-6">État Visuel du Véhicule</h3>
- <div class="flex flex-col md:flex-row gap-6 border rounded-md p-6">
- <div class="flex-shrink-0 mx-auto bg-gray-100 p-4 rounded-md shadow-inner">
- @if($handover->assignment->vehicle->vehicleType->name === 'Moto')
- <img src="{{ asset('images/scooter_sketch.png') }}" alt="Croquis Scooter" class="w-32 rounded">
- @else
- <img src="{{ asset('images/car_sketch.png') }}" alt="Croquis Voiture" class="w-48 rounded">
- @endif
- </div>
- <div class="flex-1">
- <label for="general_observations" class="block font-medium text-sm text-gray-700">Observations sur l'état extérieur (rayures, bosses, etc.)</label>
- <textarea name="general_observations" id="general_observations" rows="5" class="mt-1 block w-full border-gray-300 focus:border-violet-500 focus:ring-violet-500 rounded-md shadow-sm">{{ old('general_observations', $handover->general_observations) }}</textarea>
- <x-input-error :messages="$errors->get('general_observations')" class="mt-2" />
- </div>
- </div>
- </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm">
 
- {{-- CARTE 3: CHECKLIST DÉTAILLÉE --}}
- <div class="bg-white p-6 shadow-sm sm:rounded-lg">
- <h3 class="text-lg font-semibold text-gray-900 border-b border-gray-200 pb-4 mb-6">Checklist des Équipements</h3>
- @php
- $isMoto = $handover->assignment->vehicle->vehicleType->name === 'Moto';
- // Important: Utiliser des clés qui matchent le slug dans le contrôleur (ex: 'Papiers_&_Accessoires')
- $checklistConfig = $isMoto ? [
- 'Papiers_&_Accessoires' => ['Carte Grise', 'Assurance', 'Carte Carburant', 'Clé', 'Casque', 'Top-case'],
- 'État_Général' => ['Pneu Avant', 'Pneu Arrière', 'Saute-vent', 'Rétroviseur Gauche', 'Rétroviseur Droit', 'Verrouillage', 'Feux avant', 'Feux arrières', 'Carrosserie Générale', 'Propreté']
- ] : [
- 'Papiers_du_véhicule' => ['Carte Grise', 'Assurance', 'Vignette', 'Contrôle technique', 'Permis de circuler', 'Carte Carburant'],
- 'Accessoires_Intérieur' => ['Triangle', 'Cric', 'Manivelle/Clé', 'Gilet', 'Tapis', 'Extincteur', 'Trousse de secours', 'Rétroviseur intérieur', 'Pare-soleil', 'Autoradio', 'Propreté'],
- 'Pneumatiques' => ['Roue AV Gauche', 'Roue AV Droite', 'Roue AR Gauche', 'Roue AR Droite', 'Roue de Secours', 'Enjoliveurs'],
- 'État_Extérieur' => ['Vitres', 'Pare-brise', 'Rétroviseur Gauche', 'Rétroviseur Droit', 'Verrouillage', 'Poignées', 'Feux avant', 'Feux arrières', 'Essuie-glaces', 'Carrosserie Générale']
- ];
- $binaryStatuses = ['Oui', 'Non', 'N/A'];
- $conditionStatuses = ['Bon', 'Moyen', 'Mauvais', 'N/A'];
- @endphp
+                    <div class="p-4 border border-gray-200 rounded-lg flex items-center space-x-4 bg-gray-50">
+                        <div class="flex-shrink-0">
+                            <x-iconify icon="lucide:user" class="h-10 w-10 text-gray-400" />
+                        </div>
+                        <div>
+                            <p class="text-gray-500 font-semibold uppercase text-xs">Chauffeur</p>
+                            <p class="font-bold text-gray-900 text-lg">{{ $handover->assignment->driver->first_name }} {{ $handover->assignment->driver->last_name }}</p>
+                            <p class="text-gray-600">{{ $handover->assignment->driver->personal_phone ?? 'N/A' }}</p>
+                        </div>
+                    </div>
 
- @if($isMoto)
- <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
- @foreach($checklistConfig as $categoryKey => $items)
- <div class="bg-gray-50 rounded-md p-4 border border-gray-200">
- <h4 class="font-semibold text-gray-700 mb-3">{{ str_replace('_', ' ', $categoryKey) }}</h4>
- <div class="space-y-2">
- @foreach($items as $item)
- @php
- $statusesToUse = $categoryKey === 'Papiers_&_Accessoires' ? $binaryStatuses : $conditionStatuses;
- $itemKey = Str::slug($item, '_');
- $currentStatus = $detailsMap->get($categoryKey . '.' . $itemKey);
- @endphp
- <div class="bg-white rounded-md shadow-sm p-2">
- <x-handover-status-switcher :item="$item" :category="$categoryKey" :statuses="$statusesToUse" :currentStatus="$currentStatus" />
- </div>
- @endforeach
- </div>
- </div>
- @endforeach
- </div>
- @else
- <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
- <div class="space-y-6">
- @foreach(['Papiers_du_véhicule', 'Accessoires_Intérieur'] as $categoryKey)
- <div class="bg-gray-50 rounded-md p-4 border border-gray-200">
- <h4 class="font-semibold text-gray-700 mb-3">{{ str_replace('_', ' ', $categoryKey) }}</h4>
- <div class="space-y-2">
- @foreach($checklistConfig[$categoryKey] as $item)
- @php
- $itemKey = Str::slug($item, '_');
- $currentStatus = $detailsMap->get($categoryKey . '.' . $itemKey);
- @endphp
- <div class="bg-white rounded-md shadow-sm p-2">
- <x-handover-status-switcher :item="$item" :category="$categoryKey" :statuses="$binaryStatuses" :currentStatus="$currentStatus" />
- </div>
- @endforeach
- </div>
- </div>
- @endforeach
- </div>
+                    <div class="p-4 border border-gray-200 rounded-lg flex items-center space-x-4 bg-gray-50">
+                        <div class="flex-shrink-0">
+                            <x-iconify icon="lucide:car" class="h-10 w-10 text-gray-400" />
+                        </div>
+                        <div>
+                            <p class="text-gray-500 font-semibold uppercase text-xs">Véhicule</p>
+                            <p class="font-bold text-gray-900 text-lg">{{ $handover->assignment->vehicle->brand }} {{ $handover->assignment->vehicle->model }}</p>
+                            <p class="text-gray-600 font-mono bg-white px-2 py-0.5 rounded border border-gray-200 inline-block mt-1">{{ $handover->assignment->vehicle->registration_plate }}</p>
+                        </div>
+                    </div>
 
- <div class="space-y-6">
- @foreach(['Pneumatiques', 'État_Extérieur'] as $categoryKey)
- <div class="bg-gray-50 rounded-md p-4 border border-gray-200">
- <h4 class="font-semibold text-gray-700 mb-3">{{ str_replace('_', ' ', $categoryKey) }}</h4>
- <div class="space-y-2">
- @foreach($checklistConfig[$categoryKey] as $item)
- @php
- $itemKey = Str::slug($item, '_');
- $currentStatus = $detailsMap->get($categoryKey . '.' . $itemKey);
- @endphp
- <div class="bg-white rounded-md shadow-sm p-2">
- <x-handover-status-switcher :item="$item" :category="$categoryKey" :statuses="$conditionStatuses" :currentStatus="$currentStatus" />
- </div>
- @endforeach
- </div>
- </div>
- @endforeach
- </div>
- </div>
- @endif
- </div>
+                    <div class="p-4 bg-blue-50/50 border border-blue-100 rounded-md">
+                        <label for="issue_date" class="block text-sm font-medium text-gray-700 mb-1">Date de Remise <span class="text-red-500">*</span></label>
+                        <input id="issue_date" name="issue_date" type="date" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm" value="{{ old('issue_date', $handover->issue_date->format('Y-m-d')) }}" required />
+                        @error('issue_date') <p class="mt-2 text-sm text-red-600">{{ $message }}</p> @enderror
+                    </div>
 
- <div class="bg-white p-6 shadow-sm sm:rounded-lg">
- <div class="flex items-center justify-end mt-8 gap-4 border-t border-gray-200 pt-6">
- <a href="{{ route('admin.handovers.vehicles.show', $handover) }}" class="text-sm font-semibold text-gray-600 hover:text-gray-900">Annuler</a>
- <button type="submit" class="inline-flex items-center px-6 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-violet-600 hover:bg-violet-700">
- Mettre à jour la Fiche
- </button>
- </div>
- </div>
- </form>
- </div>
- </div>
-</x-app-layout>
+                    <div class="p-4 bg-gray-50/50 border border-gray-100 rounded-md">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Kilométrage (figé)</label>
+                        <div class="flex items-center gap-2">
+                            <x-iconify icon="lucide:gauge" class="w-5 h-5 text-gray-400" />
+                            <p class="text-xl font-bold text-gray-900">{{ number_format($handover->current_mileage, 0, ',', ' ') }} km</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {{-- CARTE 2: ÉTAT VISUEL ET OBSERVATIONS --}}
+            <div class="bg-white p-6 shadow-sm sm:rounded-lg border border-gray-200">
+                <h3 class="text-lg font-semibold text-gray-900 border-b border-gray-200 pb-4 mb-6 flex items-center gap-2">
+                    <x-iconify icon="lucide:eye" class="w-5 h-5 text-blue-600" />
+                    État Visuel du Véhicule
+                </h3>
+                <div class="flex flex-col md:flex-row gap-8">
+                    <div class="flex-shrink-0 mx-auto bg-gray-50 p-4 rounded-xl border border-gray-200 shadow-sm">
+                        @if($handover->assignment->vehicle->vehicleType->name === 'Moto')
+                        <img src="{{ asset('images/scooter_sketch.png') }}" alt="Croquis Scooter" class="w-48 rounded opacity-80 hover:opacity-100 transition-opacity">
+                        @else
+                        <img src="{{ asset('images/car_sketch.png') }}" alt="Croquis Voiture" class="w-64 rounded opacity-80 hover:opacity-100 transition-opacity">
+                        @endif
+                        <p class="text-center text-xs text-gray-400 mt-2 italic">Schéma de référence</p>
+                    </div>
+                    <div class="flex-1">
+                        <label for="general_observations" class="block text-sm font-medium text-gray-700 mb-2">Observations sur l'état extérieur (rayures, bosses, etc.)</label>
+                        <textarea name="general_observations" id="general_observations" rows="6" class="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md placeholder-gray-400">{{ old('general_observations', $handover->general_observations) }}</textarea>
+                        @error('general_observations') <p class="mt-2 text-sm text-red-600">{{ $message }}</p> @enderror
+                    </div>
+                </div>
+            </div>
+
+            {{-- CARTE 3: CHECKLIST DÉTAILLÉE --}}
+            <div class="bg-white p-6 shadow-sm sm:rounded-lg border border-gray-200">
+                <h3 class="text-lg font-semibold text-gray-900 border-b border-gray-200 pb-4 mb-6 flex items-center gap-2">
+                    <x-iconify icon="lucide:clipboard-list" class="w-5 h-5 text-blue-600" />
+                    Checklist des Équipements
+                </h3>
+
+                <div class="space-y-8">
+                    @foreach($checklistStructure as $category => $config)
+                    <div class="space-y-4">
+                        <div class="flex items-center gap-2 bg-gray-50 px-3 py-2 rounded-lg border border-gray-100">
+                            <div class="w-1.5 h-1.5 rounded-full bg-blue-500"></div>
+                            <h4 class="font-bold text-gray-800 text-sm uppercase tracking-wide">{{ $category }}</h4>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            @foreach($config['items'] as $item)
+                            @php
+                            // Reconstruct the key used in the controller's detailsMap
+                            // Controller uses: Str::slug($category, '_') . '.' . Str::slug($item, '_')
+                            $lookupKey = Str::slug($category, '_') . '.' . Str::slug($item, '_');
+                            $currentStatus = $detailsMap->get($lookupKey);
+                            @endphp
+                            <div class="bg-white rounded-lg p-3 border border-gray-200 hover:border-blue-300 transition-colors shadow-sm">
+                                <x-handover-status-switcher
+                                    :item="$item"
+                                    :category="$category"
+                                    :statuses="$config['statuses']"
+                                    :selected="$currentStatus" />
+                            </div>
+                            @endforeach
+                        </div>
+                    </div>
+                    @endforeach
+                </div>
+            </div>
+
+            <div class="flex items-center justify-end mt-8 gap-4 pt-4 border-t border-gray-200">
+                <a href="{{ route('admin.handovers.vehicles.show', $handover) }}" class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors">
+                    Annuler
+                </a>
+                <button type="submit" class="inline-flex items-center px-6 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors">
+                    <x-iconify icon="lucide:save" class="w-5 h-5 mr-2" />
+                    Mettre à jour la Fiche
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+@endsection

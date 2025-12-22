@@ -4,8 +4,9 @@ namespace App\Http\Controllers\Admin\Handover;
 
 use App\Http\Controllers\Controller;
 use App\Models\Assignment;
-use App\Models\VehicleHandoverDetail;
-use App\Models\VehicleHandoverForm;
+use App\Models\Handover\VehicleHandoverDetail;
+use App\Models\Handover\VehicleHandoverForm;
+use App\Services\HandoverChecklistService;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -26,34 +27,77 @@ class VehicleHandoverController extends Controller
      * @param Assignment $assignment
      * @return View
      */
-    public function create(Assignment $assignment): View
+    /**
+     * Affiche la liste des fiches de remise.
+     * Redirige vers la liste des affectations pour le moment.
+     *
+     * @return RedirectResponse
+     */
+    public function index(): RedirectResponse
+    {
+        return redirect()->route('admin.assignments.index');
+    }
+
+    /**
+     * Affiche la vue de création d’une fiche de remise pour une affectation donnée.
     {
         $this->authorize('create handovers');
 
         $assignment->load(['vehicle.vehicleType', 'driver']);
 
-        return view('admin.handovers.vehicles.create', compact('assignment'));
+        // Get the dynamic checklist template for this vehicle
+        $checklistStructure = $checklistService->getTemplateStructure($assignment->vehicle);
+
+        // If no template exists, redirect with error
+        if (empty($checklistStructure)) {
+            return redirect()
+                ->route('admin.assignments.index')
+                ->with('flash', [
+                    'type' => 'error',
+                    'message' => 'Aucun modèle de checklist disponible',
+                    'description' => 'Veuillez contacter votre administrateur pour configurer un modèle de checklist pour ce type de véhicule.',
+                ]);
+        }
+
+        return view('admin.handovers.vehicles.create', compact('assignment', 'checklistStructure'));
     }
 
     /**
      * Enregistre une nouvelle fiche de remise et ses détails.
      *
      * @param Request $request
+     * @param HandoverChecklistService $checklistService
      * @return RedirectResponse
      */
-    public function store(Request $request): RedirectResponse
+    public function store(Request $request, HandoverChecklistService $checklistService): RedirectResponse
     {
         $this->authorize('create handovers');
 
-        $validated = $request->validate([
+        // Basic validation
+        $basicValidated = $request->validate([
             'assignment_id' => 'required|exists:assignments,id|unique:vehicle_handover_forms,assignment_id',
             'issue_date' => 'required|date',
             'general_observations' => 'nullable|string|max:2000',
             'checklist' => 'required|array',
-            'checklist.*.*' => 'required|in:Bon,Moyen,Mauvais,N/A,Oui,Non',
         ]);
 
-        $assignment = Assignment::with('vehicle')->findOrFail($validated['assignment_id']);
+        $assignment = Assignment::with('vehicle')->findOrFail($basicValidated['assignment_id']);
+
+        // Dynamic validation using the checklist service
+        $checklistValidation = $checklistService->validateChecklistData(
+            $assignment->vehicle,
+            $request->input('checklist', [])
+        );
+
+        if (!$checklistValidation['valid']) {
+            return back()
+                ->withInput()
+                ->withErrors(['checklist' => $checklistValidation['errors']]);
+        }
+
+        $validated = $basicValidated;
+
+        // Assignment already loaded above for validation
 
         DB::beginTransaction();
         try {
@@ -129,11 +173,14 @@ class VehicleHandoverController extends Controller
      * @param VehicleHandoverForm $handover
      * @return View
      */
-    public function edit(VehicleHandoverForm $handover): View
+    public function edit(VehicleHandoverForm $handover, HandoverChecklistService $checklistService): View
     {
         $this->authorize('edit handovers');
 
         $handover->load(['assignment.vehicle.vehicleType', 'assignment.driver', 'details']);
+
+        // Get the dynamic checklist template for this vehicle
+        $checklistStructure = $checklistService->getTemplateStructure($handover->assignment->vehicle);
 
         $detailsMap = $handover->details->mapWithKeys(function ($detail) {
             return [
@@ -141,7 +188,7 @@ class VehicleHandoverController extends Controller
             ];
         });
 
-        return view('admin.handovers.vehicles.edit', compact('handover', 'detailsMap'));
+        return view('admin.handovers.vehicles.edit', compact('handover', 'detailsMap', 'checklistStructure'));
     }
 
     /**
@@ -181,7 +228,7 @@ class VehicleHandoverController extends Controller
                     ]);
                 }
             }
-            
+
             DB::commit();
 
             Log::channel('audit')->info('Fiche de remise mise à jour', [
@@ -225,13 +272,10 @@ class VehicleHandoverController extends Controller
         ]);
 
         try {
-            if ($handover->signed_form_path) {
-                Storage::disk('public')->delete($handover->signed_form_path);
-            }
-
-            $path = $request->file('signed_form')->store('handovers/signed', 'public');
-
-            $handover->update(['signed_form_path' => $path]);
+            // Spatie Media Library automatically handles replacing the old file
+            // since we configured the collection as singleFile()
+            $handover->addMediaFromRequest('signed_form')
+                ->toMediaCollection('signed_form');
 
             Log::channel('audit')->info('Fiche signée téléversée', [
                 'handover_id' => $handover->id,
@@ -312,8 +356,8 @@ class VehicleHandoverController extends Controller
         $checklist = $handover->details->groupBy('category');
 
         // Sélection de l'image schématique selon le type de véhicule
-        $sketchName = $handover->assignment->vehicle->vehicleType->name === 'Moto' 
-            ? 'scooter_sketch.png' 
+        $sketchName = $handover->assignment->vehicle->vehicleType->name === 'Moto'
+            ? 'scooter_sketch.png'
             : 'car_sketch.png';
         $sketchPath = public_path('images/' . $sketchName);
         $vehicleSketchBase64 = '';

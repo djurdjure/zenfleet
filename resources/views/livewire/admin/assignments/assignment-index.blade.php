@@ -373,6 +373,27 @@
                                                     </a>
                                                     @endif
 
+                                                    @if($assignment->status === 'active')
+                                                    @if($assignment->handoverForm)
+                                                    <a href="{{ route('admin.handovers.vehicles.show', $assignment->handoverForm) }}"
+                                                        class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
+                                                        <x-iconify icon="lucide:eye" class="w-4 h-4 mr-3 text-indigo-600" />
+                                                        Voir Fiche de Remise
+                                                    </a>
+                                                    <a href="{{ route('admin.handovers.vehicles.download-pdf', $assignment->handoverForm) }}"
+                                                        class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
+                                                        <x-iconify icon="lucide:file-down" class="w-4 h-4 mr-3 text-red-600" />
+                                                        Télécharger PDF
+                                                    </a>
+                                                    @else
+                                                    <a href="{{ route('admin.handovers.vehicles.create', $assignment) }}"
+                                                        class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
+                                                        <x-iconify icon="lucide:clipboard-check" class="w-4 h-4 mr-3 text-blue-600" />
+                                                        Créer Fiche de Remise
+                                                    </a>
+                                                    @endif
+                                                    @endif
+
                                                     <button onclick="alert('Fonctionnalité PDF à venir')"
                                                         class="flex w-full items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
                                                         <x-iconify icon="lucide:file-text" class="w-4 h-4 mr-3 text-emerald-600" />

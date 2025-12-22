@@ -1,24 +1,30 @@
 <?php
+
 namespace App\Models\Handover;
 
 use App\Models\Concerns\BelongsToOrganization;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Models\Assignment;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
+use Illuminate\Support\Facades\Storage;
 
-// --- DÉBUT DES CORRECTIONS ---
-use App\Models\Assignment; // 1. Indique à PHP où trouver le modèle Assignment
-use Illuminate\Database\Eloquent\Relations\BelongsTo; // 2. Corrige le type-hint pour la relation BelongsTo
-use Illuminate\Database\Eloquent\Relations\HasMany;   // 3. Corrige le type-hint pour la relation HasMany
-// --- FIN DES CORRECTIONS ---
-
-class VehicleHandoverForm extends Model
+class VehicleHandoverForm extends Model implements HasMedia
 {
-    use HasFactory, SoftDeletes, BelongsToOrganization;
+    use HasFactory, SoftDeletes, BelongsToOrganization, InteractsWithMedia;
 
     protected $fillable = [
-        'assignment_id', 'issue_date', 'current_mileage', 'general_observations',
-        'additional_observations', 'signed_form_path', 'organization_id',
+        'assignment_id',
+        'issue_date',
+        'current_mileage',
+        'general_observations',
+        'additional_observations',
+        'signed_form_path',
+        'organization_id',
     ];
 
     protected $casts = ['issue_date' => 'date'];
@@ -53,5 +59,38 @@ class VehicleHandoverForm extends Model
 
         // Mark this one as latest
         $this->update(['is_latest_version' => true]);
+    }
+
+    /**
+     * Register media collections for this model.
+     */
+    public function registerMediaCollections(): void
+    {
+        $this->addMediaCollection('signed_form')
+            ->singleFile()
+            ->acceptsMimeTypes(['application/pdf', 'image/jpeg', 'image/png', 'image/jpg']);
+    }
+
+    /**
+     * Get the URL of the signed form.
+     * Provides backward compatibility with old signed_form_path.
+     *
+     * @return string|null
+     */
+    public function getSignedFormUrl(): ?string
+    {
+        // First, try to get from media library
+        $media = $this->getFirstMedia('signed_form');
+
+        if ($media) {
+            return $media->getUrl();
+        }
+
+        // Fallback to old signed_form_path if no media exists
+        if ($this->signed_form_path) {
+            return Storage::disk('public')->url($this->signed_form_path);
+        }
+
+        return null;
     }
 }

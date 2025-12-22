@@ -237,7 +237,7 @@ class AssignmentIndex extends Component
     public function getAssignmentsProperty()
     {
         $query = Assignment::query()
-            ->with(['vehicle', 'driver', 'creator'])
+            ->with(['vehicle', 'driver', 'creator', 'handoverForm'])
             ->where('organization_id', Auth::user()->organization_id);
 
         // Search
