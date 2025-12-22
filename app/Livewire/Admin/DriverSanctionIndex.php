@@ -395,14 +395,30 @@ class DriverSanctionIndex extends Component
             $query->where('driver_id', $this->filterDriverId);
         }
 
-        // Filtre par date de début
+        // Filtre par date de début (format d/m/Y -> Y-m-d)
         if ($this->filterDateFrom) {
-            $query->where('sanction_date', '>=', $this->filterDateFrom);
+            try {
+                // Essayer de parser le format français d/m/Y
+                $dateFrom = \Carbon\Carbon::createFromFormat('d/m/Y', $this->filterDateFrom);
+                if ($dateFrom) {
+                    $query->where('sanction_date', '>=', $dateFrom->format('Y-m-d'));
+                }
+            } catch (\Exception $e) {
+                // Format invalide, ignorer le filtre
+            }
         }
 
-        // Filtre par date de fin
+        // Filtre par date de fin (format d/m/Y -> Y-m-d)
         if ($this->filterDateTo) {
-            $query->where('sanction_date', '<=', $this->filterDateTo);
+            try {
+                // Essayer de parser le format français d/m/Y
+                $dateTo = \Carbon\Carbon::createFromFormat('d/m/Y', $this->filterDateTo);
+                if ($dateTo) {
+                    $query->where('sanction_date', '<=', $dateTo->format('Y-m-d'));
+                }
+            } catch (\Exception $e) {
+                // Format invalide, ignorer le filtre
+            }
         }
 
         // Filtre par statut archivé

@@ -43,7 +43,7 @@ class DriverSanctionController extends Controller
 
         // Retourne la vue Blade qui encapsule le composant Livewire
         // Le layout est géré par la directive @extends dans la vue
-        return view('admin.sanctions.index', [
+        return view('admin.drivers.sanctions-livewire', [
             'pageTitle' => 'Gestion des Sanctions Chauffeurs',
             'breadcrumbs' => [
                 ['title' => 'Dashboard', 'url' => route('admin.dashboard')],
@@ -64,11 +64,11 @@ class DriverSanctionController extends Controller
     public function export()
     {
         $this->authorize('export', \App\Models\DriverSanction::class);
-        
+
         // Cette méthode peut déclencher un job d'export ou appeler
         // directement une méthode du composant Livewire
         // Pour l'instant, on redirige vers la page principale avec un message
-        return redirect()->route('admin.sanctions.index')
+        return redirect()->route('admin.drivers.sanctions.index')
             ->with('info', 'La fonctionnalité d\'export sera disponible prochainement.');
     }
 
@@ -83,10 +83,34 @@ class DriverSanctionController extends Controller
     public function statistics(): View
     {
         $this->authorize('viewAny', \App\Models\DriverSanction::class);
-        
+
         // Pour l'instant, on redirige vers la page principale
         // Une vue dédiée peut être créée ultérieurement
-        return redirect()->route('admin.sanctions.index')
+        return redirect()->route('admin.drivers.sanctions.index')
             ->with('info', 'Le tableau de bord des statistiques sera disponible prochainement.');
+    }
+
+    /**
+     * Affiche le détail d'une sanction
+     * 
+     * @param \App\Models\DriverSanction $sanction
+     * @return \Illuminate\View\View
+     */
+    public function show(\App\Models\DriverSanction $sanction): View
+    {
+        $this->authorize('view', $sanction);
+
+        $sanction->load(['driver', 'supervisor']);
+
+        return view('admin.drivers.sanctions.show', [
+            'sanction' => $sanction,
+            'pageTitle' => 'Détail de la sanction - ' . $sanction->reference,
+            'breadcrumbs' => [
+                ['title' => 'Dashboard', 'url' => route('admin.dashboard')],
+                ['title' => 'Chauffeurs', 'url' => route('admin.drivers.index')],
+                ['title' => 'Sanctions', 'url' => route('admin.drivers.sanctions.index')],
+                ['title' => $sanction->reference, 'url' => null]
+            ]
+        ]);
     }
 }

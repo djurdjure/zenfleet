@@ -97,27 +97,51 @@ class DriverSanction extends Model
     public const SANCTION_TYPES = [
         'avertissement_verbal' => [
             'label' => 'Avertissement Verbal',
-            'icon' => 'fa-comment-dots',
+            'icon' => 'heroicons:chat-bubble-left-ellipsis',
             'color' => 'yellow',
             'severity' => 1,
         ],
         'avertissement_ecrit' => [
             'label' => 'Avertissement Écrit',
-            'icon' => 'fa-file-alt',
+            'icon' => 'heroicons:document-text',
             'color' => 'orange',
             'severity' => 2,
         ],
         'mise_a_pied' => [
             'label' => 'Mise à Pied',
-            'icon' => 'fa-user-slash',
+            'icon' => 'heroicons:user-minus',
             'color' => 'red',
             'severity' => 3,
         ],
         'mise_en_demeure' => [
             'label' => 'Mise en Demeure',
-            'icon' => 'fa-gavel',
+            'icon' => 'heroicons:scale',
             'color' => 'red',
             'severity' => 4,
+        ],
+        'suspension_permis' => [
+            'label' => 'Suspension Permis',
+            'icon' => 'heroicons:no-symbol',
+            'color' => 'red',
+            'severity' => 4,
+        ],
+        'amende' => [
+            'label' => 'Amende',
+            'icon' => 'heroicons:currency-dollar',
+            'color' => 'yellow',
+            'severity' => 2,
+        ],
+        'blame' => [
+            'label' => 'Blâme',
+            'icon' => 'heroicons:exclamation-circle',
+            'color' => 'orange',
+            'severity' => 2,
+        ],
+        'licenciement' => [
+            'label' => 'Licenciement',
+            'icon' => 'heroicons:user-times',
+            'color' => 'red',
+            'severity' => 5,
         ],
     ];
 

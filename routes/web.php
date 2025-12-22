@@ -320,6 +320,10 @@ Route::middleware(['auth', 'verified'])
                     return view('admin.drivers.sanctions-livewire');
                 })->name('sanctions.index');
 
+                // ✨ NOUVEAU: Détail d'une sanction (Enterprise-Grade)
+                Route::get('sanctions/{sanction}', [DriverSanctionController::class, 'show'])
+                    ->name('sanctions.show');
+
                 Route::get('export', [DriverController::class, 'export'])->name('export');
 
                 // 🔥 EXPORT MULTIFORMATS ENTERPRISE-GRADE (PDF, CSV, Excel)
