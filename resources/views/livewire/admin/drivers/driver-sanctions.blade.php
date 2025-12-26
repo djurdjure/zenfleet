@@ -72,7 +72,7 @@
     {{-- ===============================================
  RECHERCHE ET FILTRES - Style Véhicules
  =============================================== --}}
-    <div class="bg-white rounded-xl shadow-sm border border-gray-200 px-4 py-3 mb-6">
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200 px-4 py-3 mb-6" x-data="{ showFilters: false }">
         <div class="flex flex-col lg:flex-row gap-4 items-center justify-between">
 
             {{-- Recherche --}}
@@ -94,7 +94,7 @@
             {{-- Actions --}}
             <div class="flex items-center gap-2">
                 <button
-                    onclick="toggleFilters()"
+                    @click="showFilters = !showFilters"
                     class="inline-flex items-center justify-center w-9 h-9 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors relative"
                     title="Filtres">
                     <x-iconify icon="heroicons:funnel" class="w-5 h-5" />
@@ -104,6 +104,13 @@
                         <span class="relative inline-flex rounded-full h-3 w-3 bg-blue-500"></span>
                     </span>
                     @endif
+                </button>
+
+                <button
+                    wire:click="$toggle('showArchived')"
+                    class="inline-flex items-center justify-center w-9 h-9 border rounded-lg transition-colors relative {{ $showArchived ? 'bg-amber-100 text-amber-700 border-amber-300' : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50' }}"
+                    title="{{ $showArchived ? 'Masquer archives' : 'Voir archives' }}">
+                    <x-iconify icon="heroicons:archive-box" class="w-5 h-5" />
                 </button>
 
                 <button
@@ -117,7 +124,8 @@
         </div>
 
         {{-- Panel Filtres (Collapsible) --}}
-        <div id="filtersPanel" style="display: none;" class="mt-4 pt-4 border-t border-gray-200">
+        {{-- Panel Filtres (Collapsible) --}}
+        <div x-show="showFilters" x-transition class="mt-4 pt-4 border-t border-gray-200">
 
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
 
@@ -208,11 +216,13 @@
                         this.displayDate = `${String(day.day).padStart(2, '0')}/${String(this.currentMonth + 1).padStart(2, '0')}/${this.currentYear}`;
                         this.generateCalendar();
                         this.showCalendar = false;
+                        $wire.applyFilters();
                     },
                     clearDate() {
                         this.selectedDate = '';
                         this.displayDate = '';
                         this.generateCalendar();
+                        $wire.applyFilters();
                     },
                     prevMonth() {
                         if (this.currentMonth === 0) {
@@ -353,11 +363,13 @@
                         this.displayDate = `${String(day.day).padStart(2, '0')}/${String(this.currentMonth + 1).padStart(2, '0')}/${this.currentYear}`;
                         this.generateCalendar();
                         this.showCalendar = false;
+                        $wire.applyFilters();
                     },
                     clearDate() {
                         this.selectedDate = '';
                         this.displayDate = '';
                         this.generateCalendar();
+                        $wire.applyFilters();
                     },
                     prevMonth() {
                         if (this.currentMonth === 0) {
@@ -616,7 +628,32 @@
                                         <x-iconify icon="heroicons:pencil-square" class="w-4 h-4" />
                                     </button>
 
-                                    {{-- Supprimer --}}
+                                    @if($sanction->status === 'archived')
+                                    {{-- Restaurer (Sanctions archivées) --}}
+                                    <button
+                                        wire:click="confirmRestore({{ $sanction->id }})"
+                                        class="p-1.5 text-green-600 hover:text-green-800 hover:bg-green-50 rounded-lg transition-colors"
+                                        title="Restaurer">
+                                        <x-iconify icon="heroicons:arrow-path" class="w-4 h-4" />
+                                    </button>
+
+                                    {{-- Suppression définitive (Sanctions archivées) --}}
+                                    <button
+                                        wire:click="confirmForceDelete({{ $sanction->id }})"
+                                        class="p-1.5 text-red-600 hover:text-red-800 hover:bg-red-50 rounded-lg transition-colors"
+                                        title="Supprimer définitivement">
+                                        <x-iconify icon="heroicons:trash" class="w-4 h-4" />
+                                    </button>
+                                    @else
+                                    {{-- Archiver (Sanctions actives) --}}
+                                    <button
+                                        wire:click="confirmArchive({{ $sanction->id }})"
+                                        class="p-1.5 text-amber-600 hover:text-amber-800 hover:bg-amber-50 rounded-lg transition-colors"
+                                        title="Archiver">
+                                        <x-iconify icon="heroicons:archive-box-arrow-down" class="w-4 h-4" />
+                                    </button>
+
+                                    {{-- Supprimer (Sanctions actives) --}}
                                     <button
                                         wire:click="deleteSanction({{ $sanction->id }})"
                                         wire:confirm="Êtes-vous sûr de vouloir supprimer cette sanction ? Cette action est irréversible."
@@ -624,6 +661,7 @@
                                         title="Supprimer">
                                         <x-iconify icon="heroicons:trash" class="w-4 h-4" />
                                     </button>
+                                    @endif
                                 </div>
                             </td>
                         </tr>
@@ -899,7 +937,8 @@
                                 :options="[
  'active' => 'Active',
  'appealed' => 'Contestée',
- 'cancelled' => 'Annulée'
+ 'cancelled' => 'Annulée',
+ 'archived' => 'Archivée'
  ]" />
                         </div>
 
@@ -916,22 +955,48 @@
                     </div>
 
                     {{-- Pièce jointe --}}
+                    {{-- Pièce jointe (Drag & Drop) --}}
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-2">
                             Pièce jointe
                         </label>
-                        @if($existingAttachment && !$attachment)
-                        <div class="flex items-center gap-2 text-sm text-gray-600 mb-2">
-                            <x-iconify icon="heroicons:paper-clip" class="w-4 h-4" />
-                            <span>Fichier actuel: {{ basename($existingAttachment) }}</span>
+
+                        <div x-data="{ isDropping: false, progress: 0 }"
+                            x-on:dragover.prevent="isDropping = true"
+                            x-on:dragleave.prevent="isDropping = false"
+                            x-on:drop.prevent="isDropping = false; $refs.fileInput.files = $event.dataTransfer.files; $refs.fileInput.dispatchEvent(new Event('change'))"
+                            :class="{ 'border-blue-500 bg-blue-50': isDropping, 'border-gray-300 hover:bg-gray-50': !isDropping }"
+                            class="relative border-2 border-dashed rounded-xl p-6 transition-all text-center">
+
+                            <input
+                                type="file"
+                                wire:model="attachment"
+                                x-ref="fileInput"
+                                accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
+                                class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10">
+
+                            <div class="flex flex-col items-center justify-center pointer-events-none">
+                                <x-iconify icon="heroicons:cloud-arrow-up" class="w-8 h-8 text-gray-400 mb-2" />
+                                <p class="text-sm text-gray-600 font-medium">
+                                    <span class="text-blue-600">Cliquez pour upload</span> ou glissez-déposez
+                                </p>
+                                <p class="text-xs text-gray-500 mt-1">PDF, JPG, PNG, DOC (max 10 MB)</p>
+                            </div>
+
+                            {{-- Fichier sélectionné ou existant --}}
+                            @if($attachment)
+                            <div class="mt-3 flex items-center justify-center gap-2 text-sm text-blue-600 font-medium bg-blue-50 py-1 px-3 rounded-full inline-flex">
+                                <x-iconify icon="heroicons:document-check" class="w-4 h-4" />
+                                <span>Fichier sélectionné</span>
+                            </div>
+                            @elseif($existingAttachment)
+                            <div class="mt-3 flex items-center justify-center gap-2 text-sm text-gray-600 bg-gray-100 py-1 px-3 rounded-full inline-flex relative z-20">
+                                <x-iconify icon="heroicons:paper-clip" class="w-4 h-4" />
+                                <span class="truncate max-w-xs">{{ basename($existingAttachment) }}</span>
+                            </div>
+                            @endif
                         </div>
-                        @endif
-                        <input
-                            type="file"
-                            wire:model="attachment"
-                            accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
-                            class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm">
-                        <p class="mt-1 text-xs text-gray-500">PDF, JPG, PNG, DOC, DOCX (max 10 MB)</p>
+
                         @error('attachment') <p class="mt-1.5 text-sm text-red-600 flex items-center gap-1"><x-iconify icon="heroicons:exclamation-circle" class="w-4 h-4" />{{ $message }}</p> @enderror
                     </div>
 
@@ -957,6 +1022,119 @@
 
                 </form>
 
+            </div>
+        </div>
+    </div>
+    @endif
+
+    {{-- ===============================================
+    MODAL CONFIRMATION ARCHIVAGE
+    =============================================== --}}
+    @if($showArchiveModal)
+    <div class="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+        <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity backdrop-blur-sm" wire:click="cancelArchive"></div>
+            <span class="hidden sm:inline-block sm:align-middle sm:h-screen">&#8203;</span>
+            <div class="inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full sm:p-6">
+                <div class="sm:flex sm:items-start">
+                    <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-amber-100 sm:mx-0 sm:h-10 sm:w-10">
+                        <x-iconify icon="heroicons:archive-box-arrow-down" class="h-6 w-6 text-amber-600" />
+                    </div>
+                    <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+                        <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-title">
+                            Archiver la sanction
+                        </h3>
+                        <div class="mt-2">
+                            <p class="text-sm text-gray-500">
+                                Êtes-vous sûr de vouloir archiver cette sanction ? Elle ne sera plus visible dans la liste active mais restera consultable dans l'historique (accessible via le bouton Archive).
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse">
+                    <button type="button" wire:click="executeArchive" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-amber-600 text-base font-medium text-white hover:bg-amber-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500 sm:ml-3 sm:w-auto sm:text-sm">
+                        Archiver
+                    </button>
+                    <button type="button" wire:click="cancelArchive" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:w-auto sm:text-sm">
+                        Annuler
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    @endif
+
+    {{-- ===============================================
+    MODAL CONFIRMATION RESTAURATION
+    =============================================== --}}
+    @if($showRestoreModal)
+    <div class="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+        <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity backdrop-blur-sm" wire:click="cancelRestore"></div>
+            <span class="hidden sm:inline-block sm:align-middle sm:h-screen">&#8203;</span>
+            <div class="inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full sm:p-6">
+                <div class="sm:flex sm:items-start">
+                    <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-green-100 sm:mx-0 sm:h-10 sm:w-10">
+                        <x-iconify icon="heroicons:arrow-path" class="h-6 w-6 text-green-600" />
+                    </div>
+                    <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+                        <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-title">
+                            Restaurer la sanction
+                        </h3>
+                        <div class="mt-2">
+                            <p class="text-sm text-gray-500">
+                                Êtes-vous sûr de vouloir restaurer cette sanction ? Elle apparaîtra de nouveau dans la liste des sanctions actives.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse">
+                    <button type="button" wire:click="executeRestore" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-green-600 text-base font-medium text-white hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 sm:ml-3 sm:w-auto sm:text-sm">
+                        Restaurer
+                    </button>
+                    <button type="button" wire:click="cancelRestore" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:w-auto sm:text-sm">
+                        Annuler
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    @endif
+
+    {{-- ===============================================
+    MODAL CONFIRMATION SUPPRESSION DÉFINITIVE
+    =============================================== --}}
+    @if($showForceDeleteModal)
+    <div class="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+        <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity backdrop-blur-sm" wire:click="cancelForceDelete"></div>
+            <span class="hidden sm:inline-block sm:align-middle sm:h-screen">&#8203;</span>
+            <div class="inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full sm:p-6">
+                <div class="sm:flex sm:items-start">
+                    <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
+                        <x-iconify icon="heroicons:exclamation-triangle" class="h-6 w-6 text-red-600" />
+                    </div>
+                    <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+                        <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-title">
+                            Suppression définitive
+                        </h3>
+                        <div class="mt-2">
+                            <p class="text-sm text-gray-500">
+                                Êtes-vous sûr de vouloir supprimer définitivement cette sanction ?
+                                <br><br>
+                                <span class="text-red-600 font-bold">ATTENTION : Cette action est irréversible.</span> Toutes les données associées seront supprimées.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse">
+                    <button type="button" wire:click="forceDelete" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:ml-3 sm:w-auto sm:text-sm">
+                        Supprimer définitivement
+                    </button>
+                    <button type="button" wire:click="cancelForceDelete" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:w-auto sm:text-sm">
+                        Annuler
+                    </button>
+                </div>
             </div>
         </div>
     </div>
