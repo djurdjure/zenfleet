@@ -156,21 +156,293 @@
                 </div>
 
                 {{-- Date Début --}}
-                <div class="text-xs">
-                    <x-datepicker-pro
-                        wire:model.live="dateFrom"
-                        name="dateFrom"
-                        label="Début"
-                        placeholder="JJ/MM/AAAA" />
+                <div class="text-xs" x-data="{
+                    showCalendar: false,
+                    selectedDate: @entangle('dateFrom'),
+                    displayDate: '',
+                    currentMonth: new Date().getMonth(),
+                    currentYear: new Date().getFullYear(),
+                    days: [],
+                    init() {
+                        this.parseDate();
+                        this.generateCalendar();
+                    },
+                    parseDate() {
+                        if (this.selectedDate) {
+                            const parts = this.selectedDate.split('-');
+                            if (parts.length === 3) {
+                                this.displayDate = `${parts[2]}/${parts[1]}/${parts[0]}`;
+                                this.currentYear = parseInt(parts[0]);
+                                this.currentMonth = parseInt(parts[1]) - 1;
+                            }
+                        } else {
+                            this.displayDate = '';
+                        }
+                    },
+                    generateCalendar() {
+                        this.days = [];
+                        const firstDay = new Date(this.currentYear, this.currentMonth, 1);
+                        const lastDay = new Date(this.currentYear, this.currentMonth + 1, 0);
+                        const startPadding = firstDay.getDay() === 0 ? 6 : firstDay.getDay() - 1;
+                        
+                        for (let i = 0; i < startPadding; i++) {
+                            this.days.push({ day: '', disabled: true });
+                        }
+                        
+                        const today = new Date();
+                        today.setHours(0, 0, 0, 0);
+                        
+                        for (let d = 1; d <= lastDay.getDate(); d++) {
+                            const date = new Date(this.currentYear, this.currentMonth, d);
+                            this.days.push({
+                                day: d,
+                                disabled: date > today,
+                                isToday: date.getTime() === today.getTime(),
+                                isSelected: this.selectedDate === `${this.currentYear}-${String(this.currentMonth + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`
+                            });
+                        }
+                    },
+                    selectDay(day) {
+                        if (day.disabled || !day.day) return;
+                        this.selectedDate = `${this.currentYear}-${String(this.currentMonth + 1).padStart(2, '0')}-${String(day.day).padStart(2, '0')}`;
+                        this.displayDate = `${String(day.day).padStart(2, '0')}/${String(this.currentMonth + 1).padStart(2, '0')}/${this.currentYear}`;
+                        this.generateCalendar();
+                        this.showCalendar = false;
+                    },
+                    clearDate() {
+                        this.selectedDate = '';
+                        this.displayDate = '';
+                        this.generateCalendar();
+                    },
+                    prevMonth() {
+                        if (this.currentMonth === 0) {
+                            this.currentMonth = 11;
+                            this.currentYear--;
+                        } else {
+                            this.currentMonth--;
+                        }
+                        this.generateCalendar();
+                    },
+                    nextMonth() {
+                        const today = new Date();
+                        const nextMonth = new Date(this.currentYear, this.currentMonth + 1, 1);
+                        if (nextMonth <= today) {
+                            if (this.currentMonth === 11) {
+                                this.currentMonth = 0;
+                                this.currentYear++;
+                            } else {
+                                this.currentMonth++;
+                            }
+                            this.generateCalendar();
+                        }
+                    },
+                    monthNames: ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre']
+                }" x-init="$watch('selectedDate', () => parseDate())">
+                    <label class="block text-xs font-medium text-gray-700 mb-1">Du</label>
+                    <div class="relative">
+                        <input
+                            type="text"
+                            x-model="displayDate"
+                            @click="showCalendar = !showCalendar"
+                            readonly
+                            placeholder="JJ/MM/AAAA"
+                            class="w-full px-4 py-2.5 pl-11 bg-gray-50 border border-gray-300 text-sm text-gray-900 rounded-lg shadow-sm transition-all cursor-pointer focus:border-blue-500 focus:ring-1 focus:ring-blue-500 hover:border-gray-400">
+                        <div class="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none">
+                            <x-iconify icon="heroicons:calendar-days" class="w-5 h-5 text-gray-400" />
+                        </div>
+
+                        {{-- Calendrier Popup --}}
+                        <div x-show="showCalendar"
+                            x-transition
+                            @click.away="showCalendar = false"
+                            class="absolute z-50 mt-2 bg-white rounded-xl shadow-2xl border border-gray-200 p-4 w-72">
+                            {{-- Header --}}
+                            <div class="flex items-center justify-between mb-4">
+                                <button type="button" @click="prevMonth()" class="p-1 hover:bg-gray-100 rounded-lg">
+                                    <x-iconify icon="heroicons:chevron-left" class="w-5 h-5 text-gray-600" />
+                                </button>
+                                <span class="font-semibold text-gray-900" x-text="monthNames[currentMonth] + ' ' + currentYear"></span>
+                                <button type="button" @click="nextMonth()" class="p-1 hover:bg-gray-100 rounded-lg">
+                                    <x-iconify icon="heroicons:chevron-right" class="w-5 h-5 text-gray-600" />
+                                </button>
+                            </div>
+                            {{-- Days of week --}}
+                            <div class="grid grid-cols-7 gap-1 mb-2">
+                                <template x-for="day in ['Lu', 'Ma', 'Me', 'Je', 'Ve', 'Sa', 'Di']">
+                                    <div class="text-center text-xs font-semibold text-gray-500 py-1" x-text="day"></div>
+                                </template>
+                            </div>
+                            {{-- Calendar days --}}
+                            <div class="grid grid-cols-7 gap-1">
+                                <template x-for="(day, index) in days" :key="index">
+                                    <button type="button"
+                                        @click="selectDay(day)"
+                                        :disabled="day.disabled"
+                                        :class="{
+                                            'bg-blue-600 text-white': day.isSelected,
+                                            'bg-blue-100 text-blue-800': day.isToday && !day.isSelected,
+                                            'hover:bg-gray-100': !day.disabled && !day.isSelected,
+                                            'text-gray-300 cursor-not-allowed': day.disabled,
+                                            'text-gray-700': !day.disabled && !day.isSelected
+                                        }"
+                                        class="w-8 h-8 flex items-center justify-center text-sm rounded-lg transition-colors"
+                                        x-text="day.day">
+                                    </button>
+                                </template>
+                            </div>
+                            {{-- Clear button --}}
+                            <div class="mt-3 pt-3 border-t border-gray-200">
+                                <button type="button" @click="clearDate(); showCalendar = false" class="w-full text-center text-xs text-gray-600 hover:text-gray-900">
+                                    Effacer
+                                </button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 {{-- Date Fin --}}
-                <div class="text-xs">
-                    <x-datepicker-pro
-                        wire:model.live="dateTo"
-                        name="dateTo"
-                        label="Fin"
-                        placeholder="JJ/MM/AAAA" />
+                <div class="text-xs" x-data="{
+                    showCalendar: false,
+                    selectedDate: @entangle('dateTo'),
+                    displayDate: '',
+                    currentMonth: new Date().getMonth(),
+                    currentYear: new Date().getFullYear(),
+                    days: [],
+                    init() {
+                        this.parseDate();
+                        this.generateCalendar();
+                    },
+                    parseDate() {
+                        if (this.selectedDate) {
+                            const parts = this.selectedDate.split('-');
+                            if (parts.length === 3) {
+                                this.displayDate = `${parts[2]}/${parts[1]}/${parts[0]}`;
+                                this.currentYear = parseInt(parts[0]);
+                                this.currentMonth = parseInt(parts[1]) - 1;
+                            }
+                        } else {
+                            this.displayDate = '';
+                        }
+                    },
+                    generateCalendar() {
+                        this.days = [];
+                        const firstDay = new Date(this.currentYear, this.currentMonth, 1);
+                        const lastDay = new Date(this.currentYear, this.currentMonth + 1, 0);
+                        const startPadding = firstDay.getDay() === 0 ? 6 : firstDay.getDay() - 1;
+                        
+                        for (let i = 0; i < startPadding; i++) {
+                            this.days.push({ day: '', disabled: true });
+                        }
+                        
+                        const today = new Date();
+                        today.setHours(0, 0, 0, 0);
+                        
+                        for (let d = 1; d <= lastDay.getDate(); d++) {
+                            const date = new Date(this.currentYear, this.currentMonth, d);
+                            this.days.push({
+                                day: d,
+                                disabled: date > today,
+                                isToday: date.getTime() === today.getTime(),
+                                isSelected: this.selectedDate === `${this.currentYear}-${String(this.currentMonth + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`
+                            });
+                        }
+                    },
+                    selectDay(day) {
+                        if (day.disabled || !day.day) return;
+                        this.selectedDate = `${this.currentYear}-${String(this.currentMonth + 1).padStart(2, '0')}-${String(day.day).padStart(2, '0')}`;
+                        this.displayDate = `${String(day.day).padStart(2, '0')}/${String(this.currentMonth + 1).padStart(2, '0')}/${this.currentYear}`;
+                        this.generateCalendar();
+                        this.showCalendar = false;
+                    },
+                    clearDate() {
+                        this.selectedDate = '';
+                        this.displayDate = '';
+                        this.generateCalendar();
+                    },
+                    prevMonth() {
+                        if (this.currentMonth === 0) {
+                            this.currentMonth = 11;
+                            this.currentYear--;
+                        } else {
+                            this.currentMonth--;
+                        }
+                        this.generateCalendar();
+                    },
+                    nextMonth() {
+                        const today = new Date();
+                        const nextMonth = new Date(this.currentYear, this.currentMonth + 1, 1);
+                        if (nextMonth <= today) {
+                            if (this.currentMonth === 11) {
+                                this.currentMonth = 0;
+                                this.currentYear++;
+                            } else {
+                                this.currentMonth++;
+                            }
+                            this.generateCalendar();
+                        }
+                    },
+                    monthNames: ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre']
+                }" x-init="$watch('selectedDate', () => parseDate())">
+                    <label class="block text-xs font-medium text-gray-700 mb-1">Au</label>
+                    <div class="relative">
+                        <input
+                            type="text"
+                            x-model="displayDate"
+                            @click="showCalendar = !showCalendar"
+                            readonly
+                            placeholder="JJ/MM/AAAA"
+                            class="w-full px-4 py-2.5 pl-11 bg-gray-50 border border-gray-300 text-sm text-gray-900 rounded-lg shadow-sm transition-all cursor-pointer focus:border-blue-500 focus:ring-1 focus:ring-blue-500 hover:border-gray-400">
+                        <div class="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none">
+                            <x-iconify icon="heroicons:calendar-days" class="w-5 h-5 text-gray-400" />
+                        </div>
+
+                        {{-- Calendrier Popup --}}
+                        <div x-show="showCalendar"
+                            x-transition
+                            @click.away="showCalendar = false"
+                            class="absolute z-50 mt-2 bg-white rounded-xl shadow-2xl border border-gray-200 p-4 w-72">
+                            {{-- Header --}}
+                            <div class="flex items-center justify-between mb-4">
+                                <button type="button" @click="prevMonth()" class="p-1 hover:bg-gray-100 rounded-lg">
+                                    <x-iconify icon="heroicons:chevron-left" class="w-5 h-5 text-gray-600" />
+                                </button>
+                                <span class="font-semibold text-gray-900" x-text="monthNames[currentMonth] + ' ' + currentYear"></span>
+                                <button type="button" @click="nextMonth()" class="p-1 hover:bg-gray-100 rounded-lg">
+                                    <x-iconify icon="heroicons:chevron-right" class="w-5 h-5 text-gray-600" />
+                                </button>
+                            </div>
+                            {{-- Days of week --}}
+                            <div class="grid grid-cols-7 gap-1 mb-2">
+                                <template x-for="day in ['Lu', 'Ma', 'Me', 'Je', 'Ve', 'Sa', 'Di']">
+                                    <div class="text-center text-xs font-semibold text-gray-500 py-1" x-text="day"></div>
+                                </template>
+                            </div>
+                            {{-- Calendar days --}}
+                            <div class="grid grid-cols-7 gap-1">
+                                <template x-for="(day, index) in days" :key="index">
+                                    <button type="button"
+                                        @click="selectDay(day)"
+                                        :disabled="day.disabled"
+                                        :class="{
+                                            'bg-blue-600 text-white': day.isSelected,
+                                            'bg-blue-100 text-blue-800': day.isToday && !day.isSelected,
+                                            'hover:bg-gray-100': !day.disabled && !day.isSelected,
+                                            'text-gray-300 cursor-not-allowed': day.disabled,
+                                            'text-gray-700': !day.disabled && !day.isSelected
+                                        }"
+                                        class="w-8 h-8 flex items-center justify-center text-sm rounded-lg transition-colors"
+                                        x-text="day.day">
+                                    </button>
+                                </template>
+                            </div>
+                            {{-- Clear button --}}
+                            <div class="mt-3 pt-3 border-t border-gray-200">
+                                <button type="button" @click="clearDate(); showCalendar = false" class="w-full text-center text-xs text-gray-600 hover:text-gray-900">
+                                    Effacer
+                                </button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
             </div>
@@ -338,7 +610,7 @@
 
                                     {{-- Modifier --}}
                                     <button
-                                        onclick="openEditSanctionModal({{ $sanction->id }})"
+                                        @click="$wire.call('openEditModal', {{ $sanction->id }})"
                                         class="p-1.5 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-lg transition-colors"
                                         title="Modifier">
                                         <x-iconify icon="heroicons:pencil-square" class="w-4 h-4" />
@@ -346,7 +618,8 @@
 
                                     {{-- Supprimer --}}
                                     <button
-                                        onclick="deleteSanctionModal({{ $sanction->id }}, '{{ $sanction->driver ? $sanction->driver->first_name . ' ' . $sanction->driver->last_name : 'Chauffeur supprimé' }}')"
+                                        wire:click="deleteSanction({{ $sanction->id }})"
+                                        wire:confirm="Êtes-vous sûr de vouloir supprimer cette sanction ? Cette action est irréversible."
                                         class="p-1.5 text-red-600 hover:text-red-800 hover:bg-red-50 rounded-lg transition-colors"
                                         title="Supprimer">
                                         <x-iconify icon="heroicons:trash" class="w-4 h-4" />

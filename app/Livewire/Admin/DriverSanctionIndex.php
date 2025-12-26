@@ -395,26 +395,40 @@ class DriverSanctionIndex extends Component
             $query->where('driver_id', $this->filterDriverId);
         }
 
-        // Filtre par date de début (format d/m/Y -> Y-m-d)
+        // Filtre par date de début
         if ($this->filterDateFrom) {
             try {
-                // Essayer de parser le format français d/m/Y
-                $dateFrom = \Carbon\Carbon::createFromFormat('d/m/Y', $this->filterDateFrom);
-                if ($dateFrom) {
-                    $query->where('sanction_date', '>=', $dateFrom->format('Y-m-d'));
+                // Le calendrier Alpine.js envoie déjà le format Y-m-d
+                // Mais on garde la compatibilité avec le format français d/m/Y si besoin
+                if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $this->filterDateFrom)) {
+                    // Format Y-m-d (format standard du calendrier)
+                    $query->where('sanction_date', '>=', $this->filterDateFrom);
+                } elseif (preg_match('/^\d{2}\/\d{2}\/\d{4}$/', $this->filterDateFrom)) {
+                    // Format d/m/Y (pour compatibilité)
+                    $dateFrom = \Carbon\Carbon::createFromFormat('d/m/Y', $this->filterDateFrom);
+                    if ($dateFrom) {
+                        $query->where('sanction_date', '>=', $dateFrom->format('Y-m-d'));
+                    }
                 }
             } catch (\Exception $e) {
                 // Format invalide, ignorer le filtre
             }
         }
 
-        // Filtre par date de fin (format d/m/Y -> Y-m-d)
+        // Filtre par date de fin
         if ($this->filterDateTo) {
             try {
-                // Essayer de parser le format français d/m/Y
-                $dateTo = \Carbon\Carbon::createFromFormat('d/m/Y', $this->filterDateTo);
-                if ($dateTo) {
-                    $query->where('sanction_date', '<=', $dateTo->format('Y-m-d'));
+                // Le calendrier Alpine.js envoie déjà le format Y-m-d
+                // Mais on garde la compatibilité avec le format français d/m/Y si besoin
+                if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $this->filterDateTo)) {
+                    // Format Y-m-d (format standard du calendrier)
+                    $query->where('sanction_date', '<=', $this->filterDateTo);
+                } elseif (preg_match('/^\d{2}\/\d{2}\/\d{4}$/', $this->filterDateTo)) {
+                    // Format d/m/Y (pour compatibilité)
+                    $dateTo = \Carbon\Carbon::createFromFormat('d/m/Y', $this->filterDateTo);
+                    if ($dateTo) {
+                        $query->where('sanction_date', '<=', $dateTo->format('Y-m-d'));
+                    }
                 }
             } catch (\Exception $e) {
                 // Format invalide, ignorer le filtre
