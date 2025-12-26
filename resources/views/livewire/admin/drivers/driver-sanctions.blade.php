@@ -108,9 +108,15 @@
 
                 <button
                     wire:click="$toggle('showArchived')"
-                    class="inline-flex items-center justify-center w-9 h-9 border rounded-lg transition-colors relative {{ $showArchived ? 'bg-amber-100 text-amber-700 border-amber-300' : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50' }}"
-                    title="{{ $showArchived ? 'Masquer archives' : 'Voir archives' }}">
+                    class="{{ $showArchived 
+                        ? 'inline-flex items-center gap-2 p-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-all duration-200 shadow-sm hover:shadow-md' 
+                        : 'inline-flex items-center justify-center px-3 py-2 border rounded-lg transition-colors relative bg-white text-gray-700 border-gray-300 hover:bg-gray-50' }}"
+                    title="{{ $showArchived ? 'Voir les sanctions actives' : 'Voir les archives' }}">
+                    @if($showArchived)
+                    <x-iconify icon="heroicons:list-bullet" class="w-5 h-5" />
+                    @else
                     <x-iconify icon="heroicons:archive-box" class="w-5 h-5" />
+                    @endif
                 </button>
 
                 <button
@@ -131,10 +137,10 @@
 
                 {{-- Filtre Type --}}
                 <div class="text-xs">
+                    <label class="block text-xs font-medium text-gray-700 mb-1">Type</label>
                     <x-slim-select
                         wire:model.live="sanctionTypeFilter"
                         name="sanctionTypeFilter"
-                        label="Type"
                         placeholder="Tous"
                         :options="[
  'avertissement_verbal' => 'Avertissement Verbal',
@@ -150,10 +156,10 @@
 
                 {{-- Filtre Gravité --}}
                 <div class="text-xs">
+                    <label class="block text-xs font-medium text-gray-700 mb-1">Gravité</label>
                     <x-slim-select
                         wire:model.live="severityFilter"
                         name="severityFilter"
-                        label="Gravité"
                         placeholder="Toutes"
                         :options="[
  'low' => 'Faible',
@@ -467,7 +473,7 @@
 
                 <button
                     wire:click="resetFilters"
-                    class="text-xs text-blue-600 hover:text-blue-800 font-medium">
+                    class="text-xs text-gray-400 hover:text-gray-600 hover:underline decoration-dotted underline-offset-2 transition-colors">
                     Réinitialiser
                 </button>
             </div>
@@ -628,7 +634,7 @@
                                         <x-iconify icon="heroicons:pencil-square" class="w-4 h-4" />
                                     </button>
 
-                                    @if($sanction->status === 'archived')
+                                    @if($sanction->trashed())
                                     {{-- Restaurer (Sanctions archivées) --}}
                                     <button
                                         wire:click="confirmRestore({{ $sanction->id }})"
@@ -647,19 +653,10 @@
                                     @else
                                     {{-- Archiver (Sanctions actives) --}}
                                     <button
-                                        wire:click="confirmArchive({{ $sanction->id }})"
+                                        wire:click="confirmSoftDelete({{ $sanction->id }})"
                                         class="p-1.5 text-amber-600 hover:text-amber-800 hover:bg-amber-50 rounded-lg transition-colors"
                                         title="Archiver">
                                         <x-iconify icon="heroicons:archive-box-arrow-down" class="w-4 h-4" />
-                                    </button>
-
-                                    {{-- Supprimer (Sanctions actives) --}}
-                                    <button
-                                        wire:click="deleteSanction({{ $sanction->id }})"
-                                        wire:confirm="Êtes-vous sûr de vouloir supprimer cette sanction ? Cette action est irréversible."
-                                        class="p-1.5 text-red-600 hover:text-red-800 hover:bg-red-50 rounded-lg transition-colors"
-                                        title="Supprimer">
-                                        <x-iconify icon="heroicons:trash" class="w-4 h-4" />
                                     </button>
                                     @endif
                                 </div>
@@ -1040,22 +1037,29 @@
                     <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-amber-100 sm:mx-0 sm:h-10 sm:w-10">
                         <x-iconify icon="heroicons:archive-box-arrow-down" class="h-6 w-6 text-amber-600" />
                     </div>
-                    <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+                    <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
                         <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-title">
                             Archiver la sanction
                         </h3>
-                        <div class="mt-2">
-                            <p class="text-sm text-gray-500">
-                                Êtes-vous sûr de vouloir archiver cette sanction ? Elle ne sera plus visible dans la liste active mais restera consultable dans l'historique (accessible via le bouton Archive).
+                        <div class="mt-2 text-sm text-gray-500">
+                            @if($modalSanction)
+                            <p class="mb-2">
+                                Voulez-vous archiver la sanction <strong>{{ $modalSanction->getSanctionTypeLabel() }}</strong> du chauffeur <strong>{{ $modalSanction->driver->first_name }} {{ $modalSanction->driver->last_name }}</strong> ?
                             </p>
+                            <p>
+                                Elle sera déplacée dans les archives et ne sera plus visible dans la liste principale.
+                            </p>
+                            @else
+                            <p>Chargement des détails...</p>
+                            @endif
                         </div>
                     </div>
                 </div>
                 <div class="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse">
-                    <button type="button" wire:click="executeArchive" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-amber-600 text-base font-medium text-white hover:bg-amber-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500 sm:ml-3 sm:w-auto sm:text-sm">
+                    <button type="button" wire:click="executeSoftDelete" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-amber-600 text-base font-medium text-white hover:bg-amber-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500 sm:ml-3 sm:w-auto sm:text-sm">
                         Archiver
                     </button>
-                    <button type="button" wire:click="cancelArchive" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:w-auto sm:text-sm">
+                    <button type="button" wire:click="cancelSoftDelete" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:w-auto sm:text-sm">
                         Annuler
                     </button>
                 </div>
@@ -1114,22 +1118,37 @@
                     <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
                         <x-iconify icon="heroicons:exclamation-triangle" class="h-6 w-6 text-red-600" />
                     </div>
-                    <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+                    <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
                         <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-title">
                             Suppression définitive
                         </h3>
-                        <div class="mt-2">
-                            <p class="text-sm text-gray-500">
-                                Êtes-vous sûr de vouloir supprimer définitivement cette sanction ?
-                                <br><br>
-                                <span class="text-red-600 font-bold">ATTENTION : Cette action est irréversible.</span> Toutes les données associées seront supprimées.
+                        <div class="mt-2 text-sm text-gray-500">
+                            @if($modalSanction)
+                            <p class="mb-4">
+                                Êtes-vous certain de vouloir supprimer <strong>DÉFINITIVEMENT</strong> la sanction <strong>{{ $modalSanction->getSanctionTypeLabel() }}</strong> du chauffeur <strong>{{ $modalSanction->driver->first_name }} {{ $modalSanction->driver->last_name }}</strong> ?
                             </p>
+                            @endif
+                            <div class="bg-red-50 border-l-4 border-red-500 p-4">
+                                <div class="flex">
+                                    <div class="flex-shrink-0">
+                                        <x-iconify icon="heroicons:exclamation-circle" class="h-5 w-5 text-red-400" />
+                                    </div>
+                                    <div class="ml-3">
+                                        <p class="text-xs text-red-700 font-bold uppercase tracking-wide">
+                                            Action Irréversible
+                                        </p>
+                                        <p class="text-sm text-red-600 mt-1">
+                                            Cette action supprimera définitivement la sanction, l'historique associé et les pièces jointes. Cette opération ne peut pas être annulée.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
                 <div class="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse">
                     <button type="button" wire:click="forceDelete" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:ml-3 sm:w-auto sm:text-sm">
-                        Supprimer définitivement
+                        Je confirme la suppression définitive
                     </button>
                     <button type="button" wire:click="cancelForceDelete" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:w-auto sm:text-sm">
                         Annuler

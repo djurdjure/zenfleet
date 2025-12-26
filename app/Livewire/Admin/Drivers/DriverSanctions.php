@@ -63,7 +63,7 @@ class DriverSanctions extends Component
     public ?string $duration_days = null;
     public $attachment = null;
     public ?string $existingAttachment = null;
-    public string $status = 'active'; // active, appealed, cancelled, archived
+    public string $status = 'active'; // active, appealed, cancelled
     public ?string $notes = null;
 
     // ===============================================
@@ -71,13 +71,9 @@ class DriverSanctions extends Component
     // ===============================================
 
     public bool $showArchiveModal = false;
-    public ?int $sanctionToArchive = null;
-
     public bool $showRestoreModal = false;
-    public ?int $sanctionToRestore = null;
-
     public bool $showForceDeleteModal = false;
-    public ?int $sanctionToForceDelete = null;
+    public ?DriverSanction $modalSanction = null;
 
     // ===============================================
     // RÈGLES DE VALIDATION
@@ -91,7 +87,7 @@ class DriverSanctions extends Component
         'sanction_date' => 'required|date|before_or_equal:today',
         'duration_days' => 'nullable|integer|min:1|max:365',
         'attachment' => 'nullable|file|mimes:pdf,jpg,jpeg,png,doc,docx|max:10240',
-        'status' => 'required|in:active,appealed,cancelled,archived',
+        'status' => 'required|in:active,appealed,cancelled',
         'notes' => 'nullable|string|max:1000',
     ];
 
@@ -289,95 +285,91 @@ class DriverSanctions extends Component
     // MÉTHODES DE CONFIRMATION
     // ===============================================
 
-    public function confirmArchive(int $id): void
+    public function confirmSoftDelete(int $id): void
     {
-        $this->sanctionToArchive = $id;
-        $this->showArchiveModal = true;
+        $this->modalSanction = DriverSanction::with('driver')->find($id);
+        if ($this->modalSanction) {
+            $this->showArchiveModal = true;
+        }
     }
 
-    public function cancelArchive(): void
+    public function cancelSoftDelete(): void
     {
         $this->showArchiveModal = false;
-        $this->sanctionToArchive = null;
+        $this->modalSanction = null;
     }
 
-    public function executeArchive(): void
+    public function executeSoftDelete(): void
     {
-        if ($this->sanctionToArchive) {
-            $sanction = DriverSanction::find($this->sanctionToArchive);
-            if ($sanction) {
-                $sanction->update(['status' => 'archived']);
-                $this->dispatch('notification', [
-                    'type' => 'success',
-                    'message' => 'Sanction archivée avec succès'
-                ]);
-            }
+        if ($this->modalSanction) {
+            $this->modalSanction->delete(); // Soft Delete standard
+            $this->dispatch('notification', [
+                'type' => 'success',
+                'message' => 'Sanction archivée avec succès'
+            ]);
         }
         $this->showArchiveModal = false;
-        $this->sanctionToArchive = null;
+        $this->modalSanction = null;
         $this->resetPage();
     }
 
     public function confirmRestore(int $id): void
     {
-        $this->sanctionToRestore = $id;
-        $this->showRestoreModal = true;
+        $this->modalSanction = DriverSanction::onlyTrashed()->with('driver')->find($id);
+        if ($this->modalSanction) {
+            $this->showRestoreModal = true;
+        }
     }
 
     public function cancelRestore(): void
     {
         $this->showRestoreModal = false;
-        $this->sanctionToRestore = null;
+        $this->modalSanction = null;
     }
 
     public function executeRestore(): void
     {
-        if ($this->sanctionToRestore) {
-            $sanction = DriverSanction::find($this->sanctionToRestore);
-            if ($sanction) {
-                $sanction->update(['status' => 'active']);
-                $this->dispatch('notification', [
-                    'type' => 'success',
-                    'message' => 'Sanction restaurée avec succès'
-                ]);
-            }
+        if ($this->modalSanction) {
+            $this->modalSanction->restore();
+            $this->dispatch('notification', [
+                'type' => 'success',
+                'message' => 'Sanction restaurée avec succès'
+            ]);
         }
         $this->showRestoreModal = false;
-        $this->sanctionToRestore = null;
+        $this->modalSanction = null;
         $this->resetPage();
     }
 
     public function confirmForceDelete(int $id): void
     {
-        $this->sanctionToForceDelete = $id;
-        $this->showForceDeleteModal = true;
+        $this->modalSanction = DriverSanction::onlyTrashed()->with('driver')->find($id);
+        if ($this->modalSanction) {
+            $this->showForceDeleteModal = true;
+        }
     }
 
     public function cancelForceDelete(): void
     {
         $this->showForceDeleteModal = false;
-        $this->sanctionToForceDelete = null;
+        $this->modalSanction = null;
     }
 
     public function forceDelete(): void
     {
-        if ($this->sanctionToForceDelete) {
+        if ($this->modalSanction) {
             try {
-                $sanction = DriverSanction::withTrashed()->find($this->sanctionToForceDelete);
-
-                if ($sanction) {
-                    // Delete attachment if exists
-                    if ($sanction->attachment_path) {
-                        Storage::disk('public')->delete($sanction->attachment_path);
-                    }
-
-                    $sanction->forceDelete();
-
-                    $this->dispatch('notification', [
-                        'type' => 'success',
-                        'message' => 'Sanction supprimée définitivement'
-                    ]);
+                // Delete attachment if exists
+                if ($this->modalSanction->attachment_path) {
+                    Storage::disk('public')->delete($this->modalSanction->attachment_path);
                 }
+
+                $this->modalSanction->forceDelete();
+
+                $this->dispatch('notification', [
+                    'type' => 'success',
+                    'message' => 'Sanction supprimée définitivement'
+                ]);
             } catch (\Exception $e) {
                 $this->dispatch('notification', [
                     'type' => 'error',
@@ -386,7 +378,7 @@ class DriverSanctions extends Component
             }
         }
         $this->showForceDeleteModal = false;
-        $this->sanctionToForceDelete = null;
+        $this->modalSanction = null;
         $this->resetPage();
     }
 
@@ -470,8 +462,9 @@ class DriverSanctions extends Component
                     // Ignore invalid dates
                 }
             })
-            ->when(!$this->showArchived, function ($query) {
-                $query->where('status', '!=', 'archived');
+            ->when($this->showArchived, function ($query) {
+                // Si on veut voir les archives, on inclut UNIQUEMENT les éléments supprimés (Soft Deleted)
+                $query->onlyTrashed();
             })
             ->orderBy($this->sortField, $this->sortDirection);
     }

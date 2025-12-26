@@ -56,6 +56,11 @@ class DriverSanction extends Model
      */
     protected $table = 'driver_sanctions';
 
+    // Status Constants
+    public const STATUS_ACTIVE = 'active';
+    public const STATUS_CANCELLED = 'cancelled';
+    public const STATUS_CONTESTED = 'appealed'; // Mapped to existing 'appealed' value
+
     /**
      * The attributes that are mass assignable.
      *
@@ -73,7 +78,6 @@ class DriverSanction extends Model
         'attachment_path',
         'status',
         'notes',
-        'archived_at',
     ];
 
     /**
@@ -83,7 +87,6 @@ class DriverSanction extends Model
      */
     protected $casts = [
         'sanction_date' => 'date',
-        'archived_at' => 'datetime',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
         'deleted_at' => 'datetime',
@@ -172,10 +175,22 @@ class DriverSanction extends Model
             }
         });
 
-        // Enregistrer automatiquement l'action dans l'historique lors de la suppression
+        // Enregistrer automatiquement l'action dans l'historique lors de la suppression (Soft Delete)
         static::deleted(function ($sanction) {
-            $sanction->recordHistory('deleted', [
-                'deleted_at' => now()->toDateTimeString(),
+            if ($sanction->isForceDeleting()) {
+                $sanction->recordHistory('force_deleted', [
+                    'deleted_at' => now()->toDateTimeString(),
+                ]);
+            } else {
+                $sanction->recordHistory('archived', [
+                    'archived_at' => now()->toDateTimeString(),
+                ]);
+            }
+        });
+
+        static::restored(function ($sanction) {
+            $sanction->recordHistory('restored', [
+                'restored_at' => now()->toDateTimeString(),
             ]);
         });
     }
@@ -223,24 +238,25 @@ class DriverSanction extends Model
 
     /**
      * Scope: Sanctions actives (non archivées)
+     * Note: SoftDeletes applique déjà `whereNull('deleted_at')` par défaut.
      *
      * @param Builder $query
      * @return Builder
      */
     public function scopeActive(Builder $query): Builder
     {
-        return $query->whereNull('archived_at');
+        return $query->whereNull('deleted_at');
     }
 
     /**
-     * Scope: Sanctions archivées
+     * Scope: Sanctions archivées (Soft Deleted)
      *
      * @param Builder $query
      * @return Builder
      */
     public function scopeArchived(Builder $query): Builder
     {
-        return $query->whereNotNull('archived_at');
+        return $query->onlyTrashed();
     }
 
     /**
@@ -296,7 +312,7 @@ class DriverSanction extends Model
      */
     public function getSanctionTypeIcon(): string
     {
-        return self::SANCTION_TYPES[$this->sanction_type]['icon'] ?? 'fa-exclamation-triangle';
+        return self::SANCTION_TYPES[$this->sanction_type]['icon'] ?? 'heroicons:exclamation-triangle';
     }
 
     /**
@@ -326,45 +342,27 @@ class DriverSanction extends Model
      */
     public function isArchived(): bool
     {
-        return $this->archived_at !== null;
+        return $this->trashed();
     }
 
     /**
-     * Archiver la sanction
+     * Archiver la sanction (Soft Delete)
      *
-     * @return bool
+     * @return bool|null
      */
-    public function archive(): bool
+    public function archive(): ?bool
     {
-        $this->archived_at = now();
-        $result = $this->save();
-
-        if ($result) {
-            $this->recordHistory('archived', [
-                'archived_at' => $this->archived_at->toDateTimeString(),
-            ]);
-        }
-
-        return $result;
+        return $this->delete();
     }
 
     /**
-     * Désarchiver la sanction
+     * Désarchiver la sanction (Restore)
      *
-     * @return bool
+     * @return bool|null
      */
-    public function unarchive(): bool
+    public function unarchive(): ?bool
     {
-        $this->archived_at = null;
-        $result = $this->save();
-
-        if ($result) {
-            $this->recordHistory('unarchived', [
-                'unarchived_at' => now()->toDateTimeString(),
-            ]);
-        }
-
-        return $result;
+        return $this->restore();
     }
 
     /**
