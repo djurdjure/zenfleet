@@ -499,7 +499,7 @@
                 <table class="min-w-full divide-y divide-gray-200">
                     <thead class="bg-gray-50">
                         <tr>
-                            <th class="px-6 py-3 text-left">
+                            <th class="px-3 py-2 text-left">
                                 <button wire:click="sortBy('driver_id')" class="flex items-center gap-1 text-xs font-medium text-gray-500 uppercase hover:text-gray-700">
                                     Chauffeur
                                     @if($sortField === 'driver_id')
@@ -507,7 +507,7 @@
                                     @endif
                                 </button>
                             </th>
-                            <th class="px-6 py-3 text-left">
+                            <th class="px-3 py-2 text-left">
                                 <button wire:click="sortBy('sanction_type')" class="flex items-center gap-1 text-xs font-medium text-gray-500 uppercase hover:text-gray-700">
                                     Type
                                     @if($sortField === 'sanction_type')
@@ -515,8 +515,8 @@
                                     @endif
                                 </button>
                             </th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Gravité</th>
-                            <th class="px-6 py-3 text-left">
+                            <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Gravité</th>
+                            <th class="px-3 py-2 text-left">
                                 <button wire:click="sortBy('sanction_date')" class="flex items-center gap-1 text-xs font-medium text-gray-500 uppercase hover:text-gray-700">
                                     Date
                                     @if($sortField === 'sanction_date')
@@ -524,20 +524,26 @@
                                     @endif
                                 </button>
                             </th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Motif</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Statut</th>
-                            <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Actions</th>
+                            <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Motif</th>
+                            <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Statut</th>
+                            <th class="px-3 py-2 text-right text-xs font-medium text-gray-500 uppercase">Actions</th>
                         </tr>
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-200">
                         @forelse($sanctions as $sanction)
                         <tr class="hover:bg-gray-50 transition-colors">
-                            <td class="px-6 py-4">
+                            <td class="px-3 py-2">
                                 @if($sanction->driver)
                                 <div class="flex items-center gap-3">
+                                    @if($sanction->driver->photo)
+                                    <img src="{{ asset('storage/' . $sanction->driver->photo) }}"
+                                        alt="{{ $sanction->driver->first_name }} {{ $sanction->driver->last_name }}"
+                                        class="w-10 h-10 rounded-full object-cover border-2 border-gray-200">
+                                    @else
                                     <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center text-white font-semibold text-sm">
                                         {{ substr($sanction->driver->first_name, 0, 1) }}{{ substr($sanction->driver->last_name, 0, 1) }}
                                     </div>
+                                    @endif
                                     <div>
                                         <p class="text-sm font-semibold text-gray-900">
                                             {{ $sanction->driver->first_name }} {{ $sanction->driver->last_name }}
@@ -559,13 +565,13 @@
                                 </div>
                                 @endif
                             </td>
-                            <td class="px-6 py-4">
+                            <td class="px-3 py-2">
                                 <span class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-{{ $sanction->getSanctionTypeColor() }}-100 text-{{ $sanction->getSanctionTypeColor() }}-800 text-xs font-medium rounded-full">
                                     <x-iconify icon="{{ $sanction->getSanctionTypeIcon() }}" class="w-3.5 h-3.5" />
                                     {{ $sanction->getSanctionTypeLabel() }}
                                 </span>
                             </td>
-                            <td class="px-6 py-4">
+                            <td class="px-3 py-2">
                                 @php
                                 $severityColors = [
                                 'low' => ['bg' => 'bg-green-100', 'text' => 'text-green-700'],
@@ -585,10 +591,10 @@
  } }}
                                 </span>
                             </td>
-                            <td class="px-6 py-4 text-sm text-gray-900">
+                            <td class="px-3 py-2 text-sm text-gray-900">
                                 {{ \Carbon\Carbon::parse($sanction->sanction_date)->format('d/m/Y') }}
                             </td>
-                            <td class="px-6 py-4">
+                            <td class="px-3 py-2">
                                 <p class="text-sm text-gray-900 line-clamp-2" title="{{ $sanction->reason }}">{{ $sanction->reason }}</p>
                                 @if($sanction->attachment_path)
                                 <a href="{{ $sanction->getAttachmentUrl() }}" target="_blank" class="inline-flex items-center mt-1 text-xs text-blue-600 hover:text-blue-800">
@@ -597,7 +603,7 @@
                                 </a>
                                 @endif
                             </td>
-                            <td class="px-6 py-4">
+                            <td class="px-3 py-2">
                                 @php
                                 $statusColors = [
                                 'active' => ['bg' => 'bg-green-100', 'text' => 'text-green-700'],
@@ -617,8 +623,8 @@
  } }}
                                 </span>
                             </td>
-                            <td class="px-6 py-4">
-                                <div class="flex items-center justify-end gap-2">
+                            <td class="px-3 py-2">
+                                <div class="flex items-center justify-end gap-1">
                                     {{-- Voir --}}
                                     <a href="{{ route('admin.drivers.sanctions.show', $sanction->id) }}"
                                         class="p-1.5 text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-lg transition-colors"
