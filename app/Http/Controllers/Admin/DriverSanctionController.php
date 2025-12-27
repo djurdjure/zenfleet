@@ -100,7 +100,7 @@ class DriverSanctionController extends Controller
     {
         $this->authorize('view', $sanction);
 
-        $sanction->load(['driver', 'supervisor']);
+        $sanction->load(['driver', 'supervisor', 'history.user']);
 
         return view('admin.drivers.sanctions.show', [
             'sanction' => $sanction,

@@ -160,14 +160,95 @@
             </div>
             @endif
 
-            {{-- Historique (Placeholder pour futur dev ou si existe) --}}
-            @if(method_exists($sanction, 'history') && $sanction->history->count() > 0)
-            <div class="bg-white shadow-xl rounded-2xl overflow-hidden border border-gray-100">
-                <div class="px-6 py-5 border-b border-gray-100 bg-gray-50 flex items-center">
-                    <x-iconify icon="heroicons:clock" class="w-5 h-5 text-gray-500 mr-2" />
-                    <h3 class="text-lg font-semibold text-gray-900">Historique des modifications</h3>
+            {{-- Historique des Modifications --}}
+            @if($sanction->history->count() > 0)
+            <div class="bg-white shadow-sm rounded-xl overflow-hidden border border-gray-200">
+                <div class="px-6 py-5 border-b border-gray-200 bg-gray-50 flex items-center justify-between">
+                    <div class="flex items-center">
+                        <x-iconify icon="heroicons:clock" class="w-5 h-5 text-indigo-500 mr-2" />
+                        <h3 class="text-lg font-semibold text-gray-900">Historique des modifications</h3>
+                    </div>
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800">
+                        {{ $sanction->history->count() }} {{ $sanction->history->count() > 1 ? 'événements' : 'événement' }}
+                    </span>
                 </div>
-                <!-- Implementation historique here if needed -->
+                <div class="p-6">
+                    <div class="flow-root">
+                        <ul role="list" class="-mb-8">
+                            @foreach($sanction->history as $index => $historyItem)
+                            <li>
+                                <div class="relative pb-8">
+                                    @if(!$loop->last)
+                                    <span class="absolute top-4 left-4 -ml-px h-full w-0.5 bg-gray-200" aria-hidden="true"></span>
+                                    @endif
+                                    <div class="relative flex space-x-3">
+                                        <div>
+                                            @php
+                                            $actionConfig = match($historyItem->action) {
+                                            'created' => ['icon' => 'heroicons:plus-circle', 'color' => 'bg-green-500'],
+                                            'updated' => ['icon' => 'heroicons:pencil-square', 'color' => 'bg-blue-500'],
+                                            'archived' => ['icon' => 'heroicons:archive-box', 'color' => 'bg-amber-500'],
+                                            'unarchived' => ['icon' => 'heroicons:arrow-path', 'color' => 'bg-green-500'],
+                                            'restored' => ['icon' => 'heroicons:arrow-path', 'color' => 'bg-teal-500'],
+                                            'deleted' => ['icon' => 'heroicons:trash', 'color' => 'bg-red-500'],
+                                            'force_deleted' => ['icon' => 'heroicons:x-circle', 'color' => 'bg-red-700'],
+                                            default => ['icon' => 'heroicons:information-circle', 'color' => 'bg-gray-500']
+                                            };
+                                            $actionLabel = match($historyItem->action) {
+                                            'created' => 'Création',
+                                            'updated' => 'Modification',
+                                            'archived' => 'Archivage',
+                                            'unarchived' => 'Désarchivage',
+                                            'restored' => 'Restauration',
+                                            'deleted' => 'Suppression',
+                                            'force_deleted' => 'Suppression définitive',
+                                            default => ucfirst($historyItem->action)
+                                            };
+                                            @endphp
+                                            <span class="h-8 w-8 rounded-full {{ $actionConfig['color'] }} flex items-center justify-center ring-8 ring-white">
+                                                <x-iconify icon="{{ $actionConfig['icon'] }}" class="h-5 w-5 text-white" />
+                                            </span>
+                                        </div>
+                                        <div class="flex-1 min-w-0">
+                                            <div class="flex items-center justify-between">
+                                                <div>
+                                                    <p class="text-sm font-semibold text-gray-900">{{ $actionLabel }}</p>
+                                                    <p class="mt-0.5 text-xs text-gray-500">
+                                                        Par <span class="font-medium text-gray-700">{{ $historyItem->user->name ?? 'Système' }}</span>
+                                                    </p>
+                                                </div>
+                                                <div class="text-right whitespace-nowrap text-xs text-gray-500">
+                                                    <div>{{ $historyItem->created_at->format('d/m/Y') }}</div>
+                                                    <div class="text-gray-400">{{ $historyItem->created_at->format('H:i') }}</div>
+                                                </div>
+                                            </div>
+                                            @if($historyItem->details && is_array($historyItem->details) && count($historyItem->details) > 0)
+                                            <div class="mt-2 text-sm text-gray-600 bg-gray-50 rounded-lg p-3 border border-gray-100">
+                                                @foreach($historyItem->details as $key => $value)
+                                                <div class="flex items-start gap-2 mb-1 last:mb-0">
+                                                    <x-iconify icon="heroicons:chevron-right" class="w-3 h-3 text-gray-400 mt-0.5 flex-shrink-0" />
+                                                    <span class="text-xs">
+                                                        <span class="font-medium text-gray-700">{{ ucfirst(str_replace('_', ' ', $key)) }}:</span>
+                                                        <span class="text-gray-600">{{ is_array($value) ? json_encode($value) : $value }}</span>
+                                                    </span>
+                                                </div>
+                                                @endforeach
+                                            </div>
+                                            @endif
+                                            @if($historyItem->ip_address)
+                                            <p class="mt-1 text-xs text-gray-400 flex items-center gap-1">
+                                                <x-iconify icon="heroicons:globe-alt" class="w-3 h-3" />
+                                                {{ $historyItem->ip_address }}
+                                            </p>
+                                            @endif
+                                        </div>
+                                    </div>
+                                </div>
+                            </li>
+                            @endforeach
+                        </ul>
+                    </div>
+                </div>
             </div>
             @endif
 
