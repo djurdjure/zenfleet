@@ -10,6 +10,9 @@ use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 use Livewire\WithPagination;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\MileageReadingsExport;
+use Illuminate\Support\Facades\Log;
 
 /**
  * MileageReadingsIndex - Vue globale des relevés kilométriques
@@ -147,10 +150,15 @@ class MileageReadingsIndex extends Component
     {
         $user = auth()->user();
 
-        $query = VehicleMileageReading::with([
-            'vehicle',
-            'recordedBy',
-        ])
+        // 🏗️ BASE QUERY
+        // On sélectionne explicitement toutes les colonnes de la table principale
+        // pour éviter les conflits lors des joins ou addSelect ultérieurs.
+        $query = VehicleMileageReading::query()
+            ->select('vehicle_mileage_readings.*')
+            ->with([
+                'vehicle',
+                'recordedBy',
+            ])
             ->where('organization_id', $user->organization_id);
 
         // 🔐 PERMISSION-BASED SCOPING
@@ -217,11 +225,14 @@ class MileageReadingsIndex extends Component
         // 📊 TRI
         if ($this->sortField === 'vehicle') {
             $query->join('vehicles', 'vehicle_mileage_readings.vehicle_id', '=', 'vehicles.id')
-                ->orderBy('vehicles.registration_plate', $this->sortDirection)
-                ->select('vehicle_mileage_readings.*');
+                ->orderBy('vehicles.registration_plate', $this->sortDirection);
         } else {
             $query->orderBy($this->sortField, $this->sortDirection);
         }
+
+        // 🧠 CALCUL INTELLIGENT DU KILOMÉTRAGE PRÉCÉDENT
+        // Utilisation du Scope défini dans le modèle pour encapsulation et réutilisabilité.
+        $query->withPreviousMileage();
 
         return $query->paginate($this->perPage);
     }
@@ -252,13 +263,14 @@ class MileageReadingsIndex extends Component
     /**
      * 👥 LISTE DES AUTEURS (POUR FILTRE)
      *
-     * Récupère uniquement les utilisateurs qui ont créé au moins un relevé
+     * Récupère les utilisateurs ET les chauffeurs qui ont créé au moins un relevé
      * kilométrique dans l'organisation courante.
      *
-     * Optimisations:
-     * - Cache query pour éviter requêtes répétées
-     * - Filtre multi-tenant (organization_id)
-     * - Select minimal (id, name) pour performance
+     * Enterprise-Grade:
+     * - Union Users + Drivers (chauffeurs peuvent aussi enregistrer relevés)
+     * - Filtre multi-tenant strict (organization_id)
+     * - Indication du type (user/driver) pour distinction visuelle
+     * - Tri alphabétique unique
      *
      * @return \Illuminate\Support\Collection
      */
@@ -266,14 +278,30 @@ class MileageReadingsIndex extends Component
     {
         $user = auth()->user();
 
-        return User::where('organization_id', $user->organization_id)
-            ->whereHas('mileageReadings', function ($query) use ($user) {
-                // Filtre supplémentaire: relevés de la même organisation
-                $query->where('organization_id', $user->organization_id);
-            })
-            ->select('id', 'name')
-            ->orderBy('name')
+        // IDs des utilisateurs/chauffeurs ayant enregistré au moins un relevé
+        $authorIds = VehicleMileageReading::where('organization_id', $user->organization_id)
+            ->whereNotNull('recorded_by_id')
+            ->distinct()
+            ->pluck('recorded_by_id');
+
+        if ($authorIds->isEmpty()) {
+            return collect([]);
+        }
+
+        // Récupérer les utilisateurs (table users)
+        $users = User::whereIn('id', $authorIds)
+            ->where('organization_id', $user->organization_id)
+            ->select('id', 'name', DB::raw("'user' as type"))
             ->get();
+
+        // Récupérer les chauffeurs (table drivers)
+        $drivers = \App\Models\Driver::whereIn('id', $authorIds)
+            ->where('organization_id', $user->organization_id)
+            ->select('id', DB::raw("CONCAT(first_name, ' ', last_name) as name"), DB::raw("'driver' as type"))
+            ->get();
+
+        // Fusionner et trier par nom
+        return $users->concat($drivers)->sortBy('name')->values();
     }
 
     /**
@@ -362,7 +390,7 @@ class MileageReadingsIndex extends Component
             $deletedMileage = $reading->mileage;
 
             DB::beginTransaction();
-            
+
             // Supprimer le relevé
             $reading->delete();
 
@@ -381,10 +409,9 @@ class MileageReadingsIndex extends Component
             DB::commit();
 
             session()->flash('success', "Relevé de " . number_format($deletedMileage) . " km supprimé avec succès.");
-            
+
             // Émettre un événement
             $this->dispatch('reading-deleted', vehicleId: $vehicleId);
-
         } catch (\Exception $e) {
             DB::rollBack();
             session()->flash('error', 'Erreur lors de la suppression : ' . $e->getMessage());
@@ -402,6 +429,72 @@ class MileageReadingsIndex extends Component
     {
         $this->deleteId = null;
         $this->showDeleteModal = false;
+    }
+
+    /**
+     * 📤 GESTION DES EXPORTS ENTERPRISE
+     */
+
+    protected function getFilters(): array
+    {
+        return [
+            'search' => $this->search,
+            'vehicle_id' => $this->vehicleFilter,
+            'method' => $this->methodFilter,
+            'recorded_by' => $this->authorFilter,
+            'date_from' => $this->dateFrom,
+            'date_to' => $this->dateTo,
+            'mileage_min' => $this->mileageMin,
+            'mileage_max' => $this->mileageMax,
+            'sort_by' => $this->sortField,
+            'sort_direction' => $this->sortDirection,
+        ];
+    }
+
+    public function exportExcel()
+    {
+        try {
+            return Excel::download(
+                new MileageReadingsExport($this->getFilters()),
+                'releves_kilometriques_' . date('Y-m-d_H-i') . '.xlsx'
+            );
+        } catch (\Exception $e) {
+            Log::error('Erreur export Excel: ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString()
+            ]);
+            $this->dispatch('toast', [
+                'type' => 'error',
+                'message' => 'Erreur lors de l\'export Excel: ' . $e->getMessage()
+            ]);
+        }
+    }
+
+    public function exportPdf()
+    {
+        try {
+            session(['mileage_export_filters' => $this->getFilters()]);
+            return redirect()->route('admin.mileage-readings.export.pdf');
+        } catch (\Exception $e) {
+            Log::error('Erreur export PDF: ' . $e->getMessage());
+            $this->dispatch('toast', [
+                'type' => 'error',
+                'message' => 'Erreur lors de l\'export PDF: ' . $e->getMessage()
+            ]);
+        }
+    }
+
+    public function exportCsv()
+    {
+        try {
+            session(['mileage_export_filters' => $this->getFilters()]);
+            return redirect()->route('admin.mileage-readings.export.csv');
+        } catch (\Exception $e) {
+            Log::error('Erreur export CSV: ' . $e->getMessage());
+            $this->dispatch('toast', [
+                'type' => 'error',
+                'message' => 'Erreur lors de l\'export CSV: ' . $e->getMessage()
+            ]);
+        }
     }
 
     /**

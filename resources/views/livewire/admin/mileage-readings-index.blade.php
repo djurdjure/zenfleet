@@ -63,7 +63,7 @@
             CARDS STATISTIQUES ENTERPRISE
         =============================================== --}}
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 mb-6">
-            
+
             {{-- 1. Total Relevés --}}
             <div class="bg-white rounded-lg border border-gray-200 p-4 hover:shadow-lg transition-shadow duration-300">
                 <div class="flex items-center justify-between">
@@ -74,17 +74,17 @@
                         </p>
                         <p class="text-xs text-gray-500 mt-1">
                             @if(($analytics['trend_30_days']['trend'] ?? '') === 'increasing')
-                                <span class="text-green-600">
-                                    <x-iconify icon="lucide:trending-up" class="w-3 h-3 inline" />
-                                    +{{ $analytics['trend_30_days']['percentage'] ?? 0 }}%
-                                </span>
+                            <span class="text-green-600">
+                                <x-iconify icon="lucide:trending-up" class="w-3 h-3 inline" />
+                                +{{ $analytics['trend_30_days']['percentage'] ?? 0 }}%
+                            </span>
                             @elseif(($analytics['trend_30_days']['trend'] ?? '') === 'decreasing')
-                                <span class="text-red-600">
-                                    <x-iconify icon="lucide:trending-down" class="w-3 h-3 inline" />
-                                    {{ $analytics['trend_30_days']['percentage'] ?? 0 }}%
-                                </span>
+                            <span class="text-red-600">
+                                <x-iconify icon="lucide:trending-down" class="w-3 h-3 inline" />
+                                {{ $analytics['trend_30_days']['percentage'] ?? 0 }}%
+                            </span>
                             @else
-                                <span>Stable</span>
+                            <span>Stable</span>
                             @endif
                         </p>
                     </div>
@@ -155,9 +155,9 @@
                         <p class="text-xs font-medium text-gray-600">KM Total</p>
                         <p class="text-2xl font-bold text-indigo-600 mt-1">
                             @if(($analytics['total_mileage_covered'] ?? 0) > 999999)
-                                {{ number_format(($analytics['total_mileage_covered'] ?? 0) / 1000000, 1) }}M
+                            {{ number_format(($analytics['total_mileage_covered'] ?? 0) / 1000000, 1) }}M
                             @else
-                                {{ number_format($analytics['total_mileage_covered'] ?? 0) }}
+                            {{ number_format($analytics['total_mileage_covered'] ?? 0) }}
                             @endif
                         </p>
                         <p class="text-xs text-gray-500 mt-1">
@@ -190,38 +190,40 @@
         </div>
 
         {{-- ===============================================
-            BARRE D'ACTIONS ENTERPRISE-GRADE (Sur 1 ligne)
+            BARRE D'ACTIONS ULTRA-PRO COMPACT
         =============================================== --}}
         <div class="mb-6" x-data="{ showFilters: false }">
-            <div class="bg-white shadow-sm rounded-lg border border-gray-200 p-4">
-                <div class="flex flex-col lg:flex-row items-start lg:items-center gap-3">
+            <div class="bg-white shadow-sm rounded-lg border border-gray-200 p-3">
+                <div class="flex items-center gap-2">
 
-                    {{-- Recherche Globale --}}
-                    <div class="flex-1 w-full lg:w-auto">
+                    {{-- Recherche Compacte --}}
+                    <div class="flex-1 max-w-md">
                         <div class="relative">
-                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                <x-iconify icon="lucide:search" class="w-5 h-5 text-gray-400" />
+                            <div class="absolute inset-y-0 left-0 pl-2.5 flex items-center pointer-events-none">
+                                <x-iconify icon="lucide:search" class="w-4 h-4 text-gray-400" />
                             </div>
                             <input
                                 wire:model.live.debounce.300ms="search"
                                 type="text"
-                                placeholder="Rechercher par véhicule, plaque, notes..."
-                                class="block w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm shadow-sm">
+                                placeholder="Rechercher..."
+                                class="block w-full pl-8 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm shadow-sm bg-gray-50 hover:border-gray-400 transition-colors">
                         </div>
                     </div>
 
-                    {{-- Boutons Actions --}}
-                    <div class="flex flex-wrap items-center gap-2">
+                    {{-- Boutons Actions ICONES UNIQUEMENT --}}
+                    <div class="flex items-center gap-1.5 ml-auto">
                         {{-- Bouton Filtrer (Toggle) --}}
                         <button
                             @click="showFilters = !showFilters"
                             type="button"
-                            class="inline-flex items-center gap-2 px-4 py-2.5 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-all duration-200 shadow-sm hover:shadow-md"
+                            title="Filtres"
+                            class="inline-flex items-center justify-center w-9 h-9 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-all duration-200 shadow-sm relative"
                             :class="showFilters ? 'ring-2 ring-blue-500 bg-blue-50' : ''">
-                            <x-iconify icon="lucide:filter" class="w-5 h-5 text-gray-500" />
-                            <span class="font-medium text-gray-700">Filtres</span>
+                            <x-iconify icon="lucide:filter" class="w-4 h-4 text-gray-600" />
                             @if($vehicleFilter || $methodFilter || $dateFrom || $dateTo || $authorFilter || $mileageMin || $mileageMax)
-                                <span class="inline-flex items-center justify-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-600 text-white">
+                            <span class="absolute -top-1 -right-1 flex h-4 w-4">
+                                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+                                <span class="relative inline-flex rounded-full h-4 w-4 bg-blue-600 text-white text-[10px] font-bold items-center justify-center">
                                     {{
                                         collect([
                                             $vehicleFilter ? 1 : 0,
@@ -234,182 +236,390 @@
                                         ])->sum()
                                     }}
                                 </span>
+                            </span>
                             @endif
-                            <x-iconify
-                                icon="heroicons:chevron-down"
-                                class="w-4 h-4 text-gray-400 transition-transform duration-200"
-                                x-bind:class="showFilters ? 'rotate-180' : ''" />
                         </button>
 
-                    {{-- Bouton Export --}}
-                    @can('export mileage readings')
-                    <div class="relative" x-data="{ showExportMenu: false }">
-                        <button
-                            @click="showExportMenu = !showExportMenu"
-                            @click.outside="showExportMenu = false"
-                            class="inline-flex items-center gap-2 px-4 py-2.5 bg-white border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors shadow-sm">
-                            <x-iconify icon="lucide:download" class="w-4 h-4" />
-                            Export
-                            <x-iconify icon="lucide:chevron-down" class="w-3 h-3" />
-                        </button>
+                        {{-- Bouton Export (Icon-only) --}}
+                        @can('export mileage readings')
+                        <div class="relative" x-data="{ showExportMenu: false }">
+                            <button
+                                @click="showExportMenu = !showExportMenu"
+                                @click.outside="showExportMenu = false"
+                                type="button"
+                                title="Export"
+                                class="inline-flex items-center justify-center w-9 h-9 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors shadow-sm">
+                                <x-iconify icon="lucide:download" class="w-4 h-4 text-gray-600" />
+                            </button>
 
-                        <div x-show="showExportMenu"
-                             x-transition
-                             class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 z-10">
-                            <button wire:click="exportCsv"
+                            <div x-show="showExportMenu"
+                                x-transition
+                                class="absolute right-0 mt-2 w-44 bg-white rounded-lg shadow-lg border border-gray-200 z-10">
+                                <button wire:click="exportCsv"
                                     @click="showExportMenu = false"
-                                    class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2 rounded-t-lg">
-                                <x-iconify icon="lucide:file-text" class="w-4 h-4" />
-                                Export CSV
-                            </button>
-                            <button wire:click="exportExcel"
+                                    class="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2 rounded-t-lg">
+                                    <x-iconify icon="lucide:file-text" class="w-4 h-4" />
+                                    Export CSV
+                                </button>
+                                <button wire:click="exportExcel"
                                     @click="showExportMenu = false"
-                                    class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2">
-                                <x-iconify icon="lucide:file-spreadsheet" class="w-4 h-4" />
-                                Export Excel
-                            </button>
-                            <button wire:click="exportPdf"
+                                    class="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2">
+                                    <x-iconify icon="lucide:file-spreadsheet" class="w-4 h-4" />
+                                    Export Excel
+                                </button>
+                                <button wire:click="exportPdf"
                                     @click="showExportMenu = false"
-                                    class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2 rounded-b-lg">
-                                <x-iconify icon="lucide:file" class="w-4 h-4" />
-                                Export PDF
-                            </button>
+                                    class="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2 rounded-b-lg">
+                                    <x-iconify icon="lucide:file" class="w-4 h-4" />
+                                    Export PDF
+                                </button>
+                            </div>
                         </div>
-                    </div>
-                    @endcan
+                        @endcan
 
-                    {{-- Bouton Nouveau Relevé --}}
-                    @can('create mileage readings')
-                    <a href="{{ route('admin.mileage-readings.update') }}"
-                       class="inline-flex items-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg shadow-sm hover:shadow transition-all">
-                        <x-iconify icon="lucide:plus" class="w-4 h-4" />
-                        Nouveau relevé
-                    </a>
-                    @endcan
+                        {{-- Bouton Nouveau Relevé (Icon-only) --}}
+                        @can('create mileage readings')
+                        <a href="{{ route('admin.mileage-readings.update') }}"
+                            title="Nouveau relevé"
+                            class="inline-flex items-center justify-center w-9 h-9 bg-blue-600 hover:bg-blue-700 text-white rounded-lg shadow-sm hover:shadow transition-all">
+                            <x-iconify icon="lucide:plus" class="w-5 h-5" />
+                        </a>
+                        @endcan
                     </div>
                 </div>
             </div>
 
             {{-- ===============================================
-                FILTRES COLLAPSIBLES (Alpine.js)
+                FILTRES COLLAPSIBLES (Alpine.js) - ULTRA PRO
             =============================================== --}}
             <div x-show="showFilters"
-                 x-transition:enter="transition ease-out duration-200"
-                 x-transition:enter-start="opacity-0 -translate-y-2"
-                 x-transition:enter-end="opacity-100 translate-y-0"
-                 x-transition:leave="transition ease-in duration-150"
-                 x-transition:leave-start="opacity-100 translate-y-0"
-                 x-transition:leave-end="opacity-0 -translate-y-2"
-                 class="mt-4 bg-white rounded-lg border border-gray-200 p-6 shadow-sm">
-                
+                x-transition:enter="transition ease-out duration-200"
+                x-transition:enter-start="opacity-0 -translate-y-2"
+                x-transition:enter-end="opacity-100 translate-y-0"
+                x-transition:leave="transition ease-in duration-150"
+                x-transition:leave-start="opacity-100 translate-y-0"
+                x-transition:leave-end="opacity-0 -translate-y-2"
+                class="mt-4 bg-white rounded-lg border border-gray-200 p-6 shadow-sm">
+
                 {{-- Ligne 1: Filtres principaux --}}
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4 mb-4">
-                    
-                    {{-- Véhicule --}}
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-4">
+
+                    {{-- Véhicule (col-span-2 sur large screens) --}}
                     <div class="lg:col-span-2">
-                        <label for="vehicle-select" class="block text-sm font-medium text-gray-700 mb-1">
-                            <x-iconify icon="lucide:car" class="w-4 h-4 inline mr-1" />
-                            Véhicule
-                        </label>
-                        <select 
+                        <label class="block text-sm font-medium text-gray-700 mb-1.5">Véhicule</label>
+                        <x-slim-select
                             wire:model.live="vehicleFilter"
-                            id="vehicle-select"
-                            class="block w-full border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-sm bg-white">
-                            <option value="">Tous les véhicules</option>
+                            name="vehicleFilter"
+                            placeholder="Tous les véhicules">
+                            <option value="" data-placeholder="true">Tous les véhicules</option>
                             @foreach($vehicles as $vehicle)
-                                <option value="{{ $vehicle->id }}">
-                                    {{ $vehicle->registration_plate }} - {{ $vehicle->brand }} {{ $vehicle->model }}
-                                </option>
+                            <option value="{{ $vehicle->id }}">
+                                {{ $vehicle->registration_plate }} - {{ $vehicle->brand }} {{ $vehicle->model }}
+                            </option>
                             @endforeach
-                        </select>
+                        </x-slim-select>
                     </div>
 
                     {{-- Méthode --}}
                     <div>
-                        <label for="method-filter" class="block text-sm font-medium text-gray-700 mb-1">
-                            <x-iconify icon="lucide:settings" class="w-4 h-4 inline mr-1" />
-                            Méthode
-                        </label>
-                        <select 
+                        <label class="block text-sm font-medium text-gray-700 mb-1.5">Méthode</label>
+                        <x-slim-select
                             wire:model.live="methodFilter"
-                            id="method-filter"
-                            class="block w-full border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-sm">
-                            <option value="">Toutes</option>
+                            name="methodFilter"
+                            placeholder="Toutes">
+                            <option value="" data-placeholder="true">Toutes</option>
                             <option value="manual">Manuel</option>
                             <option value="automatic">Automatique</option>
-                        </select>
+                        </x-slim-select>
                     </div>
 
-                    {{-- Date de --}}
-                    <div>
-                        <label for="date-from" class="block text-sm font-medium text-gray-700 mb-1">
-                            <x-iconify icon="lucide:calendar" class="w-4 h-4 inline mr-1" />
-                            Du
-                        </label>
-                        <input 
-                            wire:model.live="dateFrom"
-                            type="date"
-                            id="date-from"
-                            class="block w-full border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-sm">
+                    {{-- Date de (Calendrier Popup Style Sanctions) --}}
+                    <div x-data="{
+                        showCalendar: false,
+                        selectedDate: @entangle('dateFrom'),
+                        displayDate: '',
+                        currentMonth: new Date().getMonth(),
+                        currentYear: new Date().getFullYear(),
+                        days: [],
+                        init() {
+                            this.parseDate();
+                            this.generateCalendar();
+                        },
+                        parseDate() {
+                            if (this.selectedDate) {
+                                const parts =this.selectedDate.split('-');
+                                if (parts.length === 3) {
+                                    this.displayDate = `${parts[2]}/${parts[1]}/${parts[0]}`;
+                                    this.currentYear = parseInt(parts[0]);
+                                    this.currentMonth = parseInt(parts[1]) - 1;
+                                }
+                            } else {
+                                this.displayDate = '';
+                            }
+                        },
+                        generateCalendar() {
+                            this.days = [];
+                            const firstDay = new Date(this.currentYear, this.currentMonth, 1);
+                            const lastDay = new Date(this.currentYear, this.currentMonth + 1, 0);
+                            const startPadding = firstDay.getDay() === 0 ? 6 : firstDay.getDay() - 1;
+                            for (let i = 0; i < startPadding; i++) {
+                                this.days.push({ day: '', disabled: true });
+                            }
+                            const today = new Date();
+                            today.setHours(0, 0, 0, 0);
+                            for (let d = 1; d <= lastDay.getDate(); d++) {
+                                const date = new Date(this.currentYear, this.currentMonth, d);
+                                this.days.push({
+                                    day: d,
+                                    disabled: date > today,
+                                    isToday: date.getTime() === today.getTime(),
+                                    isSelected: this.selectedDate === `${this.currentYear}-${String(this.currentMonth + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`
+                                });
+                            }
+                        },
+                        selectDay(day) {
+                            if (day.disabled || !day.day) return;
+                            this.selectedDate = `${this.currentYear}-${String(this.currentMonth + 1).padStart(2, '0')}-${String(day.day).padStart(2, '0')}`;
+                            this.displayDate = `${String(day.day).padStart(2, '0')}/${String(this.currentMonth + 1).padStart(2, '0')}/${this.currentYear}`;
+                            this.generateCalendar();
+                            this.showCalendar = false;
+                        },
+                        clearDate() {
+                            this.selectedDate = '';
+                            this.displayDate = '';
+                            this.generateCalendar();
+                        },
+                        prevMonth() {
+                            if (this.currentMonth === 0) {
+                                this.currentMonth = 11;
+                                this.currentYear--;
+                            } else {
+                                this.currentMonth--;
+                            }
+                            this.generateCalendar();
+                        },
+                        nextMonth() {
+                            const today = new Date();
+                            const nextMonth = new Date(this.currentYear, this.currentMonth + 1, 1);
+                            if (nextMonth <= today) {
+                                if (this.currentMonth === 11) {
+                                    this.currentMonth = 0;
+                                    this.currentYear++;
+                                } else {
+                                    this.currentMonth++;
+                                }
+                                this.generateCalendar();
+                            }
+                        },
+                        monthNames: ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre']
+                    }" x-init="$watch('selectedDate', () => parseDate())">
+                        <label class="block text-sm font-medium text-gray-700 mb-1.5">Du</label>
+                        <div class="relative">
+                            <input
+                                type="text"
+                                x-model="displayDate"
+                                @click="showCalendar = !showCalendar"
+                                readonly
+                                placeholder="JJ/MM/AAAA"
+                                class="w-full px-4 py-2.5 pl-10 bg-gray-50 border border-gray-300 text-sm text-gray-900 rounded-lg shadow-sm transition-all cursor-pointer focus:border-blue-500 focus:ring-2 focus:ring-blue-500 hover:border-gray-400">
+                            <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                                <x-iconify icon="lucide:calendar" class="w-4 h-4 text-gray-400" />
+                            </div>
+                            <div x-show="showCalendar" x-transition @click.away="showCalendar = false" class="absolute z-50 mt-2 bg-white rounded-xl shadow-2xl border border-gray-200 p-4 w-72">
+                                <div class="flex items-center justify-between mb-4">
+                                    <button type="button" @click="prevMonth()" class="p-1 hover:bg-gray-100 rounded-lg">
+                                        <x-iconify icon="heroicons:chevron-left" class="w-5 h-5 text-gray-600" />
+                                    </button>
+                                    <span class="font-semibold text-gray-900" x-text="monthNames[currentMonth] + ' ' + currentYear"></span>
+                                    <button type="button" @click="nextMonth()" class="p-1 hover:bg-gray-100 rounded-lg">
+                                        <x-iconify icon="heroicons:chevron-right" class="w-5 h-5 text-gray-600" />
+                                    </button>
+                                </div>
+                                <div class="grid grid-cols-7 gap-1 mb-2">
+                                    <template x-for="day in ['Lu', 'Ma', 'Me', 'Je', 'Ve', 'Sa', 'Di']">
+                                        <div class="text-center text-xs font-semibold text-gray-500 py-1" x-text="day"></div>
+                                    </template>
+                                </div>
+                                <div class="grid grid-cols-7 gap-1">
+                                    <template x-for="(day, index) in days" :key="index">
+                                        <button type="button" @click="selectDay(day)" :disabled="day.disabled"
+                                            :class="{
+                                                'bg-blue-600 text-white': day.isSelected,
+                                                'bg-blue-100 text-blue-800': day.isToday && !day.isSelected,
+                                                'hover:bg-gray-100': !day.disabled && !day.isSelected,
+                                                'text-gray-300 cursor-not-allowed': day.disabled,
+                                                'text-gray-700': !day.disabled && !day.isSelected
+                                            }"
+                                            class="w-8 h-8 flex items-center justify-center text-sm rounded-lg transition-colors" x-text="day.day">
+                                        </button>
+                                    </template>
+                                </div>
+                                <div class="mt-3 pt-3 border-t border-gray-200">
+                                    <button type="button" @click="clearDate(); showCalendar = false" class="w-full text-center text-xs text-gray-600 hover:text-gray-900">Effacer</button>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
-                    {{-- Date à --}}
-                    <div>
-                        <label for="date-to" class="block text-sm font-medium text-gray-700 mb-1">
-                            <x-iconify icon="lucide:calendar" class="w-4 h-4 inline mr-1" />
-                            Au
-                        </label>
-                        <input 
-                            wire:model.live="dateTo"
-                            type="date"
-                            id="date-to"
-                            class="block w-full border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-sm">
-                    </div>
-
-                    {{-- Pagination Par Page --}}
-                    <div>
-                        <label for="per-page" class="block text-sm font-medium text-gray-700 mb-1">
-                            <x-iconify icon="lucide:list" class="w-4 h-4 inline mr-1" />
-                            Par page
-                        </label>
-                        <select 
-                            wire:model.live="perPage"
-                            id="per-page"
-                            class="block w-full border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-sm">
-                            <option value="25">25</option>
-                            <option value="50">50</option>
-                            <option value="100">100</option>
-                        </select>
+                    {{-- Date à (Calendrier Popup Style Sanctions) --}}
+                    <div x-data="{
+                        showCalendar: false,
+                        selectedDate: @entangle('dateTo'),
+                        displayDate: '',
+                        currentMonth: new Date().getMonth(),
+                        currentYear: new Date().getFullYear(),
+                        days: [],
+                        init() {
+                            this.parseDate();
+                            this.generateCalendar();
+                        },
+                        parseDate() {
+                            if (this.selectedDate) {
+                                const parts = this.selectedDate.split('-');
+                                if (parts.length === 3) {
+                                    this.displayDate = `${parts[2]}/${parts[1]}/${parts[0]}`;
+                                    this.currentYear = parseInt(parts[0]);
+                                    this.currentMonth = parseInt(parts[1]) - 1;
+                                }
+                            } else {
+                                this.displayDate = '';
+                            }
+                        },
+                        generateCalendar() {
+                            this.days = [];
+                            const firstDay = new Date(this.currentYear, this.currentMonth, 1);
+                            const lastDay = new Date(this.currentYear, this.currentMonth + 1, 0);
+                            const startPadding = firstDay.getDay() === 0 ? 6 : firstDay.getDay() - 1;
+                            for (let i = 0; i < startPadding; i++) {
+                                this.days.push({ day: '', disabled: true });
+                            }
+                            const today = new Date();
+                            today.setHours(0, 0, 0, 0);
+                            for (let d = 1; d <= lastDay.getDate(); d++) {
+                                const date = new Date(this.currentYear, this.currentMonth, d);
+                                this.days.push({
+                                    day: d,
+                                    disabled: date > today,
+                                    isToday: date.getTime() === today.getTime(),
+                                    isSelected: this.selectedDate === `${this.currentYear}-${String(this.currentMonth + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`
+                                });
+                            }
+                        },
+                        selectDay(day) {
+                            if (day.disabled || !day.day) return;
+                            this.selectedDate = `${this.currentYear}-${String(this.currentMonth + 1).padStart(2, '0')}-${String(day.day).padStart(2, '0')}`;
+                            this.displayDate = `${String(day.day).padStart(2, '0')}/${String(this.currentMonth + 1).padStart(2, '0')}/${this.currentYear}`;
+                            this.generateCalendar();
+                            this.showCalendar = false;
+                        },
+                        clearDate() {
+                            this.selectedDate = '';
+                            this.displayDate = '';
+                            this.generateCalendar();
+                        },
+                        prevMonth() {
+                            if (this.currentMonth === 0) {
+                                this.currentMonth = 11;
+                                this.currentYear--;
+                            } else {
+                                this.currentMonth--;
+                            }
+                            this.generateCalendar();
+                        },
+                        nextMonth() {
+                            const today = new Date();
+                            const nextMonth = new Date(this.currentYear, this.currentMonth + 1, 1);
+                            if (nextMonth <= today) {
+                                if (this.currentMonth === 11) {
+                                    this.currentMonth = 0;
+                                    this.currentYear++;
+                                } else {
+                                    this.currentMonth++;
+                                }
+                                this.generateCalendar();
+                            }
+                        },
+                        monthNames: ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre']
+                    }" x-init="$watch('selectedDate', () => parseDate())">
+                        <label class="block text-sm font-medium text-gray-700 mb-1.5">Au</label>
+                        <div class="relative">
+                            <input
+                                type="text"
+                                x-model="displayDate"
+                                @click="showCalendar = !showCalendar"
+                                readonly
+                                placeholder="JJ/MM/AAAA"
+                                class="w-full px-4 py-2.5 pl-10 bg-gray-50 border border-gray-300 text-sm text-gray-900 rounded-lg shadow-sm transition-all cursor-pointer focus:border-blue-500 focus:ring-2 focus:ring-blue-500 hover:border-gray-400">
+                            <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                                <x-iconify icon="lucide:calendar" class="w-4 h-4 text-gray-400" />
+                            </div>
+                            <div x-show="showCalendar" x-transition @click.away="showCalendar = false" class="absolute z-50 mt-2 bg-white rounded-xl shadow-2xl border border-gray-200 p-4 w-72">
+                                <div class="flex items-center justify-between mb-4">
+                                    <button type="button" @click="prevMonth()" class="p-1 hover:bg-gray-100 rounded-lg">
+                                        <x-iconify icon="heroicons:chevron-left" class="w-5 h-5 text-gray-600" />
+                                    </button>
+                                    <span class="font-semibold text-gray-900" x-text="monthNames[currentMonth] + ' ' + currentYear"></span>
+                                    <button type="button" @click="nextMonth()" class="p-1 hover:bg-gray-100 rounded-lg">
+                                        <x-iconify icon="heroicons:chevron-right" class="w-5 h-5 text-gray-600" />
+                                    </button>
+                                </div>
+                                <div class="grid grid-cols-7 gap-1 mb-2">
+                                    <template x-for="day in ['Lu', 'Ma', 'Me', 'Je', 'Ve', 'Sa', 'Di']">
+                                        <div class="text-center text-xs font-semibold text-gray-500 py-1" x-text="day"></div>
+                                    </template>
+                                </div>
+                                <div class="grid grid-cols-7 gap-1">
+                                    <template x-for="(day, index) in days" :key="index">
+                                        <button type="button" @click="selectDay(day)" :disabled="day.disabled"
+                                            :class="{
+                                                'bg-blue-600 text-white': day.isSelected,
+                                                'bg-blue-100 text-blue-800': day.isToday && !day.isSelected,
+                                                'hover:bg-gray-100': !day.disabled && !day.isSelected,
+                                                'text-gray-300 cursor-not-allowed': day.disabled,
+                                                'text-gray-700': !day.disabled && !day.isSelected
+                                            }"
+                                            class="w-8 h-8 flex items-center justify-center text-sm rounded-lg transition-colors" x-text="day.day">
+                                        </button>
+                                    </template>
+                                </div>
+                                <div class="mt-3 pt-3 border-t border-gray-200">
+                                    <button type="button" @click="clearDate(); showCalendar = false" class="w-full text-center text-xs text-gray-600 hover:text-gray-900">Effacer</button>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
                 {{-- Ligne 2: Filtres avancés --}}
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                    
-                    {{-- Utilisateur --}}
+
+                    {{-- Utilisateur / Chauffeur --}}
                     <div>
-                        <label for="author-filter" class="block text-sm font-medium text-gray-700 mb-1">
-                            <x-iconify icon="lucide:user" class="w-4 h-4 inline mr-1" />
-                            Utilisateur
+                        <label class="block text-sm font-medium text-gray-700 mb-1.5">
+                            Enregistré par
                         </label>
-                        <select 
+                        <x-slim-select
                             wire:model.live="authorFilter"
-                            id="author-filter"
-                            class="block w-full border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-sm">
-                            <option value="">Tous</option>
+                            name="authorFilter"
+                            placeholder="Tous">
+                            <option value="" data-placeholder="true">Tous</option>
                             @foreach($authors as $author)
-                                <option value="{{ $author->id }}">{{ $author->name }}</option>
+                            <option value="{{ $author->id }}">
+                                {{ $author->name }}
+                                @if($author->type === 'driver')
+                                (Chauffeur)
+                                @endif
+                            </option>
                             @endforeach
-                        </select>
+                        </x-slim-select>
                     </div>
 
                     {{-- KM Min --}}
                     <div>
-                        <label for="mileage-min" class="block text-sm font-medium text-gray-700 mb-1">
-                            <x-iconify icon="lucide:gauge" class="w-4 h-4 inline mr-1" />
+                        <label for="mileage-min" class="block text-sm font-medium text-gray-700 mb-1.5">
                             KM Min
                         </label>
-                        <input 
+                        <input
                             wire:model.live.debounce.500ms="mileageMin"
                             type="number"
                             id="mileage-min"
@@ -419,11 +629,10 @@
 
                     {{-- KM Max --}}
                     <div>
-                        <label for="mileage-max" class="block text-sm font-medium text-gray-700 mb-1">
-                            <x-iconify icon="lucide:gauge" class="w-4 h-4 inline mr-1" />
+                        <label for="mileage-max" class="block text-sm font-medium text-gray-700 mb-1.5">
                             KM Max
                         </label>
-                        <input 
+                        <input
                             wire:model.live.debounce.500ms="mileageMax"
                             type="number"
                             id="mileage-max"
@@ -433,7 +642,7 @@
 
                     {{-- Actions Filtres --}}
                     <div class="flex items-end gap-2">
-                        <button 
+                        <button
                             wire:click="resetFilters"
                             class="flex-1 inline-flex items-center justify-center gap-2 px-3 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors">
                             <x-iconify icon="lucide:x" class="w-4 h-4" />
@@ -457,223 +666,220 @@
         </div>
 
         {{-- ===============================================
-            TABLE DONNÉES ULTRA-PRO
+            TABLE DONNÉES ULTRA-PRO ENTERPRISE
         =============================================== --}}
         <div class="bg-white shadow-sm rounded-lg border border-gray-200 overflow-hidden">
             <div class="overflow-x-auto">
+                {{-- Table avec espacement réduit et polices affinées --}}
                 <table class="min-w-full divide-y divide-gray-200">
-                    <thead class="bg-gray-50">
-                        <tr>
-                            <th wire:click="sortBy('vehicle')" 
-                                class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors">
+                    <thead>
+                        <tr class="bg-gray-50 border-b border-gray-100">
+                            {{-- Header: Véhicule --}}
+                            <th wire:click="sortBy('vehicle')"
+                                class="group px-4 py-3 text-left text-[11px] font-semibold text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 hover:text-gray-700 transition-colors">
                                 <div class="flex items-center gap-1.5">
-                                    <x-iconify icon="lucide:car" class="w-4 h-4" />
                                     <span>Véhicule</span>
                                     @if($sortField === 'vehicle')
-                                        <x-iconify icon="lucide:{{ $sortDirection === 'asc' ? 'chevron-up' : 'chevron-down' }}" class="w-4 h-4 text-blue-600" />
+                                    <x-iconify icon="lucide:{{ $sortDirection === 'asc' ? 'chevron-up' : 'chevron-down' }}" class="w-3.5 h-3.5 text-blue-600" />
                                     @endif
                                 </div>
                             </th>
 
+                            {{-- Header: Kilométrage --}}
                             <th wire:click="sortBy('mileage')"
-                                class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors">
+                                class="group px-4 py-3 text-left text-[11px] font-semibold text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 hover:text-gray-700 transition-colors">
                                 <div class="flex items-center gap-1.5">
-                                    <x-iconify icon="lucide:gauge" class="w-4 h-4" />
                                     <span>Kilométrage</span>
                                     @if($sortField === 'mileage')
-                                        <x-iconify icon="lucide:{{ $sortDirection === 'asc' ? 'chevron-up' : 'chevron-down' }}" class="w-4 h-4 text-blue-600" />
+                                    <x-iconify icon="lucide:{{ $sortDirection === 'asc' ? 'chevron-up' : 'chevron-down' }}" class="w-3.5 h-3.5 text-blue-600" />
                                     @endif
                                 </div>
                             </th>
 
-                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                <div class="flex items-center gap-1.5">
-                                    <x-iconify icon="lucide:trending-up" class="w-4 h-4" />
-                                    <span>Différence</span>
-                                </div>
+                            {{-- Header: Différence --}}
+                            <th class="px-4 py-3 text-left text-[11px] font-semibold text-gray-500 uppercase tracking-wider">
+                                <span>Diff.</span>
                             </th>
 
+                            {{-- Header: Date/Heure --}}
                             <th wire:click="sortBy('recorded_at')"
-                                class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors">
+                                class="group px-4 py-3 text-left text-[11px] font-semibold text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 hover:text-gray-700 transition-colors">
                                 <div class="flex items-center gap-1.5">
-                                    <x-iconify icon="lucide:calendar-clock" class="w-4 h-4" />
-                                    <span>Date/Heure Relevé</span>
+                                    <span>Date</span>
                                     @if($sortField === 'recorded_at')
-                                        <x-iconify icon="lucide:{{ $sortDirection === 'asc' ? 'chevron-up' : 'chevron-down' }}" class="w-4 h-4 text-blue-600" />
+                                    <x-iconify icon="lucide:{{ $sortDirection === 'asc' ? 'chevron-up' : 'chevron-down' }}" class="w-3.5 h-3.5 text-blue-600" />
                                     @endif
                                 </div>
                             </th>
 
+                            {{-- Header: Enregistré Le --}}
                             <th wire:click="sortBy('created_at')"
-                                class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors">
+                                class="group px-4 py-3 text-left text-[11px] font-semibold text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 hover:text-gray-700 transition-colors">
                                 <div class="flex items-center gap-1.5">
-                                    <x-iconify icon="lucide:database" class="w-4 h-4" />
-                                    <span>Enregistré Le</span>
+                                    <span>Système</span>
                                     @if($sortField === 'created_at')
-                                        <x-iconify icon="lucide:{{ $sortDirection === 'asc' ? 'chevron-up' : 'chevron-down' }}" class="w-4 h-4 text-blue-600" />
+                                    <x-iconify icon="lucide:{{ $sortDirection === 'asc' ? 'chevron-up' : 'chevron-down' }}" class="w-3.5 h-3.5 text-blue-600" />
                                     @endif
                                 </div>
                             </th>
 
+                            {{-- Header: Méthode --}}
                             <th wire:click="sortBy('recording_method')"
-                                class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors">
+                                class="group px-4 py-3 text-left text-[11px] font-semibold text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 hover:text-gray-700 transition-colors">
                                 <div class="flex items-center gap-1.5">
-                                    <x-iconify icon="lucide:settings" class="w-4 h-4" />
                                     <span>Méthode</span>
                                     @if($sortField === 'recording_method')
-                                        <x-iconify icon="lucide:{{ $sortDirection === 'asc' ? 'chevron-up' : 'chevron-down' }}" class="w-4 h-4 text-blue-600" />
+                                    <x-iconify icon="lucide:{{ $sortDirection === 'asc' ? 'chevron-up' : 'chevron-down' }}" class="w-3.5 h-3.5 text-blue-600" />
                                     @endif
                                 </div>
                             </th>
 
-                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                <div class="flex items-center gap-1.5">
-                                    <x-iconify icon="lucide:user" class="w-4 h-4" />
-                                    <span>Rapporté Par</span>
-                                </div>
+                            {{-- Header: Rapporté Par --}}
+                            <th class="px-4 py-3 text-left text-[11px] font-semibold text-gray-500 uppercase tracking-wider">
+                                <span>Par</span>
                             </th>
 
-                            <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Actions
+                            {{-- Header: Actions --}}
+                            <th class="px-4 py-3 text-center text-[11px] font-semibold text-gray-500 uppercase tracking-wider w-20">
+                                <span class="sr-only">Actions</span>
                             </th>
                         </tr>
                     </thead>
-                    <tbody class="bg-white divide-y divide-gray-200">
+                    <tbody class="bg-white divide-y divide-gray-100">
                         @forelse ($readings as $reading)
-                        <tr class="hover:bg-gray-50 transition-colors duration-200">
-                            {{-- Véhicule --}}
-                            <td class="px-4 py-3 whitespace-nowrap">
+                        {{-- Row: Compact padding, hover effect --}}
+                        <tr class="hover:bg-blue-50/30 transition-colors duration-150 group">
+
+                            {{-- Cell: Véhicule --}}
+                            <td class="px-3 py-2.5 whitespace-nowrap">
                                 <div class="flex items-center">
-                                    <div class="w-10 h-10 bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg flex items-center justify-center mr-3">
-                                        <x-iconify icon="lucide:car" class="w-5 h-5 text-blue-600" />
+                                    <div class="w-8 h-8 rounded-lg bg-gray-50 border border-gray-100 flex items-center justify-center mr-2.5 group-hover:bg-white group-hover:border-blue-100 transition-colors">
+                                        <x-iconify icon="lucide:car" class="w-4 h-4 text-gray-500 group-hover:text-blue-600 transition-colors" />
                                     </div>
-                                    <div>
-                                        <div class="text-sm font-semibold text-gray-900">
+                                    <div class="flex flex-col">
+                                        <div class="text-[13px] font-bold text-gray-900 leading-tight">
                                             {{ $reading->vehicle->registration_plate }}
                                         </div>
-                                        <div class="text-xs text-gray-500">
+                                        <div class="text-[10px] text-gray-500 uppercase tracking-wide">
                                             {{ $reading->vehicle->brand }} {{ $reading->vehicle->model }}
                                         </div>
                                     </div>
                                 </div>
                             </td>
 
-                            {{-- Kilométrage --}}
+                            {{-- Cell: Kilométrage - STYLE PRO CLEAN --}}
                             <td class="px-4 py-3 whitespace-nowrap">
-                                <div class="text-base font-bold text-gray-900">
-                                    {{ number_format($reading->mileage) }}
-                                    <span class="text-xs font-normal text-gray-500">km</span>
+                                <div class="flex items-baseline font-mono tracking-tight">
+                                    <span class="text-[13px] font-bold text-gray-900">
+                                        {{ number_format($reading->mileage, 0, ',', ' ') }}
+                                    </span>
+                                    <span class="text-[11px] font-medium text-gray-500 ml-1">km</span>
                                 </div>
                             </td>
 
-                            {{-- Différence --}}
-                            <td class="px-4 py-3 whitespace-nowrap">
+                            {{-- Cell: Différence --}}
+                            <td class="px-3 py-2.5 whitespace-nowrap">
                                 @php
-                                    $difference = $reading->previous_mileage 
-                                        ? $reading->mileage - $reading->previous_mileage
-                                        : null;
+                                $difference = $reading->previous_mileage
+                                ? $reading->mileage - $reading->previous_mileage
+                                : null;
                                 @endphp
                                 @if($difference !== null)
-                                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800">
-                                        <x-iconify icon="lucide:plus" class="w-3 h-3" />
-                                        {{ number_format($difference) }} km
-                                    </span>
+                                @if($difference > 1000)
+                                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-100">
+                                    <x-iconify icon="lucide:trending-up" class="w-3 h-3" />
+                                    +{{ number_format($difference, 0, ',', ' ') }}
+                                </span>
                                 @else
-                                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-600">
-                                        <x-iconify icon="lucide:flag" class="w-3 h-3" />
-                                        Premier
-                                    </span>
+                                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-medium bg-gray-50 text-gray-600 border border-gray-100">
+                                    <x-iconify icon="lucide:plus" class="w-3 h-3 text-gray-400" />
+                                    {{ number_format($difference, 0, ',', ' ') }}
+                                </span>
+                                @endif
+                                @else
+                                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-medium bg-blue-50 text-blue-600 border border-blue-100">
+                                    <x-iconify icon="lucide:flag" class="w-3 h-3" />
+                                    Initial
+                                </span>
                                 @endif
                             </td>
 
-                            {{-- Date/Heure du Relevé --}}
-                            <td class="px-4 py-3 whitespace-nowrap">
-                                <div class="flex items-center gap-2">
-                                    <div class="w-8 h-8 bg-green-50 rounded-lg flex items-center justify-center">
-                                        <x-iconify icon="lucide:calendar-clock" class="w-4 h-4 text-green-600" />
+                            {{-- Cell: Date/Heure --}}
+                            <td class="px-3 py-2.5 whitespace-nowrap">
+                                <div class="flex flex-col">
+                                    <div class="text-[12px] font-semibold text-gray-800">
+                                        {{ $reading->recorded_at->format('d/m/Y') }}
                                     </div>
-                                    <div>
-                                        <div class="text-sm font-medium text-gray-900">
-                                            {{ $reading->recorded_at->format('d/m/Y') }}
-                                        </div>
-                                        <div class="text-xs text-gray-500 font-mono">
-                                            {{ $reading->recorded_at->format('H:i') }}
-                                        </div>
+                                    <div class="text-[10px] text-gray-400 font-mono">
+                                        {{ $reading->recorded_at->format('H:i') }}
                                     </div>
                                 </div>
                             </td>
 
-                            {{-- Date/Heure Enregistrement Système --}}
-                            <td class="px-4 py-3 whitespace-nowrap">
-                                <div class="flex items-center gap-2">
-                                    <div class="w-8 h-8 bg-purple-50 rounded-lg flex items-center justify-center">
-                                        <x-iconify icon="lucide:database" class="w-4 h-4 text-purple-600" />
+                            {{-- Cell: Système --}}
+                            <td class="px-3 py-2.5 whitespace-nowrap">
+                                <div class="flex flex-col">
+                                    <div class="text-[12px] font-medium text-gray-500">
+                                        {{ $reading->created_at->format('d/m/Y') }}
                                     </div>
-                                    <div>
-                                        <div class="text-sm font-medium text-gray-900">
-                                            {{ $reading->created_at->format('d/m/Y') }}
-                                        </div>
-                                        <div class="text-xs text-gray-500 font-mono">
-                                            {{ $reading->created_at->format('H:i:s') }}
-                                        </div>
+                                    <div class="text-[10px] text-gray-400">
+                                        {{ $reading->created_at->format('H:i:s') }}
                                     </div>
                                 </div>
                             </td>
 
-                            {{-- Méthode --}}
-                            <td class="px-4 py-3 whitespace-nowrap">
+                            {{-- Cell: Méthode --}}
+                            <td class="px-3 py-2.5 whitespace-nowrap">
                                 @if($reading->recording_method === 'manual')
-                                    <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-green-100 text-green-800">
-                                        <x-iconify icon="lucide:hand" class="w-3.5 h-3.5" />
-                                        Manuel
-                                    </span>
+                                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-100">
+                                    <x-iconify icon="lucide:hand" class="w-3 h-3" />
+                                    Manuel
+                                </span>
                                 @else
-                                    <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-purple-100 text-purple-800">
-                                        <x-iconify icon="lucide:cpu" class="w-3.5 h-3.5" />
-                                        Auto
-                                    </span>
+                                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-semibold bg-purple-50 text-purple-700 border border-purple-100">
+                                    <x-iconify icon="lucide:cpu" class="w-3 h-3" />
+                                    Auto
+                                </span>
                                 @endif
                             </td>
 
-                            {{-- Rapporté Par --}}
-                            <td class="px-4 py-3 whitespace-nowrap">
+                            {{-- Cell: Par --}}
+                            <td class="px-3 py-2.5 whitespace-nowrap">
                                 <div class="flex items-center gap-2">
-                                    <div class="w-8 h-8 bg-gradient-to-br from-indigo-50 to-indigo-100 rounded-full flex items-center justify-center">
-                                        <x-iconify icon="lucide:user" class="w-4 h-4 text-indigo-600" />
-                                    </div>
-                                    <div>
-                                        <div class="text-sm font-medium text-gray-900">
+                                    <x-iconify icon="lucide:user-circle" class="w-4 h-4 text-gray-300" />
+                                    <div class="flex flex-col">
+                                        <div class="text-[12px] font-medium text-gray-700">
                                             {{ $reading->recordedBy->name ?? 'Système' }}
                                         </div>
-                                        @if($reading->recordedBy)
-                                        <div class="text-xs text-gray-500">
-                                            {{ $reading->recordedBy->roles->first()->name ?? 'Utilisateur' }}
+                                        @if($reading->recordedBy && $reading->recordedBy->roles->count() > 0)
+                                        <div class="text-[10px] text-gray-400">
+                                            {{ $reading->recordedBy->roles->first()->name }}
                                         </div>
                                         @endif
                                     </div>
                                 </div>
                             </td>
 
-                            {{-- Actions --}}
-                            <td class="px-4 py-3 whitespace-nowrap text-center">
-                                <div class="flex items-center justify-center gap-1">
-                                    <a href="{{ route('admin.vehicles.mileage-history', $reading->vehicle_id) }}" 
-                                       class="p-1.5 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                                       title="Voir historique">
-                                        <x-iconify icon="lucide:history" class="w-4 h-4" />
+                            {{-- Cell: Actions --}}
+                            <td class="px-3 py-2.5 whitespace-nowrap text-right">
+                                <div class="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                                    <a href="{{ route('admin.vehicles.mileage-history', $reading->vehicle_id) }}"
+                                        class="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-colors"
+                                        title="Voir historique">
+                                        <x-iconify icon="lucide:history" class="w-3.5 h-3.5" />
                                     </a>
                                     @can('update mileage readings')
                                     <button wire:click="editReading({{ $reading->id }})"
-                                            class="p-1.5 text-gray-600 hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors"
-                                            title="Modifier">
-                                        <x-iconify icon="lucide:edit" class="w-4 h-4" />
+                                        class="p-1.5 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded-md transition-colors"
+                                        title="Modifier">
+                                        <x-iconify icon="lucide:edit" class="w-3.5 h-3.5" />
                                     </button>
                                     @endcan
                                     @can('delete mileage readings')
                                     <button wire:click="confirmDelete({{ $reading->id }})"
-                                            class="p-1.5 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                                            title="Supprimer">
-                                        <x-iconify icon="lucide:trash-2" class="w-4 h-4" />
+                                        class="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-md transition-colors"
+                                        title="Supprimer">
+                                        <x-iconify icon="lucide:trash-2" class="w-3.5 h-3.5" />
                                     </button>
                                     @endcan
                                 </div>
@@ -689,22 +895,22 @@
                                     <h3 class="text-lg font-medium text-gray-900 mb-1">Aucun relevé trouvé</h3>
                                     <p class="text-sm text-gray-500 mb-4">
                                         @if($search || $vehicleFilter || $methodFilter || $dateFrom || $dateTo)
-                                            Aucun relevé ne correspond à vos critères de recherche.
+                                        Aucun relevé ne correspond à vos critères de recherche.
                                         @else
-                                            Aucun relevé kilométrique n'a été enregistré.
+                                        Aucun relevé kilométrique n'a été enregistré.
                                         @endif
                                     </p>
                                     @if($search || $vehicleFilter || $methodFilter || $dateFrom || $dateTo)
-                                    <button wire:click="resetFilters" 
-                                            @click="showFilters = false"
-                                            class="inline-flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium rounded-lg transition-colors">
+                                    <button wire:click="resetFilters"
+                                        @click="showFilters = false"
+                                        class="inline-flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium rounded-lg transition-colors">
                                         <x-iconify icon="lucide:x" class="w-4 h-4" />
                                         Effacer les filtres
                                     </button>
                                     @else
                                     @can('create mileage readings')
-                                    <a href="{{ route('admin.mileage-readings.update') }}" 
-                                       class="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg shadow-sm transition-colors">
+                                    <a href="{{ route('admin.mileage-readings.update') }}"
+                                        class="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg shadow-sm transition-colors">
                                         <x-iconify icon="lucide:plus" class="w-4 h-4" />
                                         Créer le premier relevé
                                     </a>
@@ -719,33 +925,34 @@
             </div>
 
             {{-- ===============================================
-                PAGINATION ENTERPRISE
+                PAGINATION ENTERPRISE ULTRA-PRO
             =============================================== --}}
             @if($readings->hasPages())
-            <div class="bg-gray-50 px-6 py-4 border-t border-gray-200">
-                <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
-                    <div class="text-sm text-gray-700">
-                        Affichage de 
-                        <span class="font-semibold">{{ $readings->firstItem() }}</span>
-                        à 
-                        <span class="font-semibold">{{ $readings->lastItem() }}</span>
-                        sur 
-                        <span class="font-semibold">{{ $readings->total() }}</span>
-                        relevés
-                    </div>
-                    
-                    <div>
-                        {{ $readings->links() }}
-                    </div>
+            <div class="px-6 py-4 border-t border-gray-200 flex flex-col sm:flex-row justify-between items-center gap-4">
+                {{-- Pagination Links --}}
+                <div class="flex-1">
+                    {{ $readings->links() }}
+                </div>
+
+                {{-- Sélecteur "Par page" - Style Driver Index --}}
+                <div class="flex items-center gap-2">
+                    <label class="text-sm text-gray-700 font-medium">Par page:</label>
+                    <select
+                        wire:model.live="perPage"
+                        class="border-gray-300 rounded-md text-sm py-1.5 pl-2 pr-8 focus:ring-blue-500 focus:border-blue-500 shadow-sm cursor-pointer hover:bg-gray-50">
+                        <option value="25">25</option>
+                        <option value="50">50</option>
+                        <option value="100">100</option>
+                    </select>
                 </div>
             </div>
             @endif
         </div>
 
         {{-- Loading State --}}
-        <div wire:loading.flex 
-             wire:target="search, vehicleFilter, methodFilter, dateFrom, dateTo, authorFilter, mileageMin, mileageMax, perPage, sortBy, resetFilters"
-             class="fixed inset-0 z-50 bg-black bg-opacity-25 items-center justify-center">
+        <div wire:loading.flex
+            wire:target="search, vehicleFilter, methodFilter, dateFrom, dateTo, authorFilter, mileageMin, mileageMax, perPage, sortBy, resetFilters"
+            class="fixed inset-0 z-50 bg-black bg-opacity-25 items-center justify-center">
             <div class="bg-white rounded-lg px-6 py-4 shadow-xl">
                 <div class="flex items-center gap-3">
                     <svg class="animate-spin h-5 w-5 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -764,35 +971,35 @@
     =============================================== --}}
     @if($showDeleteModal)
     <div x-data="{ show: @entangle('showDeleteModal') }"
-         x-show="show"
-         x-cloak
-         class="fixed inset-0 z-50 overflow-y-auto"
-         aria-labelledby="modal-title"
-         role="dialog"
-         aria-modal="true">
-        
+        x-show="show"
+        x-cloak
+        class="fixed inset-0 z-50 overflow-y-auto"
+        aria-labelledby="modal-title"
+        role="dialog"
+        aria-modal="true">
+
         {{-- Backdrop --}}
         <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"
-             x-show="show"
-             x-transition:enter="ease-out duration-300"
-             x-transition:enter-start="opacity-0"
-             x-transition:enter-end="opacity-100"
-             x-transition:leave="ease-in duration-200"
-             x-transition:leave-start="opacity-100"
-             x-transition:leave-end="opacity-0"
-             @click="$wire.cancelDelete()"></div>
+            x-show="show"
+            x-transition:enter="ease-out duration-300"
+            x-transition:enter-start="opacity-0"
+            x-transition:enter-end="opacity-100"
+            x-transition:leave="ease-in duration-200"
+            x-transition:leave-start="opacity-100"
+            x-transition:leave-end="opacity-0"
+            @click="$wire.cancelDelete()"></div>
 
         {{-- Modal Content --}}
         <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
             <div class="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg"
-                 x-show="show"
-                 x-transition:enter="ease-out duration-300"
-                 x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-                 x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
-                 x-transition:leave="ease-in duration-200"
-                 x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
-                 x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95">
-                
+                x-show="show"
+                x-transition:enter="ease-out duration-300"
+                x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
+                x-transition:leave="ease-in duration-200"
+                x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
+                x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95">
+
                 <div class="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4">
                     <div class="sm:flex sm:items-start">
                         <div class="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
@@ -810,17 +1017,17 @@
                         </div>
                     </div>
                 </div>
-                
+
                 <div class="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6 gap-2">
                     <button type="button"
-                            wire:click="delete"
-                            class="inline-flex w-full justify-center rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-700 sm:w-auto transition-colors">
+                        wire:click="delete"
+                        class="inline-flex w-full justify-center rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-700 sm:w-auto transition-colors">
                         <x-iconify icon="heroicons:trash" class="w-5 h-5 mr-1.5" />
                         Supprimer
                     </button>
                     <button type="button"
-                            wire:click="cancelDelete"
-                            class="mt-3 inline-flex w-full justify-center rounded-lg bg-white px-4 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto transition-colors">
+                        wire:click="cancelDelete"
+                        class="mt-3 inline-flex w-full justify-center rounded-lg bg-white px-4 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto transition-colors">
                         Annuler
                     </button>
                 </div>
@@ -833,36 +1040,37 @@
 
 @push('styles')
 <style>
-/* ================================================
+    /* ================================================
    ALPINE.JS X-CLOAK
 ================================================ */
-[x-cloak] {
-    display: none !important;
-}
+    [x-cloak] {
+        display: none !important;
+    }
 
-/* ================================================
+    /* ================================================
    ANIMATIONS CUSTOM
 ================================================ */
-@keyframes slideDown {
-    from {
-        opacity: 0;
-        transform: translateY(-10px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
+    @keyframes slideDown {
+        from {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
 
-.animate-slide-down {
-    animation: slideDown 0.2s ease-out;
-}
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .animate-slide-down {
+        animation: slideDown 0.2s ease-out;
+    }
 </style>
 @endpush
 
 @push('scripts')
 <script>
-// Pas de scripts supplémentaires nécessaires
-// Alpine.js gère les interactions
+    // Pas de scripts supplémentaires nécessaires
+    // Alpine.js gère les interactions
 </script>
 @endpush

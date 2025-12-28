@@ -44,33 +44,36 @@ class PdfGenerationService
      * 1. Try microservice if available and not in fallback mode
      * 2. Use DomPDF as fallback
      */
-    public function generateFromHtml(string $html): string
+    public function generateFromHtml(string $html, array $options = []): string
     {
         // If fallback is forced or microservice is unhealthy, use DomPDF directly
         if ($this->useFallback || !$this->isServiceHealthy()) {
             Log::info('PDF Generation: Using DomPDF fallback');
-            return $this->generateWithDomPdf($html);
+            return $this->generateWithDomPdf($html, $options);
         }
 
         try {
-            return $this->generateWithMicroservice($html);
+            return $this->generateWithMicroservice($html, $options);
         } catch (\Exception $e) {
             Log::warning('Microservice PDF failed, falling back to DomPDF', [
                 'error' => $e->getMessage()
             ]);
-            return $this->generateWithDomPdf($html);
+            return $this->generateWithDomPdf($html, $options);
         }
     }
 
     /**
      * Generate PDF using DomPDF (Laravel package)
      */
-    protected function generateWithDomPdf(string $html): string
+    protected function generateWithDomPdf(string $html, array $options = []): string
     {
         $pdf = Pdf::loadHTML($html);
 
         // Configure for A4 professional output
-        $pdf->setPaper('a4', 'portrait');
+        $format = $options['format'] ?? 'a4';
+        $orientation = $options['orientation'] ?? ($options['landscape'] ?? false ? 'landscape' : 'portrait');
+
+        $pdf->setPaper($format, $orientation);
         $pdf->setOption([
             'isHtml5ParserEnabled' => true,
             'isRemoteEnabled' => true,
@@ -85,7 +88,7 @@ class PdfGenerationService
     /**
      * Generate PDF using Microservice (Puppeteer/Chrome)
      */
-    protected function generateWithMicroservice(string $html): string
+    protected function generateWithMicroservice(string $html, array $options = []): string
     {
         $httpClient = Http::timeout($this->timeout);
 
@@ -105,21 +108,25 @@ class PdfGenerationService
             $headers['X-API-Key'] = $this->apiKey;
         }
 
+        // Merge default options with passed options
+        $pdfOptions = array_merge([
+            'format' => 'A4',
+            'margin' => [
+                'top' => '15mm',
+                'right' => '12mm',
+                'bottom' => '15mm',
+                'left' => '12mm'
+            ],
+            'printBackground' => true,
+            'preferCSSPageSize' => true,
+            'landscape' => $options['landscape'] ?? false
+        ], $options);
+
         $response = $httpClient
             ->withHeaders($headers)
             ->post($this->serviceUrl, [
                 'html' => $html,
-                'options' => [
-                    'format' => 'A4',
-                    'margin' => [
-                        'top' => '15mm',
-                        'right' => '12mm',
-                        'bottom' => '15mm',
-                        'left' => '12mm'
-                    ],
-                    'printBackground' => true,
-                    'preferCSSPageSize' => true
-                ]
+                'options' => $pdfOptions
             ]);
 
         if (!$response->successful()) {

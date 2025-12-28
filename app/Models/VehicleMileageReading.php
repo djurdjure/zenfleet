@@ -204,6 +204,36 @@ class VehicleMileageReading extends Model
     }
 
     /**
+     * Scope: Ajouter la colonne 'previous_mileage' via une sous-requête corrélée.
+     * 
+     * ENTERPRISE GRADE: Utilise du SQL brut pour éviter les conflits d'alias
+     * Eloquent lors de la corrélation entre requête principale et sous-requête.
+     * 
+     * La sous-requête cherche le kilométrage du relevé PRÉCÉDENT pour le même véhicule,
+     * en utilisant recorded_at DESC + id DESC comme critère de tri pour gérer
+     * les cas où plusieurs relevés ont lieu au même moment.
+     */
+    public function scopeWithPreviousMileage($query)
+    {
+        return $query->addSelect(
+            DB::raw("(
+                SELECT prev.mileage 
+                FROM vehicle_mileage_readings AS prev 
+                WHERE prev.vehicle_id = vehicle_mileage_readings.vehicle_id 
+                AND (
+                    prev.recorded_at < vehicle_mileage_readings.recorded_at 
+                    OR (
+                        prev.recorded_at = vehicle_mileage_readings.recorded_at 
+                        AND prev.id < vehicle_mileage_readings.id
+                    )
+                )
+                ORDER BY prev.recorded_at DESC, prev.id DESC 
+                LIMIT 1
+            ) AS previous_mileage")
+        );
+    }
+
+    /**
      * Scope: Inclure les relations fréquemment utilisées
      */
     public function scopeWithRelations($query)

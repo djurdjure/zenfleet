@@ -215,6 +215,15 @@ Route::middleware(['auth', 'verified'])
                     ->name('export')
                     ->middleware('can:view mileage readings');
 
+                // NOUVEAUX EXPORTS ENTERPRISE-GRADE
+                Route::get('/export/csv', [\App\Http\Controllers\Admin\MileageReadingController::class, 'exportCsv'])
+                    ->name('export.csv')
+                    ->middleware('can:export mileage readings');
+
+                Route::get('/export/pdf', [\App\Http\Controllers\Admin\MileageReadingController::class, 'exportPdf'])
+                    ->name('export.pdf')
+                    ->middleware('can:export mileage readings');
+
                 // Mise à jour du kilométrage (tous les rôles selon permissions)
                 Route::get('/update/{vehicle?}', [\App\Http\Controllers\Admin\MileageReadingController::class, 'update'])
                     ->name('update')

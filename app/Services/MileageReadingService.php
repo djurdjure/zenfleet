@@ -48,7 +48,7 @@ class MileageReadingService
     public function getAnalytics(int $organizationId): array
     {
         $cacheKey = "mileage_analytics_{$organizationId}";
-        
+
         return Cache::remember($cacheKey, 300, function () use ($organizationId) {
             $now = now();
             $last7Days = $now->copy()->subDays(7);
@@ -150,7 +150,9 @@ class MileageReadingService
     public function getFilteredReadings(int $organizationId, array $filters = [])
     {
         $query = VehicleMileageReading::forOrganization($organizationId)
-            ->with(['vehicle', 'recordedBy']);
+            ->select('vehicle_mileage_readings.*')
+            ->with(['vehicle', 'recordedBy'])
+            ->withPreviousMileage(); // Include previous mileage for Diff calculation
 
         // Filtre: Véhicule
         if (!empty($filters['vehicle_id'])) {
@@ -186,8 +188,8 @@ class MileageReadingService
                         ->orWhere('brand', 'ILIKE', "%{$search}%")
                         ->orWhere('model', 'ILIKE', "%{$search}%");
                 })
-                ->orWhere('mileage', 'LIKE', "%{$search}%")
-                ->orWhere('notes', 'ILIKE', "%{$search}%");
+                    ->orWhere('mileage', 'LIKE', "%{$search}%")
+                    ->orWhere('notes', 'ILIKE', "%{$search}%");
             });
         }
 
@@ -215,7 +217,7 @@ class MileageReadingService
 
         // Pagination
         $perPage = $filters['per_page'] ?? 15;
-        
+
         return $query->paginate($perPage);
     }
 
@@ -234,7 +236,7 @@ class MileageReadingService
             $firstReading = VehicleMileageReading::where('vehicle_id', $vehicle->id)
                 ->oldest('recorded_at')
                 ->first();
-            
+
             $lastReading = VehicleMileageReading::where('vehicle_id', $vehicle->id)
                 ->latest('recorded_at')
                 ->first();
@@ -266,7 +268,7 @@ class MileageReadingService
                 ->where('recorded_at', '>=', $startDate)
                 ->oldest('recorded_at')
                 ->first();
-            
+
             $lastReading = VehicleMileageReading::where('vehicle_id', $vehicle->id)
                 ->where('recorded_at', '<=', $endDate)
                 ->latest('recorded_at')
@@ -303,7 +305,7 @@ class MileageReadingService
             $firstReading = VehicleMileageReading::where('vehicle_id', $vehicle->id)
                 ->oldest('recorded_at')
                 ->first();
-            
+
             $lastReading = VehicleMileageReading::where('vehicle_id', $vehicle->id)
                 ->latest('recorded_at')
                 ->first();
@@ -366,7 +368,7 @@ class MileageReadingService
         foreach ($decreasingMileage as $reading) {
             // Charger la relation véhicule
             $vehicle = Vehicle::find($reading->vehicle_id);
-            
+
             $anomalies[] = [
                 'type' => 'decreasing_mileage',
                 'severity' => 'high',
@@ -406,10 +408,10 @@ class MileageReadingService
         foreach ($suspectGaps as $reading) {
             // Charger la relation véhicule
             $vehicle = Vehicle::find($reading->vehicle_id);
-            
+
             $mileageDiff = $reading->mileage - $reading->prev_mileage;
             $timeDiff = (strtotime($reading->recorded_at) - strtotime($reading->prev_recorded_at)) / 3600; // heures
-            
+
             $anomalies[] = [
                 'type' => 'suspect_gap',
                 'severity' => $mileageDiff > 1000 ? 'high' : 'medium',
@@ -439,8 +441,8 @@ class MileageReadingService
                 ->orderBy('recorded_at', 'desc')
                 ->first();
 
-            $daysSinceLastReading = $lastReading 
-                ? now()->diffInDays($lastReading->recorded_at) 
+            $daysSinceLastReading = $lastReading
+                ? now()->diffInDays($lastReading->recorded_at)
                 : null;
 
             $anomalies[] = [
@@ -449,7 +451,7 @@ class MileageReadingService
                 'vehicle' => $vehicle,
                 'days_since_last_reading' => $daysSinceLastReading,
                 'last_reading_date' => $lastReading?->recorded_at,
-                'message' => $daysSinceLastReading 
+                'message' => $daysSinceLastReading
                     ? "Aucun relevé depuis " . $daysSinceLastReading . " jours"
                     : "Aucun relevé enregistré",
             ];
@@ -484,7 +486,7 @@ class MileageReadingService
 
         if ($previousPeriodCount > 0) {
             $percentage = round((($currentPeriodCount - $previousPeriodCount) / $previousPeriodCount) * 100, 1);
-            
+
             if ($percentage > 10) {
                 $trend = 'increasing';
             } elseif ($percentage < -10) {
@@ -513,7 +515,7 @@ class MileageReadingService
     public function exportToCSV(int $organizationId, array $filters = []): string
     {
         $readings = $this->getFilteredReadings($organizationId, array_merge($filters, ['per_page' => 999999]));
-        
+
         $filename = 'mileage_readings_' . date('Y-m-d_His') . '.csv';
         $filepath = storage_path('app/exports/' . $filename);
 
@@ -531,6 +533,7 @@ class MileageReadingService
             'Marque',
             'Modèle',
             'Kilométrage',
+            'Différence',
             'Date Relevé',
             'Heure Relevé',
             'Méthode',
@@ -544,17 +547,18 @@ class MileageReadingService
         foreach ($readings as $reading) {
             fputcsv($handle, [
                 $reading->id,
-                $reading->vehicle->registration_plate,
-                $reading->vehicle->brand,
-                $reading->vehicle->model,
+                $reading->vehicle ? $reading->vehicle->registration_plate : 'Véhicule Inconnu',
+                $reading->vehicle ? $reading->vehicle->brand : 'N/A',
+                $reading->vehicle ? $reading->vehicle->model : 'N/A',
                 $reading->mileage,
-                $reading->recorded_at->format('d/m/Y'),
-                $reading->recorded_at->format('H:i:s'),
+                $reading->previous_mileage ? ($reading->mileage - $reading->previous_mileage) : 'Initial',
+                $reading->recorded_at ? $reading->recorded_at->format('d/m/Y') : 'N/A',
+                $reading->recorded_at ? $reading->recorded_at->format('H:i:s') : 'N/A',
                 $reading->recording_method === 'manual' ? 'Manuel' : 'Automatique',
                 $reading->recordedBy?->name ?? 'Système',
                 $reading->notes ?? '',
-                $reading->created_at->format('d/m/Y H:i:s'),
-                $reading->updated_at->format('d/m/Y H:i:s'),
+                $reading->created_at ? $reading->created_at->format('d/m/Y H:i:s') : 'N/A',
+                $reading->updated_at ? $reading->updated_at->format('d/m/Y H:i:s') : 'N/A',
             ], ';');
         }
 
