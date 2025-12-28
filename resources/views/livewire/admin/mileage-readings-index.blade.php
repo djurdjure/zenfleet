@@ -624,7 +624,7 @@
                             type="number"
                             id="mileage-min"
                             placeholder="0"
-                            class="block w-full border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-sm">
+                            class="block w-full border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-sm bg-gray-50 hover:border-gray-400 transition-colors shadow-sm">
                     </div>
 
                     {{-- KM Max --}}
@@ -637,16 +637,16 @@
                             type="number"
                             id="mileage-max"
                             placeholder="999999"
-                            class="block w-full border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-sm">
+                            class="block w-full border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-sm bg-gray-50 hover:border-gray-400 transition-colors shadow-sm">
                     </div>
 
                     {{-- Actions Filtres --}}
-                    <div class="flex items-end gap-2">
+                    <div class="flex items-end gap-2 lg:col-span-4 justify-end mt-2 pt-2 border-t border-gray-100">
                         <button
                             wire:click="resetFilters"
-                            class="flex-1 inline-flex items-center justify-center gap-2 px-3 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors">
+                            class="inline-flex items-center justify-center gap-2 px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors shadow-sm">
                             <x-iconify icon="lucide:x" class="w-4 h-4" />
-                            Réinitialiser
+                            Réinitialiser tous les filtres
                         </button>
                     </div>
                 </div>

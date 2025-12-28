@@ -422,10 +422,10 @@ class DriverSanctions extends Component
             ->with(['driver', 'supervisor'])
             ->when($this->search, function ($query) {
                 $query->where(function ($q) {
-                    $q->where('reason', 'like', "%{$this->search}%")
+                    $q->where('reason', 'ilike', "%{$this->search}%")
                         ->orWhereHas('driver', function ($dq) {
-                            $dq->where('first_name', 'like', "%{$this->search}%")
-                                ->orWhere('last_name', 'like', "%{$this->search}%");
+                            $dq->where('first_name', 'ilike', "%{$this->search}%")
+                                ->orWhere('last_name', 'ilike', "%{$this->search}%");
                         });
                 });
             })

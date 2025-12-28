@@ -445,10 +445,11 @@ class DriverSanctionIndex extends Component
         // Recherche globale
         if ($this->search) {
             $query->where(function ($q) {
-                $q->where('reason', 'ilike', '%' . $this->search . '%')
-                    ->orWhereHas('driver', function ($dq) {
-                        $dq->where('first_name', 'ilike', '%' . $this->search . '%')
-                            ->orWhere('last_name', 'ilike', '%' . $this->search . '%');
+                $term = '%' . strtolower($this->search) . '%';
+                $q->whereRaw('LOWER(reason) LIKE ?', [$term])
+                    ->orWhereHas('driver', function ($dq) use ($term) {
+                        $dq->whereRaw('LOWER(first_name) LIKE ?', [$term])
+                            ->orWhereRaw('LOWER(last_name) LIKE ?', [$term]);
                     });
             });
         }

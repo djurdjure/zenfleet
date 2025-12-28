@@ -82,7 +82,7 @@
                         type="text"
                         wire:model.live.debounce.300ms="search"
                         placeholder="Rechercher..."
-                        class="w-full pl-9 pr-4 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        class="w-full pl-9 pr-4 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-gray-50 hover:border-gray-400 transition-colors shadow-sm">
                     <x-iconify icon="heroicons:magnifying-glass" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
 
                     <div wire:loading wire:target="search" class="absolute right-3 top-1/2 -translate-y-1/2">

@@ -56,16 +56,16 @@
         <div class="bg-white shadow-sm rounded-lg border border-gray-200 mb-6">
             {{-- Header & Actions --}}
             <div class="sm:flex sm:items-center sm:justify-between py-2">
-                <div>
-                    <div class="relative rounded-md shadow-sm max-w-xs">
-                        <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                            <x-iconify icon="heroicons:magnifying-glass" class="h-4 w-4 text-gray-400" />
+                <div class="flex-1 max-w-md">
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-2.5 flex items-center pointer-events-none">
+                            <x-iconify icon="lucide:search" class="w-4 h-4 text-gray-400" />
                         </div>
                         <input
                             wire:model.live.debounce.300ms="search"
                             type="text"
-                            class="block w-full rounded-md border-0 py-1.5 pl-10 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6"
-                            placeholder="Rechercher...">
+                            placeholder="Rechercher..."
+                            class="block w-full pl-8 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm shadow-sm bg-gray-50 hover:border-gray-400 transition-colors">
                     </div>
                 </div>
 
