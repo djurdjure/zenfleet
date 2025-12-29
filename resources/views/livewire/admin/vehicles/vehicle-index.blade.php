@@ -375,21 +375,21 @@
                                 @endif
                             </td>
                             <td class="px-3 py-2 whitespace-nowrap text-center text-sm font-medium">
-                                <div class="flex items-center justify-center gap-1">
+                                <div class="flex items-center justify-center gap-2">
                                     {{-- Quick Actions --}}
                                     @can('view vehicles')
                                     <a href="{{ route('admin.vehicles.show', $vehicle) }}"
-                                        class="p-1.5 text-blue-600 hover:bg-blue-50 rounded-lg transition-all duration-200"
+                                        class="p-2 rounded-full bg-gray-50 text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition-all duration-200 group"
                                         title="Voir">
-                                        <x-iconify icon="lucide:eye" class="w-4 h-4" />
+                                        <x-iconify icon="lucide:eye" class="w-3.5 h-3.5 group-hover:scale-110 transition-transform" />
                                     </a>
                                     @endcan
 
                                     @can('edit vehicles')
                                     <a href="{{ route('admin.vehicles.edit', $vehicle) }}"
-                                        class="p-1.5 text-amber-600 hover:bg-amber-50 rounded-lg transition-all duration-200"
+                                        class="p-2 rounded-full bg-gray-50 text-gray-400 hover:text-amber-600 hover:bg-amber-50 transition-all duration-200 group"
                                         title="Modifier">
-                                        <x-iconify icon="lucide:edit" class="w-4 h-4" />
+                                        <x-iconify icon="lucide:edit-3" class="w-3.5 h-3.5 group-hover:scale-110 transition-transform" />
                                     </a>
                                     @endcan
 
@@ -398,9 +398,9 @@
                                         <button @click="open = !open"
                                             @click.away="open = false"
                                             type="button"
-                                            class="inline-flex items-center p-1.5 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-all duration-200"
+                                            class="p-2 rounded-full bg-gray-50 text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-all duration-200 group"
                                             title="Plus d'actions">
-                                            <x-iconify icon="lucide:more-vertical" class="w-4 h-4" />
+                                            <x-iconify icon="lucide:more-vertical" class="w-3.5 h-3.5 group-hover:scale-110 transition-transform" />
                                         </button>
 
                                         <div x-show="open"

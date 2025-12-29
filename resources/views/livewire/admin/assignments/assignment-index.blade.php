@@ -83,38 +83,38 @@
             {{-- Barre d'actions sur une seule ligne --}}
             <div class="flex flex-col md:flex-row gap-3 items-center mb-4">
                 {{-- Search Bar - Réduit --}}
-                <div class="w-full md:w-96 relative">
+                <div class="w-full md:w-72 relative">
                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <x-iconify icon="lucide:search" class="w-5 h-5 text-gray-400" />
+                        <x-iconify icon="lucide:search" class="w-4 h-4 text-gray-400" />
                     </div>
                     <input
                         type="text"
                         wire:model.live.debounce.300ms="search"
                         placeholder="Rechercher..."
-                        class="pl-10 pr-4 py-2.5 block w-full border-gray-300 rounded-lg
+                        class="pl-9 pr-4 py-2 block w-full border-gray-300 rounded-lg
                                focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm shadow-sm" />
                     <div wire:loading wire:target="search" class="absolute inset-y-0 right-0 pr-3 flex items-center">
-                        <x-iconify icon="lucide:loader-2" class="w-4 h-4 text-blue-500 animate-spin" />
+                        <x-iconify icon="lucide:loader-2" class="w-3.5 h-3.5 text-blue-500 animate-spin" />
                     </div>
                 </div>
 
                 {{-- Boutons d'actions groupés --}}
                 <div class="flex gap-2 w-full md:w-auto md:ml-auto">
-                    {{-- Filter Button --}}
+                    {{-- Filter Button (Icon Only) --}}
                     <button
                         @click="showFilters = !showFilters"
-                        class="inline-flex items-center gap-2 px-4 py-2.5 bg-white border border-gray-300
-                               rounded-lg hover:bg-gray-50 transition-all duration-200 shadow-sm hover:shadow-md flex-1 md:flex-none justify-center">
-                        <x-iconify icon="lucide:filter" class="w-5 h-5 text-gray-500" />
-                        <span class="font-medium text-gray-700">Filtres</span>
+                        title="Filtres"
+                        class="inline-flex items-center justify-center w-10 h-10 bg-white border border-gray-300
+                               rounded-lg hover:bg-gray-50 transition-all duration-200 shadow-sm hover:shadow-md">
+                        <x-iconify icon="lucide:filter" class="w-4 h-4 text-gray-500" />
                     </button>
 
-                    {{-- Nouvelle Affectation Button --}}
+                    {{-- Nouvelle Affectation Button (Icon Only) --}}
                     <a href="{{ route('admin.assignments.create') }}"
-                        class="inline-flex items-center gap-2 px-4 py-2.5 bg-blue-600 text-white
-                              rounded-lg hover:bg-blue-700 transition-all duration-200 shadow-sm hover:shadow-md flex-1 md:flex-none justify-center font-medium">
-                        <x-iconify icon="lucide:plus-circle" class="w-5 h-5" />
-                        <span>Nouvelle affectation</span>
+                        title="Nouvelle affectation"
+                        class="inline-flex items-center justify-center w-10 h-10 bg-blue-600 text-white
+                              rounded-lg hover:bg-blue-700 transition-all duration-200 shadow-sm hover:shadow-md">
+                        <x-iconify icon="lucide:plus-circle" class="w-4 h-4" />
                     </a>
                 </div>
             </div>
@@ -144,20 +144,262 @@
                     <div class="border border-gray-200 rounded-lg p-3 bg-gray-50">
                         <label class="block text-sm font-semibold text-gray-700 mb-3">Période</label>
                         <div class="grid grid-cols-2 gap-3">
-                            <div>
+                            {{-- Date Début --}}
+                            <div x-data="{
+                                showCalendar: false,
+                                selectedDate: @entangle('date_from'),
+                                displayDate: '',
+                                currentMonth: new Date().getMonth(),
+                                currentYear: new Date().getFullYear(),
+                                days: [],
+                                init() {
+                                    this.parseDate();
+                                    this.generateCalendar();
+                                    $watch('selectedDate', value => this.parseDate());
+                                },
+                                parseDate() {
+                                    if (this.selectedDate) {
+                                        const parts = this.selectedDate.split('-');
+                                        if (parts.length === 3) {
+                                            this.displayDate = `${parts[2]}/${parts[1]}/${parts[0]}`;
+                                            this.currentYear = parseInt(parts[0]);
+                                            this.currentMonth = parseInt(parts[1]) - 1;
+                                        }
+                                    } else {
+                                        this.displayDate = '';
+                                    }
+                                },
+                                generateCalendar() {
+                                    this.days = [];
+                                    const firstDay = new Date(this.currentYear, this.currentMonth, 1);
+                                    const lastDay = new Date(this.currentYear, this.currentMonth + 1, 0);
+                                    const startPadding = firstDay.getDay() === 0 ? 6 : firstDay.getDay() - 1;
+                                    for (let i = 0; i < startPadding; i++) {
+                                        this.days.push({ day: '', disabled: true });
+                                    }
+                                    const today = new Date();
+                                    today.setHours(0, 0, 0, 0);
+                                    for (let d = 1; d <= lastDay.getDate(); d++) {
+                                        const date = new Date(this.currentYear, this.currentMonth, d);
+                                        this.days.push({
+                                            day: d,
+                                            disabled: false,
+                                            isToday: date.getTime() === today.getTime(),
+                                            isSelected: this.selectedDate === `${this.currentYear}-${String(this.currentMonth + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`
+                                        });
+                                    }
+                                },
+                                selectDay(day) {
+                                    if (day.disabled || !day.day) return;
+                                    this.selectedDate = `${this.currentYear}-${String(this.currentMonth + 1).padStart(2, '0')}-${String(day.day).padStart(2, '0')}`;
+                                    this.displayDate = `${String(day.day).padStart(2, '0')}/${String(this.currentMonth + 1).padStart(2, '0')}/${this.currentYear}`;
+                                    // Trigger Livewire update explicitly
+                                    @this.set('date_from', this.selectedDate);
+                                    this.generateCalendar();
+                                    this.showCalendar = false;
+                                },
+                                clearDate() {
+                                    this.selectedDate = '';
+                                    this.displayDate = '';
+                                    // Trigger Livewire update explicitly
+                                    @this.set('date_from', null);
+                                    this.generateCalendar();
+                                },
+                                prevMonth() {
+                                    if (this.currentMonth === 0) {
+                                        this.currentMonth = 11;
+                                        this.currentYear--;
+                                    } else {
+                                        this.currentMonth--;
+                                    }
+                                    this.generateCalendar();
+                                },
+                                nextMonth() {
+                                    if (this.currentMonth === 11) {
+                                        this.currentMonth = 0;
+                                        this.currentYear++;
+                                    } else {
+                                        this.currentMonth++;
+                                    }
+                                    this.generateCalendar();
+                                },
+                                monthNames: ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre']
+                            }">
                                 <label class="block text-xs text-gray-500 mb-1">Début</label>
-                                <x-datepicker-pro
-                                    name="date_from"
-                                    wire:model.live="date_from"
-                                    placeholder="JJ/MM/AAAA" />
+                                <div class="relative">
+                                    <input
+                                        type="text"
+                                        x-model="displayDate"
+                                        @click="showCalendar = !showCalendar"
+                                        readonly
+                                        placeholder="JJ/MM/AAAA"
+                                        class="w-full px-4 py-2 pl-10 bg-white border border-gray-300 text-xs text-gray-900 rounded-lg shadow-sm transition-all cursor-pointer focus:border-blue-500 focus:ring-2 focus:ring-blue-500 hover:border-gray-400">
+                                    <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                                        <x-iconify icon="lucide:calendar" class="w-4 h-4 text-gray-400" />
+                                    </div>
+                                    <div x-show="showCalendar" x-transition @click.away="showCalendar = false" class="absolute z-50 mt-2 bg-white rounded-xl shadow-2xl border border-gray-200 p-4 w-72 left-0">
+                                        <div class="flex items-center justify-between mb-4">
+                                            <button type="button" @click="prevMonth()" class="p-1 hover:bg-gray-100 rounded-lg">
+                                                <x-iconify icon="heroicons:chevron-left" class="w-5 h-5 text-gray-600" />
+                                            </button>
+                                            <span class="font-semibold text-gray-900" x-text="monthNames[currentMonth] + ' ' + currentYear"></span>
+                                            <button type="button" @click="nextMonth()" class="p-1 hover:bg-gray-100 rounded-lg">
+                                                <x-iconify icon="heroicons:chevron-right" class="w-5 h-5 text-gray-600" />
+                                            </button>
+                                        </div>
+                                        <div class="grid grid-cols-7 gap-1 mb-2">
+                                            <template x-for="day in ['Lu', 'Ma', 'Me', 'Je', 'Ve', 'Sa', 'Di']">
+                                                <div class="text-center text-xs font-semibold text-gray-500 py-1" x-text="day"></div>
+                                            </template>
+                                        </div>
+                                        <div class="grid grid-cols-7 gap-1">
+                                            <template x-for="(day, index) in days" :key="index">
+                                                <button type="button" @click="selectDay(day)" :disabled="day.disabled"
+                                                    :class="{
+                                                        'bg-blue-600 text-white': day.isSelected,
+                                                        'bg-blue-100 text-blue-800': day.isToday && !day.isSelected,
+                                                        'hover:bg-gray-100': !day.disabled && !day.isSelected,
+                                                        'text-gray-300 cursor-not-allowed': day.disabled,
+                                                        'text-gray-700': !day.disabled && !day.isSelected
+                                                    }"
+                                                    class="w-8 h-8 flex items-center justify-center text-sm rounded-lg transition-colors" x-text="day.day">
+                                                </button>
+                                            </template>
+                                        </div>
+                                        <div class="mt-3 pt-3 border-t border-gray-200">
+                                            <button type="button" @click="clearDate(); showCalendar = false" class="w-full text-center text-xs text-gray-600 hover:text-gray-900">Effacer</button>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
-                            <div>
+
+                            {{-- Date Fin --}}
+                            <div x-data="{
+                                showCalendar: false,
+                                selectedDate: @entangle('date_to'),
+                                displayDate: '',
+                                currentMonth: new Date().getMonth(),
+                                currentYear: new Date().getFullYear(),
+                                days: [],
+                                init() {
+                                    this.parseDate();
+                                    this.generateCalendar();
+                                    $watch('selectedDate', value => this.parseDate());
+                                },
+                                parseDate() {
+                                    if (this.selectedDate) {
+                                        const parts = this.selectedDate.split('-');
+                                        if (parts.length === 3) {
+                                            this.displayDate = `${parts[2]}/${parts[1]}/${parts[0]}`;
+                                            this.currentYear = parseInt(parts[0]);
+                                            this.currentMonth = parseInt(parts[1]) - 1;
+                                        }
+                                    } else {
+                                        this.displayDate = '';
+                                    }
+                                },
+                                generateCalendar() {
+                                    this.days = [];
+                                    const firstDay = new Date(this.currentYear, this.currentMonth, 1);
+                                    const lastDay = new Date(this.currentYear, this.currentMonth + 1, 0);
+                                    const startPadding = firstDay.getDay() === 0 ? 6 : firstDay.getDay() - 1;
+                                    for (let i = 0; i < startPadding; i++) {
+                                        this.days.push({ day: '', disabled: true });
+                                    }
+                                    const today = new Date();
+                                    today.setHours(0, 0, 0, 0);
+                                    for (let d = 1; d <= lastDay.getDate(); d++) {
+                                        const date = new Date(this.currentYear, this.currentMonth, d);
+                                        this.days.push({
+                                            day: d,
+                                            disabled: false,
+                                            isToday: date.getTime() === today.getTime(),
+                                            isSelected: this.selectedDate === `${this.currentYear}-${String(this.currentMonth + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`
+                                        });
+                                    }
+                                },
+                                selectDay(day) {
+                                    if (day.disabled || !day.day) return;
+                                    this.selectedDate = `${this.currentYear}-${String(this.currentMonth + 1).padStart(2, '0')}-${String(day.day).padStart(2, '0')}`;
+                                    this.displayDate = `${String(day.day).padStart(2, '0')}/${String(this.currentMonth + 1).padStart(2, '0')}/${this.currentYear}`;
+                                    // Trigger Livewire update explicitly
+                                    @this.set('date_to', this.selectedDate);
+                                    this.generateCalendar();
+                                    this.showCalendar = false;
+                                },
+                                clearDate() {
+                                    this.selectedDate = '';
+                                    this.displayDate = '';
+                                    // Trigger Livewire update explicitly
+                                    @this.set('date_to', null);
+                                    this.generateCalendar();
+                                },
+                                prevMonth() {
+                                    if (this.currentMonth === 0) {
+                                        this.currentMonth = 11;
+                                        this.currentYear--;
+                                    } else {
+                                        this.currentMonth--;
+                                    }
+                                    this.generateCalendar();
+                                },
+                                nextMonth() {
+                                    if (this.currentMonth === 11) {
+                                        this.currentMonth = 0;
+                                        this.currentYear++;
+                                    } else {
+                                        this.currentMonth++;
+                                    }
+                                    this.generateCalendar();
+                                },
+                                monthNames: ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre']
+                            }">
                                 <label class="block text-xs text-gray-500 mb-1">Fin</label>
-                                <x-datepicker-pro
-                                    name="date_to"
-                                    wire:model.live="date_to"
-                                    :minDate="$date_from"
-                                    placeholder="JJ/MM/AAAA" />
+                                <div class="relative">
+                                    <input
+                                        type="text"
+                                        x-model="displayDate"
+                                        @click="showCalendar = !showCalendar"
+                                        readonly
+                                        placeholder="JJ/MM/AAAA"
+                                        class="w-full px-4 py-2 pl-10 bg-white border border-gray-300 text-xs text-gray-900 rounded-lg shadow-sm transition-all cursor-pointer focus:border-blue-500 focus:ring-2 focus:ring-blue-500 hover:border-gray-400">
+                                    <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                                        <x-iconify icon="lucide:calendar" class="w-4 h-4 text-gray-400" />
+                                    </div>
+                                    <div x-show="showCalendar" x-transition @click.away="showCalendar = false" class="absolute z-50 mt-2 bg-white rounded-xl shadow-2xl border border-gray-200 p-4 w-72 right-0">
+                                        <div class="flex items-center justify-between mb-4">
+                                            <button type="button" @click="prevMonth()" class="p-1 hover:bg-gray-100 rounded-lg">
+                                                <x-iconify icon="heroicons:chevron-left" class="w-5 h-5 text-gray-600" />
+                                            </button>
+                                            <span class="font-semibold text-gray-900" x-text="monthNames[currentMonth] + ' ' + currentYear"></span>
+                                            <button type="button" @click="nextMonth()" class="p-1 hover:bg-gray-100 rounded-lg">
+                                                <x-iconify icon="heroicons:chevron-right" class="w-5 h-5 text-gray-600" />
+                                            </button>
+                                        </div>
+                                        <div class="grid grid-cols-7 gap-1 mb-2">
+                                            <template x-for="day in ['Lu', 'Ma', 'Me', 'Je', 'Ve', 'Sa', 'Di']">
+                                                <div class="text-center text-xs font-semibold text-gray-500 py-1" x-text="day"></div>
+                                            </template>
+                                        </div>
+                                        <div class="grid grid-cols-7 gap-1">
+                                            <template x-for="(day, index) in days" :key="index">
+                                                <button type="button" @click="selectDay(day)" :disabled="day.disabled"
+                                                    :class="{
+                                                    'bg-blue-600 text-white': day.isSelected,
+                                                    'bg-blue-100 text-blue-800': day.isToday && !day.isSelected,
+                                                    'hover:bg-gray-100': !day.disabled && !day.isSelected,
+                                                    'text-gray-300 cursor-not-allowed': day.disabled,
+                                                    'text-gray-700': !day.disabled && !day.isSelected
+                                                }"
+                                                    class="w-8 h-8 flex items-center justify-center text-sm rounded-lg transition-colors" x-text="day.day">
+                                                </button>
+                                            </template>
+                                        </div>
+                                        <div class="mt-3 pt-3 border-t border-gray-200">
+                                            <button type="button" @click="clearDate(); showCalendar = false" class="w-full text-center text-xs text-gray-600 hover:text-gray-900">Effacer</button>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -330,30 +572,30 @@
                                 </td>
 
                                 {{-- Actions --}}
-                                <td class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
-                                    <div class="flex items-center justify-center gap-1">
+                                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                    <div class="flex items-center justify-end gap-2">
                                         {{-- Terminer Button --}}
                                         @if($assignment->canBeEnded())
                                         <button wire:click="confirmEndAssignment({{ $assignment->id }})"
-                                            class="inline-flex items-center p-1.5 text-orange-600 hover:text-orange-700 hover:bg-orange-50 rounded-lg transition-all duration-200"
+                                            class="p-2 rounded-full bg-gray-50 text-gray-400 hover:text-orange-600 hover:bg-orange-50 transition-all duration-200 group"
                                             title="Terminer l'affectation">
-                                            <x-iconify icon="lucide:flag-triangle-right" class="w-4 h-4" />
+                                            <x-iconify icon="lucide:flag-triangle-right" class="w-3.5 h-3.5 group-hover:scale-110 transition-transform" />
                                         </button>
                                         @endif
 
                                         {{-- View Button --}}
                                         <a href="{{ route('admin.assignments.show', $assignment) }}"
-                                            class="inline-flex items-center p-1.5 text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-lg transition-all duration-200"
+                                            class="p-2 rounded-full bg-gray-50 text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition-all duration-200 group"
                                             title="Voir détails">
-                                            <x-iconify icon="lucide:eye" class="w-4 h-4" />
+                                            <x-iconify icon="lucide:eye" class="w-3.5 h-3.5 group-hover:scale-110 transition-transform" />
                                         </a>
 
                                         {{-- Three-Dot Menu --}}
                                         <div class="relative inline-block text-left" x-data="{ open: false }">
                                             <button @click="open = !open" @click.away="open = false"
                                                 type="button"
-                                                class="inline-flex items-center p-1.5 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-all duration-200">
-                                                <x-iconify icon="lucide:more-vertical" class="w-4 h-4" />
+                                                class="p-2 rounded-full bg-gray-50 text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-all duration-200 group">
+                                                <x-iconify icon="lucide:more-vertical" class="w-3.5 h-3.5 group-hover:scale-110 transition-transform" />
                                             </button>
 
                                             <div x-show="open" x-cloak
@@ -367,8 +609,8 @@
                                                 <div class="py-1">
                                                     @if($assignment->canBeEdited())
                                                     <a href="{{ route('admin.assignments.edit', $assignment) }}"
-                                                        class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
-                                                        <x-iconify icon="lucide:edit" class="w-4 h-4 mr-3 text-amber-600" />
+                                                        class="group flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
+                                                        <x-iconify icon="lucide:edit" class="mr-3 h-4 w-4 text-gray-400 group-hover:text-amber-500" />
                                                         Modifier
                                                     </a>
                                                     @endif
@@ -376,43 +618,39 @@
                                                     @if($assignment->status === 'active')
                                                     @if($assignment->handoverForm)
                                                     <a href="{{ route('admin.handovers.vehicles.show', $assignment->handoverForm) }}"
-                                                        class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
-                                                        <x-iconify icon="lucide:eye" class="w-4 h-4 mr-3 text-indigo-600" />
+                                                        class="group flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
+                                                        <x-iconify icon="lucide:eye" class="mr-3 h-4 w-4 text-gray-400 group-hover:text-indigo-500" />
                                                         Voir Fiche de Remise
                                                     </a>
                                                     <a href="{{ route('admin.handovers.vehicles.download-pdf', $assignment->handoverForm) }}"
-                                                        class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
-                                                        <x-iconify icon="lucide:file-down" class="w-4 h-4 mr-3 text-red-600" />
+                                                        class="group flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
+                                                        <x-iconify icon="lucide:file-down" class="mr-3 h-4 w-4 text-gray-400 group-hover:text-red-500" />
                                                         Télécharger PDF
                                                     </a>
                                                     @else
                                                     <a href="{{ route('admin.handovers.vehicles.create', $assignment) }}"
-                                                        class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
-                                                        <x-iconify icon="lucide:clipboard-check" class="w-4 h-4 mr-3 text-blue-600" />
+                                                        class="group flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
+                                                        <x-iconify icon="lucide:clipboard-check" class="mr-3 h-4 w-4 text-gray-400 group-hover:text-blue-500" />
                                                         Créer Fiche de Remise
                                                     </a>
                                                     @endif
                                                     @endif
 
-                                                    <button onclick="alert('Fonctionnalité PDF à venir')"
-                                                        class="flex w-full items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
-                                                        <x-iconify icon="lucide:file-text" class="w-4 h-4 mr-3 text-emerald-600" />
-                                                        Exporter PDF
+                                                    <button wire:click="exportHandoverPdf({{ $assignment->id }})"
+                                                        class="group flex w-full items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
+                                                        <x-iconify icon="lucide:file-text" class="mr-3 h-4 w-4 text-gray-400 group-hover:text-blue-500" />
+                                                        Fiche de remise
                                                     </button>
 
                                                     @if($assignment->canBeDeleted())
-                                                    <div class="border-t border-gray-100 mt-1 pt-1">
-                                                        <button wire:click="confirmDelete({{ $assignment->id }})"
-                                                            class="flex w-full items-center px-4 py-2 text-sm text-gray-700 hover:bg-red-50 transition-colors">
-                                                            <x-iconify icon="lucide:trash-2" class="w-4 h-4 mr-3 text-red-600" />
-                                                            Supprimer
-                                                        </button>
-                                                    </div>
+                                                    <div class="border-t border-gray-100 my-1"></div>
+                                                    <button wire:click="confirmDeleteAssignment({{ $assignment->id }})"
+                                                        class="group flex w-full items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
+                                                        <x-iconify icon="lucide:trash-2" class="mr-3 h-4 w-4 text-gray-400 group-hover:text-red-500" />
+                                                        Supprimer
+                                                    </button>
                                                     @endif
                                                 </div>
-                                            </div>
-                                        </div>
-                                    </div>
                                 </td>
                             </tr>
                             @endforeach
@@ -482,7 +720,7 @@
                 x-transition:leave="ease-in duration-200"
                 x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
                 x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-                class="inline-block align-bottom bg-white rounded-2xl px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full sm:p-6">
+                class="inline-block align-bottom bg-white rounded-2xl px-4 pt-5 pb-4 text-left overflow-visible shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full sm:p-6">
 
                 <div class="sm:flex sm:items-start">
                     <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-orange-100 sm:mx-0 sm:h-10 sm:w-10">
@@ -515,23 +753,142 @@
 
                             <div class="mt-4 space-y-4">
                                 {{-- ✅ NOUVEAU: Date et Heure séparés (comme dans assignment-form) --}}
-                                <div class="grid grid-cols-2 gap-3">
+                                <div class="grid grid-cols-3 gap-3">
                                     {{-- Date avec Flat pickr Enterprise --}}
-                                    <div>
+                                    {{-- Date avec Flat pickr Enterprise (Maintenant Alpine Custom) --}}
+                                    <div class="col-span-2" x-data="{
+                                        showCalendar: false,
+                                        selectedDate: @entangle('endDate'),
+                                        displayDate: '',
+                                        currentMonth: new Date().getMonth(),
+                                        currentYear: new Date().getFullYear(),
+                                        days: [],
+                                        init() {
+                                            this.parseDate();
+                                            this.generateCalendar();
+                                            $watch('selectedDate', value => this.parseDate());
+                                        },
+                                        parseDate() {
+                                            if (this.selectedDate) {
+                                                const parts = this.selectedDate.split('-');
+                                                if (parts.length === 3) {
+                                                    this.displayDate = `${parts[2]}/${parts[1]}/${parts[0]}`;
+                                                    this.currentYear = parseInt(parts[0]);
+                                                    this.currentMonth = parseInt(parts[1]) - 1;
+                                                }
+                                            } else {
+                                                this.displayDate = '';
+                                            }
+                                        },
+                                        generateCalendar() {
+                                            this.days = [];
+                                            const firstDay = new Date(this.currentYear, this.currentMonth, 1);
+                                            const lastDay = new Date(this.currentYear, this.currentMonth + 1, 0);
+                                            const startPadding = firstDay.getDay() === 0 ? 6 : firstDay.getDay() - 1;
+                                            for (let i = 0; i < startPadding; i++) {
+                                                this.days.push({ day: '', disabled: true });
+                                            }
+                                            const today = new Date();
+                                            today.setHours(0, 0, 0, 0);
+                                            for (let d = 1; d <= lastDay.getDate(); d++) {
+                                                const date = new Date(this.currentYear, this.currentMonth, d);
+                                                this.days.push({
+                                                    day: d,
+                                                    disabled: date > today, // Disable future dates for end date
+                                                    isToday: date.getTime() === today.getTime(),
+                                                    isSelected: this.selectedDate === `${this.currentYear}-${String(this.currentMonth + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`
+                                                });
+                                            }
+                                        },
+                                        selectDay(day) {
+                                            if (day.disabled || !day.day) return;
+                                            this.selectedDate = `${this.currentYear}-${String(this.currentMonth + 1).padStart(2, '0')}-${String(day.day).padStart(2, '0')}`;
+                                            this.displayDate = `${String(day.day).padStart(2, '0')}/${String(this.currentMonth + 1).padStart(2, '0')}/${this.currentYear}`;
+                                            this.generateCalendar();
+                                            this.showCalendar = false;
+                                        },
+                                        clearDate() {
+                                            this.selectedDate = '';
+                                            this.displayDate = '';
+                                            this.generateCalendar();
+                                        },
+                                        prevMonth() {
+                                            if (this.currentMonth === 0) {
+                                                this.currentMonth = 11;
+                                                this.currentYear--;
+                                            } else {
+                                                this.currentMonth--;
+                                            }
+                                            this.generateCalendar();
+                                        },
+                                        nextMonth() {
+                                            const today = new Date();
+                                            const nextMonth = new Date(this.currentYear, this.currentMonth + 1, 1);
+                                            if (nextMonth <= today) {
+                                                if (this.currentMonth === 11) {
+                                                    this.currentMonth = 0;
+                                                    this.currentYear++;
+                                                } else {
+                                                    this.currentMonth++;
+                                                }
+                                                this.generateCalendar();
+                                            }
+                                        },
+                                        monthNames: ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre']
+                                    }">
                                         <label class="block text-sm font-medium text-gray-700 mb-1">
                                             Date de fin <span class="text-red-600">*</span>
                                         </label>
-                                        <x-datepicker-pro
-                                            name="endDate"
-                                            wire:model.live="endDate"
-                                            :maxDate="date('Y-m-d')"
-                                            placeholder="Sélectionner..."
-                                            required />
+                                        <div class="relative">
+                                            <input
+                                                type="text"
+                                                x-model="displayDate"
+                                                @click="showCalendar = !showCalendar"
+                                                readonly
+                                                placeholder="JJ/MM/AAAA"
+                                                class="block w-full border-gray-300 rounded-lg focus:ring-orange-500 focus:border-orange-500 text-sm cursor-pointer pl-10">
+                                            <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                                                <x-iconify icon="lucide:calendar" class="w-4 h-4 text-gray-400" />
+                                            </div>
+                                            <div x-show="showCalendar" x-transition @click.away="showCalendar = false" class="absolute z-50 mt-2 bg-white rounded-xl shadow-2xl border border-gray-200 p-4 w-72 bottom-full mb-2">
+                                                <div class="flex items-center justify-between mb-4">
+                                                    <button type="button" @click="prevMonth()" class="p-1 hover:bg-gray-100 rounded-lg">
+                                                        <x-iconify icon="heroicons:chevron-left" class="w-5 h-5 text-gray-600" />
+                                                    </button>
+                                                    <span class="font-semibold text-gray-900" x-text="monthNames[currentMonth] + ' ' + currentYear"></span>
+                                                    <button type="button" @click="nextMonth()" class="p-1 hover:bg-gray-100 rounded-lg">
+                                                        <x-iconify icon="heroicons:chevron-right" class="w-5 h-5 text-gray-600" />
+                                                    </button>
+                                                </div>
+                                                <div class="grid grid-cols-7 gap-1 mb-2">
+                                                    <template x-for="day in ['Lu', 'Ma', 'Me', 'Je', 'Ve', 'Sa', 'Di']">
+                                                        <div class="text-center text-xs font-semibold text-gray-500 py-1" x-text="day"></div>
+                                                    </template>
+                                                </div>
+                                                <div class="grid grid-cols-7 gap-1">
+                                                    <template x-for="(day, index) in days" :key="index">
+                                                        <button type="button" @click="selectDay(day)" :disabled="day.disabled"
+                                                            :class="{
+                                                                'bg-orange-600 text-white': day.isSelected,
+                                                                'bg-orange-100 text-orange-800': day.isToday && !day.isSelected,
+                                                                'hover:bg-gray-100': !day.disabled && !day.isSelected,
+                                                                'text-gray-300 cursor-not-allowed': day.disabled,
+                                                                'text-gray-700': !day.disabled && !day.isSelected
+                                                            }"
+                                                            class="w-8 h-8 flex items-center justify-center text-sm rounded-lg transition-colors" x-text="day.day">
+                                                        </button>
+                                                    </template>
+                                                </div>
+                                                <div class="mt-3 pt-3 border-t border-gray-200">
+                                                    <button type="button" @click="clearDate(); showCalendar = false" class="w-full text-center text-xs text-gray-600 hover:text-gray-900">Effacer</button>
+                                                </div>
+                                            </div>
+                                        </div>
                                         @error('endDate') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
                                     </div>
 
                                     {{-- Heure avec SlimSelect --}}
-                                    <div>
+                                    <div class="col-span-1">
                                         <label class="block text-sm font-medium text-gray-700 mb-1">
                                             Heure <span class="text-red-600">*</span>
                                         </label>

@@ -329,27 +329,36 @@
                                 @endif
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                <div class="flex items-center justify-end gap-1">
+                                <div class="flex items-center justify-end gap-2">
                                     @if($driver->deleted_at)
-                                    <button wire:click="confirmRestore({{ $driver->id }})" class="p-1 text-green-600 hover:bg-green-50 rounded" title="Restaurer">
-                                        <x-iconify icon="lucide:rotate-ccw" class="w-4 h-4" />
+                                    <button wire:click="confirmRestore({{ $driver->id }})"
+                                        class="p-2 rounded-full bg-gray-50 text-gray-400 hover:text-green-600 hover:bg-green-50 transition-all duration-200 group"
+                                        title="Restaurer">
+                                        <x-iconify icon="lucide:rotate-ccw" class="w-4 h-4 group-hover:scale-110 transition-transform" />
                                     </button>
-                                    <button wire:click="confirmForceDelete({{ $driver->id }})" class="p-1 text-red-600 hover:bg-red-50 rounded" title="Supprimer définitivement">
-                                        <x-iconify icon="lucide:trash-2" class="w-4 h-4" />
+                                    <button wire:click="confirmForceDelete({{ $driver->id }})"
+                                        class="p-2 rounded-full bg-gray-50 text-gray-400 hover:text-red-600 hover:bg-red-50 transition-all duration-200 group"
+                                        title="Supprimer définitivement">
+                                        <x-iconify icon="lucide:trash-2" class="w-4 h-4 group-hover:scale-110 transition-transform" />
                                     </button>
                                     @else
                                     {{-- Actions directes --}}
-                                    <a href="{{ route('admin.drivers.show', $driver) }}" class="p-1.5 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors" title="Voir">
-                                        <x-iconify icon="lucide:eye" class="w-4 h-4" />
+                                    <a href="{{ route('admin.drivers.show', $driver) }}"
+                                        class="p-2 rounded-full bg-gray-50 text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition-all duration-200 group"
+                                        title="Voir">
+                                        <x-iconify icon="lucide:eye" class="w-4 h-4 group-hover:scale-110 transition-transform" />
                                     </a>
-                                    <a href="{{ route('admin.drivers.edit', $driver) }}" class="p-1.5 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors" title="Modifier">
-                                        <x-iconify icon="lucide:edit" class="w-4 h-4" />
+                                    <a href="{{ route('admin.drivers.edit', $driver) }}"
+                                        class="p-2 rounded-full bg-gray-50 text-gray-400 hover:text-amber-600 hover:bg-amber-50 transition-all duration-200 group"
+                                        title="Modifier">
+                                        <x-iconify icon="lucide:edit-3" class="w-4 h-4 group-hover:scale-110 transition-transform" />
                                     </a>
 
                                     {{-- Dropdown Menu (3 points) --}}
                                     <div class="relative" x-data="{ open: false }">
-                                        <button @click="open = !open" @click.away="open = false" class="p-1.5 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100 transition-colors">
-                                            <x-iconify icon="lucide:more-vertical" class="w-4 h-4" />
+                                        <button @click="open = !open" @click.away="open = false"
+                                            class="p-2 rounded-full bg-gray-50 text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-all duration-200 group">
+                                            <x-iconify icon="lucide:more-vertical" class="w-4 h-4 group-hover:scale-110 transition-transform" />
                                         </button>
 
                                         <div x-show="open"
@@ -360,12 +369,12 @@
                                             style="display: none;">
                                             <div class="py-1">
                                                 <button wire:click="exportPdf({{ $driver->id }}); open = false" class="group flex w-full items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                                                    <x-iconify icon="lucide:file-text" class="mr-3 h-4 w-4 text-red-500" />
+                                                    <x-iconify icon="lucide:file-text" class="mr-3 h-4 w-4 text-gray-400 group-hover:text-red-500" />
                                                     Exporter PDF
                                                 </button>
                                                 <div class="border-t border-gray-100 my-1"></div>
-                                                <button wire:click="confirmArchive({{ $driver->id }}); open = false" class="group flex w-full items-center px-4 py-2 text-sm text-orange-700 hover:bg-orange-50">
-                                                    <x-iconify icon="lucide:archive" class="mr-3 h-4 w-4 text-orange-500" />
+                                                <button wire:click="confirmArchive({{ $driver->id }}); open = false" class="group flex w-full items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                                    <x-iconify icon="lucide:archive" class="mr-3 h-4 w-4 text-gray-400 group-hover:text-amber-500" />
                                                     Archiver
                                                 </button>
                                             </div>

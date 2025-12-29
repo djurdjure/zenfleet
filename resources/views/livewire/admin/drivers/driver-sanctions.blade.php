@@ -624,47 +624,63 @@
                                 </span>
                             </td>
                             <td class="px-3 py-2">
-                                <div class="flex items-center justify-end gap-1">
+                                <div class="flex items-center justify-end gap-2">
                                     {{-- Voir --}}
                                     <a href="{{ route('admin.drivers.sanctions.show', $sanction->id) }}"
-                                        class="p-1.5 text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-lg transition-colors"
+                                        class="p-2 rounded-full bg-gray-50 text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition-all duration-200 group"
                                         title="Voir détails">
-                                        <x-iconify icon="heroicons:eye" class="w-4 h-4" />
+                                        <x-iconify icon="heroicons:eye" class="w-3.5 h-3.5 group-hover:scale-110 transition-transform" />
                                     </a>
 
-                                    {{-- Modifier --}}
-                                    <button
-                                        @click="$wire.call('openEditModal', {{ $sanction->id }})"
-                                        class="p-1.5 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-lg transition-colors"
-                                        title="Modifier">
-                                        <x-iconify icon="heroicons:pencil-square" class="w-4 h-4" />
-                                    </button>
+                                    {{-- Dropdown Menu (3 points) --}}
+                                    <div class="relative inline-block text-left" x-data="{ open: false }">
+                                        <button @click="open = !open" @click.away="open = false"
+                                            type="button"
+                                            class="p-2 rounded-full bg-gray-50 text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-all duration-200 group"
+                                            title="Plus d'actions">
+                                            <x-iconify icon="lucide:more-vertical" class="w-3.5 h-3.5 group-hover:scale-110 transition-transform" />
+                                        </button>
 
-                                    @if($sanction->trashed())
-                                    {{-- Restaurer (Sanctions archivées) --}}
-                                    <button
-                                        wire:click="confirmRestore({{ $sanction->id }})"
-                                        class="p-1.5 text-green-600 hover:text-green-800 hover:bg-green-50 rounded-lg transition-colors"
-                                        title="Restaurer">
-                                        <x-iconify icon="heroicons:arrow-path" class="w-4 h-4" />
-                                    </button>
+                                        <div x-show="open" x-cloak
+                                            x-transition:enter="transition ease-out duration-100"
+                                            x-transition:enter-start="transform opacity-0 scale-95"
+                                            x-transition:enter-end="transform opacity-100 scale-100"
+                                            class="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none z-50">
+                                            <div class="py-1">
+                                                {{-- Modifier --}}
+                                                <button @click="$wire.call('openEditModal', {{ $sanction->id }}); open = false"
+                                                    class="group flex w-full items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
+                                                    <x-iconify icon="heroicons:pencil-square" class="mr-3 h-4 w-4 text-gray-400 group-hover:text-amber-500" />
+                                                    Modifier
+                                                </button>
 
-                                    {{-- Suppression définitive (Sanctions archivées) --}}
-                                    <button
-                                        wire:click="confirmForceDelete({{ $sanction->id }})"
-                                        class="p-1.5 text-red-600 hover:text-red-800 hover:bg-red-50 rounded-lg transition-colors"
-                                        title="Supprimer définitivement">
-                                        <x-iconify icon="heroicons:trash" class="w-4 h-4" />
-                                    </button>
-                                    @else
-                                    {{-- Archiver (Sanctions actives) --}}
-                                    <button
-                                        wire:click="confirmSoftDelete({{ $sanction->id }})"
-                                        class="p-1.5 text-amber-600 hover:text-amber-800 hover:bg-amber-50 rounded-lg transition-colors"
-                                        title="Archiver">
-                                        <x-iconify icon="heroicons:archive-box-arrow-down" class="w-4 h-4" />
-                                    </button>
-                                    @endif
+                                                @if($sanction->trashed())
+                                                <div class="border-t border-gray-100 my-1"></div>
+                                                {{-- Restaurer --}}
+                                                <button wire:click="confirmRestore({{ $sanction->id }}); open = false"
+                                                    class="group flex w-full items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
+                                                    <x-iconify icon="heroicons:arrow-path" class="mr-3 h-4 w-4 text-gray-400 group-hover:text-green-500" />
+                                                    Restaurer
+                                                </button>
+
+                                                {{-- Supprimer définitivement --}}
+                                                <button wire:click="confirmForceDelete({{ $sanction->id }}); open = false"
+                                                    class="group flex w-full items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
+                                                    <x-iconify icon="heroicons:trash" class="mr-3 h-4 w-4 text-gray-400 group-hover:text-red-500" />
+                                                    Supprimer définitivement
+                                                </button>
+                                                @else
+                                                <div class="border-t border-gray-100 my-1"></div>
+                                                {{-- Archiver --}}
+                                                <button wire:click="confirmSoftDelete({{ $sanction->id }}); open = false"
+                                                    class="group flex w-full items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
+                                                    <x-iconify icon="heroicons:archive-box-arrow-down" class="mr-3 h-4 w-4 text-gray-400 group-hover:text-amber-500" />
+                                                    Archiver
+                                                </button>
+                                                @endif
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </td>
                         </tr>
@@ -688,7 +704,7 @@
             {{-- Pagination --}}
             @if($sanctions->hasPages())
             <div class="px-6 py-4 border-t border-gray-200">
-                {{ $sanctions->links() }}
+                {{ $sanctions->links('vendor.pagination.tailwind') }}
             </div>
             @endif
         </div>

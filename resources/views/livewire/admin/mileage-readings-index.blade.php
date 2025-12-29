@@ -206,7 +206,7 @@
                                 wire:model.live.debounce.300ms="search"
                                 type="text"
                                 placeholder="Rechercher..."
-                                class="block w-full pl-8 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm shadow-sm bg-gray-50 hover:border-gray-400 transition-colors">
+                                class="block w-full pl-8 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-xs shadow-sm bg-gray-50 hover:border-gray-400 transition-colors">
                         </div>
                     </div>
 
@@ -306,31 +306,35 @@
 
                     {{-- Véhicule (col-span-2 sur large screens) --}}
                     <div class="lg:col-span-2">
-                        <label class="block text-sm font-medium text-gray-700 mb-1.5">Véhicule</label>
-                        <x-slim-select
-                            wire:model.live="vehicleFilter"
-                            name="vehicleFilter"
-                            placeholder="Tous les véhicules">
-                            <option value="" data-placeholder="true">Tous les véhicules</option>
-                            @foreach($vehicles as $vehicle)
-                            <option value="{{ $vehicle->id }}">
-                                {{ $vehicle->registration_plate }} - {{ $vehicle->brand }} {{ $vehicle->model }}
-                            </option>
-                            @endforeach
-                        </x-slim-select>
+                        <label class="block text-xs font-medium text-gray-700 mb-1">Véhicule</label>
+                        <div class="text-xs">
+                            <x-slim-select
+                                wire:model.live="vehicleFilter"
+                                name="vehicleFilter"
+                                placeholder="Tous les véhicules">
+                                <option value="" data-placeholder="true">Tous les véhicules</option>
+                                @foreach($vehicles as $vehicle)
+                                <option value="{{ $vehicle->id }}">
+                                    {{ $vehicle->registration_plate }} - {{ $vehicle->brand }} {{ $vehicle->model }}
+                                </option>
+                                @endforeach
+                            </x-slim-select>
+                        </div>
                     </div>
 
                     {{-- Méthode --}}
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1.5">Méthode</label>
-                        <x-slim-select
-                            wire:model.live="methodFilter"
-                            name="methodFilter"
-                            placeholder="Toutes">
-                            <option value="" data-placeholder="true">Toutes</option>
-                            <option value="manual">Manuel</option>
-                            <option value="automatic">Automatique</option>
-                        </x-slim-select>
+                        <label class="block text-xs font-medium text-gray-700 mb-1">Méthode</label>
+                        <div class="text-xs">
+                            <x-slim-select
+                                wire:model.live="methodFilter"
+                                name="methodFilter"
+                                placeholder="Toutes">
+                                <option value="" data-placeholder="true">Toutes</option>
+                                <option value="manual">Manuel</option>
+                                <option value="automatic">Automatique</option>
+                            </x-slim-select>
+                        </div>
                     </div>
 
                     {{-- Date de (Calendrier Popup Style Sanctions) --}}
@@ -413,7 +417,7 @@
                         },
                         monthNames: ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre']
                     }" x-init="$watch('selectedDate', () => parseDate())">
-                        <label class="block text-sm font-medium text-gray-700 mb-1.5">Du</label>
+                        <label class="block text-xs font-medium text-gray-700 mb-1">Du</label>
                         <div class="relative">
                             <input
                                 type="text"
@@ -421,7 +425,7 @@
                                 @click="showCalendar = !showCalendar"
                                 readonly
                                 placeholder="JJ/MM/AAAA"
-                                class="w-full px-4 py-2.5 pl-10 bg-gray-50 border border-gray-300 text-sm text-gray-900 rounded-lg shadow-sm transition-all cursor-pointer focus:border-blue-500 focus:ring-2 focus:ring-blue-500 hover:border-gray-400">
+                                class="w-full px-4 py-2 pl-10 bg-gray-50 border border-gray-300 text-xs text-gray-900 rounded-lg shadow-sm transition-all cursor-pointer focus:border-blue-500 focus:ring-2 focus:ring-blue-500 hover:border-gray-400">
                             <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                                 <x-iconify icon="lucide:calendar" class="w-4 h-4 text-gray-400" />
                             </div>
@@ -541,7 +545,7 @@
                         },
                         monthNames: ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre']
                     }" x-init="$watch('selectedDate', () => parseDate())">
-                        <label class="block text-sm font-medium text-gray-700 mb-1.5">Au</label>
+                        <label class="block text-xs font-medium text-gray-700 mb-1">Au</label>
                         <div class="relative">
                             <input
                                 type="text"
@@ -549,7 +553,7 @@
                                 @click="showCalendar = !showCalendar"
                                 readonly
                                 placeholder="JJ/MM/AAAA"
-                                class="w-full px-4 py-2.5 pl-10 bg-gray-50 border border-gray-300 text-sm text-gray-900 rounded-lg shadow-sm transition-all cursor-pointer focus:border-blue-500 focus:ring-2 focus:ring-blue-500 hover:border-gray-400">
+                                class="w-full px-4 py-2 pl-10 bg-gray-50 border border-gray-300 text-xs text-gray-900 rounded-lg shadow-sm transition-all cursor-pointer focus:border-blue-500 focus:ring-2 focus:ring-blue-500 hover:border-gray-400">
                             <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                                 <x-iconify icon="lucide:calendar" class="w-4 h-4 text-gray-400" />
                             </div>
@@ -595,28 +599,30 @@
 
                     {{-- Utilisateur / Chauffeur --}}
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1.5">
+                        <label class="block text-xs font-medium text-gray-700 mb-1">
                             Enregistré par
                         </label>
-                        <x-slim-select
-                            wire:model.live="authorFilter"
-                            name="authorFilter"
-                            placeholder="Tous">
-                            <option value="" data-placeholder="true">Tous</option>
-                            @foreach($authors as $author)
-                            <option value="{{ $author->id }}">
-                                {{ $author->name }}
-                                @if($author->type === 'driver')
-                                (Chauffeur)
-                                @endif
-                            </option>
-                            @endforeach
-                        </x-slim-select>
+                        <div class="text-xs">
+                            <x-slim-select
+                                wire:model.live="authorFilter"
+                                name="authorFilter"
+                                placeholder="Tous">
+                                <option value="" data-placeholder="true">Tous</option>
+                                @foreach($authors as $author)
+                                <option value="{{ $author->id }}">
+                                    {{ $author->name }}
+                                    @if($author->type === 'driver')
+                                    (Chauffeur)
+                                    @endif
+                                </option>
+                                @endforeach
+                            </x-slim-select>
+                        </div>
                     </div>
 
                     {{-- KM Min --}}
                     <div>
-                        <label for="mileage-min" class="block text-sm font-medium text-gray-700 mb-1.5">
+                        <label for="mileage-min" class="block text-xs font-medium text-gray-700 mb-1">
                             KM Min
                         </label>
                         <input
@@ -624,12 +630,12 @@
                             type="number"
                             id="mileage-min"
                             placeholder="0"
-                            class="block w-full border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-sm bg-gray-50 hover:border-gray-400 transition-colors shadow-sm">
+                            class="block w-full border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-xs bg-gray-50 hover:border-gray-400 transition-colors shadow-sm">
                     </div>
 
                     {{-- KM Max --}}
                     <div>
-                        <label for="mileage-max" class="block text-sm font-medium text-gray-700 mb-1.5">
+                        <label for="mileage-max" class="block text-xs font-medium text-gray-700 mb-1">
                             KM Max
                         </label>
                         <input
@@ -637,30 +643,27 @@
                             type="number"
                             id="mileage-max"
                             placeholder="999999"
-                            class="block w-full border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-sm bg-gray-50 hover:border-gray-400 transition-colors shadow-sm">
+                            class="block w-full border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-xs bg-gray-50 hover:border-gray-400 transition-colors shadow-sm">
                     </div>
 
-                    {{-- Actions Filtres --}}
-                    <div class="flex items-end gap-2 lg:col-span-4 justify-end mt-2 pt-2 border-t border-gray-100">
-                        <button
-                            wire:click="resetFilters"
-                            class="inline-flex items-center justify-center gap-2 px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors shadow-sm">
-                            <x-iconify icon="lucide:x" class="w-4 h-4" />
-                            Réinitialiser tous les filtres
-                        </button>
-                    </div>
                 </div>
 
-                {{-- Résultats --}}
-                <div class="mt-4 flex items-center justify-between text-sm text-gray-600">
-                    <div>
-                        <span class="font-semibold">{{ $readings->total() }}</span> résultat(s) trouvé(s)
+                {{-- Résultats et Reset --}}
+                <div class="mt-4 flex items-center justify-between pt-4 border-t border-gray-100">
+                    <div class="text-sm text-gray-600">
+                        <span class="font-semibold">{{ $readings->total() }}</span> résultat(s)
+                        @if($vehicleFilter || $methodFilter || $dateFrom || $dateTo || $authorFilter || $mileageMin || $mileageMax)
+                        <span class="text-xs text-blue-600 font-medium ml-2">
+                            (Filtres actifs)
+                        </span>
+                        @endif
                     </div>
-                    @if($vehicleFilter || $methodFilter || $dateFrom || $dateTo || $authorFilter || $mileageMin || $mileageMax)
-                    <div class="text-xs text-blue-600 font-medium">
-                        Filtres actifs
-                    </div>
-                    @endif
+
+                    <button
+                        wire:click="resetFilters"
+                        class="text-xs font-medium text-gray-500 hover:text-red-600 underline decoration-dotted transition-colors outline-none focus:text-red-700">
+                        Réinitialiser
+                    </button>
                 </div>
             </div>
         </div>
@@ -676,7 +679,7 @@
                         <tr class="bg-gray-50 border-b border-gray-100">
                             {{-- Header: Véhicule --}}
                             <th wire:click="sortBy('vehicle')"
-                                class="group px-4 py-3 text-left text-[11px] font-semibold text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 hover:text-gray-700 transition-colors">
+                                class="group px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 hover:text-gray-700 transition-colors">
                                 <div class="flex items-center gap-1.5">
                                     <span>Véhicule</span>
                                     @if($sortField === 'vehicle')
@@ -687,7 +690,7 @@
 
                             {{-- Header: Kilométrage --}}
                             <th wire:click="sortBy('mileage')"
-                                class="group px-4 py-3 text-left text-[11px] font-semibold text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 hover:text-gray-700 transition-colors">
+                                class="group px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 hover:text-gray-700 transition-colors">
                                 <div class="flex items-center gap-1.5">
                                     <span>Kilométrage</span>
                                     @if($sortField === 'mileage')
@@ -697,13 +700,13 @@
                             </th>
 
                             {{-- Header: Différence --}}
-                            <th class="px-4 py-3 text-left text-[11px] font-semibold text-gray-500 uppercase tracking-wider">
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
                                 <span>Diff.</span>
                             </th>
 
                             {{-- Header: Date/Heure --}}
                             <th wire:click="sortBy('recorded_at')"
-                                class="group px-4 py-3 text-left text-[11px] font-semibold text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 hover:text-gray-700 transition-colors">
+                                class="group px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 hover:text-gray-700 transition-colors">
                                 <div class="flex items-center gap-1.5">
                                     <span>Date</span>
                                     @if($sortField === 'recorded_at')
@@ -714,7 +717,7 @@
 
                             {{-- Header: Enregistré Le --}}
                             <th wire:click="sortBy('created_at')"
-                                class="group px-4 py-3 text-left text-[11px] font-semibold text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 hover:text-gray-700 transition-colors">
+                                class="group px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 hover:text-gray-700 transition-colors">
                                 <div class="flex items-center gap-1.5">
                                     <span>Système</span>
                                     @if($sortField === 'created_at')
@@ -725,7 +728,7 @@
 
                             {{-- Header: Méthode --}}
                             <th wire:click="sortBy('recording_method')"
-                                class="group px-4 py-3 text-left text-[11px] font-semibold text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 hover:text-gray-700 transition-colors">
+                                class="group px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 hover:text-gray-700 transition-colors">
                                 <div class="flex items-center gap-1.5">
                                     <span>Méthode</span>
                                     @if($sortField === 'recording_method')
@@ -735,12 +738,12 @@
                             </th>
 
                             {{-- Header: Rapporté Par --}}
-                            <th class="px-4 py-3 text-left text-[11px] font-semibold text-gray-500 uppercase tracking-wider">
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
                                 <span>Par</span>
                             </th>
 
                             {{-- Header: Actions --}}
-                            <th class="px-4 py-3 text-center text-[11px] font-semibold text-gray-500 uppercase tracking-wider w-20">
+                            <th class="px-4 py-3 text-center text-xs font-semibold text-gray-500 uppercase tracking-wider w-20">
                                 <span class="sr-only">Actions</span>
                             </th>
                         </tr>
@@ -757,10 +760,10 @@
                                         <x-iconify icon="lucide:car" class="w-4 h-4 text-gray-500 group-hover:text-blue-600 transition-colors" />
                                     </div>
                                     <div class="flex flex-col">
-                                        <div class="text-[13px] font-bold text-gray-900 leading-tight">
+                                        <div class="text-sm font-bold text-gray-900 leading-tight">
                                             {{ $reading->vehicle->registration_plate }}
                                         </div>
-                                        <div class="text-[10px] text-gray-500 uppercase tracking-wide">
+                                        <div class="text-[11px] text-gray-500 uppercase tracking-wide">
                                             {{ $reading->vehicle->brand }} {{ $reading->vehicle->model }}
                                         </div>
                                     </div>
@@ -770,10 +773,10 @@
                             {{-- Cell: Kilométrage - STYLE PRO CLEAN --}}
                             <td class="px-4 py-3 whitespace-nowrap">
                                 <div class="flex items-baseline font-mono tracking-tight">
-                                    <span class="text-[13px] font-bold text-gray-900">
+                                    <span class="text-sm font-bold text-gray-900">
                                         {{ number_format($reading->mileage, 0, ',', ' ') }}
                                     </span>
-                                    <span class="text-[11px] font-medium text-gray-500 ml-1">km</span>
+                                    <span class="text-xs font-medium text-gray-500 ml-1">km</span>
                                 </div>
                             </td>
 
@@ -786,18 +789,18 @@
                                 @endphp
                                 @if($difference !== null)
                                 @if($difference > 1000)
-                                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-100">
+                                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-bold bg-amber-50 text-amber-700 border border-amber-100">
                                     <x-iconify icon="lucide:trending-up" class="w-3 h-3" />
                                     +{{ number_format($difference, 0, ',', ' ') }}
                                 </span>
                                 @else
-                                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-medium bg-gray-50 text-gray-600 border border-gray-100">
+                                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-medium bg-gray-50 text-gray-600 border border-gray-100">
                                     <x-iconify icon="lucide:plus" class="w-3 h-3 text-gray-400" />
                                     {{ number_format($difference, 0, ',', ' ') }}
                                 </span>
                                 @endif
                                 @else
-                                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-medium bg-blue-50 text-blue-600 border border-blue-100">
+                                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-medium bg-blue-50 text-blue-600 border border-blue-100">
                                     <x-iconify icon="lucide:flag" class="w-3 h-3" />
                                     Initial
                                 </span>
@@ -807,10 +810,10 @@
                             {{-- Cell: Date/Heure --}}
                             <td class="px-3 py-2.5 whitespace-nowrap">
                                 <div class="flex flex-col">
-                                    <div class="text-[12px] font-semibold text-gray-800">
+                                    <div class="text-[13px] font-semibold text-gray-800">
                                         {{ $reading->recorded_at->format('d/m/Y') }}
                                     </div>
-                                    <div class="text-[10px] text-gray-400 font-mono">
+                                    <div class="text-[11px] text-gray-400 font-mono">
                                         {{ $reading->recorded_at->format('H:i') }}
                                     </div>
                                 </div>
@@ -819,10 +822,10 @@
                             {{-- Cell: Système --}}
                             <td class="px-3 py-2.5 whitespace-nowrap">
                                 <div class="flex flex-col">
-                                    <div class="text-[12px] font-medium text-gray-500">
+                                    <div class="text-[13px] font-medium text-gray-500">
                                         {{ $reading->created_at->format('d/m/Y') }}
                                     </div>
-                                    <div class="text-[10px] text-gray-400">
+                                    <div class="text-[11px] text-gray-400">
                                         {{ $reading->created_at->format('H:i:s') }}
                                     </div>
                                 </div>
@@ -831,12 +834,12 @@
                             {{-- Cell: Méthode --}}
                             <td class="px-3 py-2.5 whitespace-nowrap">
                                 @if($reading->recording_method === 'manual')
-                                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-100">
+                                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-100">
                                     <x-iconify icon="lucide:hand" class="w-3 h-3" />
                                     Manuel
                                 </span>
                                 @else
-                                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-semibold bg-purple-50 text-purple-700 border border-purple-100">
+                                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-semibold bg-purple-50 text-purple-700 border border-purple-100">
                                     <x-iconify icon="lucide:cpu" class="w-3 h-3" />
                                     Auto
                                 </span>
@@ -848,11 +851,11 @@
                                 <div class="flex items-center gap-2">
                                     <x-iconify icon="lucide:user-circle" class="w-4 h-4 text-gray-300" />
                                     <div class="flex flex-col">
-                                        <div class="text-[12px] font-medium text-gray-700">
+                                        <div class="text-[13px] font-medium text-gray-700">
                                             {{ $reading->recordedBy->name ?? 'Système' }}
                                         </div>
                                         @if($reading->recordedBy && $reading->recordedBy->roles->count() > 0)
-                                        <div class="text-[10px] text-gray-400">
+                                        <div class="text-[11px] text-gray-400">
                                             {{ $reading->recordedBy->roles->first()->name }}
                                         </div>
                                         @endif
@@ -862,24 +865,24 @@
 
                             {{-- Cell: Actions --}}
                             <td class="px-3 py-2.5 whitespace-nowrap text-right">
-                                <div class="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                                <div class="flex items-center justify-end gap-2">
                                     <a href="{{ route('admin.vehicles.mileage-history', $reading->vehicle_id) }}"
-                                        class="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-colors"
+                                        class="p-2 rounded-full bg-gray-50 text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition-all duration-200 group"
                                         title="Voir historique">
-                                        <x-iconify icon="lucide:history" class="w-3.5 h-3.5" />
+                                        <x-iconify icon="lucide:history" class="w-3.5 h-3.5 group-hover:scale-110 transition-transform" />
                                     </a>
                                     @can('update mileage readings')
                                     <button wire:click="editReading({{ $reading->id }})"
-                                        class="p-1.5 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded-md transition-colors"
+                                        class="p-2 rounded-full bg-gray-50 text-gray-400 hover:text-amber-600 hover:bg-amber-50 transition-all duration-200 group"
                                         title="Modifier">
-                                        <x-iconify icon="lucide:edit" class="w-3.5 h-3.5" />
+                                        <x-iconify icon="lucide:edit-3" class="w-3.5 h-3.5 group-hover:scale-110 transition-transform" />
                                     </button>
                                     @endcan
                                     @can('delete mileage readings')
                                     <button wire:click="confirmDelete({{ $reading->id }})"
-                                        class="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-md transition-colors"
+                                        class="p-2 rounded-full bg-gray-50 text-gray-400 hover:text-red-600 hover:bg-red-50 transition-all duration-200 group"
                                         title="Supprimer">
-                                        <x-iconify icon="lucide:trash-2" class="w-3.5 h-3.5" />
+                                        <x-iconify icon="lucide:trash-2" class="w-3.5 h-3.5 group-hover:scale-110 transition-transform" />
                                     </button>
                                     @endcan
                                 </div>
