@@ -708,7 +708,7 @@
             <div class="kpi-label">Kilométrage <span class="kpi-unit">km</span></div>
         </div>
         <div class="kpi-box">
-            <div class="kpi-value">{{ $analytics['days_in_service'] ?? 0 }}</div>
+            <div class="kpi-value" style="font-size: 1rem;">{{ $analytics['duration_in_service_formatted'] ?? 'N/A' }}</div>
             <div class="kpi-label">Jours en Service</div>
         </div>
         <div class="kpi-box">

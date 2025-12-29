@@ -1153,9 +1153,27 @@ class VehicleController extends Controller
             ? Carbon::now()->diffInYears($vehicle->acquisition_date)
             : 0;
 
-        $daysInService = $vehicle->acquisition_date
-            ? Carbon::now()->diffInDays($vehicle->acquisition_date)
-            : 0;
+        $now = Carbon::now();
+        $acquisition = $vehicle->acquisition_date;
+
+        if ($acquisition && $acquisition->isFuture()) {
+            $daysInService = 0;
+            $formattedDuration = "Pas encore en service";
+        } elseif ($acquisition) {
+            $daysInService = $acquisition->diffInDays($now); // absolute by default
+
+            // Formatage durée "1 an 3 mois 15 jours"
+            $diff = $acquisition->diff($now);
+            $parts = [];
+            if ($diff->y > 0) $parts[] = $diff->y . ' an' . ($diff->y > 1 ? 's' : '');
+            if ($diff->m > 0) $parts[] = $diff->m . ' mois';
+            if ($diff->d > 0) $parts[] = $diff->d . ' jour' . ($diff->d > 1 ? 's' : '');
+
+            $formattedDuration = !empty($parts) ? implode(' ', $parts) : "Aujourd'hui";
+        } else {
+            $daysInService = 0;
+            $formattedDuration = "N/A";
+        }
 
         // === USAGE METRICS ===
         $totalKmDriven = ($vehicle->current_mileage ?? 0) - ($vehicle->initial_mileage ?? 0);
@@ -1176,6 +1194,7 @@ class VehicleController extends Controller
             // Core metrics
             'vehicle_age' => $vehicleAge,
             'days_in_service' => $daysInService,
+            'duration_in_service_formatted' => $formattedDuration,
             'total_km_driven' => $totalKmDriven,
 
             // Maintenance
