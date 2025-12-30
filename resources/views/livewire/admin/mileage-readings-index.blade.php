@@ -931,23 +931,8 @@
                 PAGINATION ENTERPRISE ULTRA-PRO
             =============================================== --}}
             @if($readings->hasPages())
-            <div class="px-6 py-4 border-t border-gray-200 flex flex-col sm:flex-row justify-between items-center gap-4">
-                {{-- Pagination Links --}}
-                <div class="flex-1">
-                    {{ $readings->links() }}
-                </div>
-
-                {{-- Sélecteur "Par page" - Style Driver Index --}}
-                <div class="flex items-center gap-2">
-                    <label class="text-sm text-gray-700 font-medium">Par page:</label>
-                    <select
-                        wire:model.live="perPage"
-                        class="border-gray-300 rounded-md text-sm py-1.5 pl-2 pr-8 focus:ring-blue-500 focus:border-blue-500 shadow-sm cursor-pointer hover:bg-gray-50">
-                        <option value="25">25</option>
-                        <option value="50">50</option>
-                        <option value="100">100</option>
-                    </select>
-                </div>
+            <div class="px-6 py-4 border-t border-gray-200">
+                <x-pagination :paginator="$readings" :records-per-page="$perPage" wire:model.live="perPage" />
             </div>
             @endif
         </div>

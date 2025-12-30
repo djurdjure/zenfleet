@@ -42,6 +42,11 @@ class DriverSanctionIndex extends Component
     public $search = '';
 
     /**
+     * Pagination
+     */
+    public int $perPage = 25;
+
+    /**
      * Propriétés pour le formulaire modal
      */
     public $showModal = false;
@@ -454,7 +459,7 @@ class DriverSanctionIndex extends Component
             });
         }
 
-        return $query->paginate(15);
+        return $query->paginate($this->perPage);
     }
 
     /**

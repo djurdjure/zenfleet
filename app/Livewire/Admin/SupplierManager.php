@@ -21,6 +21,11 @@ class SupplierManager extends Component
     public $filterRating = '';
     public $search = '';
 
+    /**
+     * Pagination
+     */
+    public int $perPage = 25;
+
     // Propriétés pour les modals
     public $showCreateModal = false;
     public $showDetailsModal = false;
@@ -251,7 +256,6 @@ class SupplierManager extends Component
             $this->closeCreateModal();
             $this->dispatch('supplier-created');
             session()->flash('message', 'Fournisseur créé avec succès.');
-
         } catch (\Exception $e) {
             session()->flash('error', 'Erreur lors de la création: ' . $e->getMessage());
         }
@@ -277,7 +281,6 @@ class SupplierManager extends Component
             $this->closeCreateModal();
             $this->dispatch('supplier-updated');
             session()->flash('message', 'Fournisseur mis à jour avec succès.');
-
         } catch (\Exception $e) {
             session()->flash('error', 'Erreur lors de la mise à jour: ' . $e->getMessage());
         }
@@ -298,7 +301,6 @@ class SupplierManager extends Component
 
             $this->dispatch('supplier-deleted');
             session()->flash('message', 'Fournisseur supprimé avec succès.');
-
         } catch (\Exception $e) {
             session()->flash('error', 'Erreur lors de la suppression: ' . $e->getMessage());
         }
@@ -337,7 +339,6 @@ class SupplierManager extends Component
             $this->closeRatingModal();
             $this->dispatch('supplier-rated');
             session()->flash('message', 'Évaluation ajoutée avec succès.');
-
         } catch (\Exception $e) {
             session()->flash('error', 'Erreur lors de l\'évaluation: ' . $e->getMessage());
         }
@@ -353,7 +354,6 @@ class SupplierManager extends Component
             $this->dispatch('supplier-updated');
             $status = $supplier->fresh()->is_preferred ? 'privilégié' : 'standard';
             session()->flash('message', "Fournisseur marqué comme {$status}.");
-
         } catch (\Exception $e) {
             session()->flash('error', 'Erreur: ' . $e->getMessage());
         }
@@ -368,7 +368,6 @@ class SupplierManager extends Component
             $this->dispatch('supplier-updated');
             $status = $supplier->fresh()->is_certified ? 'certifié' : 'non certifié';
             session()->flash('message', "Fournisseur marqué comme {$status}.");
-
         } catch (\Exception $e) {
             session()->flash('error', 'Erreur: ' . $e->getMessage());
         }
@@ -386,7 +385,6 @@ class SupplierManager extends Component
             $this->closeBlacklistModal();
             $this->dispatch('supplier-blacklisted');
             session()->flash('message', 'Fournisseur blacklisté avec succès.');
-
         } catch (\Exception $e) {
             session()->flash('error', 'Erreur: ' . $e->getMessage());
         }
@@ -400,7 +398,6 @@ class SupplierManager extends Component
 
             $this->dispatch('supplier-updated');
             session()->flash('message', 'Fournisseur retiré de la blacklist.');
-
         } catch (\Exception $e) {
             session()->flash('error', 'Erreur: ' . $e->getMessage());
         }
@@ -460,7 +457,7 @@ class SupplierManager extends Component
     private function getFilteredSuppliers()
     {
         $query = Supplier::with(['ratings'])
-                        ->forOrganization(Auth::user()->organization_id);
+            ->forOrganization(Auth::user()->organization_id);
 
         // Filtres de base
         if ($this->filterType) {
@@ -499,7 +496,7 @@ class SupplierManager extends Component
             $query->searchByName($this->search);
         }
 
-        return $query->latest('created_at')->paginate(12);
+        return $query->latest('created_at')->paginate($this->perPage);
     }
 
     private function getSupplierStats()
@@ -514,12 +511,12 @@ class SupplierManager extends Component
             'blacklisted' => Supplier::forOrganization($organizationId)->where('blacklisted', true)->count(),
             'avg_rating' => Supplier::forOrganization($organizationId)->avg('rating') ?: 0,
             'top_wilayas' => Supplier::forOrganization($organizationId)
-                                    ->selectRaw('wilaya, COUNT(*) as count')
-                                    ->groupBy('wilaya')
-                                    ->orderByDesc('count')
-                                    ->limit(5)
-                                    ->pluck('count', 'wilaya')
-                                    ->toArray()
+                ->selectRaw('wilaya, COUNT(*) as count')
+                ->groupBy('wilaya')
+                ->orderByDesc('count')
+                ->limit(5)
+                ->pluck('count', 'wilaya')
+                ->toArray()
         ];
     }
 
@@ -601,13 +598,38 @@ class SupplierManager extends Component
     private function resetCreateForm()
     {
         $this->reset([
-            'supplier_type', 'company_name', 'trade_register', 'nif', 'nis', 'ai',
-            'contact_first_name', 'contact_last_name', 'contact_phone', 'contact_email',
-            'address', 'city', 'wilaya', 'commune', 'postal_code', 'phone', 'email',
-            'website', 'specialties', 'certifications', 'service_areas',
-            'contract_start_date', 'contract_end_date', 'payment_terms',
-            'preferred_payment_method', 'credit_limit', 'bank_name', 'account_number',
-            'rib', 'is_preferred', 'is_certified', 'notes'
+            'supplier_type',
+            'company_name',
+            'trade_register',
+            'nif',
+            'nis',
+            'ai',
+            'contact_first_name',
+            'contact_last_name',
+            'contact_phone',
+            'contact_email',
+            'address',
+            'city',
+            'wilaya',
+            'commune',
+            'postal_code',
+            'phone',
+            'email',
+            'website',
+            'specialties',
+            'certifications',
+            'service_areas',
+            'contract_start_date',
+            'contract_end_date',
+            'payment_terms',
+            'preferred_payment_method',
+            'credit_limit',
+            'bank_name',
+            'account_number',
+            'rib',
+            'is_preferred',
+            'is_certified',
+            'notes'
         ]);
         $this->payment_terms = 30;
         $this->preferred_payment_method = 'virement';
@@ -617,9 +639,15 @@ class SupplierManager extends Component
     private function resetRatingForm()
     {
         $this->reset([
-            'quality_rating', 'timeliness_rating', 'communication_rating',
-            'pricing_rating', 'overall_rating', 'positive_feedback',
-            'negative_feedback', 'suggestions', 'would_recommend'
+            'quality_rating',
+            'timeliness_rating',
+            'communication_rating',
+            'pricing_rating',
+            'overall_rating',
+            'positive_feedback',
+            'negative_feedback',
+            'suggestions',
+            'would_recommend'
         ]);
         $this->quality_rating = 5;
         $this->timeliness_rating = 5;

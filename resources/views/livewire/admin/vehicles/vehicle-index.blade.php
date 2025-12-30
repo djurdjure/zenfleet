@@ -490,19 +490,7 @@
                 </table>
             </div>
             <div class="px-4 py-3 border-t border-gray-200">
-                <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
-                    <div class="flex-1 w-full sm:w-auto">
-                        {{ $vehicles->links() }}
-                    </div>
-                    <div class="flex items-center gap-2 flex-shrink-0">
-                        <select wire:model.live="per_page"
-                            class="border-gray-300 rounded-md text-sm py-1.5 pl-2 pr-8 focus:ring-blue-500 focus:border-blue-500 shadow-sm">
-                            <option value="20">20</option>
-                            <option value="50">50</option>
-                            <option value="100">100</option>
-                        </select>
-                    </div>
-                </div>
+                <x-pagination :paginator="$vehicles" :records-per-page="$perPage" wire:model.live="perPage" />
             </div>
         </x-card>
     </div>

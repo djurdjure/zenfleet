@@ -607,7 +607,7 @@
                 {{-- Pagination --}}
                 @if($sanctions->hasPages())
                 <div class="px-6 py-4 border-t border-gray-200">
-                    {{ $sanctions->links() }}
+                    <x-pagination :paginator="$sanctions" :records-per-page="$perPage" wire:model.live="perPage" />
                 </div>
                 @endif
             </div>

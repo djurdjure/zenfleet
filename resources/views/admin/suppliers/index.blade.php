@@ -100,12 +100,12 @@
                 </div>
                 <div class="space-y-2">
                     @forelse($analytics['top_rated'] as $supplier)
-                        <div class="flex items-center justify-between text-xs">
-                            <span class="text-blue-900 truncate flex-1">{{ $supplier->company_name }}</span>
-                            <span class="text-blue-700 font-bold ml-2">{{ number_format($supplier->rating, 1) }} ⭐</span>
-                        </div>
+                    <div class="flex items-center justify-between text-xs">
+                        <span class="text-blue-900 truncate flex-1">{{ $supplier->company_name }}</span>
+                        <span class="text-blue-700 font-bold ml-2">{{ number_format($supplier->rating, 1) }} ⭐</span>
+                    </div>
                     @empty
-                        <p class="text-xs text-blue-700">Aucune donnée</p>
+                    <p class="text-xs text-blue-700">Aucune donnée</p>
                     @endforelse
                 </div>
             </div>
@@ -120,12 +120,12 @@
                 </div>
                 <div class="space-y-2">
                     @forelse($analytics['top_quality'] as $supplier)
-                        <div class="flex items-center justify-between text-xs">
-                            <span class="text-emerald-900 truncate flex-1">{{ $supplier->company_name }}</span>
-                            <span class="text-emerald-700 font-bold ml-2">{{ number_format($supplier->quality_score, 1) }}%</span>
-                        </div>
+                    <div class="flex items-center justify-between text-xs">
+                        <span class="text-emerald-900 truncate flex-1">{{ $supplier->company_name }}</span>
+                        <span class="text-emerald-700 font-bold ml-2">{{ number_format($supplier->quality_score, 1) }}%</span>
+                    </div>
                     @empty
-                        <p class="text-xs text-emerald-700">Aucune donnée</p>
+                    <p class="text-xs text-emerald-700">Aucune donnée</p>
                     @endforelse
                 </div>
             </div>
@@ -140,12 +140,12 @@
                 </div>
                 <div class="space-y-2">
                     @forelse($analytics['by_wilaya'] as $wilaya)
-                        <div class="flex items-center justify-between text-xs">
-                            <span class="text-purple-900">{{ \App\Models\Supplier::WILAYAS[$wilaya->wilaya] ?? $wilaya->wilaya }}</span>
-                            <span class="text-purple-700 font-bold">{{ $wilaya->count }}</span>
-                        </div>
+                    <div class="flex items-center justify-between text-xs">
+                        <span class="text-purple-900">{{ \App\Models\Supplier::WILAYAS[$wilaya->wilaya] ?? $wilaya->wilaya }}</span>
+                        <span class="text-purple-700 font-bold">{{ $wilaya->count }}</span>
+                    </div>
                     @empty
-                        <p class="text-xs text-purple-700">Aucune donnée</p>
+                    <p class="text-xs text-purple-700">Aucune donnée</p>
                     @endforelse
                 </div>
             </div>
@@ -159,40 +159,40 @@
                     {{-- Recherche --}}
                     <div class="flex-1 relative">
                         <x-iconify icon="lucide:search" class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                        <input type="text" 
-                               name="search" 
-                               value="{{ $filters['search'] ?? '' }}"
-                               placeholder="Rechercher par nom, contact, téléphone, email..."
-                               class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        <input type="text"
+                            name="search"
+                            value="{{ $filters['search'] ?? '' }}"
+                            placeholder="Rechercher par nom, contact, téléphone, email..."
+                            class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                     </div>
 
                     {{-- Bouton Filtres --}}
-                    <button type="button" 
-                            onclick="document.getElementById('advancedFilters').classList.toggle('hidden')"
-                            class="px-4 py-2 bg-gray-100 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors duration-200 flex items-center gap-2">
+                    <button type="button"
+                        onclick="document.getElementById('advancedFilters').classList.toggle('hidden')"
+                        class="px-4 py-2 bg-gray-100 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors duration-200 flex items-center gap-2">
                         <x-iconify icon="lucide:filter" class="w-5 h-5" />
                         Filtres
                         @if(count(array_filter($filters)) > 1)
-                            <span class="bg-blue-600 text-white text-xs px-2 py-0.5 rounded-full">
-                                {{ count(array_filter($filters)) - 1 }}
-                            </span>
+                        <span class="bg-blue-600 text-white text-xs px-2 py-0.5 rounded-full">
+                            {{ count(array_filter($filters)) - 1 }}
+                        </span>
                         @endif
                     </button>
 
                     {{-- Bouton Export --}}
                     <a href="{{ route('admin.suppliers.export', $filters) }}"
-                       class="px-4 py-2 bg-gray-100 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors duration-200 flex items-center gap-2">
+                        class="px-4 py-2 bg-gray-100 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors duration-200 flex items-center gap-2">
                         <x-iconify icon="lucide:download" class="w-5 h-5" />
                         Export
                     </a>
 
                     {{-- Bouton Créer --}}
                     @can('create suppliers')
-                        <a href="{{ route('admin.suppliers.create') }}"
-                           class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200 flex items-center gap-2 font-semibold shadow-sm">
-                            <x-iconify icon="lucide:plus" class="w-5 h-5" />
-                            Nouveau Fournisseur
-                        </a>
+                    <a href="{{ route('admin.suppliers.create') }}"
+                        class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200 flex items-center gap-2 font-semibold shadow-sm">
+                        <x-iconify icon="lucide:plus" class="w-5 h-5" />
+                        Nouveau Fournisseur
+                    </a>
                     @endcan
                 </div>
 
@@ -205,9 +205,9 @@
                             <select name="supplier_type" class="w-full border-gray-300 rounded-lg text-sm">
                                 <option value="">Tous les types</option>
                                 @foreach($types as $key => $label)
-                                    <option value="{{ $key }}" {{ ($filters['supplier_type'] ?? '') == $key ? 'selected' : '' }}>
-                                        {{ $label }}
-                                    </option>
+                                <option value="{{ $key }}" {{ ($filters['supplier_type'] ?? '') == $key ? 'selected' : '' }}>
+                                    {{ $label }}
+                                </option>
                                 @endforeach
                             </select>
                         </div>
@@ -218,9 +218,9 @@
                             <select name="category_id" class="w-full border-gray-300 rounded-lg text-sm">
                                 <option value="">Toutes les catégories</option>
                                 @foreach($categories as $category)
-                                    <option value="{{ $category->id }}" {{ ($filters['category_id'] ?? '') == $category->id ? 'selected' : '' }}>
-                                        {{ $category->name }}
-                                    </option>
+                                <option value="{{ $category->id }}" {{ ($filters['category_id'] ?? '') == $category->id ? 'selected' : '' }}>
+                                    {{ $category->name }}
+                                </option>
                                 @endforeach
                             </select>
                         </div>
@@ -231,9 +231,9 @@
                             <select name="wilaya" class="w-full border-gray-300 rounded-lg text-sm">
                                 <option value="">Toutes les wilayas</option>
                                 @foreach($wilayas as $code => $name)
-                                    <option value="{{ $code }}" {{ ($filters['wilaya'] ?? '') == $code ? 'selected' : '' }}>
-                                        {{ $name }}
-                                    </option>
+                                <option value="{{ $code }}" {{ ($filters['wilaya'] ?? '') == $code ? 'selected' : '' }}>
+                                    {{ $name }}
+                                </option>
                                 @endforeach
                             </select>
                         </div>
@@ -293,13 +293,13 @@
 
                     {{-- Boutons Action Filtres --}}
                     <div class="flex items-center gap-3 pt-2">
-                        <button type="submit" 
-                                class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200 flex items-center gap-2 text-sm font-semibold">
+                        <button type="submit"
+                            class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200 flex items-center gap-2 text-sm font-semibold">
                             <x-iconify icon="lucide:filter" class="w-4 h-4" />
                             Appliquer
                         </button>
                         <a href="{{ route('admin.suppliers.index') }}"
-                           class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors duration-200 flex items-center gap-2 text-sm font-medium">
+                            class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors duration-200 flex items-center gap-2 text-sm font-medium">
                             <x-iconify icon="lucide:x" class="w-4 h-4" />
                             Réinitialiser
                         </a>
@@ -339,162 +339,160 @@
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-200">
                         @forelse($suppliers as $supplier)
-                            <tr class="hover:bg-gray-50 transition-colors duration-150">
-                                {{-- Fournisseur --}}
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="flex items-center gap-3">
-                                        <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                                            <x-iconify icon="lucide:building-2" class="w-5 h-5 text-blue-600" />
-                                        </div>
-                                        <div>
-                                            <div class="text-sm font-semibold text-gray-900">
-                                                {{ $supplier->company_name }}
-                                            </div>
-                                            @if($supplier->trade_register)
-                                                <div class="text-xs text-gray-500">RC: {{ $supplier->trade_register }}</div>
-                                            @endif
-                                        </div>
+                        <tr class="hover:bg-gray-50 transition-colors duration-150">
+                            {{-- Fournisseur --}}
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                                        <x-iconify icon="lucide:building-2" class="w-5 h-5 text-blue-600" />
                                     </div>
-                                </td>
+                                    <div>
+                                        <div class="text-sm font-semibold text-gray-900">
+                                            {{ $supplier->company_name }}
+                                        </div>
+                                        @if($supplier->trade_register)
+                                        <div class="text-xs text-gray-500">RC: {{ $supplier->trade_register }}</div>
+                                        @endif
+                                    </div>
+                                </div>
+                            </td>
 
-                                {{-- Type --}}
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
-                                        {{ \App\Models\Supplier::TYPES[$supplier->supplier_type] ?? $supplier->supplier_type }}
+                            {{-- Type --}}
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                                    {{ \App\Models\Supplier::TYPES[$supplier->supplier_type] ?? $supplier->supplier_type }}
+                                </span>
+                            </td>
+
+                            {{-- Contact --}}
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm text-gray-900">
+                                    {{ $supplier->contact_first_name }} {{ $supplier->contact_last_name }}
+                                </div>
+                                @if($supplier->contact_phone)
+                                <div class="text-xs text-gray-500 flex items-center gap-1">
+                                    <x-iconify icon="lucide:phone" class="w-3 h-3" />
+                                    {{ $supplier->contact_phone }}
+                                </div>
+                                @endif
+                            </td>
+
+                            {{-- Localisation --}}
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                @if($supplier->wilaya)
+                                <div class="flex items-center gap-1 text-sm text-gray-900">
+                                    <x-iconify icon="lucide:map-pin" class="w-4 h-4 text-gray-400" />
+                                    {{ \App\Models\Supplier::WILAYAS[$supplier->wilaya] ?? $supplier->wilaya }}
+                                </div>
+                                @endif
+                                @if($supplier->city)
+                                <div class="text-xs text-gray-500">{{ $supplier->city }}</div>
+                                @endif
+                            </td>
+
+                            {{-- Rating --}}
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                @if($supplier->rating)
+                                <div class="flex items-center gap-1">
+                                    <x-iconify icon="lucide:star" class="w-4 h-4 text-yellow-400 fill-current" />
+                                    <span class="text-sm font-semibold text-gray-900">{{ number_format($supplier->rating, 1) }}</span>
+                                </div>
+                                @else
+                                <span class="text-xs text-gray-400">Non noté</span>
+                                @endif
+                            </td>
+
+                            {{-- Statut --}}
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="flex items-center gap-2">
+                                    @if($supplier->is_active)
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                        Actif
                                     </span>
-                                </td>
-
-                                {{-- Contact --}}
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="text-sm text-gray-900">
-                                        {{ $supplier->contact_first_name }} {{ $supplier->contact_last_name }}
-                                    </div>
-                                    @if($supplier->contact_phone)
-                                        <div class="text-xs text-gray-500 flex items-center gap-1">
-                                            <x-iconify icon="lucide:phone" class="w-3 h-3" />
-                                            {{ $supplier->contact_phone }}
-                                        </div>
-                                    @endif
-                                </td>
-
-                                {{-- Localisation --}}
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    @if($supplier->wilaya)
-                                        <div class="flex items-center gap-1 text-sm text-gray-900">
-                                            <x-iconify icon="lucide:map-pin" class="w-4 h-4 text-gray-400" />
-                                            {{ \App\Models\Supplier::WILAYAS[$supplier->wilaya] ?? $supplier->wilaya }}
-                                        </div>
-                                    @endif
-                                    @if($supplier->city)
-                                        <div class="text-xs text-gray-500">{{ $supplier->city }}</div>
-                                    @endif
-                                </td>
-
-                                {{-- Rating --}}
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    @if($supplier->rating)
-                                        <div class="flex items-center gap-1">
-                                            <x-iconify icon="lucide:star" class="w-4 h-4 text-yellow-400 fill-current" />
-                                            <span class="text-sm font-semibold text-gray-900">{{ number_format($supplier->rating, 1) }}</span>
-                                        </div>
                                     @else
-                                        <span class="text-xs text-gray-400">Non noté</span>
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                                        Inactif
+                                    </span>
                                     @endif
-                                </td>
+                                    @if($supplier->is_preferred)
+                                    <x-iconify icon="lucide:heart" class="w-4 h-4 text-red-500 fill-current" title="Préféré" />
+                                    @endif
+                                    @if($supplier->is_certified)
+                                    <x-iconify icon="lucide:badge-check" class="w-4 h-4 text-purple-500" title="Certifié" />
+                                    @endif
+                                </div>
+                            </td>
 
-                                {{-- Statut --}}
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="flex items-center gap-2">
-                                        @if($supplier->is_active)
-                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                                                Actif
-                                            </span>
-                                        @else
-                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
-                                                Inactif
-                                            </span>
-                                        @endif
-                                        @if($supplier->is_preferred)
-                                            <x-iconify icon="lucide:heart" class="w-4 h-4 text-red-500 fill-current" title="Préféré" />
-                                        @endif
-                                        @if($supplier->is_certified)
-                                            <x-iconify icon="lucide:badge-check" class="w-4 h-4 text-purple-500" title="Certifié" />
-                                        @endif
-                                    </div>
-                                </td>
-
-                                {{-- Actions --}}
-                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                    <div class="flex items-center gap-2">
-                                        @can('view suppliers')
-                                            <a href="{{ route('admin.suppliers.show', $supplier) }}"
-                                               class="text-blue-600 hover:text-blue-900"
-                                               title="Voir">
-                                                <x-iconify icon="lucide:eye" class="w-5 h-5" />
-                                            </a>
-                                        @endcan
-                                        @can('edit suppliers')
-                                            <a href="{{ route('admin.suppliers.edit', $supplier) }}"
-                                               class="text-gray-600 hover:text-gray-900"
-                                               title="Modifier">
-                                                <x-iconify icon="lucide:pencil" class="w-5 h-5" />
-                                            </a>
-                                        @endcan
-                                        @can('delete suppliers')
-                                            <form action="{{ route('admin.suppliers.destroy', $supplier) }}" 
-                                                  method="POST" 
-                                                  class="inline"
-                                                  onsubmit="return confirm('Êtes-vous sûr de vouloir archiver ce fournisseur ?')">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" 
-                                                        class="text-red-600 hover:text-red-900"
-                                                        title="Archiver">
-                                                    <x-iconify icon="lucide:archive" class="w-5 h-5" />
-                                                </button>
-                                            </form>
-                                        @endcan
-                                    </div>
-                                </td>
-                            </tr>
+                            {{-- Actions --}}
+                            <td class="px-6 py-4 whitespace-nowrap text-right">
+                                <div class="flex items-center justify-end gap-2">
+                                    @can('view suppliers')
+                                    <a href="{{ route('admin.suppliers.show', $supplier) }}"
+                                        class="p-2 rounded-full bg-gray-50 text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition-all duration-200 group"
+                                        title="Voir">
+                                        <x-iconify icon="lucide:eye" class="w-4 h-4 group-hover:scale-110 transition-transform" />
+                                    </a>
+                                    @endcan
+                                    @can('edit suppliers')
+                                    <a href="{{ route('admin.suppliers.edit', $supplier) }}"
+                                        class="p-2 rounded-full bg-gray-50 text-gray-400 hover:text-amber-600 hover:bg-amber-50 transition-all duration-200 group"
+                                        title="Modifier">
+                                        <x-iconify icon="lucide:edit-3" class="w-4 h-4 group-hover:scale-110 transition-transform" />
+                                    </a>
+                                    @endcan
+                                    @can('delete suppliers')
+                                    <form action="{{ route('admin.suppliers.destroy', $supplier) }}"
+                                        method="POST"
+                                        class="inline"
+                                        onsubmit="return confirm('Êtes-vous sûr de vouloir archiver ce fournisseur ?')">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit"
+                                            class="p-2 rounded-full bg-gray-50 text-gray-400 hover:text-red-600 hover:bg-red-50 transition-all duration-200 group"
+                                            title="Archiver">
+                                            <x-iconify icon="lucide:archive" class="w-4 h-4 group-hover:scale-110 transition-transform" />
+                                        </button>
+                                    </form>
+                                    @endcan
+                                </div>
+                            </td>
+                        </tr>
                         @empty
-                            <tr>
-                                <td colspan="7" class="px-6 py-12 text-center">
-                                    <div class="flex flex-col items-center">
-                                        <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
-                                            <x-iconify icon="lucide:building-2" class="w-8 h-8 text-gray-400" />
-                                        </div>
-                                        <h3 class="text-lg font-semibold text-gray-900 mb-2">
-                                            Aucun fournisseur trouvé
-                                        </h3>
-                                        <p class="text-gray-600 mb-4">
-                                            @if(count(array_filter($filters)) > 0)
-                                                Aucun résultat ne correspond à vos critères de recherche.
-                                            @else
-                                                Commencez par ajouter un fournisseur.
-                                            @endif
-                                        </p>
-                                        @can('create suppliers')
-                                            <a href="{{ route('admin.suppliers.create') }}"
-                                               class="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-semibold">
-                                                <x-iconify icon="lucide:plus" class="w-4 h-4" />
-                                                Créer un fournisseur
-                                            </a>
-                                        @endcan
+                        <tr>
+                            <td colspan="7" class="px-6 py-12 text-center">
+                                <div class="flex flex-col items-center">
+                                    <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+                                        <x-iconify icon="lucide:building-2" class="w-8 h-8 text-gray-400" />
                                     </div>
-                                </td>
-                            </tr>
+                                    <h3 class="text-lg font-semibold text-gray-900 mb-2">
+                                        Aucun fournisseur trouvé
+                                    </h3>
+                                    <p class="text-gray-600 mb-4">
+                                        @if(count(array_filter($filters)) > 0)
+                                        Aucun résultat ne correspond à vos critères de recherche.
+                                        @else
+                                        Commencez par ajouter un fournisseur.
+                                        @endif
+                                    </p>
+                                    @can('create suppliers')
+                                    <a href="{{ route('admin.suppliers.create') }}"
+                                        class="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-semibold">
+                                        <x-iconify icon="lucide:plus" class="w-4 h-4" />
+                                        Créer un fournisseur
+                                    </a>
+                                    @endcan
+                                </div>
+                            </td>
+                        </tr>
                         @endforelse
                     </tbody>
                 </table>
             </div>
 
             {{-- Pagination --}}
-            @if($suppliers->hasPages())
-                <div class="bg-gray-50 px-4 py-3 border-t border-gray-200">
-                    {{ $suppliers->links() }}
-                </div>
-            @endif
+            <div class="bg-gray-50 px-4 py-3 border-t border-gray-200">
+                <x-pagination-standard :paginator="$suppliers" :records-per-page="request('per_page', 15)" />
+            </div>
         </div>
 
     </div>

@@ -34,7 +34,7 @@ class VehicleIndex extends Component
     public $depot_id = '';
     public $visibility = 'active'; // active, archived
 
-    public $per_page = 20;
+    public $perPage = 25;
 
     // ↕️ Tri
     public $sortField = 'created_at';
@@ -550,7 +550,7 @@ class VehicleIndex extends Component
 
     public function render()
     {
-        $vehicles = $this->getVehiclesQuery()->paginate($this->per_page);
+        $vehicles = $this->getVehiclesQuery()->paginate($this->perPage);
 
         // Reference Data (Cached)
         $vehicleStatuses = Cache::remember('vehicle_statuses', 3600, fn() => VehicleStatus::orderBy('name')->get());

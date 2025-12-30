@@ -47,7 +47,7 @@ class VehicleMileageHistory extends Component
      */
     public string $sortField = 'recorded_at';
     public string $sortDirection = 'desc';
-    public int $perPage = 15;
+    public int $perPage = 25;
 
     /**
      * 📝 PROPRIÉTÉS DU FORMULAIRE DE NOUVEAU RELEVÉ
@@ -257,8 +257,8 @@ class VehicleMileageHistory extends Component
         $totalCount = $allReadings->count();
 
         // Distance totale parcourue
-        $totalDistance = $totalCount > 1 
-            ? ($allReadings->last()->mileage - $allReadings->first()->mileage) 
+        $totalDistance = $totalCount > 1
+            ? ($allReadings->last()->mileage - $allReadings->first()->mileage)
             : 0;
 
         // Dernier relevé
@@ -269,13 +269,13 @@ class VehicleMileageHistory extends Component
 
         // Relevés des 7 derniers jours
         $last7Days = $allReadings->where('recorded_at', '>=', now()->subDays(7));
-        $last7DaysKm = $last7Days->count() > 1 
-            ? ($last7Days->last()->mileage - $last7Days->first()->mileage) 
+        $last7DaysKm = $last7Days->count() > 1
+            ? ($last7Days->last()->mileage - $last7Days->first()->mileage)
             : 0;
 
         // Moyenne journalière (basée sur 30 derniers jours)
-        $avgDaily = $totalCount > 1 && $allReadings->first()->recorded_at 
-            ? round($totalDistance / max($allReadings->first()->recorded_at->diffInDays(now()), 1), 2) 
+        $avgDaily = $totalCount > 1 && $allReadings->first()->recorded_at
+            ? round($totalDistance / max($allReadings->first()->recorded_at->diffInDays(now()), 1), 2)
             : 0;
 
         // Tendance 7 jours
@@ -392,7 +392,6 @@ class VehicleMileageHistory extends Component
 
             // Émettre un événement pour rafraîchir
             $this->dispatch('mileage-reading-created');
-
         } catch (\Exception $e) {
             DB::rollBack();
             session()->flash('error', 'Erreur lors de l\'ajout du relevé: ' . $e->getMessage());

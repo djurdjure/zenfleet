@@ -404,17 +404,8 @@
             </div>
 
             {{-- Pagination --}}
-            <div class="bg-white px-4 py-3 border-t border-gray-200 sm:px-6 flex flex-col sm:flex-row justify-between items-center gap-4">
-                <div class="flex-1">
-                    {{ $drivers->links() }}
-                </div>
-                <div class="flex items-center gap-2">
-                    <select wire:model.live="per_page" class="border-gray-300 rounded-md text-sm py-1.5 pl-2 pr-8 focus:ring-blue-500 focus:border-blue-500 shadow-sm cursor-pointer hover:bg-gray-50">
-                        <option value="20">20</option>
-                        <option value="50">50</option>
-                        <option value="100">100</option>
-                    </select>
-                </div>
+            <div class="bg-white px-4 py-3 border-t border-gray-200">
+                <x-pagination :paginator="$drivers" :records-per-page="$perPage" wire:model.live="perPage" />
             </div>
         </div>
     </div>

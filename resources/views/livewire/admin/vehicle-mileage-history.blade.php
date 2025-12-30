@@ -662,8 +662,8 @@
                                 placeholder="999999"
                                 class="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-xs text-gray-900 shadow-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500 hover:border-gray-400">
                         </div>
-                        
-                         {{-- KM Min --}}
+
+                        {{-- KM Min --}}
                         <div>
                             <label for="mileage-min" class="block text-xs font-medium text-gray-700 mb-1">
                                 KM Min
@@ -851,15 +851,7 @@
             =============================================== --}}
                 @if ($readings->hasPages())
                 <div class="bg-gray-50 px-6 py-4 border-t border-gray-200">
-                    <div class="flex flex-col sm:flex-row items-center justify-between gap-3">
-                        <div class="text-sm text-gray-700">
-                            Affichage de <span class="font-medium">{{ $readings->firstItem() }}</span> à <span class="font-medium">{{ $readings->lastItem() }}</span> sur <span class="font-medium">{{ $readings->total() }}</span> relevés
-                        </div>
-
-                        <div class="flex items-center gap-2">
-                            {{ $readings->links() }}
-                        </div>
-                    </div>
+                    <x-pagination :paginator="$readings" :records-per-page="$perPage" wire:model.live="perPage" />
                 </div>
                 @endif
             </div>

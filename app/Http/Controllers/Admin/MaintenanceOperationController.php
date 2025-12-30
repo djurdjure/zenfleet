@@ -39,16 +39,16 @@ class MaintenanceOperationController extends Controller
             // 🔍 Filtres avancés
             if ($request->filled('search')) {
                 $search = $request->get('search');
-                $query->where(function($q) use ($search) {
+                $query->where(function ($q) use ($search) {
                     $q->where('description', 'like', "%{$search}%")
-                      ->orWhereHas('vehicle', function($vq) use ($search) {
-                          $vq->where('registration_plate', 'like', "%{$search}%")
-                            ->orWhere('brand', 'like', "%{$search}%")
-                            ->orWhere('model', 'like', "%{$search}%");
-                      })
-                      ->orWhereHas('provider', function($pq) use ($search) {
-                          $pq->where('name', 'like', "%{$search}%");
-                      });
+                        ->orWhereHas('vehicle', function ($vq) use ($search) {
+                            $vq->where('registration_plate', 'like', "%{$search}%")
+                                ->orWhere('brand', 'like', "%{$search}%")
+                                ->orWhere('model', 'like', "%{$search}%");
+                        })
+                        ->orWhereHas('provider', function ($pq) use ($search) {
+                            $pq->where('name', 'like', "%{$search}%");
+                        });
                 });
             }
 
@@ -82,25 +82,24 @@ class MaintenanceOperationController extends Controller
 
             // 📊 Récupération paginée avec tri
             $operations = $query->orderBy('scheduled_date', 'desc')
-                               ->orderBy('created_at', 'desc')
-                               ->paginate(15);
+                ->orderBy('created_at', 'desc')
+                ->paginate($request->input('per_page', 15));
 
             // 📋 Données pour les filtres
             $maintenanceTypes = MaintenanceType::where('organization_id', $organizationId)
-                                              ->orderBy('name')
-                                              ->get(['id', 'name']);
+                ->orderBy('name')
+                ->get(['id', 'name']);
 
             $vehicles = Vehicle::where('organization_id', $organizationId)
-                              ->whereNull('deleted_at')
-                              ->orderBy('registration_plate')
-                              ->get(['id', 'registration_plate', 'brand', 'model']);
+                ->whereNull('deleted_at')
+                ->orderBy('registration_plate')
+                ->get(['id', 'registration_plate', 'brand', 'model']);
 
             return view('admin.maintenance.operations.index', compact(
                 'operations',
                 'maintenanceTypes',
                 'vehicles'
             ));
-
         } catch (\Exception $e) {
             \Log::error('Erreur lors de l\'affichage des opérations de maintenance', [
                 'user_id' => auth()->id(),
@@ -128,52 +127,52 @@ class MaintenanceOperationController extends Controller
 
             // 📋 Charger les types de maintenance actifs avec toutes les métadonnées pour SlimSelect
             $maintenanceTypes = MaintenanceType::where('organization_id', $organizationId)
-                                              ->where('is_active', true)
-                                              ->orderBy('category')
-                                              ->orderBy('name')
-                                              ->get()
-                                              ->map(function ($type) {
-                                                  return [
-                                                      'id' => $type->id,
-                                                      'name' => $type->name,
-                                                      'category' => $type->category,
-                                                      'category_label' => match($type->category) {
-                                                          'preventive' => 'Préventive',
-                                                          'corrective' => 'Corrective',
-                                                          'inspection' => 'Inspection',
-                                                          'revision' => 'Révision',
-                                                          default => ucfirst($type->category)
-                                                      },
-                                                      'estimated_duration_hours' => $type->estimated_duration_minutes ? round($type->estimated_duration_minutes / 60, 2) : null,
-                                                      'estimated_duration_minutes' => $type->estimated_duration_minutes,
-                                                      'estimated_cost' => $type->estimated_cost,
-                                                      'description' => $type->description,
-                                                      'display_text' => $type->name . ' (' . match($type->category) {
-                                                          'preventive' => 'Préventive',
-                                                          'corrective' => 'Corrective',
-                                                          'inspection' => 'Inspection',
-                                                          'revision' => 'Révision',
-                                                          default => ucfirst($type->category)
-                                                      } . ')'
-                                                  ];
-                                              });
+                ->where('is_active', true)
+                ->orderBy('category')
+                ->orderBy('name')
+                ->get()
+                ->map(function ($type) {
+                    return [
+                        'id' => $type->id,
+                        'name' => $type->name,
+                        'category' => $type->category,
+                        'category_label' => match ($type->category) {
+                            'preventive' => 'Préventive',
+                            'corrective' => 'Corrective',
+                            'inspection' => 'Inspection',
+                            'revision' => 'Révision',
+                            default => ucfirst($type->category)
+                        },
+                        'estimated_duration_hours' => $type->estimated_duration_minutes ? round($type->estimated_duration_minutes / 60, 2) : null,
+                        'estimated_duration_minutes' => $type->estimated_duration_minutes,
+                        'estimated_cost' => $type->estimated_cost,
+                        'description' => $type->description,
+                        'display_text' => $type->name . ' (' . match ($type->category) {
+                            'preventive' => 'Préventive',
+                            'corrective' => 'Corrective',
+                            'inspection' => 'Inspection',
+                            'revision' => 'Révision',
+                            default => ucfirst($type->category)
+                        } . ')'
+                    ];
+                });
 
             // 🚗 Charger les véhicules actifs avec kilométrage actuel pour SlimSelect
             $vehicles = Vehicle::where('organization_id', $organizationId)
-                              ->whereNull('deleted_at')
-                              ->orderBy('registration_plate')
-                              ->get()
-                              ->map(function ($vehicle) {
-                                  return [
-                                      'id' => $vehicle->id,
-                                      'registration_plate' => $vehicle->registration_plate,
-                                      'brand' => $vehicle->brand,
-                                      'model' => $vehicle->model,
-                                      'current_mileage' => $vehicle->current_mileage ?? 0,
-                                      'display_text' => $vehicle->registration_plate . ' - ' . $vehicle->brand . ' ' . $vehicle->model .
-                                                       ($vehicle->current_mileage ? ' (' . number_format($vehicle->current_mileage, 0, ',', ' ') . ' km)' : '')
-                                  ];
-                              });
+                ->whereNull('deleted_at')
+                ->orderBy('registration_plate')
+                ->get()
+                ->map(function ($vehicle) {
+                    return [
+                        'id' => $vehicle->id,
+                        'registration_plate' => $vehicle->registration_plate,
+                        'brand' => $vehicle->brand,
+                        'model' => $vehicle->model,
+                        'current_mileage' => $vehicle->current_mileage ?? 0,
+                        'display_text' => $vehicle->registration_plate . ' - ' . $vehicle->brand . ' ' . $vehicle->model .
+                            ($vehicle->current_mileage ? ' (' . number_format($vehicle->current_mileage, 0, ',', ' ') . ' km)' : '')
+                    ];
+                });
 
             // 🏢 Charger les fournisseurs de maintenance (Suppliers) actifs
             // Types pertinents : mécanicien, peinture, électricité, pneumatiques, contrôle technique
@@ -187,36 +186,34 @@ class MaintenanceOperationController extends Controller
             ];
 
             $providers = Supplier::where('organization_id', $organizationId)
-                                 ->whereIn('supplier_type', $maintenanceSupplierTypes)
-                                 ->where('is_active', true)
-                                 ->orderBy('company_name')
-                                 ->get()
-                                 ->map(function ($supplier) {
-                                     $displayName = $supplier->company_name ?:
-                                                   ($supplier->contact_first_name . ' ' . $supplier->contact_last_name);
+                ->whereIn('supplier_type', $maintenanceSupplierTypes)
+                ->where('is_active', true)
+                ->orderBy('company_name')
+                ->get()
+                ->map(function ($supplier) {
+                    $displayName = $supplier->company_name ?: ($supplier->contact_first_name . ' ' . $supplier->contact_last_name);
 
-                                     return [
-                                         'id' => $supplier->id,
-                                         'name' => $displayName,
-                                         'company_name' => $supplier->company_name,
-                                         'phone' => $supplier->phone ?: $supplier->contact_phone,
-                                         'email' => $supplier->email ?: $supplier->contact_email,
-                                         'rating' => $supplier->rating,
-                                         'supplier_type' => $supplier->supplier_type,
-                                         'type_label' => Supplier::TYPES[$supplier->supplier_type] ?? $supplier->supplier_type,
-                                         'display_text' => $displayName .
-                                                          ($supplier->phone || $supplier->contact_phone ? ' - ' . ($supplier->phone ?: $supplier->contact_phone) : '') .
-                                                          ($supplier->rating ? ' ⭐ ' . number_format($supplier->rating, 1) : '') .
-                                                          ' (' . (Supplier::TYPES[$supplier->supplier_type] ?? $supplier->supplier_type) . ')'
-                                     ];
-                                 });
+                    return [
+                        'id' => $supplier->id,
+                        'name' => $displayName,
+                        'company_name' => $supplier->company_name,
+                        'phone' => $supplier->phone ?: $supplier->contact_phone,
+                        'email' => $supplier->email ?: $supplier->contact_email,
+                        'rating' => $supplier->rating,
+                        'supplier_type' => $supplier->supplier_type,
+                        'type_label' => Supplier::TYPES[$supplier->supplier_type] ?? $supplier->supplier_type,
+                        'display_text' => $displayName .
+                            ($supplier->phone || $supplier->contact_phone ? ' - ' . ($supplier->phone ?: $supplier->contact_phone) : '') .
+                            ($supplier->rating ? ' ⭐ ' . number_format($supplier->rating, 1) : '') .
+                            ' (' . (Supplier::TYPES[$supplier->supplier_type] ?? $supplier->supplier_type) . ')'
+                    ];
+                });
 
             return view('admin.maintenance.operations.create', compact(
                 'maintenanceTypes',
                 'vehicles',
                 'providers'
             ));
-
         } catch (\Exception $e) {
             \Log::error('Erreur lors du chargement du formulaire de création d\'opération', [
                 'error' => $e->getMessage(),

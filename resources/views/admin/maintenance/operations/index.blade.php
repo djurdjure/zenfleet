@@ -43,7 +43,7 @@
             <div class="flex items-center gap-3">
                 {{-- Sélecteur de vue --}}
                 <div class="flex bg-white rounded-lg border border-gray-200 p-1" x-data="{ view: 'list' }">
-                    <button 
+                    <button
                         @click="view = 'list'"
                         :class="view === 'list' ? 'bg-blue-50 text-blue-600' : 'text-gray-600 hover:bg-gray-50'"
                         class="px-3 py-1.5 rounded-md text-sm font-medium transition-all duration-200 flex items-center gap-1.5"
@@ -51,7 +51,7 @@
                         <x-iconify icon="lucide:list" class="w-4 h-4" />
                         Liste
                     </button>
-                    <button 
+                    <button
                         @click="view = 'kanban'; window.location.href='{{ route('admin.maintenance.operations.kanban') }}'"
                         :class="view === 'kanban' ? 'bg-blue-50 text-blue-600' : 'text-gray-600 hover:bg-gray-50'"
                         class="px-3 py-1.5 rounded-md text-sm font-medium transition-all duration-200 flex items-center gap-1.5"
@@ -59,7 +59,7 @@
                         <x-iconify icon="lucide:columns-3" class="w-4 h-4" />
                         Kanban
                     </button>
-                    <button 
+                    <button
                         @click="view = 'calendar'; window.location.href='{{ route('admin.maintenance.operations.calendar') }}'"
                         :class="view === 'calendar' ? 'bg-blue-50 text-blue-600' : 'text-gray-600 hover:bg-gray-50'"
                         class="px-3 py-1.5 rounded-md text-sm font-medium transition-all duration-200 flex items-center gap-1.5"
@@ -70,8 +70,8 @@
                 </div>
 
                 {{-- Bouton Nouvelle Maintenance --}}
-                <a href="{{ route('admin.maintenance.operations.create') }}" 
-                   class="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm font-semibold rounded-lg hover:bg-blue-700 transition-all duration-200 shadow-sm hover:shadow-md">
+                <a href="{{ route('admin.maintenance.operations.create') }}"
+                    class="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm font-semibold rounded-lg hover:bg-blue-700 transition-all duration-200 shadow-sm hover:shadow-md">
                     <x-iconify icon="lucide:plus" class="w-4 h-4" />
                     Nouvelle Maintenance
                 </a>
@@ -244,16 +244,16 @@
                     </div>
                 </div>
                 @if(isset($analytics['top_vehicles']) && $analytics['top_vehicles']->count() > 0)
-                    <ul class="space-y-2">
-                        @foreach($analytics['top_vehicles']->take(5) as $item)
-                            <li class="flex items-center justify-between text-sm">
-                                <span class="text-red-900 font-medium truncate">{{ $item->vehicle->registration_plate }}</span>
-                                <span class="text-red-700 font-bold">{{ $item->count }}</span>
-                            </li>
-                        @endforeach
-                    </ul>
+                <ul class="space-y-2">
+                    @foreach($analytics['top_vehicles']->take(5) as $item)
+                    <li class="flex items-center justify-between text-sm">
+                        <span class="text-red-900 font-medium truncate">{{ $item->vehicle->registration_plate }}</span>
+                        <span class="text-red-700 font-bold">{{ $item->count }}</span>
+                    </li>
+                    @endforeach
+                </ul>
                 @else
-                    <p class="text-sm text-red-700">Aucune donnée disponible</p>
+                <p class="text-sm text-red-700">Aucune donnée disponible</p>
                 @endif
             </div>
 
@@ -269,16 +269,16 @@
                     </div>
                 </div>
                 @if(isset($analytics['top_types']) && $analytics['top_types']->count() > 0)
-                    <ul class="space-y-2">
-                        @foreach($analytics['top_types']->take(5) as $item)
-                            <li class="flex items-center justify-between text-sm">
-                                <span class="text-blue-900 font-medium truncate">{{ $item->maintenanceType->name }}</span>
-                                <span class="text-blue-700 font-bold">{{ $item->count }}</span>
-                            </li>
-                        @endforeach
-                    </ul>
+                <ul class="space-y-2">
+                    @foreach($analytics['top_types']->take(5) as $item)
+                    <li class="flex items-center justify-between text-sm">
+                        <span class="text-blue-900 font-medium truncate">{{ $item->maintenanceType->name }}</span>
+                        <span class="text-blue-700 font-bold">{{ $item->count }}</span>
+                    </li>
+                    @endforeach
+                </ul>
                 @else
-                    <p class="text-sm text-blue-700">Aucune donnée disponible</p>
+                <p class="text-sm text-blue-700">Aucune donnée disponible</p>
                 @endif
             </div>
 
@@ -343,23 +343,23 @@
                     <x-iconify icon="lucide:filter" class="w-4 h-4" />
                     Filtres avancés
                     @if(request()->hasAny(['status', 'maintenance_type_id', 'provider_id', 'category', 'date_from', 'date_to']))
-                        <span class="bg-blue-100 text-blue-800 text-xs font-semibold px-2 py-0.5 rounded-full">
-                            Actifs
-                        </span>
+                    <span class="bg-blue-100 text-blue-800 text-xs font-semibold px-2 py-0.5 rounded-full">
+                        Actifs
+                    </span>
                     @endif
                 </button>
 
                 {{-- Boutons Actions Rapides --}}
                 <div class="flex items-center gap-2">
                     {{-- Export --}}
-                    <a href="{{ route('admin.maintenance.operations.export', request()->all()) }}" 
-                       class="inline-flex items-center gap-2 px-4 py-2.5 bg-white border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-all duration-200 shadow-sm">
+                    <a href="{{ route('admin.maintenance.operations.export', request()->all()) }}"
+                        class="inline-flex items-center gap-2 px-4 py-2.5 bg-white border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-all duration-200 shadow-sm">
                         <x-iconify icon="lucide:download" class="w-4 h-4" />
                         Export
                     </a>
 
                     {{-- Refresh --}}
-                    <button 
+                    <button
                         onclick="window.location.reload()"
                         class="inline-flex items-center gap-2 px-4 py-2.5 bg-white border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-all duration-200 shadow-sm">
                         <x-iconify icon="lucide:refresh-cw" class="w-4 h-4" />
@@ -370,8 +370,8 @@
             {{-- ===============================================
                 FILTRES AVANCÉS (COLLAPSIBLE)
             =============================================== --}}
-            <div 
-                x-show="showFilters" 
+            <div
+                x-show="showFilters"
                 x-transition:enter="transition ease-out duration-300"
                 x-transition:enter-start="opacity-0 transform scale-95"
                 x-transition:enter-end="opacity-100 transform scale-100"
@@ -380,10 +380,10 @@
                 x-transition:leave-end="opacity-0 transform scale-95"
                 class="mt-4 bg-white rounded-lg border border-gray-200 p-5 shadow-sm"
                 style="display: none;">
-                
+
                 <form action="{{ route('admin.maintenance.operations.index') }}" method="GET" id="filterForm">
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                        
+
                         {{-- Filtre Statut --}}
                         <div>
                             <label for="status" class="block text-sm font-medium text-gray-700 mb-1.5">
@@ -406,9 +406,9 @@
                             <select name="maintenance_type_id" id="maintenance_type_id" class="block w-full border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-sm">
                                 <option value="">Tous les types</option>
                                 @foreach($maintenanceTypes as $type)
-                                    <option value="{{ $type->id }}" {{ request('maintenance_type_id') == $type->id ? 'selected' : '' }}>
-                                        {{ $type->name }}
-                                    </option>
+                                <option value="{{ $type->id }}" {{ request('maintenance_type_id') == $type->id ? 'selected' : '' }}>
+                                    {{ $type->name }}
+                                </option>
                                 @endforeach
                             </select>
                         </div>
@@ -421,9 +421,9 @@
                             <select name="vehicle_id" id="vehicle_id" class="block w-full border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-sm">
                                 <option value="">Tous les véhicules</option>
                                 @foreach($vehicles as $vehicle)
-                                    <option value="{{ $vehicle->id }}" {{ request('vehicle_id') == $vehicle->id ? 'selected' : '' }}>
-                                        {{ $vehicle->registration_plate }} - {{ $vehicle->brand }} {{ $vehicle->model }}
-                                    </option>
+                                <option value="{{ $vehicle->id }}" {{ request('vehicle_id') == $vehicle->id ? 'selected' : '' }}>
+                                    {{ $vehicle->registration_plate }} - {{ $vehicle->brand }} {{ $vehicle->model }}
+                                </option>
                                 @endforeach
                             </select>
                         </div>
@@ -436,9 +436,9 @@
                             <select name="provider_id" id="provider_id" class="block w-full border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-sm">
                                 <option value="">Tous les fournisseurs</option>
                                 @foreach($providers as $provider)
-                                    <option value="{{ $provider->id }}" {{ request('provider_id') == $provider->id ? 'selected' : '' }}>
-                                        {{ $provider->name }}
-                                    </option>
+                                <option value="{{ $provider->id }}" {{ request('provider_id') == $provider->id ? 'selected' : '' }}>
+                                    {{ $provider->name }}
+                                </option>
                                 @endforeach
                             </select>
                         </div>
@@ -448,8 +448,8 @@
                             <label for="date_from" class="block text-sm font-medium text-gray-700 mb-1.5">
                                 <x-iconify icon="lucide:calendar" class="w-4 h-4 inline" /> Date de début
                             </label>
-                            <input type="date" name="date_from" id="date_from" value="{{ request('date_from') }}" 
-                                   class="block w-full border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-sm">
+                            <input type="date" name="date_from" id="date_from" value="{{ request('date_from') }}"
+                                class="block w-full border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-sm">
                         </div>
 
                         {{-- Filtre Date À --}}
@@ -457,8 +457,8 @@
                             <label for="date_to" class="block text-sm font-medium text-gray-700 mb-1.5">
                                 <x-iconify icon="lucide:calendar" class="w-4 h-4 inline" /> Date de fin
                             </label>
-                            <input type="date" name="date_to" id="date_to" value="{{ request('date_to') }}" 
-                                   class="block w-full border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-sm">
+                            <input type="date" name="date_to" id="date_to" value="{{ request('date_to') }}"
+                                class="block w-full border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-sm">
                         </div>
 
                         {{-- Filtre Catégorie --}}
@@ -479,8 +479,8 @@
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1.5">&nbsp;</label>
                             <label class="flex items-center gap-2 cursor-pointer">
-                                <input type="checkbox" name="overdue" value="1" {{ request('overdue') ? 'checked' : '' }} 
-                                       class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                                <input type="checkbox" name="overdue" value="1" {{ request('overdue') ? 'checked' : '' }}
+                                    class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
                                 <span class="text-sm text-gray-700">
                                     <x-iconify icon="lucide:alert-circle" class="w-4 h-4 inline text-red-500" />
                                     Seulement en retard
@@ -491,14 +491,14 @@
 
                     {{-- Boutons Actions Filtres --}}
                     <div class="flex items-center justify-between mt-5 pt-5 border-t border-gray-200">
-                        <button 
-                            type="button" 
+                        <button
+                            type="button"
                             onclick="document.getElementById('filterForm').reset(); window.location.href='{{ route('admin.maintenance.operations.index') }}'"
                             class="text-sm text-gray-600 hover:text-gray-900 font-medium">
                             <x-iconify icon="lucide:x" class="w-4 h-4 inline" /> Réinitialiser
                         </button>
-                        <button 
-                            type="submit" 
+                        <button
+                            type="submit"
                             class="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm font-semibold rounded-lg hover:bg-blue-700 transition-all duration-200">
                             <x-iconify icon="lucide:filter" class="w-4 h-4" />
                             Appliquer les filtres
@@ -512,7 +512,7 @@
             TABLE ULTRA-LISIBLE
         =============================================== --}}
         <div class="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden">
-            
+
             {{-- Header Table avec Tri --}}
             <div class="px-6 py-4 border-b border-gray-200 bg-gray-50">
                 <div class="flex items-center justify-between">
@@ -523,7 +523,7 @@
                     </h3>
                     <div class="flex items-center gap-2">
                         <label class="text-xs text-gray-600">Trier par:</label>
-                        <select 
+                        <select
                             onchange="window.location.href='{{ route('admin.maintenance.operations.index') }}?' + new URLSearchParams(Object.fromEntries(new URLSearchParams(window.location.search).entries())).toString() + '&sort=' + this.value.split(':')[0] + '&direction=' + this.value.split(':')[1]"
                             class="text-xs border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
                             <option value="scheduled_date:desc" {{ request('sort') == 'scheduled_date' && request('direction') == 'desc' ? 'selected' : '' }}>Date (récent)</option>
@@ -544,7 +544,7 @@
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                 V
 
-échicule
+                                échicule
                             </th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                 Type de maintenance
@@ -568,133 +568,137 @@
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-200">
                         @forelse($operations as $operation)
-                            <tr class="hover:bg-gray-50 transition-colors duration-150">
-                                {{-- Véhicule --}}
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="flex items-center">
-                                        <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                                            <x-iconify icon="lucide:car" class="w-5 h-5 text-blue-600" />
-                                        </div>
-                                        <div class="ml-3">
-                                            <div class="text-sm font-semibold text-gray-900">{{ $operation->vehicle->registration_plate }}</div>
-                                            <div class="text-xs text-gray-500">{{ $operation->vehicle->brand }} {{ $operation->vehicle->model }}</div>
-                                        </div>
+                        <tr class="hover:bg-gray-50 transition-colors duration-150">
+                            {{-- Véhicule --}}
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="flex items-center">
+                                    <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                                        <x-iconify icon="lucide:car" class="w-5 h-5 text-blue-600" />
                                     </div>
-                                </td>
-
-                                {{-- Type --}}
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="flex items-center gap-2">
-                                        <div class="w-3 h-3 rounded-full" style="background-color: {{ $operation->maintenanceType->getCategoryColor() }}"></div>
-                                        <div>
-                                            <div class="text-sm font-medium text-gray-900">{{ $operation->maintenanceType->name }}</div>
-                                            <div class="text-xs text-gray-500">{{ ucfirst($operation->maintenanceType->category ?? '') }}</div>
-                                        </div>
+                                    <div class="ml-3">
+                                        <div class="text-sm font-semibold text-gray-900">{{ $operation->vehicle->registration_plate }}</div>
+                                        <div class="text-xs text-gray-500">{{ $operation->vehicle->brand }} {{ $operation->vehicle->model }}</div>
                                     </div>
-                                </td>
+                                </div>
+                            </td>
 
-                                {{-- Date --}}
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="text-sm text-gray-900">{{ $operation->scheduled_date?->format('d/m/Y') ?? 'Non définie' }}</div>
-                                    <div class="text-xs text-gray-500">
-                                        @if($operation->scheduled_date)
-                                            {{ $operation->scheduled_date->diffForHumans() }}
-                                        @endif
+                            {{-- Type --}}
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="flex items-center gap-2">
+                                    <div class="w-3 h-3 rounded-full" style="background-color: {{ $operation->maintenanceType->getCategoryColor() }}"></div>
+                                    <div>
+                                        <div class="text-sm font-medium text-gray-900">{{ $operation->maintenanceType->name }}</div>
+                                        <div class="text-xs text-gray-500">{{ ucfirst($operation->maintenanceType->category ?? '') }}</div>
                                     </div>
-                                </td>
+                                </div>
+                            </td>
 
-                                {{-- Statut --}}
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    {!! $operation->getStatusBadge() !!}
-                                </td>
-
-                                {{-- Fournisseur --}}
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    @if($operation->provider)
-                                        <div class="text-sm text-gray-900">{{ $operation->provider->name }}</div>
-                                        <div class="text-xs text-gray-500">{{ $operation->provider->contact_phone ?? '' }}</div>
-                                    @else
-                                        <span class="text-sm text-gray-400">Non défini</span>
+                            {{-- Date --}}
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm text-gray-900">{{ $operation->scheduled_date?->format('d/m/Y') ?? 'Non définie' }}</div>
+                                <div class="text-xs text-gray-500">
+                                    @if($operation->scheduled_date)
+                                    {{ $operation->scheduled_date->diffForHumans() }}
                                     @endif
-                                </td>
+                                </div>
+                            </td>
 
-                                {{-- Coût --}}
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    @if($operation->total_cost)
-                                        <div class="text-sm font-semibold text-gray-900">{{ number_format($operation->total_cost, 0, ',', ' ') }} DA</div>
-                                    @else
-                                        <span class="text-sm text-gray-400">Non défini</span>
+                            {{-- Statut --}}
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                {!! $operation->getStatusBadge() !!}
+                            </td>
+
+                            {{-- Fournisseur --}}
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                @if($operation->provider)
+                                <div class="text-sm text-gray-900">{{ $operation->provider->name }}</div>
+                                <div class="text-xs text-gray-500">{{ $operation->provider->contact_phone ?? '' }}</div>
+                                @else
+                                <span class="text-sm text-gray-400">Non défini</span>
+                                @endif
+                            </td>
+
+                            {{-- Coût --}}
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                @if($operation->total_cost)
+                                <div class="text-sm font-semibold text-gray-900">{{ number_format($operation->total_cost, 0, ',', ' ') }} DA</div>
+                                @else
+                                <span class="text-sm text-gray-400">Non défini</span>
+                                @endif
+                            </td>
+
+                            {{-- Actions --}}
+                            <td class="px-6 py-4 whitespace-nowrap text-right">
+                                <div class="flex items-center justify-end gap-2">
+                                    {{-- Voir --}}
+                                    <a href="{{ route('admin.maintenance.operations.show', $operation) }}"
+                                        class="p-2 rounded-full bg-gray-50 text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition-all duration-200 group"
+                                        title="Voir détails">
+                                        <x-iconify icon="lucide:eye" class="w-4 h-4 group-hover:scale-110 transition-transform" />
+                                    </a>
+
+                                    {{-- Éditer --}}
+                                    @can('update', $operation)
+                                    <a href="{{ route('admin.maintenance.operations.edit', $operation) }}"
+                                        class="p-2 rounded-full bg-gray-50 text-gray-400 hover:text-amber-600 hover:bg-amber-50 transition-all duration-200 group"
+                                        title="Modifier">
+                                        <x-iconify icon="lucide:edit-3" class="w-4 h-4 group-hover:scale-110 transition-transform" />
+                                    </a>
+                                    @endcan
+
+                                    {{-- Actions rapides selon statut --}}
+                                    @if($operation->status === 'planned')
+                                    <form action="{{ route('admin.maintenance.operations.start', $operation) }}" method="POST" class="inline">
+                                        @csrf
+                                        @method('PATCH')
+                                        <button type="submit"
+                                            class="p-2 rounded-full bg-gray-50 text-gray-400 hover:text-green-600 hover:bg-green-50 transition-all duration-200 group"
+                                            title="Démarrer">
+                                            <x-iconify icon="lucide:play" class="w-4 h-4 group-hover:scale-110 transition-transform" />
+                                        </button>
+                                    </form>
                                     @endif
-                                </td>
 
-                                {{-- Actions --}}
-                                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                    <div class="flex items-center justify-end gap-2">
-                                        {{-- Voir --}}
-                                        <a href="{{ route('admin.maintenance.operations.show', $operation) }}" 
-                                           class="text-blue-600 hover:text-blue-900" title="Voir détails">
-                                            <x-iconify icon="lucide:eye" class="w-5 h-5" />
-                                        </a>
-
-                                        {{-- Éditer --}}
-                                        @can('update', $operation)
-                                            <a href="{{ route('admin.maintenance.operations.edit', $operation) }}" 
-                                               class="text-gray-600 hover:text-gray-900" title="Modifier">
-                                                <x-iconify icon="lucide:pencil" class="w-5 h-5" />
-                                            </a>
-                                        @endcan
-
-                                        {{-- Actions rapides selon statut --}}
-                                        @if($operation->status === 'planned')
-                                            <form action="{{ route('admin.maintenance.operations.start', $operation) }}" method="POST" class="inline">
-                                                @csrf
-                                                @method('PATCH')
-                                                <button type="submit" class="text-green-600 hover:text-green-900" title="Démarrer">
-                                                    <x-iconify icon="lucide:play" class="w-5 h-5" />
-                                                </button>
-                                            </form>
-                                        @endif
-
-                                        {{-- Supprimer --}}
-                                        @can('delete', $operation)
-                                            <form action="{{ route('admin.maintenance.operations.destroy', $operation) }}" method="POST" 
-                                                  onsubmit="return confirm('Confirmer la suppression ?')" class="inline">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" class="text-red-600 hover:text-red-900" title="Supprimer">
-                                                    <x-iconify icon="lucide:trash-2" class="w-5 h-5" />
-                                                </button>
-                                            </form>
-                                        @endcan
-                                    </div>
-                                </td>
-                            </tr>
+                                    {{-- Supprimer --}}
+                                    @can('delete', $operation)
+                                    <form action="{{ route('admin.maintenance.operations.destroy', $operation) }}" method="POST"
+                                        onsubmit="return confirm('Confirmer la suppression ?')" class="inline">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit"
+                                            class="p-2 rounded-full bg-gray-50 text-gray-400 hover:text-red-600 hover:bg-red-50 transition-all duration-200 group"
+                                            title="Supprimer">
+                                            <x-iconify icon="lucide:trash-2" class="w-4 h-4 group-hover:scale-110 transition-transform" />
+                                        </button>
+                                    </form>
+                                    @endcan
+                                </div>
+                            </td>
+                        </tr>
                         @empty
-                            <tr>
-                                <td colspan="7" class="px-6 py-12 text-center">
-                                    <div class="flex flex-col items-center justify-center">
-                                        <x-iconify icon="lucide:inbox" class="w-12 h-12 text-gray-400 mb-3" />
-                                        <h3 class="text-sm font-medium text-gray-900 mb-1">Aucune opération trouvée</h3>
-                                        <p class="text-sm text-gray-500 mb-4">Commencez par créer une nouvelle opération de maintenance.</p>
-                                        <a href="{{ route('admin.maintenance.operations.create') }}" 
-                                           class="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm font-semibold rounded-lg hover:bg-blue-700">
-                                            <x-iconify icon="lucide:plus" class="w-4 h-4" />
-                                            Nouvelle Maintenance
-                                        </a>
-                                    </div>
-                                </td>
-                            </tr>
+                        <tr>
+                            <td colspan="7" class="px-6 py-12 text-center">
+                                <div class="flex flex-col items-center justify-center">
+                                    <x-iconify icon="lucide:inbox" class="w-12 h-12 text-gray-400 mb-3" />
+                                    <h3 class="text-sm font-medium text-gray-900 mb-1">Aucune opération trouvée</h3>
+                                    <p class="text-sm text-gray-500 mb-4">Commencez par créer une nouvelle opération de maintenance.</p>
+                                    <a href="{{ route('admin.maintenance.operations.create') }}"
+                                        class="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm font-semibold rounded-lg hover:bg-blue-700">
+                                        <x-iconify icon="lucide:plus" class="w-4 h-4" />
+                                        Nouvelle Maintenance
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
                         @endforelse
                     </tbody>
                 </table>
             </div>
 
             {{-- Pagination --}}
-            @if($operations->hasPages())
-                <div class="px-6 py-4 border-t border-gray-200 bg-gray-50">
-                    {{ $operations->links() }}
-                </div>
-            @endif
+            <div class="px-6 py-4 border-t border-gray-200 bg-gray-50">
+                <x-pagination-standard :paginator="$operations" :records-per-page="request('per_page', 15)" />
+            </div>
         </div>
 
     </div>
@@ -703,12 +707,12 @@
 {{-- Script Alpine.js pour interactions --}}
 @push('scripts')
 <script>
-// Auto-submit form on filter change
-document.querySelectorAll('#filterForm select, #filterForm input[type="date"]').forEach(element => {
-    element.addEventListener('change', function() {
-        document.getElementById('filterForm').submit();
+    // Auto-submit form on filter change
+    document.querySelectorAll('#filterForm select, #filterForm input[type="date"]').forEach(element => {
+        element.addEventListener('change', function() {
+            document.getElementById('filterForm').submit();
+        });
     });
-});
 </script>
 @endpush
 

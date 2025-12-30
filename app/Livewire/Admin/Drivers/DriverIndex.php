@@ -41,7 +41,7 @@ class DriverIndex extends Component
     #[Url(except: '')]
     public $visibility = 'active'; // active, archived, all
 
-    public $per_page = 20;
+    public $perPage = 25;
 
     // ↕️ Tri
     public $sortField = 'created_at';
@@ -402,7 +402,7 @@ class DriverIndex extends Component
 
     public function render()
     {
-        $drivers = $this->getDriversQuery()->paginate($this->per_page);
+        $drivers = $this->getDriversQuery()->paginate($this->perPage);
 
         $driverStatuses = Cache::remember('driver_statuses', 3600, fn() => DriverStatus::orderBy('name')->get());
 

@@ -1,5 +1,5 @@
 {{-- resources/views/livewire/admin/document-manager-index.blade.php --}}
-{{-- 
+{{--
     ⚠️ IMPORTANT LIVEWIRE 3 : Ce composant DOIT avoir UN SEUL élément racine
     Tous les enfants (contenu + modal) sont wrappés dans un seul <div>
 --}}
@@ -17,9 +17,9 @@
                 </p>
             </div>
             <div class="mt-4 flex md:mt-0 md:ml-4 space-x-3">
-                <x-button 
-                    @click="$dispatch('open-modal', 'document-upload-modal')" 
-                    variant="primary" 
+                <x-button
+                    @click="$dispatch('open-modal', 'document-upload-modal')"
+                    variant="primary"
                     icon="plus"
                     iconPosition="left">
                     Nouveau Document
@@ -30,15 +30,15 @@
 
     {{-- Flash Messages --}}
     @if (session()->has('success'))
-        <x-alert type="success" dismissible class="mb-6">
-            {{ session('success') }}
-        </x-alert>
+    <x-alert type="success" dismissible class="mb-6">
+        {{ session('success') }}
+    </x-alert>
     @endif
 
     @if (session()->has('error'))
-        <x-alert type="error" dismissible class="mb-6">
-            {{ session('error') }}
-        </x-alert>
+    <x-alert type="error" dismissible class="mb-6">
+        {{ session('error') }}
+    </x-alert>
     @endif
 
     {{-- Filters --}}
@@ -50,8 +50,7 @@
                     wire:model.live.debounce.300ms="search"
                     name="search"
                     placeholder="Rechercher (nom, description, métadonnées)..."
-                    icon="magnifying-glass"
-                />
+                    icon="magnifying-glass" />
             </div>
 
             {{-- Category Filter --}}
@@ -59,8 +58,7 @@
                 <x-select
                     wire:model.live="categoryFilter"
                     name="categoryFilter"
-                    :options="['' => 'Toutes les catégories'] + $categories->pluck('name', 'id')->toArray()"
-                />
+                    :options="['' => 'Toutes les catégories'] + $categories->pluck('name', 'id')->toArray()" />
             </div>
 
             {{-- Status Filter --}}
@@ -74,18 +72,17 @@
                         'validated' => 'Validé',
                         'archived' => 'Archivé',
                         'expired' => 'Expiré',
-                    ]"
-                />
+                    ]" />
             </div>
         </div>
 
         {{-- Reset Filters --}}
         @if($search || $categoryFilter || $statusFilter)
-            <div class="mt-4 flex justify-end">
-                <x-button wire:click="resetFilters" variant="ghost" size="sm">
-                    Réinitialiser les filtres
-                </x-button>
-            </div>
+        <div class="mt-4 flex justify-end">
+            <x-button wire:click="resetFilters" variant="ghost" size="sm">
+                Réinitialiser les filtres
+            </x-button>
+        </div>
         @endif
     </div>
 
@@ -99,7 +96,7 @@
                             <div class="flex items-center space-x-1">
                                 <span>Document</span>
                                 @if($sortField === 'original_filename')
-                                    <x-iconify icon="heroicons:chevron-{{ $sortDirection === 'asc' ? 'up' : 'down' }}" class="w-4 h-4" />
+                                <x-iconify icon="heroicons:chevron-{{ $sortDirection === 'asc' ? 'up' : 'down' }}" class="w-4 h-4" />
                                 @endif
                             </div>
                         </th>
@@ -110,7 +107,7 @@
                             <div class="flex items-center space-x-1">
                                 <span>Émission</span>
                                 @if($sortField === 'issue_date')
-                                    <x-iconify icon="heroicons:chevron-{{ $sortDirection === 'asc' ? 'up' : 'down' }}" class="w-4 h-4" />
+                                <x-iconify icon="heroicons:chevron-{{ $sortDirection === 'asc' ? 'up' : 'down' }}" class="w-4 h-4" />
                                 @endif
                             </div>
                         </th>
@@ -118,7 +115,7 @@
                             <div class="flex items-center space-x-1">
                                 <span>Expiration</span>
                                 @if($sortField === 'expiry_date')
-                                    <x-iconify icon="heroicons:chevron-{{ $sortDirection === 'asc' ? 'up' : 'down' }}" class="w-4 h-4" />
+                                <x-iconify icon="heroicons:chevron-{{ $sortDirection === 'asc' ? 'up' : 'down' }}" class="w-4 h-4" />
                                 @endif
                             </div>
                         </th>
@@ -129,7 +126,7 @@
                             <div class="flex items-center space-x-1">
                                 <span>Créé le</span>
                                 @if($sortField === 'created_at')
-                                    <x-iconify icon="heroicons:chevron-{{ $sortDirection === 'asc' ? 'up' : 'down' }}" class="w-4 h-4" />
+                                <x-iconify icon="heroicons:chevron-{{ $sortDirection === 'asc' ? 'up' : 'down' }}" class="w-4 h-4" />
                                 @endif
                             </div>
                         </th>
@@ -140,128 +137,131 @@
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
                     @forelse($documents as $document)
-                        <tr class="hover:bg-gray-50 transition-colors duration-150" wire:key="document-{{ $document->id }}">
-                            {{-- Document Info --}}
-                            <td class="px-6 py-4">
-                                <div class="flex items-center">
-                                    <div class="flex-shrink-0 h-10 w-10">
-                                        <div class="h-10 w-10 rounded-lg bg-blue-100 flex items-center justify-center">
-                                            <x-iconify icon="mdi:file-document" class="h-6 w-6 text-blue-600" />
-                                        </div>
-                                    </div>
-                                    <div class="ml-4">
-                                        <div class="text-sm font-medium text-gray-900 truncate max-w-xs" title="{{ $document->original_filename }}">
-                                            {{ $document->original_filename }}
-                                        </div>
-                                        <div class="text-sm text-gray-500">
-                                            {{ $document->formatted_size }}
-                                        </div>
+                    <tr class="hover:bg-gray-50 transition-colors duration-150" wire:key="document-{{ $document->id }}">
+                        {{-- Document Info --}}
+                        <td class="px-6 py-4">
+                            <div class="flex items-center">
+                                <div class="flex-shrink-0 h-10 w-10">
+                                    <div class="h-10 w-10 rounded-lg bg-blue-100 flex items-center justify-center">
+                                        <x-iconify icon="mdi:file-document" class="h-6 w-6 text-blue-600" />
                                     </div>
                                 </div>
-                            </td>
-
-                            {{-- Category --}}
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <x-badge type="info" size="sm">
-                                    {{ $document->category->name }}
-                                </x-badge>
-                            </td>
-
-                            {{-- Issue Date --}}
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                {{ $document->issue_date?->format('d/m/Y') ?? '-' }}
-                            </td>
-
-                            {{-- Expiry Date --}}
-                            <td class="px-6 py-4 whitespace-nowrap text-sm">
-                                @if($document->expiry_date)
-                                    <div class="flex flex-col">
-                                        <span class="font-medium {{ $document->is_expired ? 'text-red-600' : ($document->is_expiring_soon ? 'text-orange-600' : 'text-gray-900') }}">
-                                            {{ $document->expiry_date->format('d/m/Y') }}
-                                        </span>
-                                        @if($document->is_expired)
-                                            <span class="text-xs text-red-600">Expiré</span>
-                                        @elseif($document->is_expiring_soon)
-                                            <span class="text-xs text-orange-600">Expire bientôt</span>
-                                        @endif
+                                <div class="ml-4">
+                                    <div class="text-sm font-medium text-gray-900 truncate max-w-xs" title="{{ $document->original_filename }}">
+                                        {{ $document->original_filename }}
                                     </div>
-                                @else
-                                    <span class="text-gray-500">-</span>
+                                    <div class="text-sm text-gray-500">
+                                        {{ $document->formatted_size }}
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+
+                        {{-- Category --}}
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <x-badge type="info" size="sm">
+                                {{ $document->category->name }}
+                            </x-badge>
+                        </td>
+
+                        {{-- Issue Date --}}
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                            {{ $document->issue_date?->format('d/m/Y') ?? '-' }}
+                        </td>
+
+                        {{-- Expiry Date --}}
+                        <td class="px-6 py-4 whitespace-nowrap text-sm">
+                            @if($document->expiry_date)
+                            <div class="flex flex-col">
+                                <span class="font-medium {{ $document->is_expired ? 'text-red-600' : ($document->is_expiring_soon ? 'text-orange-600' : 'text-gray-900') }}">
+                                    {{ $document->expiry_date->format('d/m/Y') }}
+                                </span>
+                                @if($document->is_expired)
+                                <span class="text-xs text-red-600">Expiré</span>
+                                @elseif($document->is_expiring_soon)
+                                <span class="text-xs text-orange-600">Expire bientôt</span>
                                 @endif
-                            </td>
+                            </div>
+                            @else
+                            <span class="text-gray-500">-</span>
+                            @endif
+                        </td>
 
-                            {{-- Status --}}
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                @php
-                                    $statusConfig = [
-                                        'draft' => ['type' => 'gray', 'label' => 'Brouillon'],
-                                        'validated' => ['type' => 'success', 'label' => 'Validé'],
-                                        'archived' => ['type' => 'warning', 'label' => 'Archivé'],
-                                        'expired' => ['type' => 'error', 'label' => 'Expiré'],
-                                    ];
-                                    $config = $statusConfig[$document->status] ?? ['type' => 'gray', 'label' => $document->status];
-                                @endphp
-                                <x-badge :type="$config['type']" size="sm">
-                                    {{ $config['label'] }}
-                                </x-badge>
-                            </td>
+                        {{-- Status --}}
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            @php
+                            $statusConfig = [
+                            'draft' => ['type' => 'gray', 'label' => 'Brouillon'],
+                            'validated' => ['type' => 'success', 'label' => 'Validé'],
+                            'archived' => ['type' => 'warning', 'label' => 'Archivé'],
+                            'expired' => ['type' => 'error', 'label' => 'Expiré'],
+                            ];
+                            $config = $statusConfig[$document->status] ?? ['type' => 'gray', 'label' => $document->status];
+                            @endphp
+                            <x-badge :type="$config['type']" size="sm">
+                                {{ $config['label'] }}
+                            </x-badge>
+                        </td>
 
-                            {{-- Created At --}}
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                {{ $document->created_at->format('d/m/Y H:i') }}
-                            </td>
+                        {{-- Created At --}}
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                            {{ $document->created_at->format('d/m/Y H:i') }}
+                        </td>
 
-                            {{-- Actions --}}
-                            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
-                                <button 
+                        {{-- Actions --}}
+                        <td class="px-6 py-4 whitespace-nowrap text-right">
+                            <div class="flex items-center justify-end gap-2">
+                                {{-- Télécharger --}}
+                                <button
                                     wire:click="download({{ $document->id }})"
-                                    class="text-blue-600 hover:text-blue-900 inline-flex items-center"
+                                    class="p-2 rounded-full bg-gray-50 text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition-all duration-200 group"
                                     title="Télécharger">
-                                    <x-iconify icon="mdi:download" class="w-5 h-5" />
+                                    <x-iconify icon="lucide:download" class="w-4 h-4 group-hover:scale-110 transition-transform" />
                                 </button>
-                                
+
                                 @if($document->status !== 'archived')
-                                    <button 
-                                        wire:click="archive({{ $document->id }})"
-                                        wire:confirm="Êtes-vous sûr de vouloir archiver ce document ?"
-                                        class="text-orange-600 hover:text-orange-900 inline-flex items-center"
-                                        title="Archiver">
-                                        <x-iconify icon="mdi:archive" class="w-5 h-5" />
-                                    </button>
+                                {{-- Archiver --}}
+                                <button
+                                    wire:click="archive({{ $document->id }})"
+                                    wire:confirm="Êtes-vous sûr de vouloir archiver ce document ?"
+                                    class="p-2 rounded-full bg-gray-50 text-gray-400 hover:text-amber-600 hover:bg-amber-50 transition-all duration-200 group"
+                                    title="Archiver">
+                                    <x-iconify icon="lucide:archive" class="w-4 h-4 group-hover:scale-110 transition-transform" />
+                                </button>
                                 @endif
-                                
+
                                 @can('delete documents')
-                                    <button 
-                                        wire:click="delete({{ $document->id }})"
-                                        wire:confirm="ATTENTION : Cette action est irréversible. Êtes-vous sûr de vouloir supprimer définitivement ce document ?"
-                                        class="text-red-600 hover:text-red-900 inline-flex items-center"
-                                        title="Supprimer">
-                                        <x-iconify icon="mdi:delete" class="w-5 h-5" />
-                                    </button>
+                                {{-- Supprimer --}}
+                                <button
+                                    wire:click="delete({{ $document->id }})"
+                                    wire:confirm="ATTENTION : Cette action est irréversible. Êtes-vous sûr de vouloir supprimer définitivement ce document ?"
+                                    class="p-2 rounded-full bg-gray-50 text-gray-400 hover:text-red-600 hover:bg-red-50 transition-all duration-200 group"
+                                    title="Supprimer">
+                                    <x-iconify icon="lucide:trash-2" class="w-4 h-4 group-hover:scale-110 transition-transform" />
+                                </button>
                                 @endcan
-                            </td>
-                        </tr>
+                            </div>
+                        </td>
+                    </tr>
                     @empty
-                        <tr>
-                            <td colspan="7" class="px-6 py-12 text-center">
-                                <div class="flex flex-col items-center justify-center">
-                                    <x-iconify icon="mdi:file-document-outline" class="w-16 h-16 text-gray-400 mb-4" />
-                                    <p class="text-gray-500 text-lg font-medium">Aucun document trouvé</p>
-                                    <p class="text-gray-400 text-sm mt-1">Essayez de modifier vos filtres ou d'ajouter un nouveau document</p>
-                                </div>
-                            </td>
-                        </tr>
+                    <tr>
+                        <td colspan="7" class="px-6 py-12 text-center">
+                            <div class="flex flex-col items-center justify-center">
+                                <x-iconify icon="mdi:file-document-outline" class="w-16 h-16 text-gray-400 mb-4" />
+                                <p class="text-gray-500 text-lg font-medium">Aucun document trouvé</p>
+                                <p class="text-gray-400 text-sm mt-1">Essayez de modifier vos filtres ou d'ajouter un nouveau document</p>
+                            </div>
+                        </td>
+                    </tr>
                     @endforelse
                 </tbody>
             </table>
         </div>
 
         {{-- Pagination --}}
-        @if($documents->hasPages())
-            <div class="bg-white px-4 py-3 border-t border-gray-200">
-                {{ $documents->links() }}
-            </div>
-        @endif
+        <div class="px-6 py-4 border-t border-gray-200">
+            <x-pagination :paginator="$documents" :records-per-page="$perPage" wire:model.live="perPage" />
+        </div>
     </div>
 
     {{-- Stats Footer --}}

@@ -39,7 +39,7 @@ class DocumentManagerIndex extends Component
     /**
      * Pagination
      */
-    public int $perPage = 15;
+    public int $perPage = 25;
 
     /**
      * Querystring bindings
@@ -128,7 +128,6 @@ class DocumentManagerIndex extends Component
 
             $service = app(DocumentManagerService::class);
             return $service->download($document);
-            
         } catch (\Exception $e) {
             session()->flash('error', 'Erreur lors du téléchargement : ' . $e->getMessage());
         }
@@ -148,7 +147,6 @@ class DocumentManagerIndex extends Component
 
             session()->flash('success', 'Document archivé avec succès.');
             $this->dispatch('document-archived', documentId: $documentId);
-            
         } catch (\Exception $e) {
             session()->flash('error', 'Erreur lors de l\'archivage : ' . $e->getMessage());
         }
@@ -174,7 +172,6 @@ class DocumentManagerIndex extends Component
 
             session()->flash('success', 'Document supprimé définitivement.');
             $this->dispatch('document-deleted', documentId: $documentId);
-            
         } catch (\Exception $e) {
             session()->flash('error', 'Erreur lors de la suppression : ' . $e->getMessage());
         }

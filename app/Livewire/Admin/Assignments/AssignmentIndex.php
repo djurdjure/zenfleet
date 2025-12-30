@@ -63,7 +63,7 @@ class AssignmentIndex extends Component
     public $deletingAssignmentDescription = '';
 
     // 🔢 Pagination
-    public $per_page = 20;
+    public $perPage = 25;
 
     // 🔄 Query String Configuration
     protected $queryString = [
@@ -73,7 +73,7 @@ class AssignmentIndex extends Component
         'date_to' => ['except' => ''],
         'sort_by' => ['except' => 'created_at'],
         'sort_order' => ['except' => 'desc'],
-        'per_page' => ['except' => 20],
+        'perPage' => ['except' => 25],
     ];
 
     public function mount()
@@ -110,7 +110,7 @@ class AssignmentIndex extends Component
         $this->date_to = '';
         $this->sort_by = 'created_at';
         $this->sort_order = 'desc';
-        $this->per_page = 20;
+        $this->perPage = 25;
         $this->resetPage();
     }
 
@@ -290,7 +290,7 @@ class AssignmentIndex extends Component
         // Sorting
         $query->orderBy($this->sort_by, $this->sort_order);
 
-        return $query->paginate($this->per_page);
+        return $query->paginate($this->perPage);
     }
 
     public function render()
