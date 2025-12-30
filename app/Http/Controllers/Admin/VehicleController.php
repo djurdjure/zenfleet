@@ -339,7 +339,7 @@ class VehicleController extends Controller
             // Recommandations intelligentes
             $recommendations = $this->getVehicleRecommendations($vehicle);
 
-            return view('admin.vehicles.enterprise-show', compact(
+            return view('admin.vehicles.show', compact(
                 'vehicle',
                 'analytics',
                 'timeline',
@@ -1150,7 +1150,7 @@ class VehicleController extends Controller
 
         // === VEHICLE AGE & TIME IN SERVICE ===
         $vehicleAge = $vehicle->acquisition_date
-            ? Carbon::now()->diffInYears($vehicle->acquisition_date)
+            ? abs(Carbon::now()->diffInYears($vehicle->acquisition_date))
             : 0;
 
         $now = Carbon::now();
@@ -1160,7 +1160,7 @@ class VehicleController extends Controller
             $daysInService = 0;
             $formattedDuration = "Pas encore en service";
         } elseif ($acquisition) {
-            $daysInService = $acquisition->diffInDays($now); // absolute by default
+            $daysInService = abs($acquisition->diffInDays($now)); // absolute by default
 
             // Formatage durée "1 an 3 mois 15 jours"
             $diff = $acquisition->diff($now);

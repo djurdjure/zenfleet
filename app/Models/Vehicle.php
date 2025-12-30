@@ -29,11 +29,31 @@ class Vehicle extends Model
     }
 
     protected $fillable = [
-        'registration_plate', 'vin', 'brand', 'model', 'color', 'vehicle_type_id',
-        'fuel_type_id', 'transmission_type_id', 'status_id', 'manufacturing_year',
-        'acquisition_date', 'purchase_price', 'current_value', 'initial_mileage',
-        'current_mileage', 'engine_displacement_cc', 'power_hp', 'seats', 'status_reason', 'notes', 'organization_id',
-        'vehicle_name', 'category_id', 'depot_id', 'is_archived',
+        'registration_plate',
+        'vin',
+        'brand',
+        'model',
+        'color',
+        'vehicle_type_id',
+        'fuel_type_id',
+        'transmission_type_id',
+        'status_id',
+        'manufacturing_year',
+        'acquisition_date',
+        'purchase_price',
+        'current_value',
+        'initial_mileage',
+        'current_mileage',
+        'engine_displacement_cc',
+        'power_hp',
+        'seats',
+        'status_reason',
+        'notes',
+        'organization_id',
+        'vehicle_name',
+        'category_id',
+        'depot_id',
+        'is_archived',
     ];
 
     protected $casts = [
@@ -50,15 +70,36 @@ class Vehicle extends Model
     ];
 
     // CORRECTION : Ajout du bon type de retour (BelongsTo)
-    public function vehicleType(): BelongsTo { return $this->belongsTo(VehicleType::class); }
-    public function fuelType(): BelongsTo { return $this->belongsTo(FuelType::class); }
-    public function transmissionType(): BelongsTo { return $this->belongsTo(TransmissionType::class); }
-    public function vehicleStatus(): BelongsTo { return $this->belongsTo(VehicleStatus::class, 'status_id'); }
-    public function category(): BelongsTo { return $this->belongsTo(VehicleCategory::class); }
-    public function depot(): BelongsTo { return $this->belongsTo(VehicleDepot::class); }
+    public function vehicleType(): BelongsTo
+    {
+        return $this->belongsTo(VehicleType::class);
+    }
+    public function fuelType(): BelongsTo
+    {
+        return $this->belongsTo(FuelType::class);
+    }
+    public function transmissionType(): BelongsTo
+    {
+        return $this->belongsTo(TransmissionType::class);
+    }
+    public function vehicleStatus(): BelongsTo
+    {
+        return $this->belongsTo(VehicleStatus::class, 'status_id');
+    }
+    public function category(): BelongsTo
+    {
+        return $this->belongsTo(VehicleCategory::class);
+    }
+    public function depot(): BelongsTo
+    {
+        return $this->belongsTo(VehicleDepot::class);
+    }
 
     // CORRECTION : Ajout du bon type de retour (HasMany)
-    public function assignments(): HasMany { return $this->hasMany(Assignment::class); }
+    public function assignments(): HasMany
+    {
+        return $this->hasMany(Assignment::class);
+    }
 
     /**
      * 👤 Relation avec l'affectation actuelle (Active)
@@ -71,19 +112,38 @@ class Vehicle extends Model
             'id' => 'max',
         ], function ($query) {
             $query->whereNull('deleted_at')
-                  ->where('status', 'active')
-                  ->where('start_datetime', '<=', now())
-                  ->where(function($q) {
-                      $q->whereNull('end_datetime')
+                ->where('status', 'active')
+                ->where('start_datetime', '<=', now())
+                ->where(function ($q) {
+                    $q->whereNull('end_datetime')
                         ->orWhere('end_datetime', '>=', now());
-                  });
+                });
         });
     }
-    public function maintenancePlans(): HasMany { return $this->hasMany(MaintenancePlan::class); }
-    public function maintenanceLogs(): HasMany { return $this->hasMany(MaintenanceLog::class); }
-    public function repairRequests(): HasMany { return $this->hasMany(RepairRequest::class); }
-    public function mileageReadings(): HasMany { return $this->hasMany(VehicleMileageReading::class); }
-    public function depotAssignmentHistory(): HasMany { return $this->hasMany(DepotAssignmentHistory::class); }
+    public function maintenancePlans(): HasMany
+    {
+        return $this->hasMany(MaintenancePlan::class);
+    }
+    public function maintenanceLogs(): HasMany
+    {
+        return $this->hasMany(MaintenanceLog::class);
+    }
+    public function expenses(): HasMany
+    {
+        return $this->hasMany(VehicleExpense::class);
+    }
+    public function repairRequests(): HasMany
+    {
+        return $this->hasMany(RepairRequest::class);
+    }
+    public function mileageReadings(): HasMany
+    {
+        return $this->hasMany(VehicleMileageReading::class);
+    }
+    public function depotAssignmentHistory(): HasMany
+    {
+        return $this->hasMany(DepotAssignmentHistory::class);
+    }
 
     /**
      * 📊 Relation polymorphique avec l'historique des statuts
@@ -262,10 +322,10 @@ class Vehicle extends Model
     public function activeMaintenanceOperations(): HasMany
     {
         return $this->hasMany(MaintenanceOperation::class)
-                    ->whereIn('status', [
-                        MaintenanceOperation::STATUS_PLANNED,
-                        MaintenanceOperation::STATUS_IN_PROGRESS
-                    ]);
+            ->whereIn('status', [
+                MaintenanceOperation::STATUS_PLANNED,
+                MaintenanceOperation::STATUS_IN_PROGRESS
+            ]);
     }
 
     /**
@@ -274,16 +334,16 @@ class Vehicle extends Model
     public function recentMaintenanceOperations(): HasMany
     {
         return $this->hasMany(MaintenanceOperation::class)
-                    ->where('created_at', '>=', now()->subDays(30))
-                    ->orderBy('created_at', 'desc');
+            ->where('created_at', '>=', now()->subDays(30))
+            ->orderBy('created_at', 'desc');
     }
-    
+
     /**
      * Vérifie si le véhicule a une affectation actuellement en cours.
      */
     public function isCurrentlyAssigned(): bool
     {
-       return $this->assignments()->whereNull('end_datetime')->exists();
+        return $this->assignments()->whereNull('end_datetime')->exists();
     }
 
     /**
@@ -300,10 +360,10 @@ class Vehicle extends Model
     public function getNextMaintenance()
     {
         return $this->maintenanceOperations()
-                    ->where('status', MaintenanceOperation::STATUS_PLANNED)
-                    ->whereDate('scheduled_date', '>=', now()->toDateString())
-                    ->orderBy('scheduled_date')
-                    ->first();
+            ->where('status', MaintenanceOperation::STATUS_PLANNED)
+            ->whereDate('scheduled_date', '>=', now()->toDateString())
+            ->orderBy('scheduled_date')
+            ->first();
     }
 
     /**
@@ -312,7 +372,7 @@ class Vehicle extends Model
     public function getMaintenanceCost($startDate = null, $endDate = null): float
     {
         $query = $this->maintenanceOperations()
-                      ->where('status', MaintenanceOperation::STATUS_COMPLETED);
+            ->where('status', MaintenanceOperation::STATUS_COMPLETED);
 
         if ($startDate) {
             $query->whereDate('completed_date', '>=', $startDate);
@@ -451,9 +511,9 @@ class Vehicle extends Model
     public function scopeAvailableForAssignment($query)
     {
         return $query->active()
-            ->whereDoesntHave('assignments', function($q) {
+            ->whereDoesntHave('assignments', function ($q) {
                 $q->where('status', 'active')
-                  ->where('end_datetime', '>', now());
+                    ->where('end_datetime', '>', now());
             });
     }
 
@@ -539,7 +599,7 @@ class Vehicle extends Model
      */
     public function getStatusName(): string
     {
-        return match($this->status_id) {
+        return match ($this->status_id) {
             1 => 'Actif',
             2 => 'En maintenance',
             3 => 'Inactif',
@@ -554,7 +614,7 @@ class Vehicle extends Model
      */
     public function getStatusBadgeClass(): string
     {
-        return match($this->status_id) {
+        return match ($this->status_id) {
             1 => 'bg-green-100 text-green-800',
             2 => 'bg-yellow-100 text-yellow-800',
             3 => 'bg-red-100 text-red-800',

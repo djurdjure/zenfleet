@@ -54,8 +54,8 @@ class VehiclePdfExportService
                             ->limit(5);
                     },
                     'maintenanceOperations' => function ($q) {
-                        $q->orderBy('operation_date', 'desc')
-                            ->with('supplier')
+                        $q->orderBy('scheduled_date', 'desc')
+                            ->with('provider')
                             ->limit(5);
                     },
                     'expenses' => function ($q) {
@@ -89,7 +89,10 @@ class VehiclePdfExportService
             return $a->status === 'active' && !$a->end_datetime;
         });
         $daysInService = $vehicle->acquisition_date
-            ? $vehicle->acquisition_date->diffInDays(now())
+            ? abs($vehicle->acquisition_date->diffInDays(now()))
+            : 0;
+        $ageYears = $vehicle->acquisition_date
+            ? abs(now()->diffInYears($vehicle->acquisition_date))
             : 0;
         $totalKmDriven = ($vehicle->current_mileage ?? 0) - ($vehicle->initial_mileage ?? 0);
         $costPerKm = $totalKmDriven > 0 ? ($maintenanceCostTotal + $expenseTotal) / $totalKmDriven : 0;
@@ -100,10 +103,11 @@ class VehiclePdfExportService
             'assignments_count' => $assignmentsCount,
             'active_assignment' => $activeAssignment,
             'days_in_service' => $daysInService,
+            'age_years' => $ageYears,
             'total_km_driven' => $totalKmDriven,
             'cost_per_km' => $costPerKm,
             'maintenance_count' => $vehicle->maintenanceOperations->count(),
-            'last_maintenance_date' => $vehicle->maintenanceOperations->first()?->operation_date?->format('d/m/Y'),
+            'last_maintenance_date' => $vehicle->maintenanceOperations->first()?->scheduled_date?->format('d/m/Y'),
         ];
     }
 
