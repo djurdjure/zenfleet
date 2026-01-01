@@ -629,6 +629,27 @@ class DriverController extends Controller
     }
 
     /**
+     * 📄 Export PDF du profil chauffeur (Monochrome Strict)
+     */
+    public function exportProfilePdf(Driver $driver)
+    {
+        $this->authorize('view', $driver);
+
+        try {
+            // Vérification des permissions pour l'organisation
+            if (!auth()->user()->hasRole('Super Admin') && $driver->organization_id !== auth()->user()->organization_id) {
+                abort(403, 'Vous n\'avez pas l\'autorisation d\'exporter ce chauffeur.');
+            }
+
+            $pdfService = new \App\Services\DriverPdfExportService();
+            return $pdfService->exportProfile($driver);
+        } catch (\Exception $e) {
+            Log::error('Driver PDF profile export error: ' . $e->getMessage());
+            return back()->with('error', 'Erreur lors de la génération du PDF.');
+        }
+    }
+
+    /**
      * 📊 Export des chauffeurs
      */
     public function export(Request $request)

@@ -48,10 +48,11 @@ class VehiclePdfExportService
                     'transmissionType',
                     'depot',
                     'category',
+                    'currentAssignment.driver.user', // Charger le chauffeur actif explicitement
                     'assignments' => function ($q) {
                         $q->orderBy('start_datetime', 'desc')
-                            ->with('driver')
-                            ->limit(5);
+                            ->with('driver.user') // Charger user pour historique aussi
+                            ->limit(10); // Augmenter la limite pour historique
                     },
                     'maintenanceOperations' => function ($q) {
                         $q->orderBy('scheduled_date', 'desc')
@@ -85,15 +86,35 @@ class VehiclePdfExportService
         $maintenanceCostTotal = $vehicle->maintenanceOperations->sum('total_cost') ?? 0;
         $expenseTotal = $vehicle->expenses->sum('amount') ?? 0;
         $assignmentsCount = $vehicle->assignments->count();
-        $activeAssignment = $vehicle->assignments->first(function ($a) {
-            return $a->status === 'active' && !$a->end_datetime;
-        });
+
+        // Utiliser la relation currentAssignment si chargée, sinon méhode fallback sur la collection assignments
+        $activeAssignment = $vehicle->relationLoaded('currentAssignment') && $vehicle->currentAssignment
+            ? $vehicle->currentAssignment
+            : $vehicle->assignments->first(function ($a) {
+                // Logique matching VehicleController : statut active + (pas de fin ou fin future)
+                return $a->status === 'active' && (!$a->end_datetime || $a->end_datetime->isFuture());
+            });
+
+        $now = now();
         $daysInService = $vehicle->acquisition_date
-            ? abs($vehicle->acquisition_date->diffInDays(now()))
+            ? abs($vehicle->acquisition_date->diffInDays($now))
             : 0;
+
         $ageYears = $vehicle->acquisition_date
-            ? abs(now()->diffInYears($vehicle->acquisition_date))
+            ? abs($now->diffInYears($vehicle->acquisition_date))
             : 0;
+
+        // Formatage de l'âge (Année, mois, jour)
+        $vehicleAgeFormatted = "N/A";
+        if ($vehicle->acquisition_date) {
+            $diff = $vehicle->acquisition_date->diff($now);
+            $parts = [];
+            if ($diff->y > 0) $parts[] = $diff->y . ' an' . ($diff->y > 1 ? 's' : '');
+            if ($diff->m > 0) $parts[] = $diff->m . ' mois';
+            // Pas de jours pour l'âge, seulement année/mois
+            $vehicleAgeFormatted = !empty($parts) ? implode(' ', $parts) : "Moins d'un mois";
+        }
+
         $totalKmDriven = ($vehicle->current_mileage ?? 0) - ($vehicle->initial_mileage ?? 0);
         $costPerKm = $totalKmDriven > 0 ? ($maintenanceCostTotal + $expenseTotal) / $totalKmDriven : 0;
 
@@ -103,7 +124,8 @@ class VehiclePdfExportService
             'assignments_count' => $assignmentsCount,
             'active_assignment' => $activeAssignment,
             'days_in_service' => $daysInService,
-            'age_years' => $ageYears,
+            'age_years' => $ageYears, // Conserver pour compatibilité
+            'vehicle_age_formatted' => $vehicleAgeFormatted,
             'total_km_driven' => $totalKmDriven,
             'cost_per_km' => $costPerKm,
             'maintenance_count' => $vehicle->maintenanceOperations->count(),
@@ -287,9 +309,7 @@ class VehiclePdfExportService
      */
     protected function generateSingleVehicleHtml($vehicle, array $analytics = [])
     {
-        $activeAssignment = $analytics['active_assignment'] ?? $vehicle->assignments->first(function ($a) {
-            return $a->status === 'active' && !$a->end_datetime;
-        });
+        $activeAssignment = $analytics['active_assignment'] ?? null;
         $driver = $activeAssignment ? $activeAssignment->driver : null;
 
         return view('exports.pdf.vehicle-single', [

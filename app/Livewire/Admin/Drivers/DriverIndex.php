@@ -321,7 +321,7 @@ class DriverIndex extends Component
     // --- EXPORT PDF (MICROSERVICE) ---
     public function exportPdf(int $id)
     {
-        $driver = Driver::with(['driverStatus', 'user', 'organization', 'assignments.vehicle', 'supervisor'])
+        $driver = Driver::with(['driverStatus', 'user', 'organization', 'assignments.vehicle', 'supervisor', 'sanctions'])
             ->withTrashed()
             ->find($id);
 
@@ -330,10 +330,27 @@ class DriverIndex extends Component
             return;
         }
 
-        // 1. Générer le HTML
-        $html = view('pdf.driver-profile', ['driver' => $driver])->render();
+        // 1. Gestion de la photo en Base64 (vital pour le microservice PDF si domaine local inaccessible)
+        $photoBase64 = null;
+        if ($driver->photo && \Illuminate\Support\Facades\Storage::disk('public')->exists($driver->photo)) {
+            try {
+                $path = \Illuminate\Support\Facades\Storage::disk('public')->path($driver->photo);
+                $type = pathinfo($path, PATHINFO_EXTENSION);
+                $data = file_get_contents($path);
+                $photoBase64 = 'data:image/' . $type . ';base64,' . base64_encode($data);
+            } catch (\Exception $e) {
+                \Illuminate\Support\Facades\Log::warning('Impossible de charger la photo du chauffeur: ' . $e->getMessage());
+            }
+        }
 
-        // 2. Appeler le microservice PDF
+        // 2. Générer le HTML
+        $html = view('pdf.driver-profile', [
+            'driver' => $driver,
+            // Passer la photo encodée explicitement
+            'photoBase64' => $photoBase64
+        ])->render();
+
+        // 3. Appeler le microservice PDF
         try {
             $response = Http::timeout(30)->post('http://pdf-service:3000/generate-pdf', [
                 'html' => $html,
@@ -341,20 +358,27 @@ class DriverIndex extends Component
                     'format' => 'A4',
                     'printBackground' => true,
                     'margin' => [
-                        'top' => '10mm',
-                        'right' => '10mm',
-                        'bottom' => '10mm',
-                        'left' => '10mm'
+                        'top' => '0mm',    // Marges gérées par le CSS @page
+                        'right' => '0mm',
+                        'bottom' => '0mm',
+                        'left' => '0mm'
                     ]
                 ]
             ]);
 
             if ($response->successful()) {
-                $filename = 'Fiche_Chauffeur_' . $driver->employee_number . '.pdf';
+                $filename = 'Fiche_Chauffeur_' . ($driver->employee_number ?? $driver->id) . '.pdf';
 
-                return response()->streamDownload(function () use ($response) {
-                    echo $response->body();
-                }, $filename);
+                // 💾 SAUVEGARDE TEMPORAIRE POUR STABILITÉ DU TÉLÉCHARGEMENT
+                // Évite les problèmes de streaming Livewire qui peuvent retourner des UUIDs
+                $tempPath = 'temp/' . \Illuminate\Support\Str::uuid() . '.pdf';
+                \Illuminate\Support\Facades\Storage::put($tempPath, $response->body());
+
+                return response()->download(
+                    \Illuminate\Support\Facades\Storage::path($tempPath),
+                    $filename,
+                    ['Content-Type' => 'application/pdf']
+                )->deleteFileAfterSend();
             } else {
                 \Illuminate\Support\Facades\Log::error('PDF Service Error', ['body' => $response->body()]);
                 $this->dispatch('toast', ['type' => 'error', 'message' => 'Erreur du service PDF: ' . $response->status()]);

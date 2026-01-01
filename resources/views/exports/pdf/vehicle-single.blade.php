@@ -294,7 +294,7 @@
             </div>
             <div class="grid-item" style="border-right: 1px solid #e5e7eb; padding-left: 20px;">
                 <div class="text-xs text-gray-500 uppercase center">Âge</div>
-                <div class="text-lg font-bold text-gray-900 center">{{ number_format($analytics['age_years'] ?? 0, 1, ',', ' ') }} ans</div>
+                <div class="text-sm font-bold text-gray-900 center">{{ $analytics['vehicle_age_formatted'] ?? '-' }}</div>
             </div>
             <div class="grid-item" style="padding-left: 20px;">
                 <div class="text-xs text-gray-500 uppercase center">Coût/km</div>

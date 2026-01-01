@@ -350,6 +350,7 @@ Route::middleware(['auth', 'verified'])
                 Route::post('/', [DriverController::class, 'store'])->name('store');
 
                 // Routes avec paramètres {driver} - TOUJOURS EN DERNIER
+                Route::get('{driver}/export-profile-pdf', [DriverController::class, 'exportProfilePdf'])->name('export.profile.pdf');
                 Route::get('{driver}', [DriverController::class, 'show'])->name('show');
                 Route::get('{driver}/edit', [DriverController::class, 'edit'])->name('edit');
                 Route::put('{driver}', [DriverController::class, 'update'])->name('update');

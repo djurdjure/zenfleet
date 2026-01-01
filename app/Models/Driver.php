@@ -141,8 +141,7 @@ class Driver extends Model
     public function activeSanctions(): HasMany
     {
         return $this->hasMany(DriverSanction::class)
-            ->where('status', 'active')
-            ->whereNull('archived_at');
+            ->where('status', 'active');
     }
 
     /**

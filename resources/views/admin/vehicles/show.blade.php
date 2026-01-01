@@ -303,7 +303,7 @@
                             </div>
                             <div class="flex justify-between">
                                 <span class="text-gray-600">Âge du véhicule</span>
-                                <span class="font-medium">{{ $analytics['age_years'] ?? '0' }} ans</span>
+                                <span class="font-medium">{{ $analytics['vehicle_age_formatted'] ?? '-' }}</span>
                             </div>
                             <div class="flex justify-between">
                                 <span class="text-gray-600">Interventions totales</span>

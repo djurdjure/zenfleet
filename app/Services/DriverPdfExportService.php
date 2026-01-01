@@ -62,7 +62,6 @@ class DriverPdfExportService
                 'X-Frame-Options' => 'DENY',
                 'X-PDF-Service' => 'Enterprise Microservice v2.0'
             ]);
-
         } catch (\Exception $e) {
             Log::error('Driver PDF export failed', [
                 'error' => $e->getMessage(),
@@ -371,7 +370,7 @@ HTML;
      */
     protected function getStatusBadgeClass($status)
     {
-        return match($status) {
+        return match ($status) {
             'Disponible' => 'badge-green',
             'En mission' => 'badge-orange',
             'En repos' => 'badge-amber',
@@ -380,5 +379,66 @@ HTML;
             'Indisponible' => 'badge-gray',
             default => 'badge-gray',
         };
+    }
+
+    /**
+     * 📄 Export du profil complet d'un chauffeur (Format CV Strict Noir & Blanc)
+     *
+     * @param Driver $driver
+     * @return \Illuminate\Http\Response
+     */
+    public function exportProfile(Driver $driver)
+    {
+        try {
+            // 1. Préparation de la photo en Base64
+            $photoBase64 = null;
+            if ($driver->photo && \Illuminate\Support\Facades\Storage::disk('public')->exists($driver->photo)) {
+                try {
+                    $path = \Illuminate\Support\Facades\Storage::disk('public')->path($driver->photo);
+                    $type = pathinfo($path, PATHINFO_EXTENSION);
+                    $data = file_get_contents($path);
+                    $photoBase64 = 'data:image/' . $type . ';base64,' . base64_encode($data);
+                } catch (\Exception $e) {
+                    Log::warning('Impossible de charger la photo du chauffeur: ' . $e->getMessage());
+                }
+            }
+
+            // 2. Génération du HTML
+            $html = view('pdf.driver-profile', [
+                'driver' => $driver,
+                'organization' => $driver->organization ?? Auth::user()->organization,
+                'photoBase64' => $photoBase64
+            ])->render();
+
+            // 3. Appel du Microservice PDF
+            $pdfContent = $this->pdfService->generateFromHtml($html, [
+                'format' => 'A4',
+                'printBackground' => true, // Nécessaire même pour le N&B pour les cadres/fonds gris
+                'margin' => [
+                    'top' => '0mm',
+                    'right' => '0mm',
+                    'bottom' => '0mm',
+                    'left' => '0mm'
+                ]
+            ]);
+
+            // 4. Retour de la réponse
+            $fileName = 'CV_Chauffeur_' . ($driver->employee_number ?? $driver->id) . '.pdf';
+
+            return Response::make($pdfContent, 200, [
+                'Content-Type' => 'application/pdf',
+                'Content-Disposition' => 'attachment; filename="' . $fileName . '"',
+                'Content-Length' => strlen($pdfContent),
+                'Cache-Control' => 'no-cache, no-store, must-revalidate',
+                'Pragma' => 'no-cache',
+                'Expires' => '0',
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Driver profile export exception', [
+                'driver_id' => $driver->id,
+                'error' => $e->getMessage()
+            ]);
+            throw $e;
+        }
     }
 }

@@ -1,15 +1,15 @@
 <!DOCTYPE html>
 <html lang="fr">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fiche Chauffeur - {{ $driver->full_name }}</title>
+    <title>Fiche Personnel Chauffeur - {{ $driver->full_name }}</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-
+        /* RESET & BASE */
         @page {
             margin: 0;
-            size: A4;
+            size: A4 portrait;
         }
 
         * {
@@ -19,432 +19,572 @@
         }
 
         body {
-            font-family: 'Inter', sans-serif;
             margin: 0;
-            padding: 0;
-            background-color: #ffffff;
-            color: #1e293b;
-            font-size: 12px;
-            line-height: 1.5;
+            padding: 15mm;
+            font-family: 'Inter', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            font-size: 10pt;
+            line-height: 1.4;
+            color: #111;
+            background-color: #fff;
         }
 
-        /* A4 Container */
-        .page-container {
-            width: 210mm;
-            min-height: 297mm;
-            margin: 0 auto;
-            background: white;
-            position: relative;
-            overflow: hidden;
+        /* COLORS (STRICT MONOCHROME) */
+        .text-black {
+            color: #000;
         }
 
-        /* Header */
-        .header {
-            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-            color: white;
-            padding: 40px;
+        .text-dark {
+            color: #333;
+        }
+
+        .text-medium {
+            color: #666;
+        }
+
+        .text-light {
+            color: #888;
+        }
+
+        .bg-light {
+            background-color: #f8f8f8;
+        }
+
+        .bg-medium {
+            background-color: #f0f0f0;
+        }
+
+        .border-light {
+            border-color: #e5e5e5;
+        }
+
+        .border-black {
+            border-color: #000;
+        }
+
+        /* UTILITIES */
+        .uppercase {
+            text-transform: uppercase;
+        }
+
+        .bold {
+            font-weight: 700;
+        }
+
+        .ultra-bold {
+            font-weight: 800;
+        }
+
+        .text-right {
+            text-align: right;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .w-full {
+            width: 100%;
+        }
+
+        .flex {
             display: flex;
-            justify-content: space-between;
-            align-items: center;
-            height: 160px;
+        }
+
+        .hidden-print {
+            display: none;
+        }
+
+        /* Pour masquer les éléments à l'impression si nécessaire */
+
+        /* HEADER (10%) */
+        .header {
+            width: 100%;
+            border-bottom: 2px solid #000;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            display: table;
+        }
+
+        .header-col {
+            display: table-cell;
+            vertical-align: bottom;
         }
 
         .header-left {
-            display: flex;
-            align-items: center;
-            gap: 25px;
+            text-align: left;
+            width: 25%;
         }
 
-        .profile-photo {
-            width: 100px;
-            height: 100px;
-            border-radius: 12px;
-            object-fit: cover;
-            border: 3px solid rgba(255, 255, 255, 0.2);
-            background-color: #334155;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 32px;
-            color: #94a3b8;
-            font-weight: 600;
-        }
-
-        .driver-identity h1 {
-            margin: 0;
-            font-size: 28px;
-            font-weight: 700;
-            letter-spacing: -0.5px;
-        }
-
-        .driver-identity .role {
-            margin-top: 5px;
-            font-size: 14px;
-            opacity: 0.8;
-            font-weight: 400;
-            text-transform: uppercase;
-            letter-spacing: 1px;
+        .header-center {
+            text-align: center;
+            width: 50%;
         }
 
         .header-right {
             text-align: right;
+            width: 25%;
         }
 
-        .company-logo {
-            font-size: 20px;
+        .org-name {
+            font-size: 16pt;
             font-weight: 800;
+            letter-spacing: -0.5px;
+        }
+
+        .doc-title {
+            font-size: 10pt;
             letter-spacing: 2px;
+            font-weight: 600;
+        }
+
+        .meta-label {
+            font-size: 7pt;
+            color: #666;
+            text-transform: uppercase;
+        }
+
+        .meta-value {
+            font-size: 9pt;
+            font-weight: 600;
+        }
+
+        /* IDENTITY BLOCK (20%) */
+        .identity-block {
+            text-align: center;
+            margin-bottom: 25px;
+            padding: 20px;
+            background-color: #f9f9f9;
+            border: 1px solid #e5e5e5;
+            border-radius: 4px;
+        }
+
+        .photo-container {
+            display: inline-block;
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            border: 1px solid #333;
+            overflow: hidden;
+            margin-bottom: 10px;
+            background-color: #fff;
+            vertical-align: middle;
+        }
+
+        .photo-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            filter: grayscale(100%);
+        }
+
+        .photo-placeholder {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24pt;
+            font-weight: 700;
+            color: #ccc;
+            background-color: #f0f0f0;
+            line-height: 100px;
+        }
+
+        .driver-name {
+            font-size: 24pt;
+            font-weight: 900;
+            line-height: 1.1;
+            margin: 10px 0 5px 0;
+            color: #000;
+            letter-spacing: -0.5px;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            background-color: #eee;
+            border: 1px solid #ccc;
+            font-size: 9pt;
+            font-weight: 700;
+            text-transform: uppercase;
+            border-radius: 20px;
+            color: #333;
+        }
+
+        /* KEY METRICS (15%) */
+        .metrics-grid {
+            display: table;
+            width: 100%;
+            margin-bottom: 30px;
+            border-collapse: separate;
+            border-spacing: 10px 0;
+            margin-left: -5px;
+            margin-right: -5px;
+        }
+
+        .metric-card {
+            display: table-cell;
+            width: 25%;
+            background-color: #f8f8f8;
+            border: 1px solid #eee;
+            padding: 12px;
+            text-align: center;
+            vertical-align: middle;
+        }
+
+        .metric-label {
+            display: block;
+            font-size: 8pt;
+            text-transform: uppercase;
+            color: #666;
             margin-bottom: 5px;
         }
 
-        .doc-meta {
-            font-size: 10px;
-            opacity: 0.6;
+        .metric-value {
+            display: block;
+            font-size: 14pt;
+            font-weight: 800;
+            color: #000;
         }
 
-        /* Content Layout */
-        .content {
-            padding: 40px;
-            display: flex;
-            gap: 40px;
+        .alert-border {
+            border: 2px solid #000;
+            background-color: #fff;
         }
 
-        /* Sidebar (Left Column) */
-        .sidebar {
-            width: 35%;
-            flex-shrink: 0;
-        }
-
-        /* Main (Right Column) */
-        .main-content {
-            flex-grow: 1;
-        }
-
-        /* Section Styling */
-        .section {
-            margin-bottom: 35px;
+        /* MAIN CONTENT STRUCTURE (55%) */
+        .section-header {
+            margin-top: 25px;
+            margin-bottom: 15px;
+            border-bottom: 1px solid #000;
+            padding-bottom: 5px;
         }
 
         .section-title {
-            font-size: 11px;
-            text-transform: uppercase;
-            letter-spacing: 1.5px;
-            color: #64748b;
+            font-size: 11pt;
             font-weight: 700;
-            border-bottom: 1px solid #e2e8f0;
-            padding-bottom: 8px;
-            margin-bottom: 15px;
-        }
-
-        /* Info Items */
-        .info-item {
-            margin-bottom: 15px;
-        }
-
-        .info-label {
-            font-size: 10px;
-            color: #94a3b8;
-            margin-bottom: 3px;
-            font-weight: 500;
-        }
-
-        .info-value {
-            font-size: 13px;
-            font-weight: 600;
-            color: #334155;
-        }
-
-        .info-value.highlight {
-            color: #0f172a;
-        }
-
-        /* Badges */
-        .badge {
-            display: inline-block;
-            padding: 4px 10px;
-            border-radius: 6px;
-            font-size: 10px;
-            font-weight: 600;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        .badge-success { background: #dcfce7; color: #166534; }
-        .badge-warning { background: #fef9c3; color: #854d0e; }
-        .badge-danger { background: #fee2e2; color: #991b1b; }
-        .badge-neutral { background: #f1f5f9; color: #475569; }
-
-        /* Timeline / History */
-        .timeline-item {
-            position: relative;
-            padding-left: 20px;
-            margin-bottom: 20px;
-            border-left: 2px solid #e2e8f0;
+            letter-spacing: 1px;
+            color: #000;
         }
 
-        .timeline-item::before {
-            content: '';
-            position: absolute;
-            left: -5px;
-            top: 0;
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background: #cbd5e1;
+        /* DATA TABLES */
+        .info-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 10px;
         }
 
-        .timeline-item.active {
-            border-left-color: #3b82f6;
+        .info-table td {
+            padding: 6px 0;
+            vertical-align: top;
+            border-bottom: 1px solid #eee;
         }
 
-        .timeline-item.active::before {
-            background: #3b82f6;
+        .info-table tr:last-child td {
+            border-bottom: none;
         }
 
-        .timeline-date {
-            font-size: 10px;
-            color: #64748b;
-            margin-bottom: 2px;
+        .label-col {
+            width: 35%;
+            color: #555;
+            font-size: 9pt;
         }
 
-        .timeline-title {
-            font-size: 13px;
+        .value-col {
+            width: 65%;
             font-weight: 600;
-            color: #1e293b;
+            color: #000;
+            font-size: 10pt;
         }
 
-        .timeline-desc {
-            font-size: 11px;
-            color: #475569;
-            margin-top: 2px;
+        /* LICENSE TAGS */
+        .license-tag {
+            display: inline-block;
+            padding: 2px 6px;
+            background-color: #ddd;
+            border: 1px solid #ccc;
+            font-weight: 700;
+            font-size: 8pt;
+            margin-right: 4px;
+            border-radius: 2px;
         }
 
-        /* Footer */
+        /* SANCTIONS & NOTES */
+        .notes-box {
+            padding: 10px;
+            background-color: #f9f9f9;
+            border-left: 3px solid #ccc;
+            font-style: italic;
+            font-size: 9pt;
+            color: #444;
+        }
+
+        /* FOOTER */
         .footer {
-            position: absolute;
+            position: fixed;
             bottom: 0;
             left: 0;
             right: 0;
-            padding: 20px 40px;
-            background: #f8fafc;
-            border-top: 1px solid #e2e8f0;
-            font-size: 9px;
-            color: #94a3b8;
-            display: flex;
-            justify-content: space-between;
+            text-align: center;
+            border-top: 1px solid #eee;
+            padding-top: 10px;
+            padding-bottom: 0;
+            margin: 0 15mm 10mm 15mm;
+            background: #fff;
         }
 
-        /* Stats Grid */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 15px;
-            margin-bottom: 20px;
+        .footer-text {
+            font-size: 8pt;
+            color: #888;
         }
 
-        .stat-card {
-            background: #f8fafc;
-            padding: 12px;
-            border-radius: 8px;
-            border: 1px solid #e2e8f0;
+        /* TWO COLUMN LAYOUT SIMULATION */
+        .cols-container {
+            display: table;
+            width: 100%;
+            table-layout: fixed;
+            border-spacing: 20px 0;
+            margin-left: -10px;
         }
 
-        .stat-label {
-            font-size: 9px;
-            color: #64748b;
-            text-transform: uppercase;
+        .col-left {
+            display: table-cell;
+            width: 45%;
+            vertical-align: top;
         }
 
-        .stat-value {
-            font-size: 16px;
-            font-weight: 700;
-            color: #0f172a;
-            margin-top: 4px;
+        .col-right {
+            display: table-cell;
+            width: 55%;
+            vertical-align: top;
         }
     </style>
 </head>
+
 <body>
-    <div class="page-container">
-        <!-- Header -->
-        <div class="header">
-            <div class="header-left">
-                @if($driver->photo)
-                    <img src="{{ $driver->photo }}" class="profile-photo" alt="Photo">
-                @else
-                    <div class="profile-photo">
-                        {{ substr($driver->first_name, 0, 1) }}{{ substr($driver->last_name, 0, 1) }}
-                    </div>
-                @endif
-                <div class="driver-identity">
-                    <h1>{{ $driver->full_name }}</h1>
-                    <div class="role">Chauffeur Professionnel</div>
-                    <div style="margin-top: 8px;">
-                        <span class="badge {{ $driver->driverStatus?->name === 'Disponible' ? 'badge-success' : ($driver->driverStatus?->name === 'En mission' ? 'badge-warning' : 'badge-danger') }}">
-                            {{ $driver->driverStatus?->name ?? 'Statut Inconnu' }}
-                        </span>
-                    </div>
-                </div>
-            </div>
-            <div class="header-right">
-                <div class="company-logo">ZENFLEET</div>
-                <div class="doc-meta">
-                    Matricule: <strong>{{ $driver->employee_number }}</strong><br>
-                    Généré le: {{ now()->format('d/m/Y') }}
-                </div>
-            </div>
+
+    <!-- HEADER -->
+    <div class="header">
+        <div class="header-col header-left">
+            <div class="org-name">{{ $organization->name ?? 'ZENFLEET' }}</div>
         </div>
-
-        <!-- Content -->
-        <div class="content">
-            <!-- Sidebar -->
-            <div class="sidebar">
-                <div class="section">
-                    <div class="section-title">Coordonnées</div>
-                    
-                    <div class="info-item">
-                        <div class="info-label">Email</div>
-                        <div class="info-value">{{ $driver->email ?? 'Non renseigné' }}</div>
-                    </div>
-                    
-                    <div class="info-item">
-                        <div class="info-label">Téléphone</div>
-                        <div class="info-value highlight">{{ $driver->personal_phone ?? 'Non renseigné' }}</div>
-                    </div>
-
-                    <div class="info-item">
-                        <div class="info-label">Adresse</div>
-                        <div class="info-value">
-                            {{ $driver->address ?? '' }}<br>
-                            {{ $driver->postal_code }} {{ $driver->city }}
-                        </div>
-                    </div>
-                </div>
-
-                <div class="section">
-                    <div class="section-title">Informations</div>
-                    
-                    <div class="info-item">
-                        <div class="info-label">Date de Naissance</div>
-                        <div class="info-value">
-                            {{ $driver->birth_date ? $driver->birth_date->format('d/m/Y') : '-' }}
-                            @if($driver->birth_date) <span style="color:#94a3b8">({{ $driver->birth_date->age }} ans)</span> @endif
-                        </div>
-                    </div>
-
-                    <div class="info-item">
-                        <div class="info-label">Groupe Sanguin</div>
-                        <div class="info-value">{{ $driver->blood_type ?? '-' }}</div>
-                    </div>
-
-                    <div class="info-item">
-                        <div class="info-label">Urgence</div>
-                        <div class="info-value">
-                            {{ $driver->emergency_contact_name ?? '-' }}<br>
-                            <span style="font-size: 11px; color: #64748b">{{ $driver->emergency_contact_phone }}</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="section">
-                    <div class="section-title">Statistiques</div>
-                    <div class="stats-grid">
-                        <div class="stat-card">
-                            <div class="stat-label">Missions</div>
-                            <div class="stat-value">{{ $driver->assignments->count() }}</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-label">Ancienneté</div>
-                            <div class="stat-value">
-                                {{ $driver->recruitment_date ? $driver->recruitment_date->diffInYears() . ' ans' : '-' }}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Main Content -->
-            <div class="main-content">
-                <div class="section">
-                    <div class="section-title">Permis de Conduire</div>
-                    <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 20px; display: flex; gap: 30px;">
-                        <div>
-                            <div class="info-label">Numéro de Permis</div>
-                            <div class="info-value highlight" style="font-size: 16px;">{{ $driver->license_number ?? 'Non renseigné' }}</div>
-                        </div>
-                        <div>
-                            <div class="info-label">Validité</div>
-                            <div class="info-value">
-                                @if($driver->license_expiry_date)
-                                    Jusqu'au {{ $driver->license_expiry_date->format('d/m/Y') }}
-                                    @if($driver->license_expiry_date->isPast())
-                                        <span style="color: #ef4444; font-weight: bold;">(Expiré)</span>
-                                    @endif
-                                @else
-                                    -
-                                @endif
-                            </div>
-                        </div>
-                        <div>
-                            <div class="info-label">Catégories</div>
-                            <div class="info-value">
-                                @if($driver->license_categories)
-                                    @foreach($driver->license_categories as $cat)
-                                        <span class="badge badge-neutral">{{ $cat }}</span>
-                                    @endforeach
-                                @else
-                                    <span class="badge badge-neutral">{{ $driver->license_category ?? 'B' }}</span>
-                                @endif
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="section">
-                    <div class="section-title">Historique des Affectations</div>
-                    
-                    @forelse($driver->assignments()->with('vehicle')->latest('start_datetime')->take(6)->get() as $assignment)
-                        <div class="timeline-item {{ !$assignment->end_datetime ? 'active' : '' }}">
-                            <div class="timeline-date">
-                                {{ $assignment->start_datetime->format('d/m/Y') }} 
-                                @if($assignment->end_datetime)
-                                    - {{ $assignment->end_datetime->format('d/m/Y') }}
-                                @else
-                                    - <span style="color: #3b82f6; font-weight: 600;">En cours</span>
-                                @endif
-                            </div>
-                            <div class="timeline-title">
-                                {{ $assignment->vehicle->name ?? 'Véhicule Inconnu' }}
-                            </div>
-                            <div class="timeline-desc">
-                                Immatriculation: {{ $assignment->vehicle->license_plate ?? 'N/A' }}
-                                @if($assignment->end_datetime)
-                                    • Durée: {{ $assignment->start_datetime->diffForHumans($assignment->end_datetime, true) }}
-                                @endif
-                            </div>
-                        </div>
-                    @empty
-                        <div style="text-align: center; color: #94a3b8; padding: 20px; font-style: italic;">
-                            Aucune affectation enregistrée.
-                        </div>
-                    @endforelse
-                </div>
-
-                @if($driver->notes)
-                    <div class="section">
-                        <div class="section-title">Notes</div>
-                        <div style="background: #fffbeb; color: #92400e; padding: 15px; border-radius: 8px; font-size: 11px; border: 1px solid #fcd34d;">
-                            {{ $driver->notes }}
-                        </div>
-                    </div>
-                @endif
-            </div>
+        <div class="header-col header-center">
+            <div class="doc-title">FICHE PERSONNEL CHAUFFEUR</div>
         </div>
-
-        <!-- Footer -->
-        <div class="footer">
-            <div>ZenFleet Enterprise Solution</div>
-            <div>Page 1/1</div>
-            <div>{{ $driver->organization->name ?? 'Organisation' }}</div>
+        <div class="header-col header-right">
+            <div class="meta-label">Matricule</div>
+            <div class="meta-value">{{ $driver->employee_number ?? 'N/A' }}</div>
+            <div style="height: 4px;"></div>
+            <div class="meta-label">Généré le</div>
+            <div class="meta-value">{{ now()->format('d/m/Y') }}</div>
         </div>
     </div>
+
+    <!-- IDENTITY BLOCK -->
+    <div class="identity-block">
+        <div class="photo-container">
+            @if(isset($photoBase64) && $photoBase64)
+            <img src="{{ $photoBase64 }}" class="photo-img" alt="Photo">
+            @elseif($driver->photo)
+            <img src="{{ $driver->photo }}" class="photo-img" alt="Photo">
+            @else
+            <div class="photo-placeholder">
+                {{ strtoupper(substr($driver->first_name ?? '', 0, 1)) }}{{ strtoupper(substr($driver->last_name ?? '', 0, 1)) }}
+            </div>
+            @endif
+        </div>
+        <div class="driver-name uppercase">{{ $driver->full_name }}</div>
+        <div class="status-badge">
+            {{ $driver->driverStatus?->name ?? 'Statut Inconnu' }}
+        </div>
+    </div>
+
+    <!-- CALCUL DE L'ANCIENNETÉ (LOGIQUE BLADE) -->
+    @php
+    $seniority = 'N/A';
+    if ($driver->recruitment_date) {
+    $diff = $driver->recruitment_date->diff(now());
+    $seniority = '';
+    if ($diff->y > 0) {
+    $seniority .= $diff->y . ' An' . ($diff->y > 1 ? 's' : '') . ' ';
+    }
+    $seniority .= $diff->m . ' Mois';
+    }
+
+    $licenseAlert = false;
+    if ($driver->license_expiry_date) {
+    $daysToExpiry = now()->diffInDays($driver->license_expiry_date, false);
+    if ($daysToExpiry < 60) {
+        $licenseAlert=true;
+        }
+        }
+        @endphp
+
+        <!-- KEY METRICS -->
+        <div class="metrics-grid">
+            <div class="metric-card">
+                <span class="metric-label">Ancienneté</span>
+                <span class="metric-value">{{ $seniority }}</span>
+            </div>
+            <div class="metric-card">
+                <span class="metric-label">Âge</span>
+                <span class="metric-value">{{ $driver->birth_date ? $driver->birth_date->age . ' Ans' : 'N/A' }}</span>
+            </div>
+            <div class="metric-card {{ $licenseAlert ? 'alert-border' : '' }}">
+                <span class="metric-label">Permis Expire le</span>
+                <span class="metric-value">{{ $driver->license_expiry_date ? $driver->license_expiry_date->format('d/m/Y') : 'N/A' }}</span>
+            </div>
+            <div class="metric-card">
+                <span class="metric-label">Véhicule Actuel</span>
+                <span class="metric-value" style="font-size: 11pt;">{{ $driver->activeAssignment->vehicle->registration_plate ?? 'Aucun' }}</span>
+            </div>
+        </div>
+
+        <!-- MAIN CONTENT -->
+        <div class="cols-container">
+
+            <!-- COLONNE GAUCHE -->
+            <div class="col-left">
+
+                <!-- SECTION 1: COORDONNÉES & URGENCE -->
+                <div class="section-header">
+                    <div class="section-title">Coordonnées & Urgence</div>
+                </div>
+                <table class="info-table">
+                    <tr>
+                        <td class="label-col">Téléphone</td>
+                        <td class="value-col" style="font-size: 11pt;">{{ $driver->personal_phone ?? 'N/A' }}</td>
+                    </tr>
+                    <tr>
+                        <td class="label-col">Email</td>
+                        <td class="value-col">{{ $driver->personal_email ?? 'N/A' }}</td>
+                    </tr>
+                    <tr>
+                        <td class="label-col">Adresse</td>
+                        <td class="value-col">
+                            {{ $driver->address ?? '' }}<br>
+                            {{ $driver->postal_code ?? '' }} {{ $driver->city ?? '' }}
+                        </td>
+                    </tr>
+                    @if($driver->emergency_contact_name)
+                    <tr>
+                        <td style="border-top: 1px solid #ddd; padding-top: 10px;" colspan="2">
+                            <div style="font-size: 8pt; text-transform: uppercase; color: #666; margin-bottom: 2px;">Contact Urgence</div>
+                            <div style="font-weight: 700;">{{ $driver->emergency_contact_name }}</div>
+                            <div style="font-size: 9pt;">{{ $driver->emergency_contact_relationship ?? 'Relation non spécifiée' }}</div>
+                            <div style="font-weight: 700;">{{ $driver->emergency_contact_phone }}</div>
+                        </td>
+                    </tr>
+                    @endif
+                </table>
+
+                <!-- SECTION 4: NOTES & SANCTIONS -->
+                <div class="section-header">
+                    <div class="section-title">Notes & Discipline</div>
+                </div>
+
+                @if($driver->activeSanctions && $driver->activeSanctions->count() > 0)
+                <div style="padding: 8px; background-color: #f0f0f0; border: 1px solid #000; margin-bottom: 15px; text-align: center;">
+                    <span style="font-weight: 700; font-size: 12pt;">{{ $driver->activeSanctions->count() }}</span>
+                    <span style="text-transform: uppercase; font-size: 8pt;">Sanction(s) Active(s)</span>
+                </div>
+                @endif
+
+                @if($driver->notes)
+                <div class="notes-box">
+                    "{{ $driver->notes }}"
+                </div>
+                @else
+                <div style="color: #999; font-style: italic; font-size: 9pt;">Aucune note enregistrée.</div>
+                @endif
+
+            </div>
+
+            <!-- COLONNE DROITE -->
+            <div class="col-right">
+
+                <!-- SECTION 2: INFORMATIONS ADMINISTRATIVES -->
+                <div class="section-header">
+                    <div class="section-title">Informations Administratives</div>
+                </div>
+                <table class="info-table">
+                    <tr>
+                        <td class="label-col">Date de Naissance</td>
+                        <td class="value-col">{{ $driver->birth_date ? $driver->birth_date->format('d/m/Y') : 'N/A' }}</td>
+                    </tr>
+                    <tr>
+                        <td class="label-col">Groupe Sanguin</td>
+                        <td class="value-col">{{ $driver->blood_type ?? 'N/A' }}</td>
+                    </tr>
+                    <tr>
+                        <td class="label-col">Date Recrutement</td>
+                        <td class="value-col">{{ $driver->recruitment_date ? $driver->recruitment_date->format('d/m/Y') : 'N/A' }}</td>
+                    </tr>
+                    @if($driver->contract_end_date)
+                    <tr>
+                        <td class="label-col">Fin de Contrat</td>
+                        <td class="value-col">{{ $driver->contract_end_date->format('d/m/Y') }}</td>
+                    </tr>
+                    @endif
+                    <tr>
+                        <td class="label-col">Superviseur</td>
+                        <td class="value-col">{{ $driver->supervisor->name ?? 'Non assigné' }}</td>
+                    </tr>
+                </table>
+
+                <!-- SECTION 3: PERMIS DE CONDUIRE -->
+                <div class="section-header">
+                    <div class="section-title">Permis de Conduire</div>
+                </div>
+                <table class="info-table">
+                    <tr>
+                        <td class="label-col">Numéro Permis</td>
+                        <td class="value-col" style="font-family: monospace; font-size: 11pt;">{{ $driver->license_number ?? 'N/A' }}</td>
+                    </tr>
+                    <tr>
+                        <td class="label-col">Délivré le</td>
+                        <td class="value-col">{{ $driver->license_issue_date ? $driver->license_issue_date->format('d/m/Y') : 'N/A' }}</td>
+                    </tr>
+                    <tr>
+                        <td class="label-col">Autorité</td>
+                        <td class="value-col">{{ $driver->license_authority ?? 'N/A' }}</td>
+                    </tr>
+                    <tr>
+                        <td class="label-col">Catégories</td>
+                        <td class="value-col">
+                            @if($driver->license_categories && is_array($driver->license_categories))
+                            @foreach($driver->license_categories as $cat)
+                            <span class="license-tag">{{ $cat }}</span>
+                            @endforeach
+                            @else
+                            <span style="color: #999;">Aucune</span>
+                            @endif
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="label-col">Vérification</td>
+                        <td class="value-col">
+                            @if($driver->license_verified)
+                            <span style="font-weight: 700;">VÉRIFIÉ</span>
+                            @else
+                            <span style="color: #666;">Non vérifié</span>
+                            @endif
+                        </td>
+                    </tr>
+                </table>
+
+            </div>
+        </div>
+
+        <!-- FOOTER -->
+        <div class="footer">
+            <p class="footer-text">
+                Document généré par ZenFleet - Système de Gestion de Flotte Enterprise-Grade. Confidentialité assurée.<br>
+                Page <span class="page-number">1</span>
+            </p>
+        </div>
+
 </body>
+
 </html>

@@ -1175,6 +1175,16 @@ class VehicleController extends Controller
             $formattedDuration = "N/A";
         }
 
+        // Formatage de l'âge (Année, mois, jour)
+        $vehicleAgeFormatted = "N/A";
+        if ($vehicle->acquisition_date) {
+            $diff = $vehicle->acquisition_date->diff($now);
+            $parts = [];
+            if ($diff->y > 0) $parts[] = $diff->y . ' an' . ($diff->y > 1 ? 's' : '');
+            if ($diff->m > 0) $parts[] = $diff->m . ' mois';
+            $vehicleAgeFormatted = !empty($parts) ? implode(' ', $parts) : "Moins d'un mois";
+        }
+
         // === USAGE METRICS ===
         $totalKmDriven = ($vehicle->current_mileage ?? 0) - ($vehicle->initial_mileage ?? 0);
 
@@ -1218,6 +1228,7 @@ class VehicleController extends Controller
 
             // Deprecated (kept for backwards compatibility)
             'age_years' => $vehicleAge,
+            'vehicle_age_formatted' => $vehicleAgeFormatted,
             'depreciation_rate' => $this->calculateDepreciation($vehicle),
             'efficiency_score' => $this->calculateEfficiencyScore($vehicle),
             'carbon_footprint' => $this->calculateCarbonFootprint($vehicle),
