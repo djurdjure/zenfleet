@@ -24,7 +24,6 @@
         "flowbite-datepicker": "^2.0.0",
         "slim-select": "^2.8.2",
         "sortablejs": "^1.15.2",
-        "tailwindcss": "^4.1.18",
-        "tom-select": "^2.3.1"
+        "tailwindcss": "^4.1.18"
     }
 }

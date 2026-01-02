@@ -188,33 +188,9 @@ class ZenFleetAdmin {
         this.initializeFileUploads();
     }
 
-    // Configuration TomSelect pour admin
+    // Configuration TomSelect pour admin - SUPPRIMÉ (Legacy)
     initializeTomSelect() {
-        // ✅ CORRECTION: Chercher .tomselect au lieu de .admin-select (EXCLURE slimselect-field)
-        const selects = document.querySelectorAll('.tomselect, .admin-select, select[multiple]:not(.slimselect-field)');
-        selects.forEach(select => {
-            if (!select.tomselect && !select.disabled) {
-                const tomSelect = new TomSelect(select, {
-                    plugins: ['remove_button', 'clear_button'],
-                    create: select.hasAttribute('data-create'),
-                    maxItems: select.getAttribute('data-max-items') || null,
-                    placeholder: select.getAttribute('placeholder') || 'Sélectionner...',
-                    searchField: ['text', 'value'],
-                    allowEmptyOption: true,
-                    sortField: {
-                        field: "text",
-                        direction: "asc"
-                    },
-                    render: {
-                        no_results: () => '<div class="p-2 text-gray-500">Aucun résultat trouvé</div>',
-                    }
-                });
-
-                this.components.set(`tomselect-${select.id || Date.now()}`, tomSelect);
-            }
-        });
-
-        console.log(`📝 ${selects.length} TomSelect initialized`);
+        console.log('NOTICE: TomSelect has been removed in favor of SlimSelect');
     }
 
     // ✅ NOUVEAU: Initialisation Flatpickr POUT TIMEPICKER/DATETIME (Legacy/Specific)

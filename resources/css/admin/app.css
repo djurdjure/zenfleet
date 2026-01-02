@@ -132,133 +132,39 @@
 }
 
 /* ====================================
-   🎨 TOMSELECT FLOWBITE-INSPIRED STYLES
+   🎨 TOMSELECT STYLES REMOVED
    ==================================== */
 
-/* Wrapper - Pas de padding */
-.ts-wrapper {
-    padding: 0 !important;
-}
-
-/* Control - Style Flowbite bg-gray-50 ALIGNÉ AVEC FORM INPUTS */
-.ts-wrapper .ts-control {
-    @apply bg-white border-2 border-gray-200 rounded-lg text-gray-900 text-sm;
-    border-color: rgba(229, 231, 235, 0.8) !important;
-    /* Match .form-input border */
-    padding: 0.625rem 1rem !important;
-    /* Match .form-input padding */
-    min-height: 42px;
-    /* Match .form-input height */
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05) !important;
-}
 
 
-/* Focus state - Blue-500 comme Flowbite */
-.ts-wrapper.focus .ts-control,
-.ts-wrapper.input-active .ts-control {
-    @apply border-blue-500;
-    box-shadow: 0 0 0 1px rgb(59 130 246) !important;
-    outline: none;
-}
 
 
-/* Flèche dropdown */
-.ts-wrapper.single .ts-control::after {
-    border-color: rgb(107 114 128) transparent transparent transparent;
-    border-width: 5px 5px 0 5px;
-    right: 15px;
-    top: 50%;
-    margin-top: -2.5px;
-}
 
 
-/* Dropdown */
-.ts-wrapper .ts-dropdown {
-    @apply bg-white border border-gray-200 rounded-lg shadow-lg;
-    margin-top: 0.25rem;
-}
+
+
+
+
+
+
 
 
 /* Options */
-.ts-wrapper .ts-dropdown .option {
-    @apply px-3 py-2 text-gray-900 cursor-pointer;
-    transition: background-color 150ms ease-in-out;
-}
-
-
-.ts-wrapper .ts-dropdown .option:hover {
-    @apply bg-gray-50;
-}
-
-
-.ts-wrapper .ts-dropdown .option.active {
-    @apply bg-blue-50 text-blue-700;
-}
-
-
-/* Input dans le control */
-.ts-wrapper .ts-control input {
-    @apply text-gray-900;
-}
-
-
-.ts-wrapper .ts-control input::placeholder {
-    @apply text-gray-400;
-}
-
-
-/* Clear button */
-.ts-wrapper .clear-button {
-    @apply text-gray-500 cursor-pointer;
-    transition: color 150ms ease-in-out;
-}
-
-.ts-wrapper .clear-button:hover {
-    @apply text-blue-500;
-}
 
 
 
-/* Items (pour multiple select) - Badges bleus */
-.ts-wrapper .ts-control .item {
-    @apply bg-blue-100 text-blue-800 border-0 rounded-md;
-    padding: 0.125rem 0.5rem;
-    margin: 0.125rem;
-    font-size: 0.875rem;
-}
-
-
-/* ====================================
-   🔴 TOMSELECT ERROR STATE
-   ==================================== */
-
-/* État d'erreur - Bordure rouge persistante */
-.ts-wrapper.ts-error .ts-control {
-    @apply !border-red-500;
-}
-
-.ts-wrapper.ts-error.focus .ts-control,
-.ts-wrapper.ts-error.input-active .ts-control {
-    @apply !border-red-500;
-    box-shadow: 0 0 0 1px rgb(239 68 68) !important;
-}
 
 
 
-/* États responsifs */
-@media (max-width: 1024px) {
-    .admin-sidebar {
-        @apply -translate-x-full;
-    }
 
-    .admin-sidebar.open {
-        @apply translate-x-0;
-    }
 
-    .admin-main {
-        margin-left: 0 !important;
-    }
-}
+
+
+
+
+
+
+
 
 /* Animations admin */
 @keyframes fadeIn {
@@ -402,18 +308,18 @@
    ======================================== */
 
 :root {
-    --ss-main-height: 40px;
-    /* Aligné avec les inputs standards (38-40px) */
+    --ss-main-height: 42px;
+    /* Match form-input min-height */
     --ss-primary-color: #2563eb;
-    --ss-bg-color: #f9fafb;
-    /* gray-50 */
+    --ss-bg-color: #ffffff;
+    /* White background like inputs */
     --ss-font-color: #111827;
     --ss-font-placeholder-color: #9ca3af;
-    --ss-border-color: #d1d5db;
-    /* gray-300 */
+    --ss-border-color: rgba(229, 231, 235, 0.8);
+    /* Match form-input border */
     --ss-border-radius: 0.5rem;
-    --ss-spacing-l: 12px;
-    /* px-3 = 12px */
+    --ss-spacing-l: 16px;
+    /* Match form-input padding-x (1rem) */
     --ss-spacing-m: 8px;
     --ss-spacing-s: 4px;
     --ss-animation-timing: 0.2s;
@@ -424,11 +330,12 @@
 /* Main container styling - SUPER SPECIFICITY & !important */
 body .ss-main {
     background-color: var(--ss-bg-color) !important;
-    border-color: var(--ss-border-color) !important;
+    border: 2px solid var(--ss-border-color) !important;
+    /* 2px border */
     color: var(--ss-font-color) !important;
     border-radius: var(--ss-border-radius) !important;
-    padding: 3px 0 !important;
-    /* Ajusté pour hauteur finale */
+    padding: 4px 0 !important;
+    /* Adjusted for height */
     min-height: var(--ss-main-height) !important;
     transition: all 0.2s ease-in-out;
     box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05) !important;
@@ -444,10 +351,10 @@ body .ss-main:focus-within {
 
 /* Values styling */
 body .ss-main .ss-values .ss-single {
-    padding: 4px var(--ss-spacing-l) !important;
+    padding: 5px var(--ss-spacing-l) !important;
+    /* Adjusted vertical padding */
     font-size: 0.875rem !important;
     line-height: 1.25rem !important;
-    /* leading-5 */
     font-weight: 400 !important;
     display: flex;
     align-items: center;
@@ -455,7 +362,7 @@ body .ss-main .ss-values .ss-single {
 
 /* Placeholder styling */
 body .ss-main .ss-values .ss-placeholder {
-    padding: 4px var(--ss-spacing-l) !important;
+    padding: 5px var(--ss-spacing-l) !important;
     font-size: 0.875rem !important;
     line-height: 1.25rem !important;
     color: var(--ss-font-placeholder-color) !important;
