@@ -91,9 +91,3 @@ $selectId = 'slimselect-' . $name . '-' . uniqid();
     </p>
     @endif
 </div>
-
-@once
-@push('styles')
-@include('partials.slimselect-styles')
-@endpush
-@endonce

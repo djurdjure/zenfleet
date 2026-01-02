@@ -11,118 +11,18 @@
 
     <title>@yield('title', 'ZenFleet Admin') - {{ config('app.name') }}</title>
 
-    <!-- Fonts -->
-    <link rel="preconnect" href="https://fonts.bunny.net">
-    <link href="https://fonts.bunny.net/css?family=inter:300,400,500,600,700&display=swap" rel="stylesheet" />
-
     {{-- ====================================================================
  📦 ZENFLEET ENTERPRISE-GRADE ASSETS
  ==================================================================== 
- SlimSelect & Flatpickr: bundled locally via Vite (no CDN)
- Icons: Iconify runtime (loads icons from CDN, caches locally)
- FontAwesome: REMOVED - migrating to Iconify progressively
- @version 2.2 Enterprise-Ready
+ SlimSelect & Flatpickr: bundled locally via Vite
+ Icons: Iconify runtime bundled locally via Vite (@iconify/iconify)
+ Fonts: Inter bundled locally via Vite (@fontsource/inter)
+ @version 2.3 Fully Local - Zero CDN
  ==================================================================== --}}
 
-    {{-- Iconify CDN - Original runtime that renders icons from data-icon attributes --}}
-    <script src="https://code.iconify.design/3/3.1.0/iconify.min.js"></script>
+    {{-- Iconify JS - Bundled locally in app.js --}}
 
-    {{-- Flatpickr Custom Styles ZenFleet --}}
-    <style>
-        /* 🎨 FLATPICKR ENTERPRISE-GRADE LIGHT MODE - ZenFleet Ultra-Pro */
-        .flatpickr-calendar {
-            background-color: white !important;
-            border: 1px solid rgb(229 231 235);
-            border-radius: 0.75rem;
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-            font-family: inherit;
-        }
-
-        /* En-tête (mois/année) - Bleu blue-600 premium */
-        .flatpickr-months {
-            background: rgb(37 99 235) !important;
-            border-radius: 0.75rem 0.75rem 0 0;
-            padding: 0.875rem 0;
-        }
-
-        .flatpickr-months .flatpickr-month,
-        .flatpickr-current-month .flatpickr-monthDropdown-months {
-            background-color: transparent !important;
-            color: white !important;
-            font-weight: 600;
-            font-size: 1rem;
-        }
-
-        /* Boutons navigation */
-        .flatpickr-months .flatpickr-prev-month,
-        .flatpickr-months .flatpickr-next-month {
-            fill: white !important;
-            transition: all 0.2s;
-        }
-
-        .flatpickr-months .flatpickr-prev-month:hover,
-        .flatpickr-months .flatpickr-next-month:hover {
-            fill: rgb(219 234 254) !important;
-            transform: scale(1.15);
-        }
-
-        /* Jours de la semaine */
-        .flatpickr-weekdays {
-            background-color: rgb(249 250 251) !important;
-            padding: 0.625rem 0;
-            border-bottom: 1px solid rgb(229 231 235);
-        }
-
-        .flatpickr-weekday {
-            color: rgb(107 114 128) !important;
-            font-weight: 600;
-            font-size: 0.75rem;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
-
-        /* Corps du calendrier */
-        .flatpickr-days {
-            background-color: white !important;
-        }
-
-        /* Jours du mois */
-        .flatpickr-day {
-            color: rgb(17 24 39) !important;
-            border-radius: 0.5rem;
-            font-weight: 500;
-            transition: all 0.2s;
-            border: 1px solid transparent;
-        }
-
-        .flatpickr-day.today {
-            border: 2px solid rgb(37 99 235) !important;
-            font-weight: 700;
-            color: rgb(37 99 235) !important;
-            background-color: rgb(239 246 255) !important;
-        }
-
-        .flatpickr-day.selected,
-        .flatpickr-day.selected:hover {
-            background-color: rgb(37 99 235) !important;
-            border-color: rgb(37 99 235) !important;
-            color: white !important;
-            font-weight: 700;
-            box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.4);
-        }
-
-        .flatpickr-day:hover:not(.selected):not(.flatpickr-disabled):not(.today) {
-            background-color: rgb(243 244 246) !important;
-            border-color: rgb(229 231 235) !important;
-            color: rgb(17 24 39) !important;
-            transform: scale(1.05);
-        }
-
-        .flatpickr-day.flatpickr-disabled {
-            color: rgb(209 213 219) !important;
-            opacity: 0.4;
-        }
-    </style>
+    {{-- Flatpickr Styles - Moved to app.css --}}
 
     @vite(['resources/js/admin/app.js'])
     @stack('styles')

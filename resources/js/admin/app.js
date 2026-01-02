@@ -8,13 +8,18 @@
 import '../../css/admin/app.css';
 
 // ✅ ENTERPRISE: Local CSS imports
+// ✅ ENTERPRISE: Local CSS imports
 import 'slim-select/styles';
-// Note: SlimSelect CSS loaded via CDN matches the JS version used
 import 'flatpickr/dist/flatpickr.min.css';
+import '@fontsource/inter'; // Local Inter font
 
-// ✅ ENTERPRISE: Import SlimSelect and expose as global (for x-slim-select component)
+// ✅ ENTERPRISE: Import SlimSelect globally
 import SlimSelect from 'slim-select';
 window.SlimSelect = SlimSelect;
+
+// ✅ ENTERPRISE: Import Iconify runtime locally
+import Iconify from '@iconify/iconify';
+window.Iconify = Iconify;
 
 // ✅ CRITIQUE: Import Livewire 3 pour wire:click et composants Livewire
 import { Livewire, Alpine } from '../../../vendor/livewire/livewire/dist/livewire.esm.js';
