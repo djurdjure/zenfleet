@@ -3,11 +3,14 @@
  * Version: 2.1 Ultra-Pro
  */
 
+/* ✅ Tailwind CSS v4 - Must be first */
+@import "tailwindcss";
+@config "../../../tailwind.config.js";
 
-/* ✅ Import Tailwind CSS APRÈS les imports externes */
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+/* ✅ External CSS imports */
+@import 'slim-select/styles';
+@import './vendor/datepicker.css';
+@import '@fontsource/inter';
 
 /* ✅ Alpine.js - Cache les éléments avec x-cloak jusqu'à ce qu'Alpine soit prêt */
 [x-cloak] {
@@ -85,12 +88,14 @@
     }
 
     .admin-btn-primary {
-        @apply admin-btn bg-blue-600 text-white border border-blue-600;
+        @apply inline-flex items-center justify-center px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200;
+        @apply bg-blue-600 text-white border border-blue-600;
         @apply hover:bg-blue-700 hover:border-blue-700 focus:ring-4 focus:ring-blue-200;
     }
 
     .admin-btn-secondary {
-        @apply admin-btn bg-gray-600 text-white border border-gray-600;
+        @apply inline-flex items-center justify-center px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200;
+        @apply bg-gray-600 text-white border border-gray-600;
         @apply hover:bg-gray-700 hover:border-gray-700 focus:ring-4 focus:ring-gray-200;
     }
 
@@ -135,12 +140,16 @@
     padding: 0 !important;
 }
 
-/* Control - Style Flowbite bg-gray-50 */
+/* Control - Style Flowbite bg-gray-50 ALIGNÉ AVEC FORM INPUTS */
 .ts-wrapper .ts-control {
-    @apply bg-gray-50 border border-gray-300 rounded-lg text-gray-900 text-sm;
-    padding: 0.625rem;
-    /* 10px */
-    box-shadow: none !important;
+    @apply bg-white border-2 border-gray-200 rounded-lg text-gray-900 text-sm;
+    border-color: rgba(229, 231, 235, 0.8) !important;
+    /* Match .form-input border */
+    padding: 0.625rem 1rem !important;
+    /* Match .form-input padding */
+    min-height: 42px;
+    /* Match .form-input height */
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05) !important;
 }
 
 
@@ -225,12 +234,12 @@
 
 /* État d'erreur - Bordure rouge persistante */
 .ts-wrapper.ts-error .ts-control {
-    @apply border-red-500 !important;
+    @apply !border-red-500;
 }
 
 .ts-wrapper.ts-error.focus .ts-control,
 .ts-wrapper.ts-error.input-active .ts-control {
-    @apply border-red-500 !important;
+    @apply !border-red-500;
     box-shadow: 0 0 0 1px rgb(239 68 68) !important;
 }
 
@@ -270,11 +279,25 @@
 
 /* Loading admin */
 .admin-loading {
-    @apply fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50;
+    @apply fixed inset-0 bg-black/50 flex items-center justify-center z-50;
 }
 
 .admin-spinner {
     @apply animate-spin rounded-full h-8 w-8 border-b-2 border-white;
+}
+
+/* ✅ FIX: Force Sidebar Visibility on Desktop */
+@media (min-width: 1024px) {
+    #desktop-sidebar {
+        display: flex !important;
+        width: 16rem !important;
+        /* w-64 */
+        position: fixed !important;
+        z-index: 50 !important;
+        top: 0;
+        bottom: 0;
+        left: 0;
+    }
 }
 
 
@@ -574,8 +597,15 @@ body .ss-content.ss-open-above {
    🎨 DATEPICKER ENTERPRISE ANIMATIONS & ERORRS
    ======================================== */
 @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(-4px); }
-    to { opacity: 1; transform: translateY(0); }
+    from {
+        opacity: 0;
+        transform: translateY(-4px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .animate-fadeIn {
@@ -583,9 +613,26 @@ body .ss-content.ss-open-above {
 }
 
 @keyframes shake {
-    0%, 100% { transform: translateX(0); }
-    10%, 30%, 50%, 70%, 90% { transform: translateX(-2px); }
-    20%, 40%, 60%, 80% { transform: translateX(2px); }
+
+    0%,
+    100% {
+        transform: translateX(0);
+    }
+
+    10%,
+    30%,
+    50%,
+    70%,
+    90% {
+        transform: translateX(-2px);
+    }
+
+    20%,
+    40%,
+    60%,
+    80% {
+        transform: translateX(2px);
+    }
 }
 
 .datepicker-input.border-red-500 {

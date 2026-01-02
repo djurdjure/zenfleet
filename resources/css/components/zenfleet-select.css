@@ -34,6 +34,9 @@
     --zf-select-option-hover: theme('colors.blue.50');
     --zf-select-option-selected: theme('colors.blue.100');
     --zf-select-highlight: theme('colors.yellow.200');
+    --zf-select-border-width: 2px;
+    --zf-select-border-radius: 0.5rem;
+    --zf-select-focus-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1), 0 4px 12px rgba(0, 0, 0, 0.06);
 }
 
 .dark {
@@ -70,28 +73,30 @@
     @apply flex items-center justify-between gap-2;
     @apply px-4 py-2.5;
     @apply bg-white dark:bg-gray-800;
-    @apply border border-gray-300 dark:border-gray-600;
+    /* @apply border border-gray-300 dark:border-gray-600; */
     @apply rounded-lg;
     @apply text-sm text-gray-900 dark:text-gray-100;
     @apply transition-all duration-200 ease-in-out;
     @apply cursor-pointer;
     background-color: var(--zf-select-bg);
-    border-color: var(--zf-select-border);
+    border: var(--zf-select-border-width) solid var(--zf-select-border);
     color: var(--zf-select-text);
-    border-radius: var(--zf-select-radius);
-    box-shadow: var(--zf-select-shadow);
+    border-radius: var(--zf-select-border-radius);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
 }
 
 .ss-single-selected:hover {
-    border-color: var(--zf-select-border-hover);
+    border-color: #93c5fd;
     @apply shadow-md;
 }
 
 .ss-single-selected:focus,
-.ss-single-selected:focus-visible {
-    @apply outline-none ring-2 ring-blue-500 ring-offset-2 dark:ring-offset-gray-900;
-    border-color: var(--zf-select-border-focus);
-    box-shadow: var(--zf-select-shadow-focus);
+.ss-single-selected:focus-visible,
+.ss-open .ss-single-selected {
+    @apply outline-none;
+    transform: scale(1.005);
+    border-color: #3b82f6;
+    box-shadow: var(--zf-select-focus-shadow);
 }
 
 /* Placeholder state */
@@ -133,26 +138,29 @@
     @apply flex flex-wrap items-center gap-2;
     @apply px-3 py-2;
     @apply bg-white dark:bg-gray-800;
-    @apply border border-gray-300 dark:border-gray-600;
+    /* @apply border border-gray-300 dark:border-gray-600; */
     @apply rounded-lg;
     @apply text-sm;
     @apply transition-all duration-200 ease-in-out;
     @apply cursor-pointer min-h-[42px];
     background-color: var(--zf-select-bg);
-    border-color: var(--zf-select-border);
-    border-radius: var(--zf-select-radius);
-    box-shadow: var(--zf-select-shadow);
+    border: var(--zf-select-border-width) solid var(--zf-select-border);
+    border-radius: var(--zf-select-border-radius);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
 }
 
 .ss-multi-selected:hover {
-    border-color: var(--zf-select-border-hover);
+    border-color: #93c5fd;
     @apply shadow-md;
 }
 
 .ss-multi-selected:focus,
-.ss-multi-selected:focus-visible {
-    @apply outline-none ring-2 ring-blue-500 ring-offset-2 dark:ring-offset-gray-900;
-    border-color: var(--zf-select-border-focus);
+.ss-multi-selected:focus-visible,
+.ss-open .ss-multi-selected {
+    @apply outline-none;
+    transform: scale(1.005);
+    border-color: #3b82f6;
+    box-shadow: var(--zf-select-focus-shadow);
 }
 
 /* Placeholder */
@@ -403,6 +411,7 @@
         opacity: 0;
         transform: translateY(-8px) scale(0.98);
     }
+
     to {
         opacity: 1;
         transform: translateY(0) scale(1);
@@ -414,6 +423,7 @@
         opacity: 0;
         transform: translateY(8px) scale(0.98);
     }
+
     to {
         opacity: 1;
         transform: translateY(0) scale(1);
@@ -439,7 +449,8 @@
     .ss-option,
     .ss-search input {
         @apply py-3;
-        @apply text-base; /* Prevent zoom on iOS */
+        @apply text-base;
+        /* Prevent zoom on iOS */
     }
 
     .ss-single-selected,
@@ -452,11 +463,13 @@
 @media (hover: none) and (pointer: coarse) {
     .ss-option {
         @apply py-3;
-        min-height: 44px; /* iOS touch target */
+        min-height: 44px;
+        /* iOS touch target */
     }
 
     .ss-value .ss-value-delete {
-        @apply p-1; /* Larger touch target */
+        @apply p-1;
+        /* Larger touch target */
     }
 }
 
@@ -464,6 +477,7 @@
    PRINT STYLES
    ======================================== */
 @media print {
+
     .ss-content,
     .ss-arrow,
     .ss-value-delete {
@@ -472,11 +486,11 @@
 
     .ss-single-selected,
     .ss-multi-selected {
-        @apply border-gray-400 shadow-none !important;
+        @apply !border-gray-400 !shadow-none;
     }
 
     .ss-value {
-        @apply bg-gray-200 text-gray-900 !important;
+        @apply !bg-gray-200 !text-gray-900;
     }
 }
 
@@ -493,21 +507,23 @@
 
 /* Reduce motion for users who prefer it */
 @media (prefers-reduced-motion: reduce) {
+
     .ss-single-selected,
     .ss-multi-selected,
     .ss-option,
     .ss-arrow,
     .ss-content {
-        @apply transition-none !important;
+        @apply !transition-none;
         animation: none !important;
     }
 }
 
 /* High contrast mode support */
 @media (prefers-contrast: high) {
+
     .ss-single-selected,
     .ss-multi-selected {
-        @apply border-2 !important;
+        @apply !border-2;
     }
 
     .ss-option.ss-selected::after {

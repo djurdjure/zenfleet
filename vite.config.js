@@ -1,8 +1,10 @@
 import { defineConfig } from 'vite';
 import laravel from 'laravel-vite-plugin';
+import tailwindcss from '@tailwindcss/vite';
 
 export default defineConfig({
     plugins: [
+        tailwindcss(),
         laravel({
             input: [
                 // ✅ CORRECTION: Les DEUX points d'entrée
@@ -14,7 +16,7 @@ export default defineConfig({
             ],
         }),
     ],
-    
+
     build: {
         outDir: 'public/build',
         emptyOutDir: true,
@@ -37,14 +39,10 @@ export default defineConfig({
     optimizeDeps: {
         include: ['slim-select', 'alpinejs', 'axios', 'apexcharts', 'flatpickr', 'sortablejs']
     },
-    
+
     server: {
         hmr: { host: 'localhost' },
         watch: { usePolling: true, interval: 1000 },
-    },
-    
-    css: {
-        postcss: './postcss.config.js',
     },
 });
 

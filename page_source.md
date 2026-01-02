@@ -5,7 +5,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="csrf-token" content="7A2yL7NUppMhO6UAHvOBhzDwY7K5fYP9quW6GmdV">
+    <meta name="csrf-token" content="c3xGHWOQz74MbUH4heeTgpV2cNIMnJuPD7mPr13b">
         <meta name="user-data" content="{&quot;id&quot;:4,&quot;name&quot;:&quot;admin zenfleet&quot;,&quot;role&quot;:&quot;Admin&quot;}">
     
     <title>Modifier le Véhicule - ZenFleet</title>
@@ -16,13 +16,13 @@
 
     
 
-    <link rel="preload" as="style" href="http://localhost/build/assets/app-DSJyG3xs.css" /><link rel="modulepreload" as="script" href="http://localhost/build/assets/app-TNYn8kt8.js" /><link rel="modulepreload" as="script" href="http://localhost/build/assets/slimselect-CAvN1F7Q.js" /><link rel="modulepreload" as="script" href="http://localhost/build/assets/vendor-common-B9ygI19o.js" /><link rel="modulepreload" as="script" href="http://localhost/build/assets/ui-public-2hikc2V1.js" /><link rel="stylesheet" href="http://localhost/build/assets/app-DSJyG3xs.css" data-navigate-track="reload" /><script type="module" src="http://localhost/build/assets/app-TNYn8kt8.js" data-navigate-track="reload"></script>        <!-- Livewire Styles --><style >[wire\:loading][wire\:loading], [wire\:loading\.delay][wire\:loading\.delay], [wire\:loading\.inline-block][wire\:loading\.inline-block], [wire\:loading\.inline][wire\:loading\.inline], [wire\:loading\.block][wire\:loading\.block], [wire\:loading\.flex][wire\:loading\.flex], [wire\:loading\.table][wire\:loading\.table], [wire\:loading\.grid][wire\:loading\.grid], [wire\:loading\.inline-flex][wire\:loading\.inline-flex] {display: none;}[wire\:loading\.delay\.none][wire\:loading\.delay\.none], [wire\:loading\.delay\.shortest][wire\:loading\.delay\.shortest], [wire\:loading\.delay\.shorter][wire\:loading\.delay\.shorter], [wire\:loading\.delay\.short][wire\:loading\.delay\.short], [wire\:loading\.delay\.default][wire\:loading\.delay\.default], [wire\:loading\.delay\.long][wire\:loading\.delay\.long], [wire\:loading\.delay\.longer][wire\:loading\.delay\.longer], [wire\:loading\.delay\.longest][wire\:loading\.delay\.longest] {display: none;}[wire\:offline][wire\:offline] {display: none;}[wire\:dirty]:not(textarea):not(input):not(select) {display: none;}:root {--livewire-progress-bar-color: #2299dd;}[x-cloak] {display: none !important;}[wire\:cloak] {display: none !important;}</style>
+    <link rel="preload" as="style" href="http://localhost/build/assets/app-B4-sBwKD.css" /><link rel="modulepreload" as="script" href="http://localhost/build/assets/app-ClFzJlNW.js" /><link rel="modulepreload" as="script" href="http://localhost/build/assets/slimselect-CAvN1F7Q.js" /><link rel="modulepreload" as="script" href="http://localhost/build/assets/vendor-common-B9ygI19o.js" /><link rel="modulepreload" as="script" href="http://localhost/build/assets/ui-public-2hikc2V1.js" /><link rel="stylesheet" href="http://localhost/build/assets/app-B4-sBwKD.css" data-navigate-track="reload" /><script type="module" src="http://localhost/build/assets/app-ClFzJlNW.js" data-navigate-track="reload"></script>        <!-- Livewire Styles --><style >[wire\:loading][wire\:loading], [wire\:loading\.delay][wire\:loading\.delay], [wire\:loading\.inline-block][wire\:loading\.inline-block], [wire\:loading\.inline][wire\:loading\.inline], [wire\:loading\.block][wire\:loading\.block], [wire\:loading\.flex][wire\:loading\.flex], [wire\:loading\.table][wire\:loading\.table], [wire\:loading\.grid][wire\:loading\.grid], [wire\:loading\.inline-flex][wire\:loading\.inline-flex] {display: none;}[wire\:loading\.delay\.none][wire\:loading\.delay\.none], [wire\:loading\.delay\.shortest][wire\:loading\.delay\.shortest], [wire\:loading\.delay\.shorter][wire\:loading\.delay\.shorter], [wire\:loading\.delay\.short][wire\:loading\.delay\.short], [wire\:loading\.delay\.default][wire\:loading\.delay\.default], [wire\:loading\.delay\.long][wire\:loading\.delay\.long], [wire\:loading\.delay\.longer][wire\:loading\.delay\.longer], [wire\:loading\.delay\.longest][wire\:loading\.delay\.longest] {display: none;}[wire\:offline][wire\:offline] {display: none;}[wire\:dirty]:not(textarea):not(input):not(select) {display: none;}:root {--livewire-progress-bar-color: #2299dd;}[x-cloak] {display: none !important;}[wire\:cloak] {display: none !important;}</style>
 </head>
 
 <body class="h-full">
     <div class="min-h-full">
         
-        <div class="hidden lg:fixed lg:inset-y-0 lg:left-0 lg:z-50 lg:flex lg:w-64 lg:flex-col">
+        <div id="desktop-sidebar" class="hidden lg:fixed lg:inset-y-0 lg:left-0 lg:z-50 lg:flex lg:w-64 lg:flex-col">
             <div class="flex grow flex-col overflow-hidden bg-[#eef2f7] border-r border-gray-200/60 shadow-sm">
                 
                 <div class="w-full flex-none px-4 py-4 h-16 flex items-center border-b border-gray-300/50">
@@ -784,7 +784,7 @@
                                     </a>
                                     <div class="border-t border-zinc-100 my-1"></div>
                                     <form method="POST" action="http://localhost/logout">
-                                        <input type="hidden" name="_token" value="7A2yL7NUppMhO6UAHvOBhzDwY7K5fYP9quW6GmdV" autocomplete="off">                                        <button type="submit"
+                                        <input type="hidden" name="_token" value="c3xGHWOQz74MbUH4heeTgpV2cNIMnJuPD7mPr13b" autocomplete="off">                                        <button type="submit"
                                             class="group flex w-full items-center px-4 py-2 text-sm text-zinc-700 hover:bg-zinc-50">
                                             <span
     class="iconify block mr-3 h-4 w-4 text-zinc-400 group-hover:text-zinc-600"
@@ -815,7 +815,7 @@
  <span
     class="iconify block w-6 h-6 text-blue-600"
     data-icon="lucide:car"
-    data-inline="false"></span> Modifier le Véhicule: 10608-122-16
+    data-inline="false"></span> Modifier le Véhicule: 722638-220-16
  </h1>
  <p class="text-sm text-gray-600 ml-8.5">
  Complétez les 3 étapes pour mettre à jour le véhicule
@@ -828,7 +828,8 @@
  <div x-data="vehicleFormValidation()" x-init="init()">
 
  <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-0 mb-6">
- 
+ <!--[if BLOCK]><![endif]--><!--[if ENDBLOCK]><![endif]-->
+
  <div class="w-full bg-white border-b border-gray-200 py-8">
     <div class="px-4 mx-auto">
         <ol class="flex items-start justify-center gap-0 w-full max-w-4xl mx-auto">
@@ -966,8 +967,8 @@
 </div>
 
  
- <form method="POST" action="http://localhost/admin/vehicles/67" @submit="onSubmit" class="p-6">
- <input type="hidden" name="_token" value="7A2yL7NUppMhO6UAHvOBhzDwY7K5fYP9quW6GmdV" autocomplete="off"> <input type="hidden" name="_method" value="PUT"> <input type="hidden" name="current_step" x-model="currentStep">
+ <form method="POST" action="http://localhost/admin/vehicles/66" @submit="onSubmit" class="p-6">
+ <input type="hidden" name="_token" value="c3xGHWOQz74MbUH4heeTgpV2cNIMnJuPD7mPr13b" autocomplete="off"> <input type="hidden" name="_method" value="PUT"> <input type="hidden" name="current_step" x-model="currentStep">
 
  
  <div x-show="currentStep === 1" x-transition:enter="transition ease-out duration-200"
@@ -1002,7 +1003,7 @@
  id="registration_plate"
  class="bg-gray-50 border text-gray-900 text-sm rounded-lg block w-full p-2.5 transition-colors duration-200 border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 bg-gray-50 pl-10"
  placeholder="Ex: 16-12345-23"
- value="10608-122-16"
+ value="722638-220-16"
   required   
  x-bind:class="(fieldErrors && fieldErrors['registration_plate'] && touchedFields && touchedFields['registration_plate']) ? '!border-red-500 !focus:ring-2 !focus:ring-red-500 !focus:border-red-500 !bg-red-50' : ''"
  @blur="validateField('registration_plate', $event.target.value)"
@@ -1171,7 +1172,7 @@
  id="color"
  class="bg-gray-50 border text-gray-900 text-sm rounded-lg block w-full p-2.5 transition-colors duration-200 border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 bg-gray-50 pl-10"
  placeholder="Ex: Blanc, Noir, Gris métallisé..."
- value="blanc"
+ value="Noir"
    
  x-bind:class="(fieldErrors && fieldErrors['color'] && touchedFields && touchedFields['color']) ? '!border-red-500 !focus:ring-2 !focus:ring-red-500 !focus:border-red-500 !bg-red-50' : ''"
  
@@ -1241,29 +1242,32 @@
     x-init="initSelect()"
     class="" @change="validateField('vehicle_type_id', $event.target.value)">
 
-        <label for="slimselect-vehicle_type_id-6957cc4fb5df7" class="block mb-2 text-sm font-medium text-gray-900">
+    <!--[if BLOCK]><![endif]-->    <label for="slimselect-vehicle_type_id-69582e640296f" class="block mb-2 text-sm font-medium text-gray-900">
         Type de Véhicule
-                <span class="text-red-500">*</span>
-            </label>
-    
+        <!--[if BLOCK]><![endif]-->        <span class="text-red-500">*</span>
+        <!--[if ENDBLOCK]><![endif]-->
+    </label>
+    <!--[if ENDBLOCK]><![endif]-->
+
     <select
         x-ref="select"
         name="vehicle_type_id"
-        id="slimselect-vehicle_type_id-6957cc4fb5df7"
+        id="slimselect-vehicle_type_id-69582e640296f"
         class="slimselect-field w-full"
                         @change="validateField('vehicle_type_id', $event.target.value)">
 
         
-                        <option value="" data-placeholder="true">Sélectionnez un type...</option>
-        
-                <option
+        <!--[if BLOCK]><![endif]-->        <!--[if BLOCK]><![endif]-->        <option value="" data-placeholder="true">Sélectionnez un type...</option>
+        <!--[if ENDBLOCK]><![endif]-->
+
+        <!--[if BLOCK]><![endif]-->        <option
             value="11"
             >
             Autre
         </option>
                 <option
             value="1"
-            >
+            selected>
             Berline
         </option>
                 <option
@@ -1283,7 +1287,7 @@
         </option>
                 <option
             value="8"
-            selected>
+            >
             Fourgonnette
         </option>
                 <option
@@ -1311,9 +1315,12 @@
             >
             Voiture
         </option>
-                    </select>
+        <!--[if ENDBLOCK]><![endif]-->
+        <!--[if ENDBLOCK]><![endif]-->
+    </select>
 
-    </div>
+    <!--[if BLOCK]><![endif]--><!--[if ENDBLOCK]><![endif]-->
+</div>
  <div wire:ignore
     x-data="{
         instance: null,
@@ -1342,22 +1349,25 @@
     x-init="initSelect()"
     class="" @change="validateField('fuel_type_id', $event.target.value)">
 
-        <label for="slimselect-fuel_type_id-6957cc4fb65e1" class="block mb-2 text-sm font-medium text-gray-900">
+    <!--[if BLOCK]><![endif]-->    <label for="slimselect-fuel_type_id-69582e6402aa4" class="block mb-2 text-sm font-medium text-gray-900">
         Type de Carburant
-                <span class="text-red-500">*</span>
-            </label>
-    
+        <!--[if BLOCK]><![endif]-->        <span class="text-red-500">*</span>
+        <!--[if ENDBLOCK]><![endif]-->
+    </label>
+    <!--[if ENDBLOCK]><![endif]-->
+
     <select
         x-ref="select"
         name="fuel_type_id"
-        id="slimselect-fuel_type_id-6957cc4fb65e1"
+        id="slimselect-fuel_type_id-69582e6402aa4"
         class="slimselect-field w-full"
                         @change="validateField('fuel_type_id', $event.target.value)">
 
         
-                        <option value="" data-placeholder="true">Sélectionnez un carburant...</option>
-        
-                <option
+        <!--[if BLOCK]><![endif]-->        <!--[if BLOCK]><![endif]-->        <option value="" data-placeholder="true">Sélectionnez un carburant...</option>
+        <!--[if ENDBLOCK]><![endif]-->
+
+        <!--[if BLOCK]><![endif]-->        <option
             value="2"
             >
             Diesel
@@ -1377,9 +1387,12 @@
             >
             Électrique
         </option>
-                    </select>
+        <!--[if ENDBLOCK]><![endif]-->
+        <!--[if ENDBLOCK]><![endif]-->
+    </select>
 
-    </div>
+    <!--[if BLOCK]><![endif]--><!--[if ENDBLOCK]><![endif]-->
+</div>
  <div wire:ignore
     x-data="{
         instance: null,
@@ -1408,22 +1421,25 @@
     x-init="initSelect()"
     class="" @change="validateField('transmission_type_id', $event.target.value)">
 
-        <label for="slimselect-transmission_type_id-6957cc4fb6f33" class="block mb-2 text-sm font-medium text-gray-900">
+    <!--[if BLOCK]><![endif]-->    <label for="slimselect-transmission_type_id-69582e6402b56" class="block mb-2 text-sm font-medium text-gray-900">
         Type de Transmission
-                <span class="text-red-500">*</span>
-            </label>
-    
+        <!--[if BLOCK]><![endif]-->        <span class="text-red-500">*</span>
+        <!--[if ENDBLOCK]><![endif]-->
+    </label>
+    <!--[if ENDBLOCK]><![endif]-->
+
     <select
         x-ref="select"
         name="transmission_type_id"
-        id="slimselect-transmission_type_id-6957cc4fb6f33"
+        id="slimselect-transmission_type_id-69582e6402b56"
         class="slimselect-field w-full"
                         @change="validateField('transmission_type_id', $event.target.value)">
 
         
-                        <option value="" data-placeholder="true">Sélectionnez une transmission...</option>
-        
-                <option
+        <!--[if BLOCK]><![endif]-->        <!--[if BLOCK]><![endif]-->        <option value="" data-placeholder="true">Sélectionnez une transmission...</option>
+        <!--[if ENDBLOCK]><![endif]-->
+
+        <!--[if BLOCK]><![endif]-->        <option
             value="2"
             >
             Automatique
@@ -1433,9 +1449,12 @@
             selected>
             Manuelle
         </option>
-                    </select>
+        <!--[if ENDBLOCK]><![endif]-->
+        <!--[if ENDBLOCK]><![endif]-->
+    </select>
 
-    </div>
+    <!--[if BLOCK]><![endif]--><!--[if ENDBLOCK]><![endif]-->
+</div>
  <div class="" min="1950" max="2027">
   <label for="manufacturing_year" class="block mb-2 text-sm font-medium text-gray-900">
  Année de Fabrication
@@ -1622,77 +1641,77 @@
  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
  <div class="w-full"
     x-data="{
-        serverDate: '05/04/2022', // Format Y-m-d (valeur réelle)
-        displayDate: '', // Format d/m/Y (affichage)
+        serverDate: '09/03/2022',
+        displayValue: '09/03/2022',
         picker: null,
 
         init() {
-            // Initialiser la date d'affichage à partir de la valeur serveur (si présente)
-            if (this.serverDate) {
-                this.displayDate = this.formatServerDateToDisplay(this.serverDate);
-            }
-
-            // Initialiser Flowbite Datepicker sur l'input visible
             this.$nextTick(() => {
                 const el = this.$refs.displayInput;
-                this.picker = new Datepicker(el, {
+                
+                if (typeof window.Datepicker === 'undefined') {
+                    console.error('❌ ZenFleet: Datepicker not loaded');
+                    return;
+                }
+                
+                // Initialize Flowbite Datepicker
+                this.picker = new window.Datepicker(el, {
                     language: 'fr',
                     format: 'dd/mm/yyyy',
                     autohide: true,
                     todayBtn: true,
+                    todayBtnMode: 1, // Select today on click
                     clearBtn: true,
-                    weekStart: 1, // Lundi
-                    minDate: '',
-                    maxDate: '2026-01-02',
-                    // Ajouter des classes pour le calendrier
-                    orientation: 'bottom left',
-                });
-
-                // Gérer le changement de date via le picker
-                el.addEventListener('changeDate', (e) => {
-                   if (e.detail.date) {
-                       // Convertir Date object -> Y-m-d pour le serveur
-                       const d = e.detail.date;
-                       const year = d.getFullYear();
-                       const month = String(d.getMonth() + 1).padStart(2, '0');
-                       const day = String(d.getDate()).padStart(2, '0');
-                       this.serverDate = `${year}-${month}-${day}`;
-                   } else {
-                       this.serverDate = '';
-                   }
+                    weekStart: 1,
+                                                            maxDate: '2026-01-02',
+                                        orientation: 'bottom left',
                 });
                 
-                // Gérer l'effacement manuel ou via bouton clear
-                el.addEventListener('change', (e) => {
-                    if (!el.value) {
-                         this.serverDate = '';
-                         this.picker.setDate(null);
+                // Set initial date if value exists
+                if (this.displayValue) {
+                    el.value = this.displayValue;
+                }
+                
+                // Handle date change
+                el.addEventListener('changeDate', (e) => {
+                    if (e.detail.date) {
+                        const d = e.detail.date;
+                        const year = d.getFullYear();
+                        const month = String(d.getMonth() + 1).padStart(2, '0');
+                        const day = String(d.getDate()).padStart(2, '0');
+                        this.serverDate = `${year}-${month}-${day}`;
+                        this.displayValue = `${day}/${month}/${year}`;
+                    } else {
+                        this.serverDate = '';
+                        this.displayValue = '';
+                    }
+                });
+                
+                // Handle manual clear
+                el.addEventListener('input', (e) => {
+                    if (!el.value.trim()) {
+                        this.serverDate = '';
+                        this.displayValue = '';
                     }
                 });
             });
-        },
-
-        formatServerDateToDisplay(dateStr) {
-            if (!dateStr) return '';
-            // Supposer Y-m-d ou Y-m-d H:i:s
-            const date = new Date(dateStr);
-            if (isNaN(date.getTime())) return dateStr; // Fallback
-            
-            const day = String(date.getDate()).padStart(2, '0');
-            const month = String(date.getMonth() + 1).padStart(2, '0');
-            const year = date.getFullYear();
-            return `${day}/${month}/${year}`;
         }
-     }"
+    }"
     wire:ignore>
 
-        <label for="datepicker-6957cc4fb89a8" class="block mb-2 text-sm font-medium text-gray-900">
+        <label for="datepicker-69582e640305f" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
         Date d&#039;acquisition
-         <span class="text-red-500">*</span>     </label>
+                <span class="text-red-500 ml-0.5">*</span>
+            </label>
     
     <div class="relative">
-        <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
-            <svg class="w-4 h-4 text-gray-500" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+        
+        <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none z-10">
+            <svg class="w-4 h-4 text-gray-500 dark:text-gray-400"
+                aria-hidden="true"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="currentColor"
+                viewBox="0 0 20 20">
                 <path d="M20 4a2 2 0 0 0-2-2h-2V1a1 1 0 0 0-2 0v1h-3V1a1 1 0 0 0-2 0v1H6V1a1 1 0 0 0-2 0v1H2a2 2 0 0 0-2 2v2h20V4ZM0 18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8H0v10Zm5-8h10a1 1 0 0 1 0 2H5a1 1 0 0 1 0-2Z" />
             </svg>
         </div>
@@ -1701,20 +1720,18 @@
         <input
             x-ref="displayInput"
             type="text"
-            id="datepicker-6957cc4fb89a8"
-            class="bg-gray-50 border text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full ps-10 p-2.5 transition-colors duration-200 border-gray-300"
+            id="datepicker-69582e640305f"
+            class="block w-full ps-10 p-2.5 bg-gray-50 border-2 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 transition-all duration-200 border-gray-300"
             placeholder="Choisir une date"
-            x-model="displayDate"
-                         required             autocomplete="off">
+            x-model="displayValue"
+                         required             autocomplete="off"
+            readonly>
 
         
-        <input
-            type="hidden"
-            name="acquisition_date"
-            x-model="serverDate">
+        <input type="hidden" name="acquisition_date" x-model="serverDate">
     </div>
 
-        <p class="mt-2 text-sm text-gray-500">Date d&#039;achat du véhicule</p>
+        <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Date d&#039;achat du véhicule</p>
     </div>
  <div class="" step="0.01" min="0">
   <label for="purchase_price" class="block mb-2 text-sm font-medium text-gray-900">
@@ -1820,7 +1837,7 @@
  id="current_mileage"
  class="bg-gray-50 border text-gray-900 text-sm rounded-lg block w-full p-2.5 transition-colors duration-200 border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 bg-gray-50 pl-10"
  placeholder="Ex: 15000"
- value="23900"
+ value="31897"
    
  x-bind:class="(fieldErrors && fieldErrors['current_mileage'] && touchedFields && touchedFields['current_mileage']) ? '!border-red-500 !focus:ring-2 !focus:ring-red-500 !focus:border-red-500 !bg-red-50' : ''"
  min="0"
@@ -1874,22 +1891,25 @@
     x-init="initSelect()"
     class="" @change="validateField('status_id', $event.target.value)">
 
-        <label for="slimselect-status_id-6957cc4fb930a" class="block mb-2 text-sm font-medium text-gray-900">
+    <!--[if BLOCK]><![endif]-->    <label for="slimselect-status_id-69582e6403407" class="block mb-2 text-sm font-medium text-gray-900">
         Statut Initial
-                <span class="text-red-500">*</span>
-            </label>
-    
+        <!--[if BLOCK]><![endif]-->        <span class="text-red-500">*</span>
+        <!--[if ENDBLOCK]><![endif]-->
+    </label>
+    <!--[if ENDBLOCK]><![endif]-->
+
     <select
         x-ref="select"
         name="status_id"
-        id="slimselect-status_id-6957cc4fb930a"
+        id="slimselect-status_id-69582e6403407"
         class="slimselect-field w-full"
                         @change="validateField('status_id', $event.target.value)">
 
         
-                        <option value="" data-placeholder="true">Sélectionnez un statut...</option>
-        
-                <option
+        <!--[if BLOCK]><![endif]-->        <!--[if BLOCK]><![endif]-->        <option value="" data-placeholder="true">Sélectionnez un statut...</option>
+        <!--[if ENDBLOCK]><![endif]-->
+
+        <!--[if BLOCK]><![endif]-->        <option
             value="9"
             >
             Affecté
@@ -1906,12 +1926,12 @@
         </option>
                 <option
             value="8"
-            >
+            selected>
             Parking
         </option>
                 <option
             value="11"
-            selected>
+            >
             Réformé
         </option>
                 <option
@@ -1919,12 +1939,15 @@
             >
             Vendu
         </option>
-                    </select>
+        <!--[if ENDBLOCK]><![endif]-->
+        <!--[if ENDBLOCK]><![endif]-->
+    </select>
 
-        <p class="mt-2 text-sm text-gray-500">
+    <!--[if BLOCK]><![endif]-->    <p class="mt-2 text-sm text-gray-500">
         État opérationnel du véhicule
     </p>
-    </div> </div>
+    <!--[if ENDBLOCK]><![endif]-->
+</div> </div>
 
  <div class="md:col-span-2">
  <div wire:ignore
@@ -1955,20 +1978,23 @@
     x-init="initSelect()"
     class="">
 
-        <label for="slimselect-users-6957cc4fbb1fa" class="block mb-2 text-sm font-medium text-gray-900">
+    <!--[if BLOCK]><![endif]-->    <label for="slimselect-users-69582e64044f2" class="block mb-2 text-sm font-medium text-gray-900">
         Utilisateurs Autorisés
-            </label>
-    
+        <!--[if BLOCK]><![endif]--><!--[if ENDBLOCK]><![endif]-->
+    </label>
+    <!--[if ENDBLOCK]><![endif]-->
+
     <select
         x-ref="select"
         name="users"
-        id="slimselect-users-6957cc4fbb1fa"
+        id="slimselect-users-69582e64044f2"
         class="slimselect-field w-full"
                  multiple         >
 
         
-                
-                <option
+        <!--[if BLOCK]><![endif]-->        <!--[if BLOCK]><![endif]--><!--[if ENDBLOCK]><![endif]-->
+
+        <!--[if BLOCK]><![endif]-->        <option
             value="1"
             >
              (mohamed.meziani@trans-algerlogistics.local)
@@ -2048,12 +2074,15 @@
             >
             zerrouk ALIOUANE (zerroukaliouane@zenfleet.dz)
         </option>
-                    </select>
+        <!--[if ENDBLOCK]><![endif]-->
+        <!--[if ENDBLOCK]><![endif]-->
+    </select>
 
-        <p class="mt-2 text-sm text-gray-500">
+    <!--[if BLOCK]><![endif]-->    <p class="mt-2 text-sm text-gray-500">
         Sélectionnez les utilisateurs autorisés à utiliser ce véhicule
     </p>
-    </div> </div>
+    <!--[if ENDBLOCK]><![endif]-->
+</div> </div>
 
  <div class="md:col-span-2">
  <div class="">
@@ -2705,7 +2734,7 @@ function vehicleFormValidation() {
             }
         }
     </script>
-    <script data-navigate-once="true">window.livewireScriptConfig = {"csrf":"7A2yL7NUppMhO6UAHvOBhzDwY7K5fYP9quW6GmdV","uri":"\/livewire\/update","progressBar":"","nonce":""};</script>
+    <script data-navigate-once="true">window.livewireScriptConfig = {"csrf":"c3xGHWOQz74MbUH4heeTgpV2cNIMnJuPD7mPr13b","uri":"\/livewire\/update","progressBar":"","nonce":""};</script>
 </body>
 
 </html>

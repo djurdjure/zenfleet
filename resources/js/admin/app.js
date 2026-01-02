@@ -11,18 +11,20 @@ import '../../css/admin/app.css';
 // ✅ ENTERPRISE: Local CSS imports
 import 'slim-select/styles'; // Correct alias from package.json
 import 'flatpickr/dist/flatpickr.min.css';
-import '@fontsource/inter'; // Local Inter font
+// ✅ Font import moved to CSS to avoid PostCSS warning
 
 // ✅ ENTERPRISE: Import SlimSelect globally
 import SlimSelect from 'slim-select';
+
+window.SlimSelect = SlimSelect;
 
 // ✅ ENTERPRISE: Import Flowbite Datepicker globally
 import Datepicker from 'flowbite-datepicker/Datepicker';
 import fr from './locales/fr.js'; // Use local manual import
 Object.assign(Datepicker.locales, { fr }); // Register French Locale
 
-window.SlimSelect = SlimSelect;
 window.Datepicker = Datepicker;
+console.log('📅 Flowbite Datepicker configured globally:', !!window.Datepicker);
 
 // ✅ ENTERPRISE: Import Iconify runtime locally
 import Iconify from '@iconify/iconify';
@@ -44,6 +46,8 @@ const initializeAdminGlobals = () => {
     window.axios = axios;
     // window.TomSelect est chargé via CDN
     window.flatpickr = flatpickr;
+    // Configurer la locale française par défaut globalement
+    flatpickr.localize(French);
 };
 
 // ✅ NOUVELLE ARCHITECTURE: Classe ZenFleetAdmin moderne
