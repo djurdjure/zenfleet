@@ -15,28 +15,13 @@
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=inter:300,400,500,600,700&display=swap" rel="stylesheet" />
 
-    <!-- Iconify CDN -->
-    <script src="https://code.iconify.design/3/3.1.0/iconify.min.js"></script>
-
-    <!-- Font Awesome 6 -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-
     {{-- ====================================================================
- 📦 SCRIPTS & STYLES ENTERPRISE-GRADE
+ 📦 ZENFLEET ENTERPRISE-GRADE ASSETS
  ==================================================================== 
- Tom Select, Flatpickr, ApexCharts - Chargés globalement
- @version 1.0 Production-Ready
+ All UI assets (SlimSelect, Flatpickr, Icons) bundled locally via Vite
+ No external CDN dependencies for maximum reliability
+ @version 2.0 Enterprise-Ready
  ==================================================================== --}}
-
-    {{-- Tom Select CSS --}}
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.css">
-
-    {{-- SlimSelect CSS (pour formulaire d'affectation V2) --}}
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/slim-select@2/dist/slimselect.css">
-
-    {{-- Flatpickr CSS --}}
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/light.css">
 
     {{-- Flatpickr Custom Styles ZenFleet --}}
     <style>
