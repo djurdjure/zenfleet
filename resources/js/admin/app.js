@@ -7,9 +7,14 @@
 // ✅ CORRECTION: Import CSS admin en premier
 import '../../css/admin/app.css';
 
-// ✅ ENTERPRISE: Local CSS imports (no more CDN dependencies)
+// ✅ ENTERPRISE: Local CSS imports
 import 'slim-select/styles';
+// Note: SlimSelect CSS loaded via CDN matches the JS version used
 import 'flatpickr/dist/flatpickr.min.css';
+
+// ✅ ENTERPRISE: Import SlimSelect and expose as global (for x-slim-select component)
+import SlimSelect from 'slim-select';
+window.SlimSelect = SlimSelect;
 
 // ✅ CRITIQUE: Import Livewire 3 pour wire:click et composants Livewire
 import { Livewire, Alpine } from '../../../vendor/livewire/livewire/dist/livewire.esm.js';
@@ -169,8 +174,8 @@ class ZenFleetAdmin {
 
     // Configuration TomSelect pour admin
     initializeTomSelect() {
-        // ✅ CORRECTION: Chercher .tomselect au lieu de .admin-select
-        const selects = document.querySelectorAll('.tomselect, .admin-select, select[multiple]');
+        // ✅ CORRECTION: Chercher .tomselect au lieu de .admin-select (EXCLURE slimselect-field)
+        const selects = document.querySelectorAll('.tomselect, .admin-select, select[multiple]:not(.slimselect-field)');
         selects.forEach(select => {
             if (!select.tomselect && !select.disabled) {
                 const tomSelect = new TomSelect(select, {

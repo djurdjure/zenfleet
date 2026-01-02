@@ -18,10 +18,14 @@
     {{-- ====================================================================
  📦 ZENFLEET ENTERPRISE-GRADE ASSETS
  ==================================================================== 
- All UI assets (SlimSelect, Flatpickr, Icons) bundled locally via Vite
- No external CDN dependencies for maximum reliability
- @version 2.0 Enterprise-Ready
+ SlimSelect & Flatpickr: bundled locally via Vite (no CDN)
+ Icons: Iconify runtime (loads icons from CDN, caches locally)
+ FontAwesome: REMOVED - migrating to Iconify progressively
+ @version 2.2 Enterprise-Ready
  ==================================================================== --}}
+
+    {{-- Iconify CDN - Original runtime that renders icons from data-icon attributes --}}
+    <script src="https://code.iconify.design/3/3.1.0/iconify.min.js"></script>
 
     {{-- Flatpickr Custom Styles ZenFleet --}}
     <style>
@@ -1020,8 +1024,7 @@
     {{-- Tom Select JS --}}
     <script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js"></script>
 
-    {{-- SlimSelect JS (pour formulaire d'affectation V2) --}}
-    <script src="https://cdn.jsdelivr.net/npm/slim-select@2/dist/slimselect.min.js"></script>
+    {{-- SlimSelect JS - REMOVED (Bundled locally via Vite) --}}
 
     {{-- Flatpickr JS --}}
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
