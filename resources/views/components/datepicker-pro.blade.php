@@ -10,243 +10,192 @@
 'maxDate' => null,
 'format' => 'd/m/Y',
 'placeholder' => 'JJ/MM/AAAA',
-'defaultToday' => true, // ✨ Par défaut, utilise la date d'aujourd'hui
+'defaultToday' => true,
 ])
 
 @php
-// Générer un ID unique pour le composant
-$inputId = 'datepicker-' . uniqid();
+$inputId = 'datepicker-pro-' . uniqid();
+// Classes style Flowbite "Pro"
+$baseClasses = 'bg-gray-50 border text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full ps-10 p-2.5 transition-colors duration-200';
+$errorClasses = 'bg-red-50 border-red-500 text-red-900 placeholder-red-700 focus:ring-red-500 focus:border-red-500 animate-shake';
+$normalClasses = 'border-gray-300';
 
-// Définir la valeur par défaut
-if (!$value && $defaultToday && !old($name)) {
-$value = date('d/m/Y'); // Format français par défaut
-}
-
-// Classes conditionnelles pour erreur (fond rouge clair et bordure)
-$inputClasses = $error
-? 'datepicker-input !bg-red-50 border-2 border-red-500 text-gray-900 text-sm rounded-xl focus:ring-2 focus:ring-red-500 focus:border-red-500 block w-full pl-11 p-3 transition-all duration-200 placeholder-red-400'
-: 'datepicker-input !bg-white border border-gray-200 text-gray-900 text-sm rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 hover:border-gray-300 block w-full pl-11 p-3 transition-all duration-200';
-
-// Classes pour l'icône
-$iconClasses = $error
-? 'text-red-500 animate-pulse'
-: 'text-gray-400 group-hover:text-blue-600 transition-colors duration-200';
-
-// Classes pour le conteneur
-$containerClasses = $error
-? 'relative group error-state'
-: 'relative group';
+$finalClasses = $error ? $baseClasses . ' ' . $errorClasses : $baseClasses . ' ' . $normalClasses;
 @endphp
 
-<div {{ $attributes->merge(['class' => '']) }}>
+<div {{ $attributes->merge(['class' => 'w-full']) }}
+    x-data="{
+        serverDate: '{{ old($name, $value) }}',
+        displayDate: '',
+        picker: null,
+        hasError: {{ $error ? 'true' : 'false' }},
+
+        init() {
+            // Gestion Default Today si vide
+            if (!this.serverDate && {{ $defaultToday ? 'true' : 'false' }} && !'{{ old($name) }}') {
+                const today = new Date();
+                const y = today.getFullYear();
+                const m = String(today.getMonth() + 1).padStart(2, '0');
+                const d = String(today.getDate()).padStart(2, '0');
+                this.serverDate = `${y}-${m}-${d}`;
+            }
+
+            if (this.serverDate) {
+                this.displayDate = this.formatServerDateToDisplay(this.serverDate);
+            }
+
+            this.$nextTick(() => {
+                const el = this.$refs.displayInput;
+                this.picker = new Datepicker(el, {
+                    language: 'fr',
+                    format: 'dd/mm/yyyy',
+                    autohide: true,
+                    todayBtn: true,
+                    clearBtn: true,
+                    weekStart: 1,
+                    minDate: '{{ $minDate }}',
+                    maxDate: '{{ $maxDate }}',
+                    orientation: 'bottom left',
+                });
+
+                el.addEventListener('changeDate', (e) => {
+                   if (e.detail.date) {
+                       const d = e.detail.date;
+                       this.serverDate = this.formatDateToServer(d);
+                       this.hasError = false; // Reset error on selection
+                   } else {
+                       this.serverDate = '';
+                   }
+                });
+                
+                // Sync manual input
+                el.addEventListener('change', (e) => {
+                    if (!el.value) {
+                         this.clearDate();
+                    }
+                });
+            });
+        },
+
+        formatDateToServer(d) {
+             const year = d.getFullYear();
+             const month = String(d.getMonth() + 1).padStart(2, '0');
+             const day = String(d.getDate()).padStart(2, '0');
+             return `${year}-${month}-${day}`;
+        },
+
+        formatServerDateToDisplay(dateStr) {
+            if (!dateStr) return '';
+            const date = new Date(dateStr);
+            if (isNaN(date.getTime())) return dateStr;
+            const day = String(date.getDate()).padStart(2, '0');
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const year = date.getFullYear();
+            return `${day}/${month}/${year}`;
+        },
+
+        clearDate() {
+            this.serverDate = '';
+            this.displayDate = '';
+            this.picker.setDate(null);
+            this.hasError = false;
+        },
+
+        validateDate() {
+            if (!this.displayDate) return;
+            const regex = /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/;
+            if (regex.test(this.displayDate)) {
+                const parts = this.displayDate.match(regex);
+                const day = parseInt(parts[1], 10);
+                const month = parseInt(parts[2], 10);
+                const year = parseInt(parts[3], 10);
+                const date = new Date(year, month - 1, day);
+                
+                if (date.getDate() !== day || date.getMonth() !== month - 1 || date.getFullYear() !== year) {
+                     this.hasError = true;
+                } else {
+                     this.hasError = false;
+                     // Sync server date if valid manually typed
+                     this.serverDate = `${year}-${String(month).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+                     this.picker.setDate(date);
+                }
+            } else {
+                this.hasError = true;
+            }
+        }
+     }"
+    wire:ignore>
+
     @if($label)
-    <label for="{{ $inputId }}" class="block mb-2 text-sm font-semibold {{ $error ? 'text-red-700' : 'text-gray-700' }}">
+    <label for="{{ $inputId }}" class="block mb-2 text-sm font-semibold {{ $error ? 'text-red-700' : 'text-gray-700' }}" :class="{'text-red-700': hasError, 'text-gray-700': !hasError}">
         {{ $label }}
-        @if($required)
-        <span class="text-red-500 ml-0.5">*</span>
-        @endif
+        @if($required) <span class="text-red-500 ml-0.5">*</span> @endif
     </label>
     @endif
 
-    <div class="{{ $containerClasses }}">
-        {{-- Icône calendrier --}}
-        <div class="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none z-10">
-            <x-iconify icon="lucide:calendar-days" class="w-5 h-5 {{ $iconClasses }}" />
+    <div class="relative group">
+        <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
+            <svg class="w-4 h-4 transition-colors duration-200" :class="{'text-red-500': hasError, 'text-gray-500': !hasError}" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M20 4a2 2 0 0 0-2-2h-2V1a1 1 0 0 0-2 0v1h-3V1a1 1 0 0 0-2 0v1H6V1a1 1 0 0 0-2 0v1H2a2 2 0 0 0-2 2v2h20V4ZM0 18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8H0v10Zm5-8h10a1 1 0 0 1 0 2H5a1 1 0 0 1 0-2Z" />
+            </svg>
         </div>
 
-        {{-- Input avec masque --}}
+        {{-- Input visible --}}
         <input
+            x-ref="displayInput"
             type="text"
-            name="{{ $name }}"
             id="{{ $inputId }}"
-            class="{{ $inputClasses }}"
+            class="{{ $baseClasses }}"
+            :class="{
+                '{{ $errorClasses }}': hasError, 
+                '{{ $normalClasses }}': !hasError
+            }"
             placeholder="{{ $placeholder }}"
-            value="{{ old($name, $value) }}"
-            @if($required) required @endif
+            x-model="displayDate"
+            @blur="validateDate"
             @if($disabled) disabled @endif
-            @if($minDate) data-min-date="{{ $minDate }}" @endif
-            @if($maxDate) data-max-date="{{ $maxDate }}" @endif
-            data-date-format="{{ $format }}"
-            data-default-today="{{ $defaultToday ? 'true' : 'false' }}"
+            @if($required) required @endif
             autocomplete="off"
-            maxlength="10"
-            pattern="\d{1,2}/\d{1,2}/\d{4}"
-            title="Format attendu: JJ/MM/AAAA"
-            {{ $attributes->except(['class']) }} />
+            maxlength="10">
 
-        {{-- Bouton clear (visible si il y a une valeur et pas d'erreur) --}}
+        {{-- Bouton Clear --}}
         @if(!$disabled)
         <button
             type="button"
-            class="clear-date absolute inset-y-0 right-3 flex items-center pr-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200"
-            style="display: none;"
-            onclick="clearDateInput('{{ $inputId }}')">
-            <div class="p-1 rounded-full hover:bg-gray-100 transition-colors">
-                <x-iconify icon="lucide:x" class="w-4 h-4 text-gray-400" />
-            </div>
+            class="absolute inset-y-0 end-2 flex items-center px-2 text-gray-400 hover:text-gray-600 focus:outline-none"
+            x-show="displayDate"
+            @click="clearDate()"
+            style="display: none;">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
         </button>
         @endif
+
+        {{-- Input caché (Valeur réelle) --}}
+        <input
+            type="hidden"
+            name="{{ $name }}"
+            x-model="serverDate">
     </div>
 
-    {{-- Messages d'erreur ou d'aide --}}
-    @if($error)
-    <div class="mt-2 flex items-start animate-fadeIn">
-        <x-iconify icon="lucide:alert-circle" class="w-4 h-4 text-red-600 mr-1.5 mt-0.5 flex-shrink-0" />
+    {{-- Messages d'erreur --}}
+    <div x-show="hasError || '{{ $error }}'" style="display: none;" class="mt-2 flex items-start animate-fadeIn">
+        <svg class="w-4 h-4 text-red-600 mr-1.5 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+        </svg>
         <div>
-            <p class="text-sm text-red-600 font-medium">{{ $error }}</p>
-            <p class="text-xs text-red-500 mt-0.5">Format attendu: JJ/MM/AAAA</p>
+            <p class="text-sm text-red-600 font-medium" x-text="'{{ $error }}' || 'Date invalide'"></p>
+            <p class="text-xs text-red-500 mt-0.5" x-show="hasError && !'{{ $error }}'">Format attendu: JJ/MM/AAAA</p>
         </div>
     </div>
-    @elseif($helpText)
-    <p class="mt-2 text-sm text-gray-500 flex items-start">
-        <x-iconify icon="lucide:info" class="w-4 h-4 text-gray-400 mr-1.5 mt-0.5 flex-shrink-0" />
+
+    @if($helpText)
+    <p class="mt-2 text-sm text-gray-500 flex items-start" x-show="!hasError && !'{{ $error }}'">
+        <svg class="w-4 h-4 text-gray-400 mr-1.5 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+        </svg>
         <span>{{ $helpText }}</span>
     </p>
     @endif
 </div>
-
-@once
-@push('scripts')
-<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/fr.js"></script>
-
-<script>
-    // Fonction globale pour nettoyer un champ date
-    function clearDateInput(inputId) {
-        const input = document.getElementById(inputId);
-        if (input && input._flatpickr) {
-            input._flatpickr.clear();
-        }
-        input.value = '';
-        updateClearButton(input);
-        // Déclencher l'événement input pour notifier les frameworks réactifs si nécessaire
-        input.dispatchEvent(new Event('input'));
-    }
-
-    // Fonction pour gérer l'affichage du bouton clear
-    function updateClearButton(input) {
-        const clearBtn = input.parentElement.querySelector('.clear-date');
-        if (clearBtn) {
-            if (input.value && input.value.trim() !== '') {
-                clearBtn.style.display = 'flex';
-            } else {
-                clearBtn.style.display = 'none';
-            }
-        }
-    }
-
-    document.addEventListener('DOMContentLoaded', function() {
-        // Initialiser tous les datepickers
-        document.querySelectorAll('.datepicker-input').forEach(function(el) {
-            if (el._flatpickr) return; // Éviter la double initialisation
-
-            const minDate = el.getAttribute('data-min-date');
-            const maxDate = el.getAttribute('data-max-date');
-            const dateFormat = el.getAttribute('data-date-format') || 'd/m/Y';
-            const defaultToday = el.getAttribute('data-default-today') === 'true';
-
-            // Initialiser Flatpickr
-            const fp = flatpickr(el, {
-                locale: 'fr',
-                dateFormat: dateFormat,
-                minDate: minDate,
-                maxDate: maxDate,
-                allowInput: true,
-                disableMobile: true,
-                defaultDate: defaultToday && !el.value ? 'today' : el.value,
-                animate: true,
-                monthSelectorType: 'dropdown', // IMPORTANT: Permet le selecteur de mois
-                yearSelectorType: 'static', // IMPORTANT: Plus propre que dropdown pour l'année
-
-                // Icônes personnalisées SVG (Lucide style)
-                nextArrow: '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>',
-                prevArrow: '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>',
-
-                onReady: function(selectedDates, dateStr, instance) {
-                    // Ajouter une classe au parent si erreur
-                    if (el.classList.contains('border-red-500')) {
-                        instance.calendarContainer.classList.add('error-calendar');
-                    }
-
-                    // Mettre à jour le bouton clear
-                    updateClearButton(el);
-                },
-                onChange: function(selectedDates, dateStr, instance) {
-                    // Retirer les classes d'erreur lors de la sélection
-                    if (el.classList.contains('border-red-500')) {
-                        el.classList.remove('border-red-500', '!bg-red-50', 'text-red-900', 'placeholder-red-400');
-                        el.classList.add('border-gray-200', '!bg-white');
-
-                        // Retirer aussi l'animation
-                        const errorDiv = el.closest('.group').parentElement.querySelector('.animate-fadeIn');
-                        if (errorDiv) {
-                            errorDiv.style.display = 'none';
-                        }
-
-                        // Changer l'icône
-                        const icon = el.parentElement.querySelector('svg');
-                        if (icon) {
-                            icon.classList.remove('text-red-500', 'animate-pulse');
-                            icon.classList.add('text-gray-400');
-                        }
-                    }
-
-                    // Mettre à jour le bouton clear
-                    updateClearButton(el);
-                },
-                onClose: function(selectedDates, dateStr, instance) {
-                    // Valider le format de la date saisie manuellement
-                    const inputValue = el.value;
-                    if (inputValue && !dateStr) {
-                        // Essayer de parser la date manuellement
-                        const parts = inputValue.split('/');
-                        if (parts.length === 3) {
-                            const day = parseInt(parts[0], 10);
-                            const month = parseInt(parts[1], 10);
-                            const year = parseInt(parts[2], 10);
-
-                            if (day > 0 && day <= 31 && month > 0 && month <= 12 && year > 1900 && year < 2100) {
-                                const date = new Date(year, month - 1, day);
-                                instance.setDate(date, true);
-                            }
-                        }
-                    }
-                }
-            });
-
-            // Gérer la saisie manuelle avec validation
-            el.addEventListener('blur', function() {
-                const value = this.value;
-                if (value && value.includes('_')) {
-                    // Date incomplète, nettoyer
-                    this.value = '';
-                    updateClearButton(this);
-                } else if (value) {
-                    // Valider le format
-                    const regex = /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/;
-                    if (regex.test(value)) {
-                        const parts = value.match(regex);
-                        const day = parseInt(parts[1], 10);
-                        const month = parseInt(parts[2], 10);
-                        const year = parseInt(parts[3], 10);
-
-                        // Vérifier que la date est valide
-                        const date = new Date(year, month - 1, day);
-                        if (date.getDate() !== day || date.getMonth() !== month - 1 || date.getFullYear() !== year) {
-                            // Date invalide
-                            this.classList.add('border-red-500', '!bg-red-50');
-                            this.classList.remove('border-gray-200', '!bg-white');
-                        }
-                    }
-                }
-            });
-
-            // Gérer l'événement input pour le bouton clear
-            el.addEventListener('input', function() {
-                updateClearButton(this);
-            });
-        });
-    });
-</script>
-@endpush
-@endonce

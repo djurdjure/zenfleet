@@ -9,13 +9,20 @@ import '../../css/admin/app.css';
 
 // ✅ ENTERPRISE: Local CSS imports
 // ✅ ENTERPRISE: Local CSS imports
-import 'slim-select/styles';
+import 'slim-select/styles'; // Correct alias from package.json
 import 'flatpickr/dist/flatpickr.min.css';
 import '@fontsource/inter'; // Local Inter font
 
 // ✅ ENTERPRISE: Import SlimSelect globally
 import SlimSelect from 'slim-select';
+
+// ✅ ENTERPRISE: Import Flowbite Datepicker globally
+import Datepicker from 'flowbite-datepicker/Datepicker';
+import fr from './locales/fr.js'; // Use local manual import
+Object.assign(Datepicker.locales, { fr }); // Register French Locale
+
 window.SlimSelect = SlimSelect;
+window.Datepicker = Datepicker;
 
 // ✅ ENTERPRISE: Import Iconify runtime locally
 import Iconify from '@iconify/iconify';
@@ -206,39 +213,30 @@ class ZenFleetAdmin {
         console.log(`📝 ${selects.length} TomSelect initialized`);
     }
 
-    // ✅ NOUVEAU: Initialisation Flatpickr pour datepickers et timepickers
+    // ✅ NOUVEAU: Initialisation Flatpickr POUT TIMEPICKER/DATETIME (Legacy/Specific)
     initializeFlatpickr() {
         // Configurer la locale française par défaut
         flatpickr.localize(French);
 
-        // DATEPICKERS - ENTERPRISE GRADE avec altInput
-        const datepickers = document.querySelectorAll('.datepicker');
-        datepickers.forEach(el => {
+        // NOTE: Les datepickers simples (.datepicker) sont maintenant gérés par Flowbite via Alpine.js
+
+        // DATETIMEPICKERS (.datetimepicker) - Doivent rester sur Flatpickr car Flowbite n'a pas de temps
+        const datetimepickers = document.querySelectorAll('.datetimepicker');
+        datetimepickers.forEach(el => {
             if (!el._flatpickr) {
                 const minDate = el.getAttribute('data-min-date');
                 const maxDate = el.getAttribute('data-max-date');
 
                 flatpickr(el, {
                     locale: 'fr',
-                    // ✅ FORMAT SERVEUR: Y-m-d pour Laravel (2025-10-21)
-                    dateFormat: 'Y-m-d',
-                    // ✅ FORMAT AFFICHÉ: d/m/Y pour l'utilisateur français (21/10/2025)
+                    enableTime: true,
+                    dateFormat: "Y-m-d H:i",
                     altInput: true,
-                    altFormat: 'd/m/Y',
+                    altFormat: "d/m/Y H:i",
                     minDate: minDate,
                     maxDate: maxDate,
-                    allowInput: true,
-                    disableMobile: true,
-                    // ✅ PARSE: Accepter les deux formats en saisie manuelle
-                    parseDate: (datestr, format) => {
-                        // Tenter d/m/Y
-                        const parts = datestr.split('/');
-                        if (parts.length === 3) {
-                            return new Date(parts[2], parts[1] - 1, parts[0]);
-                        }
-                        // Tenter Y-m-d
-                        return new Date(datestr);
-                    },
+                    time_24hr: true,
+                    allowInput: true
                 });
             }
         });
@@ -282,7 +280,7 @@ class ZenFleetAdmin {
             }
         });
 
-        console.log(`📅 ${datepickers.length} datepickers + ${timepickers.length} timepickers initialized`);
+        console.log(`📅 ${datetimepickers.length} datetimepickers + ${timepickers.length} timepickers initialized via Flatpickr`);
     }
 
     // Initialisation des tooltips
