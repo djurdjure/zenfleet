@@ -307,156 +307,214 @@
    🎨 ZENFLEET SLIMSELECT ENTERPRISE THEME
    ======================================== */
 
+/* 🎯 CRITICAL: Override SlimSelect Native CSS Variables with ZenFleet Colors */
+.ss-main,
+.ss-content {
+    /* Primary color - ZenFleet blue-500 for selected options and focus */
+    --ss-primary-color: #3b82f6 !important;
+
+    /* Background colors - Match x-input gray-50 */
+    --ss-bg-color: #f9fafb !important;
+    --ss-content-bg-color: #ffffff !important;
+
+    /* Border colors - Match x-input gray-300 */
+    --ss-border-color: #d1d5db !important;
+
+    /* Text colors */
+    --ss-font-color: #111827 !important;
+    --ss-font-placeholder-color: #9ca3af !important;
+
+    /* Border radius - Match x-input rounded-lg */
+    --ss-border-radius: 0.5rem !important;
+
+    /* Spacing */
+    --ss-spacing-l: 12px !important;
+    --ss-spacing-m: 8px !important;
+    --ss-spacing-s: 4px !important;
+}
+
+/* 🎯 Additional ZenFleet-specific variables */
 :root {
     --ss-main-height: 42px;
-    /* Match form-input min-height */
-    --ss-primary-color: #2563eb;
-    --ss-bg-color: #ffffff;
-    /* White background like inputs */
-    --ss-font-color: #111827;
-    --ss-font-placeholder-color: #9ca3af;
-    --ss-border-color: rgba(229, 231, 235, 0.8);
-    /* Match form-input border */
-    --ss-border-radius: 0.5rem;
-    --ss-spacing-l: 16px;
-    /* Match form-input padding-x (1rem) */
-    --ss-spacing-m: 8px;
-    --ss-spacing-s: 4px;
-    --ss-animation-timing: 0.2s;
     --ss-focus-color: #3b82f6;
     --ss-error-color: #dc2626;
+    --ss-hover-border-color: #9ca3af;
 }
 
-/* Main container styling - SUPER SPECIFICITY & !important */
-body .ss-main {
-    background-color: var(--ss-bg-color) !important;
-    border: 2px solid var(--ss-border-color) !important;
-    /* 2px border */
-    color: var(--ss-font-color) !important;
-    border-radius: var(--ss-border-radius) !important;
-    padding: 4px 0 !important;
-    /* Adjusted for height */
-    min-height: var(--ss-main-height) !important;
-    transition: all 0.2s ease-in-out;
-    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05) !important;
+/* ✅ Main Container - Force gray-50 background with specificity */
+body .ss-main,
+html body .ss-main,
+.ss-main {
+    background-color: #f9fafb !important;
+    border: 1px solid #d1d5db !important;
+    color: #111827 !important;
+    border-radius: 0.5rem !important;
+    padding: 0 !important;
+    min-height: 42px !important;
+    transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out, background-color 0.2s ease-in-out !important;
+    box-shadow: none !important;
 }
 
-/* Focus state */
-body .ss-main:focus-within {
-    border-color: var(--ss-focus-color) !important;
-    box-shadow: 0 0 0 1px var(--ss-focus-color) !important;
+/* Hover state - Match x-input hover:border-gray-400 */
+body .ss-main:hover:not(:focus-within),
+html body .ss-main:hover:not(:focus-within) {
+    border-color: #9ca3af !important;
+}
+
+/* Focus state - Match x-input focus with blue-500 ring */
+body .ss-main:focus-within,
+html body .ss-main:focus-within {
+    border-color: #3b82f6 !important;
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.3) !important;
     background-color: #ffffff !important;
     outline: none !important;
 }
 
-/* Values styling */
-body .ss-main .ss-values .ss-single {
-    padding: 5px var(--ss-spacing-l) !important;
-    /* Adjusted vertical padding */
+/* Values container - Force gray-50 background */
+body .ss-main .ss-values,
+html body .ss-main .ss-values {
+    background-color: transparent !important;
+}
+
+/* Selected value styling - Match x-input p-2.5 (10px padding) */
+body .ss-main .ss-values .ss-single,
+html body .ss-main .ss-values .ss-single {
+    padding: 10px 12px !important;
     font-size: 0.875rem !important;
     line-height: 1.25rem !important;
     font-weight: 400 !important;
+    color: #111827 !important;
+    background-color: transparent !important;
     display: flex;
     align-items: center;
 }
 
 /* Placeholder styling */
-body .ss-main .ss-values .ss-placeholder {
-    padding: 5px var(--ss-spacing-l) !important;
+body .ss-main .ss-values .ss-placeholder,
+html body .ss-main .ss-values .ss-placeholder {
+    padding: 10px 12px !important;
     font-size: 0.875rem !important;
     line-height: 1.25rem !important;
-    color: var(--ss-font-placeholder-color) !important;
+    color: #9ca3af !important;
+    background-color: transparent !important;
 }
 
-/* Dropdown content */
-body .ss-content {
-    margin-top: 4px;
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-    border-color: #e5e7eb;
+/* Dropdown content container - Force white background */
+body .ss-content,
+html body .ss-content {
+    background-color: #ffffff !important;
+    margin-top: 4px !important;
+    border: 1px solid #e5e7eb !important;
+    border-radius: 0.5rem !important;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05) !important;
 }
 
-/* Champ de recherche */
-body .ss-content .ss-search {
-    background-color: #f9fafb;
-    border-bottom: 1px solid #e5e7eb;
-    padding: var(--ss-spacing-m);
+/* Search field in dropdown */
+body .ss-content .ss-search,
+html body .ss-content .ss-search {
+    background-color: #f9fafb !important;
+    border-bottom: 1px solid #e5e7eb !important;
+    padding: 8px !important;
 }
 
-body .ss-content .ss-search input {
-    font-size: 0.875rem;
-    padding: 10px 12px;
-    border-radius: 6px;
-    background-color: white;
-    border: 1px solid #d1d5db;
+body .ss-content .ss-search input,
+html body .ss-content .ss-search input {
+    font-size: 0.875rem !important;
+    padding: 10px 12px !important;
+    border-radius: 6px !important;
+    background-color: #ffffff !important;
+    border: 1px solid #d1d5db !important;
+    color: #111827 !important;
 }
 
-body .ss-content .ss-search input:focus {
-    border-color: var(--ss-focus-color);
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+body .ss-content .ss-search input:focus,
+html body .ss-content .ss-search input:focus {
+    border-color: #3b82f6 !important;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1) !important;
+    outline: none !important;
 }
 
-/* Options */
-body .ss-content .ss-list .ss-option {
-    font-size: 0.875rem;
-    padding: 10px var(--ss-spacing-l);
-    transition: background-color 0.15s ease, color 0.15s ease;
+/* Options list */
+body .ss-content .ss-list,
+html body .ss-content .ss-list {
+    background-color: #ffffff !important;
 }
 
-body .ss-content .ss-list .ss-option:hover {
-    background-color: #eff6ff;
-    color: var(--ss-font-color);
+/* Individual options */
+body .ss-content .ss-list .ss-option,
+html body .ss-content .ss-list .ss-option {
+    font-size: 0.875rem !important;
+    padding: 10px 12px !important;
+    color: #111827 !important;
+    background-color: #ffffff !important;
+    transition: background-color 0.15s ease, color 0.15s ease !important;
 }
 
-/* Option sélectionnée */
+/* Option hover - Light blue background */
+body .ss-content .ss-list .ss-option:hover,
+html body .ss-content .ss-list .ss-option:hover {
+    background-color: #eff6ff !important;
+    color: #111827 !important;
+}
+
+/* ✅ CRITICAL: Selected option - Force ZenFleet blue-500 (#3b82f6) */
 body .ss-content .ss-list .ss-option.ss-highlighted,
-body .ss-content .ss-list .ss-option:not(.ss-disabled).ss-selected {
-    background-color: var(--ss-primary-color);
-    color: #ffffff;
+html body .ss-content .ss-list .ss-option.ss-highlighted,
+body .ss-content .ss-list .ss-option:not(.ss-disabled).ss-selected,
+html body .ss-content .ss-list .ss-option:not(.ss-disabled).ss-selected {
+    background-color: #3b82f6 !important;
+    color: #ffffff !important;
 }
 
-/* Option sélectionnée avec checkmark */
-body .ss-content .ss-list .ss-option:not(.ss-disabled).ss-selected::after {
-    content: '✓';
-    margin-left: auto;
-    font-weight: 600;
+/* Selected option checkmark */
+body .ss-content .ss-list .ss-option:not(.ss-disabled).ss-selected::after,
+html body .ss-content .ss-list .ss-option:not(.ss-disabled).ss-selected::after {
+    content: '✓' !important;
+    margin-left: auto !important;
+    font-weight: 600 !important;
+    color: #ffffff !important;
 }
 
-/* État d'erreur de validation */
-.slimselect-error .ss-main {
-    border-color: var(--ss-error-color) !important;
-    box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1) !important;
-}
-
-/* Cacher le placeholder */
-body .ss-content .ss-list .ss-option[data-placeholder="true"] {
+/* Hide placeholder option in dropdown */
+body .ss-content .ss-list .ss-option[data-placeholder="true"],
+html body .ss-content .ss-list .ss-option[data-placeholder="true"] {
     display: none !important;
 }
 
-/* Message d'erreur */
+/* Error and searching messages */
 body .ss-content .ss-list .ss-error,
-body .ss-content .ss-list .ss-searching {
-    font-size: 0.875rem;
-    padding: var(--ss-spacing-l);
-    color: var(--ss-font-color);
+body .ss-content .ss-list .ss-searching,
+html body .ss-content .ss-list .ss-error,
+html body .ss-content .ss-list .ss-searching {
+    font-size: 0.875rem !important;
+    padding: 12px !important;
+    color: #111827 !important;
 }
 
-/* Searching specific color overridden if needed */
-body .ss-content .ss-list .ss-searching {
-    color: var(--ss-primary-color);
+body .ss-content .ss-list .ss-searching,
+html body .ss-content .ss-list .ss-searching {
+    color: #3b82f6 !important;
 }
 
-/* Flèche de dropdown */
-body .ss-main .ss-arrow path {
-    stroke-width: 1.5;
-    /* Plus fin pour être élégant */
-    stroke: #6b7280;
-    /* Gray-500 */
+/* Dropdown arrow */
+body .ss-main .ss-arrow path,
+html body .ss-main .ss-arrow path {
+    stroke-width: 1.5 !important;
+    stroke: #6b7280 !important;
+}
+
+/* Error state validation */
+.slimselect-error .ss-main,
+html .slimselect-error .ss-main {
+    border-color: #dc2626 !important;
+    box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1) !important;
+    background-color: #fef2f2 !important;
 }
 
 /* Animation */
 body .ss-content.ss-open-below,
 body .ss-content.ss-open-above {
-    animation: zenfleetSlideIn var(--ss-animation-timing) ease-out;
+    animation: zenfleetSlideIn 0.2s ease-out !important;
 }
 
 @keyframes zenfleetSlideIn {
@@ -473,23 +531,18 @@ body .ss-content.ss-open-above {
 
 /* Responsive Mobile */
 @media (max-width: 640px) {
-    :root {
-        --ss-main-height: 44px;
-        --ss-content-height: 240px;
-    }
-
     .ss-content .ss-list .ss-option {
-        padding: 12px var(--ss-spacing-l);
-        min-height: 44px;
+        padding: 12px !important;
+        min-height: 44px !important;
     }
 
     .ss-content .ss-search input {
-        padding: 12px;
-        font-size: 16px;
+        padding: 12px !important;
+        font-size: 16px !important;
     }
 }
 
-/* Accessibilité */
+/* Accessibility */
 @media (prefers-reduced-motion: reduce) {
 
     .ss-main,

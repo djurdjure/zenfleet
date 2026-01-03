@@ -5,7 +5,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="csrf-token" content="c3xGHWOQz74MbUH4heeTgpV2cNIMnJuPD7mPr13b">
+    <meta name="csrf-token" content="7A2yL7NUppMhO6UAHvOBhzDwY7K5fYP9quW6GmdV">
         <meta name="user-data" content="{&quot;id&quot;:4,&quot;name&quot;:&quot;admin zenfleet&quot;,&quot;role&quot;:&quot;Admin&quot;}">
     
     <title>Modifier le Véhicule - ZenFleet</title>
@@ -16,7 +16,7 @@
 
     
 
-    <link rel="preload" as="style" href="http://localhost/build/assets/app-B4-sBwKD.css" /><link rel="modulepreload" as="script" href="http://localhost/build/assets/app-ClFzJlNW.js" /><link rel="modulepreload" as="script" href="http://localhost/build/assets/slimselect-CAvN1F7Q.js" /><link rel="modulepreload" as="script" href="http://localhost/build/assets/vendor-common-B9ygI19o.js" /><link rel="modulepreload" as="script" href="http://localhost/build/assets/ui-public-2hikc2V1.js" /><link rel="stylesheet" href="http://localhost/build/assets/app-B4-sBwKD.css" data-navigate-track="reload" /><script type="module" src="http://localhost/build/assets/app-ClFzJlNW.js" data-navigate-track="reload"></script>        <!-- Livewire Styles --><style >[wire\:loading][wire\:loading], [wire\:loading\.delay][wire\:loading\.delay], [wire\:loading\.inline-block][wire\:loading\.inline-block], [wire\:loading\.inline][wire\:loading\.inline], [wire\:loading\.block][wire\:loading\.block], [wire\:loading\.flex][wire\:loading\.flex], [wire\:loading\.table][wire\:loading\.table], [wire\:loading\.grid][wire\:loading\.grid], [wire\:loading\.inline-flex][wire\:loading\.inline-flex] {display: none;}[wire\:loading\.delay\.none][wire\:loading\.delay\.none], [wire\:loading\.delay\.shortest][wire\:loading\.delay\.shortest], [wire\:loading\.delay\.shorter][wire\:loading\.delay\.shorter], [wire\:loading\.delay\.short][wire\:loading\.delay\.short], [wire\:loading\.delay\.default][wire\:loading\.delay\.default], [wire\:loading\.delay\.long][wire\:loading\.delay\.long], [wire\:loading\.delay\.longer][wire\:loading\.delay\.longer], [wire\:loading\.delay\.longest][wire\:loading\.delay\.longest] {display: none;}[wire\:offline][wire\:offline] {display: none;}[wire\:dirty]:not(textarea):not(input):not(select) {display: none;}:root {--livewire-progress-bar-color: #2299dd;}[x-cloak] {display: none !important;}[wire\:cloak] {display: none !important;}</style>
+    <link rel="preload" as="style" href="http://localhost/build/assets/app-uVMd5Lie.css" /><link rel="modulepreload" as="script" href="http://localhost/build/assets/app-CehDYceA.js" /><link rel="modulepreload" as="script" href="http://localhost/build/assets/slimselect-CAvN1F7Q.js" /><link rel="modulepreload" as="script" href="http://localhost/build/assets/vendor-common-B9ygI19o.js" /><link rel="modulepreload" as="script" href="http://localhost/build/assets/ui-public-2hikc2V1.js" /><link rel="stylesheet" href="http://localhost/build/assets/app-uVMd5Lie.css" data-navigate-track="reload" /><script type="module" src="http://localhost/build/assets/app-CehDYceA.js" data-navigate-track="reload"></script>        <!-- Livewire Styles --><style >[wire\:loading][wire\:loading], [wire\:loading\.delay][wire\:loading\.delay], [wire\:loading\.inline-block][wire\:loading\.inline-block], [wire\:loading\.inline][wire\:loading\.inline], [wire\:loading\.block][wire\:loading\.block], [wire\:loading\.flex][wire\:loading\.flex], [wire\:loading\.table][wire\:loading\.table], [wire\:loading\.grid][wire\:loading\.grid], [wire\:loading\.inline-flex][wire\:loading\.inline-flex] {display: none;}[wire\:loading\.delay\.none][wire\:loading\.delay\.none], [wire\:loading\.delay\.shortest][wire\:loading\.delay\.shortest], [wire\:loading\.delay\.shorter][wire\:loading\.delay\.shorter], [wire\:loading\.delay\.short][wire\:loading\.delay\.short], [wire\:loading\.delay\.default][wire\:loading\.delay\.default], [wire\:loading\.delay\.long][wire\:loading\.delay\.long], [wire\:loading\.delay\.longer][wire\:loading\.delay\.longer], [wire\:loading\.delay\.longest][wire\:loading\.delay\.longest] {display: none;}[wire\:offline][wire\:offline] {display: none;}[wire\:dirty]:not(textarea):not(input):not(select) {display: none;}:root {--livewire-progress-bar-color: #2299dd;}[x-cloak] {display: none !important;}[wire\:cloak] {display: none !important;}</style>
 </head>
 
 <body class="h-full">
@@ -784,7 +784,7 @@
                                     </a>
                                     <div class="border-t border-zinc-100 my-1"></div>
                                     <form method="POST" action="http://localhost/logout">
-                                        <input type="hidden" name="_token" value="c3xGHWOQz74MbUH4heeTgpV2cNIMnJuPD7mPr13b" autocomplete="off">                                        <button type="submit"
+                                        <input type="hidden" name="_token" value="7A2yL7NUppMhO6UAHvOBhzDwY7K5fYP9quW6GmdV" autocomplete="off">                                        <button type="submit"
                                             class="group flex w-full items-center px-4 py-2 text-sm text-zinc-700 hover:bg-zinc-50">
                                             <span
     class="iconify block mr-3 h-4 w-4 text-zinc-400 group-hover:text-zinc-600"
@@ -815,7 +815,7 @@
  <span
     class="iconify block w-6 h-6 text-blue-600"
     data-icon="lucide:car"
-    data-inline="false"></span> Modifier le Véhicule: 722638-220-16
+    data-inline="false"></span> Modifier le Véhicule: 10608-122-16
  </h1>
  <p class="text-sm text-gray-600 ml-8.5">
  Complétez les 3 étapes pour mettre à jour le véhicule
@@ -828,8 +828,7 @@
  <div x-data="vehicleFormValidation()" x-init="init()">
 
  <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-0 mb-6">
- <!--[if BLOCK]><![endif]--><!--[if ENDBLOCK]><![endif]-->
-
+ 
  <div class="w-full bg-white border-b border-gray-200 py-8">
     <div class="px-4 mx-auto">
         <ol class="flex items-start justify-center gap-0 w-full max-w-4xl mx-auto">
@@ -967,8 +966,8 @@
 </div>
 
  
- <form method="POST" action="http://localhost/admin/vehicles/66" @submit="onSubmit" class="p-6">
- <input type="hidden" name="_token" value="c3xGHWOQz74MbUH4heeTgpV2cNIMnJuPD7mPr13b" autocomplete="off"> <input type="hidden" name="_method" value="PUT"> <input type="hidden" name="current_step" x-model="currentStep">
+ <form method="POST" action="http://localhost/admin/vehicles/67" @submit="onSubmit" class="p-6">
+ <input type="hidden" name="_token" value="7A2yL7NUppMhO6UAHvOBhzDwY7K5fYP9quW6GmdV" autocomplete="off"> <input type="hidden" name="_method" value="PUT"> <input type="hidden" name="current_step" x-model="currentStep">
 
  
  <div x-show="currentStep === 1" x-transition:enter="transition ease-out duration-200"
@@ -985,215 +984,205 @@
 
  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
  <div class="" @blur="validateField('registration_plate', $event.target.value)">
-  <label for="registration_plate" class="block mb-2 text-sm font-medium text-gray-900">
- Immatriculation
-  <span class="text-red-600">*</span>
-  </label>
- 
- <div class="relative">
-  <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
- <span
+        <label for="registration_plate" class="block mb-2 text-sm font-medium text-gray-900">
+        Immatriculation
+                <span class="text-red-600">*</span>
+            </label>
+    
+    <div class="relative">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <span
     class="iconify block w-5 h-5 text-gray-400"
     data-icon="heroicons:identification"
-    data-inline="false"></span> </div>
- 
- <input
- type="text"
- name="registration_plate"
- id="registration_plate"
- class="bg-gray-50 border text-gray-900 text-sm rounded-lg block w-full p-2.5 transition-colors duration-200 border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 bg-gray-50 pl-10"
- placeholder="Ex: 16-12345-23"
- value="722638-220-16"
-  required   
- x-bind:class="(fieldErrors && fieldErrors['registration_plate'] && touchedFields && touchedFields['registration_plate']) ? '!border-red-500 !focus:ring-2 !focus:ring-red-500 !focus:border-red-500 !bg-red-50' : ''"
- @blur="validateField('registration_plate', $event.target.value)"
- />
- </div>
+    data-inline="false"></span>        </div>
+        
+        <input
+            type="text"
+            name="registration_plate"
+            id="registration_plate"
+            class="bg-gray-50 border text-gray-900 text-sm rounded-lg block w-full p-2.5 transition-colors duration-200 border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 bg-gray-50 !pl-10"
+            placeholder="Ex: 16-12345-23"
+            value="10608-122-16"
+             required                         
+            x-bind:class="(fieldErrors && fieldErrors['registration_plate'] && touchedFields && touchedFields['registration_plate']) ? '!border-red-500 !focus:ring-2 !focus:ring-red-500 !focus:border-red-500 !bg-red-50' : ''"
+            @blur="validateField('registration_plate', $event.target.value)" />
+    </div>
 
-  <p class="mt-2 text-sm text-gray-600">
- Numéro d&#039;immatriculation officiel du véhicule
- </p>
- 
- 
- <p x-show="fieldErrors && fieldErrors['registration_plate'] && touchedFields && touchedFields['registration_plate']"
- x-transition:enter="transition ease-out duration-200"
- x-transition:enter-start="opacity-0 transform -translate-y-1"
- x-transition:enter-end="opacity-100 transform translate-y-0"
- class="mt-2 text-sm text-red-600 flex items-start font-medium"
- style="display: none;">
- <span
+        <p class="mt-2 text-sm text-gray-600">
+        Numéro d&#039;immatriculation officiel du véhicule
+    </p>
+    
+    
+    <p x-show="fieldErrors && fieldErrors['registration_plate'] && touchedFields && touchedFields['registration_plate']"
+        x-transition:enter="transition ease-out duration-200"
+        x-transition:enter-start="opacity-0 transform -translate-y-1"
+        x-transition:enter-end="opacity-100 transform translate-y-0"
+        class="mt-2 text-sm text-red-600 flex items-start font-medium"
+        style="display: none;">
+        <span
     class="iconify block w-4 h-4 mr-1.5 mt-0.5 flex-shrink-0"
     data-icon="lucide:circle-alert"
-    data-inline="false"></span> <span>Ce champ est obligatoire et doit être correctement rempli</span>
- </p>
+    data-inline="false"></span>        <span>Ce champ est obligatoire et doit être correctement rempli</span>
+    </p>
 </div>
-
  <div class="" maxlength="17" @blur="validateField('vin', $event.target.value)">
-  <label for="vin" class="block mb-2 text-sm font-medium text-gray-900">
- Numéro de série (VIN)
-  </label>
- 
- <div class="relative">
-  <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
- <span
+        <label for="vin" class="block mb-2 text-sm font-medium text-gray-900">
+        Numéro de série (VIN)
+            </label>
+    
+    <div class="relative">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <span
     class="iconify block w-5 h-5 text-gray-400"
     data-icon="heroicons:finger-print"
-    data-inline="false"></span> </div>
- 
- <input
- type="text"
- name="vin"
- id="vin"
- class="bg-gray-50 border text-gray-900 text-sm rounded-lg block w-full p-2.5 transition-colors duration-200 border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 bg-gray-50 pl-10"
- placeholder="Ex: 1HGBH41JXMN109186"
- value=""
-   
- x-bind:class="(fieldErrors && fieldErrors['vin'] && touchedFields && touchedFields['vin']) ? '!border-red-500 !focus:ring-2 !focus:ring-red-500 !focus:border-red-500 !bg-red-50' : ''"
- maxlength="17" @blur="validateField('vin', $event.target.value)"
- />
- </div>
+    data-inline="false"></span>        </div>
+        
+        <input
+            type="text"
+            name="vin"
+            id="vin"
+            class="bg-gray-50 border text-gray-900 text-sm rounded-lg block w-full p-2.5 transition-colors duration-200 border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 bg-gray-50 !pl-10"
+            placeholder="Ex: 1HGBH41JXMN109186"
+            value=""
+                                    
+            x-bind:class="(fieldErrors && fieldErrors['vin'] && touchedFields && touchedFields['vin']) ? '!border-red-500 !focus:ring-2 !focus:ring-red-500 !focus:border-red-500 !bg-red-50' : ''"
+            maxlength="17" @blur="validateField('vin', $event.target.value)" />
+    </div>
 
-  <p class="mt-2 text-sm text-gray-600">
- 17 caractères
- </p>
- 
- 
- <p x-show="fieldErrors && fieldErrors['vin'] && touchedFields && touchedFields['vin']"
- x-transition:enter="transition ease-out duration-200"
- x-transition:enter-start="opacity-0 transform -translate-y-1"
- x-transition:enter-end="opacity-100 transform translate-y-0"
- class="mt-2 text-sm text-red-600 flex items-start font-medium"
- style="display: none;">
- <span
+        <p class="mt-2 text-sm text-gray-600">
+        17 caractères
+    </p>
+    
+    
+    <p x-show="fieldErrors && fieldErrors['vin'] && touchedFields && touchedFields['vin']"
+        x-transition:enter="transition ease-out duration-200"
+        x-transition:enter-start="opacity-0 transform -translate-y-1"
+        x-transition:enter-end="opacity-100 transform translate-y-0"
+        class="mt-2 text-sm text-red-600 flex items-start font-medium"
+        style="display: none;">
+        <span
     class="iconify block w-4 h-4 mr-1.5 mt-0.5 flex-shrink-0"
     data-icon="lucide:circle-alert"
-    data-inline="false"></span> <span>Ce champ est obligatoire et doit être correctement rempli</span>
- </p>
+    data-inline="false"></span>        <span>Ce champ est obligatoire et doit être correctement rempli</span>
+    </p>
 </div>
-
  <div class="" @blur="validateField('brand', $event.target.value)">
-  <label for="brand" class="block mb-2 text-sm font-medium text-gray-900">
- Marque
-  <span class="text-red-600">*</span>
-  </label>
- 
- <div class="relative">
-  <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
- <span
+        <label for="brand" class="block mb-2 text-sm font-medium text-gray-900">
+        Marque
+                <span class="text-red-600">*</span>
+            </label>
+    
+    <div class="relative">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <span
     class="iconify block w-5 h-5 text-gray-400"
     data-icon="heroicons:building-storefront"
-    data-inline="false"></span> </div>
- 
- <input
- type="text"
- name="brand"
- id="brand"
- class="bg-gray-50 border text-gray-900 text-sm rounded-lg block w-full p-2.5 transition-colors duration-200 border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 bg-gray-50 pl-10"
- placeholder="Ex: Renault, Peugeot, Toyota..."
- value="TOYOTA"
-  required   
- x-bind:class="(fieldErrors && fieldErrors['brand'] && touchedFields && touchedFields['brand']) ? '!border-red-500 !focus:ring-2 !focus:ring-red-500 !focus:border-red-500 !bg-red-50' : ''"
- @blur="validateField('brand', $event.target.value)"
- />
- </div>
+    data-inline="false"></span>        </div>
+        
+        <input
+            type="text"
+            name="brand"
+            id="brand"
+            class="bg-gray-50 border text-gray-900 text-sm rounded-lg block w-full p-2.5 transition-colors duration-200 border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 bg-gray-50 !pl-10"
+            placeholder="Ex: Renault, Peugeot, Toyota..."
+            value="TOYOTA"
+             required                         
+            x-bind:class="(fieldErrors && fieldErrors['brand'] && touchedFields && touchedFields['brand']) ? '!border-red-500 !focus:ring-2 !focus:ring-red-500 !focus:border-red-500 !bg-red-50' : ''"
+            @blur="validateField('brand', $event.target.value)" />
+    </div>
 
- 
- 
- <p x-show="fieldErrors && fieldErrors['brand'] && touchedFields && touchedFields['brand']"
- x-transition:enter="transition ease-out duration-200"
- x-transition:enter-start="opacity-0 transform -translate-y-1"
- x-transition:enter-end="opacity-100 transform translate-y-0"
- class="mt-2 text-sm text-red-600 flex items-start font-medium"
- style="display: none;">
- <span
+    
+    
+    <p x-show="fieldErrors && fieldErrors['brand'] && touchedFields && touchedFields['brand']"
+        x-transition:enter="transition ease-out duration-200"
+        x-transition:enter-start="opacity-0 transform -translate-y-1"
+        x-transition:enter-end="opacity-100 transform translate-y-0"
+        class="mt-2 text-sm text-red-600 flex items-start font-medium"
+        style="display: none;">
+        <span
     class="iconify block w-4 h-4 mr-1.5 mt-0.5 flex-shrink-0"
     data-icon="lucide:circle-alert"
-    data-inline="false"></span> <span>Ce champ est obligatoire et doit être correctement rempli</span>
- </p>
+    data-inline="false"></span>        <span>Ce champ est obligatoire et doit être correctement rempli</span>
+    </p>
 </div>
-
  <div class="" @blur="validateField('model', $event.target.value)">
-  <label for="model" class="block mb-2 text-sm font-medium text-gray-900">
- Modèle
-  <span class="text-red-600">*</span>
-  </label>
- 
- <div class="relative">
-  <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
- <span
+        <label for="model" class="block mb-2 text-sm font-medium text-gray-900">
+        Modèle
+                <span class="text-red-600">*</span>
+            </label>
+    
+    <div class="relative">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <span
     class="iconify block w-5 h-5 text-gray-400"
     data-icon="heroicons:truck"
-    data-inline="false"></span> </div>
- 
- <input
- type="text"
- name="model"
- id="model"
- class="bg-gray-50 border text-gray-900 text-sm rounded-lg block w-full p-2.5 transition-colors duration-200 border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 bg-gray-50 pl-10"
- placeholder="Ex: Clio, 208, Corolla..."
- value="Yaris"
-  required   
- x-bind:class="(fieldErrors && fieldErrors['model'] && touchedFields && touchedFields['model']) ? '!border-red-500 !focus:ring-2 !focus:ring-red-500 !focus:border-red-500 !bg-red-50' : ''"
- @blur="validateField('model', $event.target.value)"
- />
- </div>
+    data-inline="false"></span>        </div>
+        
+        <input
+            type="text"
+            name="model"
+            id="model"
+            class="bg-gray-50 border text-gray-900 text-sm rounded-lg block w-full p-2.5 transition-colors duration-200 border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 bg-gray-50 !pl-10"
+            placeholder="Ex: Clio, 208, Corolla..."
+            value="Yaris"
+             required                         
+            x-bind:class="(fieldErrors && fieldErrors['model'] && touchedFields && touchedFields['model']) ? '!border-red-500 !focus:ring-2 !focus:ring-red-500 !focus:border-red-500 !bg-red-50' : ''"
+            @blur="validateField('model', $event.target.value)" />
+    </div>
 
- 
- 
- <p x-show="fieldErrors && fieldErrors['model'] && touchedFields && touchedFields['model']"
- x-transition:enter="transition ease-out duration-200"
- x-transition:enter-start="opacity-0 transform -translate-y-1"
- x-transition:enter-end="opacity-100 transform translate-y-0"
- class="mt-2 text-sm text-red-600 flex items-start font-medium"
- style="display: none;">
- <span
+    
+    
+    <p x-show="fieldErrors && fieldErrors['model'] && touchedFields && touchedFields['model']"
+        x-transition:enter="transition ease-out duration-200"
+        x-transition:enter-start="opacity-0 transform -translate-y-1"
+        x-transition:enter-end="opacity-100 transform translate-y-0"
+        class="mt-2 text-sm text-red-600 flex items-start font-medium"
+        style="display: none;">
+        <span
     class="iconify block w-4 h-4 mr-1.5 mt-0.5 flex-shrink-0"
     data-icon="lucide:circle-alert"
-    data-inline="false"></span> <span>Ce champ est obligatoire et doit être correctement rempli</span>
- </p>
+    data-inline="false"></span>        <span>Ce champ est obligatoire et doit être correctement rempli</span>
+    </p>
 </div>
-
  <div class="md:col-span-2">
  <div class="">
-  <label for="color" class="block mb-2 text-sm font-medium text-gray-900">
- Couleur
-  </label>
- 
- <div class="relative">
-  <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
- <span
+        <label for="color" class="block mb-2 text-sm font-medium text-gray-900">
+        Couleur
+            </label>
+    
+    <div class="relative">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <span
     class="iconify block w-5 h-5 text-gray-400"
     data-icon="heroicons:swatch"
-    data-inline="false"></span> </div>
- 
- <input
- type="text"
- name="color"
- id="color"
- class="bg-gray-50 border text-gray-900 text-sm rounded-lg block w-full p-2.5 transition-colors duration-200 border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 bg-gray-50 pl-10"
- placeholder="Ex: Blanc, Noir, Gris métallisé..."
- value="Noir"
-   
- x-bind:class="(fieldErrors && fieldErrors['color'] && touchedFields && touchedFields['color']) ? '!border-red-500 !focus:ring-2 !focus:ring-red-500 !focus:border-red-500 !bg-red-50' : ''"
- 
- />
- </div>
+    data-inline="false"></span>        </div>
+        
+        <input
+            type="text"
+            name="color"
+            id="color"
+            class="bg-gray-50 border text-gray-900 text-sm rounded-lg block w-full p-2.5 transition-colors duration-200 border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 bg-gray-50 !pl-10"
+            placeholder="Ex: Blanc, Noir, Gris métallisé..."
+            value="blanc"
+                                    
+            x-bind:class="(fieldErrors && fieldErrors['color'] && touchedFields && touchedFields['color']) ? '!border-red-500 !focus:ring-2 !focus:ring-red-500 !focus:border-red-500 !bg-red-50' : ''"
+             />
+    </div>
 
- 
- 
- <p x-show="fieldErrors && fieldErrors['color'] && touchedFields && touchedFields['color']"
- x-transition:enter="transition ease-out duration-200"
- x-transition:enter-start="opacity-0 transform -translate-y-1"
- x-transition:enter-end="opacity-100 transform translate-y-0"
- class="mt-2 text-sm text-red-600 flex items-start font-medium"
- style="display: none;">
- <span
+    
+    
+    <p x-show="fieldErrors && fieldErrors['color'] && touchedFields && touchedFields['color']"
+        x-transition:enter="transition ease-out duration-200"
+        x-transition:enter-start="opacity-0 transform -translate-y-1"
+        x-transition:enter-end="opacity-100 transform translate-y-0"
+        class="mt-2 text-sm text-red-600 flex items-start font-medium"
+        style="display: none;">
+        <span
     class="iconify block w-4 h-4 mr-1.5 mt-0.5 flex-shrink-0"
     data-icon="lucide:circle-alert"
-    data-inline="false"></span> <span>Ce champ est obligatoire et doit être correctement rempli</span>
- </p>
-</div>
- </div>
+    data-inline="false"></span>        <span>Ce champ est obligatoire et doit être correctement rempli</span>
+    </p>
+</div> </div>
  </div>
  </div>
  </div>
@@ -1242,32 +1231,29 @@
     x-init="initSelect()"
     class="" @change="validateField('vehicle_type_id', $event.target.value)">
 
-    <!--[if BLOCK]><![endif]-->    <label for="slimselect-vehicle_type_id-69582e640296f" class="block mb-2 text-sm font-medium text-gray-900">
+        <label for="slimselect-vehicle_type_id-69585fb51ff18" class="block mb-2 text-sm font-medium text-gray-900">
         Type de Véhicule
-        <!--[if BLOCK]><![endif]-->        <span class="text-red-500">*</span>
-        <!--[if ENDBLOCK]><![endif]-->
-    </label>
-    <!--[if ENDBLOCK]><![endif]-->
-
+                <span class="text-red-500">*</span>
+            </label>
+    
     <select
         x-ref="select"
         name="vehicle_type_id"
-        id="slimselect-vehicle_type_id-69582e640296f"
+        id="slimselect-vehicle_type_id-69585fb51ff18"
         class="slimselect-field w-full"
                         @change="validateField('vehicle_type_id', $event.target.value)">
 
         
-        <!--[if BLOCK]><![endif]-->        <!--[if BLOCK]><![endif]-->        <option value="" data-placeholder="true">Sélectionnez un type...</option>
-        <!--[if ENDBLOCK]><![endif]-->
-
-        <!--[if BLOCK]><![endif]-->        <option
+                        <option value="" data-placeholder="true">Sélectionnez un type...</option>
+        
+                <option
             value="11"
             >
             Autre
         </option>
                 <option
             value="1"
-            selected>
+            >
             Berline
         </option>
                 <option
@@ -1287,7 +1273,7 @@
         </option>
                 <option
             value="8"
-            >
+            selected>
             Fourgonnette
         </option>
                 <option
@@ -1315,12 +1301,9 @@
             >
             Voiture
         </option>
-        <!--[if ENDBLOCK]><![endif]-->
-        <!--[if ENDBLOCK]><![endif]-->
-    </select>
+                    </select>
 
-    <!--[if BLOCK]><![endif]--><!--[if ENDBLOCK]><![endif]-->
-</div>
+    </div>
  <div wire:ignore
     x-data="{
         instance: null,
@@ -1349,25 +1332,22 @@
     x-init="initSelect()"
     class="" @change="validateField('fuel_type_id', $event.target.value)">
 
-    <!--[if BLOCK]><![endif]-->    <label for="slimselect-fuel_type_id-69582e6402aa4" class="block mb-2 text-sm font-medium text-gray-900">
+        <label for="slimselect-fuel_type_id-69585fb52003f" class="block mb-2 text-sm font-medium text-gray-900">
         Type de Carburant
-        <!--[if BLOCK]><![endif]-->        <span class="text-red-500">*</span>
-        <!--[if ENDBLOCK]><![endif]-->
-    </label>
-    <!--[if ENDBLOCK]><![endif]-->
-
+                <span class="text-red-500">*</span>
+            </label>
+    
     <select
         x-ref="select"
         name="fuel_type_id"
-        id="slimselect-fuel_type_id-69582e6402aa4"
+        id="slimselect-fuel_type_id-69585fb52003f"
         class="slimselect-field w-full"
                         @change="validateField('fuel_type_id', $event.target.value)">
 
         
-        <!--[if BLOCK]><![endif]-->        <!--[if BLOCK]><![endif]-->        <option value="" data-placeholder="true">Sélectionnez un carburant...</option>
-        <!--[if ENDBLOCK]><![endif]-->
-
-        <!--[if BLOCK]><![endif]-->        <option
+                        <option value="" data-placeholder="true">Sélectionnez un carburant...</option>
+        
+                <option
             value="2"
             >
             Diesel
@@ -1387,12 +1367,9 @@
             >
             Électrique
         </option>
-        <!--[if ENDBLOCK]><![endif]-->
-        <!--[if ENDBLOCK]><![endif]-->
-    </select>
+                    </select>
 
-    <!--[if BLOCK]><![endif]--><!--[if ENDBLOCK]><![endif]-->
-</div>
+    </div>
  <div wire:ignore
     x-data="{
         instance: null,
@@ -1421,25 +1398,22 @@
     x-init="initSelect()"
     class="" @change="validateField('transmission_type_id', $event.target.value)">
 
-    <!--[if BLOCK]><![endif]-->    <label for="slimselect-transmission_type_id-69582e6402b56" class="block mb-2 text-sm font-medium text-gray-900">
+        <label for="slimselect-transmission_type_id-69585fb520132" class="block mb-2 text-sm font-medium text-gray-900">
         Type de Transmission
-        <!--[if BLOCK]><![endif]-->        <span class="text-red-500">*</span>
-        <!--[if ENDBLOCK]><![endif]-->
-    </label>
-    <!--[if ENDBLOCK]><![endif]-->
-
+                <span class="text-red-500">*</span>
+            </label>
+    
     <select
         x-ref="select"
         name="transmission_type_id"
-        id="slimselect-transmission_type_id-69582e6402b56"
+        id="slimselect-transmission_type_id-69585fb520132"
         class="slimselect-field w-full"
                         @change="validateField('transmission_type_id', $event.target.value)">
 
         
-        <!--[if BLOCK]><![endif]-->        <!--[if BLOCK]><![endif]-->        <option value="" data-placeholder="true">Sélectionnez une transmission...</option>
-        <!--[if ENDBLOCK]><![endif]-->
-
-        <!--[if BLOCK]><![endif]-->        <option
+                        <option value="" data-placeholder="true">Sélectionnez une transmission...</option>
+        
+                <option
             value="2"
             >
             Automatique
@@ -1449,176 +1423,165 @@
             selected>
             Manuelle
         </option>
-        <!--[if ENDBLOCK]><![endif]-->
-        <!--[if ENDBLOCK]><![endif]-->
-    </select>
+                    </select>
 
-    <!--[if BLOCK]><![endif]--><!--[if ENDBLOCK]><![endif]-->
-</div>
+    </div>
  <div class="" min="1950" max="2027">
-  <label for="manufacturing_year" class="block mb-2 text-sm font-medium text-gray-900">
- Année de Fabrication
-  </label>
- 
- <div class="relative">
-  <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
- <span
+        <label for="manufacturing_year" class="block mb-2 text-sm font-medium text-gray-900">
+        Année de Fabrication
+            </label>
+    
+    <div class="relative">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <span
     class="iconify block w-5 h-5 text-gray-400"
     data-icon="heroicons:calendar"
-    data-inline="false"></span> </div>
- 
- <input
- type="number"
- name="manufacturing_year"
- id="manufacturing_year"
- class="bg-gray-50 border text-gray-900 text-sm rounded-lg block w-full p-2.5 transition-colors duration-200 border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 bg-gray-50 pl-10"
- placeholder="Ex: 2024"
- value="2022"
-   
- x-bind:class="(fieldErrors && fieldErrors['manufacturing_year'] && touchedFields && touchedFields['manufacturing_year']) ? '!border-red-500 !focus:ring-2 !focus:ring-red-500 !focus:border-red-500 !bg-red-50' : ''"
- min="1950" max="2027"
- />
- </div>
+    data-inline="false"></span>        </div>
+        
+        <input
+            type="number"
+            name="manufacturing_year"
+            id="manufacturing_year"
+            class="bg-gray-50 border text-gray-900 text-sm rounded-lg block w-full p-2.5 transition-colors duration-200 border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 bg-gray-50 !pl-10"
+            placeholder="Ex: 2024"
+            value="2022"
+                                    
+            x-bind:class="(fieldErrors && fieldErrors['manufacturing_year'] && touchedFields && touchedFields['manufacturing_year']) ? '!border-red-500 !focus:ring-2 !focus:ring-red-500 !focus:border-red-500 !bg-red-50' : ''"
+            min="1950" max="2027" />
+    </div>
 
- 
- 
- <p x-show="fieldErrors && fieldErrors['manufacturing_year'] && touchedFields && touchedFields['manufacturing_year']"
- x-transition:enter="transition ease-out duration-200"
- x-transition:enter-start="opacity-0 transform -translate-y-1"
- x-transition:enter-end="opacity-100 transform translate-y-0"
- class="mt-2 text-sm text-red-600 flex items-start font-medium"
- style="display: none;">
- <span
+    
+    
+    <p x-show="fieldErrors && fieldErrors['manufacturing_year'] && touchedFields && touchedFields['manufacturing_year']"
+        x-transition:enter="transition ease-out duration-200"
+        x-transition:enter-start="opacity-0 transform -translate-y-1"
+        x-transition:enter-end="opacity-100 transform translate-y-0"
+        class="mt-2 text-sm text-red-600 flex items-start font-medium"
+        style="display: none;">
+        <span
     class="iconify block w-4 h-4 mr-1.5 mt-0.5 flex-shrink-0"
     data-icon="lucide:circle-alert"
-    data-inline="false"></span> <span>Ce champ est obligatoire et doit être correctement rempli</span>
- </p>
+    data-inline="false"></span>        <span>Ce champ est obligatoire et doit être correctement rempli</span>
+    </p>
 </div>
-
  <div class="" min="1" max="99">
-  <label for="seats" class="block mb-2 text-sm font-medium text-gray-900">
- Nombre de places
-  </label>
- 
- <div class="relative">
-  <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
- <span
+        <label for="seats" class="block mb-2 text-sm font-medium text-gray-900">
+        Nombre de places
+            </label>
+    
+    <div class="relative">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <span
     class="iconify block w-5 h-5 text-gray-400"
     data-icon="heroicons:user-group"
-    data-inline="false"></span> </div>
- 
- <input
- type="number"
- name="seats"
- id="seats"
- class="bg-gray-50 border text-gray-900 text-sm rounded-lg block w-full p-2.5 transition-colors duration-200 border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 bg-gray-50 pl-10"
- placeholder="Ex: 5"
- value="5"
-   
- x-bind:class="(fieldErrors && fieldErrors['seats'] && touchedFields && touchedFields['seats']) ? '!border-red-500 !focus:ring-2 !focus:ring-red-500 !focus:border-red-500 !bg-red-50' : ''"
- min="1" max="99"
- />
- </div>
+    data-inline="false"></span>        </div>
+        
+        <input
+            type="number"
+            name="seats"
+            id="seats"
+            class="bg-gray-50 border text-gray-900 text-sm rounded-lg block w-full p-2.5 transition-colors duration-200 border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 bg-gray-50 !pl-10"
+            placeholder="Ex: 5"
+            value="5"
+                                    
+            x-bind:class="(fieldErrors && fieldErrors['seats'] && touchedFields && touchedFields['seats']) ? '!border-red-500 !focus:ring-2 !focus:ring-red-500 !focus:border-red-500 !bg-red-50' : ''"
+            min="1" max="99" />
+    </div>
 
- 
- 
- <p x-show="fieldErrors && fieldErrors['seats'] && touchedFields && touchedFields['seats']"
- x-transition:enter="transition ease-out duration-200"
- x-transition:enter-start="opacity-0 transform -translate-y-1"
- x-transition:enter-end="opacity-100 transform translate-y-0"
- class="mt-2 text-sm text-red-600 flex items-start font-medium"
- style="display: none;">
- <span
+    
+    
+    <p x-show="fieldErrors && fieldErrors['seats'] && touchedFields && touchedFields['seats']"
+        x-transition:enter="transition ease-out duration-200"
+        x-transition:enter-start="opacity-0 transform -translate-y-1"
+        x-transition:enter-end="opacity-100 transform translate-y-0"
+        class="mt-2 text-sm text-red-600 flex items-start font-medium"
+        style="display: none;">
+        <span
     class="iconify block w-4 h-4 mr-1.5 mt-0.5 flex-shrink-0"
     data-icon="lucide:circle-alert"
-    data-inline="false"></span> <span>Ce champ est obligatoire et doit être correctement rempli</span>
- </p>
+    data-inline="false"></span>        <span>Ce champ est obligatoire et doit être correctement rempli</span>
+    </p>
 </div>
-
  <div class="" min="0">
-  <label for="power_hp" class="block mb-2 text-sm font-medium text-gray-900">
- Puissance (CV)
-  </label>
- 
- <div class="relative">
-  <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
- <span
+        <label for="power_hp" class="block mb-2 text-sm font-medium text-gray-900">
+        Puissance (CV)
+            </label>
+    
+    <div class="relative">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <span
     class="iconify block w-5 h-5 text-gray-400"
     data-icon="heroicons:bolt"
-    data-inline="false"></span> </div>
- 
- <input
- type="number"
- name="power_hp"
- id="power_hp"
- class="bg-gray-50 border text-gray-900 text-sm rounded-lg block w-full p-2.5 transition-colors duration-200 border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 bg-gray-50 pl-10"
- placeholder="Ex: 90"
- value=""
-   
- x-bind:class="(fieldErrors && fieldErrors['power_hp'] && touchedFields && touchedFields['power_hp']) ? '!border-red-500 !focus:ring-2 !focus:ring-red-500 !focus:border-red-500 !bg-red-50' : ''"
- min="0"
- />
- </div>
+    data-inline="false"></span>        </div>
+        
+        <input
+            type="number"
+            name="power_hp"
+            id="power_hp"
+            class="bg-gray-50 border text-gray-900 text-sm rounded-lg block w-full p-2.5 transition-colors duration-200 border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 bg-gray-50 !pl-10"
+            placeholder="Ex: 90"
+            value=""
+                                    
+            x-bind:class="(fieldErrors && fieldErrors['power_hp'] && touchedFields && touchedFields['power_hp']) ? '!border-red-500 !focus:ring-2 !focus:ring-red-500 !focus:border-red-500 !bg-red-50' : ''"
+            min="0" />
+    </div>
 
- 
- 
- <p x-show="fieldErrors && fieldErrors['power_hp'] && touchedFields && touchedFields['power_hp']"
- x-transition:enter="transition ease-out duration-200"
- x-transition:enter-start="opacity-0 transform -translate-y-1"
- x-transition:enter-end="opacity-100 transform translate-y-0"
- class="mt-2 text-sm text-red-600 flex items-start font-medium"
- style="display: none;">
- <span
+    
+    
+    <p x-show="fieldErrors && fieldErrors['power_hp'] && touchedFields && touchedFields['power_hp']"
+        x-transition:enter="transition ease-out duration-200"
+        x-transition:enter-start="opacity-0 transform -translate-y-1"
+        x-transition:enter-end="opacity-100 transform translate-y-0"
+        class="mt-2 text-sm text-red-600 flex items-start font-medium"
+        style="display: none;">
+        <span
     class="iconify block w-4 h-4 mr-1.5 mt-0.5 flex-shrink-0"
     data-icon="lucide:circle-alert"
-    data-inline="false"></span> <span>Ce champ est obligatoire et doit être correctement rempli</span>
- </p>
+    data-inline="false"></span>        <span>Ce champ est obligatoire et doit être correctement rempli</span>
+    </p>
 </div>
-
  <div class="lg:col-span-3">
  <div class="" min="0">
-  <label for="engine_displacement_cc" class="block mb-2 text-sm font-medium text-gray-900">
- Cylindrée (cc)
-  </label>
- 
- <div class="relative">
-  <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
- <span
+        <label for="engine_displacement_cc" class="block mb-2 text-sm font-medium text-gray-900">
+        Cylindrée (cc)
+            </label>
+    
+    <div class="relative">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <span
     class="iconify block w-5 h-5 text-gray-400"
     data-icon="heroicons:wrench-screwdriver"
-    data-inline="false"></span> </div>
- 
- <input
- type="number"
- name="engine_displacement_cc"
- id="engine_displacement_cc"
- class="bg-gray-50 border text-gray-900 text-sm rounded-lg block w-full p-2.5 transition-colors duration-200 border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 bg-gray-50 pl-10"
- placeholder="Ex: 1500"
- value=""
-   
- x-bind:class="(fieldErrors && fieldErrors['engine_displacement_cc'] && touchedFields && touchedFields['engine_displacement_cc']) ? '!border-red-500 !focus:ring-2 !focus:ring-red-500 !focus:border-red-500 !bg-red-50' : ''"
- min="0"
- />
- </div>
+    data-inline="false"></span>        </div>
+        
+        <input
+            type="number"
+            name="engine_displacement_cc"
+            id="engine_displacement_cc"
+            class="bg-gray-50 border text-gray-900 text-sm rounded-lg block w-full p-2.5 transition-colors duration-200 border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 bg-gray-50 !pl-10"
+            placeholder="Ex: 1500"
+            value=""
+                                    
+            x-bind:class="(fieldErrors && fieldErrors['engine_displacement_cc'] && touchedFields && touchedFields['engine_displacement_cc']) ? '!border-red-500 !focus:ring-2 !focus:ring-red-500 !focus:border-red-500 !bg-red-50' : ''"
+            min="0" />
+    </div>
 
-  <p class="mt-2 text-sm text-gray-600">
- Capacité du moteur en centimètres cubes
- </p>
- 
- 
- <p x-show="fieldErrors && fieldErrors['engine_displacement_cc'] && touchedFields && touchedFields['engine_displacement_cc']"
- x-transition:enter="transition ease-out duration-200"
- x-transition:enter-start="opacity-0 transform -translate-y-1"
- x-transition:enter-end="opacity-100 transform translate-y-0"
- class="mt-2 text-sm text-red-600 flex items-start font-medium"
- style="display: none;">
- <span
+        <p class="mt-2 text-sm text-gray-600">
+        Capacité du moteur en centimètres cubes
+    </p>
+    
+    
+    <p x-show="fieldErrors && fieldErrors['engine_displacement_cc'] && touchedFields && touchedFields['engine_displacement_cc']"
+        x-transition:enter="transition ease-out duration-200"
+        x-transition:enter-start="opacity-0 transform -translate-y-1"
+        x-transition:enter-end="opacity-100 transform translate-y-0"
+        class="mt-2 text-sm text-red-600 flex items-start font-medium"
+        style="display: none;">
+        <span
     class="iconify block w-4 h-4 mr-1.5 mt-0.5 flex-shrink-0"
     data-icon="lucide:circle-alert"
-    data-inline="false"></span> <span>Ce champ est obligatoire et doit être correctement rempli</span>
- </p>
-</div>
- </div>
+    data-inline="false"></span>        <span>Ce champ est obligatoire et doit être correctement rempli</span>
+    </p>
+</div> </div>
  </div>
  </div>
  </div>
@@ -1641,8 +1604,8 @@
  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
  <div class="w-full"
     x-data="{
-        serverDate: '09/03/2022',
-        displayValue: '09/03/2022',
+        serverDate: '05/04/2022',
+        displayValue: '05/04/2022',
         picker: null,
 
         init() {
@@ -1663,12 +1626,13 @@
                     todayBtnMode: 1, // Select today on click
                     clearBtn: true,
                     weekStart: 1,
-                                                            maxDate: '2026-01-02',
+                                                            maxDate: '03/01/2026',
                                         orientation: 'bottom left',
                 });
                 
                 // Set initial date if value exists
                 if (this.displayValue) {
+                    this.picker.setDate(this.displayValue);
                     el.value = this.displayValue;
                 }
                 
@@ -1699,7 +1663,7 @@
     }"
     wire:ignore>
 
-        <label for="datepicker-69582e640305f" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+        <label for="datepicker-69585fb520927" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
         Date d&#039;acquisition
                 <span class="text-red-500 ml-0.5">*</span>
             </label>
@@ -1720,8 +1684,8 @@
         <input
             x-ref="displayInput"
             type="text"
-            id="datepicker-69582e640305f"
-            class="block w-full ps-10 p-2.5 bg-gray-50 border-2 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 transition-all duration-200 border-gray-300"
+            id="datepicker-69585fb520927"
+            class="block w-full !pl-10 p-2.5 bg-gray-50 border-2 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 transition-all duration-200 border-gray-300"
             placeholder="Choisir une date"
             x-model="displayValue"
                          required             autocomplete="off"
@@ -1734,134 +1698,128 @@
         <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Date d&#039;achat du véhicule</p>
     </div>
  <div class="" step="0.01" min="0">
-  <label for="purchase_price" class="block mb-2 text-sm font-medium text-gray-900">
- Prix d&#039;achat (DA)
-  </label>
- 
- <div class="relative">
-  <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
- <span
+        <label for="purchase_price" class="block mb-2 text-sm font-medium text-gray-900">
+        Prix d&#039;achat (DA)
+            </label>
+    
+    <div class="relative">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <span
     class="iconify block w-5 h-5 text-gray-400"
     data-icon="heroicons:currency-dollar"
-    data-inline="false"></span> </div>
- 
- <input
- type="number"
- name="purchase_price"
- id="purchase_price"
- class="bg-gray-50 border text-gray-900 text-sm rounded-lg block w-full p-2.5 transition-colors duration-200 border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 bg-gray-50 pl-10"
- placeholder="Ex: 2500000"
- value=""
-   
- x-bind:class="(fieldErrors && fieldErrors['purchase_price'] && touchedFields && touchedFields['purchase_price']) ? '!border-red-500 !focus:ring-2 !focus:ring-red-500 !focus:border-red-500 !bg-red-50' : ''"
- step="0.01" min="0"
- />
- </div>
+    data-inline="false"></span>        </div>
+        
+        <input
+            type="number"
+            name="purchase_price"
+            id="purchase_price"
+            class="bg-gray-50 border text-gray-900 text-sm rounded-lg block w-full p-2.5 transition-colors duration-200 border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 bg-gray-50 !pl-10"
+            placeholder="Ex: 2500000"
+            value=""
+                                    
+            x-bind:class="(fieldErrors && fieldErrors['purchase_price'] && touchedFields && touchedFields['purchase_price']) ? '!border-red-500 !focus:ring-2 !focus:ring-red-500 !focus:border-red-500 !bg-red-50' : ''"
+            step="0.01" min="0" />
+    </div>
 
-  <p class="mt-2 text-sm text-gray-600">
- Prix d&#039;achat en Dinars Algériens
- </p>
- 
- 
- <p x-show="fieldErrors && fieldErrors['purchase_price'] && touchedFields && touchedFields['purchase_price']"
- x-transition:enter="transition ease-out duration-200"
- x-transition:enter-start="opacity-0 transform -translate-y-1"
- x-transition:enter-end="opacity-100 transform translate-y-0"
- class="mt-2 text-sm text-red-600 flex items-start font-medium"
- style="display: none;">
- <span
+        <p class="mt-2 text-sm text-gray-600">
+        Prix d&#039;achat en Dinars Algériens
+    </p>
+    
+    
+    <p x-show="fieldErrors && fieldErrors['purchase_price'] && touchedFields && touchedFields['purchase_price']"
+        x-transition:enter="transition ease-out duration-200"
+        x-transition:enter-start="opacity-0 transform -translate-y-1"
+        x-transition:enter-end="opacity-100 transform translate-y-0"
+        class="mt-2 text-sm text-red-600 flex items-start font-medium"
+        style="display: none;">
+        <span
     class="iconify block w-4 h-4 mr-1.5 mt-0.5 flex-shrink-0"
     data-icon="lucide:circle-alert"
-    data-inline="false"></span> <span>Ce champ est obligatoire et doit être correctement rempli</span>
- </p>
+    data-inline="false"></span>        <span>Ce champ est obligatoire et doit être correctement rempli</span>
+    </p>
 </div>
-
  <div class="" step="0.01" min="0">
-  <label for="current_value" class="block mb-2 text-sm font-medium text-gray-900">
- Valeur actuelle (DA)
-  </label>
- 
- <div class="relative">
-  <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
- <span
+        <label for="current_value" class="block mb-2 text-sm font-medium text-gray-900">
+        Valeur actuelle (DA)
+            </label>
+    
+    <div class="relative">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <span
     class="iconify block w-5 h-5 text-gray-400"
     data-icon="heroicons:currency-dollar"
-    data-inline="false"></span> </div>
- 
- <input
- type="number"
- name="current_value"
- id="current_value"
- class="bg-gray-50 border text-gray-900 text-sm rounded-lg block w-full p-2.5 transition-colors duration-200 border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 bg-gray-50 pl-10"
- placeholder="Ex: 2000000"
- value=""
-   
- x-bind:class="(fieldErrors && fieldErrors['current_value'] && touchedFields && touchedFields['current_value']) ? '!border-red-500 !focus:ring-2 !focus:ring-red-500 !focus:border-red-500 !bg-red-50' : ''"
- step="0.01" min="0"
- />
- </div>
+    data-inline="false"></span>        </div>
+        
+        <input
+            type="number"
+            name="current_value"
+            id="current_value"
+            class="bg-gray-50 border text-gray-900 text-sm rounded-lg block w-full p-2.5 transition-colors duration-200 border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 bg-gray-50 !pl-10"
+            placeholder="Ex: 2000000"
+            value=""
+                                    
+            x-bind:class="(fieldErrors && fieldErrors['current_value'] && touchedFields && touchedFields['current_value']) ? '!border-red-500 !focus:ring-2 !focus:ring-red-500 !focus:border-red-500 !bg-red-50' : ''"
+            step="0.01" min="0" />
+    </div>
 
-  <p class="mt-2 text-sm text-gray-600">
- Valeur estimée actuelle
- </p>
- 
- 
- <p x-show="fieldErrors && fieldErrors['current_value'] && touchedFields && touchedFields['current_value']"
- x-transition:enter="transition ease-out duration-200"
- x-transition:enter-start="opacity-0 transform -translate-y-1"
- x-transition:enter-end="opacity-100 transform translate-y-0"
- class="mt-2 text-sm text-red-600 flex items-start font-medium"
- style="display: none;">
- <span
+        <p class="mt-2 text-sm text-gray-600">
+        Valeur estimée actuelle
+    </p>
+    
+    
+    <p x-show="fieldErrors && fieldErrors['current_value'] && touchedFields && touchedFields['current_value']"
+        x-transition:enter="transition ease-out duration-200"
+        x-transition:enter-start="opacity-0 transform -translate-y-1"
+        x-transition:enter-end="opacity-100 transform translate-y-0"
+        class="mt-2 text-sm text-red-600 flex items-start font-medium"
+        style="display: none;">
+        <span
     class="iconify block w-4 h-4 mr-1.5 mt-0.5 flex-shrink-0"
     data-icon="lucide:circle-alert"
-    data-inline="false"></span> <span>Ce champ est obligatoire et doit être correctement rempli</span>
- </p>
+    data-inline="false"></span>        <span>Ce champ est obligatoire et doit être correctement rempli</span>
+    </p>
 </div>
-
  <div class="" min="0">
-  <label for="current_mileage" class="block mb-2 text-sm font-medium text-gray-900">
- Kilométrage Actuel
-  </label>
- 
- <div class="relative">
-  <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
- <span
+        <label for="current_mileage" class="block mb-2 text-sm font-medium text-gray-900">
+        Kilométrage Actuel
+            </label>
+    
+    <div class="relative">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <span
     class="iconify block w-5 h-5 text-gray-400"
     data-icon="heroicons:chart-bar"
-    data-inline="false"></span> </div>
- 
- <input
- type="number"
- name="current_mileage"
- id="current_mileage"
- class="bg-gray-50 border text-gray-900 text-sm rounded-lg block w-full p-2.5 transition-colors duration-200 border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 bg-gray-50 pl-10"
- placeholder="Ex: 15000"
- value="31897"
-   
- x-bind:class="(fieldErrors && fieldErrors['current_mileage'] && touchedFields && touchedFields['current_mileage']) ? '!border-red-500 !focus:ring-2 !focus:ring-red-500 !focus:border-red-500 !bg-red-50' : ''"
- min="0"
- />
- </div>
+    data-inline="false"></span>        </div>
+        
+        <input
+            type="number"
+            name="current_mileage"
+            id="current_mileage"
+            class="bg-gray-50 border text-gray-900 text-sm rounded-lg block w-full p-2.5 transition-colors duration-200 border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 bg-gray-50 !pl-10"
+            placeholder="Ex: 15000"
+            value="23900"
+                                    
+            x-bind:class="(fieldErrors && fieldErrors['current_mileage'] && touchedFields && touchedFields['current_mileage']) ? '!border-red-500 !focus:ring-2 !focus:ring-red-500 !focus:border-red-500 !bg-red-50' : ''"
+            min="0" />
+    </div>
 
-  <p class="mt-2 text-sm text-gray-600">
- Kilométrage actuel du véhicule
- </p>
- 
- 
- <p x-show="fieldErrors && fieldErrors['current_mileage'] && touchedFields && touchedFields['current_mileage']"
- x-transition:enter="transition ease-out duration-200"
- x-transition:enter-start="opacity-0 transform -translate-y-1"
- x-transition:enter-end="opacity-100 transform translate-y-0"
- class="mt-2 text-sm text-red-600 flex items-start font-medium"
- style="display: none;">
- <span
+        <p class="mt-2 text-sm text-gray-600">
+        Kilométrage actuel du véhicule
+    </p>
+    
+    
+    <p x-show="fieldErrors && fieldErrors['current_mileage'] && touchedFields && touchedFields['current_mileage']"
+        x-transition:enter="transition ease-out duration-200"
+        x-transition:enter-start="opacity-0 transform -translate-y-1"
+        x-transition:enter-end="opacity-100 transform translate-y-0"
+        class="mt-2 text-sm text-red-600 flex items-start font-medium"
+        style="display: none;">
+        <span
     class="iconify block w-4 h-4 mr-1.5 mt-0.5 flex-shrink-0"
     data-icon="lucide:circle-alert"
-    data-inline="false"></span> <span>Ce champ est obligatoire et doit être correctement rempli</span>
- </p>
+    data-inline="false"></span>        <span>Ce champ est obligatoire et doit être correctement rempli</span>
+    </p>
 </div>
-
  <div class="md:col-span-2">
  <div wire:ignore
     x-data="{
@@ -1891,25 +1849,22 @@
     x-init="initSelect()"
     class="" @change="validateField('status_id', $event.target.value)">
 
-    <!--[if BLOCK]><![endif]-->    <label for="slimselect-status_id-69582e6403407" class="block mb-2 text-sm font-medium text-gray-900">
+        <label for="slimselect-status_id-69585fb520fb8" class="block mb-2 text-sm font-medium text-gray-900">
         Statut Initial
-        <!--[if BLOCK]><![endif]-->        <span class="text-red-500">*</span>
-        <!--[if ENDBLOCK]><![endif]-->
-    </label>
-    <!--[if ENDBLOCK]><![endif]-->
-
+                <span class="text-red-500">*</span>
+            </label>
+    
     <select
         x-ref="select"
         name="status_id"
-        id="slimselect-status_id-69582e6403407"
+        id="slimselect-status_id-69585fb520fb8"
         class="slimselect-field w-full"
                         @change="validateField('status_id', $event.target.value)">
 
         
-        <!--[if BLOCK]><![endif]-->        <!--[if BLOCK]><![endif]-->        <option value="" data-placeholder="true">Sélectionnez un statut...</option>
-        <!--[if ENDBLOCK]><![endif]-->
-
-        <!--[if BLOCK]><![endif]-->        <option
+                        <option value="" data-placeholder="true">Sélectionnez un statut...</option>
+        
+                <option
             value="9"
             >
             Affecté
@@ -1926,12 +1881,12 @@
         </option>
                 <option
             value="8"
-            selected>
+            >
             Parking
         </option>
                 <option
             value="11"
-            >
+            selected>
             Réformé
         </option>
                 <option
@@ -1939,15 +1894,12 @@
             >
             Vendu
         </option>
-        <!--[if ENDBLOCK]><![endif]-->
-        <!--[if ENDBLOCK]><![endif]-->
-    </select>
+                    </select>
 
-    <!--[if BLOCK]><![endif]-->    <p class="mt-2 text-sm text-gray-500">
+        <p class="mt-2 text-sm text-gray-500">
         État opérationnel du véhicule
     </p>
-    <!--[if ENDBLOCK]><![endif]-->
-</div> </div>
+    </div> </div>
 
  <div class="md:col-span-2">
  <div wire:ignore
@@ -1978,23 +1930,20 @@
     x-init="initSelect()"
     class="">
 
-    <!--[if BLOCK]><![endif]-->    <label for="slimselect-users-69582e64044f2" class="block mb-2 text-sm font-medium text-gray-900">
+        <label for="slimselect-users-69585fb521e46" class="block mb-2 text-sm font-medium text-gray-900">
         Utilisateurs Autorisés
-        <!--[if BLOCK]><![endif]--><!--[if ENDBLOCK]><![endif]-->
-    </label>
-    <!--[if ENDBLOCK]><![endif]-->
-
+            </label>
+    
     <select
         x-ref="select"
         name="users"
-        id="slimselect-users-69582e64044f2"
+        id="slimselect-users-69585fb521e46"
         class="slimselect-field w-full"
                  multiple         >
 
         
-        <!--[if BLOCK]><![endif]-->        <!--[if BLOCK]><![endif]--><!--[if ENDBLOCK]><![endif]-->
-
-        <!--[if BLOCK]><![endif]-->        <option
+                
+                <option
             value="1"
             >
              (mohamed.meziani@trans-algerlogistics.local)
@@ -2074,15 +2023,12 @@
             >
             zerrouk ALIOUANE (zerroukaliouane@zenfleet.dz)
         </option>
-        <!--[if ENDBLOCK]><![endif]-->
-        <!--[if ENDBLOCK]><![endif]-->
-    </select>
+                    </select>
 
-    <!--[if BLOCK]><![endif]-->    <p class="mt-2 text-sm text-gray-500">
+        <p class="mt-2 text-sm text-gray-500">
         Sélectionnez les utilisateurs autorisés à utiliser ce véhicule
     </p>
-    <!--[if ENDBLOCK]><![endif]-->
-</div> </div>
+    </div> </div>
 
  <div class="md:col-span-2">
  <div class="">
@@ -2734,7 +2680,7 @@ function vehicleFormValidation() {
             }
         }
     </script>
-    <script data-navigate-once="true">window.livewireScriptConfig = {"csrf":"c3xGHWOQz74MbUH4heeTgpV2cNIMnJuPD7mPr13b","uri":"\/livewire\/update","progressBar":"","nonce":""};</script>
+    <script data-navigate-once="true">window.livewireScriptConfig = {"csrf":"7A2yL7NUppMhO6UAHvOBhzDwY7K5fYP9quW6GmdV","uri":"\/livewire\/update","progressBar":"","nonce":""};</script>
 </body>
 
 </html>
