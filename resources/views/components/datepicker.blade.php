@@ -94,9 +94,11 @@ $inputClasses .= $error ? ' border-red-500' : ' border-gray-300';
                         const day = String(d.getDate()).padStart(2, '0');
                         this.serverDate = `${year}-${month}-${day}`;
                         this.displayValue = `${day}/${month}/${year}`;
+                        this.$dispatch('input', this.serverDate);
                     } else {
                         this.serverDate = '';
                         this.displayValue = '';
+                        this.$dispatch('input', '');
                     }
                 });
                 
@@ -105,6 +107,7 @@ $inputClasses .= $error ? ' border-red-500' : ' border-gray-300';
                     if (!el.value.trim()) {
                         this.serverDate = '';
                         this.displayValue = '';
+                        this.$dispatch('input', '');
                     }
                 });
             });
