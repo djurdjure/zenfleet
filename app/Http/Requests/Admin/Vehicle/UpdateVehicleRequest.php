@@ -98,8 +98,8 @@ class UpdateVehicleRequest extends FormRequest
             'fuel_type_id' => ['nullable', 'exists:fuel_types,id'],
             'transmission_type_id' => ['nullable', 'exists:transmission_types,id'],
             'status_id' => ['nullable', 'exists:vehicle_statuses,id'],
-            'manufacturing_year' => ['nullable', 'integer', 'digits:4', 'min:1950', 'max:'.(date('Y') + 1)],
-            'acquisition_date' => ['nullable', 'date_format:d/m/Y'],
+            'manufacturing_year' => ['nullable', 'integer', 'digits:4', 'min:1950', 'max:' . (date('Y') + 1)],
+            'acquisition_date' => ['nullable', 'date_format:Y-m-d'],
             'purchase_price' => ['nullable', 'numeric', 'min:0'],
             'current_value' => ['nullable', 'numeric', 'min:0'],
             'initial_mileage' => ['nullable', 'integer', 'min:0'],
@@ -112,5 +112,3 @@ class UpdateVehicleRequest extends FormRequest
         ];
     }
 }
-
-

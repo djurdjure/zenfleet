@@ -265,12 +265,7 @@ class VehicleController extends Controller
             $validatedData = $request->validated();
 
             // Conversion de la date du format français (d/m/Y) vers format base de données (Y-m-d)
-            if (!empty($validatedData['acquisition_date'])) {
-                $date = \DateTime::createFromFormat('d/m/Y', $validatedData['acquisition_date']);
-                if ($date) {
-                    $validatedData['acquisition_date'] = $date->format('Y-m-d');
-                }
-            }
+
 
             // Enrichissement automatique des données
             $vehicleData = $this->enrichVehicleCreationData($validatedData);
@@ -410,12 +405,7 @@ class VehicleController extends Controller
             $validatedData = $request->validated();
 
             // Conversion de la date du format français (d/m/Y) vers format base de données (Y-m-d)
-            if (!empty($validatedData['acquisition_date'])) {
-                $date = \DateTime::createFromFormat('d/m/Y', $validatedData['acquisition_date']);
-                if ($date) {
-                    $validatedData['acquisition_date'] = $date->format('Y-m-d');
-                }
-            }
+
 
             // Transaction sécurisée avec audit
             $updatedVehicle = DB::transaction(function () use ($vehicle, $validatedData, $originalData) {

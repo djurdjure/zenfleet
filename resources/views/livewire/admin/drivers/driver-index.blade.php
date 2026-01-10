@@ -86,45 +86,43 @@
         =============================================== --}}
         <div class="mb-6" x-data="{ showFilters: false }">
             <div class="flex flex-col lg:flex-row items-start lg:items-center gap-3">
-                {{-- Recherche rapide --}}
-                <div class="flex-1 w-full lg:w-auto relative">
-                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <x-iconify icon="lucide:search" class="w-5 h-5 text-gray-400" />
+                {{-- Search --}}
+                <div class="flex-1 w-full lg:w-auto">
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <x-iconify icon="lucide:search" class="w-5 h-5 text-gray-400" />
+                        </div>
+                        <input
+                            wire:model.live.debounce.300ms="search"
+                            type="text"
+                            placeholder="Rechercher par nom, prénom, matricule..."
+                            class="pl-10 pr-4 py-2 block w-full border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm shadow-sm">
                     </div>
-                    <input
-                        wire:model.live.debounce.300ms="search"
-                        type="text"
-                        placeholder="Rechercher par nom, prénom, matricule..."
-                        class="pl-10 pr-4 py-2.5 block w-full border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm shadow-sm">
                 </div>
 
-                {{-- Bouton Filtres Avancés --}}
-                {{-- Bouton Filtres Avancés --}}
+                {{-- Toggle Filters --}}
                 <button
                     @click="showFilters = !showFilters"
                     type="button"
                     title="Filtres"
                     class="inline-flex items-center gap-2 p-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-all duration-200 shadow-sm hover:shadow-md">
                     <x-iconify icon="lucide:filter" class="w-5 h-5 text-gray-500" />
-                    <x-iconify
-                        icon="heroicons:chevron-down"
-                        class="w-4 h-4 text-gray-400 transition-transform duration-200"
-                        x-bind:class="showFilters ? 'rotate-180' : ''" />
+                    <x-iconify icon="heroicons:chevron-down" class="w-4 h-4 text-gray-400" x-bind:class="showFilters ? 'rotate-180' : ''" />
                 </button>
 
                 {{-- Actions --}}
                 <div class="flex items-center gap-2">
-                    {{-- Toggle Archives --}}
+
                     @if($visibility === 'archived')
                     <button wire:click="$set('visibility', 'active')"
-                        title="Voir Actifs"
-                        class="inline-flex items-center gap-2 p-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-all duration-200 shadow-sm hover:shadow-md">
+                        class="inline-flex items-center gap-2 p-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-all duration-200 shadow-sm hover:shadow-md"
+                        title="Voir Actifs">
                         <x-iconify icon="lucide:list" class="w-5 h-5" />
                     </button>
                     @else
                     <button wire:click="$set('visibility', 'archived')"
-                        title="Voir Archives"
-                        class="inline-flex items-center gap-2 p-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-all duration-200 shadow-sm hover:shadow-md">
+                        class="inline-flex items-center gap-2 p-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-all duration-200 shadow-sm hover:shadow-md"
+                        title="Voir Archives">
                         <x-iconify icon="lucide:archive" class="w-5 h-5 text-amber-600" />
                     </button>
                     @endif
@@ -138,49 +136,49 @@
                             title="Exporter"
                             class="inline-flex items-center gap-2 p-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-all duration-200 shadow-sm hover:shadow-md">
                             <x-iconify icon="lucide:download" class="w-5 h-5 text-gray-500" />
-                            <x-iconify icon="heroicons:chevron-down" class="w-4 h-4 text-gray-400" />
+                            <x-iconify icon="heroicons:chevron-down" class="w-4 h-4 text-gray-400" x-bind:class="exportOpen ? 'rotate-180' : ''" />
                         </button>
-                        {{-- Dropdown content remains same --}}
+
                         <div
                             x-show="exportOpen"
-                            class="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-lg bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
+                            x-transition:enter="transition ease-out duration-100"
+                            x-transition:enter-start="transform opacity-0 scale-95"
+                            x-transition:enter-end="transform opacity-100 scale-100"
+                            x-transition:leave="transition ease-in duration-75"
+                            x-transition:leave-start="transform opacity-100 scale-100"
+                            x-transition:leave-end="transform opacity-0 scale-95"
+                            class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-xl border border-gray-100 z-50 py-1"
                             style="display: none;">
-                            <div class="py-1">
-                                <a href="{{ route('admin.drivers.export.pdf', request()->all()) }}" class="group flex items-center gap-2 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-100">
-                                    <x-iconify icon="lucide:file-text" class="w-4 h-4 text-red-600" />
-                                    <span>Export PDF</span>
-                                </a>
-                                {{-- ... CSV/Excel ... --}}
-                            </div>
+
+                            <a href="{{ route('admin.drivers.export.pdf', request()->all()) }}" class="group flex items-center gap-2 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
+                                <x-iconify icon="lucide:file-text" class="w-4 h-4 text-red-500" />
+                                <span>Export PDF</span>
+                            </a>
                         </div>
                     </div>
 
                     {{-- Import --}}
                     <a href="{{ route('admin.drivers.import.show') }}"
                         title="Importer"
-                        class="inline-flex items-center gap-2 p-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-all duration-200 shadow-sm hover:shadow-md">
+                        class="inline-flex items-center gap-2 p-2 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg transition-colors shadow-sm hover:shadow-md">
                         <x-iconify icon="lucide:upload" class="w-5 h-5" />
                     </a>
 
                     {{-- Nouveau Chauffeur --}}
                     <a href="{{ route('admin.drivers.create') }}"
                         title="Nouveau Chauffeur"
-                        class="inline-flex items-center gap-2 p-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all duration-200 shadow-sm hover:shadow-md">
-                        <x-iconify icon="lucide:plus" class="w-5 h-5" />
+                        class="inline-flex items-center gap-2 p-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors shadow-sm hover:shadow-md">
+                        <x-iconify icon="lucide:plus-circle" class="w-5 h-5" />
                     </a>
                 </div>
             </div>
 
-            {{-- Panel Filtres Avancés --}}
-            <div
-                x-show="showFilters"
-                x-transition
-                class="mt-4 bg-white rounded-lg border border-gray-200 p-4 shadow-sm"
-                style="display: none;">
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+            {{-- Filters Panel --}}
+            <div x-show="showFilters" x-collapse class="mt-4 bg-white rounded-lg border border-gray-200 p-6 shadow-sm">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                     {{-- Statut --}}
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1.5">Statut</label>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Statut</label>
                         <x-slim-select wire:model.live="status_id" name="status_id" placeholder="Tous les statuts">
                             <option value="" data-placeholder="true">Tous les statuts</option>
                             @foreach($driverStatuses as $status)
@@ -191,7 +189,7 @@
 
                     {{-- Catégorie Permis --}}
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1.5">Catégorie permis</label>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Catégorie permis</label>
                         <x-slim-select wire:model.live="license_category" name="license_category" placeholder="Toutes les catégories">
                             <option value="" data-placeholder="true">Toutes les catégories</option>
                             @foreach(['A1', 'A', 'B', 'BE', 'C1', 'C1E', 'C', 'CE', 'D', 'DE', 'F'] as $cat)
@@ -201,11 +199,9 @@
                     </div>
                 </div>
 
-                <div class="flex items-center justify-end mt-4 pt-4 border-t border-gray-200">
-                    <button
-                        wire:click="resetFilters"
-                        class="px-3 py-1.5 bg-gray-100 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-200 transition-colors">
-                        x Réinitialiser
+                <div class="mt-4 flex gap-2 justify-end">
+                    <button wire:click="resetFilters" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors text-sm font-medium">
+                        Réinitialiser
                     </button>
                 </div>
             </div>
@@ -403,10 +399,11 @@
                 </table>
             </div>
 
-            {{-- Pagination --}}
-            <div class="bg-white px-4 py-3 border-t border-gray-200">
-                <x-pagination :paginator="$drivers" :records-per-page="$perPage" wire:model.live="perPage" />
-            </div>
+        </div>
+
+        {{-- Pagination --}}
+        <div class="mt-6">
+            <x-pagination :paginator="$drivers" :records-per-page="$perPage" wire:model.live="perPage" />
         </div>
     </div>
 

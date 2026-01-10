@@ -94,7 +94,7 @@
                             wire:model.live.debounce.300ms="search"
                             type="text"
                             placeholder="Rechercher par immatriculation, marque, modèle..."
-                            class="pl-10 pr-4 py-2.5 block w-full border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm shadow-sm">
+                            class="pl-10 pr-4 py-2 block w-full border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm shadow-sm">
                     </div>
                 </div>
 
@@ -103,7 +103,7 @@
                     @click="showFilters = !showFilters"
                     type="button"
                     title="Filtres"
-                    class="inline-flex items-center gap-2 p-2.5 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-all duration-200 shadow-sm">
+                    class="inline-flex items-center gap-2 p-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-all duration-200 shadow-sm hover:shadow-md">
                     <x-iconify icon="lucide:filter" class="w-5 h-5 text-gray-500" />
                     <x-iconify icon="heroicons:chevron-down" class="w-4 h-4 text-gray-400" x-bind:class="showFilters ? 'rotate-180' : ''" />
                 </button>
@@ -113,13 +113,13 @@
 
                     @if($visibility === 'archived')
                     <button wire:click="$set('visibility', 'active')"
-                        class="inline-flex items-center gap-2 p-2.5 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-all shadow-sm"
+                        class="inline-flex items-center gap-2 p-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-all duration-200 shadow-sm hover:shadow-md"
                         title="Voir Actifs">
                         <x-iconify icon="lucide:list" class="w-5 h-5" />
                     </button>
                     @else
                     <button wire:click="$set('visibility', 'archived')"
-                        class="inline-flex items-center gap-2 p-2.5 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-all shadow-sm"
+                        class="inline-flex items-center gap-2 p-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-all duration-200 shadow-sm hover:shadow-md"
                         title="Voir Archives">
                         <x-iconify icon="lucide:archive" class="w-5 h-5 text-amber-600" />
                     </button>
@@ -132,7 +132,7 @@
                             @click.away="open = false"
                             type="button"
                             title="Exporter"
-                            class="inline-flex items-center gap-2 p-2.5 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-all shadow-sm">
+                            class="inline-flex items-center gap-2 p-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-all duration-200 shadow-sm hover:shadow-md">
                             <x-iconify icon="lucide:download" class="w-5 h-5 text-gray-500" />
                             <x-iconify icon="lucide:chevron-down" class="w-4 h-4 text-gray-400" x-bind:class="open ? 'rotate-180' : ''" />
                         </button>
@@ -489,10 +489,11 @@
                     </tbody>
                 </table>
             </div>
-            <div class="px-4 py-3 border-t border-gray-200">
-                <x-pagination :paginator="$vehicles" :records-per-page="$perPage" wire:model.live="perPage" />
-            </div>
         </x-card>
+
+        <div class="mt-6">
+            <x-pagination :paginator="$vehicles" :records-per-page="$perPage" wire:model.live="perPage" />
+        </div>
     </div>
 
     {{-- ================================================================
