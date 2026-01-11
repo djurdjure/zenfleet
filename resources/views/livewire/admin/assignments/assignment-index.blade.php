@@ -80,41 +80,39 @@
              SEARCH + FILTERS - PROFESSIONAL DESIGN
              ===================================================================== --}}
         <div class="mb-6" x-data="{ showFilters: false }">
-            {{-- Barre d'actions sur une seule ligne --}}
-            <div class="flex flex-col md:flex-row gap-3 items-center mb-4">
-                {{-- Search Bar - Réduit --}}
-                <div class="w-full md:w-72 relative">
+            <div class="flex flex-col lg:flex-row items-start lg:items-center gap-3">
+                {{-- Search Bar --}}
+                <div class="flex-1 w-full lg:w-auto relative">
                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <x-iconify icon="lucide:search" class="w-4 h-4 text-gray-400" />
+                        <x-iconify icon="lucide:search" class="w-5 h-5 text-gray-400" />
                     </div>
                     <input
                         type="text"
                         wire:model.live.debounce.300ms="search"
                         placeholder="Rechercher..."
-                        class="pl-9 pr-4 py-2 block w-full border-gray-300 rounded-lg
-                               focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm shadow-sm" />
+                        class="pl-10 pr-4 py-2.5 block w-full border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm shadow-sm">
                     <div wire:loading wire:target="search" class="absolute inset-y-0 right-0 pr-3 flex items-center">
-                        <x-iconify icon="lucide:loader-2" class="w-3.5 h-3.5 text-blue-500 animate-spin" />
+                        <x-iconify icon="lucide:loader-2" class="w-4 h-4 text-blue-500 animate-spin" />
                     </div>
                 </div>
 
-                {{-- Boutons d'actions groupés --}}
-                <div class="flex gap-2 w-full md:w-auto md:ml-auto">
-                    {{-- Filter Button (Icon Only) --}}
+                {{-- Action Buttons --}}
+                <div class="flex items-center gap-2">
+                    {{-- Filter Button --}}
                     <button
                         @click="showFilters = !showFilters"
+                        type="button"
                         title="Filtres"
-                        class="inline-flex items-center justify-center w-10 h-10 bg-white border border-gray-300
-                               rounded-lg hover:bg-gray-50 transition-all duration-200 shadow-sm hover:shadow-md">
-                        <x-iconify icon="lucide:filter" class="w-4 h-4 text-gray-500" />
+                        class="inline-flex items-center gap-2 p-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-all duration-200 shadow-sm hover:shadow-md">
+                        <x-iconify icon="lucide:filter" class="w-5 h-5 text-gray-500" />
+                        <x-iconify icon="heroicons:chevron-down" class="w-4 h-4 text-gray-400 transition-transform duration-200" x-bind:class="showFilters ? 'rotate-180' : ''" />
                     </button>
 
-                    {{-- Nouvelle Affectation Button (Icon Only) --}}
+                    {{-- Create Assignment --}}
                     <a href="{{ route('admin.assignments.create') }}"
                         title="Nouvelle affectation"
-                        class="inline-flex items-center justify-center w-10 h-10 bg-blue-600 text-white
-                              rounded-lg hover:bg-blue-700 transition-all duration-200 shadow-sm hover:shadow-md">
-                        <x-iconify icon="lucide:plus-circle" class="w-4 h-4" />
+                        class="inline-flex items-center gap-2 p-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all duration-200 shadow-sm hover:shadow-md">
+                        <x-iconify icon="lucide:plus" class="w-5 h-5" />
                     </a>
                 </div>
             </div>
@@ -123,7 +121,7 @@
             <div x-show="showFilters"
                 x-collapse
                 x-cloak
-                class="w-full bg-white rounded-lg border border-gray-200 p-6 shadow-sm mb-6">
+                class="w-full bg-white rounded-lg border border-gray-200 p-6 shadow-sm mb-6 mt-4">
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {{-- Status Filter --}}

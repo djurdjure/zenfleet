@@ -205,15 +205,15 @@
                     {{-- Import --}}
                     <a href="{{ route('admin.vehicles.import.show') }}"
                         title="Importer"
-                        class="inline-flex items-center gap-2 p-2.5 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg transition-colors shadow-sm">
+                        class="inline-flex items-center gap-2 p-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-all duration-200 shadow-sm hover:shadow-md">
                         <x-iconify icon="lucide:upload" class="w-5 h-5" />
                     </a>
 
                     {{-- Nouveau Véhicule --}}
                     <a href="{{ route('admin.vehicles.create') }}"
-                        title="Nouveau véhicule"
-                        class="inline-flex items-center gap-2 p-2.5 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors shadow-sm">
-                        <x-iconify icon="lucide:plus-circle" class="w-5 h-5" />
+                        title="Nouveau Véhicule"
+                        class="inline-flex items-center gap-2 p-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all duration-200 shadow-sm hover:shadow-md">
+                        <x-iconify icon="lucide:plus" class="w-5 h-5" />
                     </a>
                     @endcan
                 </div>

@@ -402,11 +402,11 @@
                     </tbody>
                 </table>
             </div>
+        </div>
 
-            {{-- Pagination --}}
-            <div class="bg-white px-4 py-3 border-t border-gray-200">
-                <x-pagination :paginator="$drivers" :records-per-page="$perPage" wire:model.live="perPage" />
-            </div>
+        {{-- Pagination (Gray Area) --}}
+        <div class="mt-4">
+            <x-pagination :paginator="$drivers" :records-per-page="$perPage" wire:model.live="perPage" />
         </div>
     </div>
 
