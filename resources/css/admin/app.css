@@ -24,12 +24,12 @@
         --admin-danger: #ef4444;
         --admin-info: #06b6d4;
     }
-    
+
     .admin-layout {
         font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
         @apply bg-gray-50 text-gray-900 antialiased;
     }
-    
+
     body {
         @apply bg-gray-50 text-gray-900;
     }
@@ -40,78 +40,78 @@
     .admin-container {
         @apply flex min-h-screen;
     }
-    
+
     /* ✅ Sidebar width géré par Tailwind (lg:w-64 = 256px) */
     .admin-sidebar {
         @apply fixed top-0 left-0 z-40 h-screen bg-gray-900 text-white transition-all duration-300;
     }
-    
+
     .admin-sidebar.collapsed {
         @apply lg:w-20;
     }
-    
+
     /* ✅ Contenu principal padding géré par Tailwind (lg:pl-64 = 256px) */
     .admin-main {
         @apply flex-1 transition-all duration-300;
     }
-    
-    .admin-sidebar.collapsed ~ .admin-main {
+
+    .admin-sidebar.collapsed~.admin-main {
         @apply lg:pl-20;
     }
-    
+
     .admin-header {
         @apply bg-white border-b border-gray-200 px-6 py-4;
         height: 70px;
     }
-    
+
     .admin-content {
         @apply flex-1 p-6;
     }
-    
+
     .admin-card {
         @apply bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden;
     }
-    
+
     .admin-card-header {
         @apply px-6 py-4 border-b border-gray-200 bg-gray-50;
     }
-    
+
     .admin-card-body {
         @apply p-6;
     }
-    
+
     .admin-btn {
         @apply inline-flex items-center justify-center px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200;
     }
-    
+
     .admin-btn-primary {
         @apply admin-btn bg-blue-600 text-white border border-blue-600;
         @apply hover:bg-blue-700 hover:border-blue-700 focus:ring-4 focus:ring-blue-200;
     }
-    
+
     .admin-btn-secondary {
         @apply admin-btn bg-gray-600 text-white border border-gray-600;
         @apply hover:bg-gray-700 hover:border-gray-700 focus:ring-4 focus:ring-gray-200;
     }
-    
+
     .admin-input {
         @apply block w-full px-3 py-2 text-sm border border-gray-300 rounded-lg;
         @apply focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500;
         @apply disabled:bg-gray-50 disabled:text-gray-500;
     }
-    
+
     .admin-table {
         @apply w-full text-sm text-left text-gray-500;
     }
-    
+
     .admin-table th {
         @apply px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider bg-gray-50;
     }
-    
+
     .admin-table td {
         @apply px-6 py-4 whitespace-nowrap border-b border-gray-200;
     }
-    
+
     .admin-table tbody tr:hover {
         @apply bg-gray-50;
     }
@@ -120,7 +120,7 @@
 /* ✅ Utilitaires Admin */
 @layer utilities {
     /* ✅ Largeurs de sidebar gérées par Tailwind (lg:w-64 et lg:w-20) */
-    
+
     .text-shadow {
         text-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
     }
@@ -138,7 +138,8 @@
 /* Control - Style Flowbite bg-gray-50 */
 .ts-wrapper .ts-control {
     @apply bg-gray-50 border border-gray-300 rounded-lg text-gray-900 text-sm;
-    padding: 0.625rem; /* 10px */
+    padding: 0.625rem;
+    /* 10px */
     box-shadow: none !important;
 }
 
@@ -240,11 +241,11 @@
     .admin-sidebar {
         @apply -translate-x-full;
     }
-    
+
     .admin-sidebar.open {
         @apply translate-x-0;
     }
-    
+
     .admin-main {
         margin-left: 0 !important;
     }
@@ -252,8 +253,15 @@
 
 /* Animations admin */
 @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .animate-fade-in {
@@ -268,4 +276,3 @@
 .admin-spinner {
     @apply animate-spin rounded-full h-8 w-8 border-b-2 border-white;
 }
-

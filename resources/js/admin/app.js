@@ -11,6 +11,8 @@ import '../../css/admin/app.css';
 import 'slim-select/styles';
 // Note: SlimSelect CSS loaded via CDN matches the JS version used
 import 'flatpickr/dist/flatpickr.min.css';
+import '../../css/admin/datepicker-base.css';
+import '../../css/admin/datepicker-ultra-pro.css';
 
 // ✅ ENTERPRISE: Import SlimSelect and expose as global (for x-slim-select component)
 import SlimSelect from 'slim-select';
@@ -26,12 +28,20 @@ import axios from 'axios';
 // ✅ OPTIMISATION: Imports sélectifs pour l'admin
 import flatpickr from 'flatpickr';
 import { French } from 'flatpickr/dist/l10n/fr.js';
+// ✅ FLOWBITE DATEPICKER
+import Datepicker from 'flowbite-datepicker/Datepicker';
+import fr from './locales/fr.js';
 
 // Configuration sécurisée des objets globaux admin
 const initializeAdminGlobals = () => {
     window.axios = axios;
     // window.TomSelect est chargé via CDN
     window.flatpickr = flatpickr;
+
+    // ✅ FLOWBITE SETUP
+    Object.assign(Datepicker.locales, { fr });
+    window.Datepicker = Datepicker;
+    console.log('📅 Flowbite Datepicker configured globally:', !!window.Datepicker);
 };
 
 // ✅ NOUVELLE ARCHITECTURE: Classe ZenFleetAdmin moderne

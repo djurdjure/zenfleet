@@ -8,23 +8,156 @@
 'value' => null,
 'minDate' => null,
 'maxDate' => null,
-'format' => 'd/m/Y',
 'placeholder' => 'Sélectionner une date',
 ])
 
 @php
-$component = new \App\View\Components\Datepicker($name, $label, $error, $helpText, $required, $disabled, $value, $minDate, $maxDate, $format, $placeholder);
-$inputId = $component->getId();
+$inputId = 'datepicker-' . uniqid();
+$rawValue = old($name, $value);
 
-// Classes conditionnelles pour erreur (fond gris clair bg-gray-50)
-$inputClasses = $error
-? 'datepicker !bg-red-50 border-2 border-red-500 text-gray-900 text-sm rounded-xl focus:ring-2 focus:ring-red-500 focus:border-red-500 block w-full pl-11 p-3 transition-colors duration-200'
-: 'datepicker !bg-white border border-gray-200 text-gray-900 text-sm rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 hover:border-gray-300 block w-full pl-11 p-3 transition-colors duration-200';
+// Convert server value to display format (d/m/Y) for Flowbite
+$displayValue = '';
+if ($rawValue) {
+// Handle Y-m-d format from database
+if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $rawValue)) {
+$date = \Carbon\Carbon::createFromFormat('Y-m-d', $rawValue);
+$displayValue = $date->format('d/m/Y');
+}
+// Handle d/m/Y format from old() flash
+elseif (preg_match('/^\d{2}\/\d{2}\/\d{4}$/', $rawValue)) {
+$displayValue = $rawValue;
+}
+}
+
+// Input classes following Flowbite pattern
+$inputClasses = 'block w-full !pl-10 p-2.5 bg-gray-50 border-2 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 transition-all duration-200';
+$inputClasses .= $error ? ' border-red-500' : ' border-gray-300';
 @endphp
 
-<div {{ $attributes->merge(['class' => '']) }}>
+<div {{ $attributes->merge(['class' => 'w-full']) }}
+    x-data="{
+        serverDate: '{{ $rawValue }}',
+        displayValue: '{{ $displayValue }}',
+        picker: null,
+
+        init() {
+            this.$nextTick(() => {
+                const el = this.$refs.displayInput;
+                const component = this;
+                let isOpening = false; // Flag to prevent immediate close
+                
+                if (typeof window.Datepicker === 'undefined') {
+                    console.error('❌ ZenFleet: Datepicker not loaded');
+                    return;
+                }
+                
+                // Initialize Flowbite Datepicker
+                this.picker = new window.Datepicker(el, {
+                    language: 'fr',
+                    format: 'dd/mm/yyyy',
+                    autohide: true,
+                    todayBtn: true,
+                    todayBtnMode: 1,
+                    clearBtn: true,
+                    weekStart: 1,
+                    @if($minDate)
+                    minDate: '{{ \Carbon\Carbon::parse($minDate)->format('d/m/Y') }}',
+                    @endif
+                    @if($maxDate)
+                    maxDate: '{{ \Carbon\Carbon::parse($maxDate)->format('d/m/Y') }}',
+                    @endif
+                    orientation: 'bottom left',
+                });
+                
+                // ✅ ENTERPRISE-GRADE: Force hide function
+                const forceHidePicker = () => {
+                    if (!component.picker || isOpening) return;
+                    
+                    const pickerEl = component.picker.picker?.element;
+                    if (pickerEl) {
+                        pickerEl.style.display = 'none';
+                        pickerEl.classList.remove('active', 'block');
+                        pickerEl.classList.add('hidden');
+                        if (component.picker.picker) {
+                            component.picker.picker.active = false;
+                        }
+                    }
+                };
+                
+                // ✅ ENTERPRISE-GRADE: Force show function (reset display)
+                const ensurePickerVisible = () => {
+                    const pickerEl = component.picker.picker?.element;
+                    if (pickerEl) {
+                        pickerEl.style.display = '';
+                        pickerEl.classList.remove('hidden');
+                    }
+                };
+                
+                // Set initial date if value exists
+                if (this.displayValue) {
+                    this.picker.setDate(this.displayValue);
+                    el.value = this.displayValue;
+                }
+                
+                // ✅ Listen for show event to reset display and set flag
+                el.addEventListener('show', () => {
+                    isOpening = true;
+                    ensurePickerVisible();
+                    setTimeout(() => { isOpening = false; }, 100);
+                });
+                
+                // Handle date change - force close on selection
+                el.addEventListener('changeDate', (e) => {
+                    if (e.detail.date) {
+                        const d = e.detail.date;
+                        const year = d.getFullYear();
+                        const month = String(d.getMonth() + 1).padStart(2, '0');
+                        const day = String(d.getDate()).padStart(2, '0');
+                        component.serverDate = `${year}-${month}-${day}`;
+                        component.displayValue = `${day}/${month}/${year}`;
+                        component.$dispatch('input', component.serverDate);
+                        
+                        // Force hide after selection
+                        setTimeout(forceHidePicker, 10);
+                    } else {
+                        component.serverDate = '';
+                        component.displayValue = '';
+                        component.$dispatch('input', '');
+                    }
+                });
+                
+                // ✅ ENTERPRISE-GRADE: Click outside handler
+                document.addEventListener('mousedown', (e) => {
+                    if (!component.picker || isOpening) return;
+                    
+                    const pickerEl = component.picker.picker?.element;
+                    if (!pickerEl) return;
+                    
+                    // Only check active class for visibility (more reliable)
+                    const isVisible = pickerEl.classList.contains('active');
+                    if (!isVisible) return;
+                    
+                    // Check if click is outside both input and picker
+                    if (!pickerEl.contains(e.target) && !el.contains(e.target)) {
+                        forceHidePicker();
+                    }
+                });
+                
+                // Handle manual clear
+                el.addEventListener('input', (e) => {
+                    if (!el.value.trim()) {
+                        component.serverDate = '';
+                        component.displayValue = '';
+                        component.$dispatch('input', '');
+                    }
+                });
+            });
+        }
+    }"
+    wire:ignore>
+
     @if($label)
-    <label for="{{ $inputId }}" class="block mb-2 text-sm font-semibold {{ $error ? 'text-red-700' : 'text-gray-700' }}">
+    <label for="{{ $inputId }}" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
         {{ $label }}
         @if($required)
         <span class="text-red-500 ml-0.5">*</span>
@@ -32,205 +165,43 @@ $inputClasses = $error
     </label>
     @endif
 
-    <div class="relative group">
-        <div class="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none">
-            <x-iconify icon="lucide:calendar-days" class="w-5 h-5 {{ $error ? 'text-red-500' : 'text-gray-400 group-hover:text-blue-600 transition-colors duration-200' }}" />
+    <div class="relative">
+        {{-- Calendar Icon --}}
+        <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none z-10">
+            <svg class="w-4 h-4 {{ $error ? 'text-red-500' : 'text-gray-500 dark:text-gray-400' }}"
+                aria-hidden="true"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="currentColor"
+                viewBox="0 0 20 20">
+                <path d="M20 4a2 2 0 0 0-2-2h-2V1a1 1 0 0 0-2 0v1h-3V1a1 1 0 0 0-2 0v1H6V1a1 1 0 0 0-2 0v1H2a2 2 0 0 0-2 2v2h20V4ZM0 18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8H0v10Zm5-8h10a1 1 0 0 1 0 2H5a1 1 0 0 1 0-2Z" />
+            </svg>
         </div>
+
+        {{-- Display Input (User sees this) --}}
         <input
+            x-ref="displayInput"
             type="text"
-            name="{{ $name }}"
             id="{{ $inputId }}"
             class="{{ $inputClasses }}"
             placeholder="{{ $placeholder }}"
-            value="{{ old($name, $value) }}"
-            @if($required) required @endif
+            x-model="displayValue"
             @if($disabled) disabled @endif
-            @if($minDate) data-min-date="{{ $minDate }}" @endif
-            @if($maxDate) data-max-date="{{ $maxDate }}" @endif
-            data-date-format="{{ $format }}"
+            @if($required) required @endif
             autocomplete="off"
-            {{ $attributes->except(['class']) }} />
+            readonly>
+
+        {{-- Hidden Input (Server receives this in Y-m-d format) --}}
+        <input type="hidden" name="{{ $name }}" x-model="serverDate">
     </div>
 
     @if($error)
-    <p class="mt-2 text-sm text-red-600 flex items-start font-medium">
-        <x-iconify icon="lucide:circle-alert" class="w-4 h-4 mr-1.5 mt-0.5 flex-shrink-0" />
-        <span>{{ $error }}</span>
+    <p class="mt-2 text-sm text-red-600 dark:text-red-500 flex items-center gap-1">
+        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+        </svg>
+        {{ $error }}
     </p>
     @elseif($helpText)
-    <p class="mt-2 text-sm text-gray-500 flex items-start">
-        <x-iconify icon="lucide:info" class="w-4 h-4 text-gray-400 mr-1.5 mt-0.5 flex-shrink-0" />
-        <span>{{ $helpText }}</span>
-    </p>
+    <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">{{ $helpText }}</p>
     @endif
 </div>
-
-@once
-@push('styles')
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/light.css">
-<style>
-    /* 🎨 FLATPICKR ENTERPRISE-GRADE ULTRA-PRO V2 - Standard Variant */
-
-    .flatpickr-calendar {
-        background-color: #ffffff !important;
-        border: 0 !important;
-        border-radius: 1rem !important;
-        box-shadow:
-            0 0 0 1px rgba(0, 0, 0, 0.03),
-            0 20px 25px -5px rgba(0, 0, 0, 0.08),
-            0 10px 10px -5px rgba(0, 0, 0, 0.02) !important;
-        font-family: 'Plus Jakarta Sans', system-ui, sans-serif !important;
-        margin-top: 8px;
-        width: 320px !important;
-        padding: 0 !important;
-        overflow: hidden;
-    }
-
-    .flatpickr-calendar:before,
-    .flatpickr-calendar:after {
-        display: none !important;
-    }
-
-    .flatpickr-months {
-        background: #ffffff !important;
-        border-bottom: 1px solid #f3f4f6;
-        padding: 1.25rem 0.5rem 0.5rem 0.5rem !important;
-    }
-
-    .flatpickr-current-month .flatpickr-monthDropdown-months {
-        background: white !important;
-        border: 1px solid #e5e7eb !important;
-        border-radius: 0.5rem !important;
-        color: #111827 !important;
-        font-weight: 600 !important;
-        padding: 0.25rem 0.5rem !important;
-        appearance: none;
-        -webkit-appearance: none;
-        transition: all 0.2s;
-    }
-
-    .flatpickr-current-month .flatpickr-monthDropdown-months:hover {
-        border-color: #d1d5db !important;
-        background-color: #f9fafb !important;
-    }
-
-    .flatpickr-current-month .flatpickr-monthDropdown-months option {
-        background-color: white !important;
-        color: #111827 !important;
-        padding: 8px;
-    }
-
-    .flatpickr-current-month input.cur-year {
-        background: white !important;
-        border: 1px solid #e5e7eb !important;
-        border-radius: 0.5rem !important;
-        color: #111827 !important;
-        font-weight: 600 !important;
-        padding: 0.25rem 0.5rem !important;
-    }
-
-    .flatpickr-months .flatpickr-prev-month,
-    .flatpickr-months .flatpickr-next-month {
-        top: 1.25rem !important;
-        padding: 0.5rem !important;
-        height: 2rem !important;
-        width: 2rem !important;
-        border-radius: 0.5rem;
-        fill: #6b7280 !important;
-    }
-
-    .flatpickr-months .flatpickr-prev-month:hover,
-    .flatpickr-months .flatpickr-next-month:hover {
-        background: #f3f4f6 !important;
-        fill: #111827 !important;
-    }
-
-    .flatpickr-weekdays {
-        background: #f9fafb !important;
-        padding: 0.75rem 0.5rem !important;
-        margin-bottom: 0.5rem;
-    }
-
-    .flatpickr-weekday {
-        color: #6b7280 !important;
-        font-weight: 700 !important;
-        text-transform: uppercase;
-    }
-
-    .flatpickr-days {
-        padding: 0 0.5rem 0.75rem 0.5rem !important;
-    }
-
-    .flatpickr-day {
-        max-width: 38px !important;
-        height: 38px !important;
-        line-height: 38px !important;
-        margin: 2px !important;
-        border-radius: 0.6rem !important;
-        color: #374151 !important;
-        font-weight: 500;
-        border: 1px solid transparent;
-    }
-
-    .flatpickr-day.today {
-        background: #eff6ff !important;
-        border: 1px solid #bfdbfe !important;
-        color: #2563eb !important;
-        font-weight: 600;
-    }
-
-    .flatpickr-day.selected,
-    .flatpickr-day.selected:hover {
-        background: #2563eb !important;
-        color: white !important;
-        border-color: #2563eb !important;
-        box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.3);
-        font-weight: 600;
-    }
-
-    .flatpickr-day:hover:not(.selected):not(.flatpickr-disabled):not(.today) {
-        background: #f3f4f6 !important;
-        transform: scale(1.1);
-    }
-
-    input.datepicker.border-red-500+.flatpickr-calendar {
-        box-shadow: 0 0 0 2px rgb(239 68 68), 0 20px 25px -5px rgba(239, 68, 68, 0.15) !important;
-    }
-</style>
-@endpush
-
-@push('scripts')
-<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/fr.js"></script>
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        document.querySelectorAll('.datepicker').forEach(function(el) {
-            if (el._flatpickr) return;
-
-            const minDate = el.getAttribute('data-min-date');
-            const maxDate = el.getAttribute('data-max-date');
-            const dateFormat = el.getAttribute('data-date-format') || 'd/m/Y';
-
-            flatpickr(el, {
-                locale: 'fr',
-                dateFormat: dateFormat,
-                minDate: minDate,
-                maxDate: maxDate,
-                allowInput: true,
-                disableMobile: true,
-                monthSelectorType: 'dropdown',
-                yearSelectorType: 'static',
-                nextArrow: '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>',
-                prevArrow: '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>',
-                onReady: function(selectedDates, dateStr, instance) {
-                    if (el.classList.contains('border-red-500')) {
-                        instance.calendarContainer.classList.add('error-calendar');
-                    }
-                }
-            });
-        });
-    });
-</script>
-@endpush
-@endonce

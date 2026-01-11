@@ -1,0 +1,134 @@
+/* ====================================
+   📅 DATEPICKER FLOWBITE ULTRA-PRO (COMPACT & BORDERLESS)
+   ==================================== */
+
+/* Main Container : Fond blanc + Ombre légère + SANS bordure */
+.datepicker-dropdown {
+    @apply bg-white rounded-xl p-3 font-sans !important;
+    border: none !important;
+    box-shadow: 0 4px 15px -3px rgba(0, 0, 0, 0.1), 0 2px 6px -2px rgba(0, 0, 0, 0.05) !important;
+    /* shadow-lg réduit */
+    z-index: 9999 !important;
+    animation: fadeIn 0.15s ease-out;
+}
+
+/* Override base picker border */
+.datepicker-dropdown .datepicker-picker {
+    border: none !important;
+    box-shadow: none !important;
+    background: transparent !important;
+}
+
+/* Header (Mois/Année) */
+.datepicker-picker .datepicker-header .datepicker-controls {
+    @apply mb-2 flex items-center justify-between;
+}
+
+/* Boutons Navigation (< >) */
+.datepicker-picker .datepicker-header .datepicker-controls .button {
+    @apply bg-white text-gray-700 hover:bg-gray-100 rounded-lg h-8 w-8 flex items-center justify-center transition-all duration-200 !important;
+    border: none !important;
+    box-shadow: none !important;
+}
+
+.datepicker-picker .datepicker-header .datepicker-controls .button:hover {
+    @apply text-blue-600;
+}
+
+/* Titre Mois/Année */
+.datepicker-picker .datepicker-header .datepicker-controls .button.view-switch {
+    @apply w-auto px-3 font-semibold text-sm tracking-tight bg-transparent hover:bg-gray-100;
+    border: none !important;
+}
+
+/* Jours de la semaine (Lun, Mar...) */
+.datepicker-picker .datepicker-main .days-of-week {
+    @apply grid grid-cols-7 mb-1;
+}
+
+.datepicker-picker .datepicker-main .days-of-week .dow {
+    @apply text-center text-[10px] font-bold text-gray-400 uppercase tracking-wider py-1;
+}
+
+/* Grille des jours - Taille compacte */
+.datepicker-main {
+    @apply w-56 !important;
+}
+
+.datepicker-picker .datepicker-main .datepicker-grid {
+    @apply gap-0.5;
+}
+
+/* Cellules (Jours) */
+.datepicker-picker .datepicker-main .datepicker-grid .datepicker-cell {
+    @apply h-8 w-8 rounded-lg flex items-center justify-center text-xs font-medium text-gray-700 transition-all duration-150;
+    border: none !important;
+}
+
+/* État Hover */
+.datepicker-picker .datepicker-main .datepicker-grid .datepicker-cell:not(.disabled):not(.selected):hover {
+    @apply bg-blue-50 text-blue-600 font-semibold;
+}
+
+/* État Sélectionné */
+.datepicker-picker .datepicker-main .datepicker-grid .datepicker-cell.selected {
+    @apply bg-blue-600 text-white font-bold !important;
+    border: none !important;
+}
+
+/* Aujourd'hui (non sélectionné) */
+.datepicker-picker .datepicker-main .datepicker-grid .datepicker-cell.today:not(.selected) {
+    @apply bg-blue-100 text-blue-700 font-bold;
+    border: none !important;
+}
+
+/* Aujourd'hui (sélectionné) */
+.datepicker-picker .datepicker-main .datepicker-grid .datepicker-cell.today.selected {
+    @apply bg-blue-600 text-white;
+}
+
+/* Mois / Années (Vues supérieures) */
+.datepicker-picker .datepicker-main .datepicker-grid .datepicker-cell.month,
+.datepicker-picker .datepicker-main .datepicker-grid .datepicker-cell.year {
+    @apply h-10 rounded-lg text-xs;
+}
+
+/* Désactivé */
+.datepicker-picker .datepicker-main .datepicker-grid .datepicker-cell.disabled {
+    @apply text-gray-300 cursor-not-allowed bg-transparent;
+}
+
+/* Days from prev/next month */
+.datepicker-picker .datepicker-main .datepicker-grid .datepicker-cell.prev,
+.datepicker-picker .datepicker-main .datepicker-grid .datepicker-cell.next {
+    @apply text-gray-300;
+}
+
+/* Footer (Boutons action) */
+.datepicker-footer {
+    @apply pt-2 mt-2 border-t border-gray-100;
+    background: transparent !important;
+    box-shadow: none !important;
+}
+
+.datepicker-footer .datepicker-controls .button {
+    @apply py-1.5 px-3 rounded-lg text-xs font-medium transition-colors !important;
+    border: none !important;
+    margin: 2px !important;
+}
+
+.datepicker-footer .datepicker-controls .button.today-btn {
+    @apply bg-blue-50 text-blue-700 hover:bg-blue-100;
+}
+
+.datepicker-footer .datepicker-controls .button.clear-btn {
+    @apply bg-gray-50 text-gray-500 hover:text-red-600 hover:bg-red-50;
+}
+
+/* ✅ FORCE HIDDEN STATE */
+.datepicker-dropdown.hidden,
+.datepicker-dropdown[style*="display: none"] {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+}
