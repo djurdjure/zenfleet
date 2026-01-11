@@ -473,17 +473,10 @@
                     <div wire:ignore x-data="{
                         instance: null,
                         value: @entangle('driver_id'),
-                        init() {
-                            this.$nextTick(() => {
-                                this.initSlimSelect();
-                            });
-                        },
-                        initSlimSelect() {
-                            if (this.instance) {
-                                this.instance.destroy();
-                            }
+                        initSelect() {
+                            if (this.instance) return;
                             this.instance = new SlimSelect({
-                                select: this.$refs.driverSelect,
+                                select: this.$refs.select,
                                 settings: {
                                     showSearch: true,
                                     searchPlaceholder: 'Rechercher un chauffeur...',
@@ -493,25 +486,29 @@
                                 },
                                 events: {
                                     afterChange: (newVal) => {
-                                        if (newVal && newVal[0]) {
-                                            this.value = newVal[0].value;
-                                        } else {
-                                            this.value = '';
-                                        }
+                                        this.value = newVal && newVal.length > 0 ? newVal[0].value : null;
                                     }
                                 }
-                            // Watch for value changes from Livewire
+                            });
+                            
+                            // Watch for changes from Livewire
                             this.$watch('value', (val) => {
-                                if (this.instance && val !== this.instance.getSelected()[0]) {
+                                if (this.instance && val != this.instance.getSelected()[0]) {
                                     this.instance.setSelected(val);
                                 }
                             });
+
+                            // Set initial value
+                            if (this.value) {
+                                this.instance.setSelected(this.value);
+                            }
                         }
-                    }">
+                    }"
+                        x-init="initSelect()">
                         <label class="block mb-2 text-sm font-medium text-gray-900">
                             Chauffeur <span class="text-red-500">*</span>
                         </label>
-                        <select x-ref="driverSelect" class="slimselect-field w-full">
+                        <select x-ref="select" class="slimselect-field w-full">
                             <option value="" data-placeholder="true">Sélectionner un chauffeur</option>
                             @foreach($drivers as $driver)
                             <option value="{{ $driver->id }}">{{ $driver->first_name }} {{ $driver->last_name }} - {{ $driver->employee_number }}</option>
@@ -617,17 +614,52 @@
 
                     {{-- Statut et Notes --}}
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                            <x-slim-select
-                                wire:model="status"
-                                name="status"
-                                label="Statut"
-                                :options="[
- 'active' => 'Active',
- 'appealed' => 'Contestée',
- 'cancelled' => 'Annulée',
- 'archived' => 'Archivée'
- ]" />
+                        <div wire:ignore x-data="{
+                            instance: null,
+                            value: @entangle('status'),
+                            init() {
+                                this.$nextTick(() => {
+                                    this.initSlimSelect();
+                                });
+                                this.$watch('value', (val) => {
+                                    if (this.instance) {
+                                        this.instance.setSelected(val);
+                                    }
+                                });
+                            },
+                            initSlimSelect() {
+                                if (this.instance) {
+                                    this.instance.destroy();
+                                }
+                                this.instance = new SlimSelect({
+                                    select: this.$refs.statusSelect,
+                                    settings: {
+                                        showSearch: false,
+                                        placeholderText: 'Sélectionner un statut',
+                                        allowDeselect: false,
+                                    },
+                                    events: {
+                                        afterChange: (newVal) => {
+                                            if (newVal && newVal[0]) {
+                                                this.value = newVal[0].value;
+                                            }
+                                        }
+                                    }
+                                });
+                                if (this.value) {
+                                    this.instance.setSelected(this.value);
+                                }
+                            }
+                        }">
+                            <label class="block mb-2 text-sm font-medium text-gray-900">
+                                Statut <span class="text-red-500">*</span>
+                            </label>
+                            <select x-ref="statusSelect" class="slimselect-field w-full">
+                                <option value="active">Active</option>
+                                <option value="appealed">Contestée</option>
+                                <option value="cancelled">Annulée</option>
+                                <option value="archived">Archivée</option>
+                            </select>
                         </div>
 
                         <div>

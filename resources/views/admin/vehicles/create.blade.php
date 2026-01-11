@@ -346,10 +346,15 @@
                                     </div>
 
                                     <div class="md:col-span-2">
+                                        @php
+                                        $userOptions = $users->mapWithKeys(function($user) {
+                                        return [$user->id => $user->name . ' (' . $user->email . ')'];
+                                        })->toArray();
+                                        @endphp
                                         <x-slim-select
                                             name="users"
                                             label="Utilisateurs Autorisés"
-                                            :options="$users->mapWithKeys(fn($user) => [$user->id => $user->name . ' (' . $user->email . ')'])->toArray()"
+                                            :options="$userOptions"
                                             :selected="old('users', [])"
                                             placeholder="Rechercher des utilisateurs..."
                                             :multiple="true"
