@@ -13,6 +13,9 @@ import 'slim-select/styles';
 import 'flatpickr/dist/flatpickr.min.css';
 import '../../css/admin/datepicker-base.css';
 import '../../css/admin/datepicker-ultra-pro.css';
+// ✅ ENTERPRISE: Flowbite Datepicker Data (for x-data="zenfleetDatepicker")
+import { zenfleetDatepickerData } from '../components/zenfleet-datepicker';
+import 'tom-select/dist/css/tom-select.default.css';
 
 // ✅ ENTERPRISE: Import SlimSelect and expose as global (for x-slim-select component)
 import SlimSelect from 'slim-select';
@@ -31,11 +34,12 @@ import { French } from 'flatpickr/dist/l10n/fr.js';
 // ✅ FLOWBITE DATEPICKER
 import Datepicker from 'flowbite-datepicker/Datepicker';
 import fr from './locales/fr.js';
+import TomSelect from 'tom-select';
 
 // Configuration sécurisée des objets globaux admin
 const initializeAdminGlobals = () => {
     window.axios = axios;
-    // window.TomSelect est chargé via CDN
+    window.TomSelect = TomSelect;
     window.flatpickr = flatpickr;
 
     // ✅ FLOWBITE SETUP
@@ -696,6 +700,9 @@ class ZenFleetAdmin {
 
 // ✅ INITIALISATION LIVEWIRE + ALPINE
 // Démarrer Livewire (doit être fait AVANT DOMContentLoaded)
+// Register ZenFleet components on Livewire's Alpine instance
+Alpine.data('zenfleetDatepicker', zenfleetDatepickerData);
+
 Livewire.start();
 
 // ✅ INITIALISATION GLOBALE

@@ -133,6 +133,8 @@ services:
       - 1.1.1.1
     working_dir: /var/www/html
     tty: true
+    ports:
+      - "5173:5173"
 
   # --- ⏰ SCHEDULER LARAVEL - TÂCHES PLANIFIÉES ENTERPRISE-GRADE ---
   # Ce service exécute le scheduler Laravel toutes les minutes
