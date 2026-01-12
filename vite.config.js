@@ -1,20 +1,21 @@
 import { defineConfig } from 'vite';
 import laravel from 'laravel-vite-plugin';
+import tailwindcss from '@tailwindcss/vite';
 
 export default defineConfig({
     plugins: [
         laravel({
             input: [
-                // ✅ CORRECTION: Les DEUX points d'entrée
-                'resources/js/app.js',        // Pages publiques
-                'resources/js/admin/app.js',  // Admin
+                'resources/js/app.js',
+                'resources/js/admin/app.js',
+                'resources/css/app.css',
+                'resources/css/admin/app.css'
             ],
-            refresh: [
-                'resources/views/**/*.blade.php',
-            ],
+            refresh: true,
         }),
+        tailwindcss(),
     ],
-    
+
     build: {
         outDir: 'public/build',
         emptyOutDir: true,
@@ -37,14 +38,4 @@ export default defineConfig({
     optimizeDeps: {
         include: ['slim-select', 'alpinejs', 'axios', 'apexcharts', 'flatpickr', 'sortablejs']
     },
-    
-    server: {
-        hmr: { host: 'localhost' },
-        watch: { usePolling: true, interval: 1000 },
-    },
-    
-    css: {
-        postcss: './postcss.config.js',
-    },
 });
-

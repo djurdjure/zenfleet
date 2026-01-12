@@ -1,47 +1,4 @@
 @theme {
-    /* -- Font Family -- */
-    --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
-
-    /* -- Spacing -- */
-    --spacing-sidebar: 280px;
-    --spacing-sidebar-collapsed: 80px;
-    --spacing-header: 70px;
-    --spacing-content: 1200px;
-
-    /* -- Animations -- */
-    --animate-fade-in: fadeIn 0.3s ease-in-out;
-    --animate-slide-in: slideIn 0.3s ease-out;
-    --animate-pulse-slow: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-
-    @keyframes fadeIn {
-        0% {
-            opacity: 0;
-        }
-
-        100% {
-            opacity: 1;
-        }
-    }
-
-    @keyframes slideIn {
-        0% {
-            transform: translateX(-100%);
-        }
-
-        100% {
-            transform: translateX(0);
-        }
-    }
-
-    /* -- Box Shadows -- */
-    --shadow-zenfleet: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
-    0 2px 4px -1px rgba(0, 0, 0, 0.06);
-    --shadow-zenfleet-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1),
-    0 4px 6px -2px rgba(0, 0, 0, 0.05);
-    --shadow-zenfleet-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1),
-    0 10px 10px -5px rgba(0, 0, 0, 0.04);
-
-    /* -- Colors: ZenFleet Aliases -- */
     --color-zenfleet-primary: #0ea5e9;
     --color-zenfleet-secondary: #1e293b;
     --color-zenfleet-success: #22c55e;
@@ -49,7 +6,6 @@
     --color-zenfleet-danger: #ef4444;
     --color-zenfleet-info: #06b6d4;
 
-    /* -- Colors: Primary (Blue Sky) -- */
     --color-primary-50: #f0f9ff;
     --color-primary-100: #e0f2fe;
     --color-primary-200: #bae6fd;
@@ -62,7 +18,6 @@
     --color-primary-900: #0c4a6e;
     --color-primary-950: #082f49;
 
-    /* -- Colors: Secondary (Slate) -- */
     --color-secondary-50: #f8fafc;
     --color-secondary-100: #f1f5f9;
     --color-secondary-200: #e2e8f0;
@@ -75,7 +30,6 @@
     --color-secondary-900: #0f172a;
     --color-secondary-950: #020617;
 
-    /* -- Colors: Success (Green) -- */
     --color-success-50: #f0fdf4;
     --color-success-100: #dcfce7;
     --color-success-200: #bbf7d0;
@@ -88,7 +42,6 @@
     --color-success-900: #14532d;
     --color-success-950: #052e16;
 
-    /* -- Colors: Warning (Amber) -- */
     --color-warning-50: #fffbeb;
     --color-warning-100: #fef3c7;
     --color-warning-200: #fde68a;
@@ -101,7 +54,6 @@
     --color-warning-900: #78350f;
     --color-warning-950: #451a03;
 
-    /* -- Colors: Danger (Red) -- */
     --color-danger-50: #fef2f2;
     --color-danger-100: #fee2e2;
     --color-danger-200: #fecaca;
@@ -114,7 +66,6 @@
     --color-danger-900: #7f1d1d;
     --color-danger-950: #450a0a;
 
-    /* -- Colors: Info (Cyan) -- */
     --color-info-50: #ecfeff;
     --color-info-100: #cffafe;
     --color-info-200: #a5f3fc;
@@ -126,4 +77,13 @@
     --color-info-800: #155e75;
     --color-info-900: #164e63;
     --color-info-950: #083344;
+
+    --spacing-sidebar: 280px;
+    --spacing-sidebar-collapsed: 80px;
+    --spacing-header: 70px;
+    --spacing-content: 1200px;
+
+    --shadow-zenfleet: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    --shadow-zenfleet-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    --shadow-zenfleet-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
 }

@@ -19,7 +19,7 @@ import SlimSelect from 'slim-select';
 window.SlimSelect = SlimSelect;
 
 // ✅ CRITIQUE: Import Livewire 3 pour wire:click et composants Livewire
-import { Livewire, Alpine } from '../../../vendor/livewire/livewire/dist/livewire.esm.js';
+import { Livewire, Alpine } from '../../../vendor/livewire/livewire/dist/livewire.esm';
 
 // Import des dépendances système (ESM)
 import axios from 'axios';

@@ -1,6 +1,6 @@
 /**
  * 🎯 ZENFLEET SLIMSELECT WRAPPER - ULTRA-PRO ENTERPRISE-GRADE
- *
+ * 
  * Wrapper optimisé pour SlimSelect avec intégration native:
  * ✅ Alpine.js v3.x full integration
  * ✅ Livewire v3.x bidirectional sync
@@ -10,7 +10,7 @@
  * ✅ Dark mode support
  * ✅ Error handling & logging
  * ✅ Event system enterprise
- *
+ * 
  * @version 2.0.0-Enterprise
  * @author ZenFleet Architecture Team
  * @standard Surpasse Fleetio, Samsara, Verizon Connect
@@ -33,13 +33,13 @@ const ZENFLEET_DEFAULTS = {
         placeholderText: 'Sélectionner une option',
         maxValuesShown: 20,
         maxValuesMessage: '{number} élément(s) sélectionné(s)',
-        contentLocation: document.body,  // Pour éviter overflow issues
+        contentLocation: document.body,
         contentPosition: 'auto'
     },
     events: {},
     performance: {
         enableMetrics: true,
-        logLevel: 'info' // 'debug', 'info', 'warn', 'error'
+        logLevel: 'info'
     }
 };
 
@@ -48,9 +48,7 @@ const ZENFLEET_DEFAULTS = {
  */
 class ZenFleetSelect {
     constructor(element, options = {}) {
-        this.element = typeof element === 'string'
-            ? document.querySelector(element)
-            : element;
+        this.element = typeof element === 'string' ? document.querySelector(element) : element;
 
         if (!this.element) {
             this.logError('Element not found', { selector: element });
@@ -61,6 +59,14 @@ class ZenFleetSelect {
         this.slimInstance = null;
         this.livewireComponent = null;
         this.fallbackInput = null;
+        this.observers = [];
+        this.performanceMetrics = {
+            initTime: 0,
+            searchTime: 0,
+            searchCount: 0,
+            lastSearchQuery: ''
+        };
+
         this.init();
     }
 
@@ -84,8 +90,7 @@ class ZenFleetSelect {
         // Auto-détection Livewire
         if (this.element.hasAttribute('wire:model') || this.element.hasAttribute('wire:model.live')) {
             merged.livewireSync = true;
-            merged.livewireProperty = this.element.getAttribute('wire:model') ||
-                this.element.getAttribute('wire:model.live');
+            merged.livewireProperty = this.element.getAttribute('wire:model') || this.element.getAttribute('wire:model.live');
         }
 
         // Auto-détection multi-select
@@ -93,11 +98,10 @@ class ZenFleetSelect {
             merged.settings.closeOnSelect = false;
         }
 
-        // ✅ Auto-configuration depuis les attributs DOM
+        // Auto-configuration depuis les attributs DOM
         const placeholder = this.element.getAttribute('data-placeholder') || this.element.getAttribute('placeholder');
         if (placeholder) {
             merged.settings.placeholderText = placeholder;
-            // Si pas de searchPlaceholder spécifique, utiliser une valeur par défaut cohérente
             if (!merged.settings.searchPlaceholder) {
                 merged.settings.searchPlaceholder = 'Rechercher...';
             }
@@ -118,10 +122,10 @@ class ZenFleetSelect {
         const startTime = performance.now();
 
         try {
-            // ✅ Detection du champ fallback (hidden input)
-            // Doit être le précédent sibling immédiat avec le même nom (sans [])
+            // Detection du champ fallback (hidden input)
             const inputName = this.element.name.replace('[]', '');
             const prevEl = this.element.previousElementSibling;
+
             if (prevEl && prevEl.tagName === 'INPUT' && prevEl.type === 'hidden' && prevEl.name === inputName) {
                 this.fallbackInput = prevEl;
                 this.log('debug', 'Fallback input found', { name: inputName });
@@ -163,9 +167,9 @@ class ZenFleetSelect {
                 multiple: this.element.hasAttribute('multiple')
             });
 
-            // ✅ Enterprise Fix: Ensure robust sync with original select AND fallback input initialization
+            // Enterprise Fix: Ensure robust sync
             this.setupFormSync();
-            this.manageFallbackInput(); // Init state based on current selection
+            this.manageFallbackInput();
 
         } catch (error) {
             this.logError('Initialization failed', error);
@@ -180,6 +184,7 @@ class ZenFleetSelect {
 
         // Extraction depuis les options HTML
         const options = Array.from(this.element.options);
+
         return options.map(opt => ({
             text: opt.textContent.trim(),
             value: opt.value,
@@ -199,10 +204,8 @@ class ZenFleetSelect {
             afterChange: (newVal) => {
                 this.log('debug', 'Value changed', { newValue: newVal });
 
-                // ✅ Enterprise Fix: Sync immediately on change
+                // Enterprise Fix: Sync immediately on change
                 this.syncToOriginalSelect();
-
-                // ✅ Update fallback input state
                 this.manageFallbackInput();
 
                 // Callback utilisateur
@@ -222,10 +225,9 @@ class ZenFleetSelect {
                 }));
             },
 
-            // Événement recherche avec monitoring performance
+            // Événement recherche
             search: (search, currentData) => {
                 const startTime = performance.now();
-
                 this.performanceMetrics.lastSearchQuery = search;
                 this.performanceMetrics.searchCount++;
 
@@ -305,15 +307,15 @@ class ZenFleetSelect {
     }
 
     /**
-     * ✅ Enterprise Logic: Setup Form Synchronization
-     * Ensures that values are forcefully synced to the original select before submit
+     * Enterprise Logic: Setup Form Synchronization
      */
     setupFormSync() {
         const form = this.element.closest('form');
+
         if (form && !form.dataset.zenfleetSelectHandlerAttached) {
             form.dataset.zenfleetSelectHandlerAttached = 'true';
 
-            // Capture phase event listener to run before other handlers
+            // Capture phase event listener
             form.addEventListener('submit', () => {
                 form.querySelectorAll('select').forEach(select => {
                     if (select.zenfleetSelect) {
@@ -327,8 +329,7 @@ class ZenFleetSelect {
     }
 
     /**
-     * ✅ Enterprise Logic: Force Sync to Original Select
-     * Critical for multi-selects where DOM state might desync
+     * Enterprise Logic: Force Sync to Original Select
      */
     syncToOriginalSelect() {
         if (!this.slimInstance) return;
@@ -343,16 +344,12 @@ class ZenFleetSelect {
 
         // Set selected options
         valueArray.forEach(val => {
-            // Handle both primitive values and object values from SlimSelect
             const value = (val && typeof val === 'object' && 'value' in val) ? val.value : val;
-
-            // Find specific option to handle special characters in values safely
-            // We use attribute selector for exact match
             const option = Array.from(this.element.options).find(opt => opt.value === String(value));
 
             if (option) {
                 option.selected = true;
-                option.setAttribute('selected', 'selected'); // Force attribute update for serialization
+                option.setAttribute('selected', 'selected');
             }
         });
 
@@ -360,9 +357,7 @@ class ZenFleetSelect {
     }
 
     /**
-     * ✅ Enterprise Logic: Manage Fallback Hidden Input
-     * Disables the fallback hidden input if items are selected to prevent
-     * redundant/conflicting data submission (e.g. overwriting with empty string).
+     * Enterprise Logic: Manage Fallback Hidden Input
      */
     manageFallbackInput() {
         if (!this.fallbackInput) return;
@@ -371,11 +366,9 @@ class ZenFleetSelect {
         const hasSelection = Array.isArray(selectedValues) ? selectedValues.length > 0 : !!selectedValues;
 
         if (hasSelection) {
-            // Desactiver le fallback car le select enverra les données
             this.fallbackInput.disabled = true;
             this.log('debug', 'Fallback input DISABLED (selection active)');
         } else {
-            // Activer le fallback pour envoyer use valeur vide
             this.fallbackInput.disabled = false;
             this.log('debug', 'Fallback input ENABLED (no selection)');
         }
@@ -387,6 +380,7 @@ class ZenFleetSelect {
     setupLivewireSync() {
         // Détection du composant Livewire parent
         const livewireEl = this.element.closest('[wire\\:id]');
+
         if (!livewireEl) {
             this.log('warn', 'Livewire component not found for sync');
             return;
@@ -406,6 +400,7 @@ class ZenFleetSelect {
                 if (this.slimInstance && value !== undefined) {
                     // Éviter boucles infinies
                     const currentValue = this.slimInstance.getSelected();
+
                     if (JSON.stringify(currentValue) !== JSON.stringify(value)) {
                         this.slimInstance.setSelected(value);
                         this.log('debug', 'Livewire → SlimSelect sync', { value });
@@ -417,6 +412,7 @@ class ZenFleetSelect {
                 property: this.options.livewireProperty,
                 wireId
             });
+
         } catch (error) {
             this.logError('Livewire watch setup failed', error);
         }
@@ -441,6 +437,7 @@ class ZenFleetSelect {
      */
     applyZenFleetStyling() {
         const container = this.element.parentElement.querySelector('.ss-main');
+
         if (!container) {
             this.log('warn', 'SlimSelect container not found for styling');
             return;
@@ -510,7 +507,7 @@ class ZenFleetSelect {
 
         // Affichage utilisateur discret
         const errorMsg = document.createElement('div');
-        errorMsg.className = 'zenfleet-select-error text-red-600 dark:text-red-400 text-xs mt-1 flex items-center gap-1';
+        errorMsg.className = 'zenfleet-select-error text-red-600 text-xs mt-1 flex items-center gap-1';
         errorMsg.innerHTML = `
             <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                 <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
@@ -693,6 +690,7 @@ export function zenfleetSelectData() {
         init() {
             // Auto-init si l'élément a x-ref="select"
             const selectEl = this.$refs.select || this.$el.querySelector('select');
+
             if (selectEl) {
                 this.selectInstance = new ZenFleetSelect(selectEl, this.selectOptions || {});
             }
