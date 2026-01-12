@@ -3,6 +3,9 @@
  * Version: 2.1 Admin-Pro
  * Spécialisé pour l'interface d'administration
  */
+// 🚫 FORCE LIGHT THEME (Enterprise Standard)
+document.documentElement.classList.remove('dark');
+if (localStorage.theme === 'dark') localStorage.removeItem('theme');
 
 // ✅ CORRECTION: Import CSS admin en premier
 import '../../css/admin/app.css';

@@ -10,6 +10,10 @@
 import '../css/app.css';
 
 // Import des dépendances système
+// 🚫 FORCE LIGHT THEME (Enterprise Standard)
+document.documentElement.classList.remove('dark');
+if (localStorage.theme === 'dark') localStorage.removeItem('theme');
+
 import './bootstrap';
 
 // Import des librairies tierces avec optimisation

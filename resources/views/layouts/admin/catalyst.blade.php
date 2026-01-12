@@ -124,7 +124,8 @@
         }
     </style>
 
-    @vite(['resources/js/admin/app.js'])
+    <!-- 🚀 Performance: Load CSS in Parallel (No JS blocking) -->
+    @vite(['resources/css/app.css', 'resources/css/admin/app.css', 'resources/js/admin/app.js'])
     @stack('styles')
     @livewireStyles
 </head>
