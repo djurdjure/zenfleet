@@ -1,0 +1,37 @@
+@layer components {
+    .zenfleet-card {
+        @apply bg-white rounded-xl shadow-zenfleet border border-gray-200 overflow-hidden;
+        @apply transition-all duration-300;
+    }
+
+    .zenfleet-card:hover {
+        @apply shadow-zenfleet-lg -translate-y-[2px];
+    }
+
+    .zenfleet-btn {
+        @apply inline-flex items-center justify-center px-4 py-2 text-sm font-medium rounded-lg;
+        @apply border border-transparent cursor-pointer no-underline transition-all duration-200;
+    }
+
+    .zenfleet-input {
+        @apply block w-full px-3 py-2 text-sm border border-gray-300 rounded-lg;
+        @apply transition-all duration-200;
+    }
+
+    .zenfleet-input:focus {
+        @apply outline-none ring-2 ring-primary-500 border-primary-500;
+    }
+
+    /* Utility classes that were in JS plugin */
+    .sidebar-width {
+        width: var(--spacing-sidebar);
+    }
+
+    .sidebar-collapsed-width {
+        width: var(--spacing-sidebar-collapsed);
+    }
+
+    .header-height {
+        height: var(--spacing-header);
+    }
+}

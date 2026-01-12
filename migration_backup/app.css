@@ -1,0 +1,78 @@
+/*!
+ * 🚀 ZENFLEET - CSS Principal (Pages Publiques)
+ * Compatible avec Tailwind CSS + Vite
+ */
+
+/* ✅ Import des librairies tierces EN PREMIER */
+@import 'flatpickr/dist/flatpickr.min.css';
+
+/* ✅ Import ZenFleet Select (SlimSelect wrapper) */
+@import './components/zenfleet-select.css';
+
+/* ✅ Import des styles personnalisés pour les statuts de véhicules */
+@import './vehicle-status.css';
+
+/* ✅ Import des composants de formulaire (form-section, form-input, etc.) */
+@import './components/form-components.css';
+
+/* ✅ Import Tailwind CSS */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Alpine.js - Hide elements with x-cloak until Alpine is ready */
+[x-cloak] {
+    display: none !important;
+}
+
+/* Variables globales ZenFleet */
+@layer base {
+    :root {
+        --zenfleet-primary: #3b82f6;
+        --zenfleet-secondary: #1e293b;
+        --zenfleet-success: #10b981;
+        --zenfleet-warning: #f59e0b;
+        --zenfleet-danger: #ef4444;
+        --zenfleet-info: #06b6d4;
+    }
+    
+    body {
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        @apply bg-gray-50 text-gray-900 antialiased;
+    }
+}
+
+/* Composants publics */
+@layer components {
+    .zenfleet-card {
+        @apply bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden;
+        @apply transition-all duration-300 hover:shadow-lg;
+    }
+    
+    .zenfleet-btn {
+        @apply inline-flex items-center justify-center px-4 py-2 text-sm font-medium rounded-lg;
+        @apply transition-all duration-200;
+    }
+    
+    .zenfleet-btn-primary {
+        @apply zenfleet-btn bg-blue-600 text-white border border-blue-600;
+        @apply hover:bg-blue-700 focus:ring-4 focus:ring-blue-200;
+    }
+    
+    .zenfleet-input {
+        @apply block w-full px-3 py-2 text-sm border border-gray-300 rounded-lg;
+        @apply focus:ring-2 focus:ring-blue-500 focus:border-blue-500;
+    }
+}
+
+/* Utilitaires */
+@layer utilities {
+    .text-zenfleet-primary {
+        color: var(--zenfleet-primary);
+    }
+    
+    .bg-zenfleet-primary {
+        background-color: var(--zenfleet-primary);
+    }
+}
+

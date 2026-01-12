@@ -55,29 +55,29 @@ class StoreVehicleRequest extends FormRequest
                     ->whereNull('deleted_at')
             ],
             'color' => ['nullable', 'string', 'max:50'],
-            
+
             // ========================================
             // PHASE 2: CARACTÉRISTIQUES (Champs Required)
             // ========================================
             'vehicle_type_id' => ['required', 'exists:vehicle_types,id'],
             'fuel_type_id' => ['required', 'exists:fuel_types,id'],
             'transmission_type_id' => ['required', 'exists:transmission_types,id'],
-            'manufacturing_year' => ['nullable', 'integer', 'digits:4', 'min:1950', 'max:'.(date('Y') + 1)],
+            'manufacturing_year' => ['nullable', 'integer', 'digits:4', 'min:1950', 'max:' . (date('Y') + 1)],
             'seats' => ['nullable', 'integer', 'min:1', 'max:99'],
             'power_hp' => ['nullable', 'integer', 'min:0', 'max:9999'],
             'engine_displacement_cc' => ['nullable', 'integer', 'min:0', 'max:99999'],
-            
+
             // ========================================
             // PHASE 3: ACQUISITION & STATUT (Champs Required)
             // ========================================
             'status_id' => ['required', 'exists:vehicle_statuses,id'],
-            'acquisition_date' => ['required', 'date_format:d/m/Y', 'before_or_equal:today'],
+            'acquisition_date' => ['required', 'date_format:Y-m-d', 'before_or_equal:today'],
             'purchase_price' => ['nullable', 'numeric', 'min:0', 'max:999999999'],
             'current_value' => ['nullable', 'numeric', 'min:0', 'max:999999999'],
             'initial_mileage' => ['nullable', 'integer', 'min:0', 'max:9999999'],
             'current_mileage' => ['nullable', 'integer', 'min:0', 'max:9999999', 'gte:initial_mileage'],
             'notes' => ['nullable', 'string', 'max:5000'],
-            
+
             // ========================================
             // CHAMPS OPTIONNELS
             // ========================================
@@ -96,7 +96,7 @@ class StoreVehicleRequest extends FormRequest
             'photo' => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif', 'max:2048'],
         ];
     }
-    
+
     /**
      * Messages d'erreur personnalisés enterprise-grade
      */
@@ -110,7 +110,7 @@ class StoreVehicleRequest extends FormRequest
             'model.required' => 'Le modèle du véhicule est obligatoire',
             'vin.size' => 'Le VIN doit contenir exactement 17 caractères',
             'vin.unique' => 'Ce numéro VIN existe déjà dans votre organisation',
-            
+
             // Phase 2 - Caractéristiques
             'vehicle_type_id.required' => 'Le type de véhicule est obligatoire',
             'fuel_type_id.required' => 'Le type de carburant est obligatoire',
@@ -120,16 +120,16 @@ class StoreVehicleRequest extends FormRequest
             'manufacturing_year.max' => 'L\'année ne peut pas être dans le futur',
             'seats.min' => 'Le nombre de places doit être au moins 1',
             'seats.max' => 'Le nombre de places ne peut pas dépasser 99',
-            
+
             // Phase 3 - Acquisition
             'status_id.required' => 'Le statut du véhicule est obligatoire',
             'acquisition_date.required' => 'La date d\'acquisition est obligatoire',
-            'acquisition_date.date_format' => 'La date d\'acquisition doit être au format JJ/MM/AAAA',
+            'acquisition_date.date_format' => 'La date d\'acquisition doit être au format valide',
             'acquisition_date.before_or_equal' => 'La date d\'acquisition ne peut pas être dans le futur',
             'current_mileage.gte' => 'Le kilométrage actuel doit être supérieur ou égal au kilométrage initial',
         ];
     }
-    
+
     /**
      * Attributs personnalisés pour messages d'erreur
      */
@@ -152,4 +152,3 @@ class StoreVehicleRequest extends FormRequest
         ];
     }
 }
-

@@ -24,7 +24,7 @@ class UpdateVehicleRequest extends FormRequest
             'manufacturing_year.digits' => 'L\'année de fabrication doit contenir 4 chiffres.',
             'manufacturing_year.min' => 'L\'année de fabrication doit être au minimum 1950.',
             'manufacturing_year.max' => 'L\'année de fabrication ne peut pas dépasser l\'année prochaine.',
-            'acquisition_date.date_format' => 'La date d\'acquisition doit être au format JJ/MM/AAAA.',
+            'acquisition_date.date_format' => 'La date d\'acquisition doit être au format valide.',
             'purchase_price.numeric' => 'Le prix d\'achat doit être un nombre.',
             'purchase_price.min' => 'Le prix d\'achat doit être positif.',
             'current_value.numeric' => 'La valeur actuelle doit être un nombre.',
@@ -98,8 +98,8 @@ class UpdateVehicleRequest extends FormRequest
             'fuel_type_id' => ['nullable', 'exists:fuel_types,id'],
             'transmission_type_id' => ['nullable', 'exists:transmission_types,id'],
             'status_id' => ['nullable', 'exists:vehicle_statuses,id'],
-            'manufacturing_year' => ['nullable', 'integer', 'digits:4', 'min:1950', 'max:'.(date('Y') + 1)],
-            'acquisition_date' => ['nullable', 'date_format:d/m/Y'],
+            'manufacturing_year' => ['nullable', 'integer', 'digits:4', 'min:1950', 'max:' . (date('Y') + 1)],
+            'acquisition_date' => ['nullable', 'date_format:Y-m-d'],
             'purchase_price' => ['nullable', 'numeric', 'min:0'],
             'current_value' => ['nullable', 'numeric', 'min:0'],
             'initial_mileage' => ['nullable', 'integer', 'min:0'],
@@ -112,5 +112,3 @@ class UpdateVehicleRequest extends FormRequest
         ];
     }
 }
-
-
