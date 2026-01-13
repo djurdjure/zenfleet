@@ -20,7 +20,6 @@
         "flowbite-datepicker": "^1.3.1",
         "slim-select": "^2.9.2",
         "sortablejs": "^1.15.6",
-        "svg.js": "^2.7.1",
-        "tom-select": "^2.4.1"
+        "svg.js": "^2.7.1"
     }
 }

@@ -6,7 +6,7 @@
             <!-- Logo Placeholder Section -->
             <div class="flex flex-col items-center justify-center space-y-6">
                 <!-- Logo Placeholder - Can be replaced with actual logo -->
-                <div class="w-16 h-16 rounded-2xl bg-gray-900 flex items-center justify-center shadow-sm">
+                <div class="w-16 h-16 rounded-2xl bg-blue-600 flex items-center justify-center shadow-sm">
                     <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
                     </svg>
@@ -46,12 +46,11 @@
                             autocomplete="username"
                             placeholder="nom@entreprise.com"
                             class="appearance-none block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400
-                                   focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent
+                                   focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent
                                    transition-all duration-200 text-gray-900 text-base
-                                   @error('email') border-red-300 focus:ring-red-500 @enderror"
-                        />
+                                   @error('email') border-red-300 focus:ring-red-500 @enderror" />
                         @error('email')
-                            <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                        <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
                         @enderror
                     </div>
 
@@ -69,15 +68,13 @@
                                 autocomplete="current-password"
                                 placeholder="••••••••••"
                                 class="appearance-none block w-full px-4 py-3 pr-10 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400
-                                       focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent
+                                       focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent
                                        transition-all duration-200 text-gray-900 text-base
-                                       @error('password') border-red-300 focus:ring-red-500 @enderror"
-                            />
+                                       @error('password') border-red-300 focus:ring-red-500 @enderror" />
                             <button
                                 type="button"
                                 @click="showPassword = !showPassword"
-                                class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 transition-colors"
-                            >
+                                class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 transition-colors">
                                 <svg x-show="!showPassword" class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
@@ -88,7 +85,7 @@
                             </button>
                         </div>
                         @error('password')
-                            <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                        <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
                         @enderror
                     </div>
                 </div>
@@ -100,20 +97,18 @@
                             id="remember_me"
                             type="checkbox"
                             name="remember"
-                            class="h-4 w-4 text-gray-900 focus:ring-gray-900 border-gray-300 rounded transition-colors cursor-pointer"
-                        />
+                            class="h-4 w-4 text-blue-600 focus:ring-blue-600 border-gray-300 rounded transition-colors cursor-pointer" />
                         <span class="ml-2 text-sm text-gray-600 group-hover:text-gray-900 transition-colors">
                             Se souvenir de moi
                         </span>
                     </label>
 
                     @if (Route::has('password.request'))
-                        <a
-                            href="{{ route('password.request') }}"
-                            class="text-sm font-medium text-gray-700 hover:text-gray-900 transition-colors"
-                        >
-                            Mot de passe oublié ?
-                        </a>
+                    <a
+                        href="{{ route('password.request') }}"
+                        class="text-sm font-medium text-gray-700 hover:text-gray-900 transition-colors">
+                        Mot de passe oublié ?
+                    </a>
                     @endif
                 </div>
 
@@ -122,11 +117,10 @@
                     type="submit"
                     :disabled="isLoading"
                     class="group relative w-full flex justify-center py-3 px-4 border border-transparent rounded-lg
-                           text-sm font-medium text-white bg-gray-900
-                           hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900
+                           text-sm font-medium text-white bg-blue-600
+                           hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-600
                            transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed
-                           shadow-sm hover:shadow-md"
-                >
+                           shadow-sm hover:shadow-md">
                     <span class="absolute left-0 inset-y-0 flex items-center pl-4" x-show="isLoading">
                         <svg class="animate-spin h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
                             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
@@ -140,17 +134,16 @@
 
                 <!-- Optional: Register Link -->
                 @if (Route::has('register'))
-                    <div class="text-center mt-6">
-                        <p class="text-sm text-gray-600">
-                            Pas encore de compte ?
-                            <a
-                                href="{{ route('register') }}"
-                                class="font-medium text-gray-900 hover:text-gray-700 transition-colors"
-                            >
-                                Créer un compte
-                            </a>
-                        </p>
-                    </div>
+                <div class="text-center mt-6">
+                    <p class="text-sm text-gray-600">
+                        Pas encore de compte ?
+                        <a
+                            href="{{ route('register') }}"
+                            class="font-medium text-gray-900 hover:text-gray-700 transition-colors">
+                            Créer un compte
+                        </a>
+                    </p>
+                </div>
                 @endif
             </form>
 

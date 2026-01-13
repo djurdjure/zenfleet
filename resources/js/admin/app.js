@@ -18,7 +18,7 @@ import '../../css/admin/datepicker-base.css';
 import '../../css/admin/datepicker-ultra-pro.css';
 // ✅ ENTERPRISE: Flowbite Datepicker Data (for x-data="zenfleetDatepicker")
 import { zenfleetDatepickerData } from '../components/zenfleet-datepicker';
-import 'tom-select/dist/css/tom-select.default.css';
+
 
 // ✅ ENTERPRISE: Import SlimSelect and expose as global (for x-slim-select component)
 import SlimSelect from 'slim-select';
@@ -37,12 +37,12 @@ import { French } from 'flatpickr/dist/l10n/fr.js';
 // ✅ FLOWBITE DATEPICKER
 import Datepicker from 'flowbite-datepicker/Datepicker';
 import fr from './locales/fr.js';
-import TomSelect from 'tom-select';
+
 
 // Configuration sécurisée des objets globaux admin
 const initializeAdminGlobals = () => {
     window.axios = axios;
-    window.TomSelect = TomSelect;
+
     window.flatpickr = flatpickr;
 
     // ✅ FLOWBITE SETUP
@@ -180,7 +180,7 @@ class ZenFleetAdmin {
 
     // ✅ OPTIMISATION: Initialisation des composants admin
     initializeComponents() {
-        this.initializeTomSelect();
+
         this.initializeFlatpickr();
         this.initializeTooltips();
         this.initializeForms();
@@ -189,34 +189,7 @@ class ZenFleetAdmin {
         this.initializeFileUploads();
     }
 
-    // Configuration TomSelect pour admin
-    initializeTomSelect() {
-        // ✅ CORRECTION: Chercher .tomselect au lieu de .admin-select (EXCLURE slimselect-field)
-        const selects = document.querySelectorAll('.tomselect, .admin-select, select[multiple]:not(.slimselect-field)');
-        selects.forEach(select => {
-            if (!select.tomselect && !select.disabled) {
-                const tomSelect = new TomSelect(select, {
-                    plugins: ['remove_button', 'clear_button'],
-                    create: select.hasAttribute('data-create'),
-                    maxItems: select.getAttribute('data-max-items') || null,
-                    placeholder: select.getAttribute('placeholder') || 'Sélectionner...',
-                    searchField: ['text', 'value'],
-                    allowEmptyOption: true,
-                    sortField: {
-                        field: "text",
-                        direction: "asc"
-                    },
-                    render: {
-                        no_results: () => '<div class="p-2 text-gray-500">Aucun résultat trouvé</div>',
-                    }
-                });
 
-                this.components.set(`tomselect-${select.id || Date.now()}`, tomSelect);
-            }
-        });
-
-        console.log(`📝 ${selects.length} TomSelect initialized`);
-    }
 
     // ✅ NOUVEAU: Initialisation Flatpickr pour datepickers et timepickers
     initializeFlatpickr() {

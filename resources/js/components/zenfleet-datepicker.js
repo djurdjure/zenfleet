@@ -4,7 +4,7 @@
  * Provides a robust, reusable datepicker component using Flowbite Datepicker
  * with proper Alpine.data integration for clean Blade templates.
  * 
- * @version 1.0.0
+ * @version 2.0.0 (Flowbite Edition)
  * @author ZenFleet Development Team
  */
 
@@ -14,212 +14,180 @@
  * 
  * Required data attributes:
  * - data-value: Initial value in YYYY-MM-DD or DD/MM/YYYY format
- * - data-display-value: Initial display value in DD/MM/YYYY format
  * 
  * Optional data attributes:
  * - data-min-date: Minimum selectable date (DD/MM/YYYY format)
  * - data-max-date: Maximum selectable date (DD/MM/YYYY format)
+ * - data-format: Display format (default: dd/mm/yyyy)
  */
 export function zenfleetDatepickerData() {
     return {
         // Reactive state
-        serverDate: '',
         displayValue: '',
         picker: null,
+        value: null, // For x-model binding
+        instance: null, // Flowbite instance
 
         /**
          * Initialize the datepicker component
          */
         init() {
+            // Setup x-model binding support
+            if (this.$el.hasAttribute('x-model') || this.$el.hasAttribute('wire:model') || this.$el.hasAttribute('wire:model.live')) {
+                // Initialize from the bound model if available
+                this.$watch('value', (val) => {
+                    this.syncFromModel(val);
+                });
+            }
+
             // Read configuration from data attributes
             const container = this.$el;
-            this.serverDate = container.dataset.value || '';
-            this.displayValue = container.dataset.displayValue || '';
+            // Handle Laravel old() or wire:model initial values which might be YYYY-MM-DD
+            const initialValue = container.dataset.value || this.value || '';
 
+            // Initial sync
+            if (initialValue) {
+                this.syncFromModel(initialValue);
+            }
+
+            // Initialize Flowbite Datepicker
             this.$nextTick(() => {
                 this.initializePicker(container);
             });
         },
 
         /**
-         * Initialize Flowbite Datepicker with enterprise-grade configuration
-         * @param {HTMLElement} container - The component container element
+         * Sync display value from model value (Server YYYY-MM-DD -> Display DD/MM/YYYY)
+         */
+        syncFromModel(val) {
+            if (!val) {
+                this.displayValue = '';
+                if (this.instance) {
+                    this.instance.setDate({ clear: true });
+                }
+                return;
+            }
+
+            // Check if format is YYYY-MM-DD (Server format)
+            if (val.match(/^\d{4}-\d{2}-\d{2}$/)) {
+                const [year, month, day] = val.split('-');
+                // Flowbite/Standard European format
+                this.displayValue = `${day}/${month}/${year}`;
+
+                // Update internal picker state if it exists
+                if (this.instance) {
+                    this.instance.setDate(this.displayValue);
+                }
+            } else {
+                // Assume it might be already formatted or invalid
+                this.displayValue = val;
+            }
+        },
+
+        /**
+         * Initialize Flowbite Datepicker
          */
         initializePicker(container) {
             const el = this.$refs.displayInput;
-            if (!el) {
-                console.error('❌ ZenFleet Datepicker: displayInput ref not found');
+            if (!el) return;
+
+            // Ensure window.Datepicker is available (set in app.js)
+            if (!window.Datepicker) {
+                console.error('❌ Flowbite Datepicker not found globally. Check app.js imports.');
                 return;
             }
 
-            const component = this;
-            let isOpening = false;
-
-            // Check if Flowbite Datepicker is available
-            if (typeof window.Datepicker === 'undefined') {
-                console.error('❌ ZenFleet: Flowbite Datepicker not loaded');
-                return;
-            }
-
-            // Build datepicker options
-            const options = {
-                language: 'fr',
-                format: 'dd/mm/yyyy',
-                autohide: true,
-                todayBtn: true,
-                todayBtnMode: 1,
-                clearBtn: true,
-                weekStart: 1,
-                orientation: 'bottom left',
-            };
-
-            // Add minDate if specified
-            const minDate = container.dataset.minDate;
-            if (minDate) {
-                options.minDate = minDate;
-            }
-
-            // Add maxDate if specified
-            const maxDate = container.dataset.maxDate;
-            if (maxDate) {
-                options.maxDate = maxDate;
-            }
+            const minDate = container.dataset.minDate || null;
+            const maxDate = container.dataset.maxDate || null;
+            const format = container.dataset.format || 'dd/mm/yyyy';
 
             // Initialize Flowbite Datepicker
-            this.picker = new window.Datepicker(el, options);
-
-            // ✅ ENTERPRISE-GRADE: Force hide function
-            const forceHidePicker = () => {
-                if (!component.picker || isOpening) return;
-                const pickerEl = component.picker.picker?.element;
-                if (pickerEl) {
-                    pickerEl.style.display = 'none';
-                    pickerEl.classList.remove('active', 'block');
-                    pickerEl.classList.add('hidden');
-                    if (component.picker.picker) {
-                        component.picker.picker.active = false;
-                    }
-                }
-            };
-
-            // ✅ ENTERPRISE-GRADE: Force show function (reset display)
-            const ensurePickerVisible = () => {
-                const pickerEl = component.picker.picker?.element;
-                if (pickerEl) {
-                    pickerEl.style.display = '';
-                    pickerEl.classList.remove('hidden');
-                }
-            };
-
-            // Set initial date if value exists
-            if (this.displayValue) {
-                this.picker.setDate(this.displayValue);
-                el.value = this.displayValue;
-            }
-
-            // ✅ Listen for show event to reset display and set flag
-            el.addEventListener('show', () => {
-                isOpening = true;
-                ensurePickerVisible();
-                setTimeout(() => {
-                    isOpening = false;
-                }, 100);
+            this.instance = new window.Datepicker(el, {
+                autohide: true,
+                format: format,
+                language: 'fr',
+                orientation: 'bottom left',
+                todayBtn: true,
+                clearBtn: true,
+                todayBtnMode: 1, // Select today on click
+                minDate: minDate,
+                maxDate: maxDate,
+                // Ensure the picker respects our manually set value
+                defaultViewDate: this.displayValue || new Date(),
             });
 
-            // Handle date change - force close on selection
+            // 🚫 FORCE LIGHT MODE: Remove 'dark' class from the generated picker
+            // Flowbite Datepicker appends the picker to the body or container
+            // We need to find it and strip the class
+            if (this.instance && this.instance.pickerElement) {
+                this.instance.pickerElement.classList.remove('dark');
+                // Also force a specific light class if needed by our CSS
+                this.instance.pickerElement.classList.add('light-mode-forced');
+            }
+
+            // Handle Date Selection Event
             el.addEventListener('changeDate', (e) => {
-                if (e.detail.date) {
-                    const d = e.detail.date;
+                // Flowbite event detail usually contains the date object
+                const d = e.detail.date;
+
+                if (d && !isNaN(d.getTime())) {
+                    // Convert to YYYY-MM-DD for server/Livewire
                     const year = d.getFullYear();
                     const month = String(d.getMonth() + 1).padStart(2, '0');
                     const day = String(d.getDate()).padStart(2, '0');
+                    const serverDate = `${year}-${month}-${day}`;
 
-                    component.serverDate = `${year}-${month}-${day}`;
-                    component.displayValue = `${day}/${month}/${year}`;
-                    component.$dispatch('input', component.serverDate);
+                    this.displayValue = this.instance.getDate('dd/mm/yyyy');
+                    this.value = serverDate;
 
-                    // Force hide after selection
-                    setTimeout(forceHidePicker, 10);
+                    // IMPORTANT: Dispatch input event for Livewire wire:model
+                    this.$dispatch('input', serverDate);
                 } else {
-                    component.serverDate = '';
-                    component.displayValue = '';
-                    component.$dispatch('input', '');
+                    // Cleared
+                    this.displayValue = '';
+                    this.value = null;
+                    this.$dispatch('input', null);
                 }
             });
 
-            // ✅ ENTERPRISE-GRADE: Click outside handler
-            const clickOutsideHandler = (e) => {
-                if (!component.picker || isOpening) return;
-                const pickerEl = component.picker.picker?.element;
-                if (!pickerEl) return;
-
-                // Only check active class for visibility (more reliable)
-                const isVisible = pickerEl.classList.contains('active');
-                if (!isVisible) return;
-
-                // Check if click is outside both input and picker
-                if (!pickerEl.contains(e.target) && !el.contains(e.target)) {
-                    forceHidePicker();
+            // Handle manual input changes (blur) to validate strict format
+            el.addEventListener('blur', () => {
+                const val = el.value;
+                if (!val) {
+                    this.value = null;
+                    this.$dispatch('input', null);
+                    return;
                 }
-            };
 
-            document.addEventListener('mousedown', clickOutsideHandler);
+                // If the user typed something valid, Flowbite usually handles it,
+                // but we should sync just in case
+                const date = this.instance.getDate();
+                if (date) {
+                    const year = date.getFullYear();
+                    const month = String(date.getMonth() + 1).padStart(2, '0');
+                    const day = String(date.getDate()).padStart(2, '0');
+                    const serverDate = `${year}-${month}-${day}`;
 
-            // Handle manual clear
-            el.addEventListener('input', () => {
-                if (!el.value.trim()) {
-                    component.serverDate = '';
-                    component.displayValue = '';
-                    component.$dispatch('input', '');
+                    if (this.value !== serverDate) {
+                        this.value = serverDate;
+                        this.$dispatch('input', serverDate);
+                    }
                 }
             });
 
-            // ✅ Cleanup on destroy
-            this.$cleanup = () => {
-                document.removeEventListener('mousedown', clickOutsideHandler);
-                if (this.picker && typeof this.picker.destroy === 'function') {
-                    this.picker.destroy();
-                }
-            };
-        },
-
-        /**
-         * Programmatically set the date
-         * @param {string} dateStr - Date in YYYY-MM-DD format
-         */
-        setDate(dateStr) {
-            if (!dateStr) {
-                this.serverDate = '';
-                this.displayValue = '';
-                if (this.picker) {
-                    this.picker.setDate({ clear: true });
-                }
-                return;
-            }
-
-            // Parse YYYY-MM-DD format
-            const match = dateStr.match(/^(\d{4})-(\d{2})-(\d{2})$/);
-            if (match) {
-                const [, year, month, day] = match;
-                this.serverDate = dateStr;
-                this.displayValue = `${day}/${month}/${year}`;
-
-                if (this.picker) {
-                    this.picker.setDate(this.displayValue);
-                }
+            // Set initial date if valid
+            if (this.displayValue) {
+                this.instance.setDate(this.displayValue);
             }
         },
 
-        /**
-         * Clear the datepicker
-         */
         clear() {
-            this.serverDate = '';
-            this.displayValue = '';
-            if (this.picker) {
-                this.picker.setDate({ clear: true });
+            if (this.instance) {
+                this.instance.setDate({ clear: true });
             }
-            this.$dispatch('input', '');
+            this.displayValue = '';
+            this.value = null;
+            this.$dispatch('input', null);
         }
     };
 }

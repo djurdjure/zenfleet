@@ -19,216 +19,181 @@
 @section('title', 'Nouvelle Dépense - ZenFleet')
 
 @push('styles')
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.min.css">
+
 <style>
-/* Ultra-Pro Enterprise Expense Creation Styles */
+    /* Ultra-Pro Enterprise Expense Creation Styles */
 
-/* Global animations */
-.fade-in {
-    animation: fadeInUp 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-@keyframes fadeInUp {
-    from {
-        opacity: 0;
-        transform: translateY(30px) scale(0.98);
-        filter: blur(2px);
+    /* Global animations */
+    .fade-in {
+        animation: fadeInUp 0.6s cubic-bezier(0.4, 0, 0.2, 1);
     }
-    to {
-        opacity: 1;
-        transform: translateY(0) scale(1);
-        filter: blur(0);
+
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px) scale(0.98);
+            filter: blur(2px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+            filter: blur(0);
+        }
     }
-}
 
-/* Ultra-modern section cards */
-.form-section {
-    background: linear-gradient(145deg, #ffffff 0%, #f8fafc 50%, #f1f5f9 100%);
-    border: 1px solid rgba(226, 232, 240, 0.8);
-    border-radius: 20px;
-    padding: 2rem;
-    margin-bottom: 2rem;
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    backdrop-filter: blur(10px);
-    position: relative;
-    overflow: hidden;
-}
+    /* Ultra-modern section cards */
+    .form-section {
+        background: linear-gradient(145deg, #ffffff 0%, #f8fafc 50%, #f1f5f9 100%);
+        border: 1px solid rgba(226, 232, 240, 0.8);
+        border-radius: 20px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        backdrop-filter: blur(10px);
+        position: relative;
+        overflow: hidden;
+    }
 
-.form-section::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
-    transition: left 0.6s ease;
-}
+    .form-section::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+        transition: left 0.6s ease;
+    }
 
-.form-section:hover::before {
-    left: 100%;
-}
+    .form-section:hover::before {
+        left: 100%;
+    }
 
-.form-section:hover {
-    transform: translateY(-2px) scale(1.005);
-    border-color: rgba(99, 102, 241, 0.2);
-    box-shadow: 0 8px 20px rgba(0,0,0,0.06), 0 4px 10px rgba(0,0,0,0.04);
-}
+    .form-section:hover {
+        transform: translateY(-2px) scale(1.005);
+        border-color: rgba(99, 102, 241, 0.2);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06), 0 4px 10px rgba(0, 0, 0, 0.04);
+    }
 
-.form-section h3 {
-    color: #1e293b;
-    font-size: 1.25rem;
-    font-weight: 700;
-    margin-bottom: 1.5rem;
-    padding-bottom: 0.75rem;
-    border-bottom: 3px solid transparent;
-    background: linear-gradient(90deg, rgba(99, 102, 241, 0.2) 0%, transparent 100%);
-    background-size: 100% 3px;
-    background-repeat: no-repeat;
-    background-position: bottom;
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-}
+    .form-section h3 {
+        color: #1e293b;
+        font-size: 1.25rem;
+        font-weight: 700;
+        margin-bottom: 1.5rem;
+        padding-bottom: 0.75rem;
+        border-bottom: 3px solid transparent;
+        background: linear-gradient(90deg, rgba(99, 102, 241, 0.2) 0%, transparent 100%);
+        background-size: 100% 3px;
+        background-repeat: no-repeat;
+        background-position: bottom;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
 
-.form-group {
-    margin-bottom: 1.5rem;
-}
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
 
-.form-label {
-    display: block;
-    font-size: 0.875rem;
-    font-weight: 600;
-    color: #374151;
-    margin-bottom: 0.5rem;
-}
+    .form-label {
+        display: block;
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: #374151;
+        margin-bottom: 0.5rem;
+    }
 
-.form-label .required {
-    color: #dc2626;
-    margin-left: 0.25rem;
-}
+    .form-label .required {
+        color: #dc2626;
+        margin-left: 0.25rem;
+    }
 
-.form-input {
-    width: 100%;
-    padding: 0.875rem 1rem;
-    border: 2px solid rgba(229, 231, 235, 0.8);
-    border-radius: 12px;
-    font-size: 0.875rem;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    background: linear-gradient(135deg, #ffffff 0%, #f9fafb 100%);
-    backdrop-filter: blur(5px);
-}
+    .form-input {
+        width: 100%;
+        padding: 0.875rem 1rem;
+        border: 2px solid rgba(229, 231, 235, 0.8);
+        border-radius: 12px;
+        font-size: 0.875rem;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        background: linear-gradient(135deg, #ffffff 0%, #f9fafb 100%);
+        backdrop-filter: blur(5px);
+    }
 
-.form-input:focus {
-    transform: scale(1.01);
-    border-color: #6366f1;
-    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1), 0 4px 12px rgba(0,0,0,0.06);
-    background: white;
-    outline: none;
-}
+    .form-input:focus {
+        transform: scale(1.01);
+        border-color: #6366f1;
+        box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1), 0 4px 12px rgba(0, 0, 0, 0.06);
+        background: white;
+        outline: none;
+    }
 
-.form-textarea {
-    width: 100%;
-    padding: 0.875rem 1rem;
-    border: 2px solid #e5e7eb;
-    border-radius: 12px;
-    font-size: 0.875rem;
-    transition: all 0.3s ease;
-    background: linear-gradient(135deg, #ffffff 0%, #f9fafb 100%);
-    resize: vertical;
-    min-height: 100px;
-}
+    .form-textarea {
+        width: 100%;
+        padding: 0.875rem 1rem;
+        border: 2px solid #e5e7eb;
+        border-radius: 12px;
+        font-size: 0.875rem;
+        transition: all 0.3s ease;
+        background: linear-gradient(135deg, #ffffff 0%, #f9fafb 100%);
+        resize: vertical;
+        min-height: 100px;
+    }
 
-.form-textarea:focus {
-    border-color: #6366f1;
-    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
-    background: white;
-    outline: none;
-}
+    .form-textarea:focus {
+        border-color: #6366f1;
+        box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        background: white;
+        outline: none;
+    }
 
-/* Tom Select Custom Styling */
-.ts-wrapper .ts-control {
-    border: 2px solid rgba(229, 231, 235, 0.8) !important;
-    border-radius: 12px !important;
-    padding: 0.65rem 1rem !important;
-    background: linear-gradient(135deg, #ffffff 0%, #f9fafb 100%) !important;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
-}
 
-.ts-wrapper.focus .ts-control {
-    border-color: #6366f1 !important;
-    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1), 0 4px 12px rgba(0,0,0,0.06) !important;
-    background: white !important;
-}
 
-.ts-dropdown {
-    border-radius: 12px !important;
-    border: 2px solid #e5e7eb !important;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.1) !important;
-    margin-top: 0.5rem !important;
-}
+    /* Currency badge styling */
+    .currency-badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.375rem 0.75rem;
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        color: white;
+        font-weight: 600;
+        border-radius: 8px;
+        font-size: 0.875rem;
+        box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+    }
 
-.ts-dropdown .option {
-    padding: 0.75rem 1rem !important;
-    border-bottom: 1px solid #f3f4f6;
-    transition: all 0.2s ease;
-}
+    /* Upload zone styling */
+    .upload-zone {
+        border: 2px dashed #cbd5e1;
+        border-radius: 12px;
+        padding: 2rem;
+        text-align: center;
+        transition: all 0.3s ease;
+        background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+        cursor: pointer;
+    }
 
-.ts-dropdown .option:hover {
-    background: linear-gradient(135deg, #f0f9ff 0%, #dbeafe 100%) !important;
-    border-left: 3px solid #3b82f6;
-}
+    .upload-zone:hover {
+        border-color: #6366f1;
+        background: linear-gradient(135deg, #eef2ff 0%, #e0e7ff 100%);
+        transform: scale(1.02);
+    }
 
-.ts-dropdown .active {
-    background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%) !important;
-    border-left: 3px solid #2563eb;
-}
+    /* Alert styling */
+    .alert {
+        padding: 1rem 1.25rem;
+        border-radius: 12px;
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
 
-/* Currency badge styling */
-.currency-badge {
-    display: inline-flex;
-    align-items: center;
-    padding: 0.375rem 0.75rem;
-    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-    color: white;
-    font-weight: 600;
-    border-radius: 8px;
-    font-size: 0.875rem;
-    box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
-}
-
-/* Upload zone styling */
-.upload-zone {
-    border: 2px dashed #cbd5e1;
-    border-radius: 12px;
-    padding: 2rem;
-    text-align: center;
-    transition: all 0.3s ease;
-    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-    cursor: pointer;
-}
-
-.upload-zone:hover {
-    border-color: #6366f1;
-    background: linear-gradient(135deg, #eef2ff 0%, #e0e7ff 100%);
-    transform: scale(1.02);
-}
-
-/* Alert styling */
-.alert {
-    padding: 1rem 1.25rem;
-    border-radius: 12px;
-    margin-bottom: 1.5rem;
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-}
-
-.alert-danger {
-    background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
-    border: 2px solid #fca5a5;
-    color: #991b1b;
-}
+    .alert-danger {
+        background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+        border: 2px solid #fca5a5;
+        color: #991b1b;
+    }
 </style>
 @endpush
 
@@ -251,7 +216,7 @@
                     <p class="text-gray-600 mt-2 text-sm">Enregistrez une nouvelle dépense véhicule avec justificatif</p>
                 </div>
                 <a href="{{ route('admin.expenses.index') }}"
-                   class="inline-flex items-center gap-2 px-4 py-2.5 bg-white border-2 border-gray-300 rounded-lg hover:bg-gray-50 transition-all duration-200 shadow-sm hover:shadow-md">
+                    class="inline-flex items-center gap-2 px-4 py-2.5 bg-white border-2 border-gray-300 rounded-lg hover:bg-gray-50 transition-all duration-200 shadow-sm hover:shadow-md">
                     <x-iconify icon="lucide:arrow-left" class="w-5 h-5 text-gray-600" />
                     <span class="font-medium text-gray-700">Retour</span>
                 </a>
@@ -268,7 +233,7 @@
                 <h3 class="font-semibold mb-1">Erreurs de validation :</h3>
                 <ul class="list-disc list-inside text-sm">
                     @foreach ($errors->all() as $error)
-                        <li>{{ $error }}</li>
+                    <li>{{ $error }}</li>
                     @endforeach
                 </ul>
             </div>
@@ -290,22 +255,18 @@
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {{-- Véhicule --}}
+                    {{-- Véhicule --}}
                     <div class="form-group">
                         <label for="vehicle-select" class="form-label">
                             Véhicule <span class="required">*</span>
                         </label>
-                        <select id="vehicle-select" name="vehicle_id" required>
-                            <option value="">Sélectionner un véhicule...</option>
+                        <x-slim-select name="vehicle_id" id="vehicle-select" placeholder="Sélectionner un véhicule..." required>
                             @foreach($vehicles as $vehicle)
-                                <option value="{{ $vehicle->id }}"
-                                        data-plate="{{ $vehicle->registration_plate }}"
-                                        data-brand="{{ $vehicle->brand }} {{ $vehicle->model }}"
-                                        data-mileage="{{ number_format($vehicle->current_mileage ?? 0, 0, ',', ' ') }} km"
-                                        {{ old('vehicle_id') == $vehicle->id ? 'selected' : '' }}>
-                                    {{ $vehicle->registration_plate }} - {{ $vehicle->brand }} {{ $vehicle->model }}
-                                </option>
+                            <option value="{{ $vehicle->id }}" {{ old('vehicle_id') == $vehicle->id ? 'selected' : '' }}>
+                                {{ $vehicle->registration_plate }} - {{ $vehicle->brand }} {{ $vehicle->model }}
+                            </option>
                             @endforeach
-                        </select>
+                        </x-slim-select>
                         <p class="text-xs text-gray-500 mt-1">Sélectionnez le véhicule concerné par cette dépense</p>
                     </div>
 
@@ -314,17 +275,14 @@
                         <label for="driver-select" class="form-label">
                             Chauffeur <span class="text-gray-400">(optionnel)</span>
                         </label>
-                        <select id="driver-select" name="driver_id">
+                        <x-slim-select name="driver_id" id="driver-select" placeholder="Aucun chauffeur...">
                             <option value="">Aucun chauffeur...</option>
                             @foreach($drivers as $driver)
-                                <option value="{{ $driver->id }}"
-                                        data-name="{{ $driver->first_name }} {{ $driver->last_name }}"
-                                        data-employee="{{ $driver->employee_number ?? 'N/A' }}"
-                                        {{ old('driver_id') == $driver->id ? 'selected' : '' }}>
-                                    {{ $driver->first_name }} {{ $driver->last_name }} ({{ $driver->employee_number ?? 'N/A' }})
-                                </option>
+                            <option value="{{ $driver->id }}" {{ old('driver_id') == $driver->id ? 'selected' : '' }}>
+                                {{ $driver->first_name }} {{ $driver->last_name }} ({{ $driver->employee_number ?? 'N/A' }})
+                            </option>
                             @endforeach
-                        </select>
+                        </x-slim-select>
                         <p class="text-xs text-gray-500 mt-1">Chauffeur responsable au moment de la dépense</p>
                     </div>
                 </div>
@@ -346,12 +304,12 @@
                         <select id="expense-category" name="expense_type" class="form-input" required>
                             <option value="">Sélectionner une catégorie...</option>
                             @php
-                                $categories = \App\Models\VehicleExpense::getExpenseCategories();
+                            $categories = \App\Models\VehicleExpense::getExpenseCategories();
                             @endphp
                             @foreach($categories as $key => $label)
-                                <option value="{{ $key }}" {{ old('expense_type') == $key ? 'selected' : '' }}>
-                                    {{ $label }}
-                                </option>
+                            <option value="{{ $key }}" {{ old('expense_type') == $key ? 'selected' : '' }}>
+                                {{ $label }}
+                            </option>
                             @endforeach
                         </select>
                         <p class="text-xs text-gray-500 mt-1">Type de dépense effectuée</p>
@@ -363,12 +321,12 @@
                             Date de la dépense <span class="required">*</span>
                         </label>
                         <input type="date"
-                               id="expense-date"
-                               name="expense_date"
-                               class="form-input"
-                               max="{{ date('Y-m-d') }}"
-                               value="{{ old('expense_date', date('Y-m-d')) }}"
-                               required>
+                            id="expense-date"
+                            name="expense_date"
+                            class="form-input"
+                            max="{{ date('Y-m-d') }}"
+                            value="{{ old('expense_date', date('Y-m-d')) }}"
+                            required>
                         <p class="text-xs text-gray-500 mt-1">Date à laquelle la dépense a été effectuée</p>
                     </div>
                 </div>
@@ -393,16 +351,16 @@
                         </label>
                         <div class="relative">
                             <input type="number"
-                                   id="amount-ht"
-                                   name="amount"
-                                   class="form-input pr-12"
-                                   step="0.01"
-                                   min="0.01"
-                                   max="999999.99"
-                                   value="{{ old('amount') }}"
-                                   placeholder="0.00"
-                                   required
-                                   oninput="calculateTTC()">
+                                id="amount-ht"
+                                name="amount"
+                                class="form-input pr-12"
+                                step="0.01"
+                                min="0.01"
+                                max="999999.99"
+                                value="{{ old('amount') }}"
+                                placeholder="0.00"
+                                required
+                                oninput="calculateTTC()">
                             <span class="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-500 font-semibold">DA</span>
                         </div>
                         <p class="text-xs text-gray-500 mt-1">Montant hors taxes</p>
@@ -428,10 +386,10 @@
                         </label>
                         <div class="relative">
                             <input type="text"
-                                   id="amount-ttc"
-                                   class="form-input pr-12 bg-gray-100 font-bold text-green-700"
-                                   value="0.00"
-                                   readonly>
+                                id="amount-ttc"
+                                class="form-input pr-12 bg-gray-100 font-bold text-green-700"
+                                value="0.00"
+                                readonly>
                             <span class="absolute right-4 top-1/2 transform -translate-y-1/2 text-green-700 font-bold">DA</span>
                         </div>
                         <p class="text-xs text-gray-500 mt-1">Calculé automatiquement</p>
@@ -469,12 +427,12 @@
                             Nom du fournisseur
                         </label>
                         <input type="text"
-                               id="supplier-name"
-                               name="supplier_name"
-                               class="form-input"
-                               maxlength="255"
-                               value="{{ old('supplier_name') }}"
-                               placeholder="Ex: Garage Al-Baraka, Station Total...">
+                            id="supplier-name"
+                            name="supplier_name"
+                            class="form-input"
+                            maxlength="255"
+                            value="{{ old('supplier_name') }}"
+                            placeholder="Ex: Garage Al-Baraka, Station Total...">
                     </div>
 
                     {{-- Numéro de facture --}}
@@ -483,12 +441,12 @@
                             Numéro de facture
                         </label>
                         <input type="text"
-                               id="invoice-number"
-                               name="invoice_number"
-                               class="form-input"
-                               maxlength="100"
-                               value="{{ old('invoice_number') }}"
-                               placeholder="Ex: F-2025-001234">
+                            id="invoice-number"
+                            name="invoice_number"
+                            class="form-input"
+                            maxlength="100"
+                            value="{{ old('invoice_number') }}"
+                            placeholder="Ex: F-2025-001234">
                     </div>
 
                     {{-- Kilométrage au moment de la dépense --}}
@@ -497,12 +455,12 @@
                             Kilométrage (km)
                         </label>
                         <input type="number"
-                               id="mileage"
-                               name="mileage_at_expense"
-                               class="form-input"
-                               min="0"
-                               value="{{ old('mileage_at_expense') }}"
-                               placeholder="Ex: 125000">
+                            id="mileage"
+                            name="mileage_at_expense"
+                            class="form-input"
+                            min="0"
+                            value="{{ old('mileage_at_expense') }}"
+                            placeholder="Ex: 125000">
                         <p class="text-xs text-gray-500 mt-1">Kilométrage du véhicule au moment de la dépense</p>
                     </div>
                 </div>
@@ -522,11 +480,11 @@
                             Description de la dépense <span class="required">*</span>
                         </label>
                         <textarea id="description"
-                                  name="description"
-                                  class="form-textarea"
-                                  maxlength="1000"
-                                  required
-                                  placeholder="Décrivez en détail la nature de cette dépense...">{{ old('description') }}</textarea>
+                            name="description"
+                            class="form-textarea"
+                            maxlength="1000"
+                            required
+                            placeholder="Décrivez en détail la nature de cette dépense...">{{ old('description') }}</textarea>
                         <p class="text-xs text-gray-500 mt-1">Maximum 1000 caractères</p>
                     </div>
 
@@ -537,11 +495,11 @@
                         </label>
                         <div class="upload-zone" onclick="document.getElementById('receipt-file').click()">
                             <input type="file"
-                                   id="receipt-file"
-                                   name="receipt_file"
-                                   accept=".pdf,.jpg,.jpeg,.png"
-                                   class="hidden"
-                                   onchange="updateFileName(this)">
+                                id="receipt-file"
+                                name="receipt_file"
+                                accept=".pdf,.jpg,.jpeg,.png"
+                                class="hidden"
+                                onchange="updateFileName(this)">
                             <x-iconify icon="lucide:upload-cloud" class="w-12 h-12 text-gray-400 mx-auto mb-3" />
                             <p class="text-sm font-medium text-gray-700">Cliquez pour télécharger un fichier</p>
                             <p class="text-xs text-gray-500 mt-1">PDF, JPG, JPEG ou PNG (max 10 MB)</p>
@@ -555,10 +513,10 @@
                             Notes internes <span class="text-gray-400">(optionnel)</span>
                         </label>
                         <textarea id="notes"
-                                  name="notes"
-                                  class="form-textarea"
-                                  maxlength="2000"
-                                  placeholder="Notes additionnelles pour usage interne uniquement...">{{ old('notes') }}</textarea>
+                            name="notes"
+                            class="form-textarea"
+                            maxlength="2000"
+                            placeholder="Notes additionnelles pour usage interne uniquement...">{{ old('notes') }}</textarea>
                         <p class="text-xs text-gray-500 mt-1">Ces notes ne seront visibles que par les administrateurs</p>
                     </div>
                 </div>
@@ -567,13 +525,13 @@
             {{-- Actions Buttons --}}
             <div class="flex items-center justify-between gap-4 fade-in" style="animation-delay: 0.6s">
                 <a href="{{ route('admin.expenses.index') }}"
-                   class="inline-flex items-center gap-2 px-6 py-3 bg-white border-2 border-gray-300 rounded-xl hover:bg-gray-50 transition-all duration-200 shadow-sm hover:shadow-md">
+                    class="inline-flex items-center gap-2 px-6 py-3 bg-white border-2 border-gray-300 rounded-xl hover:bg-gray-50 transition-all duration-200 shadow-sm hover:shadow-md">
                     <x-iconify icon="lucide:x" class="w-5 h-5 text-gray-600" />
                     <span class="font-semibold text-gray-700">Annuler</span>
                 </a>
 
                 <button type="submit"
-                        class="inline-flex items-center gap-2 px-8 py-3 bg-gradient-to-r from-blue-600 to-indigo-700 text-white font-semibold rounded-xl hover:from-blue-700 hover:to-indigo-800 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105">
+                    class="inline-flex items-center gap-2 px-8 py-3 bg-gradient-to-r from-blue-600 to-indigo-700 text-white font-semibold rounded-xl hover:from-blue-700 hover:to-indigo-800 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105">
                     <x-iconify icon="lucide:save" class="w-5 h-5" />
                     <span>Enregistrer la dépense</span>
                 </button>
@@ -586,146 +544,59 @@
 @endsection
 
 @push('scripts')
-<script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js"></script>
 <script>
-document.addEventListener('DOMContentLoaded', function() {
+    < script src = "https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js" >
+</script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
 
-    // =====================================================
-    // TOM SELECT: Véhicules avec design enterprise
-    // =====================================================
-    new TomSelect('#vehicle-select', {
-        placeholder: 'Rechercher un véhicule par immatriculation...',
-        maxOptions: 100,
-        allowEmptyOption: true,
-        searchField: ['text'],
-        render: {
-            option: function(data, escape) {
-                const plate = data['data-plate'] || data.text.split(' - ')[0] || '';
-                const brand = data['data-brand'] || '';
-                const mileage = data['data-mileage'] || '';
 
-                return `<div class="flex items-center justify-between py-1 border-b border-gray-100">
-                    <div class="flex items-center gap-3">
-                        <div class="w-9 h-9 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                            <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
-                            </svg>
-                        </div>
-                        <div>
-                            <div class="font-semibold text-gray-900">${escape(plate)}</div>
-                            <div class="text-xs text-gray-600">${escape(brand)}</div>
-                        </div>
-                    </div>
-                    <div class="text-xs font-medium text-gray-500">${escape(mileage)}</div>
-                </div>`;
-            },
-            item: function(data, escape) {
-                const plate = data['data-plate'] || data.text.split(' - ')[0] || '';
-                return `<div class="flex items-center gap-2">
-                    <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
-                    </svg>
-                    <span class="font-semibold">${escape(plate)}</span>
-                </div>`;
+
+        // =====================================================
+        // CALCUL AUTOMATIQUE TTC
+        // =====================================================
+        window.calculateTTC = function() {
+            const amountHT = parseFloat(document.getElementById('amount-ht').value) || 0;
+            const taxRate = parseFloat(document.getElementById('tax-rate').value) || 0;
+
+            const taxAmount = (amountHT * taxRate) / 100;
+            const totalTTC = amountHT + taxAmount;
+
+            // Mise à jour affichage
+            document.getElementById('amount-ttc').value = totalTTC.toFixed(2);
+            document.getElementById('display-ht').textContent = amountHT.toFixed(2) + ' DA';
+            document.getElementById('display-tax-rate').textContent = taxRate.toFixed(0);
+            document.getElementById('display-tva').textContent = taxAmount.toFixed(2) + ' DA';
+            document.getElementById('display-ttc').textContent = totalTTC.toFixed(2) + ' DA';
+
+            // Afficher le breakdown si montant > 0
+            const breakdown = document.getElementById('amount-breakdown');
+            if (amountHT > 0) {
+                breakdown.classList.remove('hidden');
+            } else {
+                breakdown.classList.add('hidden');
             }
-        },
-        onInitialize: function() {
-            console.log('✅ Tom Select véhicules initialisé');
-        }
-    });
+        };
 
-    // =====================================================
-    // TOM SELECT: Chauffeurs avec design enterprise
-    // =====================================================
-    new TomSelect('#driver-select', {
-        placeholder: 'Rechercher un chauffeur...',
-        maxOptions: 100,
-        allowEmptyOption: true,
-        searchField: ['text'],
-        render: {
-            option: function(data, escape) {
-                if (!data.value) {
-                    return `<div class="text-gray-500 italic">Aucun chauffeur</div>`;
-                }
-
-                const name = data['data-name'] || data.text.split(' (')[0] || '';
-                const employee = data['data-employee'] || 'N/A';
-
-                return `<div class="flex items-center gap-3 py-1 border-b border-gray-100">
-                    <div class="w-9 h-9 bg-purple-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                        <svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
-                        </svg>
-                    </div>
-                    <div>
-                        <div class="font-semibold text-gray-900">${escape(name)}</div>
-                        <div class="text-xs text-gray-600">Matricule: ${escape(employee)}</div>
-                    </div>
-                </div>`;
-            },
-            item: function(data, escape) {
-                if (!data.value) {
-                    return `<div class="text-gray-500 italic">Aucun chauffeur</div>`;
-                }
-                const name = data['data-name'] || data.text.split(' (')[0] || '';
-                return `<div class="flex items-center gap-2">
-                    <svg class="w-4 h-4 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
-                    </svg>
-                    <span class="font-semibold">${escape(name)}</span>
-                </div>`;
+        // =====================================================
+        // UPLOAD FILENAME DISPLAY
+        // =====================================================
+        window.updateFileName = function(input) {
+            const fileNameDisplay = document.getElementById('file-name');
+            if (input.files && input.files[0]) {
+                const fileName = input.files[0].name;
+                const fileSize = (input.files[0].size / 1024 / 1024).toFixed(2);
+                fileNameDisplay.textContent = `📎 ${fileName} (${fileSize} MB)`;
+                fileNameDisplay.classList.remove('hidden');
+            } else {
+                fileNameDisplay.classList.add('hidden');
             }
-        },
-        onInitialize: function() {
-            console.log('✅ Tom Select chauffeurs initialisé');
-        }
+        };
+
+        // Calcul initial au chargement
+        calculateTTC();
+
+        console.log('✅ Formulaire de création de dépense initialisé avec succès');
     });
-
-    // =====================================================
-    // CALCUL AUTOMATIQUE TTC
-    // =====================================================
-    window.calculateTTC = function() {
-        const amountHT = parseFloat(document.getElementById('amount-ht').value) || 0;
-        const taxRate = parseFloat(document.getElementById('tax-rate').value) || 0;
-
-        const taxAmount = (amountHT * taxRate) / 100;
-        const totalTTC = amountHT + taxAmount;
-
-        // Mise à jour affichage
-        document.getElementById('amount-ttc').value = totalTTC.toFixed(2);
-        document.getElementById('display-ht').textContent = amountHT.toFixed(2) + ' DA';
-        document.getElementById('display-tax-rate').textContent = taxRate.toFixed(0);
-        document.getElementById('display-tva').textContent = taxAmount.toFixed(2) + ' DA';
-        document.getElementById('display-ttc').textContent = totalTTC.toFixed(2) + ' DA';
-
-        // Afficher le breakdown si montant > 0
-        const breakdown = document.getElementById('amount-breakdown');
-        if (amountHT > 0) {
-            breakdown.classList.remove('hidden');
-        } else {
-            breakdown.classList.add('hidden');
-        }
-    };
-
-    // =====================================================
-    // UPLOAD FILENAME DISPLAY
-    // =====================================================
-    window.updateFileName = function(input) {
-        const fileNameDisplay = document.getElementById('file-name');
-        if (input.files && input.files[0]) {
-            const fileName = input.files[0].name;
-            const fileSize = (input.files[0].size / 1024 / 1024).toFixed(2);
-            fileNameDisplay.textContent = `📎 ${fileName} (${fileSize} MB)`;
-            fileNameDisplay.classList.remove('hidden');
-        } else {
-            fileNameDisplay.classList.add('hidden');
-        }
-    };
-
-    // Calcul initial au chargement
-    calculateTTC();
-
-    console.log('✅ Formulaire de création de dépense initialisé avec succès');
-});
 </script>
 @endpush

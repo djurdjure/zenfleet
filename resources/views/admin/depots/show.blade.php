@@ -24,27 +24,27 @@
 
         {{-- Messages Flash --}}
         @if (session()->has('success'))
-            <div class="mb-6 bg-green-50 border-l-4 border-green-500 p-4 rounded-r-lg print:hidden">
-                <div class="flex items-center">
-                    <x-iconify icon="lucide:check-circle" class="w-5 h-5 text-green-600 mr-3" />
-                    <p class="text-sm font-medium text-green-800">{{ session('success') }}</p>
-                </div>
+        <div class="mb-6 bg-green-50 border-l-4 border-green-500 p-4 rounded-r-lg print:hidden">
+            <div class="flex items-center">
+                <x-iconify icon="lucide:check-circle" class="w-5 h-5 text-green-600 mr-3" />
+                <p class="text-sm font-medium text-green-800">{{ session('success') }}</p>
             </div>
+        </div>
         @endif
 
         @if (session()->has('error'))
-            <div class="mb-6 bg-red-50 border-l-4 border-red-500 p-4 rounded-r-lg print:hidden">
-                <div class="flex items-center">
-                    <x-iconify icon="lucide:alert-circle" class="w-5 h-5 text-red-600 mr-3" />
-                    <p class="text-sm font-medium text-red-800">{{ session('error') }}</p>
-                </div>
+        <div class="mb-6 bg-red-50 border-l-4 border-red-500 p-4 rounded-r-lg print:hidden">
+            <div class="flex items-center">
+                <x-iconify icon="lucide:alert-circle" class="w-5 h-5 text-red-600 mr-3" />
+                <p class="text-sm font-medium text-red-800">{{ session('error') }}</p>
             </div>
+        </div>
         @endif
 
         {{-- Barre d'actions (masquée à l'impression) --}}
         <div class="mb-6 flex items-center justify-between print:hidden">
             <a href="{{ route('admin.depots.index') }}"
-               class="inline-flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-all">
+                class="inline-flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-all">
                 <x-iconify icon="lucide:arrow-left" class="w-4 h-4" />
                 <span class="font-medium text-gray-700">Retour à la liste</span>
             </a>
@@ -52,21 +52,21 @@
             <div class="flex items-center gap-3">
                 {{-- Export PDF --}}
                 <a href="{{ route('admin.depots.export.pdf', $depot->id) }}"
-                   class="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all">
+                    class="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all">
                     <x-iconify icon="lucide:file-text" class="w-4 h-4" />
                     <span class="font-medium">Exporter PDF</span>
                 </a>
 
                 {{-- Modifier --}}
                 <button onclick="openEditModal({{ $depot->id }})"
-                        class="inline-flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-all">
+                    class="inline-flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-all">
                     <x-iconify icon="lucide:edit" class="w-4 h-4" />
                     <span class="font-medium">Modifier</span>
                 </button>
 
                 {{-- Supprimer --}}
                 <button onclick="confirmDelete({{ $depot->id }}, '{{ $depot->name }}', {{ $stats['total_vehicles'] }})"
-                        class="inline-flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-all">
+                    class="inline-flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-all">
                     <x-iconify icon="lucide:trash-2" class="w-4 h-4" />
                     <span class="font-medium">Supprimer</span>
                 </button>
@@ -130,11 +130,11 @@
                                 {{ $depot->address ?? 'Non renseignée' }}
                             </p>
                             @if($depot->city || $depot->wilaya || $depot->postal_code)
-                                <p class="text-gray-700 mt-1">
-                                    {{ $depot->city }}
-                                    @if($depot->wilaya), {{ $depot->wilaya }}@endif
-                                    @if($depot->postal_code) - {{ $depot->postal_code }}@endif
-                                </p>
+                            <p class="text-gray-700 mt-1">
+                                {{ $depot->city }}
+                                @if($depot->wilaya), {{ $depot->wilaya }}@endif
+                                @if($depot->postal_code) - {{ $depot->postal_code }}@endif
+                            </p>
                             @endif
                         </div>
 
@@ -143,16 +143,16 @@
                         <div>
                             <label class="block text-sm font-medium text-gray-600 mb-1">Contact</label>
                             @if($depot->phone)
-                                <p class="text-gray-900 flex items-center gap-2">
-                                    <x-iconify icon="lucide:phone" class="w-4 h-4 text-green-600" />
-                                    {{ $depot->phone }}
-                                </p>
+                            <p class="text-gray-900 flex items-center gap-2">
+                                <x-iconify icon="lucide:phone" class="w-4 h-4 text-green-600" />
+                                {{ $depot->phone }}
+                            </p>
                             @endif
                             @if($depot->email)
-                                <p class="text-gray-900 flex items-center gap-2 mt-1">
-                                    <x-iconify icon="lucide:mail" class="w-4 h-4 text-blue-600" />
-                                    {{ $depot->email }}
-                                </p>
+                            <p class="text-gray-900 flex items-center gap-2 mt-1">
+                                <x-iconify icon="lucide:mail" class="w-4 h-4 text-blue-600" />
+                                {{ $depot->email }}
+                            </p>
                             @endif
                         </div>
                         @endif
@@ -162,10 +162,10 @@
                         <div>
                             <label class="block text-sm font-medium text-gray-600 mb-1">Responsable</label>
                             @if($depot->manager_name)
-                                <p class="text-gray-900 font-medium">{{ $depot->manager_name }}</p>
+                            <p class="text-gray-900 font-medium">{{ $depot->manager_name }}</p>
                             @endif
                             @if($depot->manager_phone)
-                                <p class="text-gray-700 text-sm mt-1">{{ $depot->manager_phone }}</p>
+                            <p class="text-gray-700 text-sm mt-1">{{ $depot->manager_phone }}</p>
                             @endif
                         </div>
                         @endif
@@ -270,7 +270,7 @@
                         </div>
                         <div class="w-full bg-gray-200 rounded-full h-3">
                             <div class="bg-gradient-to-r from-blue-500 to-blue-600 h-3 rounded-full transition-all"
-                                 style="width: {{ min($stats['occupancy_percentage'], 100) }}%"></div>
+                                style="width: {{ min($stats['occupancy_percentage'], 100) }}%"></div>
                         </div>
                     </div>
                     @endif
@@ -398,7 +398,7 @@
 </div>
 
 {{-- Modal confirmation suppression --}}
-<div id="deleteModal" style="display: none;" class="fixed inset-0 bg-gray-900/75 backdrop-blur-sm z-50 print:hidden">
+<div id="deleteModal" style="display: none;" class="fixed inset-0 bg-gray-500/75 backdrop-blur-sm z-50 print:hidden">
     <div class="flex min-h-full items-center justify-center p-4">
         <div class="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
             <div class="flex items-center mb-4">
@@ -428,11 +428,11 @@
 
             <div class="flex gap-3 justify-end">
                 <button onclick="closeDeleteModal()"
-                        class="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors">
+                    class="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors">
                     Annuler
                 </button>
                 <button onclick="submitDelete()"
-                        class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">
+                    class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">
                     Supprimer
                 </button>
             </div>
@@ -444,83 +444,83 @@
 
 @push('scripts')
 <script>
-let deleteDepotId = null;
-let deleteDepotVehicleCount = 0;
+    let deleteDepotId = null;
+    let deleteDepotVehicleCount = 0;
 
-function confirmDelete(depotId, depotName, vehicleCount) {
-    deleteDepotId = depotId;
-    deleteDepotVehicleCount = vehicleCount;
+    function confirmDelete(depotId, depotName, vehicleCount) {
+        deleteDepotId = depotId;
+        deleteDepotVehicleCount = vehicleCount;
 
-    document.getElementById('deleteDepotName').textContent = depotName;
+        document.getElementById('deleteDepotName').textContent = depotName;
 
-    if (vehicleCount > 0) {
-        document.getElementById('deleteWarningMessage').textContent =
-            'Attention: Ce dépôt contient des véhicules. Vous devez soit les réaffecter, soit forcer la suppression.';
-        document.getElementById('vehicleWarning').style.display = 'block';
-        document.getElementById('vehicleCount').textContent = vehicleCount;
-    } else {
-        document.getElementById('deleteWarningMessage').textContent =
-            'Êtes-vous sûr de vouloir supprimer ce dépôt ? Cette action peut être annulée ultérieurement.';
-        document.getElementById('vehicleWarning').style.display = 'none';
+        if (vehicleCount > 0) {
+            document.getElementById('deleteWarningMessage').textContent =
+                'Attention: Ce dépôt contient des véhicules. Vous devez soit les réaffecter, soit forcer la suppression.';
+            document.getElementById('vehicleWarning').style.display = 'block';
+            document.getElementById('vehicleCount').textContent = vehicleCount;
+        } else {
+            document.getElementById('deleteWarningMessage').textContent =
+                'Êtes-vous sûr de vouloir supprimer ce dépôt ? Cette action peut être annulée ultérieurement.';
+            document.getElementById('vehicleWarning').style.display = 'none';
+        }
+
+        document.getElementById('deleteModal').style.display = 'flex';
     }
 
-    document.getElementById('deleteModal').style.display = 'flex';
-}
-
-function closeDeleteModal() {
-    document.getElementById('deleteModal').style.display = 'none';
-    document.getElementById('forceDelete').checked = false;
-}
-
-function submitDelete() {
-    const force = deleteDepotVehicleCount > 0 && document.getElementById('forceDelete').checked;
-
-    if (deleteDepotVehicleCount > 0 && !force) {
-        alert('Veuillez cocher la case pour confirmer la désaffectation des véhicules.');
-        return;
+    function closeDeleteModal() {
+        document.getElementById('deleteModal').style.display = 'none';
+        document.getElementById('forceDelete').checked = false;
     }
 
-    const form = document.createElement('form');
-    form.method = 'POST';
-    form.action = `/admin/depots/${deleteDepotId}`;
+    function submitDelete() {
+        const force = deleteDepotVehicleCount > 0 && document.getElementById('forceDelete').checked;
 
-    const csrf = document.createElement('input');
-    csrf.type = 'hidden';
-    csrf.name = '_token';
-    csrf.value = '{{ csrf_token() }}';
-    form.appendChild(csrf);
+        if (deleteDepotVehicleCount > 0 && !force) {
+            alert('Veuillez cocher la case pour confirmer la désaffectation des véhicules.');
+            return;
+        }
 
-    const method = document.createElement('input');
-    method.type = 'hidden';
-    method.name = '_method';
-    method.value = 'DELETE';
-    form.appendChild(method);
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = `/admin/depots/${deleteDepotId}`;
 
-    if (force) {
-        const forceInput = document.createElement('input');
-        forceInput.type = 'hidden';
-        forceInput.name = 'force';
-        forceInput.value = '1';
-        form.appendChild(forceInput);
+        const csrf = document.createElement('input');
+        csrf.type = 'hidden';
+        csrf.name = '_token';
+        csrf.value = '{{ csrf_token() }}';
+        form.appendChild(csrf);
+
+        const method = document.createElement('input');
+        method.type = 'hidden';
+        method.name = '_method';
+        method.value = 'DELETE';
+        form.appendChild(method);
+
+        if (force) {
+            const forceInput = document.createElement('input');
+            forceInput.type = 'hidden';
+            forceInput.name = 'force';
+            forceInput.value = '1';
+            form.appendChild(forceInput);
+        }
+
+        document.body.appendChild(form);
+        form.submit();
     }
 
-    document.body.appendChild(form);
-    form.submit();
-}
+    function openEditModal(depotId) {
+        // Dispatch Livewire event pour ouvrir modal édition
+        window.dispatchEvent(new CustomEvent('open-edit-depot-modal', {
+            detail: depotId
+        }));
 
-function openEditModal(depotId) {
-    // Dispatch Livewire event pour ouvrir modal édition
-    window.dispatchEvent(new CustomEvent('open-edit-depot-modal', {
-        detail: depotId
-    }));
+        // Redirection vers page liste avec modal auto-ouvert
+        window.location.href = '/admin/depots?edit=' + depotId;
+    }
 
-    // Redirection vers page liste avec modal auto-ouvert
-    window.location.href = '/admin/depots?edit=' + depotId;
-}
-
-// Style impression
-const style = document.createElement('style');
-style.textContent = `
+    // Style impression
+    const style = document.createElement('style');
+    style.textContent = `
     @media print {
         body * {
             visibility: hidden;
@@ -566,6 +566,6 @@ style.textContent = `
         }
     }
 `;
-document.head.appendChild(style);
+    document.head.appendChild(style);
 </script>
 @endpush

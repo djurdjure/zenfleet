@@ -338,260 +338,16 @@
                     </div>
 
                     {{-- Date de (Calendrier Popup Style Sanctions) --}}
-                    <div x-data="{
-                        showCalendar: false,
-                        selectedDate: @entangle('dateFrom'),
-                        displayDate: '',
-                        currentMonth: new Date().getMonth(),
-                        currentYear: new Date().getFullYear(),
-                        days: [],
-                        init() {
-                            this.parseDate();
-                            this.generateCalendar();
-                        },
-                        parseDate() {
-                            if (this.selectedDate) {
-                                const parts =this.selectedDate.split('-');
-                                if (parts.length === 3) {
-                                    this.displayDate = `${parts[2]}/${parts[1]}/${parts[0]}`;
-                                    this.currentYear = parseInt(parts[0]);
-                                    this.currentMonth = parseInt(parts[1]) - 1;
-                                }
-                            } else {
-                                this.displayDate = '';
-                            }
-                        },
-                        generateCalendar() {
-                            this.days = [];
-                            const firstDay = new Date(this.currentYear, this.currentMonth, 1);
-                            const lastDay = new Date(this.currentYear, this.currentMonth + 1, 0);
-                            const startPadding = firstDay.getDay() === 0 ? 6 : firstDay.getDay() - 1;
-                            for (let i = 0; i < startPadding; i++) {
-                                this.days.push({ day: '', disabled: true });
-                            }
-                            const today = new Date();
-                            today.setHours(0, 0, 0, 0);
-                            for (let d = 1; d <= lastDay.getDate(); d++) {
-                                const date = new Date(this.currentYear, this.currentMonth, d);
-                                this.days.push({
-                                    day: d,
-                                    disabled: date > today,
-                                    isToday: date.getTime() === today.getTime(),
-                                    isSelected: this.selectedDate === `${this.currentYear}-${String(this.currentMonth + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`
-                                });
-                            }
-                        },
-                        selectDay(day) {
-                            if (day.disabled || !day.day) return;
-                            this.selectedDate = `${this.currentYear}-${String(this.currentMonth + 1).padStart(2, '0')}-${String(day.day).padStart(2, '0')}`;
-                            this.displayDate = `${String(day.day).padStart(2, '0')}/${String(this.currentMonth + 1).padStart(2, '0')}/${this.currentYear}`;
-                            this.generateCalendar();
-                            this.showCalendar = false;
-                        },
-                        clearDate() {
-                            this.selectedDate = '';
-                            this.displayDate = '';
-                            this.generateCalendar();
-                        },
-                        prevMonth() {
-                            if (this.currentMonth === 0) {
-                                this.currentMonth = 11;
-                                this.currentYear--;
-                            } else {
-                                this.currentMonth--;
-                            }
-                            this.generateCalendar();
-                        },
-                        nextMonth() {
-                            const today = new Date();
-                            const nextMonth = new Date(this.currentYear, this.currentMonth + 1, 1);
-                            if (nextMonth <= today) {
-                                if (this.currentMonth === 11) {
-                                    this.currentMonth = 0;
-                                    this.currentYear++;
-                                } else {
-                                    this.currentMonth++;
-                                }
-                                this.generateCalendar();
-                            }
-                        },
-                        monthNames: ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre']
-                    }" x-init="$watch('selectedDate', () => parseDate())">
-                        <label class="block text-xs font-medium text-gray-700 mb-1">Du</label>
-                        <div class="relative">
-                            <input
-                                type="text"
-                                x-model="displayDate"
-                                @click="showCalendar = !showCalendar"
-                                readonly
-                                placeholder="JJ/MM/AAAA"
-                                class="w-full px-4 py-2 pl-10 bg-gray-50 border border-gray-300 text-xs text-gray-900 rounded-lg shadow-sm transition-all cursor-pointer focus:border-blue-500 focus:ring-2 focus:ring-blue-500 hover:border-gray-400">
-                            <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                                <x-iconify icon="lucide:calendar" class="w-4 h-4 text-gray-400" />
-                            </div>
-                            <div x-show="showCalendar" x-transition @click.away="showCalendar = false" class="absolute z-50 mt-2 bg-white rounded-xl shadow-2xl border border-gray-200 p-4 w-72">
-                                <div class="flex items-center justify-between mb-4">
-                                    <button type="button" @click="prevMonth()" class="p-1 hover:bg-gray-100 rounded-lg">
-                                        <x-iconify icon="heroicons:chevron-left" class="w-5 h-5 text-gray-600" />
-                                    </button>
-                                    <span class="font-semibold text-gray-900" x-text="monthNames[currentMonth] + ' ' + currentYear"></span>
-                                    <button type="button" @click="nextMonth()" class="p-1 hover:bg-gray-100 rounded-lg">
-                                        <x-iconify icon="heroicons:chevron-right" class="w-5 h-5 text-gray-600" />
-                                    </button>
-                                </div>
-                                <div class="grid grid-cols-7 gap-1 mb-2">
-                                    <template x-for="day in ['Lu', 'Ma', 'Me', 'Je', 'Ve', 'Sa', 'Di']">
-                                        <div class="text-center text-xs font-semibold text-gray-500 py-1" x-text="day"></div>
-                                    </template>
-                                </div>
-                                <div class="grid grid-cols-7 gap-1">
-                                    <template x-for="(day, index) in days" :key="index">
-                                        <button type="button" @click="selectDay(day)" :disabled="day.disabled"
-                                            :class="{
-                                                'bg-blue-600 text-white': day.isSelected,
-                                                'bg-blue-100 text-blue-800': day.isToday && !day.isSelected,
-                                                'hover:bg-gray-100': !day.disabled && !day.isSelected,
-                                                'text-gray-300 cursor-not-allowed': day.disabled,
-                                                'text-gray-700': !day.disabled && !day.isSelected
-                                            }"
-                                            class="w-8 h-8 flex items-center justify-center text-sm rounded-lg transition-colors" x-text="day.day">
-                                        </button>
-                                    </template>
-                                </div>
-                                <div class="mt-3 pt-3 border-t border-gray-200">
-                                    <button type="button" @click="clearDate(); showCalendar = false" class="w-full text-center text-xs text-gray-600 hover:text-gray-900">Effacer</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                    <x-date-picker
+                        label="Du"
+                        wire:model.live="dateFrom"
+                        placeholder="JJ/MM/AAAA" />
 
                     {{-- Date à (Calendrier Popup Style Sanctions) --}}
-                    <div x-data="{
-                        showCalendar: false,
-                        selectedDate: @entangle('dateTo'),
-                        displayDate: '',
-                        currentMonth: new Date().getMonth(),
-                        currentYear: new Date().getFullYear(),
-                        days: [],
-                        init() {
-                            this.parseDate();
-                            this.generateCalendar();
-                        },
-                        parseDate() {
-                            if (this.selectedDate) {
-                                const parts = this.selectedDate.split('-');
-                                if (parts.length === 3) {
-                                    this.displayDate = `${parts[2]}/${parts[1]}/${parts[0]}`;
-                                    this.currentYear = parseInt(parts[0]);
-                                    this.currentMonth = parseInt(parts[1]) - 1;
-                                }
-                            } else {
-                                this.displayDate = '';
-                            }
-                        },
-                        generateCalendar() {
-                            this.days = [];
-                            const firstDay = new Date(this.currentYear, this.currentMonth, 1);
-                            const lastDay = new Date(this.currentYear, this.currentMonth + 1, 0);
-                            const startPadding = firstDay.getDay() === 0 ? 6 : firstDay.getDay() - 1;
-                            for (let i = 0; i < startPadding; i++) {
-                                this.days.push({ day: '', disabled: true });
-                            }
-                            const today = new Date();
-                            today.setHours(0, 0, 0, 0);
-                            for (let d = 1; d <= lastDay.getDate(); d++) {
-                                const date = new Date(this.currentYear, this.currentMonth, d);
-                                this.days.push({
-                                    day: d,
-                                    disabled: date > today,
-                                    isToday: date.getTime() === today.getTime(),
-                                    isSelected: this.selectedDate === `${this.currentYear}-${String(this.currentMonth + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`
-                                });
-                            }
-                        },
-                        selectDay(day) {
-                            if (day.disabled || !day.day) return;
-                            this.selectedDate = `${this.currentYear}-${String(this.currentMonth + 1).padStart(2, '0')}-${String(day.day).padStart(2, '0')}`;
-                            this.displayDate = `${String(day.day).padStart(2, '0')}/${String(this.currentMonth + 1).padStart(2, '0')}/${this.currentYear}`;
-                            this.generateCalendar();
-                            this.showCalendar = false;
-                        },
-                        clearDate() {
-                            this.selectedDate = '';
-                            this.displayDate = '';
-                            this.generateCalendar();
-                        },
-                        prevMonth() {
-                            if (this.currentMonth === 0) {
-                                this.currentMonth = 11;
-                                this.currentYear--;
-                            } else {
-                                this.currentMonth--;
-                            }
-                            this.generateCalendar();
-                        },
-                        nextMonth() {
-                            const today = new Date();
-                            const nextMonth = new Date(this.currentYear, this.currentMonth + 1, 1);
-                            if (nextMonth <= today) {
-                                if (this.currentMonth === 11) {
-                                    this.currentMonth = 0;
-                                    this.currentYear++;
-                                } else {
-                                    this.currentMonth++;
-                                }
-                                this.generateCalendar();
-                            }
-                        },
-                        monthNames: ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre']
-                    }" x-init="$watch('selectedDate', () => parseDate())">
-                        <label class="block text-xs font-medium text-gray-700 mb-1">Au</label>
-                        <div class="relative">
-                            <input
-                                type="text"
-                                x-model="displayDate"
-                                @click="showCalendar = !showCalendar"
-                                readonly
-                                placeholder="JJ/MM/AAAA"
-                                class="w-full px-4 py-2 pl-10 bg-gray-50 border border-gray-300 text-xs text-gray-900 rounded-lg shadow-sm transition-all cursor-pointer focus:border-blue-500 focus:ring-2 focus:ring-blue-500 hover:border-gray-400">
-                            <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                                <x-iconify icon="lucide:calendar" class="w-4 h-4 text-gray-400" />
-                            </div>
-                            <div x-show="showCalendar" x-transition @click.away="showCalendar = false" class="absolute z-50 mt-2 bg-white rounded-xl shadow-2xl border border-gray-200 p-4 w-72">
-                                <div class="flex items-center justify-between mb-4">
-                                    <button type="button" @click="prevMonth()" class="p-1 hover:bg-gray-100 rounded-lg">
-                                        <x-iconify icon="heroicons:chevron-left" class="w-5 h-5 text-gray-600" />
-                                    </button>
-                                    <span class="font-semibold text-gray-900" x-text="monthNames[currentMonth] + ' ' + currentYear"></span>
-                                    <button type="button" @click="nextMonth()" class="p-1 hover:bg-gray-100 rounded-lg">
-                                        <x-iconify icon="heroicons:chevron-right" class="w-5 h-5 text-gray-600" />
-                                    </button>
-                                </div>
-                                <div class="grid grid-cols-7 gap-1 mb-2">
-                                    <template x-for="day in ['Lu', 'Ma', 'Me', 'Je', 'Ve', 'Sa', 'Di']">
-                                        <div class="text-center text-xs font-semibold text-gray-500 py-1" x-text="day"></div>
-                                    </template>
-                                </div>
-                                <div class="grid grid-cols-7 gap-1">
-                                    <template x-for="(day, index) in days" :key="index">
-                                        <button type="button" @click="selectDay(day)" :disabled="day.disabled"
-                                            :class="{
-                                                'bg-blue-600 text-white': day.isSelected,
-                                                'bg-blue-100 text-blue-800': day.isToday && !day.isSelected,
-                                                'hover:bg-gray-100': !day.disabled && !day.isSelected,
-                                                'text-gray-300 cursor-not-allowed': day.disabled,
-                                                'text-gray-700': !day.disabled && !day.isSelected
-                                            }"
-                                            class="w-8 h-8 flex items-center justify-center text-sm rounded-lg transition-colors" x-text="day.day">
-                                        </button>
-                                    </template>
-                                </div>
-                                <div class="mt-3 pt-3 border-t border-gray-200">
-                                    <button type="button" @click="clearDate(); showCalendar = false" class="w-full text-center text-xs text-gray-600 hover:text-gray-900">Effacer</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                    <x-date-picker
+                        label="Au"
+                        wire:model.live="dateTo"
+                        placeholder="JJ/MM/AAAA" />
                 </div>
 
                 {{-- Ligne 2: Filtres avancés --}}
@@ -621,30 +377,20 @@
                     </div>
 
                     {{-- KM Min --}}
-                    <div>
-                        <label for="mileage-min" class="block text-xs font-medium text-gray-700 mb-1">
-                            KM Min
-                        </label>
-                        <input
-                            wire:model.live.debounce.500ms="mileageMin"
-                            type="number"
-                            id="mileage-min"
-                            placeholder="0"
-                            class="block w-full border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-xs bg-gray-50 hover:border-gray-400 transition-colors shadow-sm">
-                    </div>
+                    <x-input
+                        label="KM Min"
+                        wire:model.live.debounce.500ms="mileageMin"
+                        type="number"
+                        id="mileage-min"
+                        placeholder="0" />
 
                     {{-- KM Max --}}
-                    <div>
-                        <label for="mileage-max" class="block text-xs font-medium text-gray-700 mb-1">
-                            KM Max
-                        </label>
-                        <input
-                            wire:model.live.debounce.500ms="mileageMax"
-                            type="number"
-                            id="mileage-max"
-                            placeholder="999999"
-                            class="block w-full border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-xs bg-gray-50 hover:border-gray-400 transition-colors shadow-sm">
-                    </div>
+                    <x-input
+                        label="KM Max"
+                        wire:model.live.debounce.500ms="mileageMax"
+                        type="number"
+                        id="mileage-max"
+                        placeholder="999999" />
 
                 </div>
 

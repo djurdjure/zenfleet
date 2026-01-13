@@ -43,6 +43,6 @@ class Card extends Component
      */
     public function getClasses(): string
     {
-        return "bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 {$this->padding} {$this->margin}";
+        return "bg-white rounded-lg shadow-sm border border-gray-200 {$this->padding} {$this->margin}";
     }
 }

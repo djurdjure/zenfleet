@@ -5,10 +5,10 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="csrf-token" content="bdDbWyzYEX2AzpLtVeiHgZZ6OO6SseR7X892Vy7G">
+    <meta name="csrf-token" content="EN6bFC7DubIdSLX6K2sUSuBETiDOVG6jgMh4aRp8">
         <meta name="user-data" content="{&quot;id&quot;:4,&quot;name&quot;:&quot;admin zenfleet&quot;,&quot;role&quot;:&quot;Admin&quot;}">
     
-    <title>Ajouter un Nouveau Chauffeur - ZenFleet</title>
+    <title>ZenFleet Admin - ZenFleet</title>
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.bunny.net">
@@ -20,320 +20,10 @@
     <script src="https://code.iconify.design/3/3.1.0/iconify.min.js"></script>
 
     
-    <link rel="stylesheet" href="/vendor/css/flatpickr.css">
-    <link rel="stylesheet" href="/vendor/css/slim-select.css">
-    <style>
-        /* 🎨 FLATPICKR ENTERPRISE-GRADE LIGHT MODE - ZenFleet Ultra-Pro */
-        .flatpickr-calendar {
-            background-color: white !important;
-            border: 1px solid rgb(229 231 235);
-            border-radius: 0.75rem;
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-            font-family: inherit;
-        }
 
-        /* En-tête (mois/année) - Bleu blue-600 premium */
-        .flatpickr-months {
-            background: rgb(37 99 235) !important;
-            border-radius: 0.75rem 0.75rem 0 0;
-            padding: 0.875rem 0;
-        }
 
-        .flatpickr-months .flatpickr-month,
-        .flatpickr-current-month .flatpickr-monthDropdown-months {
-            background-color: transparent !important;
-            color: white !important;
-            font-weight: 600;
-            font-size: 1rem;
-        }
-
-        /* Boutons navigation */
-        .flatpickr-months .flatpickr-prev-month,
-        .flatpickr-months .flatpickr-next-month {
-            fill: white !important;
-            transition: all 0.2s;
-        }
-
-        .flatpickr-months .flatpickr-prev-month:hover,
-        .flatpickr-months .flatpickr-next-month:hover {
-            fill: rgb(219 234 254) !important;
-            transform: scale(1.15);
-        }
-
-        /* Jours de la semaine */
-        .flatpickr-weekdays {
-            background-color: rgb(249 250 251) !important;
-            padding: 0.625rem 0;
-            border-bottom: 1px solid rgb(229 231 235);
-        }
-
-        .flatpickr-weekday {
-            color: rgb(107 114 128) !important;
-            font-weight: 600;
-            font-size: 0.75rem;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
-
-        /* Corps du calendrier */
-        .flatpickr-days {
-            background-color: white !important;
-        }
-
-        /* Jours du mois */
-        .flatpickr-day {
-            color: rgb(17 24 39) !important;
-            border-radius: 0.5rem;
-            font-weight: 500;
-            transition: all 0.2s;
-            border: 1px solid transparent;
-        }
-
-        .flatpickr-day.today {
-            border: 2px solid rgb(37 99 235) !important;
-            font-weight: 700;
-            color: rgb(37 99 235) !important;
-            background-color: rgb(239 246 255) !important;
-        }
-
-        .flatpickr-day.selected,
-        .flatpickr-day.selected:hover {
-            background-color: rgb(37 99 235) !important;
-            border-color: rgb(37 99 235) !important;
-            color: white !important;
-            font-weight: 700;
-            box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.4);
-        }
-
-        .flatpickr-day:hover:not(.selected):not(.flatpickr-disabled):not(.today) {
-            background-color: rgb(243 244 246) !important;
-            border-color: rgb(229 231 235) !important;
-            color: rgb(17 24 39) !important;
-            transform: scale(1.05);
-        }
-
-        .flatpickr-day.flatpickr-disabled {
-            color: rgb(209 213 219) !important;
-            opacity: 0.4;
-        }
-    </style>
-
-    <link rel="preload" as="style" href="http://localhost/build/assets/app-B3VcwZDs.css" /><link rel="modulepreload" as="script" href="http://localhost/build/assets/app-Dx8zybLc.js" /><link rel="modulepreload" as="script" href="http://localhost/build/assets/slimselect-CAvN1F7Q.js" /><link rel="modulepreload" as="script" href="http://localhost/build/assets/vendor-common-B9ygI19o.js" /><link rel="modulepreload" as="script" href="http://localhost/build/assets/ui-public-2hikc2V1.js" /><link rel="stylesheet" href="http://localhost/build/assets/app-B3VcwZDs.css" data-navigate-track="reload" /><script type="module" src="http://localhost/build/assets/app-Dx8zybLc.js" data-navigate-track="reload"></script>    <style>
-    /* ========================================
-   ZENFLEET SLIMSELECT ENTERPRISE THEME
-   ======================================== */
-
-    :root {
-        --ss-main-height: 42px;
-        --ss-primary-color: #2563eb;
-        /* blue-600 */
-        --ss-bg-color: #ffffff;
-        --ss-font-color: #111827;
-        /* gray-900 */
-        --ss-font-placeholder-color: #9ca3af;
-        /* gray-400 */
-        --ss-border-color: #d1d5db;
-        /* gray-300 */
-        --ss-border-radius: 0.5rem;
-        /* rounded-lg */
-        --ss-spacing-l: 10px;
-        --ss-spacing-m: 8px;
-        --ss-spacing-s: 4px;
-        --ss-animation-timing: 0.2s;
-        --ss-focus-color: #3b82f6;
-        /* blue-500 */
-        --ss-error-color: #dc2626;
-        /* red-600 */
-    }
-
-    /* Main container styling */
-    .ss-main {
-        background-color: #f9fafb;
-        /* gray-50 */
-        border-color: #d1d5db;
-        /* gray-300 */
-        color: #111827;
-        /* gray-900 */
-        border-radius: 0.5rem;
-        /* rounded-lg */
-        padding: 2px 0;
-        /* Ajustement padding */
-        min-height: 42px;
-        /* Hauteur minimale */
-        transition: all 0.2s ease-in-out;
-        box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-        /* shadow-sm */
-    }
-
-    /* Focus state */
-    .ss-main:focus-within {
-        border-color: var(--ss-focus-color);
-        box-shadow: 0 0 0 1px var(--ss-focus-color);
-        /* ring-1 */
-        background-color: #ffffff;
-    }
-
-    /* Values styling */
-    .ss-main .ss-values .ss-single {
-        padding: 4px var(--ss-spacing-l);
-        font-size: 0.875rem;
-        /* text-sm = 14px */
-        line-height: 1.25rem;
-        /* leading-5 */
-        font-weight: 400;
-    }
-
-    /* Placeholder styling */
-    .ss-main .ss-values .ss-placeholder {
-        font-size: 0.875rem;
-        font-style: normal;
-    }
-
-    /* Dropdown content - ombre plus prononcée */
-    .ss-content {
-        margin-top: 4px;
-        box-shadow:
-            0 10px 15px -3px rgba(0, 0, 0, 0.1),
-            /* shadow-lg */
-            0 4px 6px -2px rgba(0, 0, 0, 0.05);
-        border-color: #e5e7eb;
-        /* gray-200 */
-    }
-
-    /* Champ de recherche */
-    .ss-content .ss-search {
-        background-color: #f9fafb;
-        /* gray-50 */
-        border-bottom: 1px solid #e5e7eb;
-        /* gray-200 */
-        padding: var(--ss-spacing-m);
-    }
-
-    .ss-content .ss-search input {
-        font-size: 0.875rem;
-        padding: 10px 12px;
-        border-radius: 6px;
-        /* rounded-md */
-    }
-
-    .ss-content .ss-search input:focus {
-        border-color: var(--ss-focus-color);
-        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-    }
-
-    /* Options - style hover amélioré */
-    .ss-content .ss-list .ss-option {
-        font-size: 0.875rem;
-        padding: 10px var(--ss-spacing-l);
-        transition: background-color 0.15s ease, color 0.15s ease;
-    }
-
-    .ss-content .ss-list .ss-option:hover {
-        background-color: #eff6ff;
-        /* blue-50 */
-        color: var(--ss-font-color);
-        /* Garder texte lisible */
-    }
-
-    /* Option sélectionnée - fond plus subtil */
-    .ss-content .ss-list .ss-option.ss-highlighted,
-    .ss-content .ss-list .ss-option:not(.ss-disabled).ss-selected {
-        background-color: var(--ss-primary-color);
-        color: #ffffff;
-    }
-
-    /* Option sélectionnée avec checkmark */
-    .ss-content .ss-list .ss-option:not(.ss-disabled).ss-selected::after {
-        content: '✓';
-        margin-left: auto;
-        font-weight: 600;
-    }
-
-    /* État d'erreur de validation */
-    .slimselect-error .ss-main {
-        border-color: var(--ss-error-color) !important;
-        box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1) !important;
-        /* ring-red-600/10 */
-    }
-
-    /* Cacher le placeholder dans la liste des options */
-    .ss-content .ss-list .ss-option[data-placeholder="true"] {
-        display: none !important;
-    }
-
-    /* Message d'erreur */
-    .ss-content .ss-list .ss-error {
-        font-size: 0.875rem;
-        padding: var(--ss-spacing-l);
-    }
-
-    /* Message de recherche en cours */
-    .ss-content .ss-list .ss-searching {
-        font-size: 0.875rem;
-        color: var(--ss-primary-color);
-        padding: var(--ss-spacing-l);
-    }
-
-    /* Flèche de dropdown */
-    .ss-main .ss-arrow path {
-        stroke-width: 14;
-    }
-
-    /* Animation d'ouverture du dropdown */
-    .ss-content.ss-open-below,
-    .ss-content.ss-open-above {
-        animation: zenfleetSlideIn var(--ss-animation-timing) ease-out;
-    }
-
-    @keyframes zenfleetSlideIn {
-        from {
-            opacity: 0;
-            transform: scaleY(0.95) translateY(-4px);
-        }
-
-        to {
-            opacity: 1;
-            transform: scaleY(1) translateY(0);
-        }
-    }
-
-    /* ========================================
-   RESPONSIVE MOBILE
-   ======================================== */
-    @media (max-width: 640px) {
-        :root {
-            --ss-main-height: 44px;
-            /* Plus grand pour touch */
-            --ss-content-height: 240px;
-        }
-
-        .ss-content .ss-list .ss-option {
-            padding: 12px var(--ss-spacing-l);
-            /* Touch-friendly */
-            min-height: 44px;
-            /* iOS minimum */
-        }
-
-        .ss-content .ss-search input {
-            padding: 12px;
-            font-size: 16px;
-            /* Évite zoom iOS */
-        }
-    }
-
-    /* ========================================
-   ACCESSIBILITÉ
-   ======================================== */
-    @media (prefers-reduced-motion: reduce) {
-
-        .ss-main,
-        .ss-content,
-        .ss-option {
-            transition: none !important;
-            animation: none !important;
-        }
-    }
-</style>    <!-- Livewire Styles --><style >[wire\:loading][wire\:loading], [wire\:loading\.delay][wire\:loading\.delay], [wire\:loading\.inline-block][wire\:loading\.inline-block], [wire\:loading\.inline][wire\:loading\.inline], [wire\:loading\.block][wire\:loading\.block], [wire\:loading\.flex][wire\:loading\.flex], [wire\:loading\.table][wire\:loading\.table], [wire\:loading\.grid][wire\:loading\.grid], [wire\:loading\.inline-flex][wire\:loading\.inline-flex] {display: none;}[wire\:loading\.delay\.none][wire\:loading\.delay\.none], [wire\:loading\.delay\.shortest][wire\:loading\.delay\.shortest], [wire\:loading\.delay\.shorter][wire\:loading\.delay\.shorter], [wire\:loading\.delay\.short][wire\:loading\.delay\.short], [wire\:loading\.delay\.default][wire\:loading\.delay\.default], [wire\:loading\.delay\.long][wire\:loading\.delay\.long], [wire\:loading\.delay\.longer][wire\:loading\.delay\.longer], [wire\:loading\.delay\.longest][wire\:loading\.delay\.longest] {display: none;}[wire\:offline][wire\:offline] {display: none;}[wire\:dirty]:not(textarea):not(input):not(select) {display: none;}:root {--livewire-progress-bar-color: #2299dd;}[x-cloak] {display: none !important;}[wire\:cloak] {display: none !important;}</style>
+    <!-- 🚀 Performance: Load CSS in Parallel (No JS blocking) -->
+    <script type="module" src="http://localhost:5173/@vite/client" data-navigate-track="reload"></script><link rel="stylesheet" href="http://localhost:5173/resources/css/app.css" data-navigate-track="reload" /><link rel="stylesheet" href="http://localhost:5173/resources/css/admin/app.css" data-navigate-track="reload" /><script type="module" src="http://localhost:5173/resources/js/admin/app.js" data-navigate-track="reload"></script>        <!-- Livewire Styles --><style >[wire\:loading][wire\:loading], [wire\:loading\.delay][wire\:loading\.delay], [wire\:loading\.inline-block][wire\:loading\.inline-block], [wire\:loading\.inline][wire\:loading\.inline], [wire\:loading\.block][wire\:loading\.block], [wire\:loading\.flex][wire\:loading\.flex], [wire\:loading\.table][wire\:loading\.table], [wire\:loading\.grid][wire\:loading\.grid], [wire\:loading\.inline-flex][wire\:loading\.inline-flex] {display: none;}[wire\:loading\.delay\.none][wire\:loading\.delay\.none], [wire\:loading\.delay\.shortest][wire\:loading\.delay\.shortest], [wire\:loading\.delay\.shorter][wire\:loading\.delay\.shorter], [wire\:loading\.delay\.short][wire\:loading\.delay\.short], [wire\:loading\.delay\.default][wire\:loading\.delay\.default], [wire\:loading\.delay\.long][wire\:loading\.delay\.long], [wire\:loading\.delay\.longer][wire\:loading\.delay\.longer], [wire\:loading\.delay\.longest][wire\:loading\.delay\.longest] {display: none;}[wire\:offline][wire\:offline] {display: none;}[wire\:dirty]:not(textarea):not(input):not(select) {display: none;}:root {--livewire-progress-bar-color: #2299dd;}[x-cloak] {display: none !important;}[wire\:cloak] {display: none !important;}</style>
 </head>
 
 <body class="h-full">
@@ -440,14 +130,14 @@
                                         <div class="px-1 py-2 h-full relative">
                                             <div class="bg-gray-400/30 w-0.5 h-full rounded-full"></div>
                                                                                         <div class="absolute w-0.5 rounded-full bg-blue-600 transition-all duration-300"
-                                                x-bind:style="`height: 0%; top: 0%;`"></div>
+                                                x-bind:style="`height: 50%; top: 0%;`"></div>
                                         </div>
                                     </div>
                                     <div class="flex-1 min-w-0 space-y-1">
                                                                                 <a href="http://localhost/admin/drivers"
-                                            class="flex items-center w-full h-9 px-2.5 py-1.5 rounded-md text-sm font-semibold transition-all duration-200 text-gray-700 hover:bg-white/70 hover:text-gray-900">
+                                            class="flex items-center w-full h-9 px-2.5 py-1.5 rounded-md text-sm font-semibold transition-all duration-200 bg-blue-100 text-blue-700">
                                             <span
-    class="iconify block w-4 h-4 mr-2.5 text-gray-600"
+    class="iconify block w-4 h-4 mr-2.5 text-blue-600"
     data-icon="mdi:view-list"
     data-inline="false"></span>                                            Liste
                                         </a>
@@ -808,7 +498,7 @@
                 x-transition:leave-start="opacity-100"
                 x-transition:leave-end="opacity-0"
                 class="relative z-50 lg:hidden">
-                <div class="fixed inset-0 bg-gray-900/80" @click="open = false"></div>
+                <div class="fixed inset-0 bg-gray-500/75 backdrop-blur-sm" @click="open = false"></div>
 
                 <div class="fixed inset-0 flex">
                     <div x-show="open"
@@ -839,7 +529,7 @@
                                             
                                             <li>
                                                                                                 <a href="http://localhost/admin/dashboard"
-                                                    class="group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold text-zinc-700 hover:text-zinc-950 hover:bg-zinc-100">
+                                                    class="group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold text-gray-700 hover:text-gray-900 hover:bg-gray-100">
                                                     <span
     class="iconify block h-5 w-5 shrink-0"
     data-icon="heroicons:home"
@@ -852,7 +542,7 @@
                                             
                                                                                         <li x-data="{ open: false }">
                                                 <button @click="open = !open"
-                                                    class="group flex w-full gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold text-zinc-700 hover:text-zinc-950 hover:bg-zinc-100">
+                                                    class="group flex w-full gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold text-gray-700 hover:text-gray-900 hover:bg-gray-100">
                                                     <span
     class="iconify block h-5 w-5 shrink-0"
     data-icon="heroicons:truck"
@@ -867,7 +557,7 @@
                                                             <div class="absolute left-0 top-0 bottom-0 w-px bg-zinc-300"></div>
                                                             <div class="absolute left-0 top-3 w-3 h-px bg-zinc-300"></div>
                                                             <a href="http://localhost/admin/vehicles"
-                                                                class="group flex gap-x-3 rounded-md p-2 pl-4 text-sm leading-6 font-medium text-zinc-600 hover:text-zinc-900 hover:bg-zinc-50">
+                                                                class="group flex gap-x-3 rounded-md p-2 pl-4 text-sm leading-6 font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50">
                                                                 <span
     class="iconify block h-4 w-4 shrink-0"
     data-icon="heroicons:truck"
@@ -1020,7 +710,13 @@
                             </button>
                         </div>
 
-
+                        
+                        <button type="button" class="-m-2.5 p-2.5 text-zinc-500 hover:text-zinc-600">
+                            <span class="sr-only">Basculer le mode sombre</span>
+                            <span
+    class="iconify block h-6 w-6"
+    data-icon="heroicons:moon"
+    data-inline="false"></span>                        </button>
 
                         
                         <div class="hidden lg:block lg:h-6 lg:w-px lg:bg-zinc-200" aria-hidden="true"></div>
@@ -1095,7 +791,7 @@
                                     </a>
                                     <div class="border-t border-zinc-100 my-1"></div>
                                     <form method="POST" action="http://localhost/logout">
-                                        <input type="hidden" name="_token" value="bdDbWyzYEX2AzpLtVeiHgZZ6OO6SseR7X892Vy7G" autocomplete="off">                                        <button type="submit"
+                                        <input type="hidden" name="_token" value="EN6bFC7DubIdSLX6K2sUSuBETiDOVG6jgMh4aRp8" autocomplete="off">                                        <button type="submit"
                                             class="group flex w-full items-center px-4 py-2 text-sm text-zinc-700 hover:bg-zinc-50">
                                             <span
     class="iconify block mr-3 h-4 w-4 text-zinc-400 group-hover:text-zinc-600"
@@ -1112,1007 +808,202 @@
 
             <main class="py-10">
                 <div class="px-4 sm:px-6 lg:px-8">
-                    
+                            <div wire:snapshot="{&quot;data&quot;:{&quot;search&quot;:&quot;&quot;,&quot;status_id&quot;:&quot;&quot;,&quot;license_category&quot;:&quot;&quot;,&quot;visibility&quot;:&quot;active&quot;,&quot;perPage&quot;:25,&quot;sortField&quot;:&quot;created_at&quot;,&quot;sortDirection&quot;:&quot;desc&quot;,&quot;selectedDrivers&quot;:[[],{&quot;s&quot;:&quot;arr&quot;}],&quot;selectAll&quot;:false,&quot;restoringDriverId&quot;:null,&quot;showRestoreModal&quot;:false,&quot;forceDeletingDriverId&quot;:null,&quot;showForceDeleteModal&quot;:false,&quot;archivingDriverId&quot;:null,&quot;showArchiveModal&quot;:false,&quot;paginators&quot;:[{&quot;page&quot;:1},{&quot;s&quot;:&quot;arr&quot;}]},&quot;memo&quot;:{&quot;id&quot;:&quot;WsR18BfAcbwj70X7fAGY&quot;,&quot;name&quot;:&quot;admin.drivers.driver-index&quot;,&quot;path&quot;:&quot;admin\/drivers&quot;,&quot;method&quot;:&quot;GET&quot;,&quot;children&quot;:{&quot;status-13&quot;:[&quot;div&quot;,&quot;m3ieVbvhir3PiKplzGuO&quot;],&quot;status-12&quot;:[&quot;div&quot;,&quot;ZVox3FtTRP0QTkoof0P0&quot;],&quot;status-11&quot;:[&quot;div&quot;,&quot;lL1bMZ5RmjtEvIp910A1&quot;],&quot;status-10&quot;:[&quot;div&quot;,&quot;M3GgevmeV1jzp9BKlTVk&quot;],&quot;status-9&quot;:[&quot;div&quot;,&quot;XHlGE2fDekSI99SXpDcq&quot;],&quot;status-8&quot;:[&quot;div&quot;,&quot;myObKRQ9znQZlKPDqkBt&quot;],&quot;status-6&quot;:[&quot;div&quot;,&quot;ewvGPdeJGSWTpj5eE0cj&quot;],&quot;status-4&quot;:[&quot;div&quot;,&quot;USOt9vnL5h7pZZFNIKaf&quot;]},&quot;scripts&quot;:[],&quot;assets&quot;:[],&quot;errors&quot;:[],&quot;locale&quot;:&quot;fr&quot;},&quot;checksum&quot;:&quot;2100256a26fe9d6a43e264c1c0fac2c682e6b704b2be98f5954166a3064e6056&quot;}" wire:effects="{&quot;url&quot;:{&quot;search&quot;:{&quot;as&quot;:null,&quot;use&quot;:&quot;replace&quot;,&quot;alwaysShow&quot;:false,&quot;except&quot;:&quot;&quot;},&quot;status_id&quot;:{&quot;as&quot;:null,&quot;use&quot;:&quot;replace&quot;,&quot;alwaysShow&quot;:false,&quot;except&quot;:&quot;&quot;},&quot;license_category&quot;:{&quot;as&quot;:null,&quot;use&quot;:&quot;replace&quot;,&quot;alwaysShow&quot;:false,&quot;except&quot;:&quot;&quot;},&quot;visibility&quot;:{&quot;as&quot;:null,&quot;use&quot;:&quot;replace&quot;,&quot;alwaysShow&quot;:false,&quot;except&quot;:&quot;&quot;},&quot;paginators.page&quot;:{&quot;as&quot;:&quot;page&quot;,&quot;use&quot;:&quot;push&quot;,&quot;alwaysShow&quot;:false,&quot;except&quot;:null}}}" wire:id="WsR18BfAcbwj70X7fAGY">
+    
 
-
-
-
-<section class="bg-gray-50 min-h-screen">
-    <div class="py-6 px-4 mx-auto max-w-7xl lg:py-12">
+    <div class="py-4 px-4 mx-auto max-w-7xl lg:py-6">
 
         
-        <div class="mb-6">
-            <h1 class="text-2xl font-bold text-gray-900 mb-1 flex items-center gap-2.5">
+        <div class="mb-4 flex justify-between items-center">
+            <h1 class="text-2xl font-bold text-gray-900 flex items-center gap-2.5">
                 <span
     class="iconify block w-6 h-6 text-blue-600"
-    data-icon="heroicons:user-plus"
-    data-inline="false"></span>                Ajouter un Nouveau Chauffeur
+    data-icon="lucide:users"
+    data-inline="false"></span>                Gestion des Chauffeurs
+                <span class="ml-2 text-sm font-normal text-gray-500">
+                    (8)
+                </span>
             </h1>
-            <p class="text-sm text-gray-600 ml-8.5">
-                Complétez les 4 étapes pour enregistrer un chauffeur
-            </p>
+
+            
+            <div wire:loading class="flex items-center gap-2 text-blue-600">
+                <span
+    class="iconify block w-5 h-5 animate-spin"
+    data-icon="lucide:loader-2"
+    data-inline="false"></span>                <span class="text-sm font-medium">Chargement...</span>
+            </div>
         </div>
 
         
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+            
+            <div class="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-lg transition-shadow duration-300">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-gray-600">Total chauffeurs</p>
+                        <p class="text-2xl font-bold text-gray-900 mt-1">8</p>
+                    </div>
+                    <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                        <span
+    class="iconify block w-6 h-6 text-blue-600"
+    data-icon="lucide:users"
+    data-inline="false"></span>                    </div>
+                </div>
+            </div>
+
+            
+            <div class="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-lg transition-shadow duration-300">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-gray-600">Disponibles</p>
+                        <p class="text-2xl font-bold text-green-600 mt-1">4</p>
+                    </div>
+                    <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                        <span
+    class="iconify block w-6 h-6 text-green-600"
+    data-icon="lucide:user-check"
+    data-inline="false"></span>                    </div>
+                </div>
+            </div>
+
+            
+            <div class="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-lg transition-shadow duration-300">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-gray-600">En mission</p>
+                        <p class="text-2xl font-bold text-orange-600 mt-1">2</p>
+                    </div>
+                    <div class="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
+                        <span
+    class="iconify block w-6 h-6 text-orange-600"
+    data-icon="lucide:briefcase"
+    data-inline="false"></span>                    </div>
+                </div>
+            </div>
+
+            
+            <div class="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-lg transition-shadow duration-300">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-gray-600">En repos</p>
+                        <p class="text-2xl font-bold text-amber-600 mt-1">0</p>
+                    </div>
+                    <div class="w-12 h-12 bg-amber-100 rounded-lg flex items-center justify-center">
+                        <span
+    class="iconify block w-6 h-6 text-amber-600"
+    data-icon="lucide:pause-circle"
+    data-inline="false"></span>                    </div>
+                </div>
+            </div>
+        </div>
+
         
-        
-        <div x-data="driverFormValidation()" x-init="init()">
-
-            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-0 mb-6">
- 
- <div class="w-full bg-white border-b border-gray-200 py-8">
-    <div class="px-4 mx-auto">
-        <ol class="flex items-start justify-center gap-0 w-full max-w-4xl mx-auto">
-                            
-                <li class="flex flex-col items-center relative flex-1">
-
-                    
-                    <div class="flex items-center w-full relative z-10">
-
-                        
-                        <div class="flex items-center justify-center w-12 h-12 rounded-full flex-shrink-0 bg-white border-2 transition-all duration-300 relative"
-                            x-bind:class="{
-                                'border-blue-600 shadow-lg shadow-blue-500/40': currentStep === 1,
-                                'border-blue-600 shadow-md shadow-blue-500/20': currentStep &gt; 1,
-                                'border-gray-300 shadow-sm': currentStep &lt; 1
-                            }">
-
-                            
-                            <span class="iconify w-6 h-6 transition-colors duration-300"
-                                x-bind:class="{
-                                    'text-gray-400': currentStep === 1,      
-                                    'text-blue-600': currentStep &gt; 1,   
-                                    'text-gray-300': currentStep &lt; 1       
-                                }"
-                                x-bind:data-icon="'lucide:' + &quot;user&quot;"
-                                data-inline="false">
-                            </span>
-                        </div>
-
-                        
-                                                    <div class="flex-1 h-1 mx-2 rounded-full transition-all duration-300"
-                                x-bind:class="currentStep &gt; 1 ? 'bg-blue-600 shadow-sm' : 'bg-gray-300'">
-                            </div>
-                        
-                    </div>
-
-                    
-                    <span class="mt-4 text-center text-sm font-semibold transition-all duration-200 whitespace-nowrap leading-snug"
-                        x-bind:class="{
-                            'text-blue-600 font-bold text-sm': currentStep === 1,
-                            'text-blue-600 font-semibold': currentStep &gt; 1,
-                            'text-gray-500': currentStep &lt; 1
-                        }">
-                        Informations Personnelles
-                    </span>
-
-                </li>
-                            
-                <li class="flex flex-col items-center relative flex-1">
-
-                    
-                    <div class="flex items-center w-full relative z-10">
-
-                        
-                        <div class="flex items-center justify-center w-12 h-12 rounded-full flex-shrink-0 bg-white border-2 transition-all duration-300 relative"
-                            x-bind:class="{
-                                'border-blue-600 shadow-lg shadow-blue-500/40': currentStep === 2,
-                                'border-blue-600 shadow-md shadow-blue-500/20': currentStep &gt; 2,
-                                'border-gray-300 shadow-sm': currentStep &lt; 2
-                            }">
-
-                            
-                            <span class="iconify w-6 h-6 transition-colors duration-300"
-                                x-bind:class="{
-                                    'text-gray-400': currentStep === 2,      
-                                    'text-blue-600': currentStep &gt; 2,   
-                                    'text-gray-300': currentStep &lt; 2       
-                                }"
-                                x-bind:data-icon="'lucide:' + &quot;briefcase&quot;"
-                                data-inline="false">
-                            </span>
-                        </div>
-
-                        
-                                                    <div class="flex-1 h-1 mx-2 rounded-full transition-all duration-300"
-                                x-bind:class="currentStep &gt; 2 ? 'bg-blue-600 shadow-sm' : 'bg-gray-300'">
-                            </div>
-                        
-                    </div>
-
-                    
-                    <span class="mt-4 text-center text-sm font-semibold transition-all duration-200 whitespace-nowrap leading-snug"
-                        x-bind:class="{
-                            'text-blue-600 font-bold text-sm': currentStep === 2,
-                            'text-blue-600 font-semibold': currentStep &gt; 2,
-                            'text-gray-500': currentStep &lt; 2
-                        }">
-                        Informations Professionnelles
-                    </span>
-
-                </li>
-                            
-                <li class="flex flex-col items-center relative flex-1">
-
-                    
-                    <div class="flex items-center w-full relative z-10">
-
-                        
-                        <div class="flex items-center justify-center w-12 h-12 rounded-full flex-shrink-0 bg-white border-2 transition-all duration-300 relative"
-                            x-bind:class="{
-                                'border-blue-600 shadow-lg shadow-blue-500/40': currentStep === 3,
-                                'border-blue-600 shadow-md shadow-blue-500/20': currentStep &gt; 3,
-                                'border-gray-300 shadow-sm': currentStep &lt; 3
-                            }">
-
-                            
-                            <span class="iconify w-6 h-6 transition-colors duration-300"
-                                x-bind:class="{
-                                    'text-gray-400': currentStep === 3,      
-                                    'text-blue-600': currentStep &gt; 3,   
-                                    'text-gray-300': currentStep &lt; 3       
-                                }"
-                                x-bind:data-icon="'lucide:' + &quot;id-card&quot;"
-                                data-inline="false">
-                            </span>
-                        </div>
-
-                        
-                                                    <div class="flex-1 h-1 mx-2 rounded-full transition-all duration-300"
-                                x-bind:class="currentStep &gt; 3 ? 'bg-blue-600 shadow-sm' : 'bg-gray-300'">
-                            </div>
-                        
-                    </div>
-
-                    
-                    <span class="mt-4 text-center text-sm font-semibold transition-all duration-200 whitespace-nowrap leading-snug"
-                        x-bind:class="{
-                            'text-blue-600 font-bold text-sm': currentStep === 3,
-                            'text-blue-600 font-semibold': currentStep &gt; 3,
-                            'text-gray-500': currentStep &lt; 3
-                        }">
-                        Permis de Conduire
-                    </span>
-
-                </li>
-                            
-                <li class="flex flex-col items-center relative flex-none">
-
-                    
-                    <div class="flex items-center w-full relative z-10">
-
-                        
-                        <div class="flex items-center justify-center w-12 h-12 rounded-full flex-shrink-0 bg-white border-2 transition-all duration-300 relative"
-                            x-bind:class="{
-                                'border-blue-600 shadow-lg shadow-blue-500/40': currentStep === 4,
-                                'border-blue-600 shadow-md shadow-blue-500/20': currentStep &gt; 4,
-                                'border-gray-300 shadow-sm': currentStep &lt; 4
-                            }">
-
-                            
-                            <span class="iconify w-6 h-6 transition-colors duration-300"
-                                x-bind:class="{
-                                    'text-gray-400': currentStep === 4,      
-                                    'text-blue-600': currentStep &gt; 4,   
-                                    'text-gray-300': currentStep &lt; 4       
-                                }"
-                                x-bind:data-icon="'lucide:' + &quot;link&quot;"
-                                data-inline="false">
-                            </span>
-                        </div>
-
-                        
-                        
-                    </div>
-
-                    
-                    <span class="mt-4 text-center text-sm font-semibold transition-all duration-200 whitespace-nowrap leading-snug"
-                        x-bind:class="{
-                            'text-blue-600 font-bold text-sm': currentStep === 4,
-                            'text-blue-600 font-semibold': currentStep &gt; 4,
-                            'text-gray-500': currentStep &lt; 4
-                        }">
-                        Compte &amp; Urgence
-                    </span>
-
-                </li>
-                    </ol>
-    </div>
-</div>
+        <div class="mb-6" x-data="{ showFilters: false }">
+            <div class="flex flex-col lg:flex-row items-start lg:items-center gap-3">
+                
+                <div class="flex-1 w-full lg:w-auto relative">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <span
+    class="iconify block w-5 h-5 text-gray-400"
+    data-icon="lucide:search"
+    data-inline="false"></span>                    </div>
+                    <input
+                        wire:model.live.debounce.300ms="search"
+                        type="text"
+                        placeholder="Rechercher par nom, prénom, matricule..."
+                        class="pl-10 pr-4 py-2.5 block w-full border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm shadow-sm">
+                </div>
 
                 
-                <form method="POST" action="http://localhost/admin/drivers" enctype="multipart/form-data" @submit="onSubmit" class="p-6">
-                    <input type="hidden" name="_token" value="bdDbWyzYEX2AzpLtVeiHgZZ6OO6SseR7X892Vy7G" autocomplete="off">                    <input type="hidden" name="current_step" x-model="currentStep">
+                
+                <button
+                    @click="showFilters = !showFilters"
+                    type="button"
+                    title="Filtres"
+                    class="inline-flex items-center gap-2 p-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-all duration-200 shadow-sm hover:shadow-md">
+                    <span
+    class="iconify block w-5 h-5 text-gray-500"
+    data-icon="lucide:filter"
+    data-inline="false"></span>                    <span
+    class="iconify block w-4 h-4 text-gray-400 transition-transform duration-200" x-bind:class="showFilters ? 'rotate-180' : ''"
+    data-icon="heroicons:chevron-down"
+    data-inline="false"></span>                </button>
+
+                
+                <div class="flex items-center gap-2">
+                    
+                    <!--[if BLOCK]><![endif]-->                    <button wire:click="$set('visibility', 'archived')"
+                        title="Voir Archives"
+                        class="inline-flex items-center gap-2 p-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-all duration-200 shadow-sm hover:shadow-md">
+                        <span
+    class="iconify block w-5 h-5 text-amber-600"
+    data-icon="lucide:archive"
+    data-inline="false"></span>                    </button>
+                    <!--[if ENDBLOCK]><![endif]-->
 
                     
-                    <div x-show="currentStep === 1" x-transition:enter="transition ease-out duration-200"
-                        x-transition:enter-start="opacity-0 transform translate-x-4"
-                        x-transition:enter-end="opacity-100 transform translate-x-0">
-                        <div class="space-y-6">
-                            <div>
-                                <h3 class="text-lg font-medium text-gray-900 mb-4 flex items-center gap-2">
+                    <div class="relative" x-data="{ exportOpen: false }">
+                        <button
+                            @click="exportOpen = !exportOpen"
+                            @click.away="exportOpen = false"
+                            type="button"
+                            title="Exporter"
+                            class="inline-flex items-center gap-2 p-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-all duration-200 shadow-sm hover:shadow-md">
+                            <span
+    class="iconify block w-5 h-5 text-gray-500"
+    data-icon="lucide:download"
+    data-inline="false"></span>                            <span
+    class="iconify block w-4 h-4 text-gray-400"
+    data-icon="heroicons:chevron-down"
+    data-inline="false"></span>                        </button>
+                        
+                        <div
+                            x-show="exportOpen"
+                            class="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-lg bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
+                            style="display: none;">
+                            <div class="py-1">
+                                <a href="http://localhost/admin/drivers/export/pdf?visibility=active" class="group flex items-center gap-2 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-100">
                                     <span
-    class="iconify block w-5 h-5 text-blue-600"
-    data-icon="heroicons:user"
-    data-inline="false"></span>                                    Informations Personnelles
-                                </h3>
-
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                    <div class="" @blur="validateField('first_name', $event.target.value)">
-  <label for="first_name" class="block mb-2 text-sm font-medium text-gray-900">
- Prénom
-  <span class="text-red-600">*</span>
-  </label>
- 
- <div class="relative">
-  <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
- <span
-    class="iconify block w-5 h-5 text-gray-400"
-    data-icon="heroicons:user"
-    data-inline="false"></span> </div>
- 
- <input
- type="text"
- name="first_name"
- id="first_name"
- class="bg-gray-50 border text-gray-900 text-sm rounded-lg block w-full p-2.5 transition-colors duration-200 border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 bg-gray-50 pl-10"
- placeholder="Ex: Ahmed"
- value=""
-  required   
- x-bind:class="(fieldErrors && fieldErrors['first_name'] && touchedFields && touchedFields['first_name']) ? '!border-red-500 !focus:ring-2 !focus:ring-red-500 !focus:border-red-500 !bg-red-50' : ''"
- @blur="validateField('first_name', $event.target.value)"
- />
- </div>
-
-  <p class="mt-2 text-sm text-gray-600">
- Prénom du chauffeur
- </p>
- 
- 
- <p x-show="fieldErrors && fieldErrors['first_name'] && touchedFields && touchedFields['first_name']"
- x-transition:enter="transition ease-out duration-200"
- x-transition:enter-start="opacity-0 transform -translate-y-1"
- x-transition:enter-end="opacity-100 transform translate-y-0"
- class="mt-2 text-sm text-red-600 flex items-start font-medium"
- style="display: none;">
- <span
-    class="iconify block w-4 h-4 mr-1.5 mt-0.5 flex-shrink-0"
-    data-icon="lucide:circle-alert"
-    data-inline="false"></span> <span>Ce champ est obligatoire et doit être correctement rempli</span>
- </p>
-</div>
-
-                                    <div class="" @blur="validateField('last_name', $event.target.value)">
-  <label for="last_name" class="block mb-2 text-sm font-medium text-gray-900">
- Nom
-  <span class="text-red-600">*</span>
-  </label>
- 
- <div class="relative">
-  <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
- <span
-    class="iconify block w-5 h-5 text-gray-400"
-    data-icon="heroicons:user"
-    data-inline="false"></span> </div>
- 
- <input
- type="text"
- name="last_name"
- id="last_name"
- class="bg-gray-50 border text-gray-900 text-sm rounded-lg block w-full p-2.5 transition-colors duration-200 border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 bg-gray-50 pl-10"
- placeholder="Ex: Benali"
- value=""
-  required   
- x-bind:class="(fieldErrors && fieldErrors['last_name'] && touchedFields && touchedFields['last_name']) ? '!border-red-500 !focus:ring-2 !focus:ring-red-500 !focus:border-red-500 !bg-red-50' : ''"
- @blur="validateField('last_name', $event.target.value)"
- />
- </div>
-
- 
- 
- <p x-show="fieldErrors && fieldErrors['last_name'] && touchedFields && touchedFields['last_name']"
- x-transition:enter="transition ease-out duration-200"
- x-transition:enter-start="opacity-0 transform -translate-y-1"
- x-transition:enter-end="opacity-100 transform translate-y-0"
- class="mt-2 text-sm text-red-600 flex items-start font-medium"
- style="display: none;">
- <span
-    class="iconify block w-4 h-4 mr-1.5 mt-0.5 flex-shrink-0"
-    data-icon="lucide:circle-alert"
-    data-inline="false"></span> <span>Ce champ est obligatoire et doit être correctement rempli</span>
- </p>
-</div>
-
-                                    <div class="w-full"
-    x-data="{
-        serverDate: '',
-        displayValue: '',
-        picker: null,
-
-        init() {
-            this.$nextTick(() => {
-                const el = this.$refs.displayInput;
-                const component = this;
-                let isOpening = false; // Flag to prevent immediate close
-                
-                if (typeof window.Datepicker === 'undefined') {
-                    console.error('❌ ZenFleet: Datepicker not loaded');
-                    return;
-                }
-                
-                // Initialize Flowbite Datepicker
-                this.picker = new window.Datepicker(el, {
-                    language: 'fr',
-                    format: 'dd/mm/yyyy',
-                    autohide: true,
-                    todayBtn: true,
-                    todayBtnMode: 1,
-                    clearBtn: true,
-                    weekStart: 1,
-                                                            maxDate: '12/01/2026',
-                                        orientation: 'bottom left',
-                });
-                
-                // ✅ ENTERPRISE-GRADE: Force hide function
-                const forceHidePicker = () => {
-                    if (!component.picker || isOpening) return;
-                    
-                    const pickerEl = component.picker.picker?.element;
-                    if (pickerEl) {
-                        pickerEl.style.display = 'none';
-                        pickerEl.classList.remove('active', 'block');
-                        pickerEl.classList.add('hidden');
-                        if (component.picker.picker) {
-                            component.picker.picker.active = false;
-                        }
-                    }
-                };
-                
-                // ✅ ENTERPRISE-GRADE: Force show function (reset display)
-                const ensurePickerVisible = () => {
-                    const pickerEl = component.picker.picker?.element;
-                    if (pickerEl) {
-                        pickerEl.style.display = '';
-                        pickerEl.classList.remove('hidden');
-                    }
-                };
-                
-                // Set initial date if value exists
-                if (this.displayValue) {
-                    this.picker.setDate(this.displayValue);
-                    el.value = this.displayValue;
-                }
-                
-                // ✅ Listen for show event to reset display and set flag
-                el.addEventListener('show', () => {
-                    isOpening = true;
-                    ensurePickerVisible();
-                    setTimeout(() => { isOpening = false; }, 100);
-                });
-                
-                // Handle date change - force close on selection
-                el.addEventListener('changeDate', (e) => {
-                    if (e.detail.date) {
-                        const d = e.detail.date;
-                        const year = d.getFullYear();
-                        const month = String(d.getMonth() + 1).padStart(2, '0');
-                        const day = String(d.getDate()).padStart(2, '0');
-                        component.serverDate = `${year}-${month}-${day}`;
-                        component.displayValue = `${day}/${month}/${year}`;
-                        component.$dispatch('input', component.serverDate);
-                        
-                        // Force hide after selection
-                        setTimeout(forceHidePicker, 10);
-                    } else {
-                        component.serverDate = '';
-                        component.displayValue = '';
-                        component.$dispatch('input', '');
-                    }
-                });
-                
-                // ✅ ENTERPRISE-GRADE: Click outside handler
-                document.addEventListener('mousedown', (e) => {
-                    if (!component.picker || isOpening) return;
-                    
-                    const pickerEl = component.picker.picker?.element;
-                    if (!pickerEl) return;
-                    
-                    // Only check active class for visibility (more reliable)
-                    const isVisible = pickerEl.classList.contains('active');
-                    if (!isVisible) return;
-                    
-                    // Check if click is outside both input and picker
-                    if (!pickerEl.contains(e.target) && !el.contains(e.target)) {
-                        forceHidePicker();
-                    }
-                });
-                
-                // Handle manual clear
-                el.addEventListener('input', (e) => {
-                    if (!el.value.trim()) {
-                        component.serverDate = '';
-                        component.displayValue = '';
-                        component.$dispatch('input', '');
-                    }
-                });
-            });
-        }
-    }"
-    wire:ignore>
-
-        <label for="datepicker-69650ac93e05a" class="block mb-2 text-sm font-medium text-gray-900 ">
-        Date de naissance
-            </label>
-    
-    <div class="relative">
-        
-        <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none z-10">
-            <svg class="w-4 h-4 text-gray-500 "
-                aria-hidden="true"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="currentColor"
-                viewBox="0 0 20 20">
-                <path d="M20 4a2 2 0 0 0-2-2h-2V1a1 1 0 0 0-2 0v1h-3V1a1 1 0 0 0-2 0v1H6V1a1 1 0 0 0-2 0v1H2a2 2 0 0 0-2 2v2h20V4ZM0 18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8H0v10Zm5-8h10a1 1 0 0 1 0 2H5a1 1 0 0 1 0-2Z" />
-            </svg>
-        </div>
-
-        
-        <input
-            x-ref="displayInput"
-            type="text"
-            id="datepicker-69650ac93e05a"
-            class="block w-full !pl-10 p-2.5 bg-gray-50 border-2 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500     :ring-blue-500 :border-blue-500 transition-all duration-200 border-gray-300"
-            placeholder="Choisir une date"
-            x-model="displayValue"
-                                    autocomplete="off"
-            readonly>
-
-        
-        <input type="hidden" name="birth_date" x-model="serverDate">
-    </div>
-
-        <p class="mt-1 text-xs text-gray-500 ">Date de naissance du chauffeur</p>
-    </div>
-                                    <div class="">
-  <label for="personal_phone" class="block mb-2 text-sm font-medium text-gray-900">
- Téléphone personnel
-  </label>
- 
- <div class="relative">
-  <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
- <span
-    class="iconify block w-5 h-5 text-gray-400"
-    data-icon="heroicons:phone"
-    data-inline="false"></span> </div>
- 
- <input
- type="tel"
- name="personal_phone"
- id="personal_phone"
- class="bg-gray-50 border text-gray-900 text-sm rounded-lg block w-full p-2.5 transition-colors duration-200 border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 bg-gray-50 pl-10"
- placeholder="Ex: 0555123456"
- value=""
-   
- x-bind:class="(fieldErrors && fieldErrors['personal_phone'] && touchedFields && touchedFields['personal_phone']) ? '!border-red-500 !focus:ring-2 !focus:ring-red-500 !focus:border-red-500 !bg-red-50' : ''"
- 
- />
- </div>
-
- 
- 
- <p x-show="fieldErrors && fieldErrors['personal_phone'] && touchedFields && touchedFields['personal_phone']"
- x-transition:enter="transition ease-out duration-200"
- x-transition:enter-start="opacity-0 transform -translate-y-1"
- x-transition:enter-end="opacity-100 transform translate-y-0"
- class="mt-2 text-sm text-red-600 flex items-start font-medium"
- style="display: none;">
- <span
-    class="iconify block w-4 h-4 mr-1.5 mt-0.5 flex-shrink-0"
-    data-icon="lucide:circle-alert"
-    data-inline="false"></span> <span>Ce champ est obligatoire et doit être correctement rempli</span>
- </p>
-</div>
-
-                                    <div class="">
-  <label for="personal_email" class="block mb-2 text-sm font-medium text-gray-900">
- Email personnel
-  </label>
- 
- <div class="relative">
-  <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
- <span
-    class="iconify block w-5 h-5 text-gray-400"
-    data-icon="heroicons:envelope"
-    data-inline="false"></span> </div>
- 
- <input
- type="email"
- name="personal_email"
- id="personal_email"
- class="bg-gray-50 border text-gray-900 text-sm rounded-lg block w-full p-2.5 transition-colors duration-200 border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 bg-gray-50 pl-10"
- placeholder="Ex: ahmed.benali@email.com"
- value=""
-   
- x-bind:class="(fieldErrors && fieldErrors['personal_email'] && touchedFields && touchedFields['personal_email']) ? '!border-red-500 !focus:ring-2 !focus:ring-red-500 !focus:border-red-500 !bg-red-50' : ''"
- 
- />
- </div>
-
- 
- 
- <p x-show="fieldErrors && fieldErrors['personal_email'] && touchedFields && touchedFields['personal_email']"
- x-transition:enter="transition ease-out duration-200"
- x-transition:enter-start="opacity-0 transform -translate-y-1"
- x-transition:enter-end="opacity-100 transform translate-y-0"
- class="mt-2 text-sm text-red-600 flex items-start font-medium"
- style="display: none;">
- <span
-    class="iconify block w-4 h-4 mr-1.5 mt-0.5 flex-shrink-0"
-    data-icon="lucide:circle-alert"
-    data-inline="false"></span> <span>Ce champ est obligatoire et doit être correctement rempli</span>
- </p>
-</div>
-
-                                    <div class="">
-  <label for="blood_type" class="block mb-2 text-sm font-medium text-gray-900 ">
- Groupe sanguin
-  </label>
- 
- <select
- name="blood_type"
- id="blood_type"
- class="bg-gray-50 border text-gray-900 text-sm rounded-lg block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white border-gray-300 focus:ring-primary-500 focus:border-primary-500 dark:focus:ring-primary-500 dark:focus:border-primary-500"
-   
- >
- 
-  
- 
-  <option value="" selected>
- Sélectionner
- </option>
-  <option value="A+" >
- A+
- </option>
-  <option value="A-" >
- A-
- </option>
-  <option value="B+" >
- B+
- </option>
-  <option value="B-" >
- B-
- </option>
-  <option value="AB+" >
- AB+
- </option>
-  <option value="AB-" >
- AB-
- </option>
-  <option value="O+" >
- O+
- </option>
-  <option value="O-" >
- O-
- </option>
-   </select>
-
- </div>
-
-                                    <div class="md:col-span-2">
-                                        <div class="">
-  <label for="address" class="block mb-2 text-sm font-medium text-gray-900">
- Adresse
-  </label>
- 
- <textarea
- name="address"
- id="address"
- rows="3"
- class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border transition-colors duration-200 border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 !bg-gray-50"
- placeholder="Adresse complète du chauffeur..."
-   
- ></textarea>
-
- </div>
-                                    </div>
-
-                                    
-                                    <div class="md:col-span-2">
-                                        <label class="block text-sm font-medium text-gray-700 mb-2">
-                                            Photo du chauffeur
-                                        </label>
-                                        <div class="flex items-center gap-6">
-                                            
-                                            <div class="flex-shrink-0">
-                                                <div x-show="!photoPreview" class="h-24 w-24 rounded-full bg-gray-100 flex items-center justify-center">
-                                                    <span
-    class="iconify block w-12 h-12 text-gray-400"
-    data-icon="heroicons:user"
-    data-inline="false"></span>                                                </div>
-                                                <img x-show="photoPreview" :src="photoPreview" class="h-24 w-24 rounded-full object-cover ring-2 ring-blue-100" alt="Prévisualisation" x-cloak>
-                                            </div>
-                                            
-                                            <div class="flex-1">
-                                                <input
-                                                    type="file"
-                                                    name="photo"
-                                                    id="photo"
-                                                    accept="image/*"
-                                                    @change="updatePhotoPreview($event)"
-                                                    class="block w-full text-sm text-gray-500
- file:mr-4 file:py-2 file:px-4
- file:rounded-lg file:border-0
- file:text-sm file:font-medium
- file:bg-blue-50 file:text-blue-700
- hover:file:bg-blue-100
- cursor-pointer">
-                                                <p class="mt-1 text-xs text-gray-500">PNG, JPG, GIF jusqu'à 5MB</p>
-                                                                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
+    class="iconify block w-4 h-4 text-red-600"
+    data-icon="lucide:file-text"
+    data-inline="false"></span>                                    <span>Export PDF</span>
+                                </a>
+                                
                             </div>
                         </div>
                     </div>
 
                     
-                    <div x-show="currentStep === 2" x-transition:enter="transition ease-out duration-200"
-                        x-transition:enter-start="opacity-0 transform translate-x-4"
-                        x-transition:enter-end="opacity-100 transform translate-x-0"
-                        style="display: none;">
-                        <div class="space-y-6">
-                            <div>
-                                <h3 class="text-lg font-medium text-gray-900 mb-4 flex items-center gap-2">
-                                    <span
-    class="iconify block w-5 h-5 text-blue-600"
-    data-icon="heroicons:briefcase"
-    data-inline="false"></span>                                    Informations Professionnelles
-                                </h3>
+                    <a href="http://localhost/admin/drivers/import"
+                        title="Importer"
+                        class="inline-flex items-center gap-2 p-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-all duration-200 shadow-sm hover:shadow-md">
+                        <span
+    class="iconify block w-5 h-5"
+    data-icon="lucide:upload"
+    data-inline="false"></span>                    </a>
 
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                    <div class="">
-  <label for="employee_number" class="block mb-2 text-sm font-medium text-gray-900">
- Matricule
-  </label>
- 
- <div class="relative">
-  <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
- <span
-    class="iconify block w-5 h-5 text-gray-400"
-    data-icon="heroicons:identification"
-    data-inline="false"></span> </div>
- 
- <input
- type="text"
- name="employee_number"
- id="employee_number"
- class="bg-gray-50 border text-gray-900 text-sm rounded-lg block w-full p-2.5 transition-colors duration-200 border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 bg-gray-50 pl-10"
- placeholder="Ex: EMP-2024-001"
- value=""
-   
- x-bind:class="(fieldErrors && fieldErrors['employee_number'] && touchedFields && touchedFields['employee_number']) ? '!border-red-500 !focus:ring-2 !focus:ring-red-500 !focus:border-red-500 !bg-red-50' : ''"
- 
- />
- </div>
-
-  <p class="mt-2 text-sm text-gray-600">
- Numéro matricule unique
- </p>
- 
- 
- <p x-show="fieldErrors && fieldErrors['employee_number'] && touchedFields && touchedFields['employee_number']"
- x-transition:enter="transition ease-out duration-200"
- x-transition:enter-start="opacity-0 transform -translate-y-1"
- x-transition:enter-end="opacity-100 transform translate-y-0"
- class="mt-2 text-sm text-red-600 flex items-start font-medium"
- style="display: none;">
- <span
-    class="iconify block w-4 h-4 mr-1.5 mt-0.5 flex-shrink-0"
-    data-icon="lucide:circle-alert"
-    data-inline="false"></span> <span>Ce champ est obligatoire et doit être correctement rempli</span>
- </p>
-</div>
-
-                                    <div class="w-full"
-    x-data="{
-        serverDate: '',
-        displayValue: '',
-        picker: null,
-
-        init() {
-            this.$nextTick(() => {
-                const el = this.$refs.displayInput;
-                const component = this;
-                let isOpening = false; // Flag to prevent immediate close
-                
-                if (typeof window.Datepicker === 'undefined') {
-                    console.error('❌ ZenFleet: Datepicker not loaded');
-                    return;
-                }
-                
-                // Initialize Flowbite Datepicker
-                this.picker = new window.Datepicker(el, {
-                    language: 'fr',
-                    format: 'dd/mm/yyyy',
-                    autohide: true,
-                    todayBtn: true,
-                    todayBtnMode: 1,
-                    clearBtn: true,
-                    weekStart: 1,
-                                                            maxDate: '12/01/2026',
-                                        orientation: 'bottom left',
-                });
-                
-                // ✅ ENTERPRISE-GRADE: Force hide function
-                const forceHidePicker = () => {
-                    if (!component.picker || isOpening) return;
                     
-                    const pickerEl = component.picker.picker?.element;
-                    if (pickerEl) {
-                        pickerEl.style.display = 'none';
-                        pickerEl.classList.remove('active', 'block');
-                        pickerEl.classList.add('hidden');
-                        if (component.picker.picker) {
-                            component.picker.picker.active = false;
-                        }
-                    }
-                };
-                
-                // ✅ ENTERPRISE-GRADE: Force show function (reset display)
-                const ensurePickerVisible = () => {
-                    const pickerEl = component.picker.picker?.element;
-                    if (pickerEl) {
-                        pickerEl.style.display = '';
-                        pickerEl.classList.remove('hidden');
-                    }
-                };
-                
-                // Set initial date if value exists
-                if (this.displayValue) {
-                    this.picker.setDate(this.displayValue);
-                    el.value = this.displayValue;
-                }
-                
-                // ✅ Listen for show event to reset display and set flag
-                el.addEventListener('show', () => {
-                    isOpening = true;
-                    ensurePickerVisible();
-                    setTimeout(() => { isOpening = false; }, 100);
-                });
-                
-                // Handle date change - force close on selection
-                el.addEventListener('changeDate', (e) => {
-                    if (e.detail.date) {
-                        const d = e.detail.date;
-                        const year = d.getFullYear();
-                        const month = String(d.getMonth() + 1).padStart(2, '0');
-                        const day = String(d.getDate()).padStart(2, '0');
-                        component.serverDate = `${year}-${month}-${day}`;
-                        component.displayValue = `${day}/${month}/${year}`;
-                        component.$dispatch('input', component.serverDate);
-                        
-                        // Force hide after selection
-                        setTimeout(forceHidePicker, 10);
-                    } else {
-                        component.serverDate = '';
-                        component.displayValue = '';
-                        component.$dispatch('input', '');
-                    }
-                });
-                
-                // ✅ ENTERPRISE-GRADE: Click outside handler
-                document.addEventListener('mousedown', (e) => {
-                    if (!component.picker || isOpening) return;
+                    <a href="http://localhost/admin/drivers/create"
+                        title="Nouveau Chauffeur"
+                        class="inline-flex items-center gap-2 p-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all duration-200 shadow-sm hover:shadow-md">
+                        <span
+    class="iconify block w-5 h-5"
+    data-icon="lucide:plus"
+    data-inline="false"></span>                    </a>
+                </div>
+            </div>
+
+            
+            <div
+                x-show="showFilters"
+                x-transition
+                class="mt-4 bg-white rounded-lg border border-gray-200 p-4 shadow-sm"
+                style="display: none;">
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
                     
-                    const pickerEl = component.picker.picker?.element;
-                    if (!pickerEl) return;
-                    
-                    // Only check active class for visibility (more reliable)
-                    const isVisible = pickerEl.classList.contains('active');
-                    if (!isVisible) return;
-                    
-                    // Check if click is outside both input and picker
-                    if (!pickerEl.contains(e.target) && !el.contains(e.target)) {
-                        forceHidePicker();
-                    }
-                });
-                
-                // Handle manual clear
-                el.addEventListener('input', (e) => {
-                    if (!el.value.trim()) {
-                        component.serverDate = '';
-                        component.displayValue = '';
-                        component.$dispatch('input', '');
-                    }
-                });
-            });
-        }
-    }"
-    wire:ignore>
-
-        <label for="datepicker-69650ac93e7ef" class="block mb-2 text-sm font-medium text-gray-900 ">
-        Date de recrutement
-            </label>
-    
-    <div class="relative">
-        
-        <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none z-10">
-            <svg class="w-4 h-4 text-gray-500 "
-                aria-hidden="true"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="currentColor"
-                viewBox="0 0 20 20">
-                <path d="M20 4a2 2 0 0 0-2-2h-2V1a1 1 0 0 0-2 0v1h-3V1a1 1 0 0 0-2 0v1H6V1a1 1 0 0 0-2 0v1H2a2 2 0 0 0-2 2v2h20V4ZM0 18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8H0v10Zm5-8h10a1 1 0 0 1 0 2H5a1 1 0 0 1 0-2Z" />
-            </svg>
-        </div>
-
-        
-        <input
-            x-ref="displayInput"
-            type="text"
-            id="datepicker-69650ac93e7ef"
-            class="block w-full !pl-10 p-2.5 bg-gray-50 border-2 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500     :ring-blue-500 :border-blue-500 transition-all duration-200 border-gray-300"
-            placeholder="Choisir une date"
-            x-model="displayValue"
-                                    autocomplete="off"
-            readonly>
-
-        
-        <input type="hidden" name="recruitment_date" x-model="serverDate">
-    </div>
-
-    </div>
-                                    <div class="w-full"
-    x-data="{
-        serverDate: '',
-        displayValue: '',
-        picker: null,
-
-        init() {
-            this.$nextTick(() => {
-                const el = this.$refs.displayInput;
-                const component = this;
-                let isOpening = false; // Flag to prevent immediate close
-                
-                if (typeof window.Datepicker === 'undefined') {
-                    console.error('❌ ZenFleet: Datepicker not loaded');
-                    return;
-                }
-                
-                // Initialize Flowbite Datepicker
-                this.picker = new window.Datepicker(el, {
-                    language: 'fr',
-                    format: 'dd/mm/yyyy',
-                    autohide: true,
-                    todayBtn: true,
-                    todayBtnMode: 1,
-                    clearBtn: true,
-                    weekStart: 1,
-                                        minDate: '12/01/2026',
-                                                            orientation: 'bottom left',
-                });
-                
-                // ✅ ENTERPRISE-GRADE: Force hide function
-                const forceHidePicker = () => {
-                    if (!component.picker || isOpening) return;
-                    
-                    const pickerEl = component.picker.picker?.element;
-                    if (pickerEl) {
-                        pickerEl.style.display = 'none';
-                        pickerEl.classList.remove('active', 'block');
-                        pickerEl.classList.add('hidden');
-                        if (component.picker.picker) {
-                            component.picker.picker.active = false;
-                        }
-                    }
-                };
-                
-                // ✅ ENTERPRISE-GRADE: Force show function (reset display)
-                const ensurePickerVisible = () => {
-                    const pickerEl = component.picker.picker?.element;
-                    if (pickerEl) {
-                        pickerEl.style.display = '';
-                        pickerEl.classList.remove('hidden');
-                    }
-                };
-                
-                // Set initial date if value exists
-                if (this.displayValue) {
-                    this.picker.setDate(this.displayValue);
-                    el.value = this.displayValue;
-                }
-                
-                // ✅ Listen for show event to reset display and set flag
-                el.addEventListener('show', () => {
-                    isOpening = true;
-                    ensurePickerVisible();
-                    setTimeout(() => { isOpening = false; }, 100);
-                });
-                
-                // Handle date change - force close on selection
-                el.addEventListener('changeDate', (e) => {
-                    if (e.detail.date) {
-                        const d = e.detail.date;
-                        const year = d.getFullYear();
-                        const month = String(d.getMonth() + 1).padStart(2, '0');
-                        const day = String(d.getDate()).padStart(2, '0');
-                        component.serverDate = `${year}-${month}-${day}`;
-                        component.displayValue = `${day}/${month}/${year}`;
-                        component.$dispatch('input', component.serverDate);
-                        
-                        // Force hide after selection
-                        setTimeout(forceHidePicker, 10);
-                    } else {
-                        component.serverDate = '';
-                        component.displayValue = '';
-                        component.$dispatch('input', '');
-                    }
-                });
-                
-                // ✅ ENTERPRISE-GRADE: Click outside handler
-                document.addEventListener('mousedown', (e) => {
-                    if (!component.picker || isOpening) return;
-                    
-                    const pickerEl = component.picker.picker?.element;
-                    if (!pickerEl) return;
-                    
-                    // Only check active class for visibility (more reliable)
-                    const isVisible = pickerEl.classList.contains('active');
-                    if (!isVisible) return;
-                    
-                    // Check if click is outside both input and picker
-                    if (!pickerEl.contains(e.target) && !el.contains(e.target)) {
-                        forceHidePicker();
-                    }
-                });
-                
-                // Handle manual clear
-                el.addEventListener('input', (e) => {
-                    if (!el.value.trim()) {
-                        component.serverDate = '';
-                        component.displayValue = '';
-                        component.$dispatch('input', '');
-                    }
-                });
-            });
-        }
-    }"
-    wire:ignore>
-
-        <label for="datepicker-69650ac93e8f7" class="block mb-2 text-sm font-medium text-gray-900 ">
-        Fin de contrat
-            </label>
-    
-    <div class="relative">
-        
-        <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none z-10">
-            <svg class="w-4 h-4 text-gray-500 "
-                aria-hidden="true"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="currentColor"
-                viewBox="0 0 20 20">
-                <path d="M20 4a2 2 0 0 0-2-2h-2V1a1 1 0 0 0-2 0v1h-3V1a1 1 0 0 0-2 0v1H6V1a1 1 0 0 0-2 0v1H2a2 2 0 0 0-2 2v2h20V4ZM0 18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8H0v10Zm5-8h10a1 1 0 0 1 0 2H5a1 1 0 0 1 0-2Z" />
-            </svg>
-        </div>
-
-        
-        <input
-            x-ref="displayInput"
-            type="text"
-            id="datepicker-69650ac93e8f7"
-            class="block w-full !pl-10 p-2.5 bg-gray-50 border-2 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500     :ring-blue-500 :border-blue-500 transition-all duration-200 border-gray-300"
-            placeholder="Choisir une date"
-            x-model="displayValue"
-                                    autocomplete="off"
-            readonly>
-
-        
-        <input type="hidden" name="contract_end_date" x-model="serverDate">
-    </div>
-
-        <p class="mt-1 text-xs text-gray-500 ">Date de fin du contrat (optionnel)</p>
-    </div>
-                                    <div wire:ignore
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1.5">Statut</label>
+                        <div wire:ignore
     x-data="{
         instance: null,
         initSelect() {
@@ -2124,7 +1015,7 @@
                     searchPlaceholder: 'Rechercher...',
                     searchText: 'Aucun résultat',
                     searchingText: 'Recherche...',
-                    placeholderText: 'Sélectionnez un statut...',
+                    placeholderText: 'Tous les statuts',
                     allowDeselect: true,
                     hideSelected: false,
                 },
@@ -2138,900 +1029,35 @@
         }
     }"
     x-init="initSelect()"
-    class="" @change="validateField('status_id', $event.target.value)">
+    class="" wire:model.live="status_id">
 
-    <!--[if BLOCK]><![endif]-->    <label for="slimselect-status_id-69650ac93eb51" class="block mb-2 text-sm font-medium text-gray-900">
-        Statut du Chauffeur
-        <!--[if BLOCK]><![endif]-->        <span class="text-red-500">*</span>
-        <!--[if ENDBLOCK]><![endif]-->
-    </label>
-    <!--[if ENDBLOCK]><![endif]-->
+    <!--[if BLOCK]><![endif]--><!--[if ENDBLOCK]><![endif]-->
 
     <select
         x-ref="select"
         name="status_id"
-        id="slimselect-status_id-69650ac93eb51"
+        id="slimselect-status_id-6966126f62727"
         class="slimselect-field w-full"
-                        @change="validateField('status_id', $event.target.value)">
+                        wire:model.live="status_id">
 
         
-        <!--[if BLOCK]><![endif]-->        <!--[if BLOCK]><![endif]-->        <option value="" data-placeholder="true">Sélectionnez un statut...</option>
-        <!--[if ENDBLOCK]><![endif]-->
-
-        <!--[if BLOCK]><![endif]-->        <option
-            value="7"
-            >
-            Disponible
-        </option>
-                <option
-            value="8"
-            >
-            En mission
-        </option>
-                <option
-            value="12"
-            >
-            En formation
-        </option>
-                <option
-            value="9"
-            >
-            En congé
-        </option>
-                <option
-            value="10"
-            >
-            Autre
-        </option>
-        <!--[if ENDBLOCK]><![endif]-->
+        <!--[if BLOCK]><![endif]-->        <option value="" data-placeholder="true">Tous les statuts</option>
+                            <!--[if BLOCK]><![endif]-->                            <option value="10">Autre</option>
+                                                        <option value="7">Disponible</option>
+                                                        <option value="9">En congé</option>
+                                                        <option value="12">En formation</option>
+                                                        <option value="8">En mission</option>
+                            <!--[if ENDBLOCK]><![endif]-->
         <!--[if ENDBLOCK]><![endif]-->
     </select>
 
     <!--[if BLOCK]><![endif]--><!--[if ENDBLOCK]><![endif]-->
-</div>
-
-
-                                    <div class="md:col-span-2">
-                                        <div class="">
-  <label for="notes" class="block mb-2 text-sm font-medium text-gray-900">
- Notes professionnelles
-  </label>
- 
- <textarea
- name="notes"
- id="notes"
- rows="4"
- class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border transition-colors duration-200 border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 !bg-gray-50"
- placeholder="Informations complémentaires sur le chauffeur..."
-   
- ></textarea>
-
-  <p class="mt-2 text-sm text-gray-600">
- Compétences, formations, remarques, etc.
- </p>
- </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+</div>                    </div>
 
                     
-                    <div x-show="currentStep === 3" x-transition:enter="transition ease-out duration-200"
-                        x-transition:enter-start="opacity-0 transform translate-x-4"
-                        x-transition:enter-end="opacity-100 transform translate-x-0"
-                        style="display: none;">
-                        <div class="space-y-6">
-                            <div>
-                                <h3 class="text-lg font-medium text-gray-900 mb-4 flex items-center gap-2">
-                                    <span
-    class="iconify block w-5 h-5 text-blue-600"
-    data-icon="heroicons:identification"
-    data-inline="false"></span>                                    Permis de Conduire
-                                </h3>
-
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                    <div class="">
-  <label for="license_number" class="block mb-2 text-sm font-medium text-gray-900">
- Numéro de permis
-  <span class="text-red-600">*</span>
-  </label>
- 
- <div class="relative">
-  <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
- <span
-    class="iconify block w-5 h-5 text-gray-400"
-    data-icon="heroicons:identification"
-    data-inline="false"></span> </div>
- 
- <input
- type="text"
- name="license_number"
- id="license_number"
- class="bg-gray-50 border text-gray-900 text-sm rounded-lg block w-full p-2.5 transition-colors duration-200 border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 bg-gray-50 pl-10"
- placeholder="Ex: 123456789"
- value=""
-  required   
- x-bind:class="(fieldErrors && fieldErrors['license_number'] && touchedFields && touchedFields['license_number']) ? '!border-red-500 !focus:ring-2 !focus:ring-red-500 !focus:border-red-500 !bg-red-50' : ''"
- 
- />
- </div>
-
-  <p class="mt-2 text-sm text-gray-600">
- Numéro du permis de conduire
- </p>
- 
- 
- <p x-show="fieldErrors && fieldErrors['license_number'] && touchedFields && touchedFields['license_number']"
- x-transition:enter="transition ease-out duration-200"
- x-transition:enter-start="opacity-0 transform -translate-y-1"
- x-transition:enter-end="opacity-100 transform translate-y-0"
- class="mt-2 text-sm text-red-600 flex items-start font-medium"
- style="display: none;">
- <span
-    class="iconify block w-4 h-4 mr-1.5 mt-0.5 flex-shrink-0"
-    data-icon="lucide:circle-alert"
-    data-inline="false"></span> <span>Ce champ est obligatoire et doit être correctement rempli</span>
- </p>
-</div>
-
-                                    
-                                    
-                                    <div>
-                                        <div x-data="{ 
-    open: false, 
-    selected: [], 
-    options: JSON.parse('[\u0022A1\u0022,\u0022A\u0022,\u0022B\u0022,\u0022BE\u0022,\u0022C1\u0022,\u0022C1E\u0022,\u0022C\u0022,\u0022CE\u0022,\u0022D\u0022,\u0022DE\u0022,\u0022F\u0022]'),
-    toggle(value) {
-        const index = this.selected.indexOf(value);
-        if (index === -1) {
-            this.selected.push(value);
-        } else {
-            this.selected.splice(index, 1);
-        }
-        // Dispatch change event pour la validation Alpine.js externe
-        this.$el.dispatchEvent(new CustomEvent('change', { detail: { selected: this.selected } }));
-    },
-    isSelected(value) {
-        return this.selected.includes(value);
-    },
-    get selectedLabels() {
-        if (this.selected.length === 0) {
-            return 'Sélectionnez les catégories de permis...';
-        }
-        // Afficher uniquement les abréviations (valeurs) pour optimiser l'affichage
-        return this.selected.join(', ');
-    }
-}"
-    @click.outside="open = false"
-    class="relative" @change="validateField('license_categories', $event.detail.selected)">
-
-        <label for="multi-select-license_categories-69650ac93ee36" class="block mb-2 text-sm font-medium text-gray-900">
-        Catégories de permis
-                <span class="text-red-500">*</span>
-            </label>
-    
-    <!-- Bouton d'affichage -->
-    <button type="button"
-        @click="open = !open"
-        :aria-expanded="open"
-        aria-haspopup="true"
-        class="w-full bg-gray-50 border border-gray-300 text-gray-900 rounded-lg shadow-sm px-4 py-2.5 text-left cursor-default focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition duration-150 ease-in-out"
-        :class="{ 'border-red-500 focus:ring-red-500 focus:border-red-500': '' }">
-        <span x-text="selectedLabels" class="block truncate" :class="{ 'text-gray-500': selected.length === 0 }"></span>
-        <span class="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
-            <svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                <path fill-rule="evenodd" d="M10 3a1 1 0 01.707.293l3 3a1 1 0 01-1.414 1.414L10 5.414 7.707 7.707a1 1 0 01-1.414-1.414l3-3A1 1 0 0110 3zm-3.707 9.293a1 1 0 011.414 0L10 14.586l2.293-2.293a1 1 0 011.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" />
-            </svg>
-        </span>
-    </button>
-
-    <!-- Liste des options -->
-    <div x-show="open"
-        x-transition:enter="transition ease-out duration-100"
-        x-transition:enter-start="transform opacity-0 scale-95"
-        x-transition:enter-end="transform opacity-100 scale-100"
-        x-transition:leave="transition ease-in duration-75"
-        x-transition:leave-start="transform opacity-100 scale-100"
-        x-transition:leave-end="transform opacity-0 scale-95"
-        class="absolute z-10 mt-1 w-full rounded-lg bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none max-h-60 overflow-auto"
-        style="display: none;">
-
-        <ul class="py-1 text-base ring-1 ring-gray-200 rounded-lg">
-                        <li class="text-gray-900 cursor-default select-none relative py-2 pl-3 pr-9 hover:bg-gray-100 transition duration-100 ease-in-out"
-                @click.stop="toggle('A1')">
-
-                <div class="flex items-center">
-                    <!-- Case à cocher invisible pour la soumission -->
-                    <input type="checkbox"
-                        name="license_categories[]"
-                        value="A1"
-                        :checked="isSelected('A1')"
-                        class="hidden"
-                        :id="'multi-select-license_categories-69650ac93ee36-A1'">
-
-                    <!-- Affichage de la case à cocher custom -->
-                    <div class="w-4 h-4 rounded border border-gray-300 flex items-center justify-center mr-3 transition duration-150 ease-in-out"
-                        :class="{ 'bg-blue-600 border-blue-600': isSelected('A1'), 'bg-white': !isSelected('A1') }">
-                        <svg x-show="isSelected('A1')" class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                        </svg>
-                    </div>
-
-                    <span class="font-normal block truncate">
-                        A1 - Motocyclettes légères
-                    </span>
-                </div>
-            </li>
-                        <li class="text-gray-900 cursor-default select-none relative py-2 pl-3 pr-9 hover:bg-gray-100 transition duration-100 ease-in-out"
-                @click.stop="toggle('A')">
-
-                <div class="flex items-center">
-                    <!-- Case à cocher invisible pour la soumission -->
-                    <input type="checkbox"
-                        name="license_categories[]"
-                        value="A"
-                        :checked="isSelected('A')"
-                        class="hidden"
-                        :id="'multi-select-license_categories-69650ac93ee36-A'">
-
-                    <!-- Affichage de la case à cocher custom -->
-                    <div class="w-4 h-4 rounded border border-gray-300 flex items-center justify-center mr-3 transition duration-150 ease-in-out"
-                        :class="{ 'bg-blue-600 border-blue-600': isSelected('A'), 'bg-white': !isSelected('A') }">
-                        <svg x-show="isSelected('A')" class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                        </svg>
-                    </div>
-
-                    <span class="font-normal block truncate">
-                        A - Motocyclettes
-                    </span>
-                </div>
-            </li>
-                        <li class="text-gray-900 cursor-default select-none relative py-2 pl-3 pr-9 hover:bg-gray-100 transition duration-100 ease-in-out"
-                @click.stop="toggle('B')">
-
-                <div class="flex items-center">
-                    <!-- Case à cocher invisible pour la soumission -->
-                    <input type="checkbox"
-                        name="license_categories[]"
-                        value="B"
-                        :checked="isSelected('B')"
-                        class="hidden"
-                        :id="'multi-select-license_categories-69650ac93ee36-B'">
-
-                    <!-- Affichage de la case à cocher custom -->
-                    <div class="w-4 h-4 rounded border border-gray-300 flex items-center justify-center mr-3 transition duration-150 ease-in-out"
-                        :class="{ 'bg-blue-600 border-blue-600': isSelected('B'), 'bg-white': !isSelected('B') }">
-                        <svg x-show="isSelected('B')" class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                        </svg>
-                    </div>
-
-                    <span class="font-normal block truncate">
-                        B - Véhicules légers
-                    </span>
-                </div>
-            </li>
-                        <li class="text-gray-900 cursor-default select-none relative py-2 pl-3 pr-9 hover:bg-gray-100 transition duration-100 ease-in-out"
-                @click.stop="toggle('BE')">
-
-                <div class="flex items-center">
-                    <!-- Case à cocher invisible pour la soumission -->
-                    <input type="checkbox"
-                        name="license_categories[]"
-                        value="BE"
-                        :checked="isSelected('BE')"
-                        class="hidden"
-                        :id="'multi-select-license_categories-69650ac93ee36-BE'">
-
-                    <!-- Affichage de la case à cocher custom -->
-                    <div class="w-4 h-4 rounded border border-gray-300 flex items-center justify-center mr-3 transition duration-150 ease-in-out"
-                        :class="{ 'bg-blue-600 border-blue-600': isSelected('BE'), 'bg-white': !isSelected('BE') }">
-                        <svg x-show="isSelected('BE')" class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                        </svg>
-                    </div>
-
-                    <span class="font-normal block truncate">
-                        B(E) - Véhicules légers avec remorque
-                    </span>
-                </div>
-            </li>
-                        <li class="text-gray-900 cursor-default select-none relative py-2 pl-3 pr-9 hover:bg-gray-100 transition duration-100 ease-in-out"
-                @click.stop="toggle('C1')">
-
-                <div class="flex items-center">
-                    <!-- Case à cocher invisible pour la soumission -->
-                    <input type="checkbox"
-                        name="license_categories[]"
-                        value="C1"
-                        :checked="isSelected('C1')"
-                        class="hidden"
-                        :id="'multi-select-license_categories-69650ac93ee36-C1'">
-
-                    <!-- Affichage de la case à cocher custom -->
-                    <div class="w-4 h-4 rounded border border-gray-300 flex items-center justify-center mr-3 transition duration-150 ease-in-out"
-                        :class="{ 'bg-blue-600 border-blue-600': isSelected('C1'), 'bg-white': !isSelected('C1') }">
-                        <svg x-show="isSelected('C1')" class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                        </svg>
-                    </div>
-
-                    <span class="font-normal block truncate">
-                        C1 - Poids lourds légers
-                    </span>
-                </div>
-            </li>
-                        <li class="text-gray-900 cursor-default select-none relative py-2 pl-3 pr-9 hover:bg-gray-100 transition duration-100 ease-in-out"
-                @click.stop="toggle('C1E')">
-
-                <div class="flex items-center">
-                    <!-- Case à cocher invisible pour la soumission -->
-                    <input type="checkbox"
-                        name="license_categories[]"
-                        value="C1E"
-                        :checked="isSelected('C1E')"
-                        class="hidden"
-                        :id="'multi-select-license_categories-69650ac93ee36-C1E'">
-
-                    <!-- Affichage de la case à cocher custom -->
-                    <div class="w-4 h-4 rounded border border-gray-300 flex items-center justify-center mr-3 transition duration-150 ease-in-out"
-                        :class="{ 'bg-blue-600 border-blue-600': isSelected('C1E'), 'bg-white': !isSelected('C1E') }">
-                        <svg x-show="isSelected('C1E')" class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                        </svg>
-                    </div>
-
-                    <span class="font-normal block truncate">
-                        C1(E) - Poids lourds légers avec remorque
-                    </span>
-                </div>
-            </li>
-                        <li class="text-gray-900 cursor-default select-none relative py-2 pl-3 pr-9 hover:bg-gray-100 transition duration-100 ease-in-out"
-                @click.stop="toggle('C')">
-
-                <div class="flex items-center">
-                    <!-- Case à cocher invisible pour la soumission -->
-                    <input type="checkbox"
-                        name="license_categories[]"
-                        value="C"
-                        :checked="isSelected('C')"
-                        class="hidden"
-                        :id="'multi-select-license_categories-69650ac93ee36-C'">
-
-                    <!-- Affichage de la case à cocher custom -->
-                    <div class="w-4 h-4 rounded border border-gray-300 flex items-center justify-center mr-3 transition duration-150 ease-in-out"
-                        :class="{ 'bg-blue-600 border-blue-600': isSelected('C'), 'bg-white': !isSelected('C') }">
-                        <svg x-show="isSelected('C')" class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                        </svg>
-                    </div>
-
-                    <span class="font-normal block truncate">
-                        C - Poids lourds
-                    </span>
-                </div>
-            </li>
-                        <li class="text-gray-900 cursor-default select-none relative py-2 pl-3 pr-9 hover:bg-gray-100 transition duration-100 ease-in-out"
-                @click.stop="toggle('CE')">
-
-                <div class="flex items-center">
-                    <!-- Case à cocher invisible pour la soumission -->
-                    <input type="checkbox"
-                        name="license_categories[]"
-                        value="CE"
-                        :checked="isSelected('CE')"
-                        class="hidden"
-                        :id="'multi-select-license_categories-69650ac93ee36-CE'">
-
-                    <!-- Affichage de la case à cocher custom -->
-                    <div class="w-4 h-4 rounded border border-gray-300 flex items-center justify-center mr-3 transition duration-150 ease-in-out"
-                        :class="{ 'bg-blue-600 border-blue-600': isSelected('CE'), 'bg-white': !isSelected('CE') }">
-                        <svg x-show="isSelected('CE')" class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                        </svg>
-                    </div>
-
-                    <span class="font-normal block truncate">
-                        C(E) - Poids lourds avec remorque
-                    </span>
-                </div>
-            </li>
-                        <li class="text-gray-900 cursor-default select-none relative py-2 pl-3 pr-9 hover:bg-gray-100 transition duration-100 ease-in-out"
-                @click.stop="toggle('D')">
-
-                <div class="flex items-center">
-                    <!-- Case à cocher invisible pour la soumission -->
-                    <input type="checkbox"
-                        name="license_categories[]"
-                        value="D"
-                        :checked="isSelected('D')"
-                        class="hidden"
-                        :id="'multi-select-license_categories-69650ac93ee36-D'">
-
-                    <!-- Affichage de la case à cocher custom -->
-                    <div class="w-4 h-4 rounded border border-gray-300 flex items-center justify-center mr-3 transition duration-150 ease-in-out"
-                        :class="{ 'bg-blue-600 border-blue-600': isSelected('D'), 'bg-white': !isSelected('D') }">
-                        <svg x-show="isSelected('D')" class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                        </svg>
-                    </div>
-
-                    <span class="font-normal block truncate">
-                        D - Transport de personnes
-                    </span>
-                </div>
-            </li>
-                        <li class="text-gray-900 cursor-default select-none relative py-2 pl-3 pr-9 hover:bg-gray-100 transition duration-100 ease-in-out"
-                @click.stop="toggle('DE')">
-
-                <div class="flex items-center">
-                    <!-- Case à cocher invisible pour la soumission -->
-                    <input type="checkbox"
-                        name="license_categories[]"
-                        value="DE"
-                        :checked="isSelected('DE')"
-                        class="hidden"
-                        :id="'multi-select-license_categories-69650ac93ee36-DE'">
-
-                    <!-- Affichage de la case à cocher custom -->
-                    <div class="w-4 h-4 rounded border border-gray-300 flex items-center justify-center mr-3 transition duration-150 ease-in-out"
-                        :class="{ 'bg-blue-600 border-blue-600': isSelected('DE'), 'bg-white': !isSelected('DE') }">
-                        <svg x-show="isSelected('DE')" class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                        </svg>
-                    </div>
-
-                    <span class="font-normal block truncate">
-                        D(E) - Transport de personnes avec remorque
-                    </span>
-                </div>
-            </li>
-                        <li class="text-gray-900 cursor-default select-none relative py-2 pl-3 pr-9 hover:bg-gray-100 transition duration-100 ease-in-out"
-                @click.stop="toggle('F')">
-
-                <div class="flex items-center">
-                    <!-- Case à cocher invisible pour la soumission -->
-                    <input type="checkbox"
-                        name="license_categories[]"
-                        value="F"
-                        :checked="isSelected('F')"
-                        class="hidden"
-                        :id="'multi-select-license_categories-69650ac93ee36-F'">
-
-                    <!-- Affichage de la case à cocher custom -->
-                    <div class="w-4 h-4 rounded border border-gray-300 flex items-center justify-center mr-3 transition duration-150 ease-in-out"
-                        :class="{ 'bg-blue-600 border-blue-600': isSelected('F'), 'bg-white': !isSelected('F') }">
-                        <svg x-show="isSelected('F')" class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                        </svg>
-                    </div>
-
-                    <span class="font-normal block truncate">
-                        F - Véhicules agricoles
-                    </span>
-                </div>
-            </li>
-                    </ul>
-    </div>
-
-    <!-- Le champ caché qui envoyait une chaîne de caractères a été supprimé. 
-    La soumission est maintenant gérée par les checkboxes cachées avec name="license_categories[]", 
-    ce qui assure que le serveur reçoit un tableau comme requis par la validation. -->
-
-        <p class="mt-2 text-sm text-gray-500">
-        Sélectionnez toutes les catégories de permis détenues par le chauffeur
-    </p>
-    
-    
-    <p x-show="fieldErrors && fieldErrors['license_categories'] && touchedFields && touchedFields['license_categories']"
-        x-transition:enter="transition ease-out duration-200"
-        x-transition:enter-start="opacity-0 transform -translate-y-1"
-        x-transition:enter-end="opacity-100 transform translate-y-0"
-        class="mt-2 text-sm text-red-600 flex items-start font-medium"
-        style="display: none;">
-        <span
-    class="iconify block w-4 h-4 mr-1.5 mt-0.5 flex-shrink-0"
-    data-icon="lucide:circle-alert"
-    data-inline="false"></span>        <span x-text="fieldErrors['license_categories']"></span>
-    </p>
-</div>                                    </div>
-
-                                    <div class="w-full"
-    x-data="{
-        serverDate: '',
-        displayValue: '',
-        picker: null,
-
-        init() {
-            this.$nextTick(() => {
-                const el = this.$refs.displayInput;
-                const component = this;
-                let isOpening = false; // Flag to prevent immediate close
-                
-                if (typeof window.Datepicker === 'undefined') {
-                    console.error('❌ ZenFleet: Datepicker not loaded');
-                    return;
-                }
-                
-                // Initialize Flowbite Datepicker
-                this.picker = new window.Datepicker(el, {
-                    language: 'fr',
-                    format: 'dd/mm/yyyy',
-                    autohide: true,
-                    todayBtn: true,
-                    todayBtnMode: 1,
-                    clearBtn: true,
-                    weekStart: 1,
-                                                            maxDate: '12/01/2026',
-                                        orientation: 'bottom left',
-                });
-                
-                // ✅ ENTERPRISE-GRADE: Force hide function
-                const forceHidePicker = () => {
-                    if (!component.picker || isOpening) return;
-                    
-                    const pickerEl = component.picker.picker?.element;
-                    if (pickerEl) {
-                        pickerEl.style.display = 'none';
-                        pickerEl.classList.remove('active', 'block');
-                        pickerEl.classList.add('hidden');
-                        if (component.picker.picker) {
-                            component.picker.picker.active = false;
-                        }
-                    }
-                };
-                
-                // ✅ ENTERPRISE-GRADE: Force show function (reset display)
-                const ensurePickerVisible = () => {
-                    const pickerEl = component.picker.picker?.element;
-                    if (pickerEl) {
-                        pickerEl.style.display = '';
-                        pickerEl.classList.remove('hidden');
-                    }
-                };
-                
-                // Set initial date if value exists
-                if (this.displayValue) {
-                    this.picker.setDate(this.displayValue);
-                    el.value = this.displayValue;
-                }
-                
-                // ✅ Listen for show event to reset display and set flag
-                el.addEventListener('show', () => {
-                    isOpening = true;
-                    ensurePickerVisible();
-                    setTimeout(() => { isOpening = false; }, 100);
-                });
-                
-                // Handle date change - force close on selection
-                el.addEventListener('changeDate', (e) => {
-                    if (e.detail.date) {
-                        const d = e.detail.date;
-                        const year = d.getFullYear();
-                        const month = String(d.getMonth() + 1).padStart(2, '0');
-                        const day = String(d.getDate()).padStart(2, '0');
-                        component.serverDate = `${year}-${month}-${day}`;
-                        component.displayValue = `${day}/${month}/${year}`;
-                        component.$dispatch('input', component.serverDate);
-                        
-                        // Force hide after selection
-                        setTimeout(forceHidePicker, 10);
-                    } else {
-                        component.serverDate = '';
-                        component.displayValue = '';
-                        component.$dispatch('input', '');
-                    }
-                });
-                
-                // ✅ ENTERPRISE-GRADE: Click outside handler
-                document.addEventListener('mousedown', (e) => {
-                    if (!component.picker || isOpening) return;
-                    
-                    const pickerEl = component.picker.picker?.element;
-                    if (!pickerEl) return;
-                    
-                    // Only check active class for visibility (more reliable)
-                    const isVisible = pickerEl.classList.contains('active');
-                    if (!isVisible) return;
-                    
-                    // Check if click is outside both input and picker
-                    if (!pickerEl.contains(e.target) && !el.contains(e.target)) {
-                        forceHidePicker();
-                    }
-                });
-                
-                // Handle manual clear
-                el.addEventListener('input', (e) => {
-                    if (!el.value.trim()) {
-                        component.serverDate = '';
-                        component.displayValue = '';
-                        component.$dispatch('input', '');
-                    }
-                });
-            });
-        }
-    }"
-    wire:ignore>
-
-        <label for="datepicker-69650ac93efa5" class="block mb-2 text-sm font-medium text-gray-900 ">
-        Date de délivrance
-                <span class="text-red-500 ml-0.5">*</span>
-            </label>
-    
-    <div class="relative">
-        
-        <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none z-10">
-            <svg class="w-4 h-4 text-gray-500 "
-                aria-hidden="true"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="currentColor"
-                viewBox="0 0 20 20">
-                <path d="M20 4a2 2 0 0 0-2-2h-2V1a1 1 0 0 0-2 0v1h-3V1a1 1 0 0 0-2 0v1H6V1a1 1 0 0 0-2 0v1H2a2 2 0 0 0-2 2v2h20V4ZM0 18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8H0v10Zm5-8h10a1 1 0 0 1 0 2H5a1 1 0 0 1 0-2Z" />
-            </svg>
-        </div>
-
-        
-        <input
-            x-ref="displayInput"
-            type="text"
-            id="datepicker-69650ac93efa5"
-            class="block w-full !pl-10 p-2.5 bg-gray-50 border-2 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500     :ring-blue-500 :border-blue-500 transition-all duration-200 border-gray-300"
-            placeholder="Choisir une date"
-            x-model="displayValue"
-                         required             autocomplete="off"
-            readonly>
-
-        
-        <input type="hidden" name="license_issue_date" x-model="serverDate">
-    </div>
-
-    </div>
-                                    <div class="w-full"
-    x-data="{
-        serverDate: '',
-        displayValue: '',
-        picker: null,
-
-        init() {
-            this.$nextTick(() => {
-                const el = this.$refs.displayInput;
-                const component = this;
-                let isOpening = false; // Flag to prevent immediate close
-                
-                if (typeof window.Datepicker === 'undefined') {
-                    console.error('❌ ZenFleet: Datepicker not loaded');
-                    return;
-                }
-                
-                // Initialize Flowbite Datepicker
-                this.picker = new window.Datepicker(el, {
-                    language: 'fr',
-                    format: 'dd/mm/yyyy',
-                    autohide: true,
-                    todayBtn: true,
-                    todayBtnMode: 1,
-                    clearBtn: true,
-                    weekStart: 1,
-                                        minDate: '12/01/2026',
-                                                            orientation: 'bottom left',
-                });
-                
-                // ✅ ENTERPRISE-GRADE: Force hide function
-                const forceHidePicker = () => {
-                    if (!component.picker || isOpening) return;
-                    
-                    const pickerEl = component.picker.picker?.element;
-                    if (pickerEl) {
-                        pickerEl.style.display = 'none';
-                        pickerEl.classList.remove('active', 'block');
-                        pickerEl.classList.add('hidden');
-                        if (component.picker.picker) {
-                            component.picker.picker.active = false;
-                        }
-                    }
-                };
-                
-                // ✅ ENTERPRISE-GRADE: Force show function (reset display)
-                const ensurePickerVisible = () => {
-                    const pickerEl = component.picker.picker?.element;
-                    if (pickerEl) {
-                        pickerEl.style.display = '';
-                        pickerEl.classList.remove('hidden');
-                    }
-                };
-                
-                // Set initial date if value exists
-                if (this.displayValue) {
-                    this.picker.setDate(this.displayValue);
-                    el.value = this.displayValue;
-                }
-                
-                // ✅ Listen for show event to reset display and set flag
-                el.addEventListener('show', () => {
-                    isOpening = true;
-                    ensurePickerVisible();
-                    setTimeout(() => { isOpening = false; }, 100);
-                });
-                
-                // Handle date change - force close on selection
-                el.addEventListener('changeDate', (e) => {
-                    if (e.detail.date) {
-                        const d = e.detail.date;
-                        const year = d.getFullYear();
-                        const month = String(d.getMonth() + 1).padStart(2, '0');
-                        const day = String(d.getDate()).padStart(2, '0');
-                        component.serverDate = `${year}-${month}-${day}`;
-                        component.displayValue = `${day}/${month}/${year}`;
-                        component.$dispatch('input', component.serverDate);
-                        
-                        // Force hide after selection
-                        setTimeout(forceHidePicker, 10);
-                    } else {
-                        component.serverDate = '';
-                        component.displayValue = '';
-                        component.$dispatch('input', '');
-                    }
-                });
-                
-                // ✅ ENTERPRISE-GRADE: Click outside handler
-                document.addEventListener('mousedown', (e) => {
-                    if (!component.picker || isOpening) return;
-                    
-                    const pickerEl = component.picker.picker?.element;
-                    if (!pickerEl) return;
-                    
-                    // Only check active class for visibility (more reliable)
-                    const isVisible = pickerEl.classList.contains('active');
-                    if (!isVisible) return;
-                    
-                    // Check if click is outside both input and picker
-                    if (!pickerEl.contains(e.target) && !el.contains(e.target)) {
-                        forceHidePicker();
-                    }
-                });
-                
-                // Handle manual clear
-                el.addEventListener('input', (e) => {
-                    if (!el.value.trim()) {
-                        component.serverDate = '';
-                        component.displayValue = '';
-                        component.$dispatch('input', '');
-                    }
-                });
-            });
-        }
-    }"
-    wire:ignore>
-
-        <label for="datepicker-69650ac93f01c" class="block mb-2 text-sm font-medium text-gray-900 ">
-        Date d&#039;expiration
-                <span class="text-red-500 ml-0.5">*</span>
-            </label>
-    
-    <div class="relative">
-        
-        <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none z-10">
-            <svg class="w-4 h-4 text-gray-500 "
-                aria-hidden="true"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="currentColor"
-                viewBox="0 0 20 20">
-                <path d="M20 4a2 2 0 0 0-2-2h-2V1a1 1 0 0 0-2 0v1h-3V1a1 1 0 0 0-2 0v1H6V1a1 1 0 0 0-2 0v1H2a2 2 0 0 0-2 2v2h20V4ZM0 18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8H0v10Zm5-8h10a1 1 0 0 1 0 2H5a1 1 0 0 1 0-2Z" />
-            </svg>
-        </div>
-
-        
-        <input
-            x-ref="displayInput"
-            type="text"
-            id="datepicker-69650ac93f01c"
-            class="block w-full !pl-10 p-2.5 bg-gray-50 border-2 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500     :ring-blue-500 :border-blue-500 transition-all duration-200 border-gray-300"
-            placeholder="Choisir une date"
-            x-model="displayValue"
-                         required             autocomplete="off"
-            readonly>
-
-        
-        <input type="hidden" name="license_expiry_date" x-model="serverDate">
-    </div>
-
-        <p class="mt-1 text-xs text-gray-500 ">Date d&#039;expiration du permis</p>
-    </div>
-                                    <div class="">
-  <label for="license_authority" class="block mb-2 text-sm font-medium text-gray-900">
- Autorité de délivrance
-  </label>
- 
- <div class="relative">
-  <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
- <span
-    class="iconify block w-5 h-5 text-gray-400"
-    data-icon="heroicons:building-office-2"
-    data-inline="false"></span> </div>
- 
- <input
- type="text"
- name="license_authority"
- id="license_authority"
- class="bg-gray-50 border text-gray-900 text-sm rounded-lg block w-full p-2.5 transition-colors duration-200 border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 bg-gray-50 pl-10"
- placeholder="Ex: Wilaya d&#039;Alger"
- value=""
-   
- x-bind:class="(fieldErrors && fieldErrors['license_authority'] && touchedFields && touchedFields['license_authority']) ? '!border-red-500 !focus:ring-2 !focus:ring-red-500 !focus:border-red-500 !bg-red-50' : ''"
- 
- />
- </div>
-
- 
- 
- <p x-show="fieldErrors && fieldErrors['license_authority'] && touchedFields && touchedFields['license_authority']"
- x-transition:enter="transition ease-out duration-200"
- x-transition:enter-start="opacity-0 transform -translate-y-1"
- x-transition:enter-end="opacity-100 transform translate-y-0"
- class="mt-2 text-sm text-red-600 flex items-start font-medium"
- style="display: none;">
- <span
-    class="iconify block w-4 h-4 mr-1.5 mt-0.5 flex-shrink-0"
-    data-icon="lucide:circle-alert"
-    data-inline="false"></span> <span>Ce champ est obligatoire et doit être correctement rempli</span>
- </p>
-</div>
-
-                                    <div class="flex items-center h-full pt-6">
-                                        <label class="inline-flex items-center cursor-pointer">
-                                            <input
-                                                type="checkbox"
-                                                name="license_verified"
-                                                value="1"
-                                                
-                                                class="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50">
-                                            <span class="ml-2 text-sm text-gray-700 font-medium">
-                                                <span
-    class="iconify block w-4 h-4 inline text-blue-600"
-    data-icon="heroicons:check-badge"
-    data-inline="false"></span>                                                Permis vérifié
-                                            </span>
-                                        </label>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    
-                    <div x-show="currentStep === 4" x-transition:enter="transition ease-out duration-200"
-                        x-transition:enter-start="opacity-0 transform translate-x-4"
-                        x-transition:enter-end="opacity-100 transform translate-x-0"
-                        style="display: none;">
-                        <div class="space-y-6">
-                            
-                            <div>
-                                <h3 class="text-lg font-medium text-gray-900 mb-4 flex items-center gap-2">
-                                    <span
-    class="iconify block w-5 h-5 text-blue-600"
-    data-icon="heroicons:user-circle"
-    data-inline="false"></span>                                    Compte Utilisateur (Optionnel)
-                                </h3>
-
-                                <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
-                                    <div class="flex">
-                                        <span
-    class="iconify block w-5 h-5 text-blue-600 mr-2 mt-0.5 flex-shrink-0"
-    data-icon="heroicons:information-circle"
-    data-inline="false"></span>                                        <div>
-                                            <p class="text-sm font-medium text-blue-900">Création de compte optionnelle</p>
-                                            <p class="text-xs text-blue-700 mt-1">
-                                                Si vous associez un compte utilisateur, le chauffeur pourra se connecter à l'application.
-                                                Vous pouvez aussi le faire plus tard.
-                                            </p>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                                                        <div wire:ignore
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1.5">Catégorie permis</label>
+                        <div wire:ignore
     x-data="{
         instance: null,
         initSelect() {
@@ -3043,7 +1069,7 @@
                     searchPlaceholder: 'Rechercher...',
                     searchText: 'Aucun résultat',
                     searchingText: 'Recherche...',
-                    placeholderText: 'Rechercher un utilisateur...',
+                    placeholderText: 'Toutes les catégories',
                     allowDeselect: true,
                     hideSelected: false,
                 },
@@ -3057,264 +1083,3229 @@
         }
     }"
     x-init="initSelect()"
-    class="">
+    class="" wire:model.live="license_category">
 
-    <!--[if BLOCK]><![endif]-->    <label for="slimselect-user_id-69650ac93f227" class="block mb-2 text-sm font-medium text-gray-900">
-        Compte utilisateur
-        <!--[if BLOCK]><![endif]--><!--[if ENDBLOCK]><![endif]-->
-    </label>
-    <!--[if ENDBLOCK]><![endif]-->
+    <!--[if BLOCK]><![endif]--><!--[if ENDBLOCK]><![endif]-->
 
     <select
         x-ref="select"
-        name="user_id"
-        id="slimselect-user_id-69650ac93f227"
+        name="license_category"
+        id="slimselect-license_category-6966126f62767"
         class="slimselect-field w-full"
-                        >
+                        wire:model.live="license_category">
 
         
-        <!--[if BLOCK]><![endif]-->        <!--[if BLOCK]><![endif]-->        <option value="" data-placeholder="true">Rechercher un utilisateur...</option>
-        <!--[if ENDBLOCK]><![endif]-->
-
-        <!--[if BLOCK]><![endif]-->        <option
-            value="2"
-            >
-             (amine.belabes@trans-algerlogistics.local)
-        </option>
-                <option
-            value="1"
-            >
-             (mohamed.meziani@trans-algerlogistics.local)
-        </option>
-                <option
-            value="23"
-            >
-            Ali Boumalou (ali@zenfleet.dz)
-        </option>
-                <option
-            value="5"
-            >
-            Gestionnaire Flotte (gestionnaire@zenfleet.dz)
-        </option>
-                <option
-            value="6"
-            >
-            SUPER VISEUR (superviseur@zenfleet.dz)
-        </option>
-                <option
-            value="3"
-            >
-            Super Administrateur (superadmin@zenfleet.dz)
-        </option>
-                <option
-            value="4"
-            >
-            admin zenfleet (admin@zenfleet.dz)
-        </option>
-                <option
-            value="7"
-            >
-            hamid Baroudi (comptable@zenfleet.dz)
-        </option>
-        <!--[if ENDBLOCK]><![endif]-->
+        <!--[if BLOCK]><![endif]-->        <option value="" data-placeholder="true">Toutes les catégories</option>
+                            <!--[if BLOCK]><![endif]-->                            <option value="A1">A1</option>
+                                                        <option value="A">A</option>
+                                                        <option value="B">B</option>
+                                                        <option value="BE">BE</option>
+                                                        <option value="C1">C1</option>
+                                                        <option value="C1E">C1E</option>
+                                                        <option value="C">C</option>
+                                                        <option value="CE">CE</option>
+                                                        <option value="D">D</option>
+                                                        <option value="DE">DE</option>
+                                                        <option value="F">F</option>
+                            <!--[if ENDBLOCK]><![endif]-->
         <!--[if ENDBLOCK]><![endif]-->
     </select>
 
-    <!--[if BLOCK]><![endif]-->    <p class="mt-2 text-sm text-gray-500">
-        Sélectionnez un compte existant ou laissez vide (optionnel)
-    </p>
-    <!--[if ENDBLOCK]><![endif]-->
-</div>
+    <!--[if BLOCK]><![endif]--><!--[if ENDBLOCK]><![endif]-->
+</div>                    </div>
+                </div>
 
+                <div class="flex items-center justify-end mt-4 pt-4 border-t border-gray-200">
+                    <button
+                        wire:click="resetFilters"
+                        class="px-3 py-1.5 bg-gray-100 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-200 transition-colors">
+                        x Réinitialiser
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        
+        <div class="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden relative">
+
+            
+            <!--[if BLOCK]><![endif]--><!--[if ENDBLOCK]><![endif]-->
+
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th scope="col" class="px-6 py-3 text-left">
+                                <input type="checkbox" wire:click="toggleAll"  class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                            </th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer" wire:click="sortBy('last_name')">
+                                Chauffeur
+                                <!--[if BLOCK]><![endif]--><!--[if ENDBLOCK]><![endif]-->
+                            </th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Contact</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Permis</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Statut</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Véhicule Actuel</th>
+                            <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        <!--[if BLOCK]><![endif]-->                        <tr wire:key="driver-13" class="hover:bg-gray-50 transition-colors duration-150 ">
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <input type="checkbox" wire:click="toggleSelection(13)"  class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="flex items-center">
+                                    <div class="flex-shrink-0 h-10 w-10 rounded-full overflow-hidden">
+                                        <!--[if BLOCK]><![endif]-->                                        <img src="http://localhost/storage/drivers/photos/UWbCoTRz39mnlzF9j8nybfpFaRrWWK74YE6WgIUK.png" class="h-full w-full object-cover">
+                                        <!--[if ENDBLOCK]><![endif]-->
+                                    </div>
+                                    <div class="ml-4">
+                                        <div class="text-sm font-medium text-gray-900">
+                                            chellouche hocine
+                                        </div>
+                                        <div class="text-xs text-gray-500">#DIF-4363001</div>
+                                    </div>
                                 </div>
-                            </div>
-
-                            
-                            <div>
-                                <h3 class="text-lg font-medium text-gray-900 mb-4 flex items-center gap-2">
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-xs text-gray-900 flex items-center gap-1.5">
                                     <span
-    class="iconify block w-5 h-5 text-red-600"
-    data-icon="heroicons:phone"
-    data-inline="false"></span>                                    Contact d'Urgence
-                                </h3>
-
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                    <div class="">
-  <label for="emergency_contact_name" class="block mb-2 text-sm font-medium text-gray-900">
- Nom du contact
-  </label>
- 
- <div class="relative">
-  <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
- <span
-    class="iconify block w-5 h-5 text-gray-400"
-    data-icon="heroicons:user"
-    data-inline="false"></span> </div>
- 
- <input
- type="text"
- name="emergency_contact_name"
- id="emergency_contact_name"
- class="bg-gray-50 border text-gray-900 text-sm rounded-lg block w-full p-2.5 transition-colors duration-200 border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 bg-gray-50 pl-10"
- placeholder="Ex: Fatima Benali"
- value=""
-   
- x-bind:class="(fieldErrors && fieldErrors['emergency_contact_name'] && touchedFields && touchedFields['emergency_contact_name']) ? '!border-red-500 !focus:ring-2 !focus:ring-red-500 !focus:border-red-500 !bg-red-50' : ''"
- 
- />
- </div>
-
- 
- 
- <p x-show="fieldErrors && fieldErrors['emergency_contact_name'] && touchedFields && touchedFields['emergency_contact_name']"
- x-transition:enter="transition ease-out duration-200"
- x-transition:enter-start="opacity-0 transform -translate-y-1"
- x-transition:enter-end="opacity-100 transform translate-y-0"
- class="mt-2 text-sm text-red-600 flex items-start font-medium"
- style="display: none;">
- <span
-    class="iconify block w-4 h-4 mr-1.5 mt-0.5 flex-shrink-0"
-    data-icon="lucide:circle-alert"
-    data-inline="false"></span> <span>Ce champ est obligatoire et doit être correctement rempli</span>
- </p>
-</div>
-
-                                    <div class="">
-  <label for="emergency_contact_phone" class="block mb-2 text-sm font-medium text-gray-900">
- Téléphone du contact
-  </label>
- 
- <div class="relative">
-  <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
- <span
-    class="iconify block w-5 h-5 text-gray-400"
-    data-icon="heroicons:phone"
-    data-inline="false"></span> </div>
- 
- <input
- type="tel"
- name="emergency_contact_phone"
- id="emergency_contact_phone"
- class="bg-gray-50 border text-gray-900 text-sm rounded-lg block w-full p-2.5 transition-colors duration-200 border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 bg-gray-50 pl-10"
- placeholder="Ex: 0555987654"
- value=""
-   
- x-bind:class="(fieldErrors && fieldErrors['emergency_contact_phone'] && touchedFields && touchedFields['emergency_contact_phone']) ? '!border-red-500 !focus:ring-2 !focus:ring-red-500 !focus:border-red-500 !bg-red-50' : ''"
- 
- />
- </div>
-
- 
- 
- <p x-show="fieldErrors && fieldErrors['emergency_contact_phone'] && touchedFields && touchedFields['emergency_contact_phone']"
- x-transition:enter="transition ease-out duration-200"
- x-transition:enter-start="opacity-0 transform -translate-y-1"
- x-transition:enter-end="opacity-100 transform translate-y-0"
- class="mt-2 text-sm text-red-600 flex items-start font-medium"
- style="display: none;">
- <span
-    class="iconify block w-4 h-4 mr-1.5 mt-0.5 flex-shrink-0"
-    data-icon="lucide:circle-alert"
-    data-inline="false"></span> <span>Ce champ est obligatoire et doit être correctement rempli</span>
- </p>
-</div>
-
-                                    <div class="">
-  <label for="emergency_contact_relationship" class="block mb-2 text-sm font-medium text-gray-900">
- Lien de parenté
-  </label>
- 
- <div class="relative">
-  <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
- <span
-    class="iconify block w-5 h-5 text-gray-400"
-    data-icon="heroicons:users"
-    data-inline="false"></span> </div>
- 
- <input
- type="text"
- name="emergency_contact_relationship"
- id="emergency_contact_relationship"
- class="bg-gray-50 border text-gray-900 text-sm rounded-lg block w-full p-2.5 transition-colors duration-200 border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 bg-gray-50 pl-10"
- placeholder="Ex: Épouse, Frère, Mère"
- value=""
-   
- x-bind:class="(fieldErrors && fieldErrors['emergency_contact_relationship'] && touchedFields && touchedFields['emergency_contact_relationship']) ? '!border-red-500 !focus:ring-2 !focus:ring-red-500 !focus:border-red-500 !bg-red-50' : ''"
- 
- />
- </div>
-
- 
- 
- <p x-show="fieldErrors && fieldErrors['emergency_contact_relationship'] && touchedFields && touchedFields['emergency_contact_relationship']"
- x-transition:enter="transition ease-out duration-200"
- x-transition:enter-start="opacity-0 transform -translate-y-1"
- x-transition:enter-end="opacity-100 transform translate-y-0"
- class="mt-2 text-sm text-red-600 flex items-start font-medium"
- style="display: none;">
- <span
-    class="iconify block w-4 h-4 mr-1.5 mt-0.5 flex-shrink-0"
-    data-icon="lucide:circle-alert"
-    data-inline="false"></span> <span>Ce champ est obligatoire et doit être correctement rempli</span>
- </p>
-</div>
+    class="iconify block w-3.5 h-3.5 text-gray-400"
+    data-icon="lucide:phone"
+    data-inline="false"></span> +213645890245
                                 </div>
-                            </div>
-                        </div>
+                                <div class="text-xs text-gray-500 flex items-center gap-1.5 mt-1">
+                                    <span
+    class="iconify block w-3.5 h-3.5 text-gray-400"
+    data-icon="lucide:mail"
+    data-inline="false"></span> N/A
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-xs font-medium text-gray-900">DZ-9873986</div>
+                                <!--[if BLOCK]><![endif]-->                                <div class="flex flex-wrap gap-1 mt-1">
+                                    <!--[if BLOCK]><![endif]-->                                    <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-blue-100 text-blue-800">
+                                        A1
+                                    </span>
+                                                                        <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-blue-100 text-blue-800">
+                                        A
+                                    </span>
+                                                                        <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-blue-100 text-blue-800">
+                                        B
+                                    </span>
+                                                                        <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-blue-100 text-blue-800">
+                                        C
+                                    </span>
+                                    <!--[if ENDBLOCK]><![endif]-->
+                                </div>
+                                <!--[if ENDBLOCK]><![endif]-->
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div wire:snapshot="{&quot;data&quot;:{&quot;driverId&quot;:13,&quot;driver&quot;:[null,{&quot;class&quot;:&quot;App\\Models\\Driver&quot;,&quot;key&quot;:13,&quot;s&quot;:&quot;mdl&quot;}],&quot;showConfirmModal&quot;:false,&quot;pendingStatus&quot;:null,&quot;pendingStatusEnum&quot;:null,&quot;confirmMessage&quot;:&quot;&quot;},&quot;memo&quot;:{&quot;id&quot;:&quot;m3ieVbvhir3PiKplzGuO&quot;,&quot;name&quot;:&quot;admin.driver-status-badge-ultra-pro&quot;,&quot;path&quot;:&quot;admin\/drivers&quot;,&quot;method&quot;:&quot;GET&quot;,&quot;children&quot;:[],&quot;scripts&quot;:[],&quot;assets&quot;:[],&quot;errors&quot;:[],&quot;locale&quot;:&quot;fr&quot;},&quot;checksum&quot;:&quot;4c154f28b4cec8a8f7ea5a5ad5d744d347ab24e0cb64731b5205945115e79bf6&quot;}" wire:effects="{&quot;listeners&quot;:[&quot;refreshComponent&quot;,&quot;driverStatusUpdated&quot;,&quot;driverStatusChanged&quot;,&quot;echo:drivers,DriverStatusChanged&quot;]}" wire:id="m3ieVbvhir3PiKplzGuO" class="relative inline-block"
+    x-data="{ 
+         open: false, 
+         confirmModal: window.Livewire.find('m3ieVbvhir3PiKplzGuO').entangle('showConfirmModal').live,
+         toggle() { this.open = !this.open; },
+         close() { this.open = false; },
+         selectStatus(status) { 
+             this.open = false; 
+             $wire.prepareStatusChange(status); 
+         }
+     }"
+    @click.stop
+    x-init="$watch('confirmModal', value => { if (value) open = false; })">
+    
+    <!--[if BLOCK]><![endif]-->    <button
+        @click.stop="toggle"
+        @click.away="close"
+        type="button"
+        class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold 
+                   transition-all duration-200 hover:shadow-md hover:scale-105 cursor-pointer 
+                   inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800
+                   focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+        title="Cliquer pour modifier le statut">
+        
+        <!--[if BLOCK]><![endif]-->        <span
+    class="iconify block w-3.5 h-3.5"
+    data-icon="lucide:help-circle"
+    data-inline="false"></span>        <!--[if ENDBLOCK]><![endif]-->
+
+        
+        <span>Autre</span>
+
+        
+        <svg class="w-3 h-3 opacity-60 transition-transform duration-200"
+            :class="{ 'rotate-180': open }"
+            fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+        </svg>
+    </button>
+    <!--[if ENDBLOCK]><![endif]-->
+
+    
+    <!--[if BLOCK]><![endif]-->    <div
+        x-show="open"
+        x-transition:enter="transition ease-out duration-200"
+        x-transition:enter-start="transform opacity-0 scale-95 translate-y-2"
+        x-transition:enter-end="transform opacity-100 scale-100 translate-y-0"
+        x-transition:leave="transition ease-in duration-150"
+        x-transition:leave-start="transform opacity-100 scale-100 translate-y-0"
+        x-transition:leave-end="transform opacity-0 scale-95 translate-y-2"
+        class="absolute left-0 mt-3 w-72 rounded-xl shadow-[0_10px_40px_-10px_rgba(0,0,0,0.2)] bg-white ring-1 ring-black/5 z-50 overflow-visible"
+        style="display: none;">
+
+        
+        <div class="absolute -top-2 left-6 w-4 h-4 bg-white transform rotate-45 border-t border-l border-gray-100 shadow-sm"></div>
+
+        <div class="relative bg-white rounded-xl overflow-hidden">
+            
+            <div class="px-4 py-3 bg-gradient-to-r from-gray-50 to-white border-b border-gray-100">
+                <div class="flex items-center justify-between">
+                    <span class="text-xs font-bold text-gray-800 uppercase tracking-wider flex items-center gap-2">
+                        <span
+    class="iconify block w-3.5 h-3.5 text-blue-500"
+    data-icon="lucide:git-branch"
+    data-inline="false"></span>                        Changer le statut
+                    </span>
+                    <button @click="close" class="text-gray-400 hover:text-gray-600 transition-colors p-1 hover:bg-gray-100 rounded-full">
+                        <span
+    class="iconify block w-3.5 h-3.5"
+    data-icon="lucide:x"
+    data-inline="false"></span>                    </button>
+                </div>
+            </div>
+
+            
+            <div class="py-2 max-h-[300px] overflow-y-auto custom-scrollbar">
+                <!--[if BLOCK]><![endif]-->                <button
+                    @click.stop="selectStatus('disponible')"
+                    type="button"
+                    class="w-full flex items-center justify-between px-4 py-3 hover:bg-blue-50/50 
+                                   transition-all duration-200 group focus:outline-none border-l-2 border-transparent hover:border-blue-500">
+                    <div class="flex items-center gap-3">
+                        
+                        <span class="inline-flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-xs font-semibold 
+                                           inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 shadow-sm group-hover:shadow transition-all">
+                            <span
+    class="iconify block w-3.5 h-3.5"
+    data-icon="lucide:user-check"
+    data-inline="false"></span>                            Disponible
+                        </span>
+                    </div>
+                    
+                    <div class="w-6 h-6 rounded-full bg-transparent group-hover:bg-blue-100 flex items-center justify-center transition-all">
+                        <span
+    class="iconify block w-3.5 h-3.5 text-gray-300 group-hover:text-blue-600 
+                                                 group-hover:translate-x-0.5 transition-all"
+    data-icon="lucide:arrow-right"
+    data-inline="false"></span>                    </div>
+                </button>
+                                <button
+                    @click.stop="selectStatus('en_conge')"
+                    type="button"
+                    class="w-full flex items-center justify-between px-4 py-3 hover:bg-blue-50/50 
+                                   transition-all duration-200 group focus:outline-none border-l-2 border-transparent hover:border-blue-500">
+                    <div class="flex items-center gap-3">
+                        
+                        <span class="inline-flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-xs font-semibold 
+                                           inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-orange-100 text-orange-800 shadow-sm group-hover:shadow transition-all">
+                            <span
+    class="iconify block w-3.5 h-3.5"
+    data-icon="lucide:palmtree"
+    data-inline="false"></span>                            En congé
+                        </span>
+                    </div>
+                    
+                    <div class="w-6 h-6 rounded-full bg-transparent group-hover:bg-blue-100 flex items-center justify-center transition-all">
+                        <span
+    class="iconify block w-3.5 h-3.5 text-gray-300 group-hover:text-blue-600 
+                                                 group-hover:translate-x-0.5 transition-all"
+    data-icon="lucide:arrow-right"
+    data-inline="false"></span>                    </div>
+                </button>
+                <!--[if ENDBLOCK]><![endif]-->
+            </div>
+
+            
+            <!--[if BLOCK]><![endif]-->            <div class="px-4 py-3 bg-gray-50/80 border-t border-gray-100 backdrop-blur-sm">
+                <div class="flex items-start gap-2.5">
+                    <span
+    class="iconify block w-4 h-4 text-blue-500 mt-0.5 flex-shrink-0"
+    data-icon="lucide:info"
+    data-inline="false"></span>                    <p class="text-xs text-gray-600 leading-relaxed">
+                        <span class="font-medium text-gray-900">Note:</span>
+                        Statut spécial : sanctionné, en formation, en maladie, etc.
+                    </p>
+                </div>
+            </div>
+            <!--[if ENDBLOCK]><![endif]-->
+        </div>
+    </div>
+    <!--[if ENDBLOCK]><![endif]-->
+
+    
+    <div x-show="confirmModal"
+        x-cloak
+        class="fixed inset-0 z-50 overflow-y-auto"
+        aria-labelledby="modal-title"
+        role="dialog"
+        aria-modal="true">
+
+        
+        <div x-show="confirmModal"
+            x-transition:enter="ease-out duration-300"
+            x-transition:enter-start="opacity-0"
+            x-transition:enter-end="opacity-100"
+            x-transition:leave="ease-in duration-200"
+            x-transition:leave-start="opacity-100"
+            x-transition:leave-end="opacity-0"
+            class="fixed inset-0 bg-gray-900 bg-opacity-50 backdrop-blur-sm transition-opacity">
+        </div>
+
+        
+        <div class="flex min-h-full items-center justify-center p-4 text-center sm:p-0">
+            <div x-show="confirmModal"
+                x-transition:enter="ease-out duration-300"
+                x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
+                x-transition:leave="ease-in duration-200"
+                x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
+                x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                class="relative transform overflow-hidden rounded-2xl bg-white text-left shadow-2xl transition-all sm:my-8 sm:w-full sm:max-w-lg">
+
+                
+                <div class="bg-gradient-to-r from-blue-500 to-blue-600 px-6 py-4">
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-lg font-semibold text-white flex items-center gap-2">
+                            <span
+    class="iconify block w-5 h-5"
+    data-icon="lucide:alert-circle"
+    data-inline="false"></span>                            Confirmation de changement de statut
+                        </h3>
+                        <button @click="confirmModal = false; $wire.cancelStatusChange()"
+                            class="text-white/80 hover:text-white transition-colors">
+                            <span
+    class="iconify block w-5 h-5"
+    data-icon="lucide:x"
+    data-inline="false"></span>                        </button>
+                    </div>
+                </div>
+
+                
+                <div class="px-6 py-5">
+                    
+                    <div class="mb-4">
+                        <p class="text-sm text-gray-700 whitespace-pre-line"></p>
                     </div>
 
                     
-                    <div class="mt-8 pt-6 border-t border-gray-200 flex items-center justify-between">
-                        <div>
-                            <button
-                                type="button"
-                                @click="prevStep()"
-                                x-show="currentStep > 1"
-                                class="inline-flex items-center gap-2 px-4 py-2.5 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors text-sm font-medium text-gray-700">
-                                <span
-    class="iconify block w-4 h-4"
-    data-icon="heroicons:arrow-left"
-    data-inline="false"></span>                                Précédent
-                            </button>
-                        </div>
-
-                        <div class="flex items-center gap-4">
-                            <a href="http://localhost/admin/drivers"
-                                class="text-gray-600 hover:text-gray-900 font-medium text-sm transition-colors">
-                                Annuler
-                            </a>
-
-                            <button
-                                type="button"
-                                @click="nextStep()"
-                                x-show="currentStep < 4"
-                                class="inline-flex items-center gap-2 px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors shadow-sm hover:shadow-md text-sm">
-                                Suivant
-                                <span
-    class="iconify block w-4 h-4"
-    data-icon="heroicons:arrow-right"
-    data-inline="false"></span>                            </button>
-
-                            <button
-                                type="submit"
-                                x-show="currentStep === 4"
-                                x-cloak
-                                class="inline-flex items-center gap-2 px-6 py-2.5 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg transition-colors shadow-sm hover:shadow-md text-sm">
-                                <span
-    class="iconify block w-5 h-5"
-    data-icon="heroicons:check"
-    data-inline="false"></span>                                Créer le Chauffeur
-                            </button>
+                    <div class="bg-gray-50 rounded-lg p-4 mb-4">
+                        <div class="grid grid-cols-2 gap-3 text-sm">
+                            <div>
+                                <span class="text-gray-500">Chauffeur:</span>
+                                <p class="font-medium text-gray-900">chellouche hocine</p>
+                            </div>
+                            <div>
+                                <span class="text-gray-500">Matricule:</span>
+                                <p class="font-medium text-gray-900">DIF-4363001</p>
+                            </div>
+                            <!--[if BLOCK]><![endif]-->                            <div>
+                                <span class="text-gray-500">Statut actuel:</span>
+                                <p class="mt-1">
+                                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                                        <span
+    class="iconify block w-3 h-3"
+    data-icon="lucide:help-circle"
+    data-inline="false"></span>                                        Autre
+                                    </span>
+                                </p>
+                            </div>
+                            <!--[if ENDBLOCK]><![endif]-->
+                            <!--[if BLOCK]><![endif]--><!--[if ENDBLOCK]><![endif]-->
                         </div>
                     </div>
-                </form>
-</div>
+                </div>
 
+                
+                <div class="bg-gray-50 px-6 py-4 flex items-center justify-end gap-3">
+                    <button wire:click="cancelStatusChange"
+                        @click="confirmModal = false"
+                        type="button"
+                        class="inline-flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 
+                                   rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 
+                                   focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 
+                                   transition-all duration-150">
+                        <span
+    class="iconify block w-4 h-4"
+    data-icon="lucide:x"
+    data-inline="false"></span>                        Annuler
+                    </button>
+
+                    <button wire:click="confirmStatusChange"
+                        type="button"
+                        wire:loading.attr="disabled"
+                        wire:loading.class="opacity-50 cursor-not-allowed"
+                        class="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 
+                                   text-white rounded-lg text-sm font-medium 
+                                   focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500
+                                   transition-all duration-150 shadow-sm hover:shadow-md">
+                        <span wire:loading.remove wire:target="confirmStatusChange">
+                            <span
+    class="iconify block w-4 h-4"
+    data-icon="lucide:check"
+    data-inline="false"></span>                        </span>
+                        <span wire:loading wire:target="confirmStatusChange">
+                            <svg class="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+                            </svg>
+                        </span>
+                        <span wire:loading.remove wire:target="confirmStatusChange">Confirmer</span>
+                        <span wire:loading wire:target="confirmStatusChange">Traitement...</span>
+                    </button>
+                </div>
+            </div>
         </div>
     </div>
-</section>
+</div>                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-xs text-gray-500">
+                                <!--[if BLOCK]><![endif]-->                                <span class="text-gray-400 italic">Aucun véhicule</span>
+                                <!--[if ENDBLOCK]><![endif]-->
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                <div class="flex items-center justify-end gap-2">
+                                    <!--[if BLOCK]><![endif]-->                                    
+                                    <a href="http://localhost/admin/drivers/13"
+                                        class="p-2 rounded-full bg-gray-50 text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition-all duration-200 group"
+                                        title="Voir">
+                                        <span
+    class="iconify block w-4 h-4 group-hover:scale-110 transition-transform"
+    data-icon="lucide:eye"
+    data-inline="false"></span>                                    </a>
+                                    <a href="http://localhost/admin/drivers/13/edit"
+                                        class="p-2 rounded-full bg-gray-50 text-gray-400 hover:text-amber-600 hover:bg-amber-50 transition-all duration-200 group"
+                                        title="Modifier">
+                                        <span
+    class="iconify block w-4 h-4 group-hover:scale-110 transition-transform"
+    data-icon="lucide:edit-3"
+    data-inline="false"></span>                                    </a>
 
+                                    
+                                    <div class="relative" x-data="{ open: false }">
+                                        <button @click="open = !open" @click.away="open = false"
+                                            class="p-2 rounded-full bg-gray-50 text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-all duration-200 group">
+                                            <span
+    class="iconify block w-4 h-4 group-hover:scale-110 transition-transform"
+    data-icon="lucide:more-vertical"
+    data-inline="false"></span>                                        </button>
+
+                                        <div x-show="open"
+                                            x-transition:enter="transition ease-out duration-100"
+                                            x-transition:enter-start="transform opacity-0 scale-95"
+                                            x-transition:enter-end="transform opacity-100 scale-100"
+                                            class="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
+                                            style="display: none;">
+                                            <div class="py-1">
+                                                <button wire:click="exportPdf(13); open = false" class="group flex w-full items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                                    <span
+    class="iconify block mr-3 h-4 w-4 text-gray-400 group-hover:text-red-500"
+    data-icon="lucide:file-text"
+    data-inline="false"></span>                                                    Exporter PDF
+                                                </button>
+                                                <div class="border-t border-gray-100 my-1"></div>
+                                                <button wire:click="confirmArchive(13); open = false" class="group flex w-full items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                                    <span
+    class="iconify block mr-3 h-4 w-4 text-gray-400 group-hover:text-amber-500"
+    data-icon="lucide:archive"
+    data-inline="false"></span>                                                    Archiver
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!--[if ENDBLOCK]><![endif]-->
+                                </div>
+                            </td>
+                        </tr>
+                                                <tr wire:key="driver-12" class="hover:bg-gray-50 transition-colors duration-150 ">
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <input type="checkbox" wire:click="toggleSelection(12)"  class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="flex items-center">
+                                    <div class="flex-shrink-0 h-10 w-10 rounded-full overflow-hidden">
+                                        <!--[if BLOCK]><![endif]-->                                        <img src="http://localhost/storage/drivers/photos/6funIROUjmmlVPOAeno0LeqmtBPmqWteqX2dajzO.png" class="h-full w-full object-cover">
+                                        <!--[if ENDBLOCK]><![endif]-->
+                                    </div>
+                                    <div class="ml-4">
+                                        <div class="text-sm font-medium text-gray-900">
+                                            said Bounouh
+                                        </div>
+                                        <div class="text-xs text-gray-500">#DIF-09707</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-xs text-gray-900 flex items-center gap-1.5">
+                                    <span
+    class="iconify block w-3.5 h-3.5 text-gray-400"
+    data-icon="lucide:phone"
+    data-inline="false"></span> +213567993689
+                                </div>
+                                <div class="text-xs text-gray-500 flex items-center gap-1.5 mt-1">
+                                    <span
+    class="iconify block w-3.5 h-3.5 text-gray-400"
+    data-icon="lucide:mail"
+    data-inline="false"></span> N/A
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-xs font-medium text-gray-900">DZ-9879868-001</div>
+                                <!--[if BLOCK]><![endif]-->                                <div class="flex flex-wrap gap-1 mt-1">
+                                    <!--[if BLOCK]><![endif]-->                                    <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-blue-100 text-blue-800">
+                                        A1
+                                    </span>
+                                                                        <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-blue-100 text-blue-800">
+                                        A
+                                    </span>
+                                                                        <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-blue-100 text-blue-800">
+                                        B
+                                    </span>
+                                    <!--[if ENDBLOCK]><![endif]-->
+                                </div>
+                                <!--[if ENDBLOCK]><![endif]-->
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div wire:snapshot="{&quot;data&quot;:{&quot;driverId&quot;:12,&quot;driver&quot;:[null,{&quot;class&quot;:&quot;App\\Models\\Driver&quot;,&quot;key&quot;:12,&quot;s&quot;:&quot;mdl&quot;}],&quot;showConfirmModal&quot;:false,&quot;pendingStatus&quot;:null,&quot;pendingStatusEnum&quot;:null,&quot;confirmMessage&quot;:&quot;&quot;},&quot;memo&quot;:{&quot;id&quot;:&quot;ZVox3FtTRP0QTkoof0P0&quot;,&quot;name&quot;:&quot;admin.driver-status-badge-ultra-pro&quot;,&quot;path&quot;:&quot;admin\/drivers&quot;,&quot;method&quot;:&quot;GET&quot;,&quot;children&quot;:[],&quot;scripts&quot;:[],&quot;assets&quot;:[],&quot;errors&quot;:[],&quot;locale&quot;:&quot;fr&quot;},&quot;checksum&quot;:&quot;e83afe98c1e640142ace16266484b56dc4f7701b5409787578cfc6e788160b99&quot;}" wire:effects="{&quot;listeners&quot;:[&quot;refreshComponent&quot;,&quot;driverStatusUpdated&quot;,&quot;driverStatusChanged&quot;,&quot;echo:drivers,DriverStatusChanged&quot;]}" wire:id="ZVox3FtTRP0QTkoof0P0" class="relative inline-block"
+    x-data="{ 
+         open: false, 
+         confirmModal: window.Livewire.find('ZVox3FtTRP0QTkoof0P0').entangle('showConfirmModal').live,
+         toggle() { this.open = !this.open; },
+         close() { this.open = false; },
+         selectStatus(status) { 
+             this.open = false; 
+             $wire.prepareStatusChange(status); 
+         }
+     }"
+    @click.stop
+    x-init="$watch('confirmModal', value => { if (value) open = false; })">
+    
+    <!--[if BLOCK]><![endif]-->    <button
+        @click.stop="toggle"
+        @click.away="close"
+        type="button"
+        class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold 
+                   transition-all duration-200 hover:shadow-md hover:scale-105 cursor-pointer 
+                   inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800
+                   focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+        title="Cliquer pour modifier le statut">
+        
+        <!--[if BLOCK]><![endif]-->        <span
+    class="iconify block w-3.5 h-3.5"
+    data-icon="lucide:user-check"
+    data-inline="false"></span>        <!--[if ENDBLOCK]><![endif]-->
+
+        
+        <span>Disponible</span>
+
+        
+        <svg class="w-3 h-3 opacity-60 transition-transform duration-200"
+            :class="{ 'rotate-180': open }"
+            fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+        </svg>
+    </button>
+    <!--[if ENDBLOCK]><![endif]-->
+
+    
+    <!--[if BLOCK]><![endif]-->    <div
+        x-show="open"
+        x-transition:enter="transition ease-out duration-200"
+        x-transition:enter-start="transform opacity-0 scale-95 translate-y-2"
+        x-transition:enter-end="transform opacity-100 scale-100 translate-y-0"
+        x-transition:leave="transition ease-in duration-150"
+        x-transition:leave-start="transform opacity-100 scale-100 translate-y-0"
+        x-transition:leave-end="transform opacity-0 scale-95 translate-y-2"
+        class="absolute left-0 mt-3 w-72 rounded-xl shadow-[0_10px_40px_-10px_rgba(0,0,0,0.2)] bg-white ring-1 ring-black/5 z-50 overflow-visible"
+        style="display: none;">
+
+        
+        <div class="absolute -top-2 left-6 w-4 h-4 bg-white transform rotate-45 border-t border-l border-gray-100 shadow-sm"></div>
+
+        <div class="relative bg-white rounded-xl overflow-hidden">
+            
+            <div class="px-4 py-3 bg-gradient-to-r from-gray-50 to-white border-b border-gray-100">
+                <div class="flex items-center justify-between">
+                    <span class="text-xs font-bold text-gray-800 uppercase tracking-wider flex items-center gap-2">
+                        <span
+    class="iconify block w-3.5 h-3.5 text-blue-500"
+    data-icon="lucide:git-branch"
+    data-inline="false"></span>                        Changer le statut
+                    </span>
+                    <button @click="close" class="text-gray-400 hover:text-gray-600 transition-colors p-1 hover:bg-gray-100 rounded-full">
+                        <span
+    class="iconify block w-3.5 h-3.5"
+    data-icon="lucide:x"
+    data-inline="false"></span>                    </button>
                 </div>
+            </div>
+
+            
+            <div class="py-2 max-h-[300px] overflow-y-auto custom-scrollbar">
+                <!--[if BLOCK]><![endif]-->                <button
+                    @click.stop="selectStatus('en_mission')"
+                    type="button"
+                    class="w-full flex items-center justify-between px-4 py-3 hover:bg-blue-50/50 
+                                   transition-all duration-200 group focus:outline-none border-l-2 border-transparent hover:border-blue-500">
+                    <div class="flex items-center gap-3">
+                        
+                        <span class="inline-flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-xs font-semibold 
+                                           inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 shadow-sm group-hover:shadow transition-all">
+                            <span
+    class="iconify block w-3.5 h-3.5"
+    data-icon="lucide:truck"
+    data-inline="false"></span>                            En mission
+                        </span>
+                    </div>
+                    
+                    <div class="w-6 h-6 rounded-full bg-transparent group-hover:bg-blue-100 flex items-center justify-center transition-all">
+                        <span
+    class="iconify block w-3.5 h-3.5 text-gray-300 group-hover:text-blue-600 
+                                                 group-hover:translate-x-0.5 transition-all"
+    data-icon="lucide:arrow-right"
+    data-inline="false"></span>                    </div>
+                </button>
+                                <button
+                    @click.stop="selectStatus('en_conge')"
+                    type="button"
+                    class="w-full flex items-center justify-between px-4 py-3 hover:bg-blue-50/50 
+                                   transition-all duration-200 group focus:outline-none border-l-2 border-transparent hover:border-blue-500">
+                    <div class="flex items-center gap-3">
+                        
+                        <span class="inline-flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-xs font-semibold 
+                                           inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-orange-100 text-orange-800 shadow-sm group-hover:shadow transition-all">
+                            <span
+    class="iconify block w-3.5 h-3.5"
+    data-icon="lucide:palmtree"
+    data-inline="false"></span>                            En congé
+                        </span>
+                    </div>
+                    
+                    <div class="w-6 h-6 rounded-full bg-transparent group-hover:bg-blue-100 flex items-center justify-center transition-all">
+                        <span
+    class="iconify block w-3.5 h-3.5 text-gray-300 group-hover:text-blue-600 
+                                                 group-hover:translate-x-0.5 transition-all"
+    data-icon="lucide:arrow-right"
+    data-inline="false"></span>                    </div>
+                </button>
+                                <button
+                    @click.stop="selectStatus('en_formation')"
+                    type="button"
+                    class="w-full flex items-center justify-between px-4 py-3 hover:bg-blue-50/50 
+                                   transition-all duration-200 group focus:outline-none border-l-2 border-transparent hover:border-blue-500">
+                    <div class="flex items-center gap-3">
+                        
+                        <span class="inline-flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-xs font-semibold 
+                                           inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800 shadow-sm group-hover:shadow transition-all">
+                            <span
+    class="iconify block w-3.5 h-3.5"
+    data-icon="lucide:graduation-cap"
+    data-inline="false"></span>                            En formation
+                        </span>
+                    </div>
+                    
+                    <div class="w-6 h-6 rounded-full bg-transparent group-hover:bg-blue-100 flex items-center justify-center transition-all">
+                        <span
+    class="iconify block w-3.5 h-3.5 text-gray-300 group-hover:text-blue-600 
+                                                 group-hover:translate-x-0.5 transition-all"
+    data-icon="lucide:arrow-right"
+    data-inline="false"></span>                    </div>
+                </button>
+                                <button
+                    @click.stop="selectStatus('autre')"
+                    type="button"
+                    class="w-full flex items-center justify-between px-4 py-3 hover:bg-blue-50/50 
+                                   transition-all duration-200 group focus:outline-none border-l-2 border-transparent hover:border-blue-500">
+                    <div class="flex items-center gap-3">
+                        
+                        <span class="inline-flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-xs font-semibold 
+                                           inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 shadow-sm group-hover:shadow transition-all">
+                            <span
+    class="iconify block w-3.5 h-3.5"
+    data-icon="lucide:help-circle"
+    data-inline="false"></span>                            Autre
+                        </span>
+                    </div>
+                    
+                    <div class="w-6 h-6 rounded-full bg-transparent group-hover:bg-blue-100 flex items-center justify-center transition-all">
+                        <span
+    class="iconify block w-3.5 h-3.5 text-gray-300 group-hover:text-blue-600 
+                                                 group-hover:translate-x-0.5 transition-all"
+    data-icon="lucide:arrow-right"
+    data-inline="false"></span>                    </div>
+                </button>
+                <!--[if ENDBLOCK]><![endif]-->
+            </div>
+
+            
+            <!--[if BLOCK]><![endif]-->            <div class="px-4 py-3 bg-gray-50/80 border-t border-gray-100 backdrop-blur-sm">
+                <div class="flex items-start gap-2.5">
+                    <span
+    class="iconify block w-4 h-4 text-blue-500 mt-0.5 flex-shrink-0"
+    data-icon="lucide:info"
+    data-inline="false"></span>                    <p class="text-xs text-gray-600 leading-relaxed">
+                        <span class="font-medium text-gray-900">Note:</span>
+                        Chauffeur disponible, peut recevoir une affectation de véhicule
+                    </p>
+                </div>
+            </div>
+            <!--[if ENDBLOCK]><![endif]-->
+        </div>
+    </div>
+    <!--[if ENDBLOCK]><![endif]-->
+
+    
+    <div x-show="confirmModal"
+        x-cloak
+        class="fixed inset-0 z-50 overflow-y-auto"
+        aria-labelledby="modal-title"
+        role="dialog"
+        aria-modal="true">
+
+        
+        <div x-show="confirmModal"
+            x-transition:enter="ease-out duration-300"
+            x-transition:enter-start="opacity-0"
+            x-transition:enter-end="opacity-100"
+            x-transition:leave="ease-in duration-200"
+            x-transition:leave-start="opacity-100"
+            x-transition:leave-end="opacity-0"
+            class="fixed inset-0 bg-gray-900 bg-opacity-50 backdrop-blur-sm transition-opacity">
+        </div>
+
+        
+        <div class="flex min-h-full items-center justify-center p-4 text-center sm:p-0">
+            <div x-show="confirmModal"
+                x-transition:enter="ease-out duration-300"
+                x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
+                x-transition:leave="ease-in duration-200"
+                x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
+                x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                class="relative transform overflow-hidden rounded-2xl bg-white text-left shadow-2xl transition-all sm:my-8 sm:w-full sm:max-w-lg">
+
+                
+                <div class="bg-gradient-to-r from-blue-500 to-blue-600 px-6 py-4">
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-lg font-semibold text-white flex items-center gap-2">
+                            <span
+    class="iconify block w-5 h-5"
+    data-icon="lucide:alert-circle"
+    data-inline="false"></span>                            Confirmation de changement de statut
+                        </h3>
+                        <button @click="confirmModal = false; $wire.cancelStatusChange()"
+                            class="text-white/80 hover:text-white transition-colors">
+                            <span
+    class="iconify block w-5 h-5"
+    data-icon="lucide:x"
+    data-inline="false"></span>                        </button>
+                    </div>
+                </div>
+
+                
+                <div class="px-6 py-5">
+                    
+                    <div class="mb-4">
+                        <p class="text-sm text-gray-700 whitespace-pre-line"></p>
+                    </div>
+
+                    
+                    <div class="bg-gray-50 rounded-lg p-4 mb-4">
+                        <div class="grid grid-cols-2 gap-3 text-sm">
+                            <div>
+                                <span class="text-gray-500">Chauffeur:</span>
+                                <p class="font-medium text-gray-900">said Bounouh</p>
+                            </div>
+                            <div>
+                                <span class="text-gray-500">Matricule:</span>
+                                <p class="font-medium text-gray-900">DIF-09707</p>
+                            </div>
+                            <!--[if BLOCK]><![endif]-->                            <div>
+                                <span class="text-gray-500">Statut actuel:</span>
+                                <p class="mt-1">
+                                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                        <span
+    class="iconify block w-3 h-3"
+    data-icon="lucide:user-check"
+    data-inline="false"></span>                                        Disponible
+                                    </span>
+                                </p>
+                            </div>
+                            <!--[if ENDBLOCK]><![endif]-->
+                            <!--[if BLOCK]><![endif]--><!--[if ENDBLOCK]><![endif]-->
+                        </div>
+                    </div>
+                </div>
+
+                
+                <div class="bg-gray-50 px-6 py-4 flex items-center justify-end gap-3">
+                    <button wire:click="cancelStatusChange"
+                        @click="confirmModal = false"
+                        type="button"
+                        class="inline-flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 
+                                   rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 
+                                   focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 
+                                   transition-all duration-150">
+                        <span
+    class="iconify block w-4 h-4"
+    data-icon="lucide:x"
+    data-inline="false"></span>                        Annuler
+                    </button>
+
+                    <button wire:click="confirmStatusChange"
+                        type="button"
+                        wire:loading.attr="disabled"
+                        wire:loading.class="opacity-50 cursor-not-allowed"
+                        class="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 
+                                   text-white rounded-lg text-sm font-medium 
+                                   focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500
+                                   transition-all duration-150 shadow-sm hover:shadow-md">
+                        <span wire:loading.remove wire:target="confirmStatusChange">
+                            <span
+    class="iconify block w-4 h-4"
+    data-icon="lucide:check"
+    data-inline="false"></span>                        </span>
+                        <span wire:loading wire:target="confirmStatusChange">
+                            <svg class="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+                            </svg>
+                        </span>
+                        <span wire:loading.remove wire:target="confirmStatusChange">Confirmer</span>
+                        <span wire:loading wire:target="confirmStatusChange">Traitement...</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-xs text-gray-500">
+                                <!--[if BLOCK]><![endif]-->                                <span class="text-gray-400 italic">Aucun véhicule</span>
+                                <!--[if ENDBLOCK]><![endif]-->
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                <div class="flex items-center justify-end gap-2">
+                                    <!--[if BLOCK]><![endif]-->                                    
+                                    <a href="http://localhost/admin/drivers/12"
+                                        class="p-2 rounded-full bg-gray-50 text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition-all duration-200 group"
+                                        title="Voir">
+                                        <span
+    class="iconify block w-4 h-4 group-hover:scale-110 transition-transform"
+    data-icon="lucide:eye"
+    data-inline="false"></span>                                    </a>
+                                    <a href="http://localhost/admin/drivers/12/edit"
+                                        class="p-2 rounded-full bg-gray-50 text-gray-400 hover:text-amber-600 hover:bg-amber-50 transition-all duration-200 group"
+                                        title="Modifier">
+                                        <span
+    class="iconify block w-4 h-4 group-hover:scale-110 transition-transform"
+    data-icon="lucide:edit-3"
+    data-inline="false"></span>                                    </a>
+
+                                    
+                                    <div class="relative" x-data="{ open: false }">
+                                        <button @click="open = !open" @click.away="open = false"
+                                            class="p-2 rounded-full bg-gray-50 text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-all duration-200 group">
+                                            <span
+    class="iconify block w-4 h-4 group-hover:scale-110 transition-transform"
+    data-icon="lucide:more-vertical"
+    data-inline="false"></span>                                        </button>
+
+                                        <div x-show="open"
+                                            x-transition:enter="transition ease-out duration-100"
+                                            x-transition:enter-start="transform opacity-0 scale-95"
+                                            x-transition:enter-end="transform opacity-100 scale-100"
+                                            class="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
+                                            style="display: none;">
+                                            <div class="py-1">
+                                                <button wire:click="exportPdf(12); open = false" class="group flex w-full items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                                    <span
+    class="iconify block mr-3 h-4 w-4 text-gray-400 group-hover:text-red-500"
+    data-icon="lucide:file-text"
+    data-inline="false"></span>                                                    Exporter PDF
+                                                </button>
+                                                <div class="border-t border-gray-100 my-1"></div>
+                                                <button wire:click="confirmArchive(12); open = false" class="group flex w-full items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                                    <span
+    class="iconify block mr-3 h-4 w-4 text-gray-400 group-hover:text-amber-500"
+    data-icon="lucide:archive"
+    data-inline="false"></span>                                                    Archiver
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!--[if ENDBLOCK]><![endif]-->
+                                </div>
+                            </td>
+                        </tr>
+                                                <tr wire:key="driver-11" class="hover:bg-gray-50 transition-colors duration-150 ">
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <input type="checkbox" wire:click="toggleSelection(11)"  class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="flex items-center">
+                                    <div class="flex-shrink-0 h-10 w-10 rounded-full overflow-hidden">
+                                        <!--[if BLOCK]><![endif]-->                                        <div class="h-10 w-10 bg-gradient-to-br from-blue-100 to-indigo-100 rounded-full flex items-center justify-center">
+                                            <span class="text-xs font-semibold text-blue-700">
+                                                MB
+                                            </span>
+                                        </div>
+                                        <!--[if ENDBLOCK]><![endif]-->
+                                    </div>
+                                    <div class="ml-4">
+                                        <div class="text-sm font-medium text-gray-900">
+                                            Mounir Bensaid
+                                        </div>
+                                        <div class="text-xs text-gray-500">#EMP-78537-2000</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-xs text-gray-900 flex items-center gap-1.5">
+                                    <span
+    class="iconify block w-3.5 h-3.5 text-gray-400"
+    data-icon="lucide:phone"
+    data-inline="false"></span> +213765789254
+                                </div>
+                                <div class="text-xs text-gray-500 flex items-center gap-1.5 mt-1">
+                                    <span
+    class="iconify block w-3.5 h-3.5 text-gray-400"
+    data-icon="lucide:mail"
+    data-inline="false"></span> N/A
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-xs font-medium text-gray-900">9707-DZ-98</div>
+                                <!--[if BLOCK]><![endif]-->                                <div class="flex flex-wrap gap-1 mt-1">
+                                    <!--[if BLOCK]><![endif]-->                                    <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-blue-100 text-blue-800">
+                                        B
+                                    </span>
+                                    <!--[if ENDBLOCK]><![endif]-->
+                                </div>
+                                <!--[if ENDBLOCK]><![endif]-->
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div wire:snapshot="{&quot;data&quot;:{&quot;driverId&quot;:11,&quot;driver&quot;:[null,{&quot;class&quot;:&quot;App\\Models\\Driver&quot;,&quot;key&quot;:11,&quot;s&quot;:&quot;mdl&quot;}],&quot;showConfirmModal&quot;:false,&quot;pendingStatus&quot;:null,&quot;pendingStatusEnum&quot;:null,&quot;confirmMessage&quot;:&quot;&quot;},&quot;memo&quot;:{&quot;id&quot;:&quot;lL1bMZ5RmjtEvIp910A1&quot;,&quot;name&quot;:&quot;admin.driver-status-badge-ultra-pro&quot;,&quot;path&quot;:&quot;admin\/drivers&quot;,&quot;method&quot;:&quot;GET&quot;,&quot;children&quot;:[],&quot;scripts&quot;:[],&quot;assets&quot;:[],&quot;errors&quot;:[],&quot;locale&quot;:&quot;fr&quot;},&quot;checksum&quot;:&quot;adad907c4c538e09e44e3b3df00148b63c8b12fc2fa544664fb1073416157a21&quot;}" wire:effects="{&quot;listeners&quot;:[&quot;refreshComponent&quot;,&quot;driverStatusUpdated&quot;,&quot;driverStatusChanged&quot;,&quot;echo:drivers,DriverStatusChanged&quot;]}" wire:id="lL1bMZ5RmjtEvIp910A1" class="relative inline-block"
+    x-data="{ 
+         open: false, 
+         confirmModal: window.Livewire.find('lL1bMZ5RmjtEvIp910A1').entangle('showConfirmModal').live,
+         toggle() { this.open = !this.open; },
+         close() { this.open = false; },
+         selectStatus(status) { 
+             this.open = false; 
+             $wire.prepareStatusChange(status); 
+         }
+     }"
+    @click.stop
+    x-init="$watch('confirmModal', value => { if (value) open = false; })">
+    
+    <!--[if BLOCK]><![endif]-->    <button
+        @click.stop="toggle"
+        @click.away="close"
+        type="button"
+        class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold 
+                   transition-all duration-200 hover:shadow-md hover:scale-105 cursor-pointer 
+                   inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800
+                   focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+        title="Cliquer pour modifier le statut">
+        
+        <!--[if BLOCK]><![endif]-->        <span
+    class="iconify block w-3.5 h-3.5"
+    data-icon="lucide:truck"
+    data-inline="false"></span>        <!--[if ENDBLOCK]><![endif]-->
+
+        
+        <span>En mission</span>
+
+        
+        <svg class="w-3 h-3 opacity-60 transition-transform duration-200"
+            :class="{ 'rotate-180': open }"
+            fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+        </svg>
+    </button>
+    <!--[if ENDBLOCK]><![endif]-->
+
+    
+    <!--[if BLOCK]><![endif]-->    <div
+        x-show="open"
+        x-transition:enter="transition ease-out duration-200"
+        x-transition:enter-start="transform opacity-0 scale-95 translate-y-2"
+        x-transition:enter-end="transform opacity-100 scale-100 translate-y-0"
+        x-transition:leave="transition ease-in duration-150"
+        x-transition:leave-start="transform opacity-100 scale-100 translate-y-0"
+        x-transition:leave-end="transform opacity-0 scale-95 translate-y-2"
+        class="absolute left-0 mt-3 w-72 rounded-xl shadow-[0_10px_40px_-10px_rgba(0,0,0,0.2)] bg-white ring-1 ring-black/5 z-50 overflow-visible"
+        style="display: none;">
+
+        
+        <div class="absolute -top-2 left-6 w-4 h-4 bg-white transform rotate-45 border-t border-l border-gray-100 shadow-sm"></div>
+
+        <div class="relative bg-white rounded-xl overflow-hidden">
+            
+            <div class="px-4 py-3 bg-gradient-to-r from-gray-50 to-white border-b border-gray-100">
+                <div class="flex items-center justify-between">
+                    <span class="text-xs font-bold text-gray-800 uppercase tracking-wider flex items-center gap-2">
+                        <span
+    class="iconify block w-3.5 h-3.5 text-blue-500"
+    data-icon="lucide:git-branch"
+    data-inline="false"></span>                        Changer le statut
+                    </span>
+                    <button @click="close" class="text-gray-400 hover:text-gray-600 transition-colors p-1 hover:bg-gray-100 rounded-full">
+                        <span
+    class="iconify block w-3.5 h-3.5"
+    data-icon="lucide:x"
+    data-inline="false"></span>                    </button>
+                </div>
+            </div>
+
+            
+            <div class="py-2 max-h-[300px] overflow-y-auto custom-scrollbar">
+                <!--[if BLOCK]><![endif]-->                <button
+                    @click.stop="selectStatus('disponible')"
+                    type="button"
+                    class="w-full flex items-center justify-between px-4 py-3 hover:bg-blue-50/50 
+                                   transition-all duration-200 group focus:outline-none border-l-2 border-transparent hover:border-blue-500">
+                    <div class="flex items-center gap-3">
+                        
+                        <span class="inline-flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-xs font-semibold 
+                                           inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 shadow-sm group-hover:shadow transition-all">
+                            <span
+    class="iconify block w-3.5 h-3.5"
+    data-icon="lucide:user-check"
+    data-inline="false"></span>                            Disponible
+                        </span>
+                    </div>
+                    
+                    <div class="w-6 h-6 rounded-full bg-transparent group-hover:bg-blue-100 flex items-center justify-center transition-all">
+                        <span
+    class="iconify block w-3.5 h-3.5 text-gray-300 group-hover:text-blue-600 
+                                                 group-hover:translate-x-0.5 transition-all"
+    data-icon="lucide:arrow-right"
+    data-inline="false"></span>                    </div>
+                </button>
+                <!--[if ENDBLOCK]><![endif]-->
+            </div>
+
+            
+            <!--[if BLOCK]><![endif]-->            <div class="px-4 py-3 bg-gray-50/80 border-t border-gray-100 backdrop-blur-sm">
+                <div class="flex items-start gap-2.5">
+                    <span
+    class="iconify block w-4 h-4 text-blue-500 mt-0.5 flex-shrink-0"
+    data-icon="lucide:info"
+    data-inline="false"></span>                    <p class="text-xs text-gray-600 leading-relaxed">
+                        <span class="font-medium text-gray-900">Note:</span>
+                        Chauffeur actuellement en mission avec un véhicule affecté
+                    </p>
+                </div>
+            </div>
+            <!--[if ENDBLOCK]><![endif]-->
+        </div>
+    </div>
+    <!--[if ENDBLOCK]><![endif]-->
+
+    
+    <div x-show="confirmModal"
+        x-cloak
+        class="fixed inset-0 z-50 overflow-y-auto"
+        aria-labelledby="modal-title"
+        role="dialog"
+        aria-modal="true">
+
+        
+        <div x-show="confirmModal"
+            x-transition:enter="ease-out duration-300"
+            x-transition:enter-start="opacity-0"
+            x-transition:enter-end="opacity-100"
+            x-transition:leave="ease-in duration-200"
+            x-transition:leave-start="opacity-100"
+            x-transition:leave-end="opacity-0"
+            class="fixed inset-0 bg-gray-900 bg-opacity-50 backdrop-blur-sm transition-opacity">
+        </div>
+
+        
+        <div class="flex min-h-full items-center justify-center p-4 text-center sm:p-0">
+            <div x-show="confirmModal"
+                x-transition:enter="ease-out duration-300"
+                x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
+                x-transition:leave="ease-in duration-200"
+                x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
+                x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                class="relative transform overflow-hidden rounded-2xl bg-white text-left shadow-2xl transition-all sm:my-8 sm:w-full sm:max-w-lg">
+
+                
+                <div class="bg-gradient-to-r from-blue-500 to-blue-600 px-6 py-4">
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-lg font-semibold text-white flex items-center gap-2">
+                            <span
+    class="iconify block w-5 h-5"
+    data-icon="lucide:alert-circle"
+    data-inline="false"></span>                            Confirmation de changement de statut
+                        </h3>
+                        <button @click="confirmModal = false; $wire.cancelStatusChange()"
+                            class="text-white/80 hover:text-white transition-colors">
+                            <span
+    class="iconify block w-5 h-5"
+    data-icon="lucide:x"
+    data-inline="false"></span>                        </button>
+                    </div>
+                </div>
+
+                
+                <div class="px-6 py-5">
+                    
+                    <div class="mb-4">
+                        <p class="text-sm text-gray-700 whitespace-pre-line"></p>
+                    </div>
+
+                    
+                    <div class="bg-gray-50 rounded-lg p-4 mb-4">
+                        <div class="grid grid-cols-2 gap-3 text-sm">
+                            <div>
+                                <span class="text-gray-500">Chauffeur:</span>
+                                <p class="font-medium text-gray-900">Mounir Bensaid</p>
+                            </div>
+                            <div>
+                                <span class="text-gray-500">Matricule:</span>
+                                <p class="font-medium text-gray-900">EMP-78537-2000</p>
+                            </div>
+                            <!--[if BLOCK]><![endif]-->                            <div>
+                                <span class="text-gray-500">Statut actuel:</span>
+                                <p class="mt-1">
+                                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                        <span
+    class="iconify block w-3 h-3"
+    data-icon="lucide:truck"
+    data-inline="false"></span>                                        En mission
+                                    </span>
+                                </p>
+                            </div>
+                            <!--[if ENDBLOCK]><![endif]-->
+                            <!--[if BLOCK]><![endif]--><!--[if ENDBLOCK]><![endif]-->
+                        </div>
+                    </div>
+                </div>
+
+                
+                <div class="bg-gray-50 px-6 py-4 flex items-center justify-end gap-3">
+                    <button wire:click="cancelStatusChange"
+                        @click="confirmModal = false"
+                        type="button"
+                        class="inline-flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 
+                                   rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 
+                                   focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 
+                                   transition-all duration-150">
+                        <span
+    class="iconify block w-4 h-4"
+    data-icon="lucide:x"
+    data-inline="false"></span>                        Annuler
+                    </button>
+
+                    <button wire:click="confirmStatusChange"
+                        type="button"
+                        wire:loading.attr="disabled"
+                        wire:loading.class="opacity-50 cursor-not-allowed"
+                        class="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 
+                                   text-white rounded-lg text-sm font-medium 
+                                   focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500
+                                   transition-all duration-150 shadow-sm hover:shadow-md">
+                        <span wire:loading.remove wire:target="confirmStatusChange">
+                            <span
+    class="iconify block w-4 h-4"
+    data-icon="lucide:check"
+    data-inline="false"></span>                        </span>
+                        <span wire:loading wire:target="confirmStatusChange">
+                            <svg class="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+                            </svg>
+                        </span>
+                        <span wire:loading.remove wire:target="confirmStatusChange">Confirmer</span>
+                        <span wire:loading wire:target="confirmStatusChange">Traitement...</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-xs text-gray-500">
+                                <!--[if BLOCK]><![endif]-->                                <div class="flex items-center gap-1.5">
+                                    <span
+    class="iconify block w-3.5 h-3.5 text-blue-600"
+    data-icon="lucide:car"
+    data-inline="false"></span>                                    <span class="font-medium text-gray-900">118910-16</span>
+                                </div>
+                                <!--[if ENDBLOCK]><![endif]-->
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                <div class="flex items-center justify-end gap-2">
+                                    <!--[if BLOCK]><![endif]-->                                    
+                                    <a href="http://localhost/admin/drivers/11"
+                                        class="p-2 rounded-full bg-gray-50 text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition-all duration-200 group"
+                                        title="Voir">
+                                        <span
+    class="iconify block w-4 h-4 group-hover:scale-110 transition-transform"
+    data-icon="lucide:eye"
+    data-inline="false"></span>                                    </a>
+                                    <a href="http://localhost/admin/drivers/11/edit"
+                                        class="p-2 rounded-full bg-gray-50 text-gray-400 hover:text-amber-600 hover:bg-amber-50 transition-all duration-200 group"
+                                        title="Modifier">
+                                        <span
+    class="iconify block w-4 h-4 group-hover:scale-110 transition-transform"
+    data-icon="lucide:edit-3"
+    data-inline="false"></span>                                    </a>
+
+                                    
+                                    <div class="relative" x-data="{ open: false }">
+                                        <button @click="open = !open" @click.away="open = false"
+                                            class="p-2 rounded-full bg-gray-50 text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-all duration-200 group">
+                                            <span
+    class="iconify block w-4 h-4 group-hover:scale-110 transition-transform"
+    data-icon="lucide:more-vertical"
+    data-inline="false"></span>                                        </button>
+
+                                        <div x-show="open"
+                                            x-transition:enter="transition ease-out duration-100"
+                                            x-transition:enter-start="transform opacity-0 scale-95"
+                                            x-transition:enter-end="transform opacity-100 scale-100"
+                                            class="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
+                                            style="display: none;">
+                                            <div class="py-1">
+                                                <button wire:click="exportPdf(11); open = false" class="group flex w-full items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                                    <span
+    class="iconify block mr-3 h-4 w-4 text-gray-400 group-hover:text-red-500"
+    data-icon="lucide:file-text"
+    data-inline="false"></span>                                                    Exporter PDF
+                                                </button>
+                                                <div class="border-t border-gray-100 my-1"></div>
+                                                <button wire:click="confirmArchive(11); open = false" class="group flex w-full items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                                    <span
+    class="iconify block mr-3 h-4 w-4 text-gray-400 group-hover:text-amber-500"
+    data-icon="lucide:archive"
+    data-inline="false"></span>                                                    Archiver
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!--[if ENDBLOCK]><![endif]-->
+                                </div>
+                            </td>
+                        </tr>
+                                                <tr wire:key="driver-10" class="hover:bg-gray-50 transition-colors duration-150 ">
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <input type="checkbox" wire:click="toggleSelection(10)"  class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="flex items-center">
+                                    <div class="flex-shrink-0 h-10 w-10 rounded-full overflow-hidden">
+                                        <!--[if BLOCK]><![endif]-->                                        <img src="http://localhost/storage/drivers/photos/Hssc9BzkW3Bjpqn2W2p2r8OZHPxXFkV3TQsPoICg.png" class="h-full w-full object-cover">
+                                        <!--[if ENDBLOCK]><![endif]-->
+                                    </div>
+                                    <div class="ml-4">
+                                        <div class="text-sm font-medium text-gray-900">
+                                            Med BOUBENIA
+                                        </div>
+                                        <div class="text-xs text-gray-500">#DIFEX-00000</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-xs text-gray-900 flex items-center gap-1.5">
+                                    <span
+    class="iconify block w-3.5 h-3.5 text-gray-400"
+    data-icon="lucide:phone"
+    data-inline="false"></span> +213770457000
+                                </div>
+                                <div class="text-xs text-gray-500 flex items-center gap-1.5 mt-1">
+                                    <span
+    class="iconify block w-3.5 h-3.5 text-gray-400"
+    data-icon="lucide:mail"
+    data-inline="false"></span> m.boubenia@gmail.dz
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-xs font-medium text-gray-900">Dz-53000-00</div>
+                                <!--[if BLOCK]><![endif]-->                                <div class="flex flex-wrap gap-1 mt-1">
+                                    <!--[if BLOCK]><![endif]-->                                    <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-blue-100 text-blue-800">
+                                        B
+                                    </span>
+                                    <!--[if ENDBLOCK]><![endif]-->
+                                </div>
+                                <!--[if ENDBLOCK]><![endif]-->
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div wire:snapshot="{&quot;data&quot;:{&quot;driverId&quot;:10,&quot;driver&quot;:[null,{&quot;class&quot;:&quot;App\\Models\\Driver&quot;,&quot;key&quot;:10,&quot;s&quot;:&quot;mdl&quot;}],&quot;showConfirmModal&quot;:false,&quot;pendingStatus&quot;:null,&quot;pendingStatusEnum&quot;:null,&quot;confirmMessage&quot;:&quot;&quot;},&quot;memo&quot;:{&quot;id&quot;:&quot;M3GgevmeV1jzp9BKlTVk&quot;,&quot;name&quot;:&quot;admin.driver-status-badge-ultra-pro&quot;,&quot;path&quot;:&quot;admin\/drivers&quot;,&quot;method&quot;:&quot;GET&quot;,&quot;children&quot;:[],&quot;scripts&quot;:[],&quot;assets&quot;:[],&quot;errors&quot;:[],&quot;locale&quot;:&quot;fr&quot;},&quot;checksum&quot;:&quot;e2a412a5f38516a131944330e955ecf55773d719fc5fea72f671116406d43254&quot;}" wire:effects="{&quot;listeners&quot;:[&quot;refreshComponent&quot;,&quot;driverStatusUpdated&quot;,&quot;driverStatusChanged&quot;,&quot;echo:drivers,DriverStatusChanged&quot;]}" wire:id="M3GgevmeV1jzp9BKlTVk" class="relative inline-block"
+    x-data="{ 
+         open: false, 
+         confirmModal: window.Livewire.find('M3GgevmeV1jzp9BKlTVk').entangle('showConfirmModal').live,
+         toggle() { this.open = !this.open; },
+         close() { this.open = false; },
+         selectStatus(status) { 
+             this.open = false; 
+             $wire.prepareStatusChange(status); 
+         }
+     }"
+    @click.stop
+    x-init="$watch('confirmModal', value => { if (value) open = false; })">
+    
+    <!--[if BLOCK]><![endif]-->    <button
+        @click.stop="toggle"
+        @click.away="close"
+        type="button"
+        class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold 
+                   transition-all duration-200 hover:shadow-md hover:scale-105 cursor-pointer 
+                   inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800
+                   focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+        title="Cliquer pour modifier le statut">
+        
+        <!--[if BLOCK]><![endif]-->        <span
+    class="iconify block w-3.5 h-3.5"
+    data-icon="lucide:graduation-cap"
+    data-inline="false"></span>        <!--[if ENDBLOCK]><![endif]-->
+
+        
+        <span>En formation</span>
+
+        
+        <svg class="w-3 h-3 opacity-60 transition-transform duration-200"
+            :class="{ 'rotate-180': open }"
+            fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+        </svg>
+    </button>
+    <!--[if ENDBLOCK]><![endif]-->
+
+    
+    <!--[if BLOCK]><![endif]-->    <div
+        x-show="open"
+        x-transition:enter="transition ease-out duration-200"
+        x-transition:enter-start="transform opacity-0 scale-95 translate-y-2"
+        x-transition:enter-end="transform opacity-100 scale-100 translate-y-0"
+        x-transition:leave="transition ease-in duration-150"
+        x-transition:leave-start="transform opacity-100 scale-100 translate-y-0"
+        x-transition:leave-end="transform opacity-0 scale-95 translate-y-2"
+        class="absolute left-0 mt-3 w-72 rounded-xl shadow-[0_10px_40px_-10px_rgba(0,0,0,0.2)] bg-white ring-1 ring-black/5 z-50 overflow-visible"
+        style="display: none;">
+
+        
+        <div class="absolute -top-2 left-6 w-4 h-4 bg-white transform rotate-45 border-t border-l border-gray-100 shadow-sm"></div>
+
+        <div class="relative bg-white rounded-xl overflow-hidden">
+            
+            <div class="px-4 py-3 bg-gradient-to-r from-gray-50 to-white border-b border-gray-100">
+                <div class="flex items-center justify-between">
+                    <span class="text-xs font-bold text-gray-800 uppercase tracking-wider flex items-center gap-2">
+                        <span
+    class="iconify block w-3.5 h-3.5 text-blue-500"
+    data-icon="lucide:git-branch"
+    data-inline="false"></span>                        Changer le statut
+                    </span>
+                    <button @click="close" class="text-gray-400 hover:text-gray-600 transition-colors p-1 hover:bg-gray-100 rounded-full">
+                        <span
+    class="iconify block w-3.5 h-3.5"
+    data-icon="lucide:x"
+    data-inline="false"></span>                    </button>
+                </div>
+            </div>
+
+            
+            <div class="py-2 max-h-[300px] overflow-y-auto custom-scrollbar">
+                <!--[if BLOCK]><![endif]-->                <button
+                    @click.stop="selectStatus('disponible')"
+                    type="button"
+                    class="w-full flex items-center justify-between px-4 py-3 hover:bg-blue-50/50 
+                                   transition-all duration-200 group focus:outline-none border-l-2 border-transparent hover:border-blue-500">
+                    <div class="flex items-center gap-3">
+                        
+                        <span class="inline-flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-xs font-semibold 
+                                           inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 shadow-sm group-hover:shadow transition-all">
+                            <span
+    class="iconify block w-3.5 h-3.5"
+    data-icon="lucide:user-check"
+    data-inline="false"></span>                            Disponible
+                        </span>
+                    </div>
+                    
+                    <div class="w-6 h-6 rounded-full bg-transparent group-hover:bg-blue-100 flex items-center justify-center transition-all">
+                        <span
+    class="iconify block w-3.5 h-3.5 text-gray-300 group-hover:text-blue-600 
+                                                 group-hover:translate-x-0.5 transition-all"
+    data-icon="lucide:arrow-right"
+    data-inline="false"></span>                    </div>
+                </button>
+                                <button
+                    @click.stop="selectStatus('autre')"
+                    type="button"
+                    class="w-full flex items-center justify-between px-4 py-3 hover:bg-blue-50/50 
+                                   transition-all duration-200 group focus:outline-none border-l-2 border-transparent hover:border-blue-500">
+                    <div class="flex items-center gap-3">
+                        
+                        <span class="inline-flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-xs font-semibold 
+                                           inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 shadow-sm group-hover:shadow transition-all">
+                            <span
+    class="iconify block w-3.5 h-3.5"
+    data-icon="lucide:help-circle"
+    data-inline="false"></span>                            Autre
+                        </span>
+                    </div>
+                    
+                    <div class="w-6 h-6 rounded-full bg-transparent group-hover:bg-blue-100 flex items-center justify-center transition-all">
+                        <span
+    class="iconify block w-3.5 h-3.5 text-gray-300 group-hover:text-blue-600 
+                                                 group-hover:translate-x-0.5 transition-all"
+    data-icon="lucide:arrow-right"
+    data-inline="false"></span>                    </div>
+                </button>
+                <!--[if ENDBLOCK]><![endif]-->
+            </div>
+
+            
+            <!--[if BLOCK]><![endif]-->            <div class="px-4 py-3 bg-gray-50/80 border-t border-gray-100 backdrop-blur-sm">
+                <div class="flex items-start gap-2.5">
+                    <span
+    class="iconify block w-4 h-4 text-blue-500 mt-0.5 flex-shrink-0"
+    data-icon="lucide:info"
+    data-inline="false"></span>                    <p class="text-xs text-gray-600 leading-relaxed">
+                        <span class="font-medium text-gray-900">Note:</span>
+                        Chauffeur en période de formation
+                    </p>
+                </div>
+            </div>
+            <!--[if ENDBLOCK]><![endif]-->
+        </div>
+    </div>
+    <!--[if ENDBLOCK]><![endif]-->
+
+    
+    <div x-show="confirmModal"
+        x-cloak
+        class="fixed inset-0 z-50 overflow-y-auto"
+        aria-labelledby="modal-title"
+        role="dialog"
+        aria-modal="true">
+
+        
+        <div x-show="confirmModal"
+            x-transition:enter="ease-out duration-300"
+            x-transition:enter-start="opacity-0"
+            x-transition:enter-end="opacity-100"
+            x-transition:leave="ease-in duration-200"
+            x-transition:leave-start="opacity-100"
+            x-transition:leave-end="opacity-0"
+            class="fixed inset-0 bg-gray-900 bg-opacity-50 backdrop-blur-sm transition-opacity">
+        </div>
+
+        
+        <div class="flex min-h-full items-center justify-center p-4 text-center sm:p-0">
+            <div x-show="confirmModal"
+                x-transition:enter="ease-out duration-300"
+                x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
+                x-transition:leave="ease-in duration-200"
+                x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
+                x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                class="relative transform overflow-hidden rounded-2xl bg-white text-left shadow-2xl transition-all sm:my-8 sm:w-full sm:max-w-lg">
+
+                
+                <div class="bg-gradient-to-r from-blue-500 to-blue-600 px-6 py-4">
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-lg font-semibold text-white flex items-center gap-2">
+                            <span
+    class="iconify block w-5 h-5"
+    data-icon="lucide:alert-circle"
+    data-inline="false"></span>                            Confirmation de changement de statut
+                        </h3>
+                        <button @click="confirmModal = false; $wire.cancelStatusChange()"
+                            class="text-white/80 hover:text-white transition-colors">
+                            <span
+    class="iconify block w-5 h-5"
+    data-icon="lucide:x"
+    data-inline="false"></span>                        </button>
+                    </div>
+                </div>
+
+                
+                <div class="px-6 py-5">
+                    
+                    <div class="mb-4">
+                        <p class="text-sm text-gray-700 whitespace-pre-line"></p>
+                    </div>
+
+                    
+                    <div class="bg-gray-50 rounded-lg p-4 mb-4">
+                        <div class="grid grid-cols-2 gap-3 text-sm">
+                            <div>
+                                <span class="text-gray-500">Chauffeur:</span>
+                                <p class="font-medium text-gray-900">Med BOUBENIA</p>
+                            </div>
+                            <div>
+                                <span class="text-gray-500">Matricule:</span>
+                                <p class="font-medium text-gray-900">DIFEX-00000</p>
+                            </div>
+                            <!--[if BLOCK]><![endif]-->                            <div>
+                                <span class="text-gray-500">Statut actuel:</span>
+                                <p class="mt-1">
+                                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800">
+                                        <span
+    class="iconify block w-3 h-3"
+    data-icon="lucide:graduation-cap"
+    data-inline="false"></span>                                        En formation
+                                    </span>
+                                </p>
+                            </div>
+                            <!--[if ENDBLOCK]><![endif]-->
+                            <!--[if BLOCK]><![endif]--><!--[if ENDBLOCK]><![endif]-->
+                        </div>
+                    </div>
+                </div>
+
+                
+                <div class="bg-gray-50 px-6 py-4 flex items-center justify-end gap-3">
+                    <button wire:click="cancelStatusChange"
+                        @click="confirmModal = false"
+                        type="button"
+                        class="inline-flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 
+                                   rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 
+                                   focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 
+                                   transition-all duration-150">
+                        <span
+    class="iconify block w-4 h-4"
+    data-icon="lucide:x"
+    data-inline="false"></span>                        Annuler
+                    </button>
+
+                    <button wire:click="confirmStatusChange"
+                        type="button"
+                        wire:loading.attr="disabled"
+                        wire:loading.class="opacity-50 cursor-not-allowed"
+                        class="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 
+                                   text-white rounded-lg text-sm font-medium 
+                                   focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500
+                                   transition-all duration-150 shadow-sm hover:shadow-md">
+                        <span wire:loading.remove wire:target="confirmStatusChange">
+                            <span
+    class="iconify block w-4 h-4"
+    data-icon="lucide:check"
+    data-inline="false"></span>                        </span>
+                        <span wire:loading wire:target="confirmStatusChange">
+                            <svg class="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+                            </svg>
+                        </span>
+                        <span wire:loading.remove wire:target="confirmStatusChange">Confirmer</span>
+                        <span wire:loading wire:target="confirmStatusChange">Traitement...</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-xs text-gray-500">
+                                <!--[if BLOCK]><![endif]-->                                <span class="text-gray-400 italic">Aucun véhicule</span>
+                                <!--[if ENDBLOCK]><![endif]-->
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                <div class="flex items-center justify-end gap-2">
+                                    <!--[if BLOCK]><![endif]-->                                    
+                                    <a href="http://localhost/admin/drivers/10"
+                                        class="p-2 rounded-full bg-gray-50 text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition-all duration-200 group"
+                                        title="Voir">
+                                        <span
+    class="iconify block w-4 h-4 group-hover:scale-110 transition-transform"
+    data-icon="lucide:eye"
+    data-inline="false"></span>                                    </a>
+                                    <a href="http://localhost/admin/drivers/10/edit"
+                                        class="p-2 rounded-full bg-gray-50 text-gray-400 hover:text-amber-600 hover:bg-amber-50 transition-all duration-200 group"
+                                        title="Modifier">
+                                        <span
+    class="iconify block w-4 h-4 group-hover:scale-110 transition-transform"
+    data-icon="lucide:edit-3"
+    data-inline="false"></span>                                    </a>
+
+                                    
+                                    <div class="relative" x-data="{ open: false }">
+                                        <button @click="open = !open" @click.away="open = false"
+                                            class="p-2 rounded-full bg-gray-50 text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-all duration-200 group">
+                                            <span
+    class="iconify block w-4 h-4 group-hover:scale-110 transition-transform"
+    data-icon="lucide:more-vertical"
+    data-inline="false"></span>                                        </button>
+
+                                        <div x-show="open"
+                                            x-transition:enter="transition ease-out duration-100"
+                                            x-transition:enter-start="transform opacity-0 scale-95"
+                                            x-transition:enter-end="transform opacity-100 scale-100"
+                                            class="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
+                                            style="display: none;">
+                                            <div class="py-1">
+                                                <button wire:click="exportPdf(10); open = false" class="group flex w-full items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                                    <span
+    class="iconify block mr-3 h-4 w-4 text-gray-400 group-hover:text-red-500"
+    data-icon="lucide:file-text"
+    data-inline="false"></span>                                                    Exporter PDF
+                                                </button>
+                                                <div class="border-t border-gray-100 my-1"></div>
+                                                <button wire:click="confirmArchive(10); open = false" class="group flex w-full items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                                    <span
+    class="iconify block mr-3 h-4 w-4 text-gray-400 group-hover:text-amber-500"
+    data-icon="lucide:archive"
+    data-inline="false"></span>                                                    Archiver
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!--[if ENDBLOCK]><![endif]-->
+                                </div>
+                            </td>
+                        </tr>
+                                                <tr wire:key="driver-9" class="hover:bg-gray-50 transition-colors duration-150 ">
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <input type="checkbox" wire:click="toggleSelection(9)"  class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="flex items-center">
+                                    <div class="flex-shrink-0 h-10 w-10 rounded-full overflow-hidden">
+                                        <!--[if BLOCK]><![endif]-->                                        <img src="http://localhost/storage/drivers/photos/aNLnjnIDztumn2WmqnBLjGlu5dI04w7UtwvVUCXK.png" class="h-full w-full object-cover">
+                                        <!--[if ENDBLOCK]><![endif]-->
+                                    </div>
+                                    <div class="ml-4">
+                                        <div class="text-sm font-medium text-gray-900">
+                                            Ahmed Lounis
+                                        </div>
+                                        <div class="text-xs text-gray-500">#876387DZ987</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-xs text-gray-900 flex items-center gap-1.5">
+                                    <span
+    class="iconify block w-3.5 h-3.5 text-gray-400"
+    data-icon="lucide:phone"
+    data-inline="false"></span> +213567800927
+                                </div>
+                                <div class="text-xs text-gray-500 flex items-center gap-1.5 mt-1">
+                                    <span
+    class="iconify block w-3.5 h-3.5 text-gray-400"
+    data-icon="lucide:mail"
+    data-inline="false"></span> N/A
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-xs font-medium text-gray-900">56DZ98736</div>
+                                <!--[if BLOCK]><![endif]-->                                <div class="flex flex-wrap gap-1 mt-1">
+                                    <!--[if BLOCK]><![endif]-->                                    <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-blue-100 text-blue-800">
+                                        B
+                                    </span>
+                                    <!--[if ENDBLOCK]><![endif]-->
+                                </div>
+                                <!--[if ENDBLOCK]><![endif]-->
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div wire:snapshot="{&quot;data&quot;:{&quot;driverId&quot;:9,&quot;driver&quot;:[null,{&quot;class&quot;:&quot;App\\Models\\Driver&quot;,&quot;key&quot;:9,&quot;s&quot;:&quot;mdl&quot;}],&quot;showConfirmModal&quot;:false,&quot;pendingStatus&quot;:null,&quot;pendingStatusEnum&quot;:null,&quot;confirmMessage&quot;:&quot;&quot;},&quot;memo&quot;:{&quot;id&quot;:&quot;XHlGE2fDekSI99SXpDcq&quot;,&quot;name&quot;:&quot;admin.driver-status-badge-ultra-pro&quot;,&quot;path&quot;:&quot;admin\/drivers&quot;,&quot;method&quot;:&quot;GET&quot;,&quot;children&quot;:[],&quot;scripts&quot;:[],&quot;assets&quot;:[],&quot;errors&quot;:[],&quot;locale&quot;:&quot;fr&quot;},&quot;checksum&quot;:&quot;22f7200118ed07fe1c3b468260b22568bfad06ee2021fdd754a2165cd8767b8b&quot;}" wire:effects="{&quot;listeners&quot;:[&quot;refreshComponent&quot;,&quot;driverStatusUpdated&quot;,&quot;driverStatusChanged&quot;,&quot;echo:drivers,DriverStatusChanged&quot;]}" wire:id="XHlGE2fDekSI99SXpDcq" class="relative inline-block"
+    x-data="{ 
+         open: false, 
+         confirmModal: window.Livewire.find('XHlGE2fDekSI99SXpDcq').entangle('showConfirmModal').live,
+         toggle() { this.open = !this.open; },
+         close() { this.open = false; },
+         selectStatus(status) { 
+             this.open = false; 
+             $wire.prepareStatusChange(status); 
+         }
+     }"
+    @click.stop
+    x-init="$watch('confirmModal', value => { if (value) open = false; })">
+    
+    <!--[if BLOCK]><![endif]-->    <button
+        @click.stop="toggle"
+        @click.away="close"
+        type="button"
+        class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold 
+                   transition-all duration-200 hover:shadow-md hover:scale-105 cursor-pointer 
+                   inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800
+                   focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+        title="Cliquer pour modifier le statut">
+        
+        <!--[if BLOCK]><![endif]-->        <span
+    class="iconify block w-3.5 h-3.5"
+    data-icon="lucide:truck"
+    data-inline="false"></span>        <!--[if ENDBLOCK]><![endif]-->
+
+        
+        <span>En mission</span>
+
+        
+        <svg class="w-3 h-3 opacity-60 transition-transform duration-200"
+            :class="{ 'rotate-180': open }"
+            fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+        </svg>
+    </button>
+    <!--[if ENDBLOCK]><![endif]-->
+
+    
+    <!--[if BLOCK]><![endif]-->    <div
+        x-show="open"
+        x-transition:enter="transition ease-out duration-200"
+        x-transition:enter-start="transform opacity-0 scale-95 translate-y-2"
+        x-transition:enter-end="transform opacity-100 scale-100 translate-y-0"
+        x-transition:leave="transition ease-in duration-150"
+        x-transition:leave-start="transform opacity-100 scale-100 translate-y-0"
+        x-transition:leave-end="transform opacity-0 scale-95 translate-y-2"
+        class="absolute left-0 mt-3 w-72 rounded-xl shadow-[0_10px_40px_-10px_rgba(0,0,0,0.2)] bg-white ring-1 ring-black/5 z-50 overflow-visible"
+        style="display: none;">
+
+        
+        <div class="absolute -top-2 left-6 w-4 h-4 bg-white transform rotate-45 border-t border-l border-gray-100 shadow-sm"></div>
+
+        <div class="relative bg-white rounded-xl overflow-hidden">
+            
+            <div class="px-4 py-3 bg-gradient-to-r from-gray-50 to-white border-b border-gray-100">
+                <div class="flex items-center justify-between">
+                    <span class="text-xs font-bold text-gray-800 uppercase tracking-wider flex items-center gap-2">
+                        <span
+    class="iconify block w-3.5 h-3.5 text-blue-500"
+    data-icon="lucide:git-branch"
+    data-inline="false"></span>                        Changer le statut
+                    </span>
+                    <button @click="close" class="text-gray-400 hover:text-gray-600 transition-colors p-1 hover:bg-gray-100 rounded-full">
+                        <span
+    class="iconify block w-3.5 h-3.5"
+    data-icon="lucide:x"
+    data-inline="false"></span>                    </button>
+                </div>
+            </div>
+
+            
+            <div class="py-2 max-h-[300px] overflow-y-auto custom-scrollbar">
+                <!--[if BLOCK]><![endif]-->                <button
+                    @click.stop="selectStatus('disponible')"
+                    type="button"
+                    class="w-full flex items-center justify-between px-4 py-3 hover:bg-blue-50/50 
+                                   transition-all duration-200 group focus:outline-none border-l-2 border-transparent hover:border-blue-500">
+                    <div class="flex items-center gap-3">
+                        
+                        <span class="inline-flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-xs font-semibold 
+                                           inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 shadow-sm group-hover:shadow transition-all">
+                            <span
+    class="iconify block w-3.5 h-3.5"
+    data-icon="lucide:user-check"
+    data-inline="false"></span>                            Disponible
+                        </span>
+                    </div>
+                    
+                    <div class="w-6 h-6 rounded-full bg-transparent group-hover:bg-blue-100 flex items-center justify-center transition-all">
+                        <span
+    class="iconify block w-3.5 h-3.5 text-gray-300 group-hover:text-blue-600 
+                                                 group-hover:translate-x-0.5 transition-all"
+    data-icon="lucide:arrow-right"
+    data-inline="false"></span>                    </div>
+                </button>
+                <!--[if ENDBLOCK]><![endif]-->
+            </div>
+
+            
+            <!--[if BLOCK]><![endif]-->            <div class="px-4 py-3 bg-gray-50/80 border-t border-gray-100 backdrop-blur-sm">
+                <div class="flex items-start gap-2.5">
+                    <span
+    class="iconify block w-4 h-4 text-blue-500 mt-0.5 flex-shrink-0"
+    data-icon="lucide:info"
+    data-inline="false"></span>                    <p class="text-xs text-gray-600 leading-relaxed">
+                        <span class="font-medium text-gray-900">Note:</span>
+                        Chauffeur actuellement en mission avec un véhicule affecté
+                    </p>
+                </div>
+            </div>
+            <!--[if ENDBLOCK]><![endif]-->
+        </div>
+    </div>
+    <!--[if ENDBLOCK]><![endif]-->
+
+    
+    <div x-show="confirmModal"
+        x-cloak
+        class="fixed inset-0 z-50 overflow-y-auto"
+        aria-labelledby="modal-title"
+        role="dialog"
+        aria-modal="true">
+
+        
+        <div x-show="confirmModal"
+            x-transition:enter="ease-out duration-300"
+            x-transition:enter-start="opacity-0"
+            x-transition:enter-end="opacity-100"
+            x-transition:leave="ease-in duration-200"
+            x-transition:leave-start="opacity-100"
+            x-transition:leave-end="opacity-0"
+            class="fixed inset-0 bg-gray-900 bg-opacity-50 backdrop-blur-sm transition-opacity">
+        </div>
+
+        
+        <div class="flex min-h-full items-center justify-center p-4 text-center sm:p-0">
+            <div x-show="confirmModal"
+                x-transition:enter="ease-out duration-300"
+                x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
+                x-transition:leave="ease-in duration-200"
+                x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
+                x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                class="relative transform overflow-hidden rounded-2xl bg-white text-left shadow-2xl transition-all sm:my-8 sm:w-full sm:max-w-lg">
+
+                
+                <div class="bg-gradient-to-r from-blue-500 to-blue-600 px-6 py-4">
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-lg font-semibold text-white flex items-center gap-2">
+                            <span
+    class="iconify block w-5 h-5"
+    data-icon="lucide:alert-circle"
+    data-inline="false"></span>                            Confirmation de changement de statut
+                        </h3>
+                        <button @click="confirmModal = false; $wire.cancelStatusChange()"
+                            class="text-white/80 hover:text-white transition-colors">
+                            <span
+    class="iconify block w-5 h-5"
+    data-icon="lucide:x"
+    data-inline="false"></span>                        </button>
+                    </div>
+                </div>
+
+                
+                <div class="px-6 py-5">
+                    
+                    <div class="mb-4">
+                        <p class="text-sm text-gray-700 whitespace-pre-line"></p>
+                    </div>
+
+                    
+                    <div class="bg-gray-50 rounded-lg p-4 mb-4">
+                        <div class="grid grid-cols-2 gap-3 text-sm">
+                            <div>
+                                <span class="text-gray-500">Chauffeur:</span>
+                                <p class="font-medium text-gray-900">Ahmed Lounis</p>
+                            </div>
+                            <div>
+                                <span class="text-gray-500">Matricule:</span>
+                                <p class="font-medium text-gray-900">876387DZ987</p>
+                            </div>
+                            <!--[if BLOCK]><![endif]-->                            <div>
+                                <span class="text-gray-500">Statut actuel:</span>
+                                <p class="mt-1">
+                                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                        <span
+    class="iconify block w-3 h-3"
+    data-icon="lucide:truck"
+    data-inline="false"></span>                                        En mission
+                                    </span>
+                                </p>
+                            </div>
+                            <!--[if ENDBLOCK]><![endif]-->
+                            <!--[if BLOCK]><![endif]--><!--[if ENDBLOCK]><![endif]-->
+                        </div>
+                    </div>
+                </div>
+
+                
+                <div class="bg-gray-50 px-6 py-4 flex items-center justify-end gap-3">
+                    <button wire:click="cancelStatusChange"
+                        @click="confirmModal = false"
+                        type="button"
+                        class="inline-flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 
+                                   rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 
+                                   focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 
+                                   transition-all duration-150">
+                        <span
+    class="iconify block w-4 h-4"
+    data-icon="lucide:x"
+    data-inline="false"></span>                        Annuler
+                    </button>
+
+                    <button wire:click="confirmStatusChange"
+                        type="button"
+                        wire:loading.attr="disabled"
+                        wire:loading.class="opacity-50 cursor-not-allowed"
+                        class="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 
+                                   text-white rounded-lg text-sm font-medium 
+                                   focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500
+                                   transition-all duration-150 shadow-sm hover:shadow-md">
+                        <span wire:loading.remove wire:target="confirmStatusChange">
+                            <span
+    class="iconify block w-4 h-4"
+    data-icon="lucide:check"
+    data-inline="false"></span>                        </span>
+                        <span wire:loading wire:target="confirmStatusChange">
+                            <svg class="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+                            </svg>
+                        </span>
+                        <span wire:loading.remove wire:target="confirmStatusChange">Confirmer</span>
+                        <span wire:loading wire:target="confirmStatusChange">Traitement...</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-xs text-gray-500">
+                                <!--[if BLOCK]><![endif]-->                                <div class="flex items-center gap-1.5">
+                                    <span
+    class="iconify block w-3.5 h-3.5 text-blue-600"
+    data-icon="lucide:car"
+    data-inline="false"></span>                                    <span class="font-medium text-gray-900">631035-16</span>
+                                </div>
+                                <!--[if ENDBLOCK]><![endif]-->
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                <div class="flex items-center justify-end gap-2">
+                                    <!--[if BLOCK]><![endif]-->                                    
+                                    <a href="http://localhost/admin/drivers/9"
+                                        class="p-2 rounded-full bg-gray-50 text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition-all duration-200 group"
+                                        title="Voir">
+                                        <span
+    class="iconify block w-4 h-4 group-hover:scale-110 transition-transform"
+    data-icon="lucide:eye"
+    data-inline="false"></span>                                    </a>
+                                    <a href="http://localhost/admin/drivers/9/edit"
+                                        class="p-2 rounded-full bg-gray-50 text-gray-400 hover:text-amber-600 hover:bg-amber-50 transition-all duration-200 group"
+                                        title="Modifier">
+                                        <span
+    class="iconify block w-4 h-4 group-hover:scale-110 transition-transform"
+    data-icon="lucide:edit-3"
+    data-inline="false"></span>                                    </a>
+
+                                    
+                                    <div class="relative" x-data="{ open: false }">
+                                        <button @click="open = !open" @click.away="open = false"
+                                            class="p-2 rounded-full bg-gray-50 text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-all duration-200 group">
+                                            <span
+    class="iconify block w-4 h-4 group-hover:scale-110 transition-transform"
+    data-icon="lucide:more-vertical"
+    data-inline="false"></span>                                        </button>
+
+                                        <div x-show="open"
+                                            x-transition:enter="transition ease-out duration-100"
+                                            x-transition:enter-start="transform opacity-0 scale-95"
+                                            x-transition:enter-end="transform opacity-100 scale-100"
+                                            class="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
+                                            style="display: none;">
+                                            <div class="py-1">
+                                                <button wire:click="exportPdf(9); open = false" class="group flex w-full items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                                    <span
+    class="iconify block mr-3 h-4 w-4 text-gray-400 group-hover:text-red-500"
+    data-icon="lucide:file-text"
+    data-inline="false"></span>                                                    Exporter PDF
+                                                </button>
+                                                <div class="border-t border-gray-100 my-1"></div>
+                                                <button wire:click="confirmArchive(9); open = false" class="group flex w-full items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                                    <span
+    class="iconify block mr-3 h-4 w-4 text-gray-400 group-hover:text-amber-500"
+    data-icon="lucide:archive"
+    data-inline="false"></span>                                                    Archiver
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!--[if ENDBLOCK]><![endif]-->
+                                </div>
+                            </td>
+                        </tr>
+                                                <tr wire:key="driver-8" class="hover:bg-gray-50 transition-colors duration-150 ">
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <input type="checkbox" wire:click="toggleSelection(8)"  class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="flex items-center">
+                                    <div class="flex-shrink-0 h-10 w-10 rounded-full overflow-hidden">
+                                        <!--[if BLOCK]><![endif]-->                                        <img src="http://localhost/storage/drivers/photos/eJsJDLnrNN64p3HKluFn7atG1ryDM8Yf9M5l4tix.png" class="h-full w-full object-cover">
+                                        <!--[if ENDBLOCK]><![endif]-->
+                                    </div>
+                                    <div class="ml-4">
+                                        <div class="text-sm font-medium text-gray-900">
+                                            El Hadi CHEMLI
+                                        </div>
+                                        <div class="text-xs text-gray-500">#DIF-2025-80000</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-xs text-gray-900 flex items-center gap-1.5">
+                                    <span
+    class="iconify block w-3.5 h-3.5 text-gray-400"
+    data-icon="lucide:phone"
+    data-inline="false"></span> +213789050000
+                                </div>
+                                <div class="text-xs text-gray-500 flex items-center gap-1.5 mt-1">
+                                    <span
+    class="iconify block w-3.5 h-3.5 text-gray-400"
+    data-icon="lucide:mail"
+    data-inline="false"></span> Echemli2025@gmail.com
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-xs font-medium text-gray-900">DZ-00000</div>
+                                <!--[if BLOCK]><![endif]-->                                <div class="flex flex-wrap gap-1 mt-1">
+                                    <!--[if BLOCK]><![endif]-->                                    <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-blue-100 text-blue-800">
+                                        B
+                                    </span>
+                                    <!--[if ENDBLOCK]><![endif]-->
+                                </div>
+                                <!--[if ENDBLOCK]><![endif]-->
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div wire:snapshot="{&quot;data&quot;:{&quot;driverId&quot;:8,&quot;driver&quot;:[null,{&quot;class&quot;:&quot;App\\Models\\Driver&quot;,&quot;key&quot;:8,&quot;s&quot;:&quot;mdl&quot;}],&quot;showConfirmModal&quot;:false,&quot;pendingStatus&quot;:null,&quot;pendingStatusEnum&quot;:null,&quot;confirmMessage&quot;:&quot;&quot;},&quot;memo&quot;:{&quot;id&quot;:&quot;myObKRQ9znQZlKPDqkBt&quot;,&quot;name&quot;:&quot;admin.driver-status-badge-ultra-pro&quot;,&quot;path&quot;:&quot;admin\/drivers&quot;,&quot;method&quot;:&quot;GET&quot;,&quot;children&quot;:[],&quot;scripts&quot;:[],&quot;assets&quot;:[],&quot;errors&quot;:[],&quot;locale&quot;:&quot;fr&quot;},&quot;checksum&quot;:&quot;8386cfe3469d5625a41817a9dee6f3296fbd484e903b82fed925b0ef02a07b7a&quot;}" wire:effects="{&quot;listeners&quot;:[&quot;refreshComponent&quot;,&quot;driverStatusUpdated&quot;,&quot;driverStatusChanged&quot;,&quot;echo:drivers,DriverStatusChanged&quot;]}" wire:id="myObKRQ9znQZlKPDqkBt" class="relative inline-block"
+    x-data="{ 
+         open: false, 
+         confirmModal: window.Livewire.find('myObKRQ9znQZlKPDqkBt').entangle('showConfirmModal').live,
+         toggle() { this.open = !this.open; },
+         close() { this.open = false; },
+         selectStatus(status) { 
+             this.open = false; 
+             $wire.prepareStatusChange(status); 
+         }
+     }"
+    @click.stop
+    x-init="$watch('confirmModal', value => { if (value) open = false; })">
+    
+    <!--[if BLOCK]><![endif]-->    <button
+        @click.stop="toggle"
+        @click.away="close"
+        type="button"
+        class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold 
+                   transition-all duration-200 hover:shadow-md hover:scale-105 cursor-pointer 
+                   inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800
+                   focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+        title="Cliquer pour modifier le statut">
+        
+        <!--[if BLOCK]><![endif]-->        <span
+    class="iconify block w-3.5 h-3.5"
+    data-icon="lucide:user-check"
+    data-inline="false"></span>        <!--[if ENDBLOCK]><![endif]-->
+
+        
+        <span>Disponible</span>
+
+        
+        <svg class="w-3 h-3 opacity-60 transition-transform duration-200"
+            :class="{ 'rotate-180': open }"
+            fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+        </svg>
+    </button>
+    <!--[if ENDBLOCK]><![endif]-->
+
+    
+    <!--[if BLOCK]><![endif]-->    <div
+        x-show="open"
+        x-transition:enter="transition ease-out duration-200"
+        x-transition:enter-start="transform opacity-0 scale-95 translate-y-2"
+        x-transition:enter-end="transform opacity-100 scale-100 translate-y-0"
+        x-transition:leave="transition ease-in duration-150"
+        x-transition:leave-start="transform opacity-100 scale-100 translate-y-0"
+        x-transition:leave-end="transform opacity-0 scale-95 translate-y-2"
+        class="absolute left-0 mt-3 w-72 rounded-xl shadow-[0_10px_40px_-10px_rgba(0,0,0,0.2)] bg-white ring-1 ring-black/5 z-50 overflow-visible"
+        style="display: none;">
+
+        
+        <div class="absolute -top-2 left-6 w-4 h-4 bg-white transform rotate-45 border-t border-l border-gray-100 shadow-sm"></div>
+
+        <div class="relative bg-white rounded-xl overflow-hidden">
+            
+            <div class="px-4 py-3 bg-gradient-to-r from-gray-50 to-white border-b border-gray-100">
+                <div class="flex items-center justify-between">
+                    <span class="text-xs font-bold text-gray-800 uppercase tracking-wider flex items-center gap-2">
+                        <span
+    class="iconify block w-3.5 h-3.5 text-blue-500"
+    data-icon="lucide:git-branch"
+    data-inline="false"></span>                        Changer le statut
+                    </span>
+                    <button @click="close" class="text-gray-400 hover:text-gray-600 transition-colors p-1 hover:bg-gray-100 rounded-full">
+                        <span
+    class="iconify block w-3.5 h-3.5"
+    data-icon="lucide:x"
+    data-inline="false"></span>                    </button>
+                </div>
+            </div>
+
+            
+            <div class="py-2 max-h-[300px] overflow-y-auto custom-scrollbar">
+                <!--[if BLOCK]><![endif]-->                <button
+                    @click.stop="selectStatus('en_mission')"
+                    type="button"
+                    class="w-full flex items-center justify-between px-4 py-3 hover:bg-blue-50/50 
+                                   transition-all duration-200 group focus:outline-none border-l-2 border-transparent hover:border-blue-500">
+                    <div class="flex items-center gap-3">
+                        
+                        <span class="inline-flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-xs font-semibold 
+                                           inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 shadow-sm group-hover:shadow transition-all">
+                            <span
+    class="iconify block w-3.5 h-3.5"
+    data-icon="lucide:truck"
+    data-inline="false"></span>                            En mission
+                        </span>
+                    </div>
+                    
+                    <div class="w-6 h-6 rounded-full bg-transparent group-hover:bg-blue-100 flex items-center justify-center transition-all">
+                        <span
+    class="iconify block w-3.5 h-3.5 text-gray-300 group-hover:text-blue-600 
+                                                 group-hover:translate-x-0.5 transition-all"
+    data-icon="lucide:arrow-right"
+    data-inline="false"></span>                    </div>
+                </button>
+                                <button
+                    @click.stop="selectStatus('en_conge')"
+                    type="button"
+                    class="w-full flex items-center justify-between px-4 py-3 hover:bg-blue-50/50 
+                                   transition-all duration-200 group focus:outline-none border-l-2 border-transparent hover:border-blue-500">
+                    <div class="flex items-center gap-3">
+                        
+                        <span class="inline-flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-xs font-semibold 
+                                           inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-orange-100 text-orange-800 shadow-sm group-hover:shadow transition-all">
+                            <span
+    class="iconify block w-3.5 h-3.5"
+    data-icon="lucide:palmtree"
+    data-inline="false"></span>                            En congé
+                        </span>
+                    </div>
+                    
+                    <div class="w-6 h-6 rounded-full bg-transparent group-hover:bg-blue-100 flex items-center justify-center transition-all">
+                        <span
+    class="iconify block w-3.5 h-3.5 text-gray-300 group-hover:text-blue-600 
+                                                 group-hover:translate-x-0.5 transition-all"
+    data-icon="lucide:arrow-right"
+    data-inline="false"></span>                    </div>
+                </button>
+                                <button
+                    @click.stop="selectStatus('en_formation')"
+                    type="button"
+                    class="w-full flex items-center justify-between px-4 py-3 hover:bg-blue-50/50 
+                                   transition-all duration-200 group focus:outline-none border-l-2 border-transparent hover:border-blue-500">
+                    <div class="flex items-center gap-3">
+                        
+                        <span class="inline-flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-xs font-semibold 
+                                           inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800 shadow-sm group-hover:shadow transition-all">
+                            <span
+    class="iconify block w-3.5 h-3.5"
+    data-icon="lucide:graduation-cap"
+    data-inline="false"></span>                            En formation
+                        </span>
+                    </div>
+                    
+                    <div class="w-6 h-6 rounded-full bg-transparent group-hover:bg-blue-100 flex items-center justify-center transition-all">
+                        <span
+    class="iconify block w-3.5 h-3.5 text-gray-300 group-hover:text-blue-600 
+                                                 group-hover:translate-x-0.5 transition-all"
+    data-icon="lucide:arrow-right"
+    data-inline="false"></span>                    </div>
+                </button>
+                                <button
+                    @click.stop="selectStatus('autre')"
+                    type="button"
+                    class="w-full flex items-center justify-between px-4 py-3 hover:bg-blue-50/50 
+                                   transition-all duration-200 group focus:outline-none border-l-2 border-transparent hover:border-blue-500">
+                    <div class="flex items-center gap-3">
+                        
+                        <span class="inline-flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-xs font-semibold 
+                                           inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 shadow-sm group-hover:shadow transition-all">
+                            <span
+    class="iconify block w-3.5 h-3.5"
+    data-icon="lucide:help-circle"
+    data-inline="false"></span>                            Autre
+                        </span>
+                    </div>
+                    
+                    <div class="w-6 h-6 rounded-full bg-transparent group-hover:bg-blue-100 flex items-center justify-center transition-all">
+                        <span
+    class="iconify block w-3.5 h-3.5 text-gray-300 group-hover:text-blue-600 
+                                                 group-hover:translate-x-0.5 transition-all"
+    data-icon="lucide:arrow-right"
+    data-inline="false"></span>                    </div>
+                </button>
+                <!--[if ENDBLOCK]><![endif]-->
+            </div>
+
+            
+            <!--[if BLOCK]><![endif]-->            <div class="px-4 py-3 bg-gray-50/80 border-t border-gray-100 backdrop-blur-sm">
+                <div class="flex items-start gap-2.5">
+                    <span
+    class="iconify block w-4 h-4 text-blue-500 mt-0.5 flex-shrink-0"
+    data-icon="lucide:info"
+    data-inline="false"></span>                    <p class="text-xs text-gray-600 leading-relaxed">
+                        <span class="font-medium text-gray-900">Note:</span>
+                        Chauffeur disponible, peut recevoir une affectation de véhicule
+                    </p>
+                </div>
+            </div>
+            <!--[if ENDBLOCK]><![endif]-->
+        </div>
+    </div>
+    <!--[if ENDBLOCK]><![endif]-->
+
+    
+    <div x-show="confirmModal"
+        x-cloak
+        class="fixed inset-0 z-50 overflow-y-auto"
+        aria-labelledby="modal-title"
+        role="dialog"
+        aria-modal="true">
+
+        
+        <div x-show="confirmModal"
+            x-transition:enter="ease-out duration-300"
+            x-transition:enter-start="opacity-0"
+            x-transition:enter-end="opacity-100"
+            x-transition:leave="ease-in duration-200"
+            x-transition:leave-start="opacity-100"
+            x-transition:leave-end="opacity-0"
+            class="fixed inset-0 bg-gray-900 bg-opacity-50 backdrop-blur-sm transition-opacity">
+        </div>
+
+        
+        <div class="flex min-h-full items-center justify-center p-4 text-center sm:p-0">
+            <div x-show="confirmModal"
+                x-transition:enter="ease-out duration-300"
+                x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
+                x-transition:leave="ease-in duration-200"
+                x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
+                x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                class="relative transform overflow-hidden rounded-2xl bg-white text-left shadow-2xl transition-all sm:my-8 sm:w-full sm:max-w-lg">
+
+                
+                <div class="bg-gradient-to-r from-blue-500 to-blue-600 px-6 py-4">
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-lg font-semibold text-white flex items-center gap-2">
+                            <span
+    class="iconify block w-5 h-5"
+    data-icon="lucide:alert-circle"
+    data-inline="false"></span>                            Confirmation de changement de statut
+                        </h3>
+                        <button @click="confirmModal = false; $wire.cancelStatusChange()"
+                            class="text-white/80 hover:text-white transition-colors">
+                            <span
+    class="iconify block w-5 h-5"
+    data-icon="lucide:x"
+    data-inline="false"></span>                        </button>
+                    </div>
+                </div>
+
+                
+                <div class="px-6 py-5">
+                    
+                    <div class="mb-4">
+                        <p class="text-sm text-gray-700 whitespace-pre-line"></p>
+                    </div>
+
+                    
+                    <div class="bg-gray-50 rounded-lg p-4 mb-4">
+                        <div class="grid grid-cols-2 gap-3 text-sm">
+                            <div>
+                                <span class="text-gray-500">Chauffeur:</span>
+                                <p class="font-medium text-gray-900">El Hadi CHEMLI</p>
+                            </div>
+                            <div>
+                                <span class="text-gray-500">Matricule:</span>
+                                <p class="font-medium text-gray-900">DIF-2025-80000</p>
+                            </div>
+                            <!--[if BLOCK]><![endif]-->                            <div>
+                                <span class="text-gray-500">Statut actuel:</span>
+                                <p class="mt-1">
+                                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                        <span
+    class="iconify block w-3 h-3"
+    data-icon="lucide:user-check"
+    data-inline="false"></span>                                        Disponible
+                                    </span>
+                                </p>
+                            </div>
+                            <!--[if ENDBLOCK]><![endif]-->
+                            <!--[if BLOCK]><![endif]--><!--[if ENDBLOCK]><![endif]-->
+                        </div>
+                    </div>
+                </div>
+
+                
+                <div class="bg-gray-50 px-6 py-4 flex items-center justify-end gap-3">
+                    <button wire:click="cancelStatusChange"
+                        @click="confirmModal = false"
+                        type="button"
+                        class="inline-flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 
+                                   rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 
+                                   focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 
+                                   transition-all duration-150">
+                        <span
+    class="iconify block w-4 h-4"
+    data-icon="lucide:x"
+    data-inline="false"></span>                        Annuler
+                    </button>
+
+                    <button wire:click="confirmStatusChange"
+                        type="button"
+                        wire:loading.attr="disabled"
+                        wire:loading.class="opacity-50 cursor-not-allowed"
+                        class="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 
+                                   text-white rounded-lg text-sm font-medium 
+                                   focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500
+                                   transition-all duration-150 shadow-sm hover:shadow-md">
+                        <span wire:loading.remove wire:target="confirmStatusChange">
+                            <span
+    class="iconify block w-4 h-4"
+    data-icon="lucide:check"
+    data-inline="false"></span>                        </span>
+                        <span wire:loading wire:target="confirmStatusChange">
+                            <svg class="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+                            </svg>
+                        </span>
+                        <span wire:loading.remove wire:target="confirmStatusChange">Confirmer</span>
+                        <span wire:loading wire:target="confirmStatusChange">Traitement...</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-xs text-gray-500">
+                                <!--[if BLOCK]><![endif]-->                                <span class="text-gray-400 italic">Aucun véhicule</span>
+                                <!--[if ENDBLOCK]><![endif]-->
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                <div class="flex items-center justify-end gap-2">
+                                    <!--[if BLOCK]><![endif]-->                                    
+                                    <a href="http://localhost/admin/drivers/8"
+                                        class="p-2 rounded-full bg-gray-50 text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition-all duration-200 group"
+                                        title="Voir">
+                                        <span
+    class="iconify block w-4 h-4 group-hover:scale-110 transition-transform"
+    data-icon="lucide:eye"
+    data-inline="false"></span>                                    </a>
+                                    <a href="http://localhost/admin/drivers/8/edit"
+                                        class="p-2 rounded-full bg-gray-50 text-gray-400 hover:text-amber-600 hover:bg-amber-50 transition-all duration-200 group"
+                                        title="Modifier">
+                                        <span
+    class="iconify block w-4 h-4 group-hover:scale-110 transition-transform"
+    data-icon="lucide:edit-3"
+    data-inline="false"></span>                                    </a>
+
+                                    
+                                    <div class="relative" x-data="{ open: false }">
+                                        <button @click="open = !open" @click.away="open = false"
+                                            class="p-2 rounded-full bg-gray-50 text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-all duration-200 group">
+                                            <span
+    class="iconify block w-4 h-4 group-hover:scale-110 transition-transform"
+    data-icon="lucide:more-vertical"
+    data-inline="false"></span>                                        </button>
+
+                                        <div x-show="open"
+                                            x-transition:enter="transition ease-out duration-100"
+                                            x-transition:enter-start="transform opacity-0 scale-95"
+                                            x-transition:enter-end="transform opacity-100 scale-100"
+                                            class="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
+                                            style="display: none;">
+                                            <div class="py-1">
+                                                <button wire:click="exportPdf(8); open = false" class="group flex w-full items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                                    <span
+    class="iconify block mr-3 h-4 w-4 text-gray-400 group-hover:text-red-500"
+    data-icon="lucide:file-text"
+    data-inline="false"></span>                                                    Exporter PDF
+                                                </button>
+                                                <div class="border-t border-gray-100 my-1"></div>
+                                                <button wire:click="confirmArchive(8); open = false" class="group flex w-full items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                                    <span
+    class="iconify block mr-3 h-4 w-4 text-gray-400 group-hover:text-amber-500"
+    data-icon="lucide:archive"
+    data-inline="false"></span>                                                    Archiver
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!--[if ENDBLOCK]><![endif]-->
+                                </div>
+                            </td>
+                        </tr>
+                                                <tr wire:key="driver-6" class="hover:bg-gray-50 transition-colors duration-150 ">
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <input type="checkbox" wire:click="toggleSelection(6)"  class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="flex items-center">
+                                    <div class="flex-shrink-0 h-10 w-10 rounded-full overflow-hidden">
+                                        <!--[if BLOCK]><![endif]-->                                        <img src="http://localhost/storage/drivers/photos/n2CrsympJ0sAh2wR8EParyAaWdSEgBx4cKa1kfPv.png" class="h-full w-full object-cover">
+                                        <!--[if ENDBLOCK]><![endif]-->
+                                    </div>
+                                    <div class="ml-4">
+                                        <div class="text-sm font-medium text-gray-900">
+                                            zerrouk ALIOUANE
+                                        </div>
+                                        <div class="text-xs text-gray-500">#DLS-84745</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-xs text-gray-900 flex items-center gap-1.5">
+                                    <span
+    class="iconify block w-3.5 h-3.5 text-gray-400"
+    data-icon="lucide:phone"
+    data-inline="false"></span> +213684849603
+                                </div>
+                                <div class="text-xs text-gray-500 flex items-center gap-1.5 mt-1">
+                                    <span
+    class="iconify block w-3.5 h-3.5 text-gray-400"
+    data-icon="lucide:mail"
+    data-inline="false"></span> zaliouane@yahoo.fr
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-xs font-medium text-gray-900">987-DZ-867</div>
+                                <!--[if BLOCK]><![endif]-->                                <div class="flex flex-wrap gap-1 mt-1">
+                                    <!--[if BLOCK]><![endif]-->                                    <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-blue-100 text-blue-800">
+                                        B
+                                    </span>
+                                    <!--[if ENDBLOCK]><![endif]-->
+                                </div>
+                                <!--[if ENDBLOCK]><![endif]-->
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div wire:snapshot="{&quot;data&quot;:{&quot;driverId&quot;:6,&quot;driver&quot;:[null,{&quot;class&quot;:&quot;App\\Models\\Driver&quot;,&quot;key&quot;:6,&quot;s&quot;:&quot;mdl&quot;}],&quot;showConfirmModal&quot;:false,&quot;pendingStatus&quot;:null,&quot;pendingStatusEnum&quot;:null,&quot;confirmMessage&quot;:&quot;&quot;},&quot;memo&quot;:{&quot;id&quot;:&quot;ewvGPdeJGSWTpj5eE0cj&quot;,&quot;name&quot;:&quot;admin.driver-status-badge-ultra-pro&quot;,&quot;path&quot;:&quot;admin\/drivers&quot;,&quot;method&quot;:&quot;GET&quot;,&quot;children&quot;:[],&quot;scripts&quot;:[],&quot;assets&quot;:[],&quot;errors&quot;:[],&quot;locale&quot;:&quot;fr&quot;},&quot;checksum&quot;:&quot;27a3ab5b5ee40f0394194de3f48891b6d1637a54a1a57ed01ac25a06c372b1ec&quot;}" wire:effects="{&quot;listeners&quot;:[&quot;refreshComponent&quot;,&quot;driverStatusUpdated&quot;,&quot;driverStatusChanged&quot;,&quot;echo:drivers,DriverStatusChanged&quot;]}" wire:id="ewvGPdeJGSWTpj5eE0cj" class="relative inline-block"
+    x-data="{ 
+         open: false, 
+         confirmModal: window.Livewire.find('ewvGPdeJGSWTpj5eE0cj').entangle('showConfirmModal').live,
+         toggle() { this.open = !this.open; },
+         close() { this.open = false; },
+         selectStatus(status) { 
+             this.open = false; 
+             $wire.prepareStatusChange(status); 
+         }
+     }"
+    @click.stop
+    x-init="$watch('confirmModal', value => { if (value) open = false; })">
+    
+    <!--[if BLOCK]><![endif]-->    <button
+        @click.stop="toggle"
+        @click.away="close"
+        type="button"
+        class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold 
+                   transition-all duration-200 hover:shadow-md hover:scale-105 cursor-pointer 
+                   inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800
+                   focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+        title="Cliquer pour modifier le statut">
+        
+        <!--[if BLOCK]><![endif]-->        <span
+    class="iconify block w-3.5 h-3.5"
+    data-icon="lucide:user-check"
+    data-inline="false"></span>        <!--[if ENDBLOCK]><![endif]-->
+
+        
+        <span>Disponible</span>
+
+        
+        <svg class="w-3 h-3 opacity-60 transition-transform duration-200"
+            :class="{ 'rotate-180': open }"
+            fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+        </svg>
+    </button>
+    <!--[if ENDBLOCK]><![endif]-->
+
+    
+    <!--[if BLOCK]><![endif]-->    <div
+        x-show="open"
+        x-transition:enter="transition ease-out duration-200"
+        x-transition:enter-start="transform opacity-0 scale-95 translate-y-2"
+        x-transition:enter-end="transform opacity-100 scale-100 translate-y-0"
+        x-transition:leave="transition ease-in duration-150"
+        x-transition:leave-start="transform opacity-100 scale-100 translate-y-0"
+        x-transition:leave-end="transform opacity-0 scale-95 translate-y-2"
+        class="absolute left-0 mt-3 w-72 rounded-xl shadow-[0_10px_40px_-10px_rgba(0,0,0,0.2)] bg-white ring-1 ring-black/5 z-50 overflow-visible"
+        style="display: none;">
+
+        
+        <div class="absolute -top-2 left-6 w-4 h-4 bg-white transform rotate-45 border-t border-l border-gray-100 shadow-sm"></div>
+
+        <div class="relative bg-white rounded-xl overflow-hidden">
+            
+            <div class="px-4 py-3 bg-gradient-to-r from-gray-50 to-white border-b border-gray-100">
+                <div class="flex items-center justify-between">
+                    <span class="text-xs font-bold text-gray-800 uppercase tracking-wider flex items-center gap-2">
+                        <span
+    class="iconify block w-3.5 h-3.5 text-blue-500"
+    data-icon="lucide:git-branch"
+    data-inline="false"></span>                        Changer le statut
+                    </span>
+                    <button @click="close" class="text-gray-400 hover:text-gray-600 transition-colors p-1 hover:bg-gray-100 rounded-full">
+                        <span
+    class="iconify block w-3.5 h-3.5"
+    data-icon="lucide:x"
+    data-inline="false"></span>                    </button>
+                </div>
+            </div>
+
+            
+            <div class="py-2 max-h-[300px] overflow-y-auto custom-scrollbar">
+                <!--[if BLOCK]><![endif]-->                <button
+                    @click.stop="selectStatus('en_mission')"
+                    type="button"
+                    class="w-full flex items-center justify-between px-4 py-3 hover:bg-blue-50/50 
+                                   transition-all duration-200 group focus:outline-none border-l-2 border-transparent hover:border-blue-500">
+                    <div class="flex items-center gap-3">
+                        
+                        <span class="inline-flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-xs font-semibold 
+                                           inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 shadow-sm group-hover:shadow transition-all">
+                            <span
+    class="iconify block w-3.5 h-3.5"
+    data-icon="lucide:truck"
+    data-inline="false"></span>                            En mission
+                        </span>
+                    </div>
+                    
+                    <div class="w-6 h-6 rounded-full bg-transparent group-hover:bg-blue-100 flex items-center justify-center transition-all">
+                        <span
+    class="iconify block w-3.5 h-3.5 text-gray-300 group-hover:text-blue-600 
+                                                 group-hover:translate-x-0.5 transition-all"
+    data-icon="lucide:arrow-right"
+    data-inline="false"></span>                    </div>
+                </button>
+                                <button
+                    @click.stop="selectStatus('en_conge')"
+                    type="button"
+                    class="w-full flex items-center justify-between px-4 py-3 hover:bg-blue-50/50 
+                                   transition-all duration-200 group focus:outline-none border-l-2 border-transparent hover:border-blue-500">
+                    <div class="flex items-center gap-3">
+                        
+                        <span class="inline-flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-xs font-semibold 
+                                           inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-orange-100 text-orange-800 shadow-sm group-hover:shadow transition-all">
+                            <span
+    class="iconify block w-3.5 h-3.5"
+    data-icon="lucide:palmtree"
+    data-inline="false"></span>                            En congé
+                        </span>
+                    </div>
+                    
+                    <div class="w-6 h-6 rounded-full bg-transparent group-hover:bg-blue-100 flex items-center justify-center transition-all">
+                        <span
+    class="iconify block w-3.5 h-3.5 text-gray-300 group-hover:text-blue-600 
+                                                 group-hover:translate-x-0.5 transition-all"
+    data-icon="lucide:arrow-right"
+    data-inline="false"></span>                    </div>
+                </button>
+                                <button
+                    @click.stop="selectStatus('en_formation')"
+                    type="button"
+                    class="w-full flex items-center justify-between px-4 py-3 hover:bg-blue-50/50 
+                                   transition-all duration-200 group focus:outline-none border-l-2 border-transparent hover:border-blue-500">
+                    <div class="flex items-center gap-3">
+                        
+                        <span class="inline-flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-xs font-semibold 
+                                           inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800 shadow-sm group-hover:shadow transition-all">
+                            <span
+    class="iconify block w-3.5 h-3.5"
+    data-icon="lucide:graduation-cap"
+    data-inline="false"></span>                            En formation
+                        </span>
+                    </div>
+                    
+                    <div class="w-6 h-6 rounded-full bg-transparent group-hover:bg-blue-100 flex items-center justify-center transition-all">
+                        <span
+    class="iconify block w-3.5 h-3.5 text-gray-300 group-hover:text-blue-600 
+                                                 group-hover:translate-x-0.5 transition-all"
+    data-icon="lucide:arrow-right"
+    data-inline="false"></span>                    </div>
+                </button>
+                                <button
+                    @click.stop="selectStatus('autre')"
+                    type="button"
+                    class="w-full flex items-center justify-between px-4 py-3 hover:bg-blue-50/50 
+                                   transition-all duration-200 group focus:outline-none border-l-2 border-transparent hover:border-blue-500">
+                    <div class="flex items-center gap-3">
+                        
+                        <span class="inline-flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-xs font-semibold 
+                                           inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 shadow-sm group-hover:shadow transition-all">
+                            <span
+    class="iconify block w-3.5 h-3.5"
+    data-icon="lucide:help-circle"
+    data-inline="false"></span>                            Autre
+                        </span>
+                    </div>
+                    
+                    <div class="w-6 h-6 rounded-full bg-transparent group-hover:bg-blue-100 flex items-center justify-center transition-all">
+                        <span
+    class="iconify block w-3.5 h-3.5 text-gray-300 group-hover:text-blue-600 
+                                                 group-hover:translate-x-0.5 transition-all"
+    data-icon="lucide:arrow-right"
+    data-inline="false"></span>                    </div>
+                </button>
+                <!--[if ENDBLOCK]><![endif]-->
+            </div>
+
+            
+            <!--[if BLOCK]><![endif]-->            <div class="px-4 py-3 bg-gray-50/80 border-t border-gray-100 backdrop-blur-sm">
+                <div class="flex items-start gap-2.5">
+                    <span
+    class="iconify block w-4 h-4 text-blue-500 mt-0.5 flex-shrink-0"
+    data-icon="lucide:info"
+    data-inline="false"></span>                    <p class="text-xs text-gray-600 leading-relaxed">
+                        <span class="font-medium text-gray-900">Note:</span>
+                        Chauffeur disponible, peut recevoir une affectation de véhicule
+                    </p>
+                </div>
+            </div>
+            <!--[if ENDBLOCK]><![endif]-->
+        </div>
+    </div>
+    <!--[if ENDBLOCK]><![endif]-->
+
+    
+    <div x-show="confirmModal"
+        x-cloak
+        class="fixed inset-0 z-50 overflow-y-auto"
+        aria-labelledby="modal-title"
+        role="dialog"
+        aria-modal="true">
+
+        
+        <div x-show="confirmModal"
+            x-transition:enter="ease-out duration-300"
+            x-transition:enter-start="opacity-0"
+            x-transition:enter-end="opacity-100"
+            x-transition:leave="ease-in duration-200"
+            x-transition:leave-start="opacity-100"
+            x-transition:leave-end="opacity-0"
+            class="fixed inset-0 bg-gray-900 bg-opacity-50 backdrop-blur-sm transition-opacity">
+        </div>
+
+        
+        <div class="flex min-h-full items-center justify-center p-4 text-center sm:p-0">
+            <div x-show="confirmModal"
+                x-transition:enter="ease-out duration-300"
+                x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
+                x-transition:leave="ease-in duration-200"
+                x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
+                x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                class="relative transform overflow-hidden rounded-2xl bg-white text-left shadow-2xl transition-all sm:my-8 sm:w-full sm:max-w-lg">
+
+                
+                <div class="bg-gradient-to-r from-blue-500 to-blue-600 px-6 py-4">
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-lg font-semibold text-white flex items-center gap-2">
+                            <span
+    class="iconify block w-5 h-5"
+    data-icon="lucide:alert-circle"
+    data-inline="false"></span>                            Confirmation de changement de statut
+                        </h3>
+                        <button @click="confirmModal = false; $wire.cancelStatusChange()"
+                            class="text-white/80 hover:text-white transition-colors">
+                            <span
+    class="iconify block w-5 h-5"
+    data-icon="lucide:x"
+    data-inline="false"></span>                        </button>
+                    </div>
+                </div>
+
+                
+                <div class="px-6 py-5">
+                    
+                    <div class="mb-4">
+                        <p class="text-sm text-gray-700 whitespace-pre-line"></p>
+                    </div>
+
+                    
+                    <div class="bg-gray-50 rounded-lg p-4 mb-4">
+                        <div class="grid grid-cols-2 gap-3 text-sm">
+                            <div>
+                                <span class="text-gray-500">Chauffeur:</span>
+                                <p class="font-medium text-gray-900">zerrouk ALIOUANE</p>
+                            </div>
+                            <div>
+                                <span class="text-gray-500">Matricule:</span>
+                                <p class="font-medium text-gray-900">DLS-84745</p>
+                            </div>
+                            <!--[if BLOCK]><![endif]-->                            <div>
+                                <span class="text-gray-500">Statut actuel:</span>
+                                <p class="mt-1">
+                                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                        <span
+    class="iconify block w-3 h-3"
+    data-icon="lucide:user-check"
+    data-inline="false"></span>                                        Disponible
+                                    </span>
+                                </p>
+                            </div>
+                            <!--[if ENDBLOCK]><![endif]-->
+                            <!--[if BLOCK]><![endif]--><!--[if ENDBLOCK]><![endif]-->
+                        </div>
+                    </div>
+                </div>
+
+                
+                <div class="bg-gray-50 px-6 py-4 flex items-center justify-end gap-3">
+                    <button wire:click="cancelStatusChange"
+                        @click="confirmModal = false"
+                        type="button"
+                        class="inline-flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 
+                                   rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 
+                                   focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 
+                                   transition-all duration-150">
+                        <span
+    class="iconify block w-4 h-4"
+    data-icon="lucide:x"
+    data-inline="false"></span>                        Annuler
+                    </button>
+
+                    <button wire:click="confirmStatusChange"
+                        type="button"
+                        wire:loading.attr="disabled"
+                        wire:loading.class="opacity-50 cursor-not-allowed"
+                        class="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 
+                                   text-white rounded-lg text-sm font-medium 
+                                   focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500
+                                   transition-all duration-150 shadow-sm hover:shadow-md">
+                        <span wire:loading.remove wire:target="confirmStatusChange">
+                            <span
+    class="iconify block w-4 h-4"
+    data-icon="lucide:check"
+    data-inline="false"></span>                        </span>
+                        <span wire:loading wire:target="confirmStatusChange">
+                            <svg class="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+                            </svg>
+                        </span>
+                        <span wire:loading.remove wire:target="confirmStatusChange">Confirmer</span>
+                        <span wire:loading wire:target="confirmStatusChange">Traitement...</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-xs text-gray-500">
+                                <!--[if BLOCK]><![endif]-->                                <span class="text-gray-400 italic">Aucun véhicule</span>
+                                <!--[if ENDBLOCK]><![endif]-->
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                <div class="flex items-center justify-end gap-2">
+                                    <!--[if BLOCK]><![endif]-->                                    
+                                    <a href="http://localhost/admin/drivers/6"
+                                        class="p-2 rounded-full bg-gray-50 text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition-all duration-200 group"
+                                        title="Voir">
+                                        <span
+    class="iconify block w-4 h-4 group-hover:scale-110 transition-transform"
+    data-icon="lucide:eye"
+    data-inline="false"></span>                                    </a>
+                                    <a href="http://localhost/admin/drivers/6/edit"
+                                        class="p-2 rounded-full bg-gray-50 text-gray-400 hover:text-amber-600 hover:bg-amber-50 transition-all duration-200 group"
+                                        title="Modifier">
+                                        <span
+    class="iconify block w-4 h-4 group-hover:scale-110 transition-transform"
+    data-icon="lucide:edit-3"
+    data-inline="false"></span>                                    </a>
+
+                                    
+                                    <div class="relative" x-data="{ open: false }">
+                                        <button @click="open = !open" @click.away="open = false"
+                                            class="p-2 rounded-full bg-gray-50 text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-all duration-200 group">
+                                            <span
+    class="iconify block w-4 h-4 group-hover:scale-110 transition-transform"
+    data-icon="lucide:more-vertical"
+    data-inline="false"></span>                                        </button>
+
+                                        <div x-show="open"
+                                            x-transition:enter="transition ease-out duration-100"
+                                            x-transition:enter-start="transform opacity-0 scale-95"
+                                            x-transition:enter-end="transform opacity-100 scale-100"
+                                            class="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
+                                            style="display: none;">
+                                            <div class="py-1">
+                                                <button wire:click="exportPdf(6); open = false" class="group flex w-full items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                                    <span
+    class="iconify block mr-3 h-4 w-4 text-gray-400 group-hover:text-red-500"
+    data-icon="lucide:file-text"
+    data-inline="false"></span>                                                    Exporter PDF
+                                                </button>
+                                                <div class="border-t border-gray-100 my-1"></div>
+                                                <button wire:click="confirmArchive(6); open = false" class="group flex w-full items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                                    <span
+    class="iconify block mr-3 h-4 w-4 text-gray-400 group-hover:text-amber-500"
+    data-icon="lucide:archive"
+    data-inline="false"></span>                                                    Archiver
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!--[if ENDBLOCK]><![endif]-->
+                                </div>
+                            </td>
+                        </tr>
+                                                <tr wire:key="driver-4" class="hover:bg-gray-50 transition-colors duration-150 ">
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <input type="checkbox" wire:click="toggleSelection(4)"  class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="flex items-center">
+                                    <div class="flex-shrink-0 h-10 w-10 rounded-full overflow-hidden">
+                                        <!--[if BLOCK]><![endif]-->                                        <div class="h-10 w-10 bg-gradient-to-br from-blue-100 to-indigo-100 rounded-full flex items-center justify-center">
+                                            <span class="text-xs font-semibold text-blue-700">
+                                                TV
+                                            </span>
+                                        </div>
+                                        <!--[if ENDBLOCK]><![endif]-->
+                                    </div>
+                                    <div class="ml-4">
+                                        <div class="text-sm font-medium text-gray-900">
+                                            TestRole Verification
+                                        </div>
+                                        <div class="text-xs text-gray-500">#</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-xs text-gray-900 flex items-center gap-1.5">
+                                    <span
+    class="iconify block w-3.5 h-3.5 text-gray-400"
+    data-icon="lucide:phone"
+    data-inline="false"></span> +213778025640
+                                </div>
+                                <div class="text-xs text-gray-500 flex items-center gap-1.5 mt-1">
+                                    <span
+    class="iconify block w-3.5 h-3.5 text-gray-400"
+    data-icon="lucide:mail"
+    data-inline="false"></span> test001@dontexist.dz
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-xs font-medium text-gray-900">8763787BIUYE</div>
+                                <!--[if BLOCK]><![endif]-->                                <div class="flex flex-wrap gap-1 mt-1">
+                                    <!--[if BLOCK]><![endif]-->                                    <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-blue-100 text-blue-800">
+                                        B
+                                    </span>
+                                    <!--[if ENDBLOCK]><![endif]-->
+                                </div>
+                                <!--[if ENDBLOCK]><![endif]-->
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div wire:snapshot="{&quot;data&quot;:{&quot;driverId&quot;:4,&quot;driver&quot;:[null,{&quot;class&quot;:&quot;App\\Models\\Driver&quot;,&quot;key&quot;:4,&quot;s&quot;:&quot;mdl&quot;}],&quot;showConfirmModal&quot;:false,&quot;pendingStatus&quot;:null,&quot;pendingStatusEnum&quot;:null,&quot;confirmMessage&quot;:&quot;&quot;},&quot;memo&quot;:{&quot;id&quot;:&quot;USOt9vnL5h7pZZFNIKaf&quot;,&quot;name&quot;:&quot;admin.driver-status-badge-ultra-pro&quot;,&quot;path&quot;:&quot;admin\/drivers&quot;,&quot;method&quot;:&quot;GET&quot;,&quot;children&quot;:[],&quot;scripts&quot;:[],&quot;assets&quot;:[],&quot;errors&quot;:[],&quot;locale&quot;:&quot;fr&quot;},&quot;checksum&quot;:&quot;0acb14750ff493f40ee98bdc8dfa4c68be8639f17b4f1089c5bcaf93f921ba09&quot;}" wire:effects="{&quot;listeners&quot;:[&quot;refreshComponent&quot;,&quot;driverStatusUpdated&quot;,&quot;driverStatusChanged&quot;,&quot;echo:drivers,DriverStatusChanged&quot;]}" wire:id="USOt9vnL5h7pZZFNIKaf" class="relative inline-block"
+    x-data="{ 
+         open: false, 
+         confirmModal: window.Livewire.find('USOt9vnL5h7pZZFNIKaf').entangle('showConfirmModal').live,
+         toggle() { this.open = !this.open; },
+         close() { this.open = false; },
+         selectStatus(status) { 
+             this.open = false; 
+             $wire.prepareStatusChange(status); 
+         }
+     }"
+    @click.stop
+    x-init="$watch('confirmModal', value => { if (value) open = false; })">
+    
+    <!--[if BLOCK]><![endif]-->    <button
+        @click.stop="toggle"
+        @click.away="close"
+        type="button"
+        class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold 
+                   transition-all duration-200 hover:shadow-md hover:scale-105 cursor-pointer 
+                   inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800
+                   focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+        title="Cliquer pour modifier le statut">
+        
+        <!--[if BLOCK]><![endif]-->        <span
+    class="iconify block w-3.5 h-3.5"
+    data-icon="lucide:user-check"
+    data-inline="false"></span>        <!--[if ENDBLOCK]><![endif]-->
+
+        
+        <span>Disponible</span>
+
+        
+        <svg class="w-3 h-3 opacity-60 transition-transform duration-200"
+            :class="{ 'rotate-180': open }"
+            fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+        </svg>
+    </button>
+    <!--[if ENDBLOCK]><![endif]-->
+
+    
+    <!--[if BLOCK]><![endif]-->    <div
+        x-show="open"
+        x-transition:enter="transition ease-out duration-200"
+        x-transition:enter-start="transform opacity-0 scale-95 translate-y-2"
+        x-transition:enter-end="transform opacity-100 scale-100 translate-y-0"
+        x-transition:leave="transition ease-in duration-150"
+        x-transition:leave-start="transform opacity-100 scale-100 translate-y-0"
+        x-transition:leave-end="transform opacity-0 scale-95 translate-y-2"
+        class="absolute left-0 mt-3 w-72 rounded-xl shadow-[0_10px_40px_-10px_rgba(0,0,0,0.2)] bg-white ring-1 ring-black/5 z-50 overflow-visible"
+        style="display: none;">
+
+        
+        <div class="absolute -top-2 left-6 w-4 h-4 bg-white transform rotate-45 border-t border-l border-gray-100 shadow-sm"></div>
+
+        <div class="relative bg-white rounded-xl overflow-hidden">
+            
+            <div class="px-4 py-3 bg-gradient-to-r from-gray-50 to-white border-b border-gray-100">
+                <div class="flex items-center justify-between">
+                    <span class="text-xs font-bold text-gray-800 uppercase tracking-wider flex items-center gap-2">
+                        <span
+    class="iconify block w-3.5 h-3.5 text-blue-500"
+    data-icon="lucide:git-branch"
+    data-inline="false"></span>                        Changer le statut
+                    </span>
+                    <button @click="close" class="text-gray-400 hover:text-gray-600 transition-colors p-1 hover:bg-gray-100 rounded-full">
+                        <span
+    class="iconify block w-3.5 h-3.5"
+    data-icon="lucide:x"
+    data-inline="false"></span>                    </button>
+                </div>
+            </div>
+
+            
+            <div class="py-2 max-h-[300px] overflow-y-auto custom-scrollbar">
+                <!--[if BLOCK]><![endif]-->                <button
+                    @click.stop="selectStatus('en_mission')"
+                    type="button"
+                    class="w-full flex items-center justify-between px-4 py-3 hover:bg-blue-50/50 
+                                   transition-all duration-200 group focus:outline-none border-l-2 border-transparent hover:border-blue-500">
+                    <div class="flex items-center gap-3">
+                        
+                        <span class="inline-flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-xs font-semibold 
+                                           inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 shadow-sm group-hover:shadow transition-all">
+                            <span
+    class="iconify block w-3.5 h-3.5"
+    data-icon="lucide:truck"
+    data-inline="false"></span>                            En mission
+                        </span>
+                    </div>
+                    
+                    <div class="w-6 h-6 rounded-full bg-transparent group-hover:bg-blue-100 flex items-center justify-center transition-all">
+                        <span
+    class="iconify block w-3.5 h-3.5 text-gray-300 group-hover:text-blue-600 
+                                                 group-hover:translate-x-0.5 transition-all"
+    data-icon="lucide:arrow-right"
+    data-inline="false"></span>                    </div>
+                </button>
+                                <button
+                    @click.stop="selectStatus('en_conge')"
+                    type="button"
+                    class="w-full flex items-center justify-between px-4 py-3 hover:bg-blue-50/50 
+                                   transition-all duration-200 group focus:outline-none border-l-2 border-transparent hover:border-blue-500">
+                    <div class="flex items-center gap-3">
+                        
+                        <span class="inline-flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-xs font-semibold 
+                                           inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-orange-100 text-orange-800 shadow-sm group-hover:shadow transition-all">
+                            <span
+    class="iconify block w-3.5 h-3.5"
+    data-icon="lucide:palmtree"
+    data-inline="false"></span>                            En congé
+                        </span>
+                    </div>
+                    
+                    <div class="w-6 h-6 rounded-full bg-transparent group-hover:bg-blue-100 flex items-center justify-center transition-all">
+                        <span
+    class="iconify block w-3.5 h-3.5 text-gray-300 group-hover:text-blue-600 
+                                                 group-hover:translate-x-0.5 transition-all"
+    data-icon="lucide:arrow-right"
+    data-inline="false"></span>                    </div>
+                </button>
+                                <button
+                    @click.stop="selectStatus('en_formation')"
+                    type="button"
+                    class="w-full flex items-center justify-between px-4 py-3 hover:bg-blue-50/50 
+                                   transition-all duration-200 group focus:outline-none border-l-2 border-transparent hover:border-blue-500">
+                    <div class="flex items-center gap-3">
+                        
+                        <span class="inline-flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-xs font-semibold 
+                                           inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800 shadow-sm group-hover:shadow transition-all">
+                            <span
+    class="iconify block w-3.5 h-3.5"
+    data-icon="lucide:graduation-cap"
+    data-inline="false"></span>                            En formation
+                        </span>
+                    </div>
+                    
+                    <div class="w-6 h-6 rounded-full bg-transparent group-hover:bg-blue-100 flex items-center justify-center transition-all">
+                        <span
+    class="iconify block w-3.5 h-3.5 text-gray-300 group-hover:text-blue-600 
+                                                 group-hover:translate-x-0.5 transition-all"
+    data-icon="lucide:arrow-right"
+    data-inline="false"></span>                    </div>
+                </button>
+                                <button
+                    @click.stop="selectStatus('autre')"
+                    type="button"
+                    class="w-full flex items-center justify-between px-4 py-3 hover:bg-blue-50/50 
+                                   transition-all duration-200 group focus:outline-none border-l-2 border-transparent hover:border-blue-500">
+                    <div class="flex items-center gap-3">
+                        
+                        <span class="inline-flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-xs font-semibold 
+                                           inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 shadow-sm group-hover:shadow transition-all">
+                            <span
+    class="iconify block w-3.5 h-3.5"
+    data-icon="lucide:help-circle"
+    data-inline="false"></span>                            Autre
+                        </span>
+                    </div>
+                    
+                    <div class="w-6 h-6 rounded-full bg-transparent group-hover:bg-blue-100 flex items-center justify-center transition-all">
+                        <span
+    class="iconify block w-3.5 h-3.5 text-gray-300 group-hover:text-blue-600 
+                                                 group-hover:translate-x-0.5 transition-all"
+    data-icon="lucide:arrow-right"
+    data-inline="false"></span>                    </div>
+                </button>
+                <!--[if ENDBLOCK]><![endif]-->
+            </div>
+
+            
+            <!--[if BLOCK]><![endif]-->            <div class="px-4 py-3 bg-gray-50/80 border-t border-gray-100 backdrop-blur-sm">
+                <div class="flex items-start gap-2.5">
+                    <span
+    class="iconify block w-4 h-4 text-blue-500 mt-0.5 flex-shrink-0"
+    data-icon="lucide:info"
+    data-inline="false"></span>                    <p class="text-xs text-gray-600 leading-relaxed">
+                        <span class="font-medium text-gray-900">Note:</span>
+                        Chauffeur disponible, peut recevoir une affectation de véhicule
+                    </p>
+                </div>
+            </div>
+            <!--[if ENDBLOCK]><![endif]-->
+        </div>
+    </div>
+    <!--[if ENDBLOCK]><![endif]-->
+
+    
+    <div x-show="confirmModal"
+        x-cloak
+        class="fixed inset-0 z-50 overflow-y-auto"
+        aria-labelledby="modal-title"
+        role="dialog"
+        aria-modal="true">
+
+        
+        <div x-show="confirmModal"
+            x-transition:enter="ease-out duration-300"
+            x-transition:enter-start="opacity-0"
+            x-transition:enter-end="opacity-100"
+            x-transition:leave="ease-in duration-200"
+            x-transition:leave-start="opacity-100"
+            x-transition:leave-end="opacity-0"
+            class="fixed inset-0 bg-gray-900 bg-opacity-50 backdrop-blur-sm transition-opacity">
+        </div>
+
+        
+        <div class="flex min-h-full items-center justify-center p-4 text-center sm:p-0">
+            <div x-show="confirmModal"
+                x-transition:enter="ease-out duration-300"
+                x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
+                x-transition:leave="ease-in duration-200"
+                x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
+                x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                class="relative transform overflow-hidden rounded-2xl bg-white text-left shadow-2xl transition-all sm:my-8 sm:w-full sm:max-w-lg">
+
+                
+                <div class="bg-gradient-to-r from-blue-500 to-blue-600 px-6 py-4">
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-lg font-semibold text-white flex items-center gap-2">
+                            <span
+    class="iconify block w-5 h-5"
+    data-icon="lucide:alert-circle"
+    data-inline="false"></span>                            Confirmation de changement de statut
+                        </h3>
+                        <button @click="confirmModal = false; $wire.cancelStatusChange()"
+                            class="text-white/80 hover:text-white transition-colors">
+                            <span
+    class="iconify block w-5 h-5"
+    data-icon="lucide:x"
+    data-inline="false"></span>                        </button>
+                    </div>
+                </div>
+
+                
+                <div class="px-6 py-5">
+                    
+                    <div class="mb-4">
+                        <p class="text-sm text-gray-700 whitespace-pre-line"></p>
+                    </div>
+
+                    
+                    <div class="bg-gray-50 rounded-lg p-4 mb-4">
+                        <div class="grid grid-cols-2 gap-3 text-sm">
+                            <div>
+                                <span class="text-gray-500">Chauffeur:</span>
+                                <p class="font-medium text-gray-900">TestRole Verification</p>
+                            </div>
+                            <div>
+                                <span class="text-gray-500">Matricule:</span>
+                                <p class="font-medium text-gray-900">N/A</p>
+                            </div>
+                            <!--[if BLOCK]><![endif]-->                            <div>
+                                <span class="text-gray-500">Statut actuel:</span>
+                                <p class="mt-1">
+                                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                        <span
+    class="iconify block w-3 h-3"
+    data-icon="lucide:user-check"
+    data-inline="false"></span>                                        Disponible
+                                    </span>
+                                </p>
+                            </div>
+                            <!--[if ENDBLOCK]><![endif]-->
+                            <!--[if BLOCK]><![endif]--><!--[if ENDBLOCK]><![endif]-->
+                        </div>
+                    </div>
+                </div>
+
+                
+                <div class="bg-gray-50 px-6 py-4 flex items-center justify-end gap-3">
+                    <button wire:click="cancelStatusChange"
+                        @click="confirmModal = false"
+                        type="button"
+                        class="inline-flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 
+                                   rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 
+                                   focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 
+                                   transition-all duration-150">
+                        <span
+    class="iconify block w-4 h-4"
+    data-icon="lucide:x"
+    data-inline="false"></span>                        Annuler
+                    </button>
+
+                    <button wire:click="confirmStatusChange"
+                        type="button"
+                        wire:loading.attr="disabled"
+                        wire:loading.class="opacity-50 cursor-not-allowed"
+                        class="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 
+                                   text-white rounded-lg text-sm font-medium 
+                                   focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500
+                                   transition-all duration-150 shadow-sm hover:shadow-md">
+                        <span wire:loading.remove wire:target="confirmStatusChange">
+                            <span
+    class="iconify block w-4 h-4"
+    data-icon="lucide:check"
+    data-inline="false"></span>                        </span>
+                        <span wire:loading wire:target="confirmStatusChange">
+                            <svg class="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+                            </svg>
+                        </span>
+                        <span wire:loading.remove wire:target="confirmStatusChange">Confirmer</span>
+                        <span wire:loading wire:target="confirmStatusChange">Traitement...</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-xs text-gray-500">
+                                <!--[if BLOCK]><![endif]-->                                <span class="text-gray-400 italic">Aucun véhicule</span>
+                                <!--[if ENDBLOCK]><![endif]-->
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                <div class="flex items-center justify-end gap-2">
+                                    <!--[if BLOCK]><![endif]-->                                    
+                                    <a href="http://localhost/admin/drivers/4"
+                                        class="p-2 rounded-full bg-gray-50 text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition-all duration-200 group"
+                                        title="Voir">
+                                        <span
+    class="iconify block w-4 h-4 group-hover:scale-110 transition-transform"
+    data-icon="lucide:eye"
+    data-inline="false"></span>                                    </a>
+                                    <a href="http://localhost/admin/drivers/4/edit"
+                                        class="p-2 rounded-full bg-gray-50 text-gray-400 hover:text-amber-600 hover:bg-amber-50 transition-all duration-200 group"
+                                        title="Modifier">
+                                        <span
+    class="iconify block w-4 h-4 group-hover:scale-110 transition-transform"
+    data-icon="lucide:edit-3"
+    data-inline="false"></span>                                    </a>
+
+                                    
+                                    <div class="relative" x-data="{ open: false }">
+                                        <button @click="open = !open" @click.away="open = false"
+                                            class="p-2 rounded-full bg-gray-50 text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-all duration-200 group">
+                                            <span
+    class="iconify block w-4 h-4 group-hover:scale-110 transition-transform"
+    data-icon="lucide:more-vertical"
+    data-inline="false"></span>                                        </button>
+
+                                        <div x-show="open"
+                                            x-transition:enter="transition ease-out duration-100"
+                                            x-transition:enter-start="transform opacity-0 scale-95"
+                                            x-transition:enter-end="transform opacity-100 scale-100"
+                                            class="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
+                                            style="display: none;">
+                                            <div class="py-1">
+                                                <button wire:click="exportPdf(4); open = false" class="group flex w-full items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                                    <span
+    class="iconify block mr-3 h-4 w-4 text-gray-400 group-hover:text-red-500"
+    data-icon="lucide:file-text"
+    data-inline="false"></span>                                                    Exporter PDF
+                                                </button>
+                                                <div class="border-t border-gray-100 my-1"></div>
+                                                <button wire:click="confirmArchive(4); open = false" class="group flex w-full items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                                    <span
+    class="iconify block mr-3 h-4 w-4 text-gray-400 group-hover:text-amber-500"
+    data-icon="lucide:archive"
+    data-inline="false"></span>                                                    Archiver
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!--[if ENDBLOCK]><![endif]-->
+                                </div>
+                            </td>
+                        </tr>
+                        <!--[if ENDBLOCK]><![endif]-->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        
+        <div class="mt-4">
+            <div class="mt-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+    <!-- Left: Nombre d'éléments par page -->
+    <div class="flex items-center text-sm text-gray-700">
+        <span class="mr-2">Afficher</span>
+        <select
+            class="block rounded-md border-0 py-1.5 pl-3 pr-8 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-blue-600 sm:text-sm"
+            wire:model.live="perPage">
+            <option value="10">10</option>
+            <option value="25">25</option>
+            <option value="50">50</option>
+            <option value="100">100</option>
+        </select>
+        <span class="ml-2">par page</span>
+    </div>
+
+    <!-- Right: Pagination -->
+    <!--[if BLOCK]><![endif]--><!--[if ENDBLOCK]><![endif]-->
+</div>        </div>
+    </div>
+
+    
+
+    
+    <!--[if BLOCK]><![endif]--><!--[if ENDBLOCK]><![endif]-->
+
+    
+    <!--[if BLOCK]><![endif]--><!--[if ENDBLOCK]><![endif]-->
+
+    
+    <!--[if BLOCK]><![endif]--><!--[if ENDBLOCK]><![endif]-->
+
+</div>
+                    </div>
             </main>
         </div>
     </div>
@@ -3322,13 +4313,12 @@
     
 
     
-    <script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js"></script>
+
 
     
 
     
-    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-    <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/fr.js"></script>
+
 
     
     <script>
@@ -3471,533 +4461,7 @@
         });
     </script>
 
-    <script>
-    document.addEventListener('alpine:init', () => {
-        Alpine.data('driverFormValidation', () => ({
-                        currentStep: 1,
-            photoPreview: null,
-            fieldErrors: {
-                // Phase 1: Informations Personnelles
-                first_name: '',
-                last_name: '',
-                birth_date: '',
-                personal_phone: '',
-                personal_email: '',
-                blood_type: '',
-                address: '',
-                // Phase 2: Informations Professionnelles
-                employee_number: '',
-                recruitment_date: '',
-                status_id: '',
-                // Phase 3: Permis de Conduire
-                license_number: '',
-                license_categories: '',
-                license_issue_date: '',
-                license_expiry_date: ''
-            },
-            touchedFields: {
-                first_name: false,
-                last_name: false,
-                birth_date: false,
-                personal_phone: false,
-                personal_email: false,
-                status_id: false,
-                employee_number: false,
-                license_number: false,
-                license_categories: false
-            },
-            formValid: false,
-
-            init() {
-                                            },
-
-            updatePhotoPreview(event) {
-                const file = event.target.files[0];
-                if (file) {
-                    const reader = new FileReader();
-                    reader.onload = (e) => {
-                        this.photoPreview = e.target.result;
-                    };
-                    reader.readAsDataURL(file);
-                }
-            },
-
-            validateField(fieldName, value) {
-                this.touchedFields[fieldName] = true;
-
-                switch (fieldName) {
-                    case 'first_name':
-                        if (!value || value.trim() === '') {
-                            this.fieldErrors.first_name = 'Le prénom est obligatoire';
-                            this.showFieldError(fieldName, this.fieldErrors.first_name);
-                        } else if (value.trim().length < 2) {
-                            this.fieldErrors.first_name = 'Le prénom doit contenir au moins 2 caractères';
-                            this.showFieldError(fieldName, this.fieldErrors.first_name);
-                        } else if (!/^[a-zA-ZÀ-ÿ\s'-]+$/.test(value.trim())) {
-                            this.fieldErrors.first_name = 'Le prénom ne doit contenir que des lettres';
-                            this.showFieldError(fieldName, this.fieldErrors.first_name);
-                        } else {
-                            this.fieldErrors.first_name = '';
-                            this.removeFieldError(fieldName);
-                        }
-                        break;
-
-                    case 'last_name':
-                        if (!value || value.trim() === '') {
-                            this.fieldErrors.last_name = 'Le nom est obligatoire';
-                            this.showFieldError(fieldName, this.fieldErrors.last_name);
-                        } else if (value.trim().length < 2) {
-                            this.fieldErrors.last_name = 'Le nom doit contenir au moins 2 caractères';
-                            this.showFieldError(fieldName, this.fieldErrors.last_name);
-                        } else if (!/^[a-zA-ZÀ-ÿ\s'-]+$/.test(value.trim())) {
-                            this.fieldErrors.last_name = 'Le nom ne doit contenir que des lettres';
-                            this.showFieldError(fieldName, this.fieldErrors.last_name);
-                        } else {
-                            this.fieldErrors.last_name = '';
-                            this.removeFieldError(fieldName);
-                        }
-                        break;
-
-                    case 'birth_date':
-                        if (!value) {
-                            this.fieldErrors.birth_date = 'La date de naissance est obligatoire';
-                            this.showFieldError(fieldName, this.fieldErrors.birth_date);
-                        } else {
-                            const birthDate = new Date(value);
-                            const today = new Date();
-                            const age = today.getFullYear() - birthDate.getFullYear();
-                            if (age < 18) {
-                                this.fieldErrors.birth_date = 'Le chauffeur doit être majeur (18 ans minimum)';
-                                this.showFieldError(fieldName, this.fieldErrors.birth_date);
-                            } else if (age > 70) {
-                                this.fieldErrors.birth_date = 'L\'âge maximum est de 70 ans';
-                                this.showFieldError(fieldName, this.fieldErrors.birth_date);
-                            } else {
-                                this.fieldErrors.birth_date = '';
-                                this.removeFieldError(fieldName);
-                            }
-                        }
-                        break;
-
-                    case 'personal_phone':
-                        if (!value || value.trim() === '') {
-                            this.fieldErrors.personal_phone = 'Le téléphone est obligatoire';
-                            this.showFieldError(fieldName, this.fieldErrors.personal_phone);
-                        } else if (!/^(0[567])[0-9]{8}$/.test(value.replace(/\s/g, ''))) {
-                            this.fieldErrors.personal_phone = 'Format invalide (ex: 0555123456)';
-                            this.showFieldError(fieldName, this.fieldErrors.personal_phone);
-                        } else {
-                            this.fieldErrors.personal_phone = '';
-                            this.removeFieldError(fieldName);
-                        }
-                        break;
-
-                    case 'personal_email':
-                        if (value && value.trim() !== '') {
-                            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-                            if (!emailRegex.test(value)) {
-                                this.fieldErrors.personal_email = 'Format email invalide';
-                                this.showFieldError(fieldName, this.fieldErrors.personal_email);
-                            } else {
-                                this.fieldErrors.personal_email = '';
-                                this.removeFieldError(fieldName);
-                            }
-                        } else {
-                            this.fieldErrors.personal_email = '';
-                            this.removeFieldError(fieldName);
-                        }
-                        break;
-
-                    case 'employee_number':
-                        if (!value || value.trim() === '') {
-                            this.fieldErrors.employee_number = 'Le matricule est obligatoire';
-                            this.showFieldError(fieldName, this.fieldErrors.employee_number);
-                        } else if (value.trim().length < 3) {
-                            this.fieldErrors.employee_number = 'Le matricule doit contenir au moins 3 caractères';
-                            this.showFieldError(fieldName, this.fieldErrors.employee_number);
-                        } else {
-                            this.fieldErrors.employee_number = '';
-                            this.removeFieldError(fieldName);
-                        }
-                        break;
-
-                    case 'recruitment_date':
-                        if (!value) {
-                            this.fieldErrors.recruitment_date = 'La date de recrutement est obligatoire';
-                            this.showFieldError(fieldName, this.fieldErrors.recruitment_date);
-                        } else {
-                            const recruitDate = new Date(value);
-                            const today = new Date();
-                            if (recruitDate > today) {
-                                this.fieldErrors.recruitment_date = 'La date ne peut pas être dans le futur';
-                                this.showFieldError(fieldName, this.fieldErrors.recruitment_date);
-                            } else {
-                                this.fieldErrors.recruitment_date = '';
-                                this.removeFieldError(fieldName);
-                            }
-                        }
-                        break;
-
-                    case 'status_id':
-                        if (!value || value === '' || value === '0') {
-                            this.fieldErrors.status_id = 'Le statut du chauffeur est obligatoire';
-                            this.showFieldError(fieldName, this.fieldErrors.status_id);
-                        } else {
-                            this.fieldErrors.status_id = '';
-                            this.removeFieldError(fieldName);
-                        }
-                        break;
-
-                    case 'license_number':
-                        if (!value || value.trim() === '') {
-                            this.fieldErrors.license_number = 'Le numéro de permis est obligatoire';
-                            this.showFieldError(fieldName, this.fieldErrors.license_number);
-                        } else if (value.trim().length < 5) {
-                            this.fieldErrors.license_number = 'Le numéro de permis doit contenir au moins 5 caractères';
-                            this.showFieldError(fieldName, this.fieldErrors.license_number);
-                        } else {
-                            this.fieldErrors.license_number = '';
-                            this.removeFieldError(fieldName);
-                        }
-                        break;
-
-                    case 'license_categories':
-                        // La valeur passée est le tableau 'selected' de l'événement custom
-                        if (!value || value.length === 0) {
-                            this.fieldErrors.license_categories = 'Au moins une catégorie de permis est obligatoire';
-                            this.showFieldError(fieldName, this.fieldErrors.license_categories);
-                        } else {
-                            this.fieldErrors.license_categories = '';
-                            this.removeFieldError(fieldName);
-                        }
-                        break;
-
-                    case 'license_issue_date':
-                        if (!value) {
-                            this.fieldErrors.license_issue_date = 'La date de délivrance est obligatoire';
-                            this.showFieldError(fieldName, this.fieldErrors.license_issue_date);
-                        } else {
-                            this.fieldErrors.license_issue_date = '';
-                            this.removeFieldError(fieldName);
-                        }
-                        break;
-
-                    case 'license_expiry_date':
-                        if (!value) {
-                            this.fieldErrors.license_expiry_date = 'La date d\'expiration est obligatoire';
-                            this.showFieldError(fieldName, this.fieldErrors.license_expiry_date);
-                        } else {
-                            const expiryDate = new Date(value);
-                            const today = new Date();
-                            if (expiryDate < today) {
-                                this.fieldErrors.license_expiry_date = 'Le permis est expiré';
-                                this.showFieldError(fieldName, this.fieldErrors.license_expiry_date);
-                            } else {
-                                this.fieldErrors.license_expiry_date = '';
-                                this.removeFieldError(fieldName);
-                            }
-                        }
-                        break;
-                }
-
-                this.updateFormValidity();
-            },
-
-            showFieldError(fieldName, message) {
-                const field = document.querySelector(`[name="${fieldName}"]`);
-                if (field) {
-                    field.classList.add('border-red-500', 'focus:border-red-500', 'focus:ring-red-500');
-                    field.classList.remove('border-gray-300', 'focus:border-blue-500', 'focus:ring-blue-500');
-
-                    // Ajouter ou mettre à jour le message d'erreur
-                    let errorDiv = field.parentElement.querySelector('.field-error');
-                    if (!errorDiv) {
-                        errorDiv = document.createElement('p');
-                        errorDiv.className = 'field-error mt-1.5 text-sm text-red-600 flex items-center gap-1';
-                        errorDiv.innerHTML = `<svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/></svg><span>${message}</span>`;
-                        field.parentElement.appendChild(errorDiv);
-                    } else {
-                        errorDiv.querySelector('span').textContent = message;
-                    }
-                }
-            },
-
-            removeFieldError(fieldName) {
-                const field = document.querySelector(`[name="${fieldName}"]`);
-                if (field) {
-                    field.classList.remove('border-red-500', 'focus:border-red-500', 'focus:ring-red-500');
-                    field.classList.add('border-gray-300', 'focus:border-blue-500', 'focus:ring-blue-500');
-
-                    const errorDiv = field.parentElement.querySelector('.field-error');
-                    if (errorDiv) {
-                        errorDiv.remove();
-                    }
-                }
-            },
-
-            updateFormValidity() {
-                let hasErrors = false;
-                for (let key in this.fieldErrors) {
-                    if (this.fieldErrors[key] !== '') {
-                        hasErrors = true;
-                        break;
-                    }
-                }
-                this.formValid = !hasErrors;
-            },
-
-            hasError(fieldName) {
-                return this.touchedFields[fieldName] && this.fieldErrors[fieldName] !== '';
-            },
-
-            validateStep(step) {
-                let isValid = true;
-                let fieldsToValidate = [];
-
-                switch (step) {
-                    case 1: // Informations Personnelles
-                        fieldsToValidate = [
-                            'first_name',
-                            'last_name',
-                            'birth_date',
-                            'personal_phone'
-                        ];
-                        // Email est optionnel
-                        const emailField = document.querySelector('[name="personal_email"]');
-                        if (emailField && emailField.value) {
-                            fieldsToValidate.push('personal_email');
-                        }
-                        break;
-
-                    case 2: // Informations Professionnelles
-                        fieldsToValidate = [
-                            'employee_number',
-                            'recruitment_date',
-                            'status_id'
-                        ];
-                        break;
-
-                    case 3: // Permis de Conduire
-                        fieldsToValidate = [
-                            'license_number',
-                            'license_categories',
-                            'license_issue_date',
-                            'license_expiry_date'
-                        ];
-                        break;
-
-                    case 4: // Compte & Urgence
-                        // Tous les champs sont optionnels dans cette étape
-                        break;
-                }
-
-                // Valider chaque champ de l'étape
-                fieldsToValidate.forEach(fieldName => {
-                    const field = document.querySelector(`[name="${fieldName}"]`);
-                    if (field) {
-                        this.validateField(fieldName, field.value);
-                        if (this.fieldErrors[fieldName]) {
-                            isValid = false;
-                        }
-                    }
-                });
-
-                // Si des erreurs existent, afficher une alerte
-                if (!isValid) {
-                    this.showStepErrors(step, fieldsToValidate);
-                }
-
-                return isValid;
-            },
-
-            showStepErrors(step, fields) {
-                let errorMessages = [];
-                fields.forEach(fieldName => {
-                    if (this.fieldErrors[fieldName]) {
-                        const label = document.querySelector(`[name="${fieldName}"]`)?.parentElement?.querySelector('label')?.textContent || fieldName;
-                        errorMessages.push(`• ${label}: ${this.fieldErrors[fieldName]}`);
-                    }
-                });
-
-                if (errorMessages.length > 0) {
-                    // Créer ou mettre à jour le message d'erreur global
-                    let alertDiv = document.querySelector('.step-validation-alert');
-                    if (!alertDiv) {
-                        alertDiv = document.createElement('div');
-                        alertDiv.className = 'step-validation-alert fixed top-4 right-4 z-50 max-w-md bg-red-50 border border-red-200 rounded-lg p-4 shadow-lg';
-                        alertDiv.innerHTML = `
- <div class="flex items-start gap-3">
- <svg class="w-5 h-5 text-red-600 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
- <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
- </svg>
- <div class="flex-1">
- <h3 class="text-sm font-semibold text-red-800">Veuillez corriger les erreurs suivantes :</h3>
- <div class="mt-2 text-sm text-red-700 error-list"></div>
- </div>
- <button onclick="this.parentElement.parentElement.remove()" class="text-red-600 hover:text-red-800">
- <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
- <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/>
- </svg>
- </button>
- </div>
- `;
-                        document.body.appendChild(alertDiv);
-                    }
-                    alertDiv.querySelector('.error-list').innerHTML = errorMessages.join('<br>');
-
-                    // Auto-fermer après 5 secondes
-                    setTimeout(() => {
-                        if (alertDiv) {
-                            alertDiv.remove();
-                        }
-                    }, 5000);
-                }
-            },
-
-            nextStep() {
-                if (this.validateStep(this.currentStep)) {
-                    if (this.currentStep < 4) {
-                        this.currentStep++;
-                        window.scrollTo({
-                            top: 0,
-                            behavior: 'smooth'
-                        });
-                    }
-                }
-            },
-
-            prevStep() {
-                if (this.currentStep > 1) {
-                    this.currentStep--;
-                    window.scrollTo({
-                        top: 0,
-                        behavior: 'smooth'
-                    });
-                }
-            },
-
-            onSubmit(event) {
-                if (!this.validateStep(4)) {
-                    event.preventDefault();
-                    return false;
-                }
-
-                // Conversion automatique des dates avant soumission
-                this.convertDatesBeforeSubmit(event);
-            },
-
-            /**
-             * 🔄 Conversion Enterprise-Grade des dates avant soumission
-             * Convertit automatiquement tous les champs de date du format d/m/Y vers Y-m-d
-             */
-            convertDatesBeforeSubmit(event) {
-                const form = event.target;
-
-                // Liste des champs de date à convertir
-                const dateFields = [
-                    'birth_date',
-                    'recruitment_date',
-                    'contract_end_date',
-                    'license_issue_date',
-                    'license_expiry_date'
-                ];
-
-                dateFields.forEach(fieldName => {
-                    const input = form.querySelector(`[name="${fieldName}"]`);
-                    if (input && input.value) {
-                        const convertedDate = this.convertDateFormat(input.value);
-                        if (convertedDate) {
-                            input.value = convertedDate;
-                        }
-                    }
-                });
-            },
-
-            /**
-             * 📅 Convertit une date du format dd/mm/yyyy vers yyyy-mm-dd
-             * Gère plusieurs formats d'entrée de manière robuste
-             */
-            convertDateFormat(dateString) {
-                if (!dateString) return null;
-
-                // Si déjà au format yyyy-mm-dd, retourner tel quel
-                if (/^\d{4}-\d{2}-\d{2}$/.test(dateString)) {
-                    return dateString;
-                }
-
-                // Conversion depuis dd/mm/yyyy ou d/m/yyyy
-                const match = dateString.match(/^(\d{1,2})[\/\-\.](\d{1,2})[\/\-\.](\d{4})$/);
-                if (match) {
-                    const day = match[1].padStart(2, '0');
-                    const month = match[2].padStart(2, '0');
-                    const year = match[3];
-
-                    // Validation basique de la date
-                    const date = new Date(`${year}-${month}-${day}`);
-                    if (date && !isNaN(date.getTime())) {
-                        return `${year}-${month}-${day}`;
-                    }
-                }
-
-                // Si format non reconnu, retourner null et logger une erreur
-                console.error('Format de date non reconnu:', dateString);
-                return null;
-            },
-
-            handleValidationErrors(errors) {
-                console.log('Server Errors:', errors);
-                // Map server errors to fieldErrors
-                Object.keys(errors).forEach(field => {
-                    this.fieldErrors[field] = errors[field][0];
-                    this.touchedFields[field] = true;
-                });
-
-                const fieldToStepMap = {
-                    'first_name': 1,
-                    'last_name': 1,
-                    'birth_date': 1,
-                    'personal_phone': 1,
-                    'address': 1,
-                    'blood_type': 1,
-                    'personal_email': 1,
-                    'photo': 1,
-                    'employee_number': 2,
-                    'recruitment_date': 2,
-                    'contract_end_date': 2,
-                    'status_id': 2,
-                    'notes': 2,
-                    'license_number': 3,
-                    'license_categories': 3,
-                    'license_issue_date': 3,
-                    'license_expiry_date': 3,
-                    'license_authority': 3,
-                    'license_verified': 3,
-                    'user_id': 4,
-                    'emergency_contact_name': 4,
-                    'emergency_contact_phone': 4,
-                    'emergency_contact_relationship': 4
-                };
-
-                // Determine the first step with an error
-                const errorFields = Object.keys(errors);
-                let firstErrorStep = null;
-
-                for (const field of errorFields) {
-                    if (fieldToStepMap[field]) {
-                        if (firstErrorStep === null || fieldToStepMap[field] < firstErrorStep) {
-                            firstErrorStep = fieldToStepMap[field];
-                        }
-                    }
-                }
-
-                if (firstErrorStep) {
-                    this.currentStep = firstErrorStep;
-                }
-            }
-        }));
-    });
-</script>
-    
+        
 
     
     <div x-data="toastManager()"
@@ -4120,7 +4584,7 @@
             }
         }
     </script>
-    <script data-navigate-once="true">window.livewireScriptConfig = {"csrf":"bdDbWyzYEX2AzpLtVeiHgZZ6OO6SseR7X892Vy7G","uri":"\/livewire\/update","progressBar":"","nonce":""};</script>
+    <script data-navigate-once="true">window.livewireScriptConfig = {"csrf":"EN6bFC7DubIdSLX6K2sUSuBETiDOVG6jgMh4aRp8","uri":"\/livewire\/update","progressBar":"","nonce":""};</script>
 </body>
 
 </html>

@@ -1,33 +1,28 @@
 {{-- ====================================================================
- 📊 MISE À JOUR KILOMÉTRAGE - ULTRA-PRO V14.0 AVEC TOMSELECT
- ====================================================================
+    📊 MISE À JOUR KILOMÉTRAGE - SLIMSELECT EDITION
+    ====================================================================
 
- 🏆 SOLUTION ENTERPRISE-GRADE AVEC RECHERCHE AVANCÉE:
- 
- ✨ FEATURES ULTRA-PROFESSIONNELLES:
- - TomSelect pour recherche intelligente des véhicules
- - Filtrage en temps réel (plaque, marque, modèle)
- - Design identique aux standards de l'application
- - Affichage conditionnel robuste
- - Performance optimisée
- 
- @version 14.0-Ultra-Pro-TomSelect
- @since 2025-10-27
- @author Expert Fullstack Senior (20+ ans)
- ==================================================================== --}}
+    ✨ FEATURES:
+    - SlimSelect pour recherche intelligente des véhicules
+    - Filtrage en temps réel (plaque, marque, modèle)
+    - Design standardisé
+    - Affichage conditionnel robuste
+    
+    @version 15.0-SlimSelect
+    ==================================================================== --}}
 
 {{-- Message de succès session --}}
 @if(session('success'))
-<div x-data="{ show: true }" 
-     x-show="show" 
-     x-init="setTimeout(() => show = false, 5000)"
-     x-transition:enter="transition ease-out duration-300"
-     x-transition:enter-start="opacity-0 transform scale-90"
-     x-transition:enter-end="opacity-100 transform scale-100"
-     x-transition:leave="transition ease-in duration-300"
-     x-transition:leave-start="opacity-100 transform scale-100"
-     x-transition:leave-end="opacity-0 transform scale-90"
-     class="fixed top-4 right-4 z-50 max-w-md">
+<div x-data="{ show: true }"
+    x-show="show"
+    x-init="setTimeout(() => show = false, 5000)"
+    x-transition:enter="transition ease-out duration-300"
+    x-transition:enter-start="opacity-0 transform scale-90"
+    x-transition:enter-end="opacity-100 transform scale-100"
+    x-transition:leave="transition ease-in duration-300"
+    x-transition:leave-start="opacity-100 transform scale-100"
+    x-transition:leave-end="opacity-0 transform scale-90"
+    class="fixed top-4 right-4 z-50 max-w-md">
     <x-alert type="success" title="Succès" dismissible>
         {{ session('success') }}
     </x-alert>
@@ -47,15 +42,15 @@
                     </h1>
                     <p class="text-sm text-gray-600 ml-8.5">
                         @if($mode === 'fixed' && $vehicleData)
-                            Mise à jour pour <strong>{{ $vehicleData['registration_plate'] }}</strong> - {{ $vehicleData['brand'] }} {{ $vehicleData['model'] }}
+                        Mise à jour pour <strong>{{ $vehicleData['registration_plate'] }}</strong> - {{ $vehicleData['brand'] }} {{ $vehicleData['model'] }}
                         @else
-                            Recherchez et sélectionnez un véhicule pour mettre à jour son kilométrage
+                        Recherchez et sélectionnez un véhicule pour mettre à jour son kilométrage
                         @endif
                     </p>
                 </div>
                 <div class="mt-4 flex gap-2 md:mt-0 md:ml-4">
-                    <a href="{{ route('admin.mileage-readings.index') }}" 
-                       class="inline-flex items-center gap-2 px-4 py-2 bg-white hover:bg-gray-50 border border-gray-300 text-gray-700 font-medium rounded-lg shadow-sm transition-colors duration-200">
+                    <a href="{{ route('admin.mileage-readings.index') }}"
+                        class="inline-flex items-center gap-2 px-4 py-2 bg-white hover:bg-gray-50 border border-gray-300 text-gray-700 font-medium rounded-lg shadow-sm transition-colors duration-200">
                         <x-iconify icon="heroicons:arrow-left" class="w-5 h-5" />
                         <span class="hidden sm:inline">Retour</span>
                     </a>
@@ -78,48 +73,33 @@
 
         {{-- FORMULAIRE PRINCIPAL --}}
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            
+
             {{-- COLONNE PRINCIPALE (2/3) --}}
             <div class="lg:col-span-2 space-y-6">
-                
+
                 <form wire:submit.prevent="save">
                     <x-card padding="p-6">
                         <div class="space-y-6">
 
-                            {{-- SÉLECTION VÉHICULE AVEC TOMSELECT --}}
+                            {{-- SÉLECTION VÉHICULE AVEC SLIMSELECT --}}
                             @if($mode === 'select')
                             <div>
-                                <label for="vehicleSearch" class="block mb-2 text-sm font-medium text-gray-900">
-                                    <x-iconify icon="heroicons:truck" class="w-5 h-5 inline mr-1 text-blue-600" />
-                                    Rechercher un véhicule
-                                    <span class="text-red-600">*</span>
-                                </label>
-                                
-                                <div class="relative">
-                                    <select 
-                                        id="vehicleSearch"
-                                        wire:model.live="vehicleId"
-                                        required
-                                        class="tomselect-vehicle">
-                                        <option value="">Rechercher par plaque, marque ou modèle...</option>
-                                        @if($availableVehicles && count($availableVehicles) > 0)
-                                            @foreach($availableVehicles as $vehicle)
-                                                <option value="{{ $vehicle->id }}" 
-                                                        data-data='@json([
-                                                            "plate" => $vehicle->registration_plate,
-                                                            "brand" => $vehicle->brand,
-                                                            "model" => $vehicle->model,
-                                                            "mileage" => $vehicle->current_mileage
-                                                        ])'>
-                                                    {{ $vehicle->registration_plate }} - {{ $vehicle->brand }} {{ $vehicle->model }} ({{ number_format($vehicle->current_mileage) }} km)
-                                                </option>
-                                            @endforeach
-                                        @endif
-                                    </select>
-                                </div>
-                                
+                                <x-slim-select
+                                    name="vehicleId"
+                                    wire:model.live="vehicleId"
+                                    label="Rechercher un véhicule"
+                                    placeholder="Rechercher par plaque, marque ou modèle..."
+                                    required>
+                                    <option data-placeholder="true"></option>
+                                    @foreach($availableVehicles as $vehicle)
+                                    <option value="{{ $vehicle->id }}">
+                                        {{ $vehicle->registration_plate }} - {{ $vehicle->brand }} {{ $vehicle->model }} ({{ number_format($vehicle->current_mileage) }} km)
+                                    </option>
+                                    @endforeach
+                                </x-slim-select>
+
                                 @error('vehicleId')
-                                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                                 @enderror
                             </div>
                             @endif
@@ -151,7 +131,7 @@
 
                             {{-- FORMULAIRE RELEVÉ --}}
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                
+
                                 {{-- Nouveau Kilométrage --}}
                                 <div class="md:col-span-2">
                                     <x-input
@@ -164,8 +144,7 @@
                                         required
                                         :min="$vehicleData['current_mileage']"
                                         helpText="Le kilométrage doit être supérieur ou égal au kilométrage actuel ({{ number_format($vehicleData['current_mileage']) }} km)"
-                                        :error="$errors->first('newMileage')"
-                                    />
+                                        :error="$errors->first('newMileage')" />
 
                                     {{-- Badge Différence --}}
                                     @if($newMileage && $newMileage >= $vehicleData['current_mileage'])
@@ -189,8 +168,7 @@
                                     :max="date('Y-m-d')"
                                     :min="date('Y-m-d', strtotime('-7 days'))"
                                     helpText="Date du relevé (7 derniers jours max)"
-                                    :error="$errors->first('recordedDate')"
-                                />
+                                    :error="$errors->first('recordedDate')" />
 
                                 {{-- Heure --}}
                                 <x-input
@@ -201,8 +179,7 @@
                                     wire:model.live="recordedTime"
                                     required
                                     helpText="Heure précise du relevé"
-                                    :error="$errors->first('recordedTime')"
-                                />
+                                    :error="$errors->first('recordedTime')" />
                             </div>
 
                             {{-- Notes --}}
@@ -225,14 +202,14 @@
 
                             {{-- BOUTONS D'ACTION --}}
                             <div class="flex items-center justify-between pt-4 border-t border-gray-200">
-                                <button 
+                                <button
                                     type="button"
                                     wire:click="resetForm"
                                     class="inline-flex items-center gap-2 px-4 py-2 bg-white hover:bg-gray-50 border border-gray-300 text-gray-700 font-medium rounded-lg transition-colors">
                                     <x-iconify icon="heroicons:x-mark" class="w-5 h-5" />
                                     Réinitialiser
                                 </button>
-                                
+
                                 <button
                                     type="submit"
                                     wire:loading.attr="disabled"
@@ -257,7 +234,7 @@
 
             {{-- SIDEBAR (1/3) --}}
             <div class="lg:col-span-1 space-y-6">
-                
+
                 {{-- HISTORIQUE RÉCENT --}}
                 @if($vehicleData && isset($recentReadings) && count($recentReadings) > 0)
                 <x-card padding="p-0">
@@ -319,109 +296,3 @@
 
     </div>
 </section>
-
-{{-- TOMSELECT CSS & JS --}}
-@push('styles')
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.css">
-<style>
-.ts-wrapper.tomselect-vehicle {
-    width: 100% !important;
-}
-.ts-control {
-    border: 1px solid #d1d5db !important;
-    border-radius: 0.5rem !important;
-    padding: 0.625rem !important;
-    font-size: 0.875rem !important;
-}
-.ts-control:focus {
-    border-color: #3b82f6 !important;
-    ring: 2px !important;
-    ring-color: #3b82f6 !important;
-}
-.ts-dropdown {
-    border: 1px solid #d1d5db !important;
-    border-radius: 0.5rem !important;
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1) !important;
-}
-.ts-dropdown-content {
-    max-height: 300px !important;
-}
-</style>
-@endpush
-
-@push('scripts')
-<script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js"></script>
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    const selectElement = document.getElementById('vehicleSearch');
-    
-    if (selectElement) {
-        const tomselect = new TomSelect(selectElement, {
-            create: false,
-            sortField: {
-                field: 'text',
-                direction: 'asc'
-            },
-            placeholder: 'Rechercher par plaque, marque ou modèle...',
-            maxOptions: 100,
-            render: {
-                option: function(data, escape) {
-                    if (data.value === '') {
-                        return '<div class="py-2 px-3 text-gray-500 text-sm">' + escape(data.text) + '</div>';
-                    }
-                    
-                    const vehicleData = data.customData || {};
-                    return '<div class="py-2 px-3 hover:bg-blue-50">' +
-                        '<div class="font-semibold text-gray-900">' + escape(vehicleData.plate || '') + '</div>' +
-                        '<div class="text-sm text-gray-600">' + escape(vehicleData.brand || '') + ' ' + escape(vehicleData.model || '') + '</div>' +
-                        '<div class="text-xs text-gray-500 mt-1">Kilométrage actuel: ' + (vehicleData.mileage ? vehicleData.mileage.toLocaleString() : '0') + ' km</div>' +
-                    '</div>';
-                },
-                item: function(data, escape) {
-                    const vehicleData = data.customData || {};
-                    return '<div>' + escape(vehicleData.plate || data.text) + '</div>';
-                }
-            },
-            onInitialize: function() {
-                // Parser les données custom pour chaque option
-                this.options = {};
-                selectElement.querySelectorAll('option').forEach(option => {
-                    if (option.value) {
-                        const dataAttr = option.getAttribute('data-data');
-                        this.addOption({
-                            value: option.value,
-                            text: option.textContent,
-                            customData: dataAttr ? JSON.parse(dataAttr) : {}
-                        });
-                    }
-                });
-                this.refreshOptions(false);
-            },
-            onChange: function(value) {
-                // Déclencher l'événement Livewire
-                const event = new Event('change', { bubbles: true });
-                selectElement.value = value;
-                selectElement.dispatchEvent(event);
-                
-                // Trigger Livewire update
-                if (window.Livewire) {
-                    @this.set('vehicleId', value);
-                }
-            }
-        });
-        
-        // Écouter les changements Livewire pour réinitialiser
-        document.addEventListener('livewire:load', function() {
-            Livewire.hook('message.processed', (message, component) => {
-                if (component.fingerprint.name === 'admin.update-vehicle-mileage') {
-                    // Réinitialiser TomSelect si le véhicule est cleared
-                    if (!component.data.vehicleId) {
-                        tomselect.clear();
-                    }
-                }
-            });
-        });
-    }
-});
-</script>
-@endpush
