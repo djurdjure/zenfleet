@@ -572,11 +572,15 @@ class VehicleIndex extends Component
             'broken_vehicles' => Vehicle::whereHas('vehicleStatus', fn($q) => $q->where('name', 'En panne'))->count(),
         ];
 
+        // Get distinct brands for filter
+        $brands = Cache::remember('vehicle_brands', 3600, fn() => Vehicle::distinct()->orderBy('brand')->pluck('brand')->filter());
+
         return view('livewire.admin.vehicles.vehicle-index', [
             'vehicles' => $vehicles,
             'vehicleStatuses' => $vehicleStatuses,
             'vehicleTypes' => $vehicleTypes,
             'fuelTypes' => $fuelTypes,
+            'brands' => $brands,
             'depots' => $depots,
             'analytics' => $analytics
         ])->extends('layouts.admin.catalyst')->section('content');

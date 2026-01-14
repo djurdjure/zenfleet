@@ -5,7 +5,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="csrf-token" content="EN6bFC7DubIdSLX6K2sUSuBETiDOVG6jgMh4aRp8">
+    <meta name="csrf-token" content="7X6no3HDKh3OvayVp3JDKdYNzndkkqqGFdLilGSU">
         <meta name="user-data" content="{&quot;id&quot;:4,&quot;name&quot;:&quot;admin zenfleet&quot;,&quot;role&quot;:&quot;Admin&quot;}">
     
     <title>ZenFleet Admin - ZenFleet</title>
@@ -29,7 +29,7 @@
 <body class="h-full">
     <div class="min-h-full">
         
-        <div class="hidden lg:fixed lg:inset-y-0 lg:left-0 lg:z-50 lg:flex lg:w-64 lg:flex-col">
+        <div class="max-lg:hidden lg:fixed lg:inset-y-0 lg:left-0 lg:z-50 lg:flex lg:w-64 lg:flex-col">
             <div class="flex grow flex-col overflow-hidden bg-[#eef2f7] border-r border-gray-200/60 shadow-sm">
                 
                 <div class="w-full flex-none px-4 py-4 h-16 flex items-center border-b border-gray-300/50">
@@ -791,7 +791,7 @@
                                     </a>
                                     <div class="border-t border-zinc-100 my-1"></div>
                                     <form method="POST" action="http://localhost/logout">
-                                        <input type="hidden" name="_token" value="EN6bFC7DubIdSLX6K2sUSuBETiDOVG6jgMh4aRp8" autocomplete="off">                                        <button type="submit"
+                                        <input type="hidden" name="_token" value="7X6no3HDKh3OvayVp3JDKdYNzndkkqqGFdLilGSU" autocomplete="off">                                        <button type="submit"
                                             class="group flex w-full items-center px-4 py-2 text-sm text-zinc-700 hover:bg-zinc-50">
                                             <span
     class="iconify block mr-3 h-4 w-4 text-zinc-400 group-hover:text-zinc-600"
@@ -808,7 +808,7 @@
 
             <main class="py-10">
                 <div class="px-4 sm:px-6 lg:px-8">
-                            <div wire:snapshot="{&quot;data&quot;:{&quot;search&quot;:&quot;&quot;,&quot;status_id&quot;:&quot;&quot;,&quot;license_category&quot;:&quot;&quot;,&quot;visibility&quot;:&quot;active&quot;,&quot;perPage&quot;:25,&quot;sortField&quot;:&quot;created_at&quot;,&quot;sortDirection&quot;:&quot;desc&quot;,&quot;selectedDrivers&quot;:[[],{&quot;s&quot;:&quot;arr&quot;}],&quot;selectAll&quot;:false,&quot;restoringDriverId&quot;:null,&quot;showRestoreModal&quot;:false,&quot;forceDeletingDriverId&quot;:null,&quot;showForceDeleteModal&quot;:false,&quot;archivingDriverId&quot;:null,&quot;showArchiveModal&quot;:false,&quot;paginators&quot;:[{&quot;page&quot;:1},{&quot;s&quot;:&quot;arr&quot;}]},&quot;memo&quot;:{&quot;id&quot;:&quot;WsR18BfAcbwj70X7fAGY&quot;,&quot;name&quot;:&quot;admin.drivers.driver-index&quot;,&quot;path&quot;:&quot;admin\/drivers&quot;,&quot;method&quot;:&quot;GET&quot;,&quot;children&quot;:{&quot;status-13&quot;:[&quot;div&quot;,&quot;m3ieVbvhir3PiKplzGuO&quot;],&quot;status-12&quot;:[&quot;div&quot;,&quot;ZVox3FtTRP0QTkoof0P0&quot;],&quot;status-11&quot;:[&quot;div&quot;,&quot;lL1bMZ5RmjtEvIp910A1&quot;],&quot;status-10&quot;:[&quot;div&quot;,&quot;M3GgevmeV1jzp9BKlTVk&quot;],&quot;status-9&quot;:[&quot;div&quot;,&quot;XHlGE2fDekSI99SXpDcq&quot;],&quot;status-8&quot;:[&quot;div&quot;,&quot;myObKRQ9znQZlKPDqkBt&quot;],&quot;status-6&quot;:[&quot;div&quot;,&quot;ewvGPdeJGSWTpj5eE0cj&quot;],&quot;status-4&quot;:[&quot;div&quot;,&quot;USOt9vnL5h7pZZFNIKaf&quot;]},&quot;scripts&quot;:[],&quot;assets&quot;:[],&quot;errors&quot;:[],&quot;locale&quot;:&quot;fr&quot;},&quot;checksum&quot;:&quot;2100256a26fe9d6a43e264c1c0fac2c682e6b704b2be98f5954166a3064e6056&quot;}" wire:effects="{&quot;url&quot;:{&quot;search&quot;:{&quot;as&quot;:null,&quot;use&quot;:&quot;replace&quot;,&quot;alwaysShow&quot;:false,&quot;except&quot;:&quot;&quot;},&quot;status_id&quot;:{&quot;as&quot;:null,&quot;use&quot;:&quot;replace&quot;,&quot;alwaysShow&quot;:false,&quot;except&quot;:&quot;&quot;},&quot;license_category&quot;:{&quot;as&quot;:null,&quot;use&quot;:&quot;replace&quot;,&quot;alwaysShow&quot;:false,&quot;except&quot;:&quot;&quot;},&quot;visibility&quot;:{&quot;as&quot;:null,&quot;use&quot;:&quot;replace&quot;,&quot;alwaysShow&quot;:false,&quot;except&quot;:&quot;&quot;},&quot;paginators.page&quot;:{&quot;as&quot;:&quot;page&quot;,&quot;use&quot;:&quot;push&quot;,&quot;alwaysShow&quot;:false,&quot;except&quot;:null}}}" wire:id="WsR18BfAcbwj70X7fAGY">
+                            <div wire:snapshot="{&quot;data&quot;:{&quot;search&quot;:&quot;&quot;,&quot;status_id&quot;:&quot;&quot;,&quot;license_category&quot;:&quot;&quot;,&quot;visibility&quot;:&quot;active&quot;,&quot;perPage&quot;:25,&quot;sortField&quot;:&quot;created_at&quot;,&quot;sortDirection&quot;:&quot;desc&quot;,&quot;selectedDrivers&quot;:[[],{&quot;s&quot;:&quot;arr&quot;}],&quot;selectAll&quot;:false,&quot;restoringDriverId&quot;:null,&quot;showRestoreModal&quot;:false,&quot;forceDeletingDriverId&quot;:null,&quot;showForceDeleteModal&quot;:false,&quot;archivingDriverId&quot;:null,&quot;showArchiveModal&quot;:false,&quot;paginators&quot;:[{&quot;page&quot;:1},{&quot;s&quot;:&quot;arr&quot;}]},&quot;memo&quot;:{&quot;id&quot;:&quot;RbuvvU8BIzM1oveWEMUN&quot;,&quot;name&quot;:&quot;admin.drivers.driver-index&quot;,&quot;path&quot;:&quot;admin\/drivers&quot;,&quot;method&quot;:&quot;GET&quot;,&quot;children&quot;:{&quot;status-13&quot;:[&quot;div&quot;,&quot;AiltmzMCVUtiy6k9r5C2&quot;],&quot;status-12&quot;:[&quot;div&quot;,&quot;r2Ql6Udu4xOJCTBOE0EM&quot;],&quot;status-11&quot;:[&quot;div&quot;,&quot;SvRhWqbPGsNlX9Pu8b5i&quot;],&quot;status-10&quot;:[&quot;div&quot;,&quot;OKYjOD735UUZ8xXMbidz&quot;],&quot;status-9&quot;:[&quot;div&quot;,&quot;hck72x6Dp2Z7qKvxJOQI&quot;],&quot;status-8&quot;:[&quot;div&quot;,&quot;cgQx8qgbL0AlOnbH0Meo&quot;],&quot;status-6&quot;:[&quot;div&quot;,&quot;xjOlSSaCesAiVMbAVGGe&quot;],&quot;status-4&quot;:[&quot;div&quot;,&quot;qcotP9zTrPYy34s7SFSH&quot;]},&quot;scripts&quot;:[],&quot;assets&quot;:[],&quot;errors&quot;:[],&quot;locale&quot;:&quot;fr&quot;},&quot;checksum&quot;:&quot;9c8f645869a63ab3c42ed7cdd1738a0d3e1c0744b1423145565dc33ebf53da12&quot;}" wire:effects="{&quot;url&quot;:{&quot;search&quot;:{&quot;as&quot;:null,&quot;use&quot;:&quot;replace&quot;,&quot;alwaysShow&quot;:false,&quot;except&quot;:&quot;&quot;},&quot;status_id&quot;:{&quot;as&quot;:null,&quot;use&quot;:&quot;replace&quot;,&quot;alwaysShow&quot;:false,&quot;except&quot;:&quot;&quot;},&quot;license_category&quot;:{&quot;as&quot;:null,&quot;use&quot;:&quot;replace&quot;,&quot;alwaysShow&quot;:false,&quot;except&quot;:&quot;&quot;},&quot;visibility&quot;:{&quot;as&quot;:null,&quot;use&quot;:&quot;replace&quot;,&quot;alwaysShow&quot;:false,&quot;except&quot;:&quot;&quot;},&quot;paginators.page&quot;:{&quot;as&quot;:&quot;page&quot;,&quot;use&quot;:&quot;push&quot;,&quot;alwaysShow&quot;:false,&quot;except&quot;:null}}}" wire:id="RbuvvU8BIzM1oveWEMUN">
     
 
     <div class="py-4 px-4 mx-auto max-w-7xl lg:py-6">
@@ -835,9 +835,9 @@
         </div>
 
         
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
-            
-            <div class="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-lg transition-shadow duration-300">
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+    <div class="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-lg transition-shadow duration-300">
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-sm font-medium text-gray-600">Total chauffeurs</p>
@@ -895,8 +895,7 @@
     data-inline="false"></span>                    </div>
                 </div>
             </div>
-        </div>
-
+</div>
         
         <div class="mb-6" x-data="{ showFilters: false }">
             <div class="flex flex-col lg:flex-row items-start lg:items-center gap-3">
@@ -1036,7 +1035,7 @@
     <select
         x-ref="select"
         name="status_id"
-        id="slimselect-status_id-6966126f62727"
+        id="slimselect-status_id-6966b801e1cd2"
         class="slimselect-field w-full"
                         wire:model.live="status_id">
 
@@ -1090,7 +1089,7 @@
     <select
         x-ref="select"
         name="license_category"
-        id="slimselect-license_category-6966126f62767"
+        id="slimselect-license_category-6966b801e1d08"
         class="slimselect-field w-full"
                         wire:model.live="license_category">
 
@@ -1202,10 +1201,10 @@
                                 <!--[if ENDBLOCK]><![endif]-->
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
-                                <div wire:snapshot="{&quot;data&quot;:{&quot;driverId&quot;:13,&quot;driver&quot;:[null,{&quot;class&quot;:&quot;App\\Models\\Driver&quot;,&quot;key&quot;:13,&quot;s&quot;:&quot;mdl&quot;}],&quot;showConfirmModal&quot;:false,&quot;pendingStatus&quot;:null,&quot;pendingStatusEnum&quot;:null,&quot;confirmMessage&quot;:&quot;&quot;},&quot;memo&quot;:{&quot;id&quot;:&quot;m3ieVbvhir3PiKplzGuO&quot;,&quot;name&quot;:&quot;admin.driver-status-badge-ultra-pro&quot;,&quot;path&quot;:&quot;admin\/drivers&quot;,&quot;method&quot;:&quot;GET&quot;,&quot;children&quot;:[],&quot;scripts&quot;:[],&quot;assets&quot;:[],&quot;errors&quot;:[],&quot;locale&quot;:&quot;fr&quot;},&quot;checksum&quot;:&quot;4c154f28b4cec8a8f7ea5a5ad5d744d347ab24e0cb64731b5205945115e79bf6&quot;}" wire:effects="{&quot;listeners&quot;:[&quot;refreshComponent&quot;,&quot;driverStatusUpdated&quot;,&quot;driverStatusChanged&quot;,&quot;echo:drivers,DriverStatusChanged&quot;]}" wire:id="m3ieVbvhir3PiKplzGuO" class="relative inline-block"
+                                <div wire:snapshot="{&quot;data&quot;:{&quot;driverId&quot;:13,&quot;driver&quot;:[null,{&quot;class&quot;:&quot;App\\Models\\Driver&quot;,&quot;key&quot;:13,&quot;s&quot;:&quot;mdl&quot;}],&quot;showConfirmModal&quot;:false,&quot;pendingStatus&quot;:null,&quot;pendingStatusEnum&quot;:null,&quot;confirmMessage&quot;:&quot;&quot;},&quot;memo&quot;:{&quot;id&quot;:&quot;AiltmzMCVUtiy6k9r5C2&quot;,&quot;name&quot;:&quot;admin.driver-status-badge-ultra-pro&quot;,&quot;path&quot;:&quot;admin\/drivers&quot;,&quot;method&quot;:&quot;GET&quot;,&quot;children&quot;:[],&quot;scripts&quot;:[],&quot;assets&quot;:[],&quot;errors&quot;:[],&quot;locale&quot;:&quot;fr&quot;},&quot;checksum&quot;:&quot;1bd0e0263b7d63545a492fe0cc0b36ae32aa0db84c7e628fd6b12d734a9e4f1d&quot;}" wire:effects="{&quot;listeners&quot;:[&quot;refreshComponent&quot;,&quot;driverStatusUpdated&quot;,&quot;driverStatusChanged&quot;,&quot;echo:drivers,DriverStatusChanged&quot;]}" wire:id="AiltmzMCVUtiy6k9r5C2" class="relative inline-block"
     x-data="{ 
          open: false, 
-         confirmModal: window.Livewire.find('m3ieVbvhir3PiKplzGuO').entangle('showConfirmModal').live,
+         confirmModal: window.Livewire.find('AiltmzMCVUtiy6k9r5C2').entangle('showConfirmModal').live,
          toggle() { this.open = !this.open; },
          close() { this.open = false; },
          selectStatus(status) { 
@@ -1576,10 +1575,10 @@
                                 <!--[if ENDBLOCK]><![endif]-->
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
-                                <div wire:snapshot="{&quot;data&quot;:{&quot;driverId&quot;:12,&quot;driver&quot;:[null,{&quot;class&quot;:&quot;App\\Models\\Driver&quot;,&quot;key&quot;:12,&quot;s&quot;:&quot;mdl&quot;}],&quot;showConfirmModal&quot;:false,&quot;pendingStatus&quot;:null,&quot;pendingStatusEnum&quot;:null,&quot;confirmMessage&quot;:&quot;&quot;},&quot;memo&quot;:{&quot;id&quot;:&quot;ZVox3FtTRP0QTkoof0P0&quot;,&quot;name&quot;:&quot;admin.driver-status-badge-ultra-pro&quot;,&quot;path&quot;:&quot;admin\/drivers&quot;,&quot;method&quot;:&quot;GET&quot;,&quot;children&quot;:[],&quot;scripts&quot;:[],&quot;assets&quot;:[],&quot;errors&quot;:[],&quot;locale&quot;:&quot;fr&quot;},&quot;checksum&quot;:&quot;e83afe98c1e640142ace16266484b56dc4f7701b5409787578cfc6e788160b99&quot;}" wire:effects="{&quot;listeners&quot;:[&quot;refreshComponent&quot;,&quot;driverStatusUpdated&quot;,&quot;driverStatusChanged&quot;,&quot;echo:drivers,DriverStatusChanged&quot;]}" wire:id="ZVox3FtTRP0QTkoof0P0" class="relative inline-block"
+                                <div wire:snapshot="{&quot;data&quot;:{&quot;driverId&quot;:12,&quot;driver&quot;:[null,{&quot;class&quot;:&quot;App\\Models\\Driver&quot;,&quot;key&quot;:12,&quot;s&quot;:&quot;mdl&quot;}],&quot;showConfirmModal&quot;:false,&quot;pendingStatus&quot;:null,&quot;pendingStatusEnum&quot;:null,&quot;confirmMessage&quot;:&quot;&quot;},&quot;memo&quot;:{&quot;id&quot;:&quot;r2Ql6Udu4xOJCTBOE0EM&quot;,&quot;name&quot;:&quot;admin.driver-status-badge-ultra-pro&quot;,&quot;path&quot;:&quot;admin\/drivers&quot;,&quot;method&quot;:&quot;GET&quot;,&quot;children&quot;:[],&quot;scripts&quot;:[],&quot;assets&quot;:[],&quot;errors&quot;:[],&quot;locale&quot;:&quot;fr&quot;},&quot;checksum&quot;:&quot;d4c029862a75c74f680f6cf046c6250956aab09eb3f36874d9cc9d6d394b5901&quot;}" wire:effects="{&quot;listeners&quot;:[&quot;refreshComponent&quot;,&quot;driverStatusUpdated&quot;,&quot;driverStatusChanged&quot;,&quot;echo:drivers,DriverStatusChanged&quot;]}" wire:id="r2Ql6Udu4xOJCTBOE0EM" class="relative inline-block"
     x-data="{ 
          open: false, 
-         confirmModal: window.Livewire.find('ZVox3FtTRP0QTkoof0P0').entangle('showConfirmModal').live,
+         confirmModal: window.Livewire.find('r2Ql6Udu4xOJCTBOE0EM').entangle('showConfirmModal').live,
          toggle() { this.open = !this.open; },
          close() { this.open = false; },
          selectStatus(status) { 
@@ -1994,10 +1993,10 @@
                                 <!--[if ENDBLOCK]><![endif]-->
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
-                                <div wire:snapshot="{&quot;data&quot;:{&quot;driverId&quot;:11,&quot;driver&quot;:[null,{&quot;class&quot;:&quot;App\\Models\\Driver&quot;,&quot;key&quot;:11,&quot;s&quot;:&quot;mdl&quot;}],&quot;showConfirmModal&quot;:false,&quot;pendingStatus&quot;:null,&quot;pendingStatusEnum&quot;:null,&quot;confirmMessage&quot;:&quot;&quot;},&quot;memo&quot;:{&quot;id&quot;:&quot;lL1bMZ5RmjtEvIp910A1&quot;,&quot;name&quot;:&quot;admin.driver-status-badge-ultra-pro&quot;,&quot;path&quot;:&quot;admin\/drivers&quot;,&quot;method&quot;:&quot;GET&quot;,&quot;children&quot;:[],&quot;scripts&quot;:[],&quot;assets&quot;:[],&quot;errors&quot;:[],&quot;locale&quot;:&quot;fr&quot;},&quot;checksum&quot;:&quot;adad907c4c538e09e44e3b3df00148b63c8b12fc2fa544664fb1073416157a21&quot;}" wire:effects="{&quot;listeners&quot;:[&quot;refreshComponent&quot;,&quot;driverStatusUpdated&quot;,&quot;driverStatusChanged&quot;,&quot;echo:drivers,DriverStatusChanged&quot;]}" wire:id="lL1bMZ5RmjtEvIp910A1" class="relative inline-block"
+                                <div wire:snapshot="{&quot;data&quot;:{&quot;driverId&quot;:11,&quot;driver&quot;:[null,{&quot;class&quot;:&quot;App\\Models\\Driver&quot;,&quot;key&quot;:11,&quot;s&quot;:&quot;mdl&quot;}],&quot;showConfirmModal&quot;:false,&quot;pendingStatus&quot;:null,&quot;pendingStatusEnum&quot;:null,&quot;confirmMessage&quot;:&quot;&quot;},&quot;memo&quot;:{&quot;id&quot;:&quot;SvRhWqbPGsNlX9Pu8b5i&quot;,&quot;name&quot;:&quot;admin.driver-status-badge-ultra-pro&quot;,&quot;path&quot;:&quot;admin\/drivers&quot;,&quot;method&quot;:&quot;GET&quot;,&quot;children&quot;:[],&quot;scripts&quot;:[],&quot;assets&quot;:[],&quot;errors&quot;:[],&quot;locale&quot;:&quot;fr&quot;},&quot;checksum&quot;:&quot;81ca45baf5d3e1133f76fb72e4755fb34c96f1889822d07116e992558284a32c&quot;}" wire:effects="{&quot;listeners&quot;:[&quot;refreshComponent&quot;,&quot;driverStatusUpdated&quot;,&quot;driverStatusChanged&quot;,&quot;echo:drivers,DriverStatusChanged&quot;]}" wire:id="SvRhWqbPGsNlX9Pu8b5i" class="relative inline-block"
     x-data="{ 
          open: false, 
-         confirmModal: window.Livewire.find('lL1bMZ5RmjtEvIp910A1').entangle('showConfirmModal').live,
+         confirmModal: window.Livewire.find('SvRhWqbPGsNlX9Pu8b5i').entangle('showConfirmModal').live,
          toggle() { this.open = !this.open; },
          close() { this.open = false; },
          selectStatus(status) { 
@@ -2344,10 +2343,10 @@
                                 <!--[if ENDBLOCK]><![endif]-->
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
-                                <div wire:snapshot="{&quot;data&quot;:{&quot;driverId&quot;:10,&quot;driver&quot;:[null,{&quot;class&quot;:&quot;App\\Models\\Driver&quot;,&quot;key&quot;:10,&quot;s&quot;:&quot;mdl&quot;}],&quot;showConfirmModal&quot;:false,&quot;pendingStatus&quot;:null,&quot;pendingStatusEnum&quot;:null,&quot;confirmMessage&quot;:&quot;&quot;},&quot;memo&quot;:{&quot;id&quot;:&quot;M3GgevmeV1jzp9BKlTVk&quot;,&quot;name&quot;:&quot;admin.driver-status-badge-ultra-pro&quot;,&quot;path&quot;:&quot;admin\/drivers&quot;,&quot;method&quot;:&quot;GET&quot;,&quot;children&quot;:[],&quot;scripts&quot;:[],&quot;assets&quot;:[],&quot;errors&quot;:[],&quot;locale&quot;:&quot;fr&quot;},&quot;checksum&quot;:&quot;e2a412a5f38516a131944330e955ecf55773d719fc5fea72f671116406d43254&quot;}" wire:effects="{&quot;listeners&quot;:[&quot;refreshComponent&quot;,&quot;driverStatusUpdated&quot;,&quot;driverStatusChanged&quot;,&quot;echo:drivers,DriverStatusChanged&quot;]}" wire:id="M3GgevmeV1jzp9BKlTVk" class="relative inline-block"
+                                <div wire:snapshot="{&quot;data&quot;:{&quot;driverId&quot;:10,&quot;driver&quot;:[null,{&quot;class&quot;:&quot;App\\Models\\Driver&quot;,&quot;key&quot;:10,&quot;s&quot;:&quot;mdl&quot;}],&quot;showConfirmModal&quot;:false,&quot;pendingStatus&quot;:null,&quot;pendingStatusEnum&quot;:null,&quot;confirmMessage&quot;:&quot;&quot;},&quot;memo&quot;:{&quot;id&quot;:&quot;OKYjOD735UUZ8xXMbidz&quot;,&quot;name&quot;:&quot;admin.driver-status-badge-ultra-pro&quot;,&quot;path&quot;:&quot;admin\/drivers&quot;,&quot;method&quot;:&quot;GET&quot;,&quot;children&quot;:[],&quot;scripts&quot;:[],&quot;assets&quot;:[],&quot;errors&quot;:[],&quot;locale&quot;:&quot;fr&quot;},&quot;checksum&quot;:&quot;53e91e5c18b9b4f6557adbf1e28355c644ef7fd14a516bc649fad6cd8a83c635&quot;}" wire:effects="{&quot;listeners&quot;:[&quot;refreshComponent&quot;,&quot;driverStatusUpdated&quot;,&quot;driverStatusChanged&quot;,&quot;echo:drivers,DriverStatusChanged&quot;]}" wire:id="OKYjOD735UUZ8xXMbidz" class="relative inline-block"
     x-data="{ 
          open: false, 
-         confirmModal: window.Livewire.find('M3GgevmeV1jzp9BKlTVk').entangle('showConfirmModal').live,
+         confirmModal: window.Livewire.find('OKYjOD735UUZ8xXMbidz').entangle('showConfirmModal').live,
          toggle() { this.open = !this.open; },
          close() { this.open = false; },
          selectStatus(status) { 
@@ -2712,10 +2711,10 @@
                                 <!--[if ENDBLOCK]><![endif]-->
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
-                                <div wire:snapshot="{&quot;data&quot;:{&quot;driverId&quot;:9,&quot;driver&quot;:[null,{&quot;class&quot;:&quot;App\\Models\\Driver&quot;,&quot;key&quot;:9,&quot;s&quot;:&quot;mdl&quot;}],&quot;showConfirmModal&quot;:false,&quot;pendingStatus&quot;:null,&quot;pendingStatusEnum&quot;:null,&quot;confirmMessage&quot;:&quot;&quot;},&quot;memo&quot;:{&quot;id&quot;:&quot;XHlGE2fDekSI99SXpDcq&quot;,&quot;name&quot;:&quot;admin.driver-status-badge-ultra-pro&quot;,&quot;path&quot;:&quot;admin\/drivers&quot;,&quot;method&quot;:&quot;GET&quot;,&quot;children&quot;:[],&quot;scripts&quot;:[],&quot;assets&quot;:[],&quot;errors&quot;:[],&quot;locale&quot;:&quot;fr&quot;},&quot;checksum&quot;:&quot;22f7200118ed07fe1c3b468260b22568bfad06ee2021fdd754a2165cd8767b8b&quot;}" wire:effects="{&quot;listeners&quot;:[&quot;refreshComponent&quot;,&quot;driverStatusUpdated&quot;,&quot;driverStatusChanged&quot;,&quot;echo:drivers,DriverStatusChanged&quot;]}" wire:id="XHlGE2fDekSI99SXpDcq" class="relative inline-block"
+                                <div wire:snapshot="{&quot;data&quot;:{&quot;driverId&quot;:9,&quot;driver&quot;:[null,{&quot;class&quot;:&quot;App\\Models\\Driver&quot;,&quot;key&quot;:9,&quot;s&quot;:&quot;mdl&quot;}],&quot;showConfirmModal&quot;:false,&quot;pendingStatus&quot;:null,&quot;pendingStatusEnum&quot;:null,&quot;confirmMessage&quot;:&quot;&quot;},&quot;memo&quot;:{&quot;id&quot;:&quot;hck72x6Dp2Z7qKvxJOQI&quot;,&quot;name&quot;:&quot;admin.driver-status-badge-ultra-pro&quot;,&quot;path&quot;:&quot;admin\/drivers&quot;,&quot;method&quot;:&quot;GET&quot;,&quot;children&quot;:[],&quot;scripts&quot;:[],&quot;assets&quot;:[],&quot;errors&quot;:[],&quot;locale&quot;:&quot;fr&quot;},&quot;checksum&quot;:&quot;1b9a1b1c919b7b555d6c066d840c87560b602fed67499cbfb5ee682fed03b2dc&quot;}" wire:effects="{&quot;listeners&quot;:[&quot;refreshComponent&quot;,&quot;driverStatusUpdated&quot;,&quot;driverStatusChanged&quot;,&quot;echo:drivers,DriverStatusChanged&quot;]}" wire:id="hck72x6Dp2Z7qKvxJOQI" class="relative inline-block"
     x-data="{ 
          open: false, 
-         confirmModal: window.Livewire.find('XHlGE2fDekSI99SXpDcq').entangle('showConfirmModal').live,
+         confirmModal: window.Livewire.find('hck72x6Dp2Z7qKvxJOQI').entangle('showConfirmModal').live,
          toggle() { this.open = !this.open; },
          close() { this.open = false; },
          selectStatus(status) { 
@@ -3062,10 +3061,10 @@
                                 <!--[if ENDBLOCK]><![endif]-->
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
-                                <div wire:snapshot="{&quot;data&quot;:{&quot;driverId&quot;:8,&quot;driver&quot;:[null,{&quot;class&quot;:&quot;App\\Models\\Driver&quot;,&quot;key&quot;:8,&quot;s&quot;:&quot;mdl&quot;}],&quot;showConfirmModal&quot;:false,&quot;pendingStatus&quot;:null,&quot;pendingStatusEnum&quot;:null,&quot;confirmMessage&quot;:&quot;&quot;},&quot;memo&quot;:{&quot;id&quot;:&quot;myObKRQ9znQZlKPDqkBt&quot;,&quot;name&quot;:&quot;admin.driver-status-badge-ultra-pro&quot;,&quot;path&quot;:&quot;admin\/drivers&quot;,&quot;method&quot;:&quot;GET&quot;,&quot;children&quot;:[],&quot;scripts&quot;:[],&quot;assets&quot;:[],&quot;errors&quot;:[],&quot;locale&quot;:&quot;fr&quot;},&quot;checksum&quot;:&quot;8386cfe3469d5625a41817a9dee6f3296fbd484e903b82fed925b0ef02a07b7a&quot;}" wire:effects="{&quot;listeners&quot;:[&quot;refreshComponent&quot;,&quot;driverStatusUpdated&quot;,&quot;driverStatusChanged&quot;,&quot;echo:drivers,DriverStatusChanged&quot;]}" wire:id="myObKRQ9znQZlKPDqkBt" class="relative inline-block"
+                                <div wire:snapshot="{&quot;data&quot;:{&quot;driverId&quot;:8,&quot;driver&quot;:[null,{&quot;class&quot;:&quot;App\\Models\\Driver&quot;,&quot;key&quot;:8,&quot;s&quot;:&quot;mdl&quot;}],&quot;showConfirmModal&quot;:false,&quot;pendingStatus&quot;:null,&quot;pendingStatusEnum&quot;:null,&quot;confirmMessage&quot;:&quot;&quot;},&quot;memo&quot;:{&quot;id&quot;:&quot;cgQx8qgbL0AlOnbH0Meo&quot;,&quot;name&quot;:&quot;admin.driver-status-badge-ultra-pro&quot;,&quot;path&quot;:&quot;admin\/drivers&quot;,&quot;method&quot;:&quot;GET&quot;,&quot;children&quot;:[],&quot;scripts&quot;:[],&quot;assets&quot;:[],&quot;errors&quot;:[],&quot;locale&quot;:&quot;fr&quot;},&quot;checksum&quot;:&quot;7f8111b5ac175dcd10b6778c6a03dc589ca418545ddf4fa4f536ee2d46405e03&quot;}" wire:effects="{&quot;listeners&quot;:[&quot;refreshComponent&quot;,&quot;driverStatusUpdated&quot;,&quot;driverStatusChanged&quot;,&quot;echo:drivers,DriverStatusChanged&quot;]}" wire:id="cgQx8qgbL0AlOnbH0Meo" class="relative inline-block"
     x-data="{ 
          open: false, 
-         confirmModal: window.Livewire.find('myObKRQ9znQZlKPDqkBt').entangle('showConfirmModal').live,
+         confirmModal: window.Livewire.find('cgQx8qgbL0AlOnbH0Meo').entangle('showConfirmModal').live,
          toggle() { this.open = !this.open; },
          close() { this.open = false; },
          selectStatus(status) { 
@@ -3476,10 +3475,10 @@
                                 <!--[if ENDBLOCK]><![endif]-->
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
-                                <div wire:snapshot="{&quot;data&quot;:{&quot;driverId&quot;:6,&quot;driver&quot;:[null,{&quot;class&quot;:&quot;App\\Models\\Driver&quot;,&quot;key&quot;:6,&quot;s&quot;:&quot;mdl&quot;}],&quot;showConfirmModal&quot;:false,&quot;pendingStatus&quot;:null,&quot;pendingStatusEnum&quot;:null,&quot;confirmMessage&quot;:&quot;&quot;},&quot;memo&quot;:{&quot;id&quot;:&quot;ewvGPdeJGSWTpj5eE0cj&quot;,&quot;name&quot;:&quot;admin.driver-status-badge-ultra-pro&quot;,&quot;path&quot;:&quot;admin\/drivers&quot;,&quot;method&quot;:&quot;GET&quot;,&quot;children&quot;:[],&quot;scripts&quot;:[],&quot;assets&quot;:[],&quot;errors&quot;:[],&quot;locale&quot;:&quot;fr&quot;},&quot;checksum&quot;:&quot;27a3ab5b5ee40f0394194de3f48891b6d1637a54a1a57ed01ac25a06c372b1ec&quot;}" wire:effects="{&quot;listeners&quot;:[&quot;refreshComponent&quot;,&quot;driverStatusUpdated&quot;,&quot;driverStatusChanged&quot;,&quot;echo:drivers,DriverStatusChanged&quot;]}" wire:id="ewvGPdeJGSWTpj5eE0cj" class="relative inline-block"
+                                <div wire:snapshot="{&quot;data&quot;:{&quot;driverId&quot;:6,&quot;driver&quot;:[null,{&quot;class&quot;:&quot;App\\Models\\Driver&quot;,&quot;key&quot;:6,&quot;s&quot;:&quot;mdl&quot;}],&quot;showConfirmModal&quot;:false,&quot;pendingStatus&quot;:null,&quot;pendingStatusEnum&quot;:null,&quot;confirmMessage&quot;:&quot;&quot;},&quot;memo&quot;:{&quot;id&quot;:&quot;xjOlSSaCesAiVMbAVGGe&quot;,&quot;name&quot;:&quot;admin.driver-status-badge-ultra-pro&quot;,&quot;path&quot;:&quot;admin\/drivers&quot;,&quot;method&quot;:&quot;GET&quot;,&quot;children&quot;:[],&quot;scripts&quot;:[],&quot;assets&quot;:[],&quot;errors&quot;:[],&quot;locale&quot;:&quot;fr&quot;},&quot;checksum&quot;:&quot;f41cf5cb972fc4ec1534da08a46958648033ba22442a1e4becfecc8870e8cd4b&quot;}" wire:effects="{&quot;listeners&quot;:[&quot;refreshComponent&quot;,&quot;driverStatusUpdated&quot;,&quot;driverStatusChanged&quot;,&quot;echo:drivers,DriverStatusChanged&quot;]}" wire:id="xjOlSSaCesAiVMbAVGGe" class="relative inline-block"
     x-data="{ 
          open: false, 
-         confirmModal: window.Livewire.find('ewvGPdeJGSWTpj5eE0cj').entangle('showConfirmModal').live,
+         confirmModal: window.Livewire.find('xjOlSSaCesAiVMbAVGGe').entangle('showConfirmModal').live,
          toggle() { this.open = !this.open; },
          close() { this.open = false; },
          selectStatus(status) { 
@@ -3894,10 +3893,10 @@
                                 <!--[if ENDBLOCK]><![endif]-->
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
-                                <div wire:snapshot="{&quot;data&quot;:{&quot;driverId&quot;:4,&quot;driver&quot;:[null,{&quot;class&quot;:&quot;App\\Models\\Driver&quot;,&quot;key&quot;:4,&quot;s&quot;:&quot;mdl&quot;}],&quot;showConfirmModal&quot;:false,&quot;pendingStatus&quot;:null,&quot;pendingStatusEnum&quot;:null,&quot;confirmMessage&quot;:&quot;&quot;},&quot;memo&quot;:{&quot;id&quot;:&quot;USOt9vnL5h7pZZFNIKaf&quot;,&quot;name&quot;:&quot;admin.driver-status-badge-ultra-pro&quot;,&quot;path&quot;:&quot;admin\/drivers&quot;,&quot;method&quot;:&quot;GET&quot;,&quot;children&quot;:[],&quot;scripts&quot;:[],&quot;assets&quot;:[],&quot;errors&quot;:[],&quot;locale&quot;:&quot;fr&quot;},&quot;checksum&quot;:&quot;0acb14750ff493f40ee98bdc8dfa4c68be8639f17b4f1089c5bcaf93f921ba09&quot;}" wire:effects="{&quot;listeners&quot;:[&quot;refreshComponent&quot;,&quot;driverStatusUpdated&quot;,&quot;driverStatusChanged&quot;,&quot;echo:drivers,DriverStatusChanged&quot;]}" wire:id="USOt9vnL5h7pZZFNIKaf" class="relative inline-block"
+                                <div wire:snapshot="{&quot;data&quot;:{&quot;driverId&quot;:4,&quot;driver&quot;:[null,{&quot;class&quot;:&quot;App\\Models\\Driver&quot;,&quot;key&quot;:4,&quot;s&quot;:&quot;mdl&quot;}],&quot;showConfirmModal&quot;:false,&quot;pendingStatus&quot;:null,&quot;pendingStatusEnum&quot;:null,&quot;confirmMessage&quot;:&quot;&quot;},&quot;memo&quot;:{&quot;id&quot;:&quot;qcotP9zTrPYy34s7SFSH&quot;,&quot;name&quot;:&quot;admin.driver-status-badge-ultra-pro&quot;,&quot;path&quot;:&quot;admin\/drivers&quot;,&quot;method&quot;:&quot;GET&quot;,&quot;children&quot;:[],&quot;scripts&quot;:[],&quot;assets&quot;:[],&quot;errors&quot;:[],&quot;locale&quot;:&quot;fr&quot;},&quot;checksum&quot;:&quot;025d49306514b50f32876f9e3a39c0255800780414221d4ee70258f4990246e5&quot;}" wire:effects="{&quot;listeners&quot;:[&quot;refreshComponent&quot;,&quot;driverStatusUpdated&quot;,&quot;driverStatusChanged&quot;,&quot;echo:drivers,DriverStatusChanged&quot;]}" wire:id="qcotP9zTrPYy34s7SFSH" class="relative inline-block"
     x-data="{ 
          open: false, 
-         confirmModal: window.Livewire.find('USOt9vnL5h7pZZFNIKaf').entangle('showConfirmModal').live,
+         confirmModal: window.Livewire.find('qcotP9zTrPYy34s7SFSH').entangle('showConfirmModal').live,
          toggle() { this.open = !this.open; },
          close() { this.open = false; },
          selectStatus(status) { 
@@ -4273,7 +4272,7 @@
 
         
         <div class="mt-4">
-            <div class="mt-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            <div class="pagination-footer mt-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3" style="margin-top: 1rem; display: flex; flex-direction: row; align-items: center; justify-content: space-between; gap: 0.75rem;">
     <!-- Left: Nombre d'éléments par page -->
     <div class="flex items-center text-sm text-gray-700">
         <span class="mr-2">Afficher</span>
@@ -4584,7 +4583,7 @@
             }
         }
     </script>
-    <script data-navigate-once="true">window.livewireScriptConfig = {"csrf":"EN6bFC7DubIdSLX6K2sUSuBETiDOVG6jgMh4aRp8","uri":"\/livewire\/update","progressBar":"","nonce":""};</script>
+    <script data-navigate-once="true">window.livewireScriptConfig = {"csrf":"7X6no3HDKh3OvayVp3JDKdYNzndkkqqGFdLilGSU","uri":"\/livewire\/update","progressBar":"","nonce":""};</script>
 </body>
 
 </html>

@@ -39,7 +39,7 @@
 <body class="h-full">
     <div class="min-h-full">
         {{-- Sidebar pour desktop - Style Ultra-Pro World-Class --}}
-        <div class="hidden lg:fixed lg:inset-y-0 lg:left-0 lg:z-50 lg:flex lg:w-64 lg:flex-col">
+        <div class="max-lg:hidden lg:fixed lg:inset-y-0 lg:left-0 lg:z-50 lg:flex lg:w-64 lg:flex-col">
             <div class="flex grow flex-col overflow-hidden bg-[#eef2f7] border-r border-gray-200/60 shadow-sm">
                 {{-- En-tête avec logo Premium --}}
                 <div class="w-full flex-none px-4 py-4 h-16 flex items-center border-b border-gray-300/50">

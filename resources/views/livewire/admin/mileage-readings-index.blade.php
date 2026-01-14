@@ -61,8 +61,8 @@
 
         {{-- ===============================================
             CARDS STATISTIQUES ENTERPRISE
-        =============================================== --}}
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 mb-6">
+        ===============================================        {{-- CARDS STATISTIQUES ENTERPRISE --}}
+        <x-page-analytics-grid columns="5">
 
             {{-- 1. Total Relevés --}}
             <div class="bg-white rounded-lg border border-gray-200 p-4 hover:shadow-lg transition-shadow duration-300">
@@ -187,125 +187,112 @@
                     </div>
                 </div>
             </div>
-        </div>
+        </x-page-analytics-grid>
 
         {{-- ===============================================
             BARRE D'ACTIONS ULTRA-PRO COMPACT
         =============================================== --}}
-        <div class="mb-6" x-data="{ showFilters: false }">
-            <div class="bg-white shadow-sm rounded-lg border border-gray-200 p-3">
-                <div class="flex items-center gap-2">
-
-                    {{-- Recherche Compacte --}}
-                    <div class="flex-1 max-w-md">
-                        <div class="relative">
-                            <div class="absolute inset-y-0 left-0 pl-2.5 flex items-center pointer-events-none">
-                                <x-iconify icon="lucide:search" class="w-4 h-4 text-gray-400" />
-                            </div>
-                            <input
-                                wire:model.live.debounce.300ms="search"
-                                type="text"
-                                placeholder="Rechercher..."
-                                class="block w-full pl-8 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-xs shadow-sm bg-gray-50 hover:border-gray-400 transition-colors">
-                        </div>
+        {{-- ===============================================
+            BARRE D'ACTIONS ULTRA-PRO COMPACT (Unified)
+        =============================================== --}}
+        <x-page-search-bar x-data="{ showFilters: false }">
+            <x-slot:search>
+                <div class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <x-iconify icon="lucide:search" class="w-4 h-4 text-gray-400" />
                     </div>
+                    <input
+                        wire:model.live.debounce.300ms="search"
+                        type="text"
+                        placeholder="Rechercher..."
+                        class="pl-10 pr-4 py-2 block w-full border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm shadow-sm">
+                </div>
+            </x-slot:search>
 
-                    {{-- Boutons Actions ICONES UNIQUEMENT --}}
-                    <div class="flex items-center gap-1.5 ml-auto">
-                        {{-- Bouton Filtrer (Toggle) --}}
-                        <button
-                            @click="showFilters = !showFilters"
-                            type="button"
-                            title="Filtres"
-                            class="inline-flex items-center justify-center w-9 h-9 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-all duration-200 shadow-sm relative"
-                            :class="showFilters ? 'ring-2 ring-blue-500 bg-blue-50' : ''">
-                            <x-iconify icon="lucide:filter" class="w-4 h-4 text-gray-600" />
-                            @if($vehicleFilter || $methodFilter || $dateFrom || $dateTo || $authorFilter || $mileageMin || $mileageMax)
-                            <span class="absolute -top-1 -right-1 flex h-4 w-4">
-                                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
-                                <span class="relative inline-flex rounded-full h-4 w-4 bg-blue-600 text-white text-[10px] font-bold items-center justify-center">
-                                    {{
-                                        collect([
-                                            $vehicleFilter ? 1 : 0,
-                                            $methodFilter ? 1 : 0,
-                                            $dateFrom ? 1 : 0,
-                                            $dateTo ? 1 : 0,
-                                            $authorFilter ? 1 : 0,
-                                            $mileageMin ? 1 : 0,
-                                            $mileageMax ? 1 : 0,
-                                        ])->sum()
-                                    }}
-                                </span>
-                            </span>
-                            @endif
+            <x-slot:filters>
+                <button
+                    @click="showFilters = !showFilters"
+                    type="button"
+                    title="Filtres"
+                    class="inline-flex items-center justify-center w-9 h-9 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-all duration-200 shadow-sm relative"
+                    :class="showFilters ? 'ring-2 ring-blue-500 bg-blue-50' : ''">
+                    <x-iconify icon="lucide:filter" class="w-4 h-4 text-gray-600" />
+                    {{-- Active Filters Indicator --}}
+                    @if($vehicleFilter || $methodFilter || $dateFrom || $dateTo || $authorFilter || $mileageMin || $mileageMax)
+                    <span class="absolute -top-1 -right-1 flex h-4 w-4">
+                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+                        <span class="relative inline-flex rounded-full h-4 w-4 bg-blue-600 text-white text-[10px] font-bold items-center justify-center">
+                            {{
+                                collect([
+                                    $vehicleFilter ? 1 : 0,
+                                    $methodFilter ? 1 : 0,
+                                    $dateFrom ? 1 : 0,
+                                    $dateTo ? 1 : 0,
+                                    $authorFilter ? 1 : 0,
+                                    $mileageMin ? 1 : 0,
+                                    $mileageMax ? 1 : 0,
+                                ])->sum()
+                            }}
+                        </span>
+                    </span>
+                    @endif
+                </button>
+            </x-slot:filters>
+
+            <x-slot:actions>
+                {{-- Bouton Export (Icon-only) --}}
+                @can('export mileage readings')
+                <div class="relative" x-data="{ showExportMenu: false }">
+                    <button
+                        @click="showExportMenu = !showExportMenu"
+                        @click.outside="showExportMenu = false"
+                        type="button"
+                        title="Export"
+                        class="inline-flex items-center justify-center w-9 h-9 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors shadow-sm">
+                        <x-iconify icon="lucide:download" class="w-4 h-4 text-gray-600" />
+                    </button>
+
+                    <div x-show="showExportMenu"
+                        x-transition
+                        class="absolute right-0 mt-2 w-44 bg-white rounded-lg shadow-lg border border-gray-200 z-10"
+                        style="display: none;">
+                        <button wire:click="exportCsv"
+                            @click="showExportMenu = false"
+                            class="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2 rounded-t-lg">
+                            <x-iconify icon="lucide:file-text" class="w-4 h-4" />
+                            Export CSV
                         </button>
-
-                        {{-- Bouton Export (Icon-only) --}}
-                        @can('export mileage readings')
-                        <div class="relative" x-data="{ showExportMenu: false }">
-                            <button
-                                @click="showExportMenu = !showExportMenu"
-                                @click.outside="showExportMenu = false"
-                                type="button"
-                                title="Export"
-                                class="inline-flex items-center justify-center w-9 h-9 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors shadow-sm">
-                                <x-iconify icon="lucide:download" class="w-4 h-4 text-gray-600" />
-                            </button>
-
-                            <div x-show="showExportMenu"
-                                x-transition
-                                class="absolute right-0 mt-2 w-44 bg-white rounded-lg shadow-lg border border-gray-200 z-10">
-                                <button wire:click="exportCsv"
-                                    @click="showExportMenu = false"
-                                    class="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2 rounded-t-lg">
-                                    <x-iconify icon="lucide:file-text" class="w-4 h-4" />
-                                    Export CSV
-                                </button>
-                                <button wire:click="exportExcel"
-                                    @click="showExportMenu = false"
-                                    class="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2">
-                                    <x-iconify icon="lucide:file-spreadsheet" class="w-4 h-4" />
-                                    Export Excel
-                                </button>
-                                <button wire:click="exportPdf"
-                                    @click="showExportMenu = false"
-                                    class="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2 rounded-b-lg">
-                                    <x-iconify icon="lucide:file" class="w-4 h-4" />
-                                    Export PDF
-                                </button>
-                            </div>
-                        </div>
-                        @endcan
-
-                        {{-- Bouton Nouveau Relevé (Icon-only) --}}
-                        @can('create mileage readings')
-                        <a href="{{ route('admin.mileage-readings.update') }}"
-                            title="Nouveau relevé"
-                            class="inline-flex items-center justify-center w-9 h-9 bg-blue-600 hover:bg-blue-700 text-white rounded-lg shadow-sm hover:shadow transition-all">
-                            <x-iconify icon="lucide:plus" class="w-5 h-5" />
-                        </a>
-                        @endcan
+                        <button wire:click="exportExcel"
+                            @click="showExportMenu = false"
+                            class="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2">
+                            <x-iconify icon="lucide:file-spreadsheet" class="w-4 h-4" />
+                            Export Excel
+                        </button>
+                        <button wire:click="exportPdf"
+                            @click="showExportMenu = false"
+                            class="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2 rounded-b-lg">
+                            <x-iconify icon="lucide:file" class="w-4 h-4" />
+                            Export PDF
+                        </button>
                     </div>
                 </div>
-            </div>
+                @endcan
 
-            {{-- ===============================================
-                FILTRES COLLAPSIBLES (Alpine.js) - ULTRA PRO
-            =============================================== --}}
-            <div x-show="showFilters"
-                x-transition:enter="transition ease-out duration-200"
-                x-transition:enter-start="opacity-0 -translate-y-2"
-                x-transition:enter-end="opacity-100 translate-y-0"
-                x-transition:leave="transition ease-in duration-150"
-                x-transition:leave-start="opacity-100 translate-y-0"
-                x-transition:leave-end="opacity-0 -translate-y-2"
-                class="mt-4 bg-white rounded-lg border border-gray-200 p-6 shadow-sm">
+                {{-- Bouton Nouveau Relevé (Icon-only) --}}
+                @can('create mileage readings')
+                <a href="{{ route('admin.mileage-readings.update') }}"
+                    title="Nouveau relevé"
+                    class="inline-flex items-center justify-center w-9 h-9 bg-blue-600 hover:bg-blue-700 text-white rounded-lg shadow-sm hover:shadow transition-all">
+                    <x-iconify icon="lucide:plus" class="w-5 h-5" />
+                </a>
+                @endcan
+            </x-slot:actions>
 
-                {{-- Ligne 1: Filtres principaux --}}
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-4">
-
-                    {{-- Véhicule (col-span-2 sur large screens) --}}
-                    <div class="lg:col-span-2">
+            <x-slot:filtersPanel>
+                <x-page-filters-panel columns="4">
+                    {{-- Véhicule (col-span-2 on standard grid, handled via class override if needed or just let it flow) --}}
+                    {{-- Note: Standard grid cells are 1fr. For col-span-2, we need a wrapper or class --}}
+                    <div class="md:col-span-2">
                         <label class="block text-xs font-medium text-gray-700 mb-1">Véhicule</label>
                         <div class="text-xs">
                             <x-slim-select
@@ -338,20 +325,24 @@
                     </div>
 
                     {{-- Date de (Calendrier Popup Style Sanctions) --}}
-                    <x-date-picker
-                        label="Du"
-                        wire:model.live="dateFrom"
-                        placeholder="JJ/MM/AAAA" />
+                    <div>
+                        <x-datepicker
+                            name="dateFrom"
+                            label="Du"
+                            :value="$dateFrom"
+                            placeholder="JJ/MM/AAAA"
+                            x-on:input="$wire.set('dateFrom', $event.detail)" />
+                    </div>
 
                     {{-- Date à (Calendrier Popup Style Sanctions) --}}
-                    <x-date-picker
-                        label="Au"
-                        wire:model.live="dateTo"
-                        placeholder="JJ/MM/AAAA" />
-                </div>
-
-                {{-- Ligne 2: Filtres avancés --}}
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div>
+                        <x-datepicker
+                            name="dateTo"
+                            label="Au"
+                            :value="$dateTo"
+                            placeholder="JJ/MM/AAAA"
+                            x-on:input="$wire.set('dateTo', $event.detail)" />
+                    </div>
 
                     {{-- Utilisateur / Chauffeur --}}
                     <div>
@@ -377,42 +368,36 @@
                     </div>
 
                     {{-- KM Min --}}
-                    <x-input
-                        label="KM Min"
-                        wire:model.live.debounce.500ms="mileageMin"
-                        type="number"
-                        id="mileage-min"
-                        placeholder="0" />
-
-                    {{-- KM Max --}}
-                    <x-input
-                        label="KM Max"
-                        wire:model.live.debounce.500ms="mileageMax"
-                        type="number"
-                        id="mileage-max"
-                        placeholder="999999" />
-
-                </div>
-
-                {{-- Résultats et Reset --}}
-                <div class="mt-4 flex items-center justify-between pt-4 border-t border-gray-100">
-                    <div class="text-sm text-gray-600">
-                        <span class="font-semibold">{{ $readings->total() }}</span> résultat(s)
-                        @if($vehicleFilter || $methodFilter || $dateFrom || $dateTo || $authorFilter || $mileageMin || $mileageMax)
-                        <span class="text-xs text-blue-600 font-medium ml-2">
-                            (Filtres actifs)
-                        </span>
-                        @endif
+                    <div>
+                        <label class="block text-xs font-medium text-gray-700 mb-1">KM Min</label>
+                        <input wire:model.live.debounce.500ms="mileageMin" type="number" placeholder="0" class="block w-full border-gray-300 rounded-lg text-xs shadow-sm focus:ring-blue-500 focus:border-blue-500">
                     </div>
 
-                    <button
-                        wire:click="resetFilters"
-                        class="text-xs font-medium text-gray-500 hover:text-red-600 underline decoration-dotted transition-colors outline-none focus:text-red-700">
-                        Réinitialiser
-                    </button>
-                </div>
-            </div>
-        </div>
+                    {{-- KM Max --}}
+                    <div>
+                        <label class="block text-xs font-medium text-gray-700 mb-1">KM Max</label>
+                        <input wire:model.live.debounce.500ms="mileageMax" type="number" placeholder="999999" class="block w-full border-gray-300 rounded-lg text-xs shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+
+                    <x-slot:reset>
+                        <div class="flex items-center justify-between w-full">
+                            <div class="text-sm text-gray-600">
+                                <span class="font-semibold">{{ $readings->total() }}</span> résultat(s)
+                            </div>
+
+                            @if($vehicleFilter || $methodFilter || $dateFrom || $dateTo || $authorFilter || $mileageMin || $mileageMax)
+                            <button
+                                wire:click="resetFilters"
+                                class="text-sm text-red-600 hover:text-red-800 flex items-center gap-1 font-medium bg-red-50 hover:bg-red-100 px-3 py-1.5 rounded-md transition-colors">
+                                <x-iconify icon="lucide:x" class="w-4 h-4" />
+                                Réinitialiser
+                            </button>
+                            @endif
+                        </div>
+                    </x-slot:reset>
+                </x-page-filters-panel>
+            </x-slot:filtersPanel>
+        </x-page-search-bar>
 
         {{-- ===============================================
             TABLE DONNÉES ULTRA-PRO ENTERPRISE

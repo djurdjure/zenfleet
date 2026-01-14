@@ -27,7 +27,8 @@
         {{-- ===============================================
             CARDS MÉTRIQUES ULTRA-PRO
         =============================================== --}}
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+        {{-- CARDS MÉTRIQUES ULTRA-PRO --}}
+        <x-page-analytics-grid columns="4">
             {{-- Total Chauffeurs --}}
             <div class="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-lg transition-shadow duration-300">
                 <div class="flex items-center justify-between">
@@ -79,15 +80,17 @@
                     </div>
                 </div>
             </div>
-        </div>
+        </x-page-analytics-grid>
 
         {{-- ===============================================
             BARRE DE RECHERCHE ET ACTIONS (Enterprise-Grade)
         =============================================== --}}
-        <div class="mb-6" x-data="{ showFilters: false }">
-            <div class="flex flex-col lg:flex-row items-start lg:items-center gap-3">
-                {{-- Recherche rapide --}}
-                <div class="flex-1 w-full lg:w-auto relative">
+        {{-- ===============================================
+            BARRE DE RECHERCHE ET ACTIONS (Enterprise-Grade)
+        =============================================== --}}
+        <x-page-search-bar x-data="{ showFilters: false }">
+            <x-slot:search>
+                <div class="relative">
                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                         <x-iconify icon="lucide:search" class="w-5 h-5 text-gray-400" />
                     </div>
@@ -96,88 +99,83 @@
                         type="text"
                         placeholder="Rechercher par nom, prénom, matricule..."
                         class="pl-10 pr-4 py-2.5 block w-full border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm shadow-sm">
+                    <div wire:loading wire:target="search" class="absolute inset-y-0 right-0 pr-3 flex items-center">
+                        <x-iconify icon="lucide:loader-2" class="w-4 h-4 text-blue-500 animate-spin" />
+                    </div>
                 </div>
+            </x-slot:search>
 
-                {{-- Bouton Filtres Avancés --}}
-                {{-- Bouton Filtres Avancés --}}
+            <x-slot:filters>
                 <button
                     @click="showFilters = !showFilters"
                     type="button"
                     title="Filtres"
                     class="inline-flex items-center gap-2 p-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-all duration-200 shadow-sm hover:shadow-md">
                     <x-iconify icon="lucide:filter" class="w-5 h-5 text-gray-500" />
-                    <x-iconify
-                        icon="heroicons:chevron-down"
-                        class="w-4 h-4 text-gray-400 transition-transform duration-200"
-                        x-bind:class="showFilters ? 'rotate-180' : ''" />
+                    <x-iconify icon="heroicons:chevron-down" class="w-4 h-4 text-gray-400 transition-transform duration-200" x-bind:class="showFilters ? 'rotate-180' : ''" />
                 </button>
+            </x-slot:filters>
 
-                {{-- Actions --}}
-                <div class="flex items-center gap-2">
-                    {{-- Toggle Archives --}}
-                    @if($visibility === 'archived')
-                    <button wire:click="$set('visibility', 'active')"
-                        title="Voir Actifs"
-                        class="inline-flex items-center gap-2 p-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-all duration-200 shadow-sm hover:shadow-md">
-                        <x-iconify icon="lucide:list" class="w-5 h-5" />
-                    </button>
-                    @else
-                    <button wire:click="$set('visibility', 'archived')"
-                        title="Voir Archives"
+            <x-slot:actions>
+                {{-- Toggle Archives --}}
+                @if($visibility === 'archived')
+                <button wire:click="$set('visibility', 'active')"
+                    title="Voir Actifs"
+                    class="inline-flex items-center gap-2 p-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-all duration-200 shadow-sm hover:shadow-md">
+                    <x-iconify icon="lucide:list" class="w-5 h-5" />
+                </button>
+                @else
+                <button wire:click="$set('visibility', 'archived')"
+                    title="Voir Archives"
+                    class="inline-flex items-center gap-2 p-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-all duration-200 shadow-sm hover:shadow-md">
+                    <x-iconify icon="lucide:archive" class="w-5 h-5 text-amber-600" />
+                </button>
+                @endif
+
+                {{-- Export Dropdown --}}
+                <div class="relative" x-data="{ exportOpen: false }">
+                    <button
+                        @click="exportOpen = !exportOpen"
+                        @click.away="exportOpen = false"
+                        type="button"
+                        title="Exporter"
                         class="inline-flex items-center gap-2 p-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-all duration-200 shadow-sm hover:shadow-md">
-                        <x-iconify icon="lucide:archive" class="w-5 h-5 text-amber-600" />
+                        <x-iconify icon="lucide:download" class="w-5 h-5 text-gray-500" />
+                        <x-iconify icon="heroicons:chevron-down" class="w-4 h-4 text-gray-400" />
                     </button>
-                    @endif
-
-                    {{-- Export Dropdown --}}
-                    <div class="relative" x-data="{ exportOpen: false }">
-                        <button
-                            @click="exportOpen = !exportOpen"
-                            @click.away="exportOpen = false"
-                            type="button"
-                            title="Exporter"
-                            class="inline-flex items-center gap-2 p-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-all duration-200 shadow-sm hover:shadow-md">
-                            <x-iconify icon="lucide:download" class="w-5 h-5 text-gray-500" />
-                            <x-iconify icon="heroicons:chevron-down" class="w-4 h-4 text-gray-400" />
-                        </button>
-                        {{-- Dropdown content remains same --}}
-                        <div
-                            x-show="exportOpen"
-                            class="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-lg bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
-                            style="display: none;">
-                            <div class="py-1">
-                                <a href="{{ route('admin.drivers.export.pdf', request()->all()) }}" class="group flex items-center gap-2 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-100">
-                                    <x-iconify icon="lucide:file-text" class="w-4 h-4 text-red-600" />
-                                    <span>Export PDF</span>
-                                </a>
-                                {{-- ... CSV/Excel ... --}}
-                            </div>
+                    {{-- Dropdown --}}
+                    <div
+                        x-show="exportOpen"
+                        x-transition
+                        class="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-lg bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
+                        style="display: none;">
+                        <div class="py-1">
+                            <a href="{{ route('admin.drivers.export.pdf', request()->all()) }}" class="group flex items-center gap-2 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-100">
+                                <x-iconify icon="lucide:file-text" class="w-4 h-4 text-red-600" />
+                                <span>Export PDF</span>
+                            </a>
+                            {{-- Add CSV/Excel if needed --}}
                         </div>
                     </div>
-
-                    {{-- Import --}}
-                    <a href="{{ route('admin.drivers.import.show') }}"
-                        title="Importer"
-                        class="inline-flex items-center gap-2 p-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-all duration-200 shadow-sm hover:shadow-md">
-                        <x-iconify icon="lucide:upload" class="w-5 h-5" />
-                    </a>
-
-                    {{-- Nouveau Chauffeur --}}
-                    <a href="{{ route('admin.drivers.create') }}"
-                        title="Nouveau Chauffeur"
-                        class="inline-flex items-center gap-2 p-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all duration-200 shadow-sm hover:shadow-md">
-                        <x-iconify icon="lucide:plus" class="w-5 h-5" />
-                    </a>
                 </div>
-            </div>
 
-            {{-- Panel Filtres Avancés --}}
-            <div
-                x-show="showFilters"
-                x-transition
-                class="mt-4 bg-white rounded-lg border border-gray-200 p-4 shadow-sm"
-                style="display: none;">
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                {{-- Import --}}
+                <a href="{{ route('admin.drivers.import.show') }}"
+                    title="Importer"
+                    class="inline-flex items-center gap-2 p-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-all duration-200 shadow-sm hover:shadow-md">
+                    <x-iconify icon="lucide:upload" class="w-5 h-5" />
+                </a>
+
+                {{-- Nouveau Chauffeur --}}
+                <a href="{{ route('admin.drivers.create') }}"
+                    title="Nouveau Chauffeur"
+                    class="inline-flex items-center gap-2 p-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all duration-200 shadow-sm hover:shadow-md">
+                    <x-iconify icon="lucide:plus" class="w-5 h-5" />
+                </a>
+            </x-slot:actions>
+
+            <x-slot:filtersPanel>
+                <x-page-filters-panel columns="2">
                     {{-- Statut --}}
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1.5">Statut</label>
@@ -199,17 +197,18 @@
                             @endforeach
                         </x-slim-select>
                     </div>
-                </div>
 
-                <div class="flex items-center justify-end mt-4 pt-4 border-t border-gray-200">
-                    <button
-                        wire:click="resetFilters"
-                        class="px-3 py-1.5 bg-gray-100 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-200 transition-colors">
-                        x Réinitialiser
-                    </button>
-                </div>
-            </div>
-        </div>
+                    <x-slot:reset>
+                        @if($search || $status_id || $license_category)
+                        <button wire:click="resetFilters" class="text-sm text-red-600 hover:text-red-800 flex items-center gap-1 font-medium bg-red-50 hover:bg-red-100 px-3 py-1.5 rounded-md transition-colors">
+                            <x-iconify icon="lucide:x" class="w-4 h-4" />
+                            Réinitialiser
+                        </button>
+                        @endif
+                    </x-slot:reset>
+                </x-page-filters-panel>
+            </x-slot:filtersPanel>
+        </x-page-search-bar>
 
         {{-- ===============================================
             TABLE DES CHAUFFEURS (Enterprise-Grade)

@@ -1,6 +1,6 @@
 @props(['paginator', 'recordsPerPage' => 25])
 
-<div class="mt-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+<div class="pagination-footer mt-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3" style="margin-top: 1rem; display: flex; flex-direction: row; align-items: center; justify-content: space-between; gap: 0.75rem;">
     <!-- Left: Nombre d'éléments par page -->
     <div class="flex items-center text-sm text-gray-700">
         <span class="mr-2">Afficher</span>

@@ -19,10 +19,8 @@
             </p>
         </div>
 
-        {{-- ====================================================================
-             METRIC CARDS - KEY STATISTICS
-             ===================================================================== --}}
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+        {{-- METRIC CARDS - KEY STATISTICS --}}
+        <x-page-analytics-grid columns="4">
             {{-- Total Affectations --}}
             <div class="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-lg transition-shadow duration-300">
                 <div class="flex items-center justify-between">
@@ -74,15 +72,14 @@
                     </div>
                 </div>
             </div>
-        </div>
+        </x-page-analytics-grid>
 
         {{-- ====================================================================
              SEARCH + FILTERS - PROFESSIONAL DESIGN
              ===================================================================== --}}
-        <div class="mb-6" x-data="{ showFilters: false }">
-            <div class="flex flex-col lg:flex-row items-start lg:items-center gap-3">
-                {{-- Search Bar --}}
-                <div class="flex-1 w-full lg:w-auto relative">
+        <x-page-search-bar x-data="{ showFilters: false }">
+            <x-slot:search>
+                <div class="relative">
                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                         <x-iconify icon="lucide:search" class="w-5 h-5 text-gray-400" />
                     </div>
@@ -95,35 +92,29 @@
                         <x-iconify icon="lucide:loader-2" class="w-4 h-4 text-blue-500 animate-spin" />
                     </div>
                 </div>
+            </x-slot:search>
 
-                {{-- Action Buttons --}}
-                <div class="flex items-center gap-2">
-                    {{-- Filter Button --}}
-                    <button
-                        @click="showFilters = !showFilters"
-                        type="button"
-                        title="Filtres"
-                        class="inline-flex items-center gap-2 p-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-all duration-200 shadow-sm hover:shadow-md">
-                        <x-iconify icon="lucide:filter" class="w-5 h-5 text-gray-500" />
-                        <x-iconify icon="heroicons:chevron-down" class="w-4 h-4 text-gray-400 transition-transform duration-200" x-bind:class="showFilters ? 'rotate-180' : ''" />
-                    </button>
+            <x-slot:filters>
+                <button
+                    @click="showFilters = !showFilters"
+                    type="button"
+                    title="Filtres"
+                    class="inline-flex items-center gap-2 p-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-all duration-200 shadow-sm hover:shadow-md">
+                    <x-iconify icon="lucide:filter" class="w-5 h-5 text-gray-500" />
+                    <x-iconify icon="heroicons:chevron-down" class="w-4 h-4 text-gray-400 transition-transform duration-200" x-bind:class="showFilters ? 'rotate-180' : ''" />
+                </button>
+            </x-slot:filters>
 
-                    {{-- Create Assignment --}}
-                    <a href="{{ route('admin.assignments.create') }}"
-                        title="Nouvelle affectation"
-                        class="inline-flex items-center gap-2 p-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all duration-200 shadow-sm hover:shadow-md">
-                        <x-iconify icon="lucide:plus" class="w-5 h-5" />
-                    </a>
-                </div>
-            </div>
+            <x-slot:actions>
+                <a href="{{ route('admin.assignments.create') }}"
+                    title="Nouvelle affectation"
+                    class="inline-flex items-center gap-2 p-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all duration-200 shadow-sm hover:shadow-md">
+                    <x-iconify icon="lucide:plus" class="w-5 h-5" />
+                </a>
+            </x-slot:actions>
 
-            {{-- Collapsible Filter Panel --}}
-            <div x-show="showFilters"
-                x-collapse
-                x-cloak
-                class="w-full bg-white rounded-lg border border-gray-200 p-6 shadow-sm mb-6 mt-4">
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <x-slot:filtersPanel>
+                <x-page-filters-panel columns="2">
                     {{-- Status Filter --}}
                     <div>
                         <x-slim-select
@@ -159,16 +150,18 @@
                                 x-on:input="$wire.set('date_to', $event.detail)" />
                         </div>
                     </div>
-                </div>
 
-                <div class="mt-4 flex gap-2 justify-end">
-                    <button wire:click="resetFilters" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors text-sm font-medium">
-                        Réinitialiser
-                    </button>
-                </div>
-            </div>
-        </div>
-
+                    <x-slot:reset>
+                        @if($search || $status || $date_from || $date_to)
+                        <button wire:click="resetFilters" class="text-sm text-red-600 hover:text-red-800 flex items-center gap-1 font-medium bg-red-50 hover:bg-red-100 px-3 py-1.5 rounded-md transition-colors">
+                            <x-iconify icon="lucide:x" class="w-4 h-4" />
+                            Réinitialiser
+                        </button>
+                        @endif
+                    </x-slot:reset>
+                </x-page-filters-panel>
+            </x-slot:filtersPanel>
+        </x-page-search-bar>
         {{-- ====================================================================
              ASSIGNMENTS TABLE - ULTRA-PRO DESIGN
              ===================================================================== --}}

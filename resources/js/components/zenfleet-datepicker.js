@@ -24,8 +24,9 @@ export function zenfleetDatepickerData() {
     return {
         // Reactive state
         displayValue: '',
+        serverDate: null, // Server format (YYYY-MM-DD) for hidden input x-model binding
         picker: null,
-        value: null, // For x-model binding
+        value: null, // Deprecated: use serverDate instead, kept for compatibility
         instance: null, // Flowbite instance
 
         /**
@@ -138,14 +139,16 @@ export function zenfleetDatepickerData() {
                     const serverDate = `${year}-${month}-${day}`;
 
                     this.displayValue = this.instance.getDate('dd/mm/yyyy');
-                    this.value = serverDate;
+                    this.serverDate = serverDate;
+                    this.value = serverDate; // Keep for backward compatibility
 
                     // IMPORTANT: Dispatch input event for Livewire wire:model
                     this.$dispatch('input', serverDate);
                 } else {
                     // Cleared
                     this.displayValue = '';
-                    this.value = null;
+                    this.serverDate = null;
+                    this.value = null; // Keep for backward compatibility
                     this.$dispatch('input', null);
                 }
             });
@@ -154,7 +157,8 @@ export function zenfleetDatepickerData() {
             el.addEventListener('blur', () => {
                 const val = el.value;
                 if (!val) {
-                    this.value = null;
+                    this.serverDate = null;
+                    this.value = null; // Keep for backward compatibility
                     this.$dispatch('input', null);
                     return;
                 }
@@ -168,8 +172,9 @@ export function zenfleetDatepickerData() {
                     const day = String(date.getDate()).padStart(2, '0');
                     const serverDate = `${year}-${month}-${day}`;
 
-                    if (this.value !== serverDate) {
-                        this.value = serverDate;
+                    if (this.serverDate !== serverDate) {
+                        this.serverDate = serverDate;
+                        this.value = serverDate; // Keep for backward compatibility
                         this.$dispatch('input', serverDate);
                     }
                 }
@@ -186,7 +191,8 @@ export function zenfleetDatepickerData() {
                 this.instance.setDate({ clear: true });
             }
             this.displayValue = '';
-            this.value = null;
+            this.serverDate = null;
+            this.value = null; // Keep for backward compatibility
             this.$dispatch('input', null);
         }
     };
