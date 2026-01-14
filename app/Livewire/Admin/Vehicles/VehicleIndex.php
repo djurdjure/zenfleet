@@ -34,6 +34,13 @@ class VehicleIndex extends Component
     public $depot_id = '';
     public $visibility = 'active'; // active, archived
 
+    // 🆕 Filtres additionnels
+    public $brand = '';
+    public $acquisition_date_from = '';
+    public $acquisition_date_to = '';
+    public $mileage_min = '';
+    public $mileage_max = '';
+
     public $perPage = 25;
 
     // ↕️ Tri
@@ -94,6 +101,11 @@ class VehicleIndex extends Component
         'vehicle_type_id' => ['except' => ''],
         'fuel_type_id' => ['except' => ''],
         'depot_id' => ['except' => ''],
+        'brand' => ['except' => ''],
+        'acquisition_date_from' => ['except' => ''],
+        'acquisition_date_to' => ['except' => ''],
+        'mileage_min' => ['except' => ''],
+        'mileage_max' => ['except' => ''],
         'visibility' => ['except' => 'active'],
         'sortField' => ['except' => 'created_at'],
         'sortDirection' => ['except' => 'desc'],
@@ -119,6 +131,11 @@ class VehicleIndex extends Component
         $this->vehicle_type_id = '';
         $this->fuel_type_id = '';
         $this->depot_id = '';
+        $this->brand = '';
+        $this->acquisition_date_from = '';
+        $this->acquisition_date_to = '';
+        $this->mileage_min = '';
+        $this->mileage_max = '';
         $this->visibility = 'active';
         $this->sortField = 'created_at';
         $this->sortDirection = 'desc';
@@ -536,6 +553,27 @@ class VehicleIndex extends Component
         $query->when($this->vehicle_type_id, fn($q) => $q->where('vehicle_type_id', $this->vehicle_type_id));
         $query->when($this->fuel_type_id, fn($q) => $q->where('fuel_type_id', $this->fuel_type_id));
         $query->when($this->depot_id, fn($q) => $q->where('depot_id', $this->depot_id));
+        $query->when($this->brand, fn($q) => $q->where('brand', 'ilike', "%{$this->brand}%"));
+
+        // Date Filtres
+        $query->when($this->acquisition_date_from, function ($q) {
+            try {
+                $date = \Carbon\Carbon::createFromFormat('d/m/Y', $this->acquisition_date_from)->startOfDay();
+                $q->whereDate('first_registration_date', '>=', $date);
+            } catch (\Exception $e) {
+            }
+        });
+        $query->when($this->acquisition_date_to, function ($q) {
+            try {
+                $date = \Carbon\Carbon::createFromFormat('d/m/Y', $this->acquisition_date_to)->endOfDay();
+                $q->whereDate('first_registration_date', '<=', $date);
+            } catch (\Exception $e) {
+            }
+        });
+
+        // Mileage Filtres
+        $query->when($this->mileage_min, fn($q) => $q->where('current_mileage', '>=', $this->mileage_min));
+        $query->when($this->mileage_max, fn($q) => $q->where('current_mileage', '<=', $this->mileage_max));
 
         // Visibility Filter
         if ($this->visibility === 'archived') {

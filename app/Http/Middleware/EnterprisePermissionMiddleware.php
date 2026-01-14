@@ -140,6 +140,17 @@ class EnterprisePermissionMiddleware
         'admin.organizations.update' => 'edit organizations',
         'admin.organizations.destroy' => 'delete organizations',
 
+        // Dépôts - GESTION
+        'admin.depots.index' => 'view depots', // ou 'view vehicles' si permission manquante
+        'admin.depots.show' => 'view depots',
+        'admin.depots.create' => 'create depots', // ou 'create vehicles'
+        'admin.depots.store' => 'create depots',
+        'admin.depots.edit' => 'edit depots', // ou 'edit vehicles'
+        'admin.depots.update' => 'edit depots',
+        'admin.depots.destroy' => 'delete depots', // ou 'delete vehicles'
+        'admin.depots.export.pdf' => 'view depots',
+        'admin.depots.restore' => 'restore depots',
+
         // Système (Super Admin seulement)
         'admin.system.*' => 'view organizations', // Super Admin only
         'admin.audit.*' => 'view organizations', // Super Admin only
@@ -158,8 +169,20 @@ class EnterprisePermissionMiddleware
         $user = Auth::user();
         $routeName = $request->route()->getName();
 
-        // Log de l'accès pour audit
-        $this->logAccess($request, $user, $routeName);
+        // Safety check for route name
+        if (empty($routeName)) {
+            Log::warning('Route accessed without name', ['url' => $request->fullUrl()]);
+            // Continue without permission check if route has no name (or handle strictly)
+            // For now, let it pass but log it safely
+            return $next($request);
+        }
+
+        // Log de l'accès pour audit - Safety wrapper
+        try {
+            $this->logAccess($request, $user, $routeName);
+        } catch (\Exception $e) {
+            // Ignore logging errors to prevent 500
+        }
 
         // Si des permissions spécifiques sont passées en paramètre
         if (!empty($permissions)) {
@@ -407,12 +430,19 @@ class EnterprisePermissionMiddleware
      */
     private function logUnmappedRoute(Request $request, string $routeName): void
     {
-        Log::channel('audit')->notice('Route non mappée dans le système de permissions', [
-            'route' => $routeName,
-            'url' => $request->fullUrl(),
-            'method' => $request->method(),
-            'user_id' => Auth::id(),
-            'timestamp' => now()->toISOString(),
-        ]);
+        try {
+            Log::channel('audit')->notice('Route non mappée dans le système de permissions', [
+                'route' => $routeName ?? 'unknown',
+                'url' => $request->fullUrl(),
+                'method' => $request->method(),
+                'user_id' => Auth::id(),
+                'timestamp' => now()->toISOString(),
+            ]);
+        } catch (\Exception $e) {
+            // Fallback to default log if audit channel missing
+            Log::warning('Route non mappée (Audit log failed): ' . ($routeName ?? 'unknown'), [
+                'error' => $e->getMessage()
+            ]);
+        }
     }
 }

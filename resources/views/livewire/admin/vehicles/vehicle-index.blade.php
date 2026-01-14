@@ -258,7 +258,7 @@
                     {{-- Fuel Type --}}
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Type de carburant</label>
-                        <x-slim-select wire:model.live="fuel_type" name="fuel_type" placeholder="Tous les carburants">
+                        <x-slim-select wire:model.live="fuel_type_id" name="fuel_type_id" placeholder="Tous les carburants">
                             <option value="" data-placeholder="true">Tous les carburants</option>
                             @foreach($fuelTypes as $key => $label)
                             <option value="{{ $key }}">{{ $label }}</option>
