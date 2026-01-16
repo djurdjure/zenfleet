@@ -175,12 +175,12 @@ class CreateAssignment extends Component
         }
 
         $this->availableVehiclesCache = Vehicle::where('organization_id', auth()->user()->organization_id)
-            ->where(function($query) {
-                $query->whereHas('vehicleStatus', function($statusQuery) {
+            ->where(function ($query) {
+                $query->whereHas('vehicleStatus', function ($statusQuery) {
                     $statusQuery->where('name', 'ILIKE', '%disponible%')
-                              ->orWhere('name', 'ILIKE', '%available%');
+                        ->orWhere('name', 'ILIKE', '%available%');
                 })
-                ->orWhereDoesntHave('vehicleStatus');
+                    ->orWhereDoesntHave('vehicleStatus');
             })
             ->with(['vehicleType', 'vehicleStatus'])
             ->orderBy('registration_plate')
@@ -197,9 +197,9 @@ class CreateAssignment extends Component
         }
 
         $this->availableDriversCache = Driver::where('organization_id', auth()->user()->organization_id)
-            ->where(function($query) {
+            ->where(function ($query) {
                 $query->where('status', 'active')
-                      ->orWhereNull('status');
+                    ->orWhereNull('status');
             })
             ->orderBy('last_name')
             ->orderBy('first_name')
@@ -251,11 +251,11 @@ class CreateAssignment extends Component
         }
 
         try {
-            $startDateTime = Carbon::parse("{$this->start_date} {$this->start_time}");
+            $startDateTime = $this->parseDateTime($this->start_date, $this->start_time);
 
             $endDateTime = null;
             if ($this->assignment_type === 'scheduled' && $this->end_date && $this->end_time) {
-                $endDateTime = Carbon::parse("{$this->end_date} {$this->end_time}");
+                $endDateTime = $this->parseDateTime($this->end_date, $this->end_time);
             }
 
             // 🚗 Détection conflits VÉHICULE (requête optimisée avec index)
@@ -276,7 +276,6 @@ class CreateAssignment extends Component
                 'conflicts_found' => count($this->conflicts),
                 'execution_time_ms' => microtime(true) * 1000,
             ]);
-
         } catch (\Exception $e) {
             Log::error('Error checking conflicts', [
                 'error' => $e->getMessage(),
@@ -302,19 +301,19 @@ class CreateAssignment extends Component
                     // Affectation ouverte: conflit si affectation existante intersecte
                     $q->where(function ($subQ) use ($start) {
                         $subQ->whereNull('end_datetime') // Affectation ouverte existante
-                             ->where('start_datetime', '<=', $start);
+                            ->where('start_datetime', '<=', $start);
                     })->orWhere(function ($subQ) use ($start) {
                         $subQ->whereNotNull('end_datetime') // Affectation programmée existante
-                             ->where('end_datetime', '>', $start);
+                            ->where('end_datetime', '>', $start);
                     });
                 } else {
                     // Affectation programmée: détection intersection classique
                     $q->where(function ($subQ) use ($start, $end) {
                         $subQ->where('start_datetime', '<', $end)
-                             ->where(function ($endQ) use ($start) {
-                                 $endQ->whereNull('end_datetime')
-                                      ->orWhere('end_datetime', '>', $start);
-                             });
+                            ->where(function ($endQ) use ($start) {
+                                $endQ->whereNull('end_datetime')
+                                    ->orWhere('end_datetime', '>', $start);
+                            });
                     });
                 }
             })
@@ -347,18 +346,18 @@ class CreateAssignment extends Component
                 if ($end === null) {
                     $q->where(function ($subQ) use ($start) {
                         $subQ->whereNull('end_datetime')
-                             ->where('start_datetime', '<=', $start);
+                            ->where('start_datetime', '<=', $start);
                     })->orWhere(function ($subQ) use ($start) {
                         $subQ->whereNotNull('end_datetime')
-                             ->where('end_datetime', '>', $start);
+                            ->where('end_datetime', '>', $start);
                     });
                 } else {
                     $q->where(function ($subQ) use ($start, $end) {
                         $subQ->where('start_datetime', '<', $end)
-                             ->where(function ($endQ) use ($start) {
-                                 $endQ->whereNull('end_datetime')
-                                      ->orWhere('end_datetime', '>', $start);
-                             });
+                            ->where(function ($endQ) use ($start) {
+                                $endQ->whereNull('end_datetime')
+                                    ->orWhere('end_datetime', '>', $start);
+                            });
                     });
                 }
             })
@@ -474,11 +473,11 @@ class CreateAssignment extends Component
             DB::beginTransaction();
 
             // Construction de l'objet Assignment
-            $startDateTime = Carbon::parse("{$validated['start_date']} {$validated['start_time']}");
+            $startDateTime = $this->parseDateTime($validated['start_date'], $validated['start_time']);
 
             $endDateTime = null;
             if ($validated['assignment_type'] === 'scheduled' && $validated['end_date'] && $validated['end_time']) {
-                $endDateTime = Carbon::parse("{$validated['end_date']} {$validated['end_time']}");
+                $endDateTime = $this->parseDateTime($validated['end_date'], $validated['end_time']);
             }
 
             $assignment = Assignment::create([
@@ -498,7 +497,7 @@ class CreateAssignment extends Component
             // 🎯 ENTERPRISE UPGRADE: Enregistrer le kilométrage de début avec traçabilité complète
             $vehicle = Vehicle::findOrFail($validated['vehicle_id']);
             $mileageService = app(VehicleMileageService::class);
-            
+
             try {
                 $mileageResult = $mileageService->recordAssignmentStart(
                     $vehicle,
@@ -518,7 +517,7 @@ class CreateAssignment extends Component
                     'assignment_id' => $assignment->id,
                     'error' => $e->getMessage(),
                 ]);
-                
+
                 throw new \Exception(
                     "Erreur lors de l'enregistrement du kilométrage : " . $e->getMessage()
                 );
@@ -544,7 +543,6 @@ class CreateAssignment extends Component
             session()->flash('success', 'Affectation créée avec succès.');
 
             return redirect()->route('admin.assignments.index');
-
         } catch (\Exception $e) {
             DB::rollBack();
 
@@ -598,6 +596,28 @@ class CreateAssignment extends Component
         return Driver::where('id', $driverId)
             ->where('organization_id', auth()->user()->organization_id)
             ->exists();
+    }
+
+    /**
+     * 🛡️ HELPER ENTERPRISE - Parsing de date robuste
+     * Gère automatiquement les formats Y-m-d (Standard) et d/m/Y (FR/Locale)
+     */
+    protected function parseDateTime(string $date, string $time): Carbon
+    {
+        $dateTimeStr = "$date $time";
+
+        try {
+            // Tentative 1: Format standard ISO (Y-m-d H:i)
+            return Carbon::createFromFormat('Y-m-d H:i', $dateTimeStr);
+        } catch (\Exception $e) {
+            try {
+                // Tentative 2: Format FR/Vite (d/m/Y H:i)
+                return Carbon::createFromFormat('d/m/Y H:i', $dateTimeStr);
+            } catch (\Exception $e2) {
+                // Tentative 3: Fallback intelligent Carbon
+                return Carbon::parse($dateTimeStr);
+            }
+        }
     }
 
     // ========================================

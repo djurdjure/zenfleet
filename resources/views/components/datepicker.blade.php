@@ -1,59 +1,79 @@
 @props([
-    'name' => '',
-    'label' => null,
-    'error' => null,
-    'helpText' => null,
-    'required' => false,
-    'disabled' => false,
-    'value' => null,
-    'minDate' => null,
-    'maxDate' => null,
-    'placeholder' => 'Sélectionner une date',
+'name' => '',
+'label' => null,
+'error' => null,
+'helpText' => null,
+'required' => false,
+'disabled' => false,
+'value' => null,
+'minDate' => null,
+'maxDate' => null,
+'placeholder' => 'Sélectionner une date',
 ])
 
 @php
-    $inputId = 'datepicker-' . uniqid();
-    $rawValue = old($name, $value);
-    
-    // Convert server value to display format (d/m/Y) for Flowbite
-    $displayValue = '';
-    if ($rawValue) {
-        // Handle Y-m-d format from database
-        if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $rawValue)) {
-            $date = \Carbon\Carbon::createFromFormat('Y-m-d', $rawValue);
-            $displayValue = $date->format('d/m/Y');
-        }
-        // Handle d/m/Y format from old() flash
-        elseif (preg_match('/^\d{2}\/\d{2}\/\d{4}$/', $rawValue)) {
-            $displayValue = $rawValue;
-        }
-    }
-    
-    // Format min/max dates for data attributes
-    $minDateFormatted = $minDate ? \Carbon\Carbon::parse($minDate)->format('d/m/Y') : '';
-    $maxDateFormatted = $maxDate ? \Carbon\Carbon::parse($maxDate)->format('d/m/Y') : '';
-    
-    // Input classes following Flowbite pattern
-    $inputClasses = 'block w-full !pl-10 p-2.5 bg-gray-50 border-2 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 transition-all duration-200';
-    $inputClasses .= $error ? ' border-red-500' : ' border-gray-300';
+$inputId = 'datepicker-' . uniqid();
+$rawValue = old($name, $value);
+
+// Convert server value to display format (d/m/Y) for Flowbite
+$displayValue = '';
+if ($rawValue) {
+// Handle Y-m-d format from database
+if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $rawValue)) {
+$date = \Carbon\Carbon::createFromFormat('Y-m-d', $rawValue);
+$displayValue = $date->format('d/m/Y');
+}
+// Handle d/m/Y format from old() flash
+elseif (preg_match('/^\d{2}\/\d{2}\/\d{4}$/', $rawValue)) {
+$displayValue = $rawValue;
+}
+}
+
+// Format min/max dates for data attributes
+// Format min/max dates for data attributes - ROBUST PARSING FIX
+$parseDate = function($dateStr) {
+if (!$dateStr) return null;
+try {
+return \Carbon\Carbon::createFromFormat('Y-m-d', $dateStr);
+} catch (\Exception $e) {
+try {
+return \Carbon\Carbon::createFromFormat('d/m/Y', $dateStr);
+} catch (\Exception $e2) {
+try {
+return \Carbon\Carbon::parse($dateStr);
+} catch (\Exception $e3) {
+return null;
+}
+}
+}
+};
+
+$minDateObj = $parseDate($minDate);
+$maxDateObj = $parseDate($maxDate);
+
+$minDateFormatted = $minDateObj ? $minDateObj->format('d/m/Y') : '';
+$maxDateFormatted = $maxDateObj ? $maxDateObj->format('d/m/Y') : '';
+
+// Input classes following Flowbite pattern
+$inputClasses = 'block w-full !pl-10 p-2.5 bg-gray-50 border-2 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 transition-all duration-200';
+$inputClasses .= $error ? ' border-red-500' : ' border-gray-300';
 @endphp
 
-<div 
+<div
     {{ $attributes->merge(['class' => 'w-full']) }}
     x-data="zenfleetDatepicker"
     data-value="{{ $rawValue }}"
     data-display-value="{{ $displayValue }}"
     @if($minDateFormatted) data-min-date="{{ $minDateFormatted }}" @endif
     @if($maxDateFormatted) data-max-date="{{ $maxDateFormatted }}" @endif
-    wire:ignore
->
+    wire:ignore>
     @if($label)
-        <label for="{{ $inputId }}" class="block mb-2 text-sm font-medium text-gray-900">
-            {{ $label }}
-            @if($required)
-                <span class="text-red-500 ml-0.5">*</span>
-            @endif
-        </label>
+    <label for="{{ $inputId }}" class="block mb-2 text-sm font-medium text-gray-900">
+        {{ $label }}
+        @if($required)
+        <span class="text-red-500 ml-0.5">*</span>
+        @endif
+    </label>
     @endif
 
     <div class="relative">
@@ -65,7 +85,7 @@
         </div>
 
         {{-- Display Input (User sees this) --}}
-        <input 
+        <input
             x-ref="displayInput"
             type="text"
             id="{{ $inputId }}"
@@ -75,26 +95,24 @@
             @if($disabled) disabled @endif
             @if($required) required @endif
             autocomplete="off"
-            readonly
-        >
+            readonly>
 
         {{-- Hidden Input (Server receives this in Y-m-d format) --}}
-        <input 
+        <input
             type="hidden"
             name="{{ $name }}"
             x-model="serverDate"
-            value="{{ $rawValue }}"
-        >
+            value="{{ $rawValue }}">
     </div>
 
     @if($error)
-        <p class="mt-2 text-sm text-red-600 flex items-center gap-1">
-            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
-            </svg>
-            {{ $error }}
-        </p>
+    <p class="mt-2 text-sm text-red-600 flex items-center gap-1">
+        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+        </svg>
+        {{ $error }}
+    </p>
     @elseif($helpText)
-        <p class="mt-1 text-xs text-gray-500">{{ $helpText }}</p>
+    <p class="mt-1 text-xs text-gray-500">{{ $helpText }}</p>
     @endif
 </div>

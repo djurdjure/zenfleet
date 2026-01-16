@@ -7,6 +7,7 @@ use App\Models\DocumentCategory;
 use App\Services\DocumentManagerService;
 use Illuminate\Contracts\View\View;
 use Livewire\Component;
+use Livewire\WithFileUploads;
 use Livewire\WithPagination;
 
 /**
@@ -26,6 +27,7 @@ use Livewire\WithPagination;
 class DocumentManagerIndex extends Component
 {
     use WithPagination;
+    use WithFileUploads; // Added for file upload
 
     /**
      * Filters and Search
@@ -42,6 +44,18 @@ class DocumentManagerIndex extends Component
     public int $perPage = 25;
 
     /**
+     * Upload Modal State & Properties
+     */
+    public bool $showUploadModal = false;
+    public $newFile; // Renamed from $file to avoid conflicts
+    public ?int $uploadCategoryId = null;
+    public ?string $uploadDescription = null;
+    public ?string $uploadIssueDate = null;
+    public ?string $uploadExpiryDate = null;
+    public string $uploadStatus = 'validated';
+    public array $uploadMetadata = [];
+
+    /**
      * Querystring bindings
      */
     protected $queryString = [
@@ -53,12 +67,25 @@ class DocumentManagerIndex extends Component
     ];
 
     /**
+     * Listeners
+     */
+    protected $listeners = [
+        'refresh-documents' => '$refresh',
+    ];
+
+    /**
      * Reset pagination when filters change
      */
     public function updated($propertyName)
     {
         if (in_array($propertyName, ['search', 'categoryFilter', 'statusFilter'])) {
             $this->resetPage();
+        }
+
+        // Reset metadata when category changes in upload modal
+        if ($propertyName === 'uploadCategoryId') {
+            $this->uploadMetadata = [];
+            $this->resetValidation();
         }
     }
 
@@ -71,6 +98,16 @@ class DocumentManagerIndex extends Component
             ->where('is_active', true)
             ->orderBy('name')
             ->get();
+    }
+
+    /**
+     * Get selected category for upload (helper)
+     */
+    public function getSelectedUploadCategoryProperty()
+    {
+        return $this->uploadCategoryId
+            ? DocumentCategory::find($this->uploadCategoryId)
+            : null;
     }
 
     /**
@@ -118,6 +155,127 @@ class DocumentManagerIndex extends Component
     }
 
     /**
+     * Open Upload Modal
+     */
+    public function openUploadModal()
+    {
+        $this->resetUploadForm();
+        $this->showUploadModal = true;
+    }
+
+    /**
+     * Close Upload Modal
+     */
+    public function closeUploadModal()
+    {
+        $this->showUploadModal = false;
+        $this->resetUploadForm();
+        $this->resetValidation();
+    }
+
+    /**
+     * Reset Upload Form
+     */
+    protected function resetUploadForm()
+    {
+        $this->reset([
+            'newFile',
+            'uploadCategoryId',
+            'uploadDescription',
+            'uploadIssueDate',
+            'uploadExpiryDate',
+            'uploadStatus',
+            'uploadMetadata',
+        ]);
+        $this->uploadStatus = 'validated';
+    }
+
+    /**
+     * Upload Document Logic
+     */
+    public function upload()
+    {
+        // 1. Static Validation
+        $rules = [
+            'newFile' => ['required', 'file', 'max:10240'], // 10MB max
+            'uploadCategoryId' => ['required', 'exists:document_categories,id'],
+            'uploadDescription' => ['nullable', 'string', 'max:500'],
+            'uploadIssueDate' => ['nullable', 'date'],
+            'uploadExpiryDate' => ['nullable', 'date', 'after:uploadIssueDate'],
+            'uploadStatus' => ['required', 'in:draft,validated'],
+        ];
+
+        // 2. Dynamic Metadata Validation
+        if ($this->uploadCategoryId) {
+            $category = DocumentCategory::find($this->uploadCategoryId);
+            if ($category && $category->meta_schema) {
+                foreach ($category->meta_schema as $field) {
+                    $key = $field['key'] ?? null;
+                    $required = $field['required'] ?? false;
+                    $type = $field['type'] ?? 'string';
+
+                    if (!$key) continue;
+
+                    $fieldRules = [];
+                    $fieldRules[] = $required ? 'required' : 'nullable';
+
+                    switch ($type) {
+                        case 'date':
+                            $fieldRules[] = 'date';
+                            break;
+                        case 'number':
+                            $fieldRules[] = 'numeric';
+                            break;
+                        case 'boolean':
+                            $fieldRules[] = 'boolean';
+                            break;
+                        default:
+                            $fieldRules[] = 'string';
+                            $fieldRules[] = 'max:255';
+                            break;
+                    }
+                    $rules["uploadMetadata.{$key}"] = $fieldRules;
+                }
+            }
+        }
+
+        $this->validate($rules, [
+            'newFile.required' => 'Veuillez sélectionner un fichier.',
+            'newFile.max' => 'Le fichier ne doit pas dépasser 10 MB.',
+            'uploadCategoryId.required' => 'Veuillez sélectionner une catégorie.',
+        ]);
+
+        try {
+            $category = DocumentCategory::findOrFail($this->uploadCategoryId);
+            $service = app(DocumentManagerService::class);
+
+            $options = [
+                'description' => $this->uploadDescription,
+                'issue_date' => $this->uploadIssueDate,
+                'expiry_date' => $this->uploadExpiryDate,
+                'status' => $this->uploadStatus,
+            ];
+
+            // Perform Upload
+            $document = $service->upload(
+                $this->newFile,
+                $category,
+                $this->uploadMetadata,
+                null, // No attachment logic in this context yet
+                $options
+            );
+
+            session()->flash('success', "Document '{$document->original_filename}' ajouté avec succès !");
+            $this->closeUploadModal();
+            $this->resetPage(); // Go to first page to see new doc
+
+        } catch (\Exception $e) {
+            \Log::error('Upload Error: ' . $e->getMessage());
+            session()->flash('error', "Erreur lors de l'upload : " . $e->getMessage());
+        }
+    }
+
+    /**
      * Download document
      */
     public function download(int $documentId)
@@ -146,7 +304,6 @@ class DocumentManagerIndex extends Component
             $service->archive($document);
 
             session()->flash('success', 'Document archivé avec succès.');
-            $this->dispatch('document-archived', documentId: $documentId);
         } catch (\Exception $e) {
             session()->flash('error', 'Erreur lors de l\'archivage : ' . $e->getMessage());
         }
@@ -161,9 +318,8 @@ class DocumentManagerIndex extends Component
             $document = Document::forOrganization(auth()->user()->organization_id)
                 ->findOrFail($documentId);
 
-            // Check permission (only admins can delete)
             if (!auth()->user()->hasAnyRole(['Super Admin', 'Admin', 'Gestionnaire Flotte'])) {
-                session()->flash('error', 'Vous n\'avez pas la permission de supprimer ce document.');
+                session()->flash('error', 'Permission refusée.');
                 return;
             }
 
@@ -171,7 +327,6 @@ class DocumentManagerIndex extends Component
             $service->delete($document);
 
             session()->flash('success', 'Document supprimé définitivement.');
-            $this->dispatch('document-deleted', documentId: $documentId);
         } catch (\Exception $e) {
             session()->flash('error', 'Erreur lors de la suppression : ' . $e->getMessage());
         }
@@ -191,9 +346,18 @@ class DocumentManagerIndex extends Component
      */
     public function render(): View
     {
+        // Calculate Stats
+        $stats = [
+            'total' => Document::forOrganization(auth()->user()->organization_id)->count(),
+            'validated' => Document::forOrganization(auth()->user()->organization_id)->where('status', 'validated')->count(),
+            'draft' => Document::forOrganization(auth()->user()->organization_id)->where('status', 'draft')->count(),
+            'archived' => Document::forOrganization(auth()->user()->organization_id)->where('status', 'archived')->count(),
+        ];
+
         return view('livewire.admin.document-manager-index', [
             'documents' => $this->documents,
             'categories' => $this->categories,
+            'stats' => $stats,
         ])->layout('layouts.admin.catalyst');
     }
 }
