@@ -3,7 +3,7 @@
 Date de mise a jour : 2026-01-21
 Base : audit_codex.md
 Contexte : Dev_environnement.md (Laravel 12 + Livewire 3 + PostgreSQL 18 + Docker)
-Statut : Plan revise et pret pour validation
+Statut : Phase 0 COMMITEE - Phase 1 PRETE
 
 ---
 
@@ -24,7 +24,7 @@ Regle : chaque action doit avoir un identifiant, un statut, une date et une note
 
 Statuts autorises : TODO, IN_PROGRESS, DONE, BLOCKED
 
-Phase courante : Phase 2
+Phase courante : Phase 1
 Etat global : IN_PROGRESS
 Derniere mise a jour : 2026-01-21
 
@@ -38,144 +38,132 @@ Tableau de suivi
 | P0-04 | 0 | Fix API vehicle show param | DONE | | 2026-01-21 | 2026-01-21 | Param route aligne |
 | P0-05 | 0 | Fix webhook mileage update | DONE | | 2026-01-21 | 2026-01-21 | Token map + scope bypass |
 | P0-06 | 0 | Fix routes non mappees (deny by default) | DONE | | 2026-01-21 | 2026-01-21 | Deny hors local/dev |
-| P0-07 | 0 | Tests RLS + scope vehicule + API show + webhook | DONE | | 2026-01-21 | 2026-01-21 | 4 tests ajoutes |
-| P1-01 | 1 | Indexes trigram + drivers composite | DONE | | 2026-01-21 | 2026-01-21 | Migration 2026_01_21_000000_add_trigram_indexes_vehicles |
-| P1-02 | 1 | Caches scoper par organization | DONE | | 2026-01-21 | 2026-01-21 | Cache depots + brands scoper org |
-| P1-03 | 1 | Analytics scoper sans scope utilisateur | DONE | | 2026-01-21 | 2026-01-21 | Vehicle::withoutGlobalScope + org_id |
-| P1-04 | 1 | Migrations driver_statuses prod-safe | DONE | | 2026-01-21 | 2026-01-21 | Guard create si table existe |
-| P1-05 | 1 | Fonction IMMUTABLE corrigee | DONE | | 2026-01-21 | 2026-01-21 | assignment_computed_status STABLE + migration correctrice |
-| P1-06 | 1 | Suppression trigger refresh MV + job planifie | DONE | | 2026-01-21 | 2026-01-21 | Trigger retire, job schedule toutes 15 min |
-| P1-07 | 1 | Compatibilite tests SQLite / PHPUnit | DONE | | 2026-01-21 | 2026-01-21 | Fix migration sanctions + conversion test Pest |
+| P0-07 | 0 | Tests RLS + scope vehicule + API show + webhook | DONE | | 2026-01-21 | 2026-01-21 | 4 tests ajoutes + conversion PHPUnit |
+| P0-08 | 0 | NOUVEAU: Fix tests Spatie Permission multi-tenant | TODO | | | | Setup incorrect dans certains tests |
+| P1-01 | 1 | Validation indexes trigram existants | TODO | | | | Migration 2026_01_21_000000 deja creee |
+| P1-02 | 1 | Validation caches scopes par organization | TODO | | | | VehicleIndex deja modifie |
+| P1-03 | 1 | Validation analytics scopes | TODO | | | | withoutGlobalScope deja implemente |
+| P1-04 | 1 | Tests de non-regression Phase 1 | TODO | | | | Verifier indexes + cache invalidation |
+| P1-05 | 1 | Corriger tests existants defaillants | TODO | | | | AssignmentManagementTest, etc. |
 | P2-01 | 2 | Split VehicleController | TODO | | | | |
 | P2-02 | 2 | Unifier naming permissions | TODO | | | | |
 | P3-01 | 3 | Accessibilite ARIA | TODO | | | | |
 | P3-02 | 3 | Perf AssignmentWizard (pagination/lazy) | TODO | | | | |
 
-Journal d execution
-- 2026-01-21 : Phase 0 terminee (RLS, scope vehicule, API show, webhook, deny unmapped, tests).
-- 2026-01-21 : Phase 1 terminee (indexes, caches scoper, analytics, driver_statuses, MV refresh).
-- 2026-01-21 : Fix tests (Pest -> PHPUnit, migrations SQLite, RefreshDatabase).
+---
+
+## Bilan Phase 0 (COMMITEE - 3aa5cf6)
+
+### Commit
+```
+[Phase 0] Securite Critique - RLS, Scopes, API, Deny by Default
+104 files changed, 3939 insertions(+), 1082 deletions(-)
+```
+
+### Changements Implementes
+1. **SetTenantSession.php** : terminate() + resetTenantContext() + supportsTenantSession()
+2. **UserVehicleAccessScope.php** : Fix groupement OR sur end_datetime
+3. **EnterprisePermissionMiddleware.php** : Deny by default en production
+4. **routes/api.php** : Middleware tenant.session + validation webhook stricte
+5. **VehicleIndex.php** : Cache brands scope par org_id + analytics sans scope user
+6. **Kernel.php** : Job RefreshAssignmentStatsMaterializedView toutes les 15 min
+7. **Tests** : Conversion Pest -> PHPUnit pour compatibilite
+
+### Tests Phase 0 Valides
+- MultiTenantRLSTest: 1 test passe
+- VehicleScopeTest: 1 test passe
+- ApiVehicleShowTest: 1 test passe
+- WebhookMileageTest: 2 tests passes
+- CreateRepairRequestTest: 9 tests passes
+- **Total: 14 tests, 30 assertions - 100% succes**
+
+### Lecons Apprises Phase 0
+
+1. **Configuration Spatie Permission Multi-tenant**
+   - Probleme : Les tests existants ne configurent pas correctement organization_id dans model_has_roles
+   - Impact : AssignmentManagementTest et autres echouent avec QueryException (contrainte unique)
+   - Solution : Ajouter a Phase 1 la correction du setup des tests
+
+2. **Conversion Pest -> PHPUnit**
+   - Les tests Pest utilisent beforeEach() qui n est pas compatible PHPUnit
+   - Migration vers setUp() + class TestCase necessaire
+   - Pattern a suivre : voir CreateRepairRequestTest.php apres correction
+
+3. **Deny by Default**
+   - ATTENTION : Les routes non mappees dans routePermissionMap sont maintenant refusees en prod
+   - Verifier que toutes les routes utilisees sont mappees avant deploiement
 
 ---
 
-## Phase 0 : Securite Critique (24-48h)
+## Phase 1 : Validation + Correction Tests (A FAIRE)
 
-### 0.1 RLS session : SET + RESET (web + API)
+### 1.1 Valider les migrations Phase 0/1 existantes
 
-Probleme : SET LOCAL ne fonctionne qu a l interieur d une transaction. En autocommit, il est annule immediatement.
-Decision : Utiliser SET (persistant) + RESET defensif en terminate. Ajouter un reset pour les requetes non authentifiees.
+Les migrations suivantes ont ete creees mais doivent etre validees :
+- `2026_01_21_000000_add_trigram_indexes_vehicles.php`
+- `2026_01_21_010000_fix_assignment_stats_refresh.php`
+- `2026_01_21_020000_ensure_driver_license_categories.php`
+- `2026_01_21_021000_ensure_vehicles_is_archived.php`
+- `2026_01_21_030000_add_payment_due_date_to_vehicle_expenses.php`
 
-Fichier : app/Http/Middleware/SetTenantSession.php
+Commande de validation :
+```bash
+docker compose exec -u zenfleet_user php php artisan migrate:status
+docker compose exec database psql -U DB_USERNAME -c "SELECT indexname FROM pg_indexes WHERE tablename = 'vehicles';"
+```
 
-Patch propose (extrait) :
-- Utiliser SET pour app.current_user_id et app.current_organization_id.
-- En cas de non-auth, RESET explicite des variables.
-- Ajouter terminate() pour RESET defensif.
+### 1.2 Corriger les tests existants defaillants
 
-Note : La remise a zero doit etre garantie meme en cas d exception (try/finally si besoin).
+Fichiers a corriger (setup Spatie Permission) :
+- tests/Feature/AssignmentManagementTest.php
+- tests/Feature/Admin/OrganizationTableTest.php
+- tests/Feature/Admin/OrganizationTest.php
+- tests/Feature/Admin/VehicleEnterpriseTest.php
+- tests/Feature/Assignment/CreateAssignmentTest.php
+- tests/Feature/ExpenseManagementTest.php
 
-### 0.2 RLS apres auth:sanctum pour API
+Pattern de correction (voir CreateRepairRequestTest.php) :
+```php
+protected function setUp(): void
+{
+    parent::setUp();
+    
+    $permissionRegistrar = app(PermissionRegistrar::class);
+    $permissionRegistrar->forgetCachedPermissions();
+    
+    $this->organization = Organization::factory()->create();
+    app(PermissionsTeamResolver::class)->setPermissionsTeamId($this->organization->id);
+    $permissionRegistrar->setPermissionsTeamId($this->organization->id);
+    
+    $role = Role::firstOrCreate([
+        'name' => 'Admin',
+        'guard_name' => 'web',
+        'organization_id' => $this->organization->id, // IMPORTANT
+    ]);
+    
+    // Apres assignRole, mettre a jour model_has_roles
+    DB::table('model_has_roles')
+        ->where('model_id', $user->id)
+        ->where('model_type', User::class)
+        ->update(['organization_id' => $this->organization->id]);
+}
+```
 
-Probleme : Ajouter SetTenantSession dans le groupe api avant auth:sanctum ne fonctionne pas (Auth::check() false).
-Decision : Ajouter SetTenantSession au groupe de routes API protegees (apres auth:sanctum).
+### 1.3 Ajouter routes manquantes au mapping
 
-Fichiers : routes/api.php, app/Http/Kernel.php
+Verifier et ajouter les routes non mappees :
+```bash
+docker compose exec -u zenfleet_user php php artisan route:list --name=admin | grep -v "mapped"
+```
 
-### 0.3 Correction scope vehicule (OR mal groupe)
+### 1.4 Tests de validation Phase 1
 
-Probleme : le OR sur end_datetime n est pas groupe avec driver_id, fuite possible.
-Fichier : app/Models/Scopes/UserVehicleAccessScope.php
+Objectif : 100% des tests passent
 
-Patch propose (extrait) :
-- Regrouper whereNull(end_datetime) OR end_datetime >= now() dans un where() interne.
-
-### 0.4 Fix API vehicle show (param mismatch)
-
-Probleme : route utilise {vehicle} mais handler prend vehicleId.
-Fichier : routes/api.php
-
-Patch propose :
-- Aligner le parametre de fonction sur {vehicle} et utiliser le model binding.
-
-### 0.5 Fix webhook mileage update (scope + org validation)
-
-Probleme : le scope global peut bloquer la mise a jour. La validation org est faible.
-Fichiers : routes/api.php, app/Models/Scopes/UserVehicleAccessScope.php
-
-Patch propose :
-- Vehicle::withoutGlobalScopes() pour recuperer le vehicule par ID.
-- Verifier organization_id via token associe a l org (a definir dans config).
-- Rejeter si mismatch.
-
-### 0.6 Routes non mappees dans EnterprisePermissionMiddleware
-
-Probleme : une route non mappee est autorisee par defaut.
-Decision : deny by default en prod, allow en local avec log.
-Fichier : app/Http/Middleware/EnterprisePermissionMiddleware.php
-
-### 0.7 Tests Phase 0
-
-A creer
-- tests/Feature/MultiTenantRLSTest.php
-- tests/Feature/VehicleScopeTest.php
-- tests/Feature/ApiVehicleShowTest.php
-- tests/Feature/WebhookMileageTest.php
-
----
-
-## Phase 1 : Performance + Hardening Multi-tenant (Semaine 1)
-
-### 1.1 Indexes trigram ILIKE
-
-Fichier a creer : database/migrations/2026_01_21_000000_add_trigram_indexes_vehicles.php
-- Extension pg_trgm
-- Index GIN trigram sur vehicles.registration_plate, vehicles.brand, vehicles.model
-- Index composite drivers(organization_id, last_name, first_name)
-- Index trigram drivers.license_number
-
-### 1.2 Caches scopes par organization
-
-Probleme : cache marques non scope.
-Fichier : app/Livewire/Admin/Vehicles/VehicleIndex.php
-
-Patch propose :
-- Key cache par organization_id pour brands.
-
-### 1.3 Analytics scoper sans scope utilisateur
-
-Probleme : UserVehicleAccessScope peut fausser les analytics.
-Fichier : app/Livewire/Admin/Vehicles/VehicleIndex.php
-
-Patch propose :
-- Vehicle::withoutGlobalScope(UserVehicleAccessScope::class)
-- Filtrer explicitement par organization_id
-
-### 1.4 Migrations driver_statuses prod-safe
-
-Probleme : doublons migrations.
-Decision prod-safe : ne pas fusionner des migrations deja appliquees.
-
-Actions :
-- Ajouter une nouvelle migration de reconciliation (checks + colonnes manquantes).
-- Garder les anciennes migrations intactes.
-- Pour clean install, documenter l ordre et valider migrate:fresh.
-
-Fichiers : database/migrations/*driver_statuses*
-
-### 1.5 Fonction IMMUTABLE corrigee
-
-Fichier : database/migrations/2025_01_20_000000_add_gist_constraints_assignments.php
-- assignment_computed_status doit etre STABLE, pas IMMUTABLE.
-
-### 1.6 Supprimer trigger REFRESH MV CONCURRENTLY
-
-Probleme : interdit dans trigger.
-Solution : Job planifie.
-
-Fichiers :
-- database/migrations/2025_01_20_000000_add_gist_constraints_assignments.php
-- app/Jobs/RefreshAssignmentStatsMaterializedView.php
-- app/Console/Kernel.php
+```bash
+docker compose exec -u zenfleet_user php php artisan test --testsuite=Feature
+docker compose exec -u zenfleet_user php php artisan test --testsuite=Unit
+```
 
 ---
 
@@ -226,12 +214,21 @@ Tests
 - docker compose exec -u zenfleet_user php php artisan migrate:fresh --seed
 
 PostgreSQL
-- docker compose exec database psql -U DB_USERNAME -c SELECT extname FROM pg_extension WHERE extname IN ('pg_trgm','btree_gist','pgcrypto');
-- docker compose exec database psql -U DB_USERNAME -c SELECT 1 FROM vehicles WHERE registration_plate ILIKE '%ABC%';
+- docker compose exec database psql -U DB_USERNAME -c "SELECT extname FROM pg_extension WHERE extname IN ('pg_trgm','btree_gist','pgcrypto');"
+- docker compose exec database psql -U DB_USERNAME -c "SELECT 1 FROM vehicles WHERE registration_plate ILIKE '%ABC%';"
 
 ---
 
-## Demarrage de l execution
+## Journal d execution
 
-Ce plan est PRET mais ne doit pas etre execute sans validation.
-Merci de confirmer avant lancement de la phase 0.
+- 2026-01-21 22:20 : Phase 0 COMMITEE (3aa5cf6) - 104 fichiers, tests valides
+- 2026-01-21 : Audit regression Phase 0 : aucune regression fonctionnelle detectee
+- 2026-01-21 : Identification probleme tests existants (Spatie Permission setup)
+- 2026-01-21 : Phase 1 prete a demarrer
+
+---
+
+## Prochaine etape
+
+Phase 1 : Validation + Correction Tests
+Priorite : Corriger le setup des tests Spatie Permission pour atteindre 100% de couverture
