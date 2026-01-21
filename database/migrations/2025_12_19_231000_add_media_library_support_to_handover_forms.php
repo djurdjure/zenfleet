@@ -2,6 +2,7 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
@@ -10,6 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (Schema::getConnection()->getDriverName() !== 'pgsql') {
+            return;
+        }
+
         // Add comment to signed_form_path column to mark it as deprecated
         // Note: The column is kept for backward compatibility
         DB::statement("COMMENT ON COLUMN vehicle_handover_forms.signed_form_path IS 'Deprecated: Use Spatie Media Library instead. Kept for backward compatibility.'");
@@ -20,6 +25,10 @@ return new class extends Migration
      */
     public function down(): void
     {
+        if (Schema::getConnection()->getDriverName() !== 'pgsql') {
+            return;
+        }
+
         // Remove the comment
         DB::statement("COMMENT ON COLUMN vehicle_handover_forms.signed_form_path IS NULL");
     }

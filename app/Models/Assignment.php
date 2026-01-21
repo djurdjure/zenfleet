@@ -372,7 +372,7 @@ class Assignment extends Model
     {
         // Accéder directement à l'attribut pour éviter la récursion
         $rawStatus = $this->attributes['status'] ?? null;
-        
+
         if ($rawStatus === self::STATUS_CANCELLED) {
             return self::STATUS_CANCELLED;
         }
@@ -417,25 +417,25 @@ class Assignment extends Model
             // Vérifier les affectations qui commencent avant la fin de celle-ci (indéterminée)
             // et qui n'ont pas encore de fin OU dont la fin est après le début de celle-ci
             $query = static::where(
-                    fn ($q) => $q->where(
-                        fn ($subQ) => $subQ->whereNull("end_datetime")->orWhere("end_datetime", ">", $start)
-                    )
+                fn($q) => $q->where(
+                    fn($subQ) => $subQ->whereNull("end_datetime")->orWhere("end_datetime", ">", $start)
                 )
-                ->where("start_datetime", "<", Carbon::maxValue()); // Utiliser Carbon::maxValue() pour les affectations indéterminées
+            )
+                ->where("start_datetime", "<", Carbon::now()->addYears(100)); // Date future lointaine pour la comparaison
         } else {
             // Vérifier les affectations qui se chevauchent avec la période définie
             $query = static::where(
-                    fn ($q) => $q->where(
-                        fn ($subQ) => $subQ->whereNull("end_datetime")->orWhere("end_datetime", ">", $start)
-                    )
+                fn($q) => $q->where(
+                    fn($subQ) => $subQ->whereNull("end_datetime")->orWhere("end_datetime", ">", $start)
                 )
+            )
                 ->where("start_datetime", "<", $end);
         }
 
         // Appliquer les filtres pour le même véhicule OU le même chauffeur
         $query->where(function ($q) {
             $q->where("vehicle_id", $this->vehicle_id)
-              ->orWhere("driver_id", $this->driver_id);
+                ->orWhere("driver_id", $this->driver_id);
         });
 
         // Exclure l'affectation en cours de modification si un ID est fourni
@@ -476,22 +476,22 @@ class Assignment extends Model
         if ($this->start_datetime > now()) {
             return false;
         }
-        
+
         // Si déjà marquée comme terminée via ended_at
         if ($this->ended_at !== null) {
             return false;
         }
-        
+
         // Si pas de date de fin définie (affectation ouverte) = terminable
         if ($this->end_datetime === null) {
             return true;
         }
-        
+
         // Si date de fin future = terminaison anticipée possible
         if ($this->end_datetime > now()) {
             return true;
         }
-        
+
         // Si date de fin passée = déjà terminée automatiquement
         return false;
     }
@@ -504,7 +504,7 @@ class Assignment extends Model
     public function canBeDeleted(): bool
     {
         return $this->status === self::STATUS_SCHEDULED ||
-               ($this->created_at && $this->created_at->diffInHours() < 24);
+            ($this->created_at && $this->created_at->diffInHours() < 24);
     }
 
     public function canBeCancelled(): bool
@@ -564,7 +564,6 @@ class Assignment extends Model
             ]);
 
             return $result['success'];
-
         } catch (\Exception $e) {
             \Log::error('[Assignment::end] Erreur lors de la terminaison', [
                 'assignment_id' => $this->id,
@@ -635,7 +634,7 @@ class Assignment extends Model
      */
     private function getStatusColor(): string
     {
-        return match($this->status) {
+        return match ($this->status) {
             self::STATUS_SCHEDULED => '#3B82F6',   // Bleu
             self::STATUS_ACTIVE => '#10B981',      // Vert
             self::STATUS_COMPLETED => '#6B7280',   // Gris
@@ -646,7 +645,7 @@ class Assignment extends Model
 
     private function getStatusBorderColor(): string
     {
-        return match($this->status) {
+        return match ($this->status) {
             self::STATUS_SCHEDULED => '#1D4ED8',   // Bleu foncé
             self::STATUS_ACTIVE => '#059669',      // Vert foncé
             self::STATUS_COMPLETED => '#4B5563',   // Gris foncé
@@ -657,7 +656,7 @@ class Assignment extends Model
 
     private function getStatusTextColor(): string
     {
-        return match($this->status) {
+        return match ($this->status) {
             self::STATUS_SCHEDULED => '#FFFFFF',   // Blanc
             self::STATUS_ACTIVE => '#FFFFFF',      // Blanc
             self::STATUS_COMPLETED => '#FFFFFF',   // Blanc

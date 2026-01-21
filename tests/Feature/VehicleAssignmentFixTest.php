@@ -7,6 +7,7 @@ use App\Livewire\AssignmentTable;
 use App\Models\Assignment;
 use App\Models\Driver;
 use App\Models\DriverStatus;
+use App\Models\Organization;
 use App\Models\User;
 use App\Models\Vehicle;
 use App\Models\VehicleStatus;
@@ -16,14 +17,19 @@ use Tests\TestCase;
 
 class VehicleAssignmentFixTest extends TestCase
 {
-    // use RefreshDatabase; // Commented out to avoid wiping existing DB if not configured for testing
+    use RefreshDatabase;
+
+    protected Organization $organization;
+    protected User $user;
 
     public function setUp(): void
     {
         parent::setUp();
-        
-        // Ensure we have an admin user
-        $this->user = User::first() ?? User::factory()->create();
+
+        $this->organization = Organization::factory()->create();
+        $this->user = User::factory()->create([
+            'organization_id' => $this->organization->id,
+        ]);
         $this->actingAs($this->user);
     }
 
@@ -34,7 +40,10 @@ class VehicleAssignmentFixTest extends TestCase
         $status1 = VehicleStatus::firstOrCreate(['slug' => 'available'], ['name' => 'Available', 'color' => 'green']);
         $status2 = VehicleStatus::firstOrCreate(['slug' => 'maintenance'], ['name' => 'Maintenance', 'color' => 'red']);
 
-        $vehicle = Vehicle::factory()->create(['status_id' => $status1->id]);
+        $vehicle = Vehicle::factory()->create([
+            'organization_id' => $this->organization->id,
+            'status_id' => $status1->id,
+        ]);
 
         Livewire::test(VehicleIndex::class)
             ->call('confirmIndividualStatusChange', $vehicle->id)
@@ -58,15 +67,21 @@ class VehicleAssignmentFixTest extends TestCase
         $busyDriverStatus = DriverStatus::firstOrCreate(['slug' => 'busy'], ['name' => 'Busy', 'color' => 'red']);
 
         // Create vehicle and driver
-        $vehicle = Vehicle::factory()->create(['status_id' => $activeStatus->id]);
-        $driver = Driver::factory()->create(['status_id' => $busyDriverStatus->id]);
+        $vehicle = Vehicle::factory()->create([
+            'organization_id' => $this->organization->id,
+            'status_id' => $activeStatus->id,
+        ]);
+        $driver = Driver::factory()->create([
+            'organization_id' => $this->organization->id,
+            'status_id' => $busyDriverStatus->id,
+        ]);
 
         // Create assignment
         $assignment = Assignment::create([
             'vehicle_id' => $vehicle->id,
             'driver_id' => $driver->id,
             'start_datetime' => now(),
-            'organization_id' => $this->user->organization_id ?? 1,
+            'organization_id' => $this->organization->id,
             'status' => 'active'
         ]);
 

@@ -16,11 +16,11 @@ use App\Http\Controllers\Api\VehicleMileageReadingController;
 |
 */
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
+Route::middleware(['auth:sanctum', 'tenant.session'])->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::middleware(['auth:sanctum', 'can:view assignments'])->prefix('admin')->name('api.admin.')->group(function () {
+Route::middleware(['auth:sanctum', 'tenant.session', 'can:view assignments'])->prefix('admin')->name('api.admin.')->group(function () {
     Route::patch('assignments/{assignment}/move', [\App\Http\Controllers\Api\AssignmentController::class, 'move'])->name('assignments.move');
     Route::apiResource('assignments', \App\Http\Controllers\Api\AssignmentController::class)->only(['show', 'update', 'store', 'destroy']);
 });
@@ -35,7 +35,7 @@ Route::middleware(['auth:sanctum', 'can:view assignments'])->prefix('admin')->na
 |
 */
 
-Route::prefix('v1')->name('api.v1.')->middleware(['auth:sanctum'])->group(function () {
+Route::prefix('v1')->name('api.v1.')->middleware(['auth:sanctum', 'tenant.session'])->group(function () {
 
     // 📊 Module Relevés Kilométriques API
     Route::prefix('mileage-readings')->name('mileage-readings.')->group(function () {
@@ -142,11 +142,11 @@ Route::prefix('v1')->name('api.v1.')->middleware(['auth:sanctum'])->group(functi
             ]);
         })->name('index');
 
-        Route::get('/{vehicle}', function (Request $request, int $vehicleId) {
+        Route::get('/{vehicle}', function (Request $request, int $vehicle) {
             $organizationId = auth()->user()->organization_id;
 
             $vehicle = \App\Models\Vehicle::where('organization_id', $organizationId)
-                ->findOrFail($vehicleId);
+                ->findOrFail($vehicle);
 
             return response()->json([
                 'success' => true,
@@ -300,19 +300,42 @@ Route::prefix('webhooks')->name('webhooks.')->group(function () {
 
     // Webhook pour mise à jour automatique du kilométrage
     Route::post('/vehicle/mileage-update', function (Request $request) {
-        $expectedToken = config('app.webhook_token');
-        if (!$expectedToken || $request->header('X-Webhook-Token') !== $expectedToken) {
-            return response()->json(['error' => 'Unauthorized'], 401);
+        $tokenHeader = $request->header('X-Webhook-Token');
+        $tokenMap = config('app.webhook_tokens');
+        $organizationId = null;
+
+        if (is_array($tokenMap)) {
+            $organizationId = array_search($tokenHeader, $tokenMap, true);
+            if (!$organizationId) {
+                return response()->json(['error' => 'Unauthorized'], 401);
+            }
+        } else {
+            $expectedToken = config('app.webhook_token');
+            if (!$expectedToken || $tokenHeader !== $expectedToken) {
+                return response()->json(['error' => 'Unauthorized'], 401);
+            }
         }
 
         $validated = $request->validate([
             'vehicle_id' => 'required|integer',
             'current_mileage' => 'required|integer|min:0',
-            'timestamp' => 'required|date'
+            'timestamp' => 'required|date',
+            'organization_id' => $organizationId ? 'nullable' : 'required|integer',
         ]);
 
+        if (!$organizationId) {
+            $organizationId = (int) $validated['organization_id'];
+        }
+
         // Mise à jour du kilométrage si plus récent
-        $vehicle = \App\Models\Vehicle::find($validated['vehicle_id']);
+        $vehicle = \App\Models\Vehicle::withoutGlobalScopes()
+            ->where('organization_id', $organizationId)
+            ->find($validated['vehicle_id']);
+
+        if (!$vehicle) {
+            return response()->json(['error' => 'Not Found'], 404);
+        }
+
         if ($vehicle && $validated['current_mileage'] > $vehicle->current_mileage) {
             $vehicle->update(['current_mileage' => $validated['current_mileage']]);
 

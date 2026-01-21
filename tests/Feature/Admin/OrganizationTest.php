@@ -7,6 +7,7 @@ use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Spatie\Permission\Models\Role;
+use Spatie\Permission\Contracts\PermissionsTeamResolver;
 use Tests\TestCase;
 
 class OrganizationTest extends TestCase
@@ -23,7 +24,9 @@ class OrganizationTest extends TestCase
         $superAdminRole = Role::firstOrCreate(['name' => 'Super Admin']);
 
         // Create admin user with Super Admin role
-        $this->adminUser = User::factory()->create();
+        $organization = Organization::factory()->create();
+        $this->adminUser = User::factory()->create(['organization_id' => $organization->id]);
+        app(PermissionsTeamResolver::class)->setPermissionsTeamId($organization->id);
         $this->adminUser->assignRole($superAdminRole);
     }
 
@@ -113,7 +116,6 @@ class OrganizationTest extends TestCase
             'name' => 'New Test Organization',
             'email' => 'contact@newtest.dz',
             'organization_type' => 'enterprise',
-            'country' => 'DZ',
         ]);
     }
 

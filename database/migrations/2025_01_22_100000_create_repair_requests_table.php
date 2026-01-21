@@ -8,11 +8,15 @@ return new class extends Migration
 {
     public function up()
     {
+        $driver = DB::getDriverName();
+
         // Créer les ENUMs requis pour PostgreSQL
-        DB::statement("CREATE TYPE repair_priority_enum AS ENUM ('urgente', 'a_prevoir', 'non_urgente')");
-        DB::statement("CREATE TYPE repair_status_enum AS ENUM ('en_attente', 'accord_initial', 'accordee', 'refusee', 'en_cours', 'terminee', 'annulee')");
-        DB::statement("CREATE TYPE supervisor_decision_enum AS ENUM ('accepte', 'refuse')");
-        DB::statement("CREATE TYPE manager_decision_enum AS ENUM ('valide', 'refuse')");
+        if ($driver === 'pgsql') {
+            DB::statement("CREATE TYPE repair_priority_enum AS ENUM ('urgente', 'a_prevoir', 'non_urgente')");
+            DB::statement("CREATE TYPE repair_status_enum AS ENUM ('en_attente', 'accord_initial', 'accordee', 'refusee', 'en_cours', 'terminee', 'annulee')");
+            DB::statement("CREATE TYPE supervisor_decision_enum AS ENUM ('accepte', 'refuse')");
+            DB::statement("CREATE TYPE manager_decision_enum AS ENUM ('valide', 'refuse')");
+        }
 
         Schema::create('repair_requests', function (Blueprint $table) {
             $table->id();
@@ -76,38 +80,44 @@ return new class extends Migration
         });
 
         // Contraintes business PostgreSQL
-        DB::statement("
-            ALTER TABLE repair_requests
-            ADD CONSTRAINT valid_workflow CHECK (
-                (status = 'accord_initial' AND supervisor_decision = 'accepte') OR
-                (status = 'accordee' AND manager_decision = 'valide') OR
-                (status = 'refusee' AND (supervisor_decision = 'refuse' OR manager_decision = 'refuse')) OR
-                (status IN ('en_attente', 'en_cours', 'terminee', 'annulee'))
-            )
-        ");
+        if ($driver === 'pgsql') {
+            DB::statement("
+                ALTER TABLE repair_requests
+                ADD CONSTRAINT valid_workflow CHECK (
+                    (status = 'accord_initial' AND supervisor_decision = 'accepte') OR
+                    (status = 'accordee' AND manager_decision = 'valide') OR
+                    (status = 'refusee' AND (supervisor_decision = 'refuse' OR manager_decision = 'refuse')) OR
+                    (status IN ('en_attente', 'en_cours', 'terminee', 'annulee'))
+                )
+            ");
 
-        DB::statement("
-            ALTER TABLE repair_requests
-            ADD CONSTRAINT valid_completion CHECK (
-                (status != 'terminee') OR
-                (status = 'terminee' AND work_completed_at IS NOT NULL AND actual_cost IS NOT NULL)
-            )
-        ");
+            DB::statement("
+                ALTER TABLE repair_requests
+                ADD CONSTRAINT valid_completion CHECK (
+                    (status != 'terminee') OR
+                    (status = 'terminee' AND work_completed_at IS NOT NULL AND actual_cost IS NOT NULL)
+                )
+            ");
 
-        DB::statement("
-            ALTER TABLE repair_requests
-            ADD CONSTRAINT valid_timing CHECK (
-                (work_started_at IS NULL OR work_completed_at IS NULL OR work_started_at <= work_completed_at)
-            )
-        ");
+            DB::statement("
+                ALTER TABLE repair_requests
+                ADD CONSTRAINT valid_timing CHECK (
+                    (work_started_at IS NULL OR work_completed_at IS NULL OR work_started_at <= work_completed_at)
+                )
+            ");
+        }
     }
 
     public function down()
     {
+        $driver = DB::getDriverName();
+
         Schema::dropIfExists('repair_requests');
-        DB::statement("DROP TYPE IF EXISTS repair_priority_enum");
-        DB::statement("DROP TYPE IF EXISTS repair_status_enum");
-        DB::statement("DROP TYPE IF EXISTS supervisor_decision_enum");
-        DB::statement("DROP TYPE IF EXISTS manager_decision_enum");
+        if ($driver === 'pgsql') {
+            DB::statement("DROP TYPE IF EXISTS repair_priority_enum");
+            DB::statement("DROP TYPE IF EXISTS repair_status_enum");
+            DB::statement("DROP TYPE IF EXISTS supervisor_decision_enum");
+            DB::statement("DROP TYPE IF EXISTS manager_decision_enum");
+        }
     }
 };

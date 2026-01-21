@@ -12,6 +12,14 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (!Schema::hasTable('driver_sanction_histories')) {
+            return;
+        }
+
+        if (Schema::getConnection()->getDriverName() !== 'pgsql') {
+            return;
+        }
+
         // Drop the old constraint
         DB::statement("ALTER TABLE driver_sanction_histories DROP CONSTRAINT IF EXISTS driver_sanction_histories_action_check");
 
@@ -24,6 +32,14 @@ return new class extends Migration
      */
     public function down(): void
     {
+        if (!Schema::hasTable('driver_sanction_histories')) {
+            return;
+        }
+
+        if (Schema::getConnection()->getDriverName() !== 'pgsql') {
+            return;
+        }
+
         // Drop the new constraint
         DB::statement("ALTER TABLE driver_sanction_histories DROP CONSTRAINT IF EXISTS driver_sanction_histories_action_check");
 

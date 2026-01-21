@@ -44,6 +44,9 @@ class AssignmentTableTest extends TestCase
             'organization_id' => $this->organization->id
         ]);
 
+        // Configurer le contexte de l'organisation pour les permissions (CRITIQUE)
+        app(\Spatie\Permission\PermissionRegistrar::class)->setPermissionsTeamId($this->organization->id);
+
         $this->vehicle = Vehicle::factory()->create([
             'organization_id' => $this->organization->id
         ]);
@@ -51,6 +54,28 @@ class AssignmentTableTest extends TestCase
         $this->driver = Driver::factory()->create([
             'organization_id' => $this->organization->id
         ]);
+
+        // Créer les permissions nécessaires pour les tests de table
+        $permissions = [
+            'view assignments',
+            'create assignments',
+            'edit assignments',
+            'delete assignments',
+            'view vehicles',
+            'view drivers',
+            // Enterprise Permissions (required by Middleware)
+            'assignments.view',
+            'assignments.create',
+            'assignments.update',
+            'assignments.delete',
+            'assignments.end'
+        ];
+
+        foreach ($permissions as $permission) {
+            \Spatie\Permission\Models\Permission::firstOrCreate(['name' => $permission, 'guard_name' => 'web']);
+        }
+
+        $this->user->givePermissionTo($permissions);
 
         $this->actingAs($this->user);
     }
@@ -85,7 +110,7 @@ class AssignmentTableTest extends TestCase
 
         Livewire::test(AssignmentTable::class)
             ->assertStatus(200)
-            ->assertViewHas('assignments', function($assignments) {
+            ->assertViewHas('assignments', function ($assignments) {
                 return $assignments->count() === 3;
             });
     }
@@ -112,7 +137,7 @@ class AssignmentTableTest extends TestCase
 
         Livewire::test(AssignmentTable::class)
             ->set('search', 'ABC-123')
-            ->assertViewHas('assignments', function($assignments) {
+            ->assertViewHas('assignments', function ($assignments) {
                 return $assignments->count() === 1;
             });
     }
@@ -140,7 +165,7 @@ class AssignmentTableTest extends TestCase
 
         Livewire::test(AssignmentTable::class)
             ->set('search', 'Jean Dupont')
-            ->assertViewHas('assignments', function($assignments) {
+            ->assertViewHas('assignments', function ($assignments) {
                 return $assignments->count() === 1;
             });
     }
@@ -171,9 +196,9 @@ class AssignmentTableTest extends TestCase
 
         Livewire::test(AssignmentTable::class)
             ->set('statusFilter', Assignment::STATUS_ACTIVE)
-            ->assertViewHas('assignments', function($assignments) {
+            ->assertViewHas('assignments', function ($assignments) {
                 return $assignments->count() === 1 &&
-                       $assignments->first()->status === Assignment::STATUS_ACTIVE;
+                    $assignments->first()->status === Assignment::STATUS_ACTIVE;
             });
     }
 
@@ -198,9 +223,9 @@ class AssignmentTableTest extends TestCase
 
         Livewire::test(AssignmentTable::class)
             ->set('vehicleFilter', $this->vehicle->id)
-            ->assertViewHas('assignments', function($assignments) {
+            ->assertViewHas('assignments', function ($assignments) {
                 return $assignments->count() === 1 &&
-                       $assignments->first()->vehicle_id === $this->vehicle->id;
+                    $assignments->first()->vehicle_id === $this->vehicle->id;
             });
     }
 
@@ -225,9 +250,9 @@ class AssignmentTableTest extends TestCase
 
         Livewire::test(AssignmentTable::class)
             ->set('driverFilter', $this->driver->id)
-            ->assertViewHas('assignments', function($assignments) {
+            ->assertViewHas('assignments', function ($assignments) {
                 return $assignments->count() === 1 &&
-                       $assignments->first()->driver_id === $this->driver->id;
+                    $assignments->first()->driver_id === $this->driver->id;
             });
     }
 
@@ -262,7 +287,7 @@ class AssignmentTableTest extends TestCase
         Livewire::test(AssignmentTable::class)
             ->set('dateFrom', $today->format('Y-m-d'))
             ->set('dateTo', $tomorrow->format('Y-m-d'))
-            ->assertViewHas('assignments', function($assignments) {
+            ->assertViewHas('assignments', function ($assignments) {
                 return $assignments->count() === 2;
             });
     }
@@ -294,7 +319,7 @@ class AssignmentTableTest extends TestCase
         Livewire::test(AssignmentTable::class)
             ->set('sortBy', 'start_datetime')
             ->set('sortDirection', 'asc')
-            ->assertViewHas('assignments', function($assignments) use ($assignment3, $assignment1, $assignment2) {
+            ->assertViewHas('assignments', function ($assignments) use ($assignment3, $assignment1, $assignment2) {
                 $assignmentIds = $assignments->pluck('id')->toArray();
                 return $assignmentIds === [$assignment3->id, $assignment1->id, $assignment2->id];
             });
@@ -311,7 +336,7 @@ class AssignmentTableTest extends TestCase
 
         Livewire::test(AssignmentTable::class)
             ->set('perPage', 10)
-            ->assertViewHas('assignments', function($assignments) {
+            ->assertViewHas('assignments', function ($assignments) {
                 return $assignments->count() === 10;
             })
             ->assertSee('Page 1 sur 2');
@@ -468,7 +493,7 @@ class AssignmentTableTest extends TestCase
 
         Livewire::test(AssignmentTable::class)
             ->set('search', '')
-            ->assertViewHas('assignments', function($assignments) {
+            ->assertViewHas('assignments', function ($assignments) {
                 return $assignments->count() === 3;
             });
     }
@@ -489,7 +514,7 @@ class AssignmentTableTest extends TestCase
         // Simuler un rafraîchissement
         Livewire::test(AssignmentTable::class)
             ->call('loadAssignments')
-            ->assertViewHas('assignments', function($assignments) {
+            ->assertViewHas('assignments', function ($assignments) {
                 return $assignments->count() === 1;
             });
     }

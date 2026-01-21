@@ -11,6 +11,8 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Schema;
+use Spatie\Permission\PermissionRegistrar;
 
 class CheckPaymentsDue implements ShouldQueue
 {
@@ -33,6 +35,8 @@ class CheckPaymentsDue implements ShouldQueue
             ->where('payment_due_date', '<=', now()->addDays(7))
             ->get();
 
+        $notificationsAvailable = Schema::hasTable('notifications');
+
         foreach ($expenses as $expense) {
             try {
                 $daysPastDue = now()->diffInDays($expense->payment_due_date, false);
@@ -43,45 +47,63 @@ class CheckPaymentsDue implements ShouldQueue
 
                 if ($isOverdue) {
                     // Pour les paiements en retard : notification quotidienne
-                    $lastNotification = \DB::table('notifications')
-                        ->where('type', SupplierPaymentDue::class)
-                        ->where('data->expense_id', $expense->id)
-                        ->where('created_at', '>=', now()->subDay())
-                        ->exists();
+                    $lastNotification = false;
+
+                    if ($notificationsAvailable) {
+                        $lastNotification = \DB::table('notifications')
+                            ->where('type', SupplierPaymentDue::class)
+                            ->where('data->expense_id', $expense->id)
+                            ->where('created_at', '>=', now()->subDay())
+                            ->exists();
+                    }
 
                     $shouldNotify = !$lastNotification;
                 } else {
                     // Pour les paiements à échéance : notification selon les seuils
                     if ($daysPastDue <= 1) {
                         // J-1 et J : notification quotidienne
-                        $lastNotification = \DB::table('notifications')
-                            ->where('type', SupplierPaymentDue::class)
-                            ->where('data->expense_id', $expense->id)
-                            ->where('created_at', '>=', now()->subDay())
-                            ->exists();
+                        $lastNotification = false;
+
+                        if ($notificationsAvailable) {
+                            $lastNotification = \DB::table('notifications')
+                                ->where('type', SupplierPaymentDue::class)
+                                ->where('data->expense_id', $expense->id)
+                                ->where('created_at', '>=', now()->subDay())
+                                ->exists();
+                        }
 
                         $shouldNotify = !$lastNotification;
                     } elseif ($daysPastDue <= 3) {
                         // J-3 à J-2 : notification unique
-                        $existingNotification = \DB::table('notifications')
-                            ->where('type', SupplierPaymentDue::class)
-                            ->where('data->expense_id', $expense->id)
-                            ->exists();
+                        $existingNotification = false;
+
+                        if ($notificationsAvailable) {
+                            $existingNotification = \DB::table('notifications')
+                                ->where('type', SupplierPaymentDue::class)
+                                ->where('data->expense_id', $expense->id)
+                                ->exists();
+                        }
 
                         $shouldNotify = !$existingNotification;
                     } elseif ($daysPastDue == 7) {
                         // J-7 : notification unique
-                        $weekNotification = \DB::table('notifications')
-                            ->where('type', SupplierPaymentDue::class)
-                            ->where('data->expense_id', $expense->id)
-                            ->where('created_at', '>=', now()->subDays(2))
-                            ->exists();
+                        $weekNotification = false;
+
+                        if ($notificationsAvailable) {
+                            $weekNotification = \DB::table('notifications')
+                                ->where('type', SupplierPaymentDue::class)
+                                ->where('data->expense_id', $expense->id)
+                                ->where('created_at', '>=', now()->subDays(2))
+                                ->exists();
+                        }
 
                         $shouldNotify = !$weekNotification;
                     }
                 }
 
                 if ($shouldNotify) {
+                    app(PermissionRegistrar::class)->setPermissionsTeamId($expense->organization_id);
+
                     // Envoyer la notification aux gestionnaires financiers et administrateurs
                     $managers = User::where('organization_id', $expense->organization_id)
                                   ->whereHas('roles', function ($query) {

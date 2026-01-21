@@ -2,6 +2,7 @@
 
 namespace App\Console;
 
+use App\Jobs\RefreshAssignmentStatsMaterializedView;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 
@@ -94,6 +95,12 @@ class Kernel extends ConsoleKernel
             ->dailyAt('06:00')
             ->name('daily-assignments-report')
             ->runInBackground();
+
+        // 📈 Rafraichissement des stats materialisees (toutes les 15 minutes)
+        $schedule->job(new RefreshAssignmentStatsMaterializedView())
+            ->everyFifteenMinutes()
+            ->name('refresh-assignment-stats-mv')
+            ->withoutOverlapping(10);
 
         // =================================================================
         // 🧹 MAINTENANCE SYSTÈME

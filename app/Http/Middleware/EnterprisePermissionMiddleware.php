@@ -229,9 +229,16 @@ class EnterprisePermissionMiddleware
         $requiredPermission = $this->getRequiredPermission($routeName);
 
         if (!$requiredPermission) {
-            // Route non mappée, autoriser mais logger
             $this->logUnmappedRoute($request, $routeName);
-            return $next($request);
+
+            if (app()->environment('local', 'development')) {
+                return $next($request);
+            }
+
+            return $this->handleUnauthorized(
+                $request,
+                "Route non mappée: {$routeName}"
+            );
         }
 
         // Vérifier la permission avec support hiérarchique

@@ -36,6 +36,11 @@ return new class extends Migration
      */
     public function up(): void
     {
+        $driver = Schema::getConnection()->getDriverName();
+        if ($driver !== 'pgsql') {
+            return;
+        }
+
         // ================================================================
         // ÉTAPE 1: Activer l'extension pg_trgm (trigram)
         // ================================================================
@@ -51,22 +56,24 @@ return new class extends Migration
 
         // Index GIN trigram sur registration_plate (ex: "ABC-123", "xyz789")
         // Permet recherche insensible à la casse ultra-rapide
-        DB::statement('
-            CREATE INDEX IF NOT EXISTS idx_vehicles_registration_plate_trgm
-            ON vehicles USING gin (registration_plate gin_trgm_ops)
-        ');
+        if (Schema::hasTable('vehicles')) {
+            DB::statement('
+                CREATE INDEX IF NOT EXISTS idx_vehicles_registration_plate_trgm
+                ON vehicles USING gin (registration_plate gin_trgm_ops)
+            ');
 
         // Index GIN trigram sur brand (ex: "Toyota", "Mercedes", "RENAULT")
-        DB::statement('
-            CREATE INDEX IF NOT EXISTS idx_vehicles_brand_trgm
-            ON vehicles USING gin (brand gin_trgm_ops)
-        ');
+            DB::statement('
+                CREATE INDEX IF NOT EXISTS idx_vehicles_brand_trgm
+                ON vehicles USING gin (brand gin_trgm_ops)
+            ');
 
         // Index GIN trigram sur model (ex: "Corolla", "Sprinter", "CLIO")
-        DB::statement('
-            CREATE INDEX IF NOT EXISTS idx_vehicles_model_trgm
-            ON vehicles USING gin (model gin_trgm_ops)
-        ');
+            DB::statement('
+                CREATE INDEX IF NOT EXISTS idx_vehicles_model_trgm
+                ON vehicles USING gin (model gin_trgm_ops)
+            ');
+        }
 
         // ================================================================
         // ÉTAPE 3: Indexes GIN pour table DRIVERS
@@ -74,22 +81,23 @@ return new class extends Migration
         // Ces indexes accélèrent les recherches sur nom, prénom, permis
 
         // Index GIN trigram sur first_name
-        DB::statement('
-            CREATE INDEX IF NOT EXISTS idx_drivers_first_name_trgm
-            ON drivers USING gin (first_name gin_trgm_ops)
-        ');
+        if (Schema::hasTable('drivers')) {
+            DB::statement('
+                CREATE INDEX IF NOT EXISTS idx_drivers_first_name_trgm
+                ON drivers USING gin (first_name gin_trgm_ops)
+            ');
 
         // Index GIN trigram sur last_name
-        DB::statement('
-            CREATE INDEX IF NOT EXISTS idx_drivers_last_name_trgm
-            ON drivers USING gin (last_name gin_trgm_ops)
-        ');
+            DB::statement('
+                CREATE INDEX IF NOT EXISTS idx_drivers_last_name_trgm
+                ON drivers USING gin (last_name gin_trgm_ops)
+            ');
 
         // Index GIN trigram sur license_number
-        DB::statement('
-            CREATE INDEX IF NOT EXISTS idx_drivers_license_number_trgm
-            ON drivers USING gin (license_number gin_trgm_ops)
-        ');
+            DB::statement('
+                CREATE INDEX IF NOT EXISTS idx_drivers_license_number_trgm
+                ON drivers USING gin (license_number gin_trgm_ops)
+            ');
 
         // ================================================================
         // ÉTAPE 4: Index GIN composite pour recherche nom complet
@@ -97,18 +105,23 @@ return new class extends Migration
         // Index sur l'expression CONCAT(first_name, ' ', last_name)
         // Permet recherche "Jean Dupont" ultra-rapide
 
-        DB::statement("
-            CREATE INDEX IF NOT EXISTS idx_drivers_full_name_trgm
-            ON drivers USING gin ((first_name || ' ' || last_name) gin_trgm_ops)
-        ");
+            DB::statement("
+                CREATE INDEX IF NOT EXISTS idx_drivers_full_name_trgm
+                ON drivers USING gin ((first_name || ' ' || last_name) gin_trgm_ops)
+            ");
+        }
 
         // ================================================================
         // ÉTAPE 5: ANALYZE pour mettre à jour les statistiques
         // ================================================================
         // PostgreSQL utilise ces statistiques pour choisir le meilleur plan de requête
 
-        DB::statement('ANALYZE vehicles');
-        DB::statement('ANALYZE drivers');
+        if (Schema::hasTable('vehicles')) {
+            DB::statement('ANALYZE vehicles');
+        }
+        if (Schema::hasTable('drivers')) {
+            DB::statement('ANALYZE drivers');
+        }
 
         // ================================================================
         // LOGS & VALIDATION

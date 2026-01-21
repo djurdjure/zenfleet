@@ -12,6 +12,8 @@ return new class extends Migration
      */
     public function up(): void
     {
+        $driver = Schema::getConnection()->getDriverName();
+
         Schema::table('vehicle_expenses', function (Blueprint $table) {
             // Groupement analytique
             $table->unsignedBigInteger('expense_group_id')
@@ -97,6 +99,10 @@ return new class extends Migration
                 ->references('id')->on('users')
                 ->onDelete('set null');
         });
+
+        if ($driver !== 'pgsql') {
+            return;
+        }
         
         // Créer les triggers séparés pour mise à jour du budget_used dans expense_groups
         DB::statement("
@@ -183,12 +189,15 @@ return new class extends Migration
      */
     public function down(): void
     {
-        // Supprimer les triggers
-        DB::statement("DROP TRIGGER IF EXISTS update_group_budget_on_expense_insert ON vehicle_expenses");
-        DB::statement("DROP TRIGGER IF EXISTS update_group_budget_on_expense_update ON vehicle_expenses");
-        DB::statement("DROP TRIGGER IF EXISTS update_group_budget_on_expense_delete ON vehicle_expenses");
-        DB::statement("DROP TRIGGER IF EXISTS auto_update_approval_status ON vehicle_expenses");
-        DB::statement("DROP FUNCTION IF EXISTS update_approval_status()");
+        $driver = Schema::getConnection()->getDriverName();
+        if ($driver === 'pgsql') {
+            // Supprimer les triggers
+            DB::statement("DROP TRIGGER IF EXISTS update_group_budget_on_expense_insert ON vehicle_expenses");
+            DB::statement("DROP TRIGGER IF EXISTS update_group_budget_on_expense_update ON vehicle_expenses");
+            DB::statement("DROP TRIGGER IF EXISTS update_group_budget_on_expense_delete ON vehicle_expenses");
+            DB::statement("DROP TRIGGER IF EXISTS auto_update_approval_status ON vehicle_expenses");
+            DB::statement("DROP FUNCTION IF EXISTS update_approval_status()");
+        }
         
         Schema::table('vehicle_expenses', function (Blueprint $table) {
             // Supprimer les foreign keys

@@ -8,6 +8,10 @@ return new class extends Migration
 {
     public function up(): void
     {
+        if (Schema::hasTable('driver_statuses')) {
+            return;
+        }
+
         Schema::create('driver_statuses', function (Blueprint $table) {
             $table->id();
             $table->string('name', 100)->unique();

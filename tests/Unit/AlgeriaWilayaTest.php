@@ -12,6 +12,14 @@ class AlgeriaWilayaTest extends TestCase
 {
     use RefreshDatabase;
 
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        AlgeriaCommune::query()->delete();
+        AlgeriaWilaya::query()->delete();
+    }
+
     /** @test */
     public function it_can_create_algeria_wilaya(): void
     {

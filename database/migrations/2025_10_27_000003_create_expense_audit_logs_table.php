@@ -87,6 +87,11 @@ return new class extends Migration
                 ->references('id')->on('users')
                 ->onDelete('set null');
         });
+
+        $driver = Schema::getConnection()->getDriverName();
+        if ($driver !== 'pgsql') {
+            return;
+        }
         
         // Vue pour résumé des audits par utilisateur
         DB::statement("
@@ -267,14 +272,17 @@ return new class extends Migration
      */
     public function down(): void
     {
-        // Supprimer les triggers et fonctions
-        DB::statement("DROP TRIGGER IF EXISTS audit_expense_changes ON vehicle_expenses");
-        DB::statement("DROP TRIGGER IF EXISTS detect_anomalies_on_expense ON vehicle_expenses");
-        DB::statement("DROP FUNCTION IF EXISTS log_expense_changes()");
-        DB::statement("DROP FUNCTION IF EXISTS detect_expense_anomalies()");
-        
-        // Supprimer la vue
-        DB::statement("DROP VIEW IF EXISTS expense_audit_summary");
+        $driver = Schema::getConnection()->getDriverName();
+        if ($driver === 'pgsql') {
+            // Supprimer les triggers et fonctions
+            DB::statement("DROP TRIGGER IF EXISTS audit_expense_changes ON vehicle_expenses");
+            DB::statement("DROP TRIGGER IF EXISTS detect_anomalies_on_expense ON vehicle_expenses");
+            DB::statement("DROP FUNCTION IF EXISTS log_expense_changes()");
+            DB::statement("DROP FUNCTION IF EXISTS detect_expense_anomalies()");
+
+            // Supprimer la vue
+            DB::statement("DROP VIEW IF EXISTS expense_audit_summary");
+        }
         
         // Supprimer la table
         Schema::dropIfExists('expense_audit_logs');

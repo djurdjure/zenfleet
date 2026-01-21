@@ -26,6 +26,11 @@ return new class extends Migration
      */
     public function up(): void
     {
+        $driver = Schema::getConnection()->getDriverName();
+        if ($driver === 'sqlite') {
+            return;
+        }
+
         DB::transaction(function () {
             echo "🔄 DÉBUT MIGRATION: maintenance_providers → suppliers\n";
             echo "====================================================\n\n";
@@ -175,6 +180,11 @@ return new class extends Migration
      */
     public function down(): void
     {
+        $driver = Schema::getConnection()->getDriverName();
+        if ($driver === 'sqlite') {
+            return;
+        }
+
         DB::transaction(function () {
             echo "⚠️  ROLLBACK: Impossible de restaurer maintenance_providers sans backup\n";
             echo "La table a été supprimée et les données migrées vers suppliers.\n";

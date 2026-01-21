@@ -15,6 +15,15 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (!Schema::hasTable('roles')) {
+            return;
+        }
+
+        $driver = Schema::getConnection()->getDriverName();
+        if ($driver !== 'pgsql') {
+            return;
+        }
+
         // Vérifier et supprimer l'ancienne contrainte unique si elle existe
         $constraintExists = DB::select("
             SELECT constraint_name
@@ -75,6 +84,15 @@ return new class extends Migration
      */
     public function down(): void
     {
+        if (!Schema::hasTable('roles')) {
+            return;
+        }
+
+        $driver = Schema::getConnection()->getDriverName();
+        if ($driver !== 'pgsql') {
+            return;
+        }
+
         // Supprimer les nouvelles contraintes
         DB::statement('DROP INDEX IF EXISTS roles_name_guard_organization_unique');
         DB::statement('DROP INDEX IF EXISTS roles_name_guard_null_organization_unique');

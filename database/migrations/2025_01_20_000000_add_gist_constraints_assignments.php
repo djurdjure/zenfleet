@@ -128,7 +128,7 @@ return new class extends Migration
             CREATE OR REPLACE FUNCTION assignment_computed_status(start_dt timestamp, end_dt timestamp)
             RETURNS text
             LANGUAGE plpgsql
-            IMMUTABLE
+            STABLE
             AS \$\$
             BEGIN
                 IF start_dt > NOW() THEN
@@ -180,25 +180,7 @@ return new class extends Migration
             CREATE UNIQUE INDEX ON assignment_stats_daily (organization_id, assignment_date);
         ");
 
-        // Trigger pour refresh automatique des stats (optionnel)
-        DB::statement("
-            CREATE OR REPLACE FUNCTION refresh_assignment_stats()
-            RETURNS TRIGGER AS \$\$
-            BEGIN
-                REFRESH MATERIALIZED VIEW CONCURRENTLY assignment_stats_daily;
-                RETURN NULL;
-            END;
-            \$\$ LANGUAGE plpgsql;
-        ");
-
-        DB::statement("DROP TRIGGER IF EXISTS assignment_stats_refresh ON assignments;");
-
-        DB::statement("
-            CREATE TRIGGER assignment_stats_refresh
-            AFTER INSERT OR UPDATE OR DELETE ON assignments
-            FOR EACH STATEMENT
-            EXECUTE FUNCTION refresh_assignment_stats();
-        ");
+        // Note: Le refresh est planifie via un job (pas de trigger) pour eviter les erreurs en prod.
     }
 
     /**

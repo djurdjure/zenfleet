@@ -3,6 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\DB;
 
 return new class extends Migration
 {
@@ -12,6 +13,10 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (!Schema::hasTable('drivers')) {
+            return;
+        }
+
         Schema::table('drivers', function (Blueprint $table) {
             // 🆔 Matricule employé (employee_number)
             if (!Schema::hasColumn('drivers', 'employee_number')) {
@@ -93,6 +98,10 @@ return new class extends Migration
      */
     public function down(): void
     {
+        if (!Schema::hasTable('drivers')) {
+            return;
+        }
+
         Schema::table('drivers', function (Blueprint $table) {
             $columnsToRemove = [
                 'employee_number', 'birth_date', 'personal_email', 'full_address',

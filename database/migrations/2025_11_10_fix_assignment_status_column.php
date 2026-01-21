@@ -13,6 +13,8 @@ return new class extends Migration
      */
     public function up(): void
     {
+        $driver = Schema::getConnection()->getDriverName();
+
         Schema::table('assignments', function (Blueprint $table) {
             // Ajouter la colonne status si elle n'existe pas
             if (!Schema::hasColumn('assignments', 'status')) {
@@ -34,12 +36,13 @@ return new class extends Migration
         });
         
         // Mettre à jour les statuts existants basés sur les dates
+        $nowExpression = $driver === 'sqlite' ? 'CURRENT_TIMESTAMP' : 'NOW()';
         DB::statement("
             UPDATE assignments 
             SET status = CASE
-                WHEN end_datetime IS NOT NULL AND end_datetime <= NOW() THEN 'completed'
-                WHEN start_datetime <= NOW() AND (end_datetime IS NULL OR end_datetime > NOW()) THEN 'active'
-                WHEN start_datetime > NOW() THEN 'scheduled'
+                WHEN end_datetime IS NOT NULL AND end_datetime <= {$nowExpression} THEN 'completed'
+                WHEN start_datetime <= {$nowExpression} AND (end_datetime IS NULL OR end_datetime > {$nowExpression}) THEN 'active'
+                WHEN start_datetime > {$nowExpression} THEN 'scheduled'
                 ELSE status
             END
             WHERE status IS NULL OR status = ''

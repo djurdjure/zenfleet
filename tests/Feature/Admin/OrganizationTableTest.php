@@ -7,6 +7,7 @@ use App\Models\Organization;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
+use Spatie\Permission\Contracts\PermissionsTeamResolver;
 use Spatie\Permission\Models\Role;
 use Tests\TestCase;
 
@@ -24,7 +25,9 @@ class OrganizationTableTest extends TestCase
         $superAdminRole = Role::firstOrCreate(['name' => 'Super Admin']);
 
         // Create admin user with Super Admin role
-        $this->adminUser = User::factory()->create();
+        $organization = Organization::factory()->create();
+        $this->adminUser = User::factory()->create(['organization_id' => $organization->id]);
+        app(PermissionsTeamResolver::class)->setPermissionsTeamId($organization->id);
         $this->adminUser->assignRole($superAdminRole);
     }
 

@@ -31,6 +31,10 @@ return new class extends Migration
     public function up(): void
     {
         $driver = DB::getDriverName();
+
+        if (!Schema::hasTable('driver_sanctions')) {
+            return;
+        }
         
         // ===============================================
         // ÉTENDRE LES TYPES DE SANCTIONS EXISTANTS
@@ -75,7 +79,7 @@ return new class extends Migration
                     ))
                 ");
             }
-        } else {
+        } elseif ($driver === 'mysql') {
             // MySQL: Méthode MODIFY COLUMN
             DB::statement("
                 ALTER TABLE driver_sanctions 
@@ -90,6 +94,8 @@ return new class extends Migration
                     'licenciement'
                 ) NOT NULL
             ");
+        } else {
+            // SQLite et autres moteurs: pas de support ENUM/MODIFY, on skip l'extension.
         }
         
         // ===============================================
@@ -149,6 +155,10 @@ return new class extends Migration
     public function down(): void
     {
         $driver = DB::getDriverName();
+
+        if (!Schema::hasTable('driver_sanctions')) {
+            return;
+        }
         
         // Supprimer les CHECK constraints si PostgreSQL
         if ($driver === 'pgsql') {

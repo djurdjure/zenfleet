@@ -34,6 +34,8 @@ return new class extends Migration
      */
     public function up(): void
     {
+        $driver = Schema::getConnection()->getDriverName();
+
         // ===============================================
         // ÉTAPE 1: CORRIGER LES COLONNES SCORES
         // ===============================================
@@ -84,109 +86,117 @@ return new class extends Migration
         // ===============================================
         // ÉTAPE 3: SUPPRIMER LES ANCIENNES CONTRAINTES
         // ===============================================
-        DB::statement("ALTER TABLE suppliers DROP CONSTRAINT IF EXISTS valid_scores");
-        DB::statement("ALTER TABLE suppliers DROP CONSTRAINT IF EXISTS valid_rating");
+        if ($driver === 'pgsql') {
+            DB::statement("ALTER TABLE suppliers DROP CONSTRAINT IF EXISTS valid_scores");
+            DB::statement("ALTER TABLE suppliers DROP CONSTRAINT IF EXISTS valid_rating");
+        }
 
         // ===============================================
         // ÉTAPE 4: AJOUTER NOUVELLES CONTRAINTES FLEXIBLES
         // ===============================================
-        DB::statement("
-            ALTER TABLE suppliers
-            ADD CONSTRAINT valid_scores_range CHECK (
-                (quality_score IS NULL OR quality_score BETWEEN 0 AND 100) AND
-                (reliability_score IS NULL OR reliability_score BETWEEN 0 AND 100)
-            )
-        ");
-        
-        DB::statement("
-            ALTER TABLE suppliers
-            ADD CONSTRAINT valid_rating_range CHECK (
-                rating IS NULL OR rating BETWEEN 0 AND 5
-            )
-        ");
+        if ($driver === 'pgsql') {
+            DB::statement("
+                ALTER TABLE suppliers
+                ADD CONSTRAINT valid_scores_range CHECK (
+                    (quality_score IS NULL OR quality_score BETWEEN 0 AND 100) AND
+                    (reliability_score IS NULL OR reliability_score BETWEEN 0 AND 100)
+                )
+            ");
+
+            DB::statement("
+                ALTER TABLE suppliers
+                ADD CONSTRAINT valid_rating_range CHECK (
+                    rating IS NULL OR rating BETWEEN 0 AND 5
+                )
+            ");
+        }
 
         // ===============================================
         // ÉTAPE 5: CRÉER FONCTION DE CALCUL AUTOMATIQUE
         // ===============================================
-        DB::statement("
-            CREATE OR REPLACE FUNCTION calculate_supplier_scores()
-            RETURNS TRIGGER AS $$
-            DECLARE
-                v_quality_score DECIMAL(5,2);
-                v_reliability_score DECIMAL(5,2);
-                v_overall_rating DECIMAL(3,2);
-                v_completion_rate DECIMAL(5,2);
-                v_punctuality_rate DECIMAL(5,2);
-                v_complaint_rate DECIMAL(5,2);
-            BEGIN
-                -- Calculer uniquement si auto_score_enabled = true
-                IF NEW.auto_score_enabled = true THEN
-                    
-                    -- Calculer le taux de complétion
-                    IF NEW.total_orders > 0 THEN
-                        v_completion_rate := (NEW.completed_orders::DECIMAL / NEW.total_orders) * 100;
-                    ELSE
-                        v_completion_rate := 75.00; -- Valeur par défaut
+        if ($driver === 'pgsql') {
+            DB::statement("
+                CREATE OR REPLACE FUNCTION calculate_supplier_scores()
+                RETURNS TRIGGER AS $$
+                DECLARE
+                    v_quality_score DECIMAL(5,2);
+                    v_reliability_score DECIMAL(5,2);
+                    v_overall_rating DECIMAL(3,2);
+                    v_completion_rate DECIMAL(5,2);
+                    v_punctuality_rate DECIMAL(5,2);
+                    v_complaint_rate DECIMAL(5,2);
+                BEGIN
+                    -- Calculer uniquement si auto_score_enabled = true
+                    IF NEW.auto_score_enabled = true THEN
+                        
+                        -- Calculer le taux de complétion
+                        IF NEW.total_orders > 0 THEN
+                            v_completion_rate := (NEW.completed_orders::DECIMAL / NEW.total_orders) * 100;
+                        ELSE
+                            v_completion_rate := 75.00; -- Valeur par défaut
+                        END IF;
+                        
+                        -- Calculer le taux de ponctualité
+                        IF NEW.completed_orders > 0 THEN
+                            v_punctuality_rate := (NEW.on_time_deliveries::DECIMAL / NEW.completed_orders) * 100;
+                        ELSE
+                            v_punctuality_rate := 75.00; -- Valeur par défaut
+                        END IF;
+                        
+                        -- Calculer le taux de réclamation (inversé)
+                        IF NEW.total_orders > 0 THEN
+                            v_complaint_rate := 100 - LEAST(100, (NEW.customer_complaints::DECIMAL / NEW.total_orders) * 100);
+                        ELSE
+                            v_complaint_rate := 95.00; -- Valeur par défaut (peu de plaintes)
+                        END IF;
+                        
+                        -- Score de qualité: 50% taux complétion + 50% absence de plaintes
+                        v_quality_score := (v_completion_rate * 0.5) + (v_complaint_rate * 0.5);
+                        
+                        -- Score de fiabilité: 70% ponctualité + 30% temps de réponse
+                        IF NEW.avg_response_time_hours IS NOT NULL THEN
+                            -- Bonus pour temps de réponse rapide (max 100 points si < 1h, min 0 si > 48h)
+                            v_reliability_score := (v_punctuality_rate * 0.7) + 
+                                (GREATEST(0, LEAST(100, (100 - (NEW.avg_response_time_hours * 2)))) * 0.3);
+                        ELSE
+                            v_reliability_score := v_punctuality_rate;
+                        END IF;
+                        
+                        -- Rating global: moyenne pondérée (qualité 40%, fiabilité 60%)
+                        v_overall_rating := ((v_quality_score * 0.4) + (v_reliability_score * 0.6)) / 20; -- Convertir 0-100 en 0-5
+                        
+                        -- Mettre à jour les scores
+                        NEW.quality_score := ROUND(v_quality_score, 2);
+                        NEW.reliability_score := ROUND(v_reliability_score, 2);
+                        NEW.rating := ROUND(v_overall_rating, 2);
+                        NEW.last_evaluation_date := CURRENT_TIMESTAMP;
                     END IF;
                     
-                    -- Calculer le taux de ponctualité
-                    IF NEW.completed_orders > 0 THEN
-                        v_punctuality_rate := (NEW.on_time_deliveries::DECIMAL / NEW.completed_orders) * 100;
-                    ELSE
-                        v_punctuality_rate := 75.00; -- Valeur par défaut
-                    END IF;
+                    -- Si les scores sont NULL, appliquer les valeurs par défaut
+                    NEW.quality_score := COALESCE(NEW.quality_score, 75.00);
+                    NEW.reliability_score := COALESCE(NEW.reliability_score, 75.00);
+                    NEW.rating := COALESCE(NEW.rating, 3.75);
                     
-                    -- Calculer le taux de réclamation (inversé)
-                    IF NEW.total_orders > 0 THEN
-                        v_complaint_rate := 100 - LEAST(100, (NEW.customer_complaints::DECIMAL / NEW.total_orders) * 100);
-                    ELSE
-                        v_complaint_rate := 95.00; -- Valeur par défaut (peu de plaintes)
-                    END IF;
-                    
-                    -- Score de qualité: 50% taux complétion + 50% absence de plaintes
-                    v_quality_score := (v_completion_rate * 0.5) + (v_complaint_rate * 0.5);
-                    
-                    -- Score de fiabilité: 70% ponctualité + 30% temps de réponse
-                    IF NEW.avg_response_time_hours IS NOT NULL THEN
-                        -- Bonus pour temps de réponse rapide (max 100 points si < 1h, min 0 si > 48h)
-                        v_reliability_score := (v_punctuality_rate * 0.7) + 
-                            (GREATEST(0, LEAST(100, (100 - (NEW.avg_response_time_hours * 2)))) * 0.3);
-                    ELSE
-                        v_reliability_score := v_punctuality_rate;
-                    END IF;
-                    
-                    -- Rating global: moyenne pondérée (qualité 40%, fiabilité 60%)
-                    v_overall_rating := ((v_quality_score * 0.4) + (v_reliability_score * 0.6)) / 20; -- Convertir 0-100 en 0-5
-                    
-                    -- Mettre à jour les scores
-                    NEW.quality_score := ROUND(v_quality_score, 2);
-                    NEW.reliability_score := ROUND(v_reliability_score, 2);
-                    NEW.rating := ROUND(v_overall_rating, 2);
-                    NEW.last_evaluation_date := CURRENT_TIMESTAMP;
-                END IF;
-                
-                -- Si les scores sont NULL, appliquer les valeurs par défaut
-                NEW.quality_score := COALESCE(NEW.quality_score, 75.00);
-                NEW.reliability_score := COALESCE(NEW.reliability_score, 75.00);
-                NEW.rating := COALESCE(NEW.rating, 3.75);
-                
-                RETURN NEW;
-            END;
-            $$ LANGUAGE plpgsql;
-        ");
+                    RETURN NEW;
+                END;
+                $$ LANGUAGE plpgsql;
+            ");
+        }
 
         // ===============================================
         // ÉTAPE 6: CRÉER LE TRIGGER
         // ===============================================
         // Séparer les commandes pour PostgreSQL
-        DB::statement("DROP TRIGGER IF EXISTS trigger_calculate_supplier_scores ON suppliers");
-        
-        DB::statement("
-            CREATE TRIGGER trigger_calculate_supplier_scores
-            BEFORE INSERT OR UPDATE ON suppliers
-            FOR EACH ROW
-            EXECUTE FUNCTION calculate_supplier_scores()
-        ");
+        if ($driver === 'pgsql') {
+            DB::statement("DROP TRIGGER IF EXISTS trigger_calculate_supplier_scores ON suppliers");
+
+            DB::statement("
+                CREATE TRIGGER trigger_calculate_supplier_scores
+                BEFORE INSERT OR UPDATE ON suppliers
+                FOR EACH ROW
+                EXECUTE FUNCTION calculate_supplier_scores()
+            ");
+        }
 
         // ===============================================
         // ÉTAPE 7: AJOUTER INDEX POUR PERFORMANCE
@@ -220,9 +230,12 @@ return new class extends Migration
      */
     public function down(): void
     {
-        // Supprimer le trigger et la fonction
-        DB::statement("DROP TRIGGER IF EXISTS trigger_calculate_supplier_scores ON suppliers");
-        DB::statement("DROP FUNCTION IF EXISTS calculate_supplier_scores()");
+        $driver = Schema::getConnection()->getDriverName();
+        if ($driver === 'pgsql') {
+            // Supprimer le trigger et la fonction
+            DB::statement("DROP TRIGGER IF EXISTS trigger_calculate_supplier_scores ON suppliers");
+            DB::statement("DROP FUNCTION IF EXISTS calculate_supplier_scores()");
+        }
         
         // Supprimer les index
         Schema::table('suppliers', function (Blueprint $table) {
@@ -245,8 +258,10 @@ return new class extends Migration
         });
         
         // Restaurer les contraintes originales
-        DB::statement("ALTER TABLE suppliers DROP CONSTRAINT IF EXISTS valid_scores_range");
-        DB::statement("ALTER TABLE suppliers DROP CONSTRAINT IF EXISTS valid_rating_range");
+        if ($driver === 'pgsql') {
+            DB::statement("ALTER TABLE suppliers DROP CONSTRAINT IF EXISTS valid_scores_range");
+            DB::statement("ALTER TABLE suppliers DROP CONSTRAINT IF EXISTS valid_rating_range");
+        }
         
         // Restaurer les colonnes NOT NULL
         Schema::table('suppliers', function (Blueprint $table) {

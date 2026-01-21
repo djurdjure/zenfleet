@@ -30,10 +30,13 @@ class VehicleFactory extends Factory
             'current_value' => $this->faker->randomFloat(2, 800_000, 4_000_000),
 
             // Utiliser des factories pour toute FK
-            'vehicle_type_id' => VehicleType::factory(),
-            'fuel_type_id' => FuelType::factory(),
-            'transmission_type_id' => TransmissionType::factory(),
-            'status_id' => VehicleStatus::factory()->state(['name' => 'Parking']),
+            'vehicle_type_id' => VehicleType::firstOrCreate(['name' => 'Sedan'])->id,
+            'fuel_type_id' => FuelType::firstOrCreate(['name' => 'Diesel'])->id,
+            'transmission_type_id' => TransmissionType::firstOrCreate(['name' => 'Manual'])->id,
+            'status_id' => VehicleStatus::firstOrCreate(
+                ['name' => 'Parking'],
+                ['is_active' => true, 'color' => '#6b7280']
+            )->id,
         ];
     }
 }

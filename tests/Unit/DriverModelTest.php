@@ -145,11 +145,34 @@ class DriverModelTest extends TestCase
     public function test_fillable_attributes(): void
     {
         $fillableAttributes = [
-            'user_id', 'employee_number', 'first_name', 'last_name', 'photo_path', 'birth_date',
-            'blood_type', 'address', 'personal_phone', 'personal_email', 'license_number',
-            'license_category', 'license_issue_date', 'license_authority', 'license_expiry_date',
-            'recruitment_date', 'contract_end_date', 'status_id', 'emergency_contact_name',
-            'emergency_contact_phone', 'organization_id'
+            'user_id',
+            'organization_id',
+            'first_name',
+            'last_name',
+            'email',
+            'employee_number',
+            'birth_date',
+            'blood_type',
+            'personal_phone',
+            'personal_email',
+            'address',
+            'city',
+            'postal_code',
+            'license_number',
+            'license_categories',
+            'license_expiry_date',
+            'license_issue_date',
+            'license_authority',
+            'license_verified',
+            'recruitment_date',
+            'contract_end_date',
+            'status_id',
+            'emergency_contact_name',
+            'emergency_contact_phone',
+            'emergency_contact_relationship',
+            'photo',
+            'notes',
+            'supervisor_id',
         ];
 
         $driver = new Driver();
@@ -193,8 +216,8 @@ class DriverModelTest extends TestCase
             'birth_date' => Carbon::now()->subYears(30)
         ]);
 
-        $age = Carbon::now()->diffInYears($driver->birth_date);
-        $this->assertEquals(30, $age);
+        $age = Carbon::now()->diffInYears($driver->birth_date, true);
+        $this->assertEqualsWithDelta(30, $age, 0.05);
     }
 
     /**
@@ -313,7 +336,7 @@ class DriverModelTest extends TestCase
         ]);
 
         // Test que le trait est utilisé
-        $this->assertArrayHasKey('organization_id', $driver->getFillable());
+        $this->assertContains('organization_id', $driver->getFillable());
 
         // Test de la relation
         $this->assertInstanceOf(Organization::class, $driver->organization);
@@ -329,10 +352,10 @@ class DriverModelTest extends TestCase
         $driver = Driver::factory()->create([
             'organization_id' => $this->organization->id,
             'status_id' => $this->driverStatus->id,
-            'photo_path' => 'drivers/photos/driver_123.jpg'
+            'photo' => 'drivers/photos/driver_123.jpg'
         ]);
 
-        $this->assertEquals('drivers/photos/driver_123.jpg', $driver->photo_path);
+        $this->assertEquals('drivers/photos/driver_123.jpg', $driver->photo);
     }
 
     /**

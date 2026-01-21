@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Assignment;
 use App\Models\Vehicle;
 use App\Models\Driver;
+use App\Models\Scopes\UserVehicleAccessScope;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Database\Eloquent\Builder;
@@ -109,6 +110,10 @@ class AssignmentOverlapService
         return Assignment::where('organization_id', $organizationId)
             ->where('vehicle_id', $vehicleId)
             ->when($excludeAssignmentId, fn($q) => $q->where('id', '!=', $excludeAssignmentId))
+            ->where(function ($query) {
+                $query->whereNull('status')
+                    ->orWhere('status', '!=', Assignment::STATUS_CANCELLED);
+            })
             ->where(function ($query) use ($startDatetime, $endDatetime) {
                 $this->addOverlapConditions($query, $startDatetime, $endDatetime);
             })
@@ -129,6 +134,10 @@ class AssignmentOverlapService
         return Assignment::where('organization_id', $organizationId)
             ->where('driver_id', $driverId)
             ->when($excludeAssignmentId, fn($q) => $q->where('id', '!=', $excludeAssignmentId))
+            ->where(function ($query) {
+                $query->whereNull('status')
+                    ->orWhere('status', '!=', Assignment::STATUS_CANCELLED);
+            })
             ->where(function ($query) use ($startDatetime, $endDatetime) {
                 $this->addOverlapConditions($query, $startDatetime, $endDatetime);
             })
@@ -279,7 +288,8 @@ class AssignmentOverlapService
                 'start_formatted' => $suggestion['start']->format('d/m/Y H:i'),
                 'end_formatted' => $suggestion['end']?->format('d/m/Y H:i'),
                 'duration_hours' => $suggestion['duration_hours'],
-                'reason' => $suggestion['reason']
+                'reason' => $suggestion['reason'],
+                'description' => $suggestion['reason'],
             ];
         }, $suggestions);
     }
@@ -405,6 +415,23 @@ class AssignmentOverlapService
     ): array {
         // Validation des dates
         $validationErrors = [];
+
+        $vehicleExists = Vehicle::withoutGlobalScope(UserVehicleAccessScope::class)
+            ->where('id', $vehicleId)
+            ->where('organization_id', $organizationId)
+            ->exists();
+
+        if (! $vehicleExists) {
+            $validationErrors[] = 'Véhicule introuvable pour cette organisation.';
+        }
+
+        $driverExists = Driver::where('id', $driverId)
+            ->where('organization_id', $organizationId)
+            ->exists();
+
+        if (! $driverExists) {
+            $validationErrors[] = 'Chauffeur introuvable pour cette organisation.';
+        }
 
         if ($endDatetime && $endDatetime->lte($startDatetime)) {
             $validationErrors[] = 'La date de fin doit être postérieure à la date de début';

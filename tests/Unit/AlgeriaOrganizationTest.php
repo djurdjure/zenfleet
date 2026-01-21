@@ -16,11 +16,10 @@ class AlgeriaOrganizationTest extends TestCase
         parent::setUp();
 
         // Create test wilayas
-        AlgeriaWilaya::create([
-            'code' => '16',
-            'name_fr' => 'Alger',
-            'is_active' => true,
-        ]);
+        AlgeriaWilaya::updateOrCreate(
+            ['code' => '16'],
+            ['name_fr' => 'Alger', 'is_active' => true]
+        );
     }
 
     /** @test */

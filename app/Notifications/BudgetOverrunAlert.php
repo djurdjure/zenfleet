@@ -7,6 +7,7 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
+use Illuminate\Support\Facades\Route;
 
 class BudgetOverrunAlert extends Notification implements ShouldQueue
 {
@@ -56,7 +57,7 @@ class BudgetOverrunAlert extends Notification implements ShouldQueue
                     ->when($this->alertType === 'overrun', function ($mail) {
                         return $mail->line('⚠️ **ACTION REQUISE:** Veuillez réviser les dépenses ou ajuster le budget.');
                     })
-                    ->action('Voir le budget', route('admin.expense-budgets.show', $this->budget))
+                    ->action('Voir le budget', $this->budgetUrl())
                     ->line('Surveillez régulièrement vos budgets pour une gestion optimale de votre flotte.');
     }
 
@@ -78,7 +79,7 @@ class BudgetOverrunAlert extends Notification implements ShouldQueue
             'budgeted_amount' => $this->budget->budgeted_amount,
             'spent_amount' => $this->budget->spent_amount,
             'remaining_amount' => $this->budget->remaining_amount,
-            'url' => route('admin.expense-budgets.show', $this->budget),
+            'url' => $this->budgetUrl(),
             'icon' => match($this->alertType) {
                 'warning' => 'exclamation-triangle',
                 'critical' => 'exclamation-circle',
@@ -98,5 +99,18 @@ class BudgetOverrunAlert extends Notification implements ShouldQueue
                 default => 'low'
             }
         ];
+    }
+
+    private function budgetUrl(): string
+    {
+        if (Route::has('admin.expense-budgets.show')) {
+            return route('admin.expense-budgets.show', $this->budget);
+        }
+
+        if (Route::has('admin.expenses.index')) {
+            return route('admin.expenses.index');
+        }
+
+        return url('/admin');
     }
 }

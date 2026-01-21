@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\Concerns\BelongsToOrganization;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -60,26 +61,23 @@ class ExpenseBudget extends Model
 
     public function expenses(): HasMany
     {
-        return $this->hasMany(VehicleExpense::class, function ($query) {
-            $query->where('expense_category', $this->expense_category);
+        $relation = $this->hasMany(VehicleExpense::class, 'organization_id', 'organization_id');
 
-            if ($this->vehicle_id) {
-                $query->where('vehicle_id', $this->vehicle_id);
-            }
+        if ($this->expense_category) {
+            $relation->where('expense_category', $this->expense_category);
+        }
 
-            // Filtrer par période
-            if ($this->budget_period === self::PERIOD_MONTHLY) {
-                $query->whereYear('expense_date', $this->budget_year)
-                      ->whereMonth('expense_date', $this->budget_month);
-            } elseif ($this->budget_period === self::PERIOD_QUARTERLY) {
-                $startMonth = ($this->budget_quarter - 1) * 3 + 1;
-                $endMonth = $this->budget_quarter * 3;
-                $query->whereYear('expense_date', $this->budget_year)
-                      ->whereBetween(DB::raw('MONTH(expense_date)'), [$startMonth, $endMonth]);
-            } else {
-                $query->whereYear('expense_date', $this->budget_year);
-            }
-        });
+        if ($this->vehicle_id) {
+            $relation->where('vehicle_id', $this->vehicle_id);
+        }
+
+        [$start, $end] = $this->getPeriodRange();
+
+        if ($start && $end) {
+            $relation->whereBetween('expense_date', [$start->toDateString(), $end->toDateString()]);
+        }
+
+        return $relation;
     }
 
     // Scopes
@@ -171,6 +169,129 @@ class ExpenseBudget extends Model
     public function isOverBudget(): bool
     {
         return $this->spent_amount > $this->budgeted_amount;
+    }
+
+    public function isWithinBudget(): bool
+    {
+        return !$this->isOverBudget();
+    }
+
+    public function isAtWarningThreshold(): bool
+    {
+        return $this->getUtilizationPercentage() >= $this->warning_threshold;
+    }
+
+    public function isAtCriticalThreshold(): bool
+    {
+        return $this->getUtilizationPercentage() >= $this->critical_threshold;
+    }
+
+    public function isOrganizationScope(): bool
+    {
+        return $this->vehicle_id === null && $this->expense_category === null;
+    }
+
+    public function isVehicleScope(): bool
+    {
+        return $this->vehicle_id !== null;
+    }
+
+    public function isCategoryScope(): bool
+    {
+        return $this->expense_category !== null && $this->vehicle_id === null;
+    }
+
+    public function isCurrentPeriod(): bool
+    {
+        [$start, $end] = $this->getPeriodRange();
+
+        if (!$start || !$end) {
+            return false;
+        }
+
+        return now()->between($start, $end);
+    }
+
+    public function isPastPeriod(): bool
+    {
+        [$start, $end] = $this->getPeriodRange();
+
+        if (!$start || !$end) {
+            return false;
+        }
+
+        return now()->greaterThan($end);
+    }
+
+    public function isFuturePeriod(): bool
+    {
+        [$start, $end] = $this->getPeriodRange();
+
+        if (!$start || !$end) {
+            return false;
+        }
+
+        return now()->lessThan($start);
+    }
+
+    public function calculateRolloverAmount(): float
+    {
+        return max($this->budgeted_amount - $this->spent_amount, 0);
+    }
+
+    public function createRolloverBudget(array $overrides = []): self
+    {
+        $rollover = $this->calculateRolloverAmount();
+        $baseAmount = $overrides['budgeted_amount'] ?? $this->budgeted_amount;
+
+        $data = array_merge([
+            'organization_id' => $this->organization_id,
+            'vehicle_id' => $this->vehicle_id,
+            'expense_category' => $this->expense_category,
+            'budget_period' => $this->budget_period,
+            'budget_year' => $this->budget_year,
+            'budget_month' => $this->budget_month,
+            'budget_quarter' => $this->budget_quarter,
+            'budgeted_amount' => $baseAmount + $rollover,
+            'spent_amount' => 0,
+            'warning_threshold' => $this->warning_threshold,
+            'critical_threshold' => $this->critical_threshold,
+            'description' => $this->description,
+            'approval_workflow' => $this->approval_workflow ?? [],
+            'is_active' => $this->is_active,
+        ], $overrides);
+
+        $data['budgeted_amount'] = $baseAmount + $rollover;
+        $data['spent_amount'] = $overrides['spent_amount'] ?? 0;
+
+        return self::create($data);
+    }
+
+    private function getPeriodRange(): array
+    {
+        if (!$this->budget_year) {
+            return [null, null];
+        }
+
+        if ($this->budget_period === self::PERIOD_MONTHLY && $this->budget_month) {
+            $start = Carbon::create($this->budget_year, $this->budget_month, 1)->startOfMonth();
+            $end = (clone $start)->endOfMonth();
+
+            return [$start, $end];
+        }
+
+        if ($this->budget_period === self::PERIOD_QUARTERLY && $this->budget_quarter) {
+            $startMonth = ($this->budget_quarter - 1) * 3 + 1;
+            $start = Carbon::create($this->budget_year, $startMonth, 1)->startOfMonth();
+            $end = (clone $start)->addMonths(2)->endOfMonth();
+
+            return [$start, $end];
+        }
+
+        $start = Carbon::create($this->budget_year, 1, 1)->startOfYear();
+        $end = Carbon::create($this->budget_year, 12, 31)->endOfYear();
+
+        return [$start, $end];
     }
 
     // Accesseurs

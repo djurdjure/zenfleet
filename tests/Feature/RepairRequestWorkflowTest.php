@@ -13,6 +13,8 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Storage;
+use Spatie\Permission\Contracts\PermissionsTeamResolver;
+use Spatie\Permission\Models\Role;
 use Tests\TestCase;
 
 class RepairRequestWorkflowTest extends TestCase
@@ -30,22 +32,28 @@ class RepairRequestWorkflowTest extends TestCase
         parent::setUp();
 
         $this->organization = Organization::factory()->create([
-            'type' => 'enterprise'
+            'organization_type' => 'enterprise'
         ]);
 
         $this->driver = User::factory()->create([
             'organization_id' => $this->organization->id
         ]);
+
+        $teamResolver = app(PermissionsTeamResolver::class);
+        $teamResolver->setPermissionsTeamId($this->organization->id);
+        Role::firstOrCreate(['name' => 'Chauffeur', 'guard_name' => 'web']);
         $this->driver->assignRole('Chauffeur');
 
         $this->supervisor = User::factory()->create([
             'organization_id' => $this->organization->id
         ]);
+        Role::firstOrCreate(['name' => 'Superviseur', 'guard_name' => 'web']);
         $this->supervisor->assignRole('Superviseur');
 
         $this->manager = User::factory()->create([
             'organization_id' => $this->organization->id
         ]);
+        Role::firstOrCreate(['name' => 'Gestionnaire Flotte', 'guard_name' => 'web']);
         $this->manager->assignRole('Gestionnaire Flotte');
 
         $this->vehicle = Vehicle::factory()->create([

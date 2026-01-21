@@ -282,10 +282,10 @@ class OverlapCheckServiceTest extends TestCase
             end: Carbon::parse('2025-01-01 17:00:00')
         );
 
-        // Assertion: Erreur de validation métier
-        $this->assertFalse($result['is_valid']);
-        $this->assertNotEmpty($result['errors']);
-        $this->assertStringContainsString('passé', $result['errors'][0]);
+        // Assertion: Les affectations rétroactives sont autorisées
+        $this->assertTrue($result['is_valid']);
+        $this->assertEmpty($result['errors']);
+        $this->assertEmpty($result['conflicts']);
     }
 
     /** @test */
@@ -377,12 +377,15 @@ class OverlapCheckServiceTest extends TestCase
 
         // Créer 1000 affectations
         for ($i = 0; $i < 1000; $i++) {
+            $start = now()->addDays(rand(1, 365))->setTime(rand(6, 20), 0, 0);
+            $end = (clone $start)->addHours(rand(1, 8));
+
             Assignment::factory()->create([
                 'organization_id' => $this->organization->id,
                 'vehicle_id' => $vehicles->random()->id,
                 'driver_id' => $drivers->random()->id,
-                'start_datetime' => now()->addDays(rand(1, 365))->setTime(rand(6, 20), 0, 0),
-                'end_datetime' => now()->addDays(rand(1, 365))->setTime(rand(6, 20), 0, 0),
+                'start_datetime' => $start,
+                'end_datetime' => $end,
             ]);
         }
 

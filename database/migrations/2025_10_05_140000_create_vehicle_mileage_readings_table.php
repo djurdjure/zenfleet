@@ -3,6 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\DB;
 
 /**
  * Migration: Create vehicle_mileage_readings table
@@ -118,6 +119,11 @@ return new class extends Migration
             $table->index('recorded_by_id', 'idx_mileage_readings_recorded_by');
         });
 
+        $driver = Schema::getConnection()->getDriverName();
+        if ($driver !== 'pgsql') {
+            return;
+        }
+
         // ===================================================================
         // POST-CREATION: CONSTRAINTS & COMMENTS
         // ===================================================================
@@ -181,9 +187,12 @@ return new class extends Migration
      */
     public function down(): void
     {
-        // Supprimer le trigger et la fonction
-        DB::unprepared('DROP TRIGGER IF EXISTS trg_check_mileage_consistency ON vehicle_mileage_readings');
-        DB::unprepared('DROP FUNCTION IF EXISTS check_mileage_consistency()');
+        $driver = Schema::getConnection()->getDriverName();
+        if ($driver === 'pgsql') {
+            // Supprimer le trigger et la fonction
+            DB::unprepared('DROP TRIGGER IF EXISTS trg_check_mileage_consistency ON vehicle_mileage_readings');
+            DB::unprepared('DROP FUNCTION IF EXISTS check_mileage_consistency()');
+        }
 
         // Supprimer la table
         Schema::dropIfExists('vehicle_mileage_readings');

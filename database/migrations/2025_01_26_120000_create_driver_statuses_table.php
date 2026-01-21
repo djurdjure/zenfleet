@@ -12,6 +12,8 @@ return new class extends Migration
      */
     public function up(): void
     {
+        $driver = DB::getDriverName();
+
         // Si la table existe déjà, on ajoute les colonnes manquantes
         if (Schema::hasTable('driver_statuses')) {
             echo "⚠️  Table driver_statuses existe déjà, ajout des colonnes manquantes\n";
@@ -150,11 +152,13 @@ return new class extends Migration
             $table->unique(['slug', 'organization_id']); // Slug unique par organisation
         });
 
-        // 📝 Commentaire de table pour documentation
-        DB::statement("COMMENT ON TABLE driver_statuses IS 'Statuts des chauffeurs - Architecture multi-tenant enterprise'");
-        DB::statement("COMMENT ON COLUMN driver_statuses.allows_assignments IS 'Détermine si le chauffeur peut recevoir des affectations'");
-        DB::statement("COMMENT ON COLUMN driver_statuses.is_available_for_work IS 'Détermine si le chauffeur est disponible pour travailler'");
-        DB::statement("COMMENT ON COLUMN driver_statuses.priority_level IS '1=Normal, 2=Important, 3=Urgent'");
+        // 📝 Commentaire de table pour documentation (PostgreSQL uniquement)
+        if ($driver === 'pgsql') {
+            DB::statement("COMMENT ON TABLE driver_statuses IS 'Statuts des chauffeurs - Architecture multi-tenant enterprise'");
+            DB::statement("COMMENT ON COLUMN driver_statuses.allows_assignments IS 'Determine si le chauffeur peut recevoir des affectations'");
+            DB::statement("COMMENT ON COLUMN driver_statuses.is_available_for_work IS 'Determine si le chauffeur est disponible pour travailler'");
+            DB::statement("COMMENT ON COLUMN driver_statuses.priority_level IS '1=Normal, 2=Important, 3=Urgent'");
+        }
     }
 
     /**

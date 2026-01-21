@@ -267,7 +267,13 @@ class Organization extends Model
             ],
         ];
 
-        return array_merge($default, json_decode($value, true) ?? []);
+        $custom = json_decode($value, true);
+
+        if (!is_array($custom)) {
+            return $default;
+        }
+
+        return array_replace_recursive($default, $custom);
     }
 
     protected static function boot()

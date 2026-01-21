@@ -8,6 +8,8 @@ return new class extends Migration
 {
     public function up()
     {
+        $driver = DB::getDriverName();
+
         Schema::create('supplier_ratings', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('organization_id');
@@ -49,16 +51,18 @@ return new class extends Migration
         });
 
         // Contraintes business pour les notes
-        DB::statement("
-            ALTER TABLE supplier_ratings
-            ADD CONSTRAINT valid_ratings CHECK (
-                quality_rating BETWEEN 1 AND 10 AND
-                timeliness_rating BETWEEN 1 AND 10 AND
-                communication_rating BETWEEN 1 AND 10 AND
-                pricing_rating BETWEEN 1 AND 10 AND
-                overall_rating BETWEEN 1 AND 10
-            )
-        ");
+        if ($driver === 'pgsql') {
+            DB::statement("
+                ALTER TABLE supplier_ratings
+                ADD CONSTRAINT valid_ratings CHECK (
+                    quality_rating BETWEEN 1 AND 10 AND
+                    timeliness_rating BETWEEN 1 AND 10 AND
+                    communication_rating BETWEEN 1 AND 10 AND
+                    pricing_rating BETWEEN 1 AND 10 AND
+                    overall_rating BETWEEN 1 AND 10
+                )
+            ");
+        }
     }
 
     public function down()

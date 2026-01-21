@@ -11,6 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (!Schema::hasTable('drivers')) {
+            return;
+        }
+
         Schema::table('drivers', function (Blueprint $table) {
             // Ajouter le lien de parenté pour le contact d'urgence
             if (!Schema::hasColumn('drivers', 'emergency_contact_relationship')) {
@@ -35,6 +39,10 @@ return new class extends Migration
      */
     public function down(): void
     {
+        if (!Schema::hasTable('drivers')) {
+            return;
+        }
+
         Schema::table('drivers', function (Blueprint $table) {
             if (Schema::hasColumn('drivers', 'emergency_contact_relationship')) {
                 $table->dropColumn('emergency_contact_relationship');

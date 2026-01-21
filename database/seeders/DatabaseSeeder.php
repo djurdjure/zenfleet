@@ -20,6 +20,7 @@ class DatabaseSeeder extends Seeder
         // 1. Créer les rôles et permissions d'abord
         $this->call([
             ZenFleetRolesPermissionsSeeder::class,
+            TestCompatibilityPermissionsSeeder::class, // ✅ Permissions legacy pour compatibilité tests
         ]);
 
         // 2. Run Algeria-specific migrations and seeders

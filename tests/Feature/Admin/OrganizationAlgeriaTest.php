@@ -9,6 +9,8 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
+use Spatie\Permission\Contracts\PermissionsTeamResolver;
+use Spatie\Permission\Models\Role;
 use Tests\TestCase;
 
 class OrganizationAlgeriaTest extends TestCase
@@ -22,21 +24,21 @@ class OrganizationAlgeriaTest extends TestCase
         parent::setUp();
 
         // Create an admin user
-        $this->admin = User::factory()->create();
+        $organization = Organization::factory()->create();
+        $this->admin = User::factory()->create(['organization_id' => $organization->id]);
+        app(PermissionsTeamResolver::class)->setPermissionsTeamId($organization->id);
+        Role::firstOrCreate(['name' => 'Super Admin', 'guard_name' => 'web']);
         $this->admin->assignRole('Super Admin');
 
         // Seed Algeria wilayas
-        $this->artisan('migrate');
-        AlgeriaWilaya::create([
-            'code' => '16',
-            'name_fr' => 'Alger',
-            'is_active' => true,
-        ]);
-        AlgeriaWilaya::create([
-            'code' => '31',
-            'name_fr' => 'Oran',
-            'is_active' => true,
-        ]);
+        AlgeriaWilaya::updateOrCreate(
+            ['code' => '16'],
+            ['name_fr' => 'Alger', 'is_active' => true]
+        );
+        AlgeriaWilaya::updateOrCreate(
+            ['code' => '31'],
+            ['name_fr' => 'Oran', 'is_active' => true]
+        );
     }
 
     /** @test */

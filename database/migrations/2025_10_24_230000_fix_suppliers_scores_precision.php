@@ -45,16 +45,24 @@ return new class extends Migration
      */
     public function up(): void
     {
-        // 1️⃣ Supprimer les anciennes contraintes CHECK
-        DB::statement("
-            ALTER TABLE suppliers
-            DROP CONSTRAINT IF EXISTS valid_scores
-        ");
-        
-        DB::statement("
-            ALTER TABLE suppliers
-            DROP CONSTRAINT IF EXISTS valid_rating
-        ");
+        if (!Schema::hasTable('suppliers')) {
+            return;
+        }
+
+        $driver = Schema::getConnection()->getDriverName();
+
+        // 1️⃣ Supprimer les anciennes contraintes CHECK (PostgreSQL uniquement)
+        if ($driver === 'pgsql') {
+            DB::statement("
+                ALTER TABLE suppliers
+                DROP CONSTRAINT IF EXISTS valid_scores
+            ");
+
+            DB::statement("
+                ALTER TABLE suppliers
+                DROP CONSTRAINT IF EXISTS valid_rating
+            ");
+        }
 
         // 2️⃣ Modifier les colonnes pour accepter les bonnes plages
         Schema::table('suppliers', function (Blueprint $table) {
@@ -68,35 +76,39 @@ return new class extends Migration
             $table->decimal('rating', 3, 2)->default(4.5)->change();
         });
 
-        // 3️⃣ Ajouter nouvelles contraintes CHECK cohérentes
-        DB::statement("
-            ALTER TABLE suppliers
-            ADD CONSTRAINT valid_scores CHECK (
-                quality_score BETWEEN 0 AND 100 AND
-                reliability_score BETWEEN 0 AND 100
-            )
-        ");
-        
-        DB::statement("
-            ALTER TABLE suppliers
-            ADD CONSTRAINT valid_rating CHECK (
-                rating BETWEEN 0 AND 5
-            )
-        ");
+        // 3️⃣ Ajouter nouvelles contraintes CHECK cohérentes (PostgreSQL uniquement)
+        if ($driver === 'pgsql') {
+            DB::statement("
+                ALTER TABLE suppliers
+                ADD CONSTRAINT valid_scores CHECK (
+                    quality_score BETWEEN 0 AND 100 AND
+                    reliability_score BETWEEN 0 AND 100
+                )
+            ");
+
+            DB::statement("
+                ALTER TABLE suppliers
+                ADD CONSTRAINT valid_rating CHECK (
+                    rating BETWEEN 0 AND 5
+                )
+            ");
+        }
 
         // 4️⃣ Normaliser les valeurs existantes
         // Convertir rating 0-10 → 0-5 si nécessaire
-        DB::statement("
-            UPDATE suppliers
-            SET 
-                rating = CASE 
-                    WHEN rating > 5 THEN rating / 2.0  -- Convertir 0-10 → 0-5
-                    ELSE rating
-                END,
-                quality_score = LEAST(quality_score, 100),
-                reliability_score = LEAST(reliability_score, 100)
-            WHERE rating > 5 OR quality_score > 100 OR reliability_score > 100
-        ");
+        if ($driver === 'pgsql') {
+            DB::statement("
+                UPDATE suppliers
+                SET 
+                    rating = CASE 
+                        WHEN rating > 5 THEN rating / 2.0  -- Convertir 0-10 → 0-5
+                        ELSE rating
+                    END,
+                    quality_score = LEAST(quality_score, 100),
+                    reliability_score = LEAST(reliability_score, 100)
+                WHERE rating > 5 OR quality_score > 100 OR reliability_score > 100
+            ");
+        }
 
         // 5️⃣ Ajouter index composite pour performance
         Schema::table('suppliers', function (Blueprint $table) {
@@ -110,21 +122,29 @@ return new class extends Migration
      */
     public function down(): void
     {
+        if (!Schema::hasTable('suppliers')) {
+            return;
+        }
+
+        $driver = Schema::getConnection()->getDriverName();
+
         // 1️⃣ Supprimer l'index composite
         Schema::table('suppliers', function (Blueprint $table) {
             $table->dropIndex('idx_suppliers_scores');
         });
 
-        // 2️⃣ Supprimer les nouvelles contraintes
-        DB::statement("
-            ALTER TABLE suppliers
-            DROP CONSTRAINT IF EXISTS valid_scores
-        ");
-        
-        DB::statement("
-            ALTER TABLE suppliers
-            DROP CONSTRAINT IF EXISTS valid_rating
-        ");
+        // 2️⃣ Supprimer les nouvelles contraintes (PostgreSQL uniquement)
+        if ($driver === 'pgsql') {
+            DB::statement("
+                ALTER TABLE suppliers
+                DROP CONSTRAINT IF EXISTS valid_scores
+            ");
+
+            DB::statement("
+                ALTER TABLE suppliers
+                DROP CONSTRAINT IF EXISTS valid_rating
+            ");
+        }
 
         // 3️⃣ Restaurer les colonnes à DECIMAL(3,2) (0-10 max)
         Schema::table('suppliers', function (Blueprint $table) {
@@ -133,20 +153,22 @@ return new class extends Migration
             $table->decimal('rating', 3, 2)->default(5.0)->change();
         });
 
-        // 4️⃣ Restaurer les anciennes contraintes CHECK (0-10)
-        DB::statement("
-            ALTER TABLE suppliers
-            ADD CONSTRAINT valid_scores CHECK (
-                quality_score BETWEEN 0 AND 10 AND
-                reliability_score BETWEEN 0 AND 10
-            )
-        ");
-        
-        DB::statement("
-            ALTER TABLE suppliers
-            ADD CONSTRAINT valid_rating CHECK (
-                rating BETWEEN 0 AND 10
-            )
-        ");
+        // 4️⃣ Restaurer les anciennes contraintes CHECK (0-10) (PostgreSQL uniquement)
+        if ($driver === 'pgsql') {
+            DB::statement("
+                ALTER TABLE suppliers
+                ADD CONSTRAINT valid_scores CHECK (
+                    quality_score BETWEEN 0 AND 10 AND
+                    reliability_score BETWEEN 0 AND 10
+                )
+            ");
+
+            DB::statement("
+                ALTER TABLE suppliers
+                ADD CONSTRAINT valid_rating CHECK (
+                    rating BETWEEN 0 AND 10
+                )
+            ");
+        }
     }
 };

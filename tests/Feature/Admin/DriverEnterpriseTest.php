@@ -11,6 +11,7 @@ use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
+use Spatie\Permission\Contracts\PermissionsTeamResolver;
 use Spatie\Permission\Models\Role;
 use Carbon\Carbon;
 
@@ -50,9 +51,10 @@ class DriverEnterpriseTest extends TestCase
         ]);
 
         // Création des rôles enterprise
-        $adminRole = Role::create(['name' => 'Super Admin']);
-        $managerRole = Role::create(['name' => 'Gestionnaire Flotte']);
-        $supervisorRole = Role::create(['name' => 'Supervisor']);
+        $adminRole = Role::firstOrCreate(['name' => 'Super Admin', 'guard_name' => 'web']);
+        $managerRole = Role::firstOrCreate(['name' => 'Gestionnaire Flotte', 'guard_name' => 'web']);
+        $supervisorRole = Role::firstOrCreate(['name' => 'Supervisor', 'guard_name' => 'web']);
+        app(PermissionsTeamResolver::class)->setPermissionsTeamId($this->organization->id);
 
         // Création des utilisateurs de test avec rôles
         $this->adminUser = User::factory()->create([

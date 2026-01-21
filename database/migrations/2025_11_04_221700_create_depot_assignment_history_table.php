@@ -3,6 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\DB;
 
 return new class extends Migration
 {
@@ -14,10 +15,13 @@ return new class extends Migration
     public function up(): void
     {
         // Drop existing indexes if any (cleanup from failed migration)
-        DB::statement('DROP INDEX IF EXISTS depot_assignment_history_action_index CASCADE');
-        DB::statement('DROP INDEX IF EXISTS depot_assignment_history_vehicle_id_assigned_at_index CASCADE');
-        DB::statement('DROP INDEX IF EXISTS depot_assignment_history_depot_id_assigned_at_index CASCADE');
-        DB::statement('DROP INDEX IF EXISTS depot_assignment_history_organization_id_assigned_at_index CASCADE');
+        $driver = Schema::getConnection()->getDriverName();
+        $cascade = $driver === 'pgsql' ? ' CASCADE' : '';
+
+        DB::statement('DROP INDEX IF EXISTS depot_assignment_history_action_index' . $cascade);
+        DB::statement('DROP INDEX IF EXISTS depot_assignment_history_vehicle_id_assigned_at_index' . $cascade);
+        DB::statement('DROP INDEX IF EXISTS depot_assignment_history_depot_id_assigned_at_index' . $cascade);
+        DB::statement('DROP INDEX IF EXISTS depot_assignment_history_organization_id_assigned_at_index' . $cascade);
 
         Schema::create('depot_assignment_history', function (Blueprint $table) {
             $table->id();

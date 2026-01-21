@@ -95,6 +95,7 @@ class RepairRequest extends Model
         'organization_id',
         'vehicle_id',
         'driver_id',
+        'requested_by',
         'category_id',
         'status',
         'title',

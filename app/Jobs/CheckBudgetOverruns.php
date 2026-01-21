@@ -11,6 +11,8 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Schema;
+use Spatie\Permission\PermissionRegistrar;
 
 class CheckBudgetOverruns implements ShouldQueue
 {
@@ -48,14 +50,20 @@ class CheckBudgetOverruns implements ShouldQueue
 
                 if ($alertType) {
                     // Vérifier si une alerte similaire n'a pas déjà été envoyée récemment
-                    $recentAlert = \DB::table('notifications')
-                        ->where('type', BudgetOverrunAlert::class)
-                        ->where('data->budget_id', $budget->id)
-                        ->where('data->alert_type', $alertType)
-                        ->where('created_at', '>=', now()->subHours(24))
-                        ->exists();
+                    $recentAlert = false;
+
+                    if (Schema::hasTable('notifications')) {
+                        $recentAlert = \DB::table('notifications')
+                            ->where('type', BudgetOverrunAlert::class)
+                            ->where('data->budget_id', $budget->id)
+                            ->where('data->alert_type', $alertType)
+                            ->where('created_at', '>=', now()->subHours(24))
+                            ->exists();
+                    }
 
                     if (!$recentAlert) {
+                        app(PermissionRegistrar::class)->setPermissionsTeamId($budget->organization_id);
+
                         // Envoyer l'alerte aux gestionnaires de l'organisation
                         $managers = User::where('organization_id', $budget->organization_id)
                                       ->whereHas('roles', function ($query) {

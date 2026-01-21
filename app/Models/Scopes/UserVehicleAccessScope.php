@@ -54,9 +54,9 @@ class UserVehicleAccessScope implements Scope
                 $query->orWhereHas('assignments', function($q) use ($user) {
                     $q->where('driver_id', $user->driver->id)
                       ->where('status', 'active')
-                      ->whereNull('end_datetime')
-                      ->orWhere(function($sq) {
-                          $sq->where('end_datetime', '>=', now());
+                      ->where(function ($dateQuery) {
+                          $dateQuery->whereNull('end_datetime')
+                              ->orWhere('end_datetime', '>=', now());
                       });
                 });
             }

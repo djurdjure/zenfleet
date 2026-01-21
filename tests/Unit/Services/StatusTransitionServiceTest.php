@@ -9,6 +9,7 @@ use App\Models\Driver;
 use App\Models\StatusHistory;
 use App\Models\VehicleStatus;
 use App\Models\DriverStatus;
+use App\Models\Scopes\UserVehicleAccessScope;
 use App\Models\User;
 use App\Models\Organization;
 use App\Enums\VehicleStatusEnum;
@@ -80,7 +81,10 @@ class StatusTransitionServiceTest extends TestCase
         ];
 
         foreach ($vehicleStatuses as $status) {
-            VehicleStatus::create($status);
+            VehicleStatus::firstOrCreate(
+                ['name' => $status['name']],
+                ['slug' => $status['slug']]
+            );
         }
 
         // Statuts chauffeurs
@@ -92,7 +96,10 @@ class StatusTransitionServiceTest extends TestCase
         ];
 
         foreach ($driverStatuses as $status) {
-            DriverStatus::create($status);
+            DriverStatus::firstOrCreate(
+                ['name' => $status['name']],
+                ['slug' => $status['slug']]
+            );
         }
     }
 
@@ -326,13 +333,13 @@ class StatusTransitionServiceTest extends TestCase
         );
 
         // Assert
-        $this->assertCount(3, $results['succeeded']);
-        $this->assertCount(0, $results['failed']);
+        $this->assertSame(3, $results['success']);
+        $this->assertSame(0, $results['failed']);
 
         // Vérifier que tous les véhicules ont bien changé de statut
         $affecteStatus = VehicleStatus::where('slug', 'affecte')->first();
         foreach ($vehicleIds as $id) {
-            $vehicle = Vehicle::find($id);
+            $vehicle = Vehicle::withoutGlobalScope(UserVehicleAccessScope::class)->find($id);
             $this->assertEquals($affecteStatus->id, $vehicle->status_id);
         }
     }

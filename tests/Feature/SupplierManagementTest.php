@@ -6,6 +6,8 @@ use App\Models\Organization;
 use App\Models\Supplier;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Spatie\Permission\Contracts\PermissionsTeamResolver;
+use Spatie\Permission\Models\Role;
 use Tests\TestCase;
 
 class SupplierManagementTest extends TestCase
@@ -20,12 +22,15 @@ class SupplierManagementTest extends TestCase
         parent::setUp();
 
         $this->organization = Organization::factory()->create([
-            'type' => 'enterprise'
+            'organization_type' => 'enterprise'
         ]);
 
         $this->admin = User::factory()->create([
             'organization_id' => $this->organization->id
         ]);
+
+        Role::firstOrCreate(['name' => 'Admin', 'guard_name' => 'web']);
+        app(PermissionsTeamResolver::class)->setPermissionsTeamId($this->organization->id);
         $this->admin->assignRole('Admin');
     }
 

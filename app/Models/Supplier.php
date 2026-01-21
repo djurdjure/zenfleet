@@ -95,6 +95,7 @@ class Supplier extends Model
         'bank_name',
         'account_number',
         'rib',
+        'tax_rate',
         'is_active',
         'is_preferred',
         'is_certified',
@@ -113,6 +114,7 @@ class Supplier extends Model
         'quality_score' => 'decimal:2',
         'reliability_score' => 'decimal:2',
         'credit_limit' => 'decimal:2',
+        'tax_rate' => 'decimal:2',
         'avg_order_value' => 'decimal:2',
         'total_amount_spent' => 'decimal:2',
         'contract_start_date' => 'date',
@@ -214,17 +216,209 @@ class Supplier extends Model
     // Méthodes de validation algérienne
     public static function validateNIF($nif): bool
     {
+        if ($nif === null) {
+            return false;
+        }
+
+        $nif = (string) $nif;
+
         return preg_match('/^[0-9]{15}$/', $nif) === 1;
+    }
+
+    public static function validateNIS($nis): bool
+    {
+        if ($nis === null) {
+            return false;
+        }
+
+        $nis = (string) $nis;
+
+        return preg_match('/^[0-9]{15}$/', $nis) === 1;
     }
 
     public static function validateTradeRegister($rc): bool
     {
-        return preg_match('/^[0-9]{2}\/[0-9]{2}-[0-9]{7}$/', $rc) === 1;
+        if ($rc === null) {
+            return false;
+        }
+
+        $rc = (string) $rc;
+
+        if (preg_match('/^[0-9]{2}\/[0-9]{2}-[0-9]{7}$/', $rc) !== 1) {
+            return false;
+        }
+
+        $wilayaCode = substr($rc, 0, 2);
+
+        return array_key_exists($wilayaCode, self::WILAYAS);
     }
 
     public static function validateRIB($rib): bool
     {
+        if ($rib === null) {
+            return false;
+        }
+
+        $rib = (string) $rib;
+
         return preg_match('/^[0-9]{20}$/', $rib) === 1;
+    }
+
+    public static function isValidWilaya($wilaya): bool
+    {
+        if ($wilaya === null) {
+            return false;
+        }
+
+        $wilaya = trim((string) $wilaya);
+
+        if ($wilaya === '') {
+            return false;
+        }
+
+        if (array_key_exists($wilaya, self::WILAYAS)) {
+            return true;
+        }
+
+        $normalized = self::normalizeWilayaName($wilaya);
+
+        foreach (self::WILAYAS as $name) {
+            if (self::normalizeWilayaName($name) === $normalized) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public static function getWilayaCode($wilaya): ?string
+    {
+        if ($wilaya === null) {
+            return null;
+        }
+
+        $wilaya = trim((string) $wilaya);
+
+        if ($wilaya === '') {
+            return null;
+        }
+
+        if (array_key_exists($wilaya, self::WILAYAS)) {
+            return $wilaya;
+        }
+
+        $normalized = self::normalizeWilayaName($wilaya);
+
+        foreach (self::WILAYAS as $code => $name) {
+            if (self::normalizeWilayaName($name) === $normalized) {
+                return $code;
+            }
+        }
+
+        return null;
+    }
+
+    public static function extractWilayaCodeFromTradeRegister($register): ?string
+    {
+        if (!self::validateTradeRegister($register)) {
+            return null;
+        }
+
+        $register = (string) $register;
+
+        return substr($register, 0, 2);
+    }
+
+    public static function validateAlgerianPhone($phone): bool
+    {
+        if ($phone === null) {
+            return false;
+        }
+
+        $phone = (string) $phone;
+
+        if ($phone === '') {
+            return false;
+        }
+
+        $landlinePattern = '/^\+213-(2[1-9]|3[1-8]|4[1-9])-\d{6}$/';
+        $mobilePattern = '/^\+213-(5|6|7)\d{2}-\d{6}$/';
+
+        return preg_match($landlinePattern, $phone) === 1
+            || preg_match($mobilePattern, $phone) === 1;
+    }
+
+    public static function isValidTvaRate($rate): bool
+    {
+        if (!is_numeric($rate)) {
+            return false;
+        }
+
+        $rate = (float) $rate;
+
+        return in_array($rate, [0.0, 9.0, 19.0], true);
+    }
+
+    public static function validateCompleteData(array $data): bool
+    {
+        $required = [
+            'nif' => [self::class, 'validateNIF'],
+            'nis' => [self::class, 'validateNIS'],
+            'trade_register' => [self::class, 'validateTradeRegister'],
+            'rib' => [self::class, 'validateRIB'],
+            'wilaya' => [self::class, 'isValidWilaya'],
+            'phone' => [self::class, 'validateAlgerianPhone'],
+            'tax_rate' => [self::class, 'isValidTvaRate'],
+        ];
+
+        foreach ($required as $key => $validator) {
+            if (!array_key_exists($key, $data)) {
+                return false;
+            }
+
+            if (!call_user_func($validator, $data[$key])) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    protected static function normalizeWilayaName(string $name): string
+    {
+        $normalized = trim($name);
+        $normalized = mb_strtolower($normalized);
+        $normalized = str_replace(['’', '\'', '-', ' '], '', $normalized);
+
+        $ascii = iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $normalized);
+        if ($ascii !== false && $ascii !== '') {
+            $normalized = $ascii;
+        }
+
+        return $normalized;
+    }
+
+    public function calculateComplianceScore(): int
+    {
+        $checks = [
+            self::validateNIF($this->nif ?? null),
+            self::validateNIS($this->nis ?? null),
+            self::validateTradeRegister($this->trade_register ?? null),
+            self::validateRIB($this->rib ?? null),
+            self::isValidWilaya($this->wilaya ?? null),
+            self::validateAlgerianPhone($this->phone ?? null),
+            !empty($this->certifications),
+            self::isValidTvaRate($this->tax_rate ?? null),
+        ];
+
+        $total = count($checks);
+        $passed = count(array_filter($checks));
+
+        if ($total === 0) {
+            return 0;
+        }
+
+        return (int) round(($passed / $total) * 100);
     }
 
     // Méthodes de gestion des évaluations

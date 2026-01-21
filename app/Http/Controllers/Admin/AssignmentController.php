@@ -22,15 +22,15 @@ use Illuminate\Support\Facades\Log;
 class AssignmentController extends Controller
 {
     use ResourceAvailability;
-        public function __construct()
+    public function __construct()
     {
         $this->middleware('auth');
-        
+
         // 🛡️ SYSTÈME DE PERMISSIONS ENTERPRISE
         // Utilisation de vérifications manuelles pour un contrôle précis
         // Les permissions sont vérifiées dans chaque méthode individuellement
         // Cela permet une granularité maximale et évite les conflits
-        
+
         // Option de debug des permissions (activé en dev)
         if (config('app.debug')) {
             $this->middleware(function ($request, $next) {
@@ -57,8 +57,8 @@ class AssignmentController extends Controller
 
         // Construction de la requête avec filtres
         $query = Assignment::with(['vehicle' => function ($query) {
-                $query->withoutGlobalScope(\App\Models\Scopes\UserVehicleAccessScope::class);
-            }, 'driver', 'creator'])
+            $query->withoutGlobalScope(\App\Models\Scopes\UserVehicleAccessScope::class);
+        }, 'driver', 'creator'])
             ->where('organization_id', auth()->user()->organization_id);
 
         // Application des filtres - RECHERCHE INSENSIBLE À LA CASSE ULTRA-PRO
@@ -70,17 +70,17 @@ class AssignmentController extends Controller
                 // Recherche véhicule: ILIKE utilise les index GIN trigram créés
                 $q->whereHas('vehicle', function ($vehicleQuery) use ($search) {
                     $vehicleQuery->where('registration_plate', 'ILIKE', "%{$search}%")
-                                ->orWhere('brand', 'ILIKE', "%{$search}%")
-                                ->orWhere('model', 'ILIKE', "%{$search}%");
+                        ->orWhere('brand', 'ILIKE', "%{$search}%")
+                        ->orWhere('model', 'ILIKE', "%{$search}%");
                 })
-                // Recherche chauffeur: ILIKE + recherche nom complet optimisée
-                ->orWhereHas('driver', function ($driverQuery) use ($search) {
-                    $driverQuery->where('first_name', 'ILIKE', "%{$search}%")
-                               ->orWhere('last_name', 'ILIKE', "%{$search}%")
-                               ->orWhere('personal_phone', 'ILIKE', "%{$search}%")
-                               // Recherche nom complet "Jean Dupont" ou "el hadi chemli"
-                               ->orWhereRaw("(first_name || ' ' || last_name) ILIKE ?", ["%{$search}%"]);
-                });
+                    // Recherche chauffeur: ILIKE + recherche nom complet optimisée
+                    ->orWhereHas('driver', function ($driverQuery) use ($search) {
+                        $driverQuery->where('first_name', 'ILIKE', "%{$search}%")
+                            ->orWhere('last_name', 'ILIKE', "%{$search}%")
+                            ->orWhere('personal_phone', 'ILIKE', "%{$search}%")
+                            // Recherche nom complet "Jean Dupont" ou "el hadi chemli"
+                            ->orWhereRaw("(first_name || ' ' || last_name) ILIKE ?", ["%{$search}%"]);
+                    });
             });
         }
 
@@ -113,7 +113,7 @@ class AssignmentController extends Controller
         // Pagination avec filtres et tri
         $perPage = (int) $request->get('per_page', 15);
         $assignments = $query->orderBy($sortBy, $sortOrder)
-                            ->paginate($perPage);
+            ->paginate($perPage);
 
         // ✅ Récupérer tous les véhicules et chauffeurs pour les filtres
         $vehicles = Vehicle::where('organization_id', auth()->user()->organization_id)
@@ -151,7 +151,7 @@ class AssignmentController extends Controller
     /**
      * Affiche le formulaire de création.
      */
-        /**
+    /**
      * Affiche le formulaire de création - ENTERPRISE EDITION
      * 
      * @throws \Illuminate\Auth\Access\AuthorizationException
@@ -212,7 +212,10 @@ class AssignmentController extends Controller
         $data['start_datetime'] = $startDateTime;
 
         // Gestion de l'affectation programmée
-        if ($data['assignment_type'] === 'scheduled' && isset($data['end_date']) && isset($data['end_time'])) {
+        $isScheduled = (string)$data['assignment_type'] === 'scheduled';
+        $hasEndDate = !empty($data['end_date']) && !empty($data['end_time']);
+
+        if ($isScheduled && $hasEndDate) {
             $endDateTime = Carbon::createFromFormat('Y-m-d H:i', $data['end_date'] . ' ' . $data['end_time']);
             $data['end_datetime'] = $endDateTime;
             $data['status'] = 'scheduled'; // Affectation programmée
@@ -231,7 +234,7 @@ class AssignmentController extends Controller
 
         // ✅ VÉRIFICATION DES CHEVAUCHEMENTS AVANT CRÉATION
         $newAssignment = new Assignment($data); // Créer une instance sans la persister
-        
+
         if ($newAssignment->isOverlapping()) {
             Log::warning('Tentative de création d\'affectation avec chevauchement', [
                 'vehicle_id' => $data['vehicle_id'],
@@ -240,13 +243,13 @@ class AssignmentController extends Controller
                 'end_datetime' => $data['end_datetime'],
                 'user_id' => auth()->id()
             ]);
-            
+
             return redirect()->back()
                 ->withInput()
                 ->with(
                     'error',
                     'Un chevauchement d\'affectation a été détecté pour ce véhicule ou ce chauffeur. '
-                    . 'Veuillez vérifier les périodes existantes.'
+                        . 'Veuillez vérifier les périodes existantes.'
                 );
         }
 
@@ -271,7 +274,6 @@ class AssignmentController extends Controller
             return redirect()->route('admin.assignments.index')
                 ->with('success', $message)
                 ->with('assignment_id', $assignment->id);
-
         } catch (\Exception $e) {
             \Log::error('Erreur lors de la création de l\'affectation', [
                 'error' => $e->getMessage(),
@@ -317,7 +319,7 @@ class AssignmentController extends Controller
 
         // ✅ VÉRIFICATION DES CHEVAUCHEMENTS AVANT MISE À JOUR
         $assignment->fill($data); // Mettre à jour l'instance existante
-        
+
         if ($assignment->isOverlapping($assignment->id)) { // Passer l'ID de l'affectation actuelle
             Log::warning('Tentative de modification d\'affectation avec chevauchement', [
                 'assignment_id' => $assignment->id,
@@ -327,19 +329,19 @@ class AssignmentController extends Controller
                 'end_datetime' => $data['end_datetime'] ?? $assignment->end_datetime,
                 'user_id' => auth()->id()
             ]);
-            
+
             return redirect()->back()
                 ->withInput()
                 ->with(
                     'error',
                     'Un chevauchement d\'affectation a été détecté pour ce véhicule ou ce chauffeur. '
-                    . 'Veuillez vérifier les périodes existantes.'
+                        . 'Veuillez vérifier les périodes existantes.'
                 );
         }
 
         try {
             $assignment->save();
-            
+
             Log::info('Affectation mise à jour avec succès', [
                 'assignment_id' => $assignment->id,
                 'updated_by' => auth()->id()
@@ -347,7 +349,6 @@ class AssignmentController extends Controller
 
             return redirect()->route('admin.assignments.index')
                 ->with('success', 'Affectation mise à jour avec succès.');
-                
         } catch (\Exception $e) {
             Log::error('Erreur lors de la mise à jour de l\'affectation', [
                 'assignment_id' => $assignment->id,
@@ -475,7 +476,6 @@ class AssignmentController extends Controller
             return redirect()
                 ->route('admin.assignments.index')
                 ->with('success', $successMessage);
-
         } catch (\Exception $e) {
             // ⚠️ ROLLBACK - Annuler toutes les modifications en cas d'erreur
             \DB::rollBack();
@@ -514,8 +514,8 @@ class AssignmentController extends Controller
         if ($assignment->status === Assignment::STATUS_COMPLETED) {
             return sprintf(
                 'Impossible de supprimer une affectation terminée. ' .
-                'Cette affectation s\'est terminée le %s. ' .
-                'Pour des raisons d\'audit et de traçabilité, les affectations terminées ne peuvent pas être supprimées.',
+                    'Cette affectation s\'est terminée le %s. ' .
+                    'Pour des raisons d\'audit et de traçabilité, les affectations terminées ne peuvent pas être supprimées.',
                 $assignment->end_datetime->format('d/m/Y à H:i')
             );
         }
@@ -525,8 +525,8 @@ class AssignmentController extends Controller
             $duration = $assignment->start_datetime->diffForHumans();
             return sprintf(
                 'Impossible de supprimer une affectation en cours. ' .
-                'Cette affectation a démarré %s. ' .
-                'Veuillez d\'abord la terminer avant de la supprimer, ou utilisez la fonction "Annuler" si nécessaire.',
+                    'Cette affectation a démarré %s. ' .
+                    'Veuillez d\'abord la terminer avant de la supprimer, ou utilisez la fonction "Annuler" si nécessaire.',
                 $duration
             );
         }
@@ -534,22 +534,22 @@ class AssignmentController extends Controller
         // Affectation annulée
         if ($assignment->status === Assignment::STATUS_CANCELLED) {
             return 'Impossible de supprimer une affectation annulée. ' .
-                   'Les affectations annulées sont conservées pour l\'historique et l\'audit.';
+                'Les affectations annulées sont conservées pour l\'historique et l\'audit.';
         }
 
         // Affectation trop ancienne (> 24h)
         if ($assignment->created_at && $assignment->created_at->diffInHours() >= 24) {
             return sprintf(
                 'Impossible de supprimer cette affectation. ' .
-                'Elle a été créée il y a %s. ' .
-                'Seules les affectations créées il y a moins de 24 heures peuvent être supprimées (sauf si elles sont programmées).',
+                    'Elle a été créée il y a %s. ' .
+                    'Seules les affectations créées il y a moins de 24 heures peuvent être supprimées (sauf si elles sont programmées).',
                 $assignment->created_at->diffForHumans()
             );
         }
 
         // Raison générique (ne devrait pas arriver)
         return 'Cette affectation ne peut pas être supprimée pour le moment. ' .
-               'Veuillez vérifier son statut et réessayer.';
+            'Veuillez vérifier son statut et réessayer.';
     }
 
     /**
@@ -603,7 +603,6 @@ class AssignmentController extends Controller
             }
 
             throw new \Exception('Échec de la terminaison');
-
         } catch (\Exception $e) {
             $errorMessage = 'Erreur lors de la terminaison de l\'affectation: ' . $e->getMessage();
 
@@ -669,7 +668,7 @@ class AssignmentController extends Controller
 
         $assignments = $query->orderBy('start_datetime', 'desc')->get();
 
-        return match($format) {
+        return match ($format) {
             'csv' => $this->exportToCsv($assignments),
             default => response()->json(['error' => 'Format non supporté'], 400)
         };
@@ -749,23 +748,22 @@ class AssignmentController extends Controller
                 // Données détaillées (optionnelles, selon les besoins)
                 'vehicles_breakdown' => $request->boolean('detailed') ?
                     Vehicle::where('organization_id', $organizationId)
-                        ->withCount(['assignments as active_assignments_count' => function ($query) {
-                            $query->whereNull('end_datetime')->where('start_datetime', '<=', now());
-                        }])
-                        ->get(['id', 'registration_plate', 'brand', 'model'])
-                        ->map(function ($vehicle) {
-                            return [
-                                'vehicle_id' => $vehicle->id,
-                                'registration_plate' => $vehicle->registration_plate,
-                                'brand_model' => $vehicle->brand . ' ' . $vehicle->model,
-                                'is_assigned' => $vehicle->active_assignments_count > 0,
-                                'active_assignments' => $vehicle->active_assignments_count
-                            ];
-                        }) : []
+                    ->withCount(['assignments as active_assignments_count' => function ($query) {
+                        $query->whereNull('end_datetime')->where('start_datetime', '<=', now());
+                    }])
+                    ->get(['id', 'registration_plate', 'brand', 'model'])
+                    ->map(function ($vehicle) {
+                        return [
+                            'vehicle_id' => $vehicle->id,
+                            'registration_plate' => $vehicle->registration_plate,
+                            'brand_model' => $vehicle->brand . ' ' . $vehicle->model,
+                            'is_assigned' => $vehicle->active_assignments_count > 0,
+                            'active_assignments' => $vehicle->active_assignments_count
+                        ];
+                    }) : []
             ];
 
             return response()->json($stats);
-
         } catch (\Exception $e) {
             // Gestion d'erreur enterprise avec fallback
             \Log::error('Erreur dans AssignmentController::stats()', [
@@ -797,10 +795,10 @@ class AssignmentController extends Controller
 
         $vehicles = Vehicle::where('organization_id', auth()->user()->organization_id)
             ->where('status', 'active')
-            ->whereDoesntHave('assignments', function($query) {
+            ->whereDoesntHave('assignments', function ($query) {
                 // Véhicules sans affectation en cours
                 $query->whereNull('end_datetime')
-                      ->where('start_datetime', '<=', now());
+                    ->where('start_datetime', '<=', now());
             })
             ->select('id', 'registration_plate', 'brand', 'model', 'current_mileage', 'status')
             ->orderBy('registration_plate')
@@ -817,21 +815,21 @@ class AssignmentController extends Controller
         $this->authorize('view assignments');
 
         $drivers = Driver::where('organization_id', auth()->user()->organization_id)
-            ->whereHas('driverStatus', function($statusQuery) {
+            ->whereHas('driverStatus', function ($statusQuery) {
                 $statusQuery->where('is_active', true)
-                           ->where('can_drive', true)
-                           ->where('can_assign', true);
+                    ->where('can_drive', true)
+                    ->where('can_assign', true);
             })
-            ->whereDoesntHave('assignments', function($query) {
+            ->whereDoesntHave('assignments', function ($query) {
                 // Chauffeurs sans affectation en cours
                 $query->whereNull('end_datetime')
-                      ->where('start_datetime', '<=', now());
+                    ->where('start_datetime', '<=', now());
             })
             ->with('driverStatus')
             ->select('id', 'first_name', 'last_name', 'license_number', 'personal_phone', 'status_id')
             ->orderBy('last_name')
             ->get()
-            ->map(function($driver) {
+            ->map(function ($driver) {
                 return [
                     'id' => $driver->id,
                     'full_name' => $driver->full_name,
@@ -958,7 +956,6 @@ class AssignmentController extends Controller
                 'Cache-Control' => 'private, max-age=0, must-revalidate',
                 'Pragma' => 'public'
             ]);
-
         } catch (\Exception $e) {
             // 🔴 LOG ERREUR - Diagnostic complet
             Log::error('Erreur lors de l\'export PDF d\'affectation', [
@@ -992,7 +989,7 @@ class AssignmentController extends Controller
             'Content-Disposition' => 'attachment; filename="affectations_' . now()->format('Y-m-d') . '.csv"'
         ];
 
-        $callback = function() use ($assignments) {
+        $callback = function () use ($assignments) {
             $file = fopen('php://output', 'w');
 
             // En-têtes CSV
@@ -1062,16 +1059,16 @@ class AssignmentController extends Controller
     private function checkPermissionEnterprise(string $permission, string $errorMessage = null): void
     {
         $user = auth()->user();
-        
+
         // Vérifications multiples pour compatibilité
-        $hasPermission = $user->can($permission) || 
-                        $user->hasPermissionTo($permission) ||
-                        $user->can(str_replace(' ', '.', $permission)) ||
-                        $user->hasPermissionTo(str_replace(' ', '.', $permission));
-        
+        $hasPermission = $user->can($permission) ||
+            $user->hasPermissionTo($permission) ||
+            $user->can(str_replace(' ', '.', $permission)) ||
+            $user->hasPermissionTo(str_replace(' ', '.', $permission));
+
         if (!$hasPermission) {
             $message = $errorMessage ?? "Vous n'avez pas la permission: {$permission}";
-            
+
             if (config('app.debug')) {
                 \Log::warning('Permission Denied', [
                     'user' => $user->email,
@@ -1079,7 +1076,7 @@ class AssignmentController extends Controller
                     'user_permissions' => $user->getAllPermissions()->pluck('name')
                 ]);
             }
-            
+
             abort(403, $message);
         }
     }

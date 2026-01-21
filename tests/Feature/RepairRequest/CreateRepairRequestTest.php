@@ -1,206 +1,272 @@
 <?php
 
+namespace Tests\Feature\RepairRequest;
+
 use App\Models\Driver;
 use App\Models\Organization;
 use App\Models\RepairRequest;
 use App\Models\User;
 use App\Models\Vehicle;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Spatie\Permission\Contracts\PermissionsTeamResolver;
+use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
+use Spatie\Permission\PermissionRegistrar;
+use Tests\TestCase;
 
-use function Pest\Laravel\actingAs;
-use function Pest\Laravel\assertDatabaseHas;
-use function Pest\Laravel\post;
+class CreateRepairRequestTest extends TestCase
+{
+    use RefreshDatabase;
 
-beforeEach(function () {
-    // Create roles
-    Role::create(['name' => 'Chauffeur', 'guard_name' => 'web']);
-    Role::create(['name' => 'Admin', 'guard_name' => 'web']);
+    private Organization $organization;
+    private User $driverUser;
+    private Driver $driver;
+    private Vehicle $vehicle;
+    private Permission $createPermission;
 
-    // Create organization
-    $this->organization = Organization::factory()->create();
+    protected function setUp(): void
+    {
+        parent::setUp();
 
-    // Create driver user
-    $this->driverUser = User::factory()->create([
-        'organization_id' => $this->organization->id,
-    ]);
-    $this->driverUser->assignRole('Chauffeur');
+        $permissionRegistrar = app(PermissionRegistrar::class);
+        $permissionRegistrar->forgetCachedPermissions();
 
-    $this->driver = Driver::factory()->create([
-        'organization_id' => $this->organization->id,
-        'user_id' => $this->driverUser->id,
-    ]);
+        $this->organization = Organization::factory()->create();
+        app(PermissionsTeamResolver::class)->setPermissionsTeamId($this->organization->id);
+        $permissionRegistrar->setPermissionsTeamId($this->organization->id);
 
-    $this->vehicle = Vehicle::factory()->create([
-        'organization_id' => $this->organization->id,
-    ]);
+        $driverRole = Role::firstOrCreate([
+            'name' => 'Chauffeur',
+            'guard_name' => 'web',
+            'organization_id' => $this->organization->id,
+        ]);
+        $adminRole = Role::firstOrCreate([
+            'name' => 'Admin',
+            'guard_name' => 'web',
+            'organization_id' => $this->organization->id,
+        ]);
 
-    Storage::fake('public');
-});
+        $createPermission = Permission::firstOrCreate([
+            'name' => 'create repair requests',
+            'guard_name' => 'web',
+        ]);
+        $this->createPermission = $createPermission;
 
-test('driver can create repair request with valid data', function () {
-    actingAs($this->driverUser);
+        $driverRole->givePermissionTo($createPermission);
+        $adminRole->givePermissionTo($createPermission);
 
-    $response = post(route('admin.repair-requests.store'), [
-        'driver_id' => $this->driver->id,
-        'vehicle_id' => $this->vehicle->id,
-        'title' => 'Pneu crevé',
-        'description' => 'Le pneu avant droit est complètement à plat après avoir roulé sur un clou',
-        'urgency' => 'high',
-        'current_mileage' => 45000,
-        'current_location' => 'Parking central',
-    ]);
+        $this->driverUser = User::factory()->create([
+            'organization_id' => $this->organization->id,
+        ]);
+        app(PermissionsTeamResolver::class)->setPermissionsTeamId($this->organization->id);
+        $permissionRegistrar->setPermissionsTeamId($this->organization->id);
+        $this->driverUser->assignRole('Chauffeur');
+        $this->driverUser->givePermissionTo($this->createPermission);
+        DB::table('model_has_roles')
+            ->where('model_id', $this->driverUser->id)
+            ->where('model_type', User::class)
+            ->update(['organization_id' => $this->organization->id]);
+        DB::table('model_has_permissions')
+            ->where('model_id', $this->driverUser->id)
+            ->where('model_type', User::class)
+            ->update(['organization_id' => $this->organization->id]);
 
-    $response->assertRedirect();
-    $response->assertSessionHas('success');
+        $this->driver = Driver::factory()->create([
+            'organization_id' => $this->organization->id,
+            'user_id' => $this->driverUser->id,
+        ]);
 
-    assertDatabaseHas('repair_requests', [
-        'driver_id' => $this->driver->id,
-        'vehicle_id' => $this->vehicle->id,
-        'title' => 'Pneu crevé',
-        'urgency' => 'high',
-        'status' => RepairRequest::STATUS_PENDING_SUPERVISOR,
-    ]);
-});
+        $this->vehicle = Vehicle::factory()->create([
+            'organization_id' => $this->organization->id,
+        ]);
 
-test('driver can create repair request with photos', function () {
-    actingAs($this->driverUser);
+        Storage::fake('public');
+    }
 
-    $photo1 = UploadedFile::fake()->image('photo1.jpg', 800, 600);
-    $photo2 = UploadedFile::fake()->image('photo2.jpg', 800, 600);
+    public function test_driver_can_create_repair_request_with_valid_data()
+    {
+        $this->actingAs($this->driverUser);
 
-    $response = post(route('admin.repair-requests.store'), [
-        'driver_id' => $this->driver->id,
-        'vehicle_id' => $this->vehicle->id,
-        'title' => 'Problème de phares',
-        'description' => 'Les phares avant ne fonctionnent plus correctement depuis ce matin',
-        'urgency' => 'normal',
-        'photos' => [$photo1, $photo2],
-    ]);
+        $response = $this->post(route('admin.repair-requests.store'), [
+            'driver_id' => $this->driver->id,
+            'vehicle_id' => $this->vehicle->id,
+            'title' => 'Pneu creve',
+            'description' => 'Le pneu avant droit est completement a plat apres avoir roule sur un clou',
+            'urgency' => 'high',
+            'current_mileage' => 45000,
+            'current_location' => 'Parking central',
+        ]);
 
-    $response->assertRedirect();
+        $response->assertRedirect();
+        $response->assertSessionHas('success');
 
-    $repairRequest = RepairRequest::latest()->first();
-    expect($repairRequest->photos)->toBeArray()
-        ->and(count($repairRequest->photos))->toBe(2);
+        $this->assertDatabaseHas('repair_requests', [
+            'driver_id' => $this->driver->id,
+            'vehicle_id' => $this->vehicle->id,
+            'title' => 'Pneu creve',
+            'urgency' => 'high',
+            'status' => RepairRequest::STATUS_PENDING_SUPERVISOR,
+        ]);
+    }
 
-    Storage::disk('public')->assertExists($repairRequest->photos[0]['path']);
-    Storage::disk('public')->assertExists($repairRequest->photos[1]['path']);
-});
+    public function test_driver_can_create_repair_request_with_photos()
+    {
+        $this->actingAs($this->driverUser);
 
-test('driver cannot create repair request without description', function () {
-    actingAs($this->driverUser);
+        $photo1 = UploadedFile::fake()->image('photo1.jpg', 800, 600);
+        $photo2 = UploadedFile::fake()->image('photo2.jpg', 800, 600);
 
-    $response = post(route('admin.repair-requests.store'), [
-        'driver_id' => $this->driver->id,
-        'vehicle_id' => $this->vehicle->id,
-        'title' => 'Problème moteur',
-        'description' => 'Court', // Too short (min 20 chars)
-        'urgency' => 'high',
-    ]);
+        $response = $this->post(route('admin.repair-requests.store'), [
+            'driver_id' => $this->driver->id,
+            'vehicle_id' => $this->vehicle->id,
+            'title' => 'Probleme de phares',
+            'description' => 'Les phares avant ne fonctionnent plus correctement depuis ce matin',
+            'urgency' => 'normal',
+            'photos' => [$photo1, $photo2],
+        ]);
 
-    $response->assertSessionHasErrors('description');
-});
+        $response->assertRedirect();
 
-test('driver cannot create repair request without title', function () {
-    actingAs($this->driverUser);
+        $repairRequest = RepairRequest::latest()->first();
+        $this->assertIsArray($repairRequest->photos);
+        $this->assertCount(2, $repairRequest->photos);
 
-    $response = post(route('admin.repair-requests.store'), [
-        'driver_id' => $this->driver->id,
-        'vehicle_id' => $this->vehicle->id,
-        'description' => 'Une description suffisamment longue pour passer la validation',
-        'urgency' => 'high',
-    ]);
+        Storage::disk('public')->assertExists($repairRequest->photos[0]['path']);
+        Storage::disk('public')->assertExists($repairRequest->photos[1]['path']);
+    }
 
-    $response->assertSessionHasErrors('title');
-});
+    public function test_driver_cannot_create_repair_request_without_description()
+    {
+        $this->actingAs($this->driverUser);
 
-test('driver cannot create repair request with invalid urgency', function () {
-    actingAs($this->driverUser);
+        $response = $this->post(route('admin.repair-requests.store'), [
+            'driver_id' => $this->driver->id,
+            'vehicle_id' => $this->vehicle->id,
+            'title' => 'Probleme moteur',
+            'description' => 'Court',
+            'urgency' => 'high',
+        ]);
 
-    $response = post(route('admin.repair-requests.store'), [
-        'driver_id' => $this->driver->id,
-        'vehicle_id' => $this->vehicle->id,
-        'title' => 'Problème',
-        'description' => 'Une description suffisamment longue pour passer la validation',
-        'urgency' => 'invalid_urgency',
-    ]);
+        $response->assertSessionHasErrors('description');
+    }
 
-    $response->assertSessionHasErrors('urgency');
-});
+    public function test_driver_cannot_create_repair_request_without_title()
+    {
+        $this->actingAs($this->driverUser);
 
-test('non-driver cannot create repair request', function () {
-    $adminUser = User::factory()->create([
-        'organization_id' => $this->organization->id,
-    ]);
-    $adminUser->assignRole('Admin');
+        $response = $this->post(route('admin.repair-requests.store'), [
+            'driver_id' => $this->driver->id,
+            'vehicle_id' => $this->vehicle->id,
+            'description' => 'Une description suffisamment longue pour passer la validation',
+            'urgency' => 'high',
+        ]);
 
-    actingAs($adminUser);
+        $response->assertSessionHasErrors('title');
+    }
 
-    $response = post(route('admin.repair-requests.store'), [
-        'driver_id' => $this->driver->id,
-        'vehicle_id' => $this->vehicle->id,
-        'title' => 'Problème',
-        'description' => 'Une description suffisamment longue pour passer la validation',
-        'urgency' => 'high',
-    ]);
+    public function test_driver_cannot_create_repair_request_with_invalid_urgency()
+    {
+        $this->actingAs($this->driverUser);
 
-    // Admin can also create, so this should pass
-    // If you want to restrict to drivers only, update the test
-    $response->assertRedirect();
-});
+        $response = $this->post(route('admin.repair-requests.store'), [
+            'driver_id' => $this->driver->id,
+            'vehicle_id' => $this->vehicle->id,
+            'title' => 'Probleme',
+            'description' => 'Une description suffisamment longue pour passer la validation',
+            'urgency' => 'invalid_urgency',
+        ]);
 
-test('driver cannot create repair request for another organization vehicle', function () {
-    actingAs($this->driverUser);
+        $response->assertSessionHasErrors('urgency');
+    }
 
-    $otherOrgVehicle = Vehicle::factory()->create([
-        'organization_id' => Organization::factory()->create()->id,
-    ]);
+    public function test_non_driver_can_create_repair_request()
+    {
+        $adminUser = User::factory()->create([
+            'organization_id' => $this->organization->id,
+        ]);
+        app(PermissionsTeamResolver::class)->setPermissionsTeamId($this->organization->id);
+        app(PermissionRegistrar::class)->setPermissionsTeamId($this->organization->id);
+        $adminUser->assignRole('Admin');
+        $adminUser->givePermissionTo($this->createPermission);
+        DB::table('model_has_roles')
+            ->where('model_id', $adminUser->id)
+            ->where('model_type', User::class)
+            ->update(['organization_id' => $this->organization->id]);
+        DB::table('model_has_permissions')
+            ->where('model_id', $adminUser->id)
+            ->where('model_type', User::class)
+            ->update(['organization_id' => $this->organization->id]);
 
-    $response = post(route('admin.repair-requests.store'), [
-        'driver_id' => $this->driver->id,
-        'vehicle_id' => $otherOrgVehicle->id,
-        'title' => 'Problème',
-        'description' => 'Une description suffisamment longue pour passer la validation',
-        'urgency' => 'high',
-    ]);
+        $this->actingAs($adminUser);
 
-    $response->assertSessionHasErrors('vehicle_id');
-});
+        $response = $this->post(route('admin.repair-requests.store'), [
+            'driver_id' => $this->driver->id,
+            'vehicle_id' => $this->vehicle->id,
+            'title' => 'Probleme',
+            'description' => 'Une description suffisamment longue pour passer la validation',
+            'urgency' => 'high',
+        ]);
 
-test('repair request defaults to normal urgency if not specified', function () {
-    actingAs($this->driverUser);
+        $response->assertRedirect();
+    }
 
-    $response = post(route('admin.repair-requests.store'), [
-        'driver_id' => $this->driver->id,
-        'vehicle_id' => $this->vehicle->id,
-        'title' => 'Problème mineur',
-        'description' => 'Une description suffisamment longue pour passer la validation',
-    ]);
+    public function test_driver_cannot_create_repair_request_for_another_organization_vehicle()
+    {
+        $this->actingAs($this->driverUser);
 
-    $response->assertRedirect();
+        $otherOrgVehicle = Vehicle::factory()->create([
+            'organization_id' => Organization::factory()->create()->id,
+        ]);
 
-    assertDatabaseHas('repair_requests', [
-        'title' => 'Problème mineur',
-        'urgency' => RepairRequest::URGENCY_NORMAL,
-    ]);
-});
+        $response = $this->post(route('admin.repair-requests.store'), [
+            'driver_id' => $this->driver->id,
+            'vehicle_id' => $otherOrgVehicle->id,
+            'title' => 'Probleme',
+            'description' => 'Une description suffisamment longue pour passer la validation',
+            'urgency' => 'high',
+        ]);
 
-test('repair request creates history entry on creation', function () {
-    actingAs($this->driverUser);
+        $response->assertSessionHasErrors('vehicle_id');
+    }
 
-    post(route('admin.repair-requests.store'), [
-        'driver_id' => $this->driver->id,
-        'vehicle_id' => $this->vehicle->id,
-        'title' => 'Test',
-        'description' => 'Une description suffisamment longue pour passer la validation',
-    ]);
+    public function test_repair_request_defaults_to_normal_urgency_if_not_specified()
+    {
+        $this->actingAs($this->driverUser);
 
-    $repairRequest = RepairRequest::latest()->first();
+        $response = $this->post(route('admin.repair-requests.store'), [
+            'driver_id' => $this->driver->id,
+            'vehicle_id' => $this->vehicle->id,
+            'title' => 'Probleme mineur',
+            'description' => 'Une description suffisamment longue pour passer la validation',
+        ]);
 
-    assertDatabaseHas('repair_request_history', [
-        'repair_request_id' => $repairRequest->id,
-        'action' => 'created',
-    ]);
-});
+        $response->assertRedirect();
+
+        $this->assertDatabaseHas('repair_requests', [
+            'title' => 'Probleme mineur',
+            'urgency' => RepairRequest::URGENCY_NORMAL,
+        ]);
+    }
+
+    public function test_repair_request_creates_history_entry_on_creation()
+    {
+        $this->actingAs($this->driverUser);
+
+        $this->post(route('admin.repair-requests.store'), [
+            'driver_id' => $this->driver->id,
+            'vehicle_id' => $this->vehicle->id,
+            'title' => 'Test demande',
+            'description' => 'Une description suffisamment longue pour passer la validation',
+        ]);
+
+        $repairRequest = RepairRequest::latest()->first();
+
+        $this->assertDatabaseHas('repair_request_history', [
+            'repair_request_id' => $repairRequest->id,
+            'action' => 'created',
+        ]);
+    }
+}

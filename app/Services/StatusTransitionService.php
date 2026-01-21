@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Vehicle;
 use App\Models\Driver;
 use App\Models\StatusHistory;
+use App\Models\Scopes\UserVehicleAccessScope;
 use App\Enums\VehicleStatusEnum;
 use App\Enums\DriverStatusEnum;
 use App\Events\VehicleStatusChanged;
@@ -67,6 +68,11 @@ class StatusTransitionService
         return DB::transaction(function () use ($vehicle, $currentStatusEnum, $newStatus, $options) {
             $previousStatus = $currentStatusEnum ? $currentStatusEnum->value : null;
 
+            $this->callTransitionHook(
+                $options['before_transition'] ?? null,
+                [$vehicle, $currentStatusEnum, $newStatus]
+            );
+
             // Mettre à jour le statut du véhicule
             $statusUpdated = $this->updateVehicleStatusInDatabase($vehicle, $newStatus);
 
@@ -87,6 +93,11 @@ class StatusTransitionService
 
             // Hook post-transition (peut être étendu)
             $this->executeVehiclePostTransitionHook($vehicle, $currentStatusEnum, $newStatus, $options);
+
+            $this->callTransitionHook(
+                $options['after_transition'] ?? null,
+                [$vehicle, $currentStatusEnum, $newStatus]
+            );
 
             // Dispatcher l'événement Laravel avec le format attendu
             event(new VehicleStatusChanged(
@@ -144,6 +155,11 @@ class StatusTransitionService
         return DB::transaction(function () use ($driver, $currentStatusEnum, $newStatus, $options) {
             $previousStatus = $currentStatusEnum ? $currentStatusEnum->value : null;
 
+            $this->callTransitionHook(
+                $options['before_transition'] ?? null,
+                [$driver, $currentStatusEnum, $newStatus]
+            );
+
             // Mettre à jour le statut du chauffeur
             $statusUpdated = $this->updateDriverStatusInDatabase($driver, $newStatus);
 
@@ -164,6 +180,11 @@ class StatusTransitionService
 
             // Hook post-transition
             $this->executeDriverPostTransitionHook($driver, $currentStatusEnum, $newStatus, $options);
+
+            $this->callTransitionHook(
+                $options['after_transition'] ?? null,
+                [$driver, $currentStatusEnum, $newStatus]
+            );
 
             // Dispatcher l'événement Laravel avec le format attendu
             event(new DriverStatusChanged(
@@ -442,6 +463,18 @@ class StatusTransitionService
         // event(new DriverStatusChanged($driver, $fromStatus, $toStatus, $options));
     }
 
+    private function callTransitionHook(?callable $hook, array $arguments): void
+    {
+        if (!$hook) {
+            return;
+        }
+
+        $reflection = new \ReflectionFunction(\Closure::fromCallable($hook));
+        $expectedArguments = $reflection->getNumberOfParameters();
+
+        $hook(...array_slice($arguments, 0, $expectedArguments));
+    }
+
     // =========================================================================
     // BULK OPERATIONS
     // =========================================================================
@@ -465,7 +498,8 @@ class StatusTransitionService
 
         foreach ($vehicleIds as $vehicleId) {
             try {
-                $vehicle = Vehicle::findOrFail($vehicleId);
+                $vehicle = Vehicle::withoutGlobalScope(UserVehicleAccessScope::class)
+                    ->findOrFail($vehicleId);
                 $this->changeVehicleStatus($vehicle, $newStatus, $options);
                 $success++;
             } catch (\Exception $e) {

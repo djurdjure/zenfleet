@@ -13,12 +13,23 @@ class SupplierFactory extends Factory
     public function definition(): array
     {
         return [
-            'company' => $this->faker->company(),
-            'contact_name' => $this->faker->name(),
-            'phone' => $this->faker->phoneNumber(),
-            'email' => $this->faker->unique()->safeEmail(),
-            'address' => $this->faker->address(),
-            'supplier_category_id' => null, // à surcharger si nécessaire
+            'supplier_type' => $this->faker->randomElement([
+                'mecanicien', 'assureur', 'station_service', 'pieces_detachees',
+                'peinture_carrosserie', 'pneumatiques', 'electricite_auto',
+                'controle_technique', 'transport_vehicules', 'autre'
+            ]),
+            'company_name' => $this->faker->company(),
+            'contact_first_name' => $this->faker->firstName(),
+            'contact_last_name' => $this->faker->lastName(),
+            'contact_phone' => '+213 ' . $this->faker->numerify('## ## ## ## ##'),
+            'contact_email' => $this->faker->unique()->safeEmail(),
+            'address' => $this->faker->streetAddress(),
+            'city' => $this->faker->city(),
+            'wilaya' => $this->faker->randomElement(['16', '31', '19', '25']),
+            'commune' => $this->faker->optional(0.6)->city(),
+            'postal_code' => $this->faker->numerify('#####'),
+            'phone' => '+213 ' . $this->faker->numerify('## ## ## ## ##'),
+            'email' => $this->faker->unique()->companyEmail(),
             'organization_id' => Organization::factory(),
         ];
     }

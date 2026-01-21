@@ -12,7 +12,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('expense_groups', function (Blueprint $table) {
+        $driver = Schema::getConnection()->getDriverName();
+
+        Schema::create('expense_groups', function (Blueprint $table) use ($driver) {
             $table->id();
             $table->unsignedBigInteger('organization_id');
             $table->string('name', 255);
@@ -23,9 +25,14 @@ return new class extends Migration
             $table->decimal('budget_used', 15, 2)
                 ->default(0)
                 ->comment('Calculé automatiquement depuis vehicle_expenses');
-            $table->decimal('budget_remaining', 15, 2)
-                ->storedAs('budget_allocated - budget_used')
-                ->comment('Budget restant calculé');
+            if ($driver === 'sqlite') {
+                $table->decimal('budget_remaining', 15, 2)->nullable()
+                    ->comment('Budget restant calculé');
+            } else {
+                $table->decimal('budget_remaining', 15, 2)
+                    ->storedAs('budget_allocated - budget_used')
+                    ->comment('Budget restant calculé');
+            }
             
             // Période fiscale
             $table->integer('fiscal_year')->default(date('Y'));
@@ -67,7 +74,11 @@ return new class extends Migration
                 ->references('id')->on('users')
                 ->onDelete('set null');
         });
-        
+
+        if ($driver !== 'pgsql') {
+            return;
+        }
+
         // Contraintes métier PostgreSQL
         DB::statement("
             ALTER TABLE expense_groups
@@ -131,9 +142,12 @@ return new class extends Migration
      */
     public function down(): void
     {
-        // Supprimer le trigger et la fonction
-        DB::statement("DROP TRIGGER IF EXISTS update_group_budget_on_expense ON vehicle_expenses");
-        DB::statement("DROP FUNCTION IF EXISTS update_expense_group_budget()");
+        $driver = Schema::getConnection()->getDriverName();
+        if ($driver === 'pgsql') {
+            // Supprimer le trigger et la fonction
+            DB::statement("DROP TRIGGER IF EXISTS update_group_budget_on_expense ON vehicle_expenses");
+            DB::statement("DROP FUNCTION IF EXISTS update_expense_group_budget()");
+        }
         
         Schema::dropIfExists('expense_groups');
     }

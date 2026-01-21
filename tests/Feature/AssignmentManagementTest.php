@@ -8,6 +8,7 @@ use App\Models\User;
 use App\Models\Vehicle;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Spatie\Permission\Contracts\PermissionsTeamResolver;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 use Tests\TestCase;
@@ -34,7 +35,9 @@ class AssignmentManagementTest extends TestCase
         $adminRole = Role::firstOrCreate(['name' => 'Admin', 'guard_name' => 'web']);
         $adminRole->givePermissionTo(['view assignments', 'create assignments', 'edit assignments', 'delete assignments']);
 
-        $this->adminUser = User::factory()->create();
+        $organization = \App\Models\Organization::factory()->create();
+        $this->adminUser = User::factory()->create(['organization_id' => $organization->id]);
+        app(PermissionsTeamResolver::class)->setPermissionsTeamId($organization->id);
         $this->adminUser->assignRole('Admin');
         $this->actingAs($this->adminUser);
 

@@ -13,6 +13,8 @@ use App\Models\VehicleStatus;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Livewire;
+use Spatie\Permission\Contracts\PermissionsTeamResolver;
+use Spatie\Permission\Models\Role;
 use Tests\TestCase;
 
 /**
@@ -53,6 +55,10 @@ class CreateAssignmentTest extends TestCase
         // Création des organisations
         $this->organization = Organization::factory()->create(['name' => 'Test Org 1']);
         $this->anotherOrganization = Organization::factory()->create(['name' => 'Test Org 2']);
+
+        Role::firstOrCreate(['name' => 'Admin', 'guard_name' => 'web']);
+        Role::firstOrCreate(['name' => 'Super Admin', 'guard_name' => 'web']);
+        app(PermissionsTeamResolver::class)->setPermissionsTeamId($this->organization->id);
 
         // Création des utilisateurs avec différents rôles
         $this->adminUser = User::factory()->create([

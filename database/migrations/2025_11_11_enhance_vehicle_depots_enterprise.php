@@ -163,6 +163,8 @@ return new class extends Migration
      */
     private function updateExistingData(): void
     {
+        $driver = Schema::getConnection()->getDriverName();
+
         // Définir le type par défaut pour les dépôts existants
         DB::table('vehicle_depots')
             ->whereNull('type')
@@ -176,11 +178,15 @@ return new class extends Migration
             ->update(['status' => 'active']);
 
         // Calculer le taux d'utilisation pour les dépôts existants
+        $utilizationExpression = $driver === 'pgsql'
+            ? 'ROUND((COALESCE(current_count, 0)::numeric / capacity::numeric) * 100, 2)'
+            : 'ROUND((CAST(COALESCE(current_count, 0) AS REAL) / CAST(capacity AS REAL)) * 100, 2)';
+
         DB::statement("
             UPDATE vehicle_depots 
             SET utilization_rate = CASE 
                 WHEN capacity IS NOT NULL AND capacity > 0 
-                THEN ROUND((COALESCE(current_count, 0)::numeric / capacity::numeric) * 100, 2)
+                THEN {$utilizationExpression}
                 ELSE 0 
             END
             WHERE utilization_rate = 0 OR utilization_rate IS NULL

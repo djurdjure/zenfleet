@@ -3,6 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\DB;
 
 return new class extends Migration
 {
@@ -65,8 +66,11 @@ return new class extends Migration
             $table->index(['days_in_past', 'confidence_score']); // Pour analyses
         });
 
-        // Commentaire sur la table
-        DB::statement("COMMENT ON TABLE retroactive_assignment_logs IS 'Log d''audit pour toutes les affectations créées dans le passé - Enterprise-grade traceability'");
+        $driver = Schema::getConnection()->getDriverName();
+        if ($driver === 'pgsql') {
+            // Commentaire sur la table
+            DB::statement("COMMENT ON TABLE retroactive_assignment_logs IS 'Log d''audit pour toutes les affectations créées dans le passé - Enterprise-grade traceability'");
+        }
     }
 
     /**

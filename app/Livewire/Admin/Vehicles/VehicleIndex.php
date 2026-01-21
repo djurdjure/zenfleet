@@ -7,6 +7,7 @@ use App\Models\VehicleStatus;
 use App\Models\Depot;
 use App\Models\VehicleType;
 use App\Models\FuelType;
+use App\Models\Scopes\UserVehicleAccessScope;
 use Livewire\Component;
 use Livewire\Attributes\Url;
 use Livewire\WithPagination;
@@ -589,29 +590,41 @@ class VehicleIndex extends Component
     public function render()
     {
         $vehicles = $this->getVehiclesQuery()->paginate($this->perPage);
+        $orgId = Auth::user()->organization_id;
 
         // Reference Data (Cached)
         $vehicleStatuses = Cache::remember('vehicle_statuses', 3600, fn() => VehicleStatus::orderBy('name')->get());
         $vehicleTypes = Cache::remember('vehicle_types', 3600, fn() => VehicleType::orderBy('name')->get());
         $fuelTypes = Cache::remember('fuel_types', 3600, fn() => FuelType::orderBy('name')->get());
         $depots = Cache::remember(
-            'depots_list_' . Auth::user()->organization_id,
+            'depots_list_' . $orgId,
             3600,
             fn() =>
-            Depot::where('organization_id', Auth::user()->organization_id)->orderBy('name')->get()
+            Depot::where('organization_id', $orgId)->orderBy('name')->get()
         );
 
         // Analytics (Simplified for now)
+        $analyticsQuery = Vehicle::withoutGlobalScope(UserVehicleAccessScope::class)
+            ->where('organization_id', $orgId);
         $analytics = [
-            'total_vehicles' => Vehicle::count(),
-            'available_vehicles' => Vehicle::whereHas('vehicleStatus', fn($q) => $q->where('name', 'Parking'))->count(),
-            'assigned_vehicles' => Vehicle::whereHas('assignments', fn($q) => $q->where('status', 'active'))->count(),
-            'maintenance_vehicles' => Vehicle::whereHas('vehicleStatus', fn($q) => $q->where('name', 'En maintenance'))->count(),
-            'broken_vehicles' => Vehicle::whereHas('vehicleStatus', fn($q) => $q->where('name', 'En panne'))->count(),
+            'total_vehicles' => (clone $analyticsQuery)->count(),
+            'available_vehicles' => (clone $analyticsQuery)->whereHas('vehicleStatus', fn($q) => $q->where('name', 'Parking'))->count(),
+            'assigned_vehicles' => (clone $analyticsQuery)->whereHas('assignments', fn($q) => $q->where('status', 'active'))->count(),
+            'maintenance_vehicles' => (clone $analyticsQuery)->whereHas('vehicleStatus', fn($q) => $q->where('name', 'En maintenance'))->count(),
+            'broken_vehicles' => (clone $analyticsQuery)->whereHas('vehicleStatus', fn($q) => $q->where('name', 'En panne'))->count(),
         ];
 
         // Get distinct brands for filter
-        $brands = Cache::remember('vehicle_brands', 3600, fn() => Vehicle::distinct()->orderBy('brand')->pluck('brand')->filter());
+        $brands = Cache::remember(
+            'vehicle_brands_' . $orgId,
+            3600,
+            fn() => Vehicle::withoutGlobalScope(UserVehicleAccessScope::class)
+                ->where('organization_id', $orgId)
+                ->distinct()
+                ->orderBy('brand')
+                ->pluck('brand')
+                ->filter()
+        );
 
         return view('livewire.admin.vehicles.vehicle-index', [
             'vehicles' => $vehicles,

@@ -3,6 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\DB;
 
 /**
  * ====================================================================
@@ -72,19 +73,19 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('vehicles', function (Blueprint $table) {
-            // ✅ Retirer la DEFAULT VALUE 'parking' de la colonne status
-            // Pour PostgreSQL, on doit faire un ALTER TABLE direct
-            // car Blueprint ne supporte pas bien DROP DEFAULT
-            DB::statement("ALTER TABLE vehicles ALTER COLUMN status DROP DEFAULT");
+        if (!Schema::hasTable('vehicles')) {
+            return;
+        }
 
-            // ⚠️ IMPORTANT: Ne PAS changer les valeurs existantes
-            // Les véhicules existants gardent leur status actuel
-        });
+        $driver = Schema::getConnection()->getDriverName();
+        if ($driver !== 'pgsql') {
+            return;
+        }
 
-        echo "✅ DEFAULT 'parking' retiré de vehicles.status\n";
-        echo "   Les nouveaux véhicules auront status = NULL\n";
-        echo "   Le système utilise status_id comme source de vérité\n";
+        // ✅ Retirer la DEFAULT VALUE 'parking' de la colonne status
+        // Pour PostgreSQL, on doit faire un ALTER TABLE direct
+        // car Blueprint ne supporte pas bien DROP DEFAULT
+        DB::statement("ALTER TABLE vehicles ALTER COLUMN status DROP DEFAULT");
     }
 
     /**
@@ -92,12 +93,16 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('vehicles', function (Blueprint $table) {
-            // ⚠️ Restaurer DEFAULT 'parking' si rollback nécessaire
-            DB::statement("ALTER TABLE vehicles ALTER COLUMN status SET DEFAULT 'parking'");
-        });
+        if (!Schema::hasTable('vehicles')) {
+            return;
+        }
 
-        echo "⚠️ DEFAULT 'parking' restauré sur vehicles.status\n";
-        echo "   Attention: Cela peut recréer le bug initial!\n";
+        $driver = Schema::getConnection()->getDriverName();
+        if ($driver !== 'pgsql') {
+            return;
+        }
+
+        // ⚠️ Restaurer DEFAULT 'parking' si rollback nécessaire
+        DB::statement("ALTER TABLE vehicles ALTER COLUMN status SET DEFAULT 'parking'");
     }
 };

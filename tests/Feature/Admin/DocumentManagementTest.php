@@ -5,12 +5,17 @@ namespace Tests\Feature\Admin;
 use App\Models\Document;
 use App\Models\DocumentCategory;
 use App\Models\Organization;
+use App\Models\Scopes\UserVehicleAccessScope;
 use App\Models\Supplier;
 use App\Models\User;
 use App\Models\Vehicle;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Spatie\Permission\Contracts\PermissionsTeamResolver;
+use Spatie\Permission\Models\Permission;
+use Spatie\Permission\PermissionRegistrar;
 use Tests\TestCase;
 
 class DocumentManagementTest extends TestCase
@@ -27,8 +32,27 @@ class DocumentManagementTest extends TestCase
         $this->adminUser = User::factory()->create([
             'organization_id' => $this->organization->id,
         ]);
-        // In a real app, we'd assign a role like 'Admin' and check permissions.
-        // For this test, acting as the user is sufficient to bypass auth middleware.
+
+        $permissionRegistrar = app(PermissionRegistrar::class);
+        $permissionRegistrar->forgetCachedPermissions();
+        app(PermissionsTeamResolver::class)->setPermissionsTeamId($this->organization->id);
+        $permissionRegistrar->setPermissionsTeamId($this->organization->id);
+
+        $createPermission = Permission::firstOrCreate([
+            'name' => 'create documents',
+            'guard_name' => 'web',
+        ]);
+        $viewPermission = Permission::firstOrCreate([
+            'name' => 'view documents',
+            'guard_name' => 'web',
+        ]);
+
+        $this->adminUser->givePermissionTo([$createPermission, $viewPermission]);
+        DB::table('model_has_permissions')
+            ->where('model_id', $this->adminUser->id)
+            ->where('model_type', User::class)
+            ->update(['organization_id' => $this->organization->id]);
+
         $this->actingAs($this->adminUser);
     }
 
@@ -89,8 +113,11 @@ class DocumentManagementTest extends TestCase
         Storage::disk('s3')->assertExists($document->file_path);
 
         // Assert polymorphic relationships were created
-        $this->assertCount(1, $document->vehicles);
-        $this->assertEquals($vehicle->id, $document->vehicles->first()->id);
+        $linkedVehicles = $document->vehicles()
+            ->withoutGlobalScope(UserVehicleAccessScope::class)
+            ->get();
+        $this->assertCount(1, $linkedVehicles);
+        $this->assertEquals($vehicle->id, $linkedVehicles->first()->id);
 
         $this->assertCount(1, $document->users);
         $this->assertEquals($driver->id, $document->users->first()->id);

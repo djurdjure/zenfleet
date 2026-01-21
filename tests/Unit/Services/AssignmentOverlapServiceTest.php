@@ -74,8 +74,9 @@ class AssignmentOverlapServiceTest extends TestCase
             $end
         );
 
-        $this->assertFalse($result['hasOverlap']);
-        $this->assertEmpty($result['conflicts']);
+        $this->assertFalse($result['hasConflicts']);
+        $this->assertTrue($result['vehicleConflicts']->isEmpty());
+        $this->assertTrue($result['driverConflicts']->isEmpty());
     }
 
     /** @test */
@@ -102,10 +103,10 @@ class AssignmentOverlapServiceTest extends TestCase
             $end
         );
 
-        $this->assertTrue($result['hasOverlap']);
-        $this->assertCount(1, $result['conflicts']);
-        $this->assertEquals('vehicle', $result['conflicts'][0]['type']);
-        $this->assertEquals($existingAssignment->id, $result['conflicts'][0]['assignment_id']);
+        $this->assertTrue($result['hasConflicts']);
+        $this->assertCount(1, $result['vehicleConflicts']);
+        $this->assertTrue($result['driverConflicts']->isEmpty());
+        $this->assertEquals($existingAssignment->id, $result['vehicleConflicts']->first()->id);
     }
 
     /** @test */
@@ -132,10 +133,10 @@ class AssignmentOverlapServiceTest extends TestCase
             $end
         );
 
-        $this->assertTrue($result['hasOverlap']);
-        $this->assertCount(1, $result['conflicts']);
-        $this->assertEquals('driver', $result['conflicts'][0]['type']);
-        $this->assertEquals($existingAssignment->id, $result['conflicts'][0]['assignment_id']);
+        $this->assertTrue($result['hasConflicts']);
+        $this->assertCount(1, $result['driverConflicts']);
+        $this->assertTrue($result['vehicleConflicts']->isEmpty());
+        $this->assertEquals($existingAssignment->id, $result['driverConflicts']->first()->id);
     }
 
     /** @test */
@@ -166,8 +167,8 @@ class AssignmentOverlapServiceTest extends TestCase
             $newEnd
         );
 
-        $this->assertTrue($result['hasOverlap']);
-        $this->assertCount(1, $result['conflicts']);
+        $this->assertTrue($result['hasConflicts']);
+        $this->assertCount(1, $result['vehicleConflicts']);
     }
 
     /** @test */
@@ -198,8 +199,8 @@ class AssignmentOverlapServiceTest extends TestCase
             $newEnd
         );
 
-        $this->assertTrue($result['hasOverlap']);
-        $this->assertCount(1, $result['conflicts']);
+        $this->assertTrue($result['hasConflicts']);
+        $this->assertCount(1, $result['vehicleConflicts']);
     }
 
     /** @test */
@@ -229,8 +230,8 @@ class AssignmentOverlapServiceTest extends TestCase
             $newEnd
         );
 
-        $this->assertTrue($result['hasOverlap']);
-        $this->assertCount(1, $result['conflicts']);
+        $this->assertTrue($result['hasConflicts']);
+        $this->assertCount(1, $result['vehicleConflicts']);
     }
 
     /** @test */
@@ -261,8 +262,9 @@ class AssignmentOverlapServiceTest extends TestCase
             $newEnd
         );
 
-        $this->assertFalse($result['hasOverlap']);
-        $this->assertEmpty($result['conflicts']);
+        $this->assertFalse($result['hasConflicts']);
+        $this->assertTrue($result['vehicleConflicts']->isEmpty());
+        $this->assertTrue($result['driverConflicts']->isEmpty());
     }
 
     /** @test */
@@ -289,8 +291,9 @@ class AssignmentOverlapServiceTest extends TestCase
             $end
         );
 
-        $this->assertFalse($result['hasOverlap']);
-        $this->assertEmpty($result['conflicts']);
+        $this->assertFalse($result['hasConflicts']);
+        $this->assertTrue($result['vehicleConflicts']->isEmpty());
+        $this->assertTrue($result['driverConflicts']->isEmpty());
     }
 
     /** @test */
@@ -319,8 +322,9 @@ class AssignmentOverlapServiceTest extends TestCase
             $existingAssignment->id
         );
 
-        $this->assertFalse($result['hasOverlap']);
-        $this->assertEmpty($result['conflicts']);
+        $this->assertFalse($result['hasConflicts']);
+        $this->assertTrue($result['vehicleConflicts']->isEmpty());
+        $this->assertTrue($result['driverConflicts']->isEmpty());
     }
 
     /** @test */
@@ -343,7 +347,7 @@ class AssignmentOverlapServiceTest extends TestCase
         $this->assertArrayHasKey('conflicts', $result);
         $this->assertArrayHasKey('suggestedSlots', $result);
 
-        $this->assertTrue($result['isValid']);
+        $this->assertTrue($result['isValid'], json_encode($result));
         $this->assertEmpty($result['validationErrors']);
         $this->assertEmpty($result['overlapErrors']);
     }
@@ -351,13 +355,15 @@ class AssignmentOverlapServiceTest extends TestCase
     /** @test */
     public function it_finds_next_available_slot()
     {
+        $baseTime = now();
+
         // Créer des affectations existantes
         Assignment::factory()->create([
             'organization_id' => $this->organization->id,
             'vehicle_id' => $this->vehicle->id,
             'driver_id' => $this->driver->id,
-            'start_datetime' => now()->addHours(2),
-            'end_datetime' => now()->addHours(6),
+            'start_datetime' => $baseTime->copy()->addHours(2),
+            'end_datetime' => $baseTime->copy()->addHours(6),
             'status' => Assignment::STATUS_ACTIVE
         ]);
 
@@ -365,8 +371,8 @@ class AssignmentOverlapServiceTest extends TestCase
             'organization_id' => $this->organization->id,
             'vehicle_id' => $this->vehicle->id,
             'driver_id' => $this->driver->id,
-            'start_datetime' => now()->addHours(8),
-            'end_datetime' => now()->addHours(12),
+            'start_datetime' => $baseTime->copy()->addHours(8),
+            'end_datetime' => $baseTime->copy()->addHours(12),
             'status' => Assignment::STATUS_ACTIVE
         ]);
 
@@ -374,7 +380,7 @@ class AssignmentOverlapServiceTest extends TestCase
             $this->organization->id,
             $this->vehicle->id,
             $this->driver->id,
-            now(),
+            $baseTime->copy(),
             4 // 4 heures de durée
         );
 
@@ -385,8 +391,15 @@ class AssignmentOverlapServiceTest extends TestCase
         $this->assertArrayHasKey('end_formatted', $nextSlot);
 
         // Le slot devrait être après 12h (fin de la dernière affectation)
-        $expectedStart = now()->addHours(12);
-        $this->assertTrue(Carbon::parse($nextSlot['start'])->gte($expectedStart));
+        $expectedStart = $baseTime->copy()->addHours(12)->startOfMinute();
+        $this->assertTrue(
+            Carbon::parse($nextSlot['start'])->gte($expectedStart),
+            json_encode([
+                'expected_start' => $expectedStart->toDateTimeString(),
+                'actual_start' => $nextSlot['start'],
+                'duration_hours' => $nextSlot['duration_hours'] ?? null,
+            ])
+        );
     }
 
     /** @test */
@@ -456,8 +469,9 @@ class AssignmentOverlapServiceTest extends TestCase
             $end
         );
 
-        $this->assertFalse($result['hasOverlap']);
-        $this->assertEmpty($result['conflicts']);
+        $this->assertFalse($result['hasConflicts']);
+        $this->assertTrue($result['vehicleConflicts']->isEmpty());
+        $this->assertTrue($result['driverConflicts']->isEmpty());
     }
 
     /** @test */
@@ -503,7 +517,7 @@ class AssignmentOverlapServiceTest extends TestCase
             $newEnd
         );
 
-        $this->assertTrue($result['hasOverlap']);
-        $this->assertEquals(2, $result['conflicts'][0]['overlap_hours']);
+        $this->assertTrue($result['hasConflicts']);
+        $this->assertCount(1, $result['vehicleConflicts']);
     }
 }

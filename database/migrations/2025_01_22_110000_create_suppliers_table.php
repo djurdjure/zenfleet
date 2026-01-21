@@ -8,18 +8,22 @@ return new class extends Migration
 {
     public function up()
     {
-        // Créer l'ENUM pour les types de fournisseurs (avec protection si existe déjà)
-        DB::statement("
-            DO $$ BEGIN
-                CREATE TYPE supplier_type_enum AS ENUM (
-                    'mecanicien', 'assureur', 'station_service', 'pieces_detachees',
-                    'peinture_carrosserie', 'pneumatiques', 'electricite_auto',
-                    'controle_technique', 'transport_vehicules', 'autre'
-                );
-            EXCEPTION
-                WHEN duplicate_object THEN null;
-            END $$;
-        ");
+        $driver = DB::getDriverName();
+
+        // Créer l'ENUM pour les types de fournisseurs (PostgreSQL uniquement)
+        if ($driver === 'pgsql') {
+            DB::statement("
+                DO $$ BEGIN
+                    CREATE TYPE supplier_type_enum AS ENUM (
+                        'mecanicien', 'assureur', 'station_service', 'pieces_detachees',
+                        'peinture_carrosserie', 'pneumatiques', 'electricite_auto',
+                        'controle_technique', 'transport_vehicules', 'autre'
+                    );
+                EXCEPTION
+                    WHEN duplicate_object THEN null;
+                END $$;
+            ");
+        }
 
         Schema::create('suppliers', function (Blueprint $table) {
             $table->id();
@@ -113,53 +117,59 @@ return new class extends Migration
         });
 
         // Contraintes business PostgreSQL
-        DB::statement("
-            ALTER TABLE suppliers
-            ADD CONSTRAINT valid_rating CHECK (rating BETWEEN 0 AND 10)
-        ");
+        if ($driver === 'pgsql') {
+            DB::statement("
+                ALTER TABLE suppliers
+                ADD CONSTRAINT valid_rating CHECK (rating BETWEEN 0 AND 10)
+            ");
 
-        DB::statement("
-            ALTER TABLE suppliers
-            ADD CONSTRAINT valid_scores CHECK (
-                quality_score BETWEEN 0 AND 10 AND
-                reliability_score BETWEEN 0 AND 10
-            )
-        ");
+            DB::statement("
+                ALTER TABLE suppliers
+                ADD CONSTRAINT valid_scores CHECK (
+                    quality_score BETWEEN 0 AND 10 AND
+                    reliability_score BETWEEN 0 AND 10
+                )
+            ");
 
-        DB::statement("
-            ALTER TABLE suppliers
-            ADD CONSTRAINT valid_contract_dates CHECK (
-                contract_start_date IS NULL OR
-                contract_end_date IS NULL OR
-                contract_start_date <= contract_end_date
-            )
-        ");
+            DB::statement("
+                ALTER TABLE suppliers
+                ADD CONSTRAINT valid_contract_dates CHECK (
+                    contract_start_date IS NULL OR
+                    contract_end_date IS NULL OR
+                    contract_start_date <= contract_end_date
+                )
+            ");
 
-        // Contrainte pour NIF algérien (15 chiffres)
-        DB::statement("
-            ALTER TABLE suppliers
-            ADD CONSTRAINT valid_nif CHECK (
-                nif IS NULL OR
-                (char_length(nif) = 15 AND nif ~ '^[0-9]{15}$')
-            )
-        ");
+            // Contrainte pour NIF algérien (15 chiffres)
+            DB::statement("
+                ALTER TABLE suppliers
+                ADD CONSTRAINT valid_nif CHECK (
+                    nif IS NULL OR
+                    (char_length(nif) = 15 AND nif ~ '^[0-9]{15}$')
+                )
+            ");
 
-        // Contrainte pour RC algérien (format XX/XX-XXXXXXX)
-        DB::statement("
-            ALTER TABLE suppliers
-            ADD CONSTRAINT valid_trade_register CHECK (
-                trade_register IS NULL OR
-                trade_register ~ '^[0-9]{2}/[0-9]{2}-[0-9]{7}$'
-            )
-        ");
+            // Contrainte pour RC algérien (format XX/XX-XXXXXXX)
+            DB::statement("
+                ALTER TABLE suppliers
+                ADD CONSTRAINT valid_trade_register CHECK (
+                    trade_register IS NULL OR
+                    trade_register ~ '^[0-9]{2}/[0-9]{2}-[0-9]{7}$'
+                )
+            ");
 
-        // Index de recherche textuelle
-        DB::statement("CREATE INDEX suppliers_search_idx ON suppliers USING gin(to_tsvector('french', company_name || ' ' || coalesce(contact_first_name, '') || ' ' || coalesce(contact_last_name, '')))");
+            // Index de recherche textuelle
+            DB::statement("CREATE INDEX suppliers_search_idx ON suppliers USING gin(to_tsvector('french', company_name || ' ' || coalesce(contact_first_name, '') || ' ' || coalesce(contact_last_name, '')))");
+        }
     }
 
     public function down()
     {
+        $driver = DB::getDriverName();
+
         Schema::dropIfExists('suppliers');
-        DB::statement("DROP TYPE IF EXISTS supplier_type_enum");
+        if ($driver === 'pgsql') {
+            DB::statement("DROP TYPE IF EXISTS supplier_type_enum");
+        }
     }
 };

@@ -41,6 +41,13 @@ class VehicleExpense extends Model
     public const PAYMENT_ESPECES = 'especes';
     public const PAYMENT_CARTE = 'carte';
 
+    // Statuts d'approbation
+    public const APPROVAL_DRAFT = 'draft';
+    public const APPROVAL_PENDING_LEVEL1 = 'pending_level1';
+    public const APPROVAL_PENDING_LEVEL2 = 'pending_level2';
+    public const APPROVAL_APPROVED = 'approved';
+    public const APPROVAL_REJECTED = 'rejected';
+
     // Types de carburant
     public const FUEL_ESSENCE = 'essence';
     public const FUEL_GASOIL = 'gasoil';
@@ -59,6 +66,8 @@ class VehicleExpense extends Model
         'expense_subtype',
         'amount_ht',
         'tva_rate',
+        'tva_amount',
+        'total_ttc',
         'invoice_number',
         'invoice_date',
         'receipt_number',
@@ -76,6 +85,9 @@ class VehicleExpense extends Model
         'is_urgent', // Nouveau
         'approval_deadline', // Nouveau
         'approval_comments',
+        'approved',
+        'approved_by',
+        'approved_at',
         'level1_approved', // Nouveau
         'level1_approved_by', // Nouveau
         'level1_approved_at', // Nouveau
@@ -92,6 +104,7 @@ class VehicleExpense extends Model
         'payment_status',
         'payment_method',
         'payment_date',
+        'payment_due_date',
         'payment_reference',
         'external_reference', // Nouveau
         'recorded_by',
@@ -121,6 +134,7 @@ class VehicleExpense extends Model
         'approval_deadline' => 'date',
         'invoice_date' => 'date',
         'payment_date' => 'date',
+        'payment_due_date' => 'date',
         'next_due_date' => 'date',
         'approved_at' => 'datetime',
         'audited_at' => 'datetime',

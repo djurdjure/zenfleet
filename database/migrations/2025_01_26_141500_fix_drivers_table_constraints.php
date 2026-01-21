@@ -11,6 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
+        $driver = DB::getDriverName();
+        if ($driver === 'sqlite' || !Schema::hasTable('drivers')) {
+            return;
+        }
+
         // Vérifier que les colonnes existent avant de les modifier
         $columns = DB::select("SELECT column_name, is_nullable FROM information_schema.columns WHERE table_name = 'drivers'");
         $columnNames = collect($columns)->pluck('column_name')->toArray();
@@ -44,6 +49,11 @@ return new class extends Migration
      */
     public function down(): void
     {
+        $driver = DB::getDriverName();
+        if ($driver === 'sqlite' || !Schema::hasTable('drivers')) {
+            return;
+        }
+
         // Vérifier que les colonnes existent avant le rollback
         $columns = DB::select("SELECT column_name FROM information_schema.columns WHERE table_name = 'drivers'");
         $columnNames = collect($columns)->pluck('column_name')->toArray();

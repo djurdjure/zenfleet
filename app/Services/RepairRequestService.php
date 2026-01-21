@@ -12,6 +12,7 @@ use App\Events\RepairRequestStatusChanged;
 use App\Events\RepairRequestApproved;
 use App\Events\RepairRequestRejected;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\Http\UploadedFile;
@@ -66,7 +67,7 @@ class RepairRequestService
             }
 
             // Create repair request
-            $repairRequest = RepairRequest::create([
+            $createPayload = [
                 'organization_id' => $driver->organization_id,
                 'vehicle_id' => $data['vehicle_id'],
                 'driver_id' => $data['driver_id'],
@@ -80,7 +81,13 @@ class RepairRequestService
                 'photos' => !empty($photoPaths) ? $photoPaths : null,
                 'attachments' => !empty($attachmentPaths) ? $attachmentPaths : null,
                 'supervisor_id' => $driver->supervisor_id,
-            ]);
+            ];
+
+            if (Schema::hasColumn('repair_requests', 'requested_by')) {
+                $createPayload['requested_by'] = $driver->user_id ?? auth()->id();
+            }
+
+            $repairRequest = RepairRequest::create($createPayload);
 
             // Log creation in history
             $this->logHistory(

@@ -12,6 +12,10 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (!Schema::hasTable('drivers')) {
+            return;
+        }
+
         Schema::table('drivers', function (Blueprint $table) {
             // Renommer l'ancienne colonne si elle existe
             if (Schema::hasColumn('drivers', 'license_category')) {
@@ -48,6 +52,10 @@ return new class extends Migration
      */
     public function down(): void
     {
+        if (!Schema::hasTable('drivers')) {
+            return;
+        }
+
         Schema::table('drivers', function (Blueprint $table) {
             // Recréer l'ancienne colonne
             $table->string('license_category', 10)->nullable()->after('license_number');

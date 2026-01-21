@@ -8,19 +8,23 @@ return new class extends Migration
 {
     public function up()
     {
-        // Créer l'ENUM pour les catégories de dépenses (avec protection si existe déjà)
-        DB::statement("
-            DO $$ BEGIN
-                CREATE TYPE expense_category_enum AS ENUM (
-                    'maintenance_preventive', 'reparation', 'pieces_detachees',
-                    'carburant', 'assurance', 'controle_technique',
-                    'vignette', 'amendes', 'peage', 'parking',
-                    'lavage', 'transport', 'formation_chauffeur', 'autre'
-                );
-            EXCEPTION
-                WHEN duplicate_object THEN null;
-            END $$;
-        ");
+        $driver = DB::getDriverName();
+
+        // Créer l'ENUM pour les catégories de dépenses (PostgreSQL uniquement)
+        if ($driver === 'pgsql') {
+            DB::statement("
+                DO $$ BEGIN
+                    CREATE TYPE expense_category_enum AS ENUM (
+                        'maintenance_preventive', 'reparation', 'pieces_detachees',
+                        'carburant', 'assurance', 'controle_technique',
+                        'vignette', 'amendes', 'peage', 'parking',
+                        'lavage', 'transport', 'formation_chauffeur', 'autre'
+                    );
+                EXCEPTION
+                    WHEN duplicate_object THEN null;
+                END $$;
+            ");
+        }
 
         Schema::create('vehicle_expenses', function (Blueprint $table) {
             $table->id();
@@ -137,65 +141,69 @@ return new class extends Migration
         });
 
         // Contraintes business PostgreSQL
-        DB::statement("
-            ALTER TABLE vehicle_expenses
-            ADD CONSTRAINT valid_amounts CHECK (
-                amount_ht >= 0 AND
-                tva_rate >= 0 AND
-                tva_rate <= 100
-            )
-        ");
+        if ($driver === 'pgsql') {
+            DB::statement("
+                ALTER TABLE vehicle_expenses
+                ADD CONSTRAINT valid_amounts CHECK (
+                    amount_ht >= 0 AND
+                    tva_rate >= 0 AND
+                    tva_rate <= 100
+                )
+            ");
 
-        DB::statement("
-            ALTER TABLE vehicle_expenses
-            ADD CONSTRAINT valid_fuel_data CHECK (
-                (fuel_quantity IS NULL AND fuel_price_per_liter IS NULL) OR
-                (fuel_quantity > 0 AND fuel_price_per_liter > 0)
-            )
-        ");
+            DB::statement("
+                ALTER TABLE vehicle_expenses
+                ADD CONSTRAINT valid_fuel_data CHECK (
+                    (fuel_quantity IS NULL AND fuel_price_per_liter IS NULL) OR
+                    (fuel_quantity > 0 AND fuel_price_per_liter > 0)
+                )
+            ");
 
-        DB::statement("
-            ALTER TABLE vehicle_expenses
-            ADD CONSTRAINT valid_approval_workflow CHECK (
-                (NOT needs_approval) OR
-                (needs_approval AND approved AND approved_by IS NOT NULL AND approved_at IS NOT NULL) OR
-                (needs_approval AND NOT approved)
-            )
-        ");
+            DB::statement("
+                ALTER TABLE vehicle_expenses
+                ADD CONSTRAINT valid_approval_workflow CHECK (
+                    (NOT needs_approval) OR
+                    (needs_approval AND approved AND approved_by IS NOT NULL AND approved_at IS NOT NULL) OR
+                    (needs_approval AND NOT approved)
+                )
+            ");
 
-        DB::statement("
-            ALTER TABLE vehicle_expenses
-            ADD CONSTRAINT valid_payment_data CHECK (
-                (payment_status != 'paid') OR
-                (payment_status = 'paid' AND payment_date IS NOT NULL)
-            )
-        ");
+            DB::statement("
+                ALTER TABLE vehicle_expenses
+                ADD CONSTRAINT valid_payment_data CHECK (
+                    (payment_status != 'paid') OR
+                    (payment_status = 'paid' AND payment_date IS NOT NULL)
+                )
+            ");
 
-        DB::statement("
-            ALTER TABLE vehicle_expenses
-            ADD CONSTRAINT valid_recurring_data CHECK (
-                (NOT is_recurring) OR
-                (is_recurring AND recurrence_pattern IS NOT NULL)
-            )
-        ");
+            DB::statement("
+                ALTER TABLE vehicle_expenses
+                ADD CONSTRAINT valid_recurring_data CHECK (
+                    (NOT is_recurring) OR
+                    (is_recurring AND recurrence_pattern IS NOT NULL)
+                )
+            ");
 
-        DB::statement("
-            ALTER TABLE vehicle_expenses
-            ADD CONSTRAINT valid_expense_date CHECK (
-                expense_date <= CURRENT_DATE
-            )
-        ");
+            DB::statement("
+                ALTER TABLE vehicle_expenses
+                ADD CONSTRAINT valid_expense_date CHECK (
+                    expense_date <= CURRENT_DATE
+                )
+            ");
 
-        // Index géospatial composite pour latitude/longitude
-        DB::statement("CREATE INDEX vehicle_expenses_location_idx ON vehicle_expenses (expense_latitude, expense_longitude) WHERE expense_latitude IS NOT NULL AND expense_longitude IS NOT NULL");
+            // Index geospatial composite pour latitude/longitude
+            DB::statement("CREATE INDEX vehicle_expenses_location_idx ON vehicle_expenses (expense_latitude, expense_longitude) WHERE expense_latitude IS NOT NULL AND expense_longitude IS NOT NULL");
 
-        // Index de recherche textuelle
-        DB::statement("CREATE INDEX vehicle_expenses_search_idx ON vehicle_expenses USING gin(to_tsvector('french', description || ' ' || expense_type))");
+            // Index de recherche textuelle
+            DB::statement("CREATE INDEX vehicle_expenses_search_idx ON vehicle_expenses USING gin(to_tsvector('french', description || ' ' || expense_type))");
+        }
     }
 
     public function down()
     {
         Schema::dropIfExists('vehicle_expenses');
-        DB::statement("DROP TYPE IF EXISTS expense_category_enum");
+        if (DB::getDriverName() === 'pgsql') {
+            DB::statement("DROP TYPE IF EXISTS expense_category_enum");
+        }
     }
 };

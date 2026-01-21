@@ -16,9 +16,9 @@ class OrganizationTest extends TestCase
         $fillable = [
             'uuid', 'name', 'legal_name', 'organization_type', 'industry',
             'description', 'website', 'phone_number', 'email', 'logo_path',
-            'status', 'country', 'trade_register', 'nif', 'ai', 'nis',
-            'address', 'city', 'zip_code', 'wilaya', 'scan_nif_path',
-            'scan_ai_path', 'scan_nis_path', 'manager_first_name',
+            'status', 'trade_register', 'nif', 'ai', 'nis',
+            'address', 'city', 'commune', 'zip_code', 'wilaya',
+            'scan_nif_path', 'scan_ai_path', 'scan_nis_path', 'manager_first_name',
             'manager_last_name', 'manager_nin', 'manager_address',
             'manager_dob', 'manager_pob', 'manager_phone_number',
             'manager_id_scan_path',
@@ -43,7 +43,6 @@ class OrganizationTest extends TestCase
             'manager_first_name' => 'John',
             'manager_last_name' => 'Doe',
             'manager_nin' => '123456789012345678',
-            'country' => 'DZ',
             'status' => 'active',
         ];
 
@@ -52,7 +51,6 @@ class OrganizationTest extends TestCase
         $this->assertInstanceOf(Organization::class, $organization);
         $this->assertEquals('Test Organization', $organization->name);
         $this->assertEquals('test@example.dz', $organization->email);
-        $this->assertEquals('DZ', $organization->country);
         $this->assertEquals('active', $organization->status);
     }
 
@@ -121,12 +119,10 @@ class OrganizationTest extends TestCase
         $organization = Organization::factory()->create([
             'wilaya' => '16', // Alger
             'city' => 'Alger',
-            'country' => 'DZ',
         ]);
 
         $this->assertEquals('16', $organization->wilaya);
         $this->assertEquals('Alger', $organization->city);
-        $this->assertEquals('DZ', $organization->country);
     }
 
     public function test_organization_factory_generates_valid_algerian_data(): void
@@ -140,7 +136,6 @@ class OrganizationTest extends TestCase
         $this->assertNotNull($organization->trade_register);
         $this->assertMatchesRegularExpression('/^\d{2}\/\d{2}-\d{6} [AB] \d{2}$/', $organization->trade_register);
 
-        $this->assertEquals('DZ', $organization->country);
         $this->assertNotNull($organization->wilaya);
         $this->assertMatchesRegularExpression('/^\d{2}$/', $organization->wilaya);
 

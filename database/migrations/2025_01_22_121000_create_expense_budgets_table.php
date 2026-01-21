@@ -8,9 +8,13 @@ return new class extends Migration
 {
     public function up()
     {
-        DB::statement("CREATE TYPE budget_period_enum AS ENUM ('monthly', 'quarterly', 'yearly')");
+        $driver = DB::getDriverName();
 
-        Schema::create('expense_budgets', function (Blueprint $table) {
+        if ($driver === 'pgsql') {
+            DB::statement("CREATE TYPE budget_period_enum AS ENUM ('monthly', 'quarterly', 'yearly')");
+        }
+
+        Schema::create('expense_budgets', function (Blueprint $table) use ($driver) {
             $table->id();
             $table->unsignedBigInteger('organization_id');
 
@@ -27,8 +31,13 @@ return new class extends Migration
             // Montants budgétaires
             $table->decimal('budgeted_amount', 15, 2);
             $table->decimal('spent_amount', 15, 2)->default(0);
-            $table->decimal('remaining_amount', 15, 2)->storedAs('(budgeted_amount - spent_amount)');
-            $table->decimal('variance_percentage', 5, 2)->storedAs('(CASE WHEN budgeted_amount > 0 THEN ((spent_amount - budgeted_amount) / budgeted_amount) * 100 ELSE 0 END)');
+            if (in_array($driver, ['pgsql', 'mysql'])) {
+                $table->decimal('remaining_amount', 15, 2)->storedAs('(budgeted_amount - spent_amount)');
+                $table->decimal('variance_percentage', 5, 2)->storedAs('(CASE WHEN budgeted_amount > 0 THEN ((spent_amount - budgeted_amount) / budgeted_amount) * 100 ELSE 0 END)');
+            } else {
+                $table->decimal('remaining_amount', 15, 2)->nullable();
+                $table->decimal('variance_percentage', 5, 2)->nullable();
+            }
 
             // Seuils d'alerte
             $table->decimal('warning_threshold', 5, 2)->default(80.00); // % pour alerte
@@ -60,29 +69,33 @@ return new class extends Migration
         });
 
         // Contraintes business
-        DB::statement("
-            ALTER TABLE expense_budgets
-            ADD CONSTRAINT valid_budget_amounts CHECK (
-                budgeted_amount > 0 AND
-                spent_amount >= 0 AND
-                warning_threshold > 0 AND warning_threshold <= 100 AND
-                critical_threshold > warning_threshold AND critical_threshold <= 100
-            )
-        ");
+        if ($driver === 'pgsql') {
+            DB::statement("
+                ALTER TABLE expense_budgets
+                ADD CONSTRAINT valid_budget_amounts CHECK (
+                    budgeted_amount > 0 AND
+                    spent_amount >= 0 AND
+                    warning_threshold > 0 AND warning_threshold <= 100 AND
+                    critical_threshold > warning_threshold AND critical_threshold <= 100
+                )
+            ");
 
-        DB::statement("
-            ALTER TABLE expense_budgets
-            ADD CONSTRAINT valid_budget_period_data CHECK (
-                (budget_period = 'monthly' AND budget_month BETWEEN 1 AND 12 AND budget_quarter IS NULL) OR
-                (budget_period = 'quarterly' AND budget_quarter BETWEEN 1 AND 4 AND budget_month IS NULL) OR
-                (budget_period = 'yearly' AND budget_month IS NULL AND budget_quarter IS NULL)
-            )
-        ");
+            DB::statement("
+                ALTER TABLE expense_budgets
+                ADD CONSTRAINT valid_budget_period_data CHECK (
+                    (budget_period = 'monthly' AND budget_month BETWEEN 1 AND 12 AND budget_quarter IS NULL) OR
+                    (budget_period = 'quarterly' AND budget_quarter BETWEEN 1 AND 4 AND budget_month IS NULL) OR
+                    (budget_period = 'yearly' AND budget_month IS NULL AND budget_quarter IS NULL)
+                )
+            ");
+        }
     }
 
     public function down()
     {
         Schema::dropIfExists('expense_budgets');
-        DB::statement("DROP TYPE IF EXISTS budget_period_enum");
+        if (DB::getDriverName() === 'pgsql') {
+            DB::statement("DROP TYPE IF EXISTS budget_period_enum");
+        }
     }
 };

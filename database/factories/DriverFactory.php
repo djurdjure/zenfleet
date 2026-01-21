@@ -20,7 +20,7 @@ class DriverFactory extends Factory
             'employee_number' => $this->faker->unique()->numerify('EMP-#####'),
             'personal_phone'  => $this->faker->unique()->phoneNumber(),
             'license_number'  => $this->faker->unique()->numerify('LN-########'),
-            'status_id' => DriverStatus::factory()->state(['name' => 'Actif']),
+            'status_id' => DriverStatus::query()->inRandomOrder()->value('id') ?? DriverStatus::factory(),
             'birth_date' => $this->faker->dateTimeBetween('-50 years', '-22 years'),
             'recruitment_date' => $this->faker->dateTimeBetween('-5 years', 'now'),
             'organization_id' => Organization::factory(),
