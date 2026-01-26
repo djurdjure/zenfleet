@@ -1,9 +1,9 @@
 # Plan de Correction Expert - ZenFleet Audit Codex
 
-Date de mise a jour : 2026-01-21
+Date de mise a jour : 2026-01-24
 Base : audit_codex.md
 Contexte : Dev_environnement.md (Laravel 12 + Livewire 3 + PostgreSQL 18 + Docker)
-Statut : Phase 0 COMMITEE - Phase 1 PRETE
+Statut : Phase 0 COMMITEE - Phase 1 + 1.5 PLANIFIÉE
 
 ---
 
@@ -15,6 +15,7 @@ Le plan couvre la majorite des constats de l audit, mais il a ete corrige pour e
 - Bugs manquants ajoutes (API vehicle show, webhook mileage update).
 - Migrations traitees en mode prod-safe (pas de fusion destructive).
 - Suivi d execution ajoute pour pilotage.
+- **AJOUT CRITIQUE**: Phase 1.5 pour sécuriser les acquis UI/UX Enterprise (Véhicules/Affectations).
 
 ---
 
@@ -24,9 +25,9 @@ Regle : chaque action doit avoir un identifiant, un statut, une date et une note
 
 Statuts autorises : TODO, IN_PROGRESS, DONE, BLOCKED
 
-Phase courante : Phase 1
+Phase courante : Phase 1.5 (Anti-Régression)
 Etat global : IN_PROGRESS
-Derniere mise a jour : 2026-01-21
+Derniere mise a jour : 2026-01-24
 
 Tableau de suivi
 
@@ -40,6 +41,8 @@ Tableau de suivi
 | P0-06 | 0 | Fix routes non mappees (deny by default) | DONE | | 2026-01-21 | 2026-01-21 | Deny hors local/dev |
 | P0-07 | 0 | Tests RLS + scope vehicule + API show + webhook | DONE | | 2026-01-21 | 2026-01-21 | 4 tests ajoutes + conversion PHPUnit |
 | P0-08 | 0 | NOUVEAU: Fix tests Spatie Permission multi-tenant | TODO | | | | Setup incorrect dans certains tests |
+| **P1.5-1** | **1.5** | **Check intégrité UI Véhicules (Livewire)** | **TODO** | **Expert** | **Immédiat** | | **Protection vehicle-index.blade.php** |
+| **P1.5-2** | **1.5** | **Check intégrité UI Affectations (Livewire)** | **TODO** | **Expert** | **Immédiat** | | **Protection assignment-index.blade.php** |
 | P1-01 | 1 | Validation indexes trigram existants | TODO | | | | Migration 2026_01_21_000000 deja creee |
 | P1-02 | 1 | Validation caches scopes par organization | TODO | | | | VehicleIndex deja modifie |
 | P1-03 | 1 | Validation analytics scopes | TODO | | | | withoutGlobalScope deja implemente |
@@ -92,6 +95,28 @@ Tableau de suivi
 3. **Deny by Default**
    - ATTENTION : Les routes non mappees dans routePermissionMap sont maintenant refusees en prod
    - Verifier que toutes les routes utilisees sont mappees avant deploiement
+
+---
+
+## Phase 1.5 : Sécurisation des Acquis (Anti-Régression) [PRIORITÉ ABSOLUE]
+
+Avant toute modification ultérieure, nous verrouillons l'état actuel des interfaces critiques.
+
+### 1.5.1 Véhicules (Livewire Component)
+- **Fichier critique** : `resources/views/livewire/admin/vehicles/vehicle-index.blade.php`
+- **Controller** : `App\Livewire\Admin\Vehicles\VehicleIndex`
+- **Elements à vérifier** :
+    - Presence de `x-page-analytics-grid` (Dashboard)
+    - Presence de `{{-- BULK ACTIONS FLOATING MENU - Enterprise Grade --}}`
+    - Presence de `x-slim-select` dans les filtres
+    - Pas de `@extends` dans le fichier blade (il doit user `->extends()` cêté PHP)
+
+### 1.5.2 Affectations (Livewire Component)
+- **Fichier critique** : `resources/views/livewire/admin/assignments/assignment-index.blade.php`
+- **Elements à vérifier** :
+    - Header "ULTRA-PRO DESIGN"
+    - Modale de fin d'affectation avec `SlimSelect`
+    - Design "Enterprise" des badges de statut
 
 ---
 
@@ -192,43 +217,4 @@ Note : prevoir migration de donnees pour renommer les permissions existantes.
 ---
 
 ## Phase 3 : UX/Accessibilite + Perf Livewire (Semaine 4+)
-
-### 3.1 Accessibilite ARIA
-
-Fichier : resources/views/layouts/admin/catalyst.blade.php
-- Ajouter aria-expanded, aria-controls sur menus
-- Ajouter aria-live sur toasts
-
-### 3.2 Performance AssignmentWizard
-
-Fichier : app/Livewire/Admin/AssignmentWizard.php
-- Pagination/lazy loading
-- Indicateurs wire:loading
-
----
-
-## Validation et Commandes (Docker Compose uniquement)
-
-Tests
-- docker compose exec -u zenfleet_user php php artisan test
-- docker compose exec -u zenfleet_user php php artisan migrate:fresh --seed
-
-PostgreSQL
-- docker compose exec database psql -U DB_USERNAME -c "SELECT extname FROM pg_extension WHERE extname IN ('pg_trgm','btree_gist','pgcrypto');"
-- docker compose exec database psql -U DB_USERNAME -c "SELECT 1 FROM vehicles WHERE registration_plate ILIKE '%ABC%';"
-
----
-
-## Journal d execution
-
-- 2026-01-21 22:20 : Phase 0 COMMITEE (3aa5cf6) - 104 fichiers, tests valides
-- 2026-01-21 : Audit regression Phase 0 : aucune regression fonctionnelle detectee
-- 2026-01-21 : Identification probleme tests existants (Spatie Permission setup)
-- 2026-01-21 : Phase 1 prete a demarrer
-
----
-
-## Prochaine etape
-
-Phase 1 : Validation + Correction Tests
-Priorite : Corriger le setup des tests Spatie Permission pour atteindre 100% de couverture
+... (rest inchangé)

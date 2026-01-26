@@ -91,11 +91,11 @@ class UpdateVehicleRequest extends FormRequest
                     ->where('organization_id', $organizationId)
                     ->whereNull('deleted_at')
             ],
-            'brand' => ['nullable', 'string', 'max:100'],
+            'brand' => ['required', 'string', 'max:100'],
             'model' => ['nullable', 'string', 'max:100'],
             'color' => ['nullable', 'string', 'max:50'],
             'vehicle_type_id' => ['nullable', 'exists:vehicle_types,id'],
-            'fuel_type_id' => ['nullable', 'exists:fuel_types,id'],
+            'fuel_type_id' => ['required', 'exists:fuel_types,id'],
             'transmission_type_id' => ['nullable', 'exists:transmission_types,id'],
             'status_id' => ['nullable', 'exists:vehicle_statuses,id'],
             'manufacturing_year' => ['nullable', 'integer', 'digits:4', 'min:1950', 'max:' . (date('Y') + 1)],

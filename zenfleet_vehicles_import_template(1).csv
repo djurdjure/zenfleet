@@ -1,0 +1,12 @@
+﻿registration_plate,vin,brand,model,color,vehicle_type,fuel_type,transmission_type,status,manufacturing_year,acquisition_date,purchase_price,current_value,initial_mileage,current_mileage,engine_displacement_cc,power_hp,seats,notes
+AB-123-CD,1HGCM82633A123456,Toyota,Corolla,Blanc,Berline,Essence,Manuelle,Parking,2020,15/01/2020,25000,20000,5000,15000,1600,120,5,Véhicule en excellent état
+EF-456-GH,2HGCM82633A789012,Peugeot,308,Noir,Berline,Diesel,Automatique,Affecté,2019,20/06/2019,30000,22000,10000,45000,1600,130,5,Maintenance régulière effectuée
+IJ-789-KL,3HGCM82633A345678,Renault,Clio,Rouge,Berline,Essence,Manuelle,Parking,2021,10/03/2021,18000,16000,0,8500,1200,75,5,Véhicule neuf avec garantie
+019037-324-16,,Iveco+U5C5:T6C5:T5C5:C5:U6,Cargo,blanc,camion,Essence,Manuelle,Parking,2024,10/08/2024,,,1500,,,220,3,camion conteneur
+019053-324-16,,Renault,Master,gris,van,Diesel,Manuelle,Parking,2024,12/03/2024,,,2075,,,190,3,Fourgon de livraison
+017796-324-16,,Iveco+U5C5:T6C5:T5C5:C5:U7,Cargo,blanc,camion,Essence,Manuelle,Parking,2024,13/10/2023,,,2650,,,160,3,camion conteneur
+018283-324-16,,Renault,Master,gris,van,Diesel,Manuelle,Parking,2024,15/05/2023,,,3225,,,130,3,Fourgon de livraison
+017784-324-16,,Iveco+U5C5:T6C5:T5C5:C5:U8,Cargo,blanc,camion,Essence,Manuelle,Parking,2024,15/12/2022,,,3800,,,100,3,camion conteneur
+017588-324-16,,Renault,Master,gris,van,Diesel,Manuelle,Parking,2024,17/07/2022,,,4375,,,70,3,Fourgon de livraison
+017582-324-16,,Iveco+U5C5:T6C5:T5C5:C5:U9,Cargo,blanc,camion,Essence,Manuelle,Parking,2024,16/02/2022,,,4950,,,40,3,camion conteneur
+017789-324-16,,Renault,Master,gris,van,Diesel,Manuelle,Parking,2024,18/09/2021,,,5525,,,10,3,Fourgon de livraison

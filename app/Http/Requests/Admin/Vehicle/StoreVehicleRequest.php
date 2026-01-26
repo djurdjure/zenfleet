@@ -12,7 +12,9 @@ class StoreVehicleRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return $this->user()->can('create vehicles');
+        /** @var \App\Models\User|null $user */
+        $user = \Illuminate\Support\Facades\Auth::user();
+        return $user && $user->can('create vehicles');
     }
 
     /**
@@ -22,11 +24,16 @@ class StoreVehicleRequest extends FormRequest
      */
     public function rules(): array
     {
-        $organizationId = auth()->user()->organization_id;
+        /** @var \App\Models\User $user */
+        $user = \Illuminate\Support\Facades\Auth::user();
+        $organizationId = $user->organization_id;
 
         return [
             // ========================================
             // PHASE 1: IDENTIFICATION (Champs Required)
+            // ========================================
+            // ========================================
+            // PHASE 1: IDENTIFICATION
             // ========================================
             'registration_plate' => [
                 'required',
@@ -37,7 +44,7 @@ class StoreVehicleRequest extends FormRequest
                     ->whereNull('deleted_at')
             ],
             'brand' => ['required', 'string', 'max:100'],
-            'model' => ['required', 'string', 'max:100'],
+            'model' => ['nullable', 'string', 'max:100'], // Devenu facultatif
             'vin' => [
                 'nullable',
                 'string',
@@ -57,21 +64,21 @@ class StoreVehicleRequest extends FormRequest
             'color' => ['nullable', 'string', 'max:50'],
 
             // ========================================
-            // PHASE 2: CARACTÉRISTIQUES (Champs Required)
+            // PHASE 2: CARACTÉRISTIQUES
             // ========================================
-            'vehicle_type_id' => ['required', 'exists:vehicle_types,id'],
+            'vehicle_type_id' => ['nullable', 'exists:vehicle_types,id'], // Devenu facultatif
             'fuel_type_id' => ['required', 'exists:fuel_types,id'],
-            'transmission_type_id' => ['required', 'exists:transmission_types,id'],
+            'transmission_type_id' => ['nullable', 'exists:transmission_types,id'], // Devenu facultatif
             'manufacturing_year' => ['nullable', 'integer', 'digits:4', 'min:1950', 'max:' . (date('Y') + 1)],
             'seats' => ['nullable', 'integer', 'min:1', 'max:99'],
             'power_hp' => ['nullable', 'integer', 'min:0', 'max:9999'],
             'engine_displacement_cc' => ['nullable', 'integer', 'min:0', 'max:99999'],
 
             // ========================================
-            // PHASE 3: ACQUISITION & STATUT (Champs Required)
+            // PHASE 3: ACQUISITION & STATUT
             // ========================================
-            'status_id' => ['required', 'exists:vehicle_statuses,id'],
-            'acquisition_date' => ['required', 'date_format:Y-m-d', 'before_or_equal:today'],
+            'status_id' => ['nullable', 'exists:vehicle_statuses,id'], // Devenu facultatif (géré par défaut)
+            'acquisition_date' => ['nullable', 'date_format:Y-m-d', 'before_or_equal:today'], // Devenu facultatif
             'purchase_price' => ['nullable', 'numeric', 'min:0', 'max:999999999'],
             'current_value' => ['nullable', 'numeric', 'min:0', 'max:999999999'],
             'initial_mileage' => ['nullable', 'integer', 'min:0', 'max:9999999'],
@@ -95,6 +102,23 @@ class StoreVehicleRequest extends FormRequest
             ],
             'photo' => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif', 'max:2048'],
         ];
+    }
+
+    /**
+     * Prépare les données avant validation.
+     */
+    protected function prepareForValidation(): void
+    {
+        // Si aucun statut n'est fourni, on assigne "Parking" par défaut
+        if ($this->missing('status_id') || is_null($this->input('status_id'))) {
+            $parkingStatus = \App\Models\VehicleStatus::where('name', 'Parking')->first();
+
+            if ($parkingStatus) {
+                $this->merge([
+                    'status_id' => $parkingStatus->id,
+                ]);
+            }
+        }
     }
 
     /**

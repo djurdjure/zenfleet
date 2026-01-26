@@ -142,23 +142,23 @@ class VehicleController extends Controller
      */
     private array $validationRules = [
         'registration_plate' => ['required', 'string', 'max:20', 'unique:vehicles,registration_plate'],
-        'vin' => ['required', 'string', 'size:17', 'unique:vehicles,vin'],
+        'vin' => ['nullable', 'string', 'size:17', 'unique:vehicles,vin'],
         'brand' => ['required', 'string', 'max:50'],
-        'model' => ['required', 'string', 'max:50'],
-        'color' => ['required', 'string', 'max:30'],
-        'vehicle_type_id' => ['required', 'exists:vehicle_types,id'],
+        'model' => ['nullable', 'string', 'max:50'],
+        'color' => ['nullable', 'string', 'max:30'],
+        'vehicle_type_id' => ['nullable', 'exists:vehicle_types,id'],
         'fuel_type_id' => ['required', 'exists:fuel_types,id'],
-        'transmission_type_id' => ['required', 'exists:transmission_types,id'],
-        'status_id' => ['required', 'exists:vehicle_statuses,id'],
-        'manufacturing_year' => ['required', 'integer', 'min:1990', 'max:2030'],
-        'acquisition_date' => ['required', 'date', 'before_or_equal:today'],
-        'purchase_price' => ['required', 'numeric', 'min:0'],
+        'transmission_type_id' => ['nullable', 'exists:transmission_types,id'],
+        'status_id' => ['nullable', 'exists:vehicle_statuses,id'],
+        'manufacturing_year' => ['nullable', 'integer', 'min:1950', 'max:2030'],
+        'acquisition_date' => ['nullable', 'date', 'before_or_equal:today'],
+        'purchase_price' => ['nullable', 'numeric', 'min:0'],
         'current_value' => ['nullable', 'numeric', 'min:0'],
-        'initial_mileage' => ['required', 'integer', 'min:0'],
-        'current_mileage' => ['required', 'integer', 'min:0'],
-        'engine_displacement_cc' => ['required', 'integer', 'min:50', 'max:10000'],
-        'power_hp' => ['required', 'integer', 'min:1', 'max:2000'],
-        'seats' => ['required', 'integer', 'min:1', 'max:100'],
+        'initial_mileage' => ['nullable', 'integer', 'min:0'],
+        'current_mileage' => ['nullable', 'integer', 'min:0'],
+        'engine_displacement_cc' => ['nullable', 'integer', 'min:0', 'max:10000'],
+        'power_hp' => ['nullable', 'integer', 'min:0', 'max:2000'],
+        'seats' => ['nullable', 'integer', 'min:0', 'max:100'],
         'notes' => ['nullable', 'string', 'max:1000'],
     ];
 
@@ -222,7 +222,7 @@ class VehicleController extends Controller
     /**
      * 📝 Formulaire de création avec assistance intelligente
      */
-    public function create(): View
+    public function create(): View|RedirectResponse
     {
         $this->logUserAction('vehicle.create.form_accessed');
 
@@ -348,7 +348,7 @@ class VehicleController extends Controller
     /**
      * ✏️ Formulaire d'édition avec pré-validation
      */
-    public function edit(Vehicle $vehicle): View
+    public function edit(Vehicle $vehicle): View|RedirectResponse
     {
         $this->logUserAction('vehicle.edit.form_accessed', null, ['vehicle_id' => $vehicle->id]);
 
@@ -643,9 +643,9 @@ class VehicleController extends Controller
      * Méthode appelée depuis Livewire via redirection pour éviter
      * les problèmes d'encodage UTF-8 avec le contenu binaire PDF.
      * 
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\Response|\Illuminate\Http\RedirectResponse
      */
-    public function exportPdf(): \Illuminate\Http\Response
+    public function exportPdf(): \Illuminate\Http\Response|RedirectResponse
     {
         // Autorisation pour voir la liste des véhicules (viewAny, pas view)
         $this->authorize('viewAny', Vehicle::class);
@@ -792,7 +792,9 @@ class VehicleController extends Controller
                         ->active()
                         ->orderBy('sort_order')
                         ->get(),
-                    'organizations' => Auth::user()->hasRole('Super Admin')
+                    'organizations' => ($user = Auth::user()) &&
+                    /** @var \App\Models\User $user */
+                    $user->hasRole('Super Admin')
                         ? Organization::orderBy('name')->get()
                         : collect([Auth::user()->organization]),
                 ];
@@ -819,7 +821,9 @@ class VehicleController extends Controller
         }
 
         // Règles dynamiques basées sur le rôle
-        if (!Auth::user()->hasRole('Super Admin')) {
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+        if (Auth::check() && !$user->hasRole('Super Admin')) {
             unset($rules['organization_id']);
         }
 
@@ -1358,7 +1362,7 @@ class VehicleController extends Controller
     /**
      * 📥 Affiche le formulaire d'importation enterprise
      */
-    public function showImportForm(): View
+    public function showImportForm(): View|RedirectResponse
     {
         $this->authorize('create vehicles');
         $this->logUserAction('vehicle.import.form_accessed');
@@ -1458,7 +1462,7 @@ class VehicleController extends Controller
     /**
      * 📊 Affiche les résultats d'importation avec détails
      */
-    public function showImportResults(): View
+    public function showImportResults(): View|RedirectResponse
     {
         $this->authorize('create vehicles');
         $this->logUserAction('vehicle.import.results_viewed');
@@ -1880,21 +1884,28 @@ class VehicleController extends Controller
      */
     private function prepareVehicleDataFromRow(array $row, int $rowNumber): array
     {
+        // Initial Mileage default to 0 if empty
+        $initialMileage = !empty($row['initial_mileage']) ? (int) $row['initial_mileage'] : 0;
+
+        // Current Mileage logic: if empty, default to initial_mileage (which might be 0)
+        // If provided, use it. Validation will check if current >= initial.
+        $currentMileage = !empty($row['current_mileage']) ? (int) $row['current_mileage'] : $initialMileage;
+
         $data = [
             'registration_plate' => trim($row['registration_plate'] ?? ''),
-            'vin' => trim($row['vin'] ?? ''),
+            'vin' => !empty(trim($row['vin'] ?? '')) ? trim($row['vin']) : null,
             'brand' => trim($row['brand'] ?? ''),
-            'model' => trim($row['model'] ?? ''),
-            'color' => trim($row['color'] ?? ''),
-            'manufacturing_year' => (int) ($row['manufacturing_year'] ?? 0),
+            'model' => !empty(trim($row['model'] ?? '')) ? trim($row['model']) : null,
+            'color' => !empty(trim($row['color'] ?? '')) ? trim($row['color']) : null,
+            'manufacturing_year' => !empty($row['manufacturing_year']) ? (int) $row['manufacturing_year'] : null,
             'acquisition_date' => $this->parseDate($row['acquisition_date'] ?? ''),
-            'purchase_price' => (float) ($row['purchase_price'] ?? 0),
-            'current_value' => (float) ($row['current_value'] ?? 0),
-            'initial_mileage' => (int) ($row['initial_mileage'] ?? 0),
-            'current_mileage' => (int) ($row['current_mileage'] ?? 0),
-            'engine_displacement_cc' => (int) ($row['engine_displacement_cc'] ?? 0),
-            'power_hp' => (int) ($row['power_hp'] ?? 0),
-            'seats' => (int) ($row['seats'] ?? 0),
+            'purchase_price' => !empty($row['purchase_price']) ? (float) $row['purchase_price'] : null,
+            'current_value' => !empty($row['current_value']) ? (float) $row['current_value'] : null,
+            'initial_mileage' => $initialMileage,
+            'current_mileage' => $currentMileage,
+            'engine_displacement_cc' => !empty($row['engine_displacement_cc']) ? (int) $row['engine_displacement_cc'] : null,
+            'power_hp' => !empty($row['power_hp']) ? (int) $row['power_hp'] : null,
+            'seats' => !empty($row['seats']) ? (int) $row['seats'] : null,
             'notes' => trim($row['notes'] ?? ''),
             'organization_id' => Auth::user()->organization_id
         ];
@@ -1903,7 +1914,7 @@ class VehicleController extends Controller
         $data['vehicle_type_id'] = $this->resolveVehicleTypeId($row['vehicle_type'] ?? '');
         $data['fuel_type_id'] = $this->resolveFuelTypeId($row['fuel_type'] ?? '');
         $data['transmission_type_id'] = $this->resolveTransmissionTypeId($row['transmission_type'] ?? '');
-        $data['status_id'] = $this->resolveStatusId($row['status'] ?? 'Disponible');
+        $data['status_id'] = $this->resolveStatusId($row['status'] ?? 'Parking');
 
         // Validation des données
         $this->validateImportRowData($data, $rowNumber);
@@ -1950,7 +1961,7 @@ class VehicleController extends Controller
     /**
      * 🗄️ Affiche les véhicules archivés avec interface enterprise
      */
-    public function archived(Request $request): View
+    public function archived(Request $request): View|RedirectResponse
     {
         $this->logUserAction('vehicles.archived.view', null, [
             'filters' => $request->query()
@@ -2609,27 +2620,23 @@ class VehicleController extends Controller
         // Validation des champs obligatoires avec messages personnalisés
         $validator = Validator::make($data, [
             'registration_plate' => 'required|string|max:20',
-            'vin' => 'required|string|min:17|max:17',
+            'vin' => 'nullable|string|min:17|max:17',
             'brand' => 'required|string|max:50',
-            'model' => 'required|string|max:50',
-            'manufacturing_year' => 'required|integer|min:1990|max:' . (date('Y') + 1),
-            'purchase_price' => 'required|numeric|min:0',
-            'current_mileage' => 'required|integer|min:0',
-            'initial_mileage' => 'required|integer|min:0',
-            'engine_displacement_cc' => 'required|integer|min:50|max:10000',
-            'power_hp' => 'required|integer|min:1|max:2000',
-            'seats' => 'required|integer|min:1|max:100',
+            'model' => 'nullable|string|max:50',
+            'manufacturing_year' => 'nullable|integer|min:1950|max:' . (date('Y') + 1),
+            'purchase_price' => 'nullable|numeric|min:0',
+            'current_mileage' => 'nullable|integer|min:0',
+            'initial_mileage' => 'nullable|integer|min:0',
+            'engine_displacement_cc' => 'nullable|integer|min:0|max:10000',
+            'power_hp' => 'nullable|integer|min:0|max:2000',
+            'seats' => 'nullable|integer|min:0|max:100',
         ], [
             'registration_plate.required' => 'La plaque d\'immatriculation est obligatoire',
-            'vin.required' => 'Le numéro VIN est obligatoire',
             'vin.min' => 'Le VIN doit contenir exactement 17 caractères',
             'vin.max' => 'Le VIN doit contenir exactement 17 caractères',
             'brand.required' => 'La marque est obligatoire',
-            'model.required' => 'Le modèle est obligatoire',
-            'manufacturing_year.required' => 'L\'année de fabrication est obligatoire',
-            'manufacturing_year.min' => 'L\'année de fabrication doit être supérieure ou égale à 1990',
+            'manufacturing_year.min' => 'L\'année de fabrication doit être supérieure ou égale à 1950',
             'manufacturing_year.max' => 'L\'année de fabrication ne peut pas être dans le futur',
-            'purchase_price.required' => 'Le prix d\'achat est obligatoire',
             'purchase_price.min' => 'Le prix d\'achat doit être positif',
         ]);
 
@@ -2967,7 +2974,7 @@ class VehicleController extends Controller
      * 🗂️ Service de cache intelligent enterprise avec stratégie adaptative
      * Implémente un cache multi-niveau avec invalidation contextuelle
      */
-    private function getEnterpriseCache(string $key, \Closure $callback, int $ttl = null): mixed
+    private function getEnterpriseCache(string $key, \Closure $callback, ?int $ttl = null): mixed
     {
         $ttl = $ttl ?? self::CACHE_TTL_MEDIUM;
         $cacheKey = $this->buildCacheKey($key);
@@ -3009,7 +3016,7 @@ class VehicleController extends Controller
                 'performance' => [
                     'memory_usage_mb' => round(memory_get_usage(true) / 1024 / 1024, 2),
                     'peak_memory_mb' => round(memory_get_peak_usage(true) / 1024 / 1024, 2),
-                    'execution_time_ms' => round((microtime(true) - LARAVEL_START) * 1000, 2)
+                    'execution_time_ms' => round((microtime(true) - (defined('LARAVEL_START') ? constant('LARAVEL_START') : microtime(true))) * 1000, 2)
                 ]
             ];
 
@@ -3303,7 +3310,7 @@ class VehicleController extends Controller
             'execution_time_ms' => round($executionTime, 2),
             'memory_usage_mb' => round(memory_get_usage(true) / 1024 / 1024, 2),
             'peak_memory_mb' => round(memory_get_peak_usage(true) / 1024 / 1024, 2),
-            'queries_count' => \DB::getQueryLog() ? count(\DB::getQueryLog()) : 0,
+            'queries_count' => DB::getQueryLog() ? count(DB::getQueryLog()) : 0,
             'cache_hits' => $this->getCacheHitCount(),
             'timestamp' => now()->toISOString()
         ];
@@ -3315,8 +3322,13 @@ class VehicleController extends Controller
     private function getCacheHitCount(): int
     {
         try {
-            // Implémentation dépendante du driver de cache
-            return Cache::getStore()->getHits() ?? 0;
+            $store = Cache::getStore();
+            // Check if method exists before calling
+            if (method_exists($store, 'getHits')) {
+                /** @var mixed $store */
+                return $store->getHits() ?? 0;
+            }
+            return 0;
         } catch (\Exception $e) {
             return 0;
         }

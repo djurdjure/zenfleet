@@ -53,50 +53,50 @@ class ImportExportService
         // Générer un identifiant unique pour cette importation
         $importId = Str::uuid()->toString();
         $fileName = $file->getClientOriginalName();
-        
+
         // Stocker temporairement le fichier
         $path = $file->storeAs('imports/temp', $importId . '.csv');
         $fullPath = Storage::path($path);
-        
+
         try {
             // Détecter et convertir l'encodage si nécessaire
             $detectedEncoding = $this->detectEncoding($fullPath, $encoding);
             $content = file_get_contents($fullPath);
-            
+
             if ($detectedEncoding !== 'UTF-8') {
                 $content = mb_convert_encoding($content, 'UTF-8', $detectedEncoding);
                 file_put_contents($fullPath, $content);
             }
-            
+
             // Charger le CSV avec League\CSV
             $csv = Reader::createFromPath($fullPath, 'r');
             $csv->setHeaderOffset(0);
-            
+
             // Préparer les données de référence pour la validation
             $vehicleTypes = ($mappings["vehicle_types"] ?? VehicleType::pluck("id", "name"))->toArray();
             $fuelTypes = ($mappings["fuel_types"] ?? FuelType::pluck("id", "name"))->toArray();
             $transmissionTypes = ($mappings["transmission_types"] ?? TransmissionType::pluck("id", "name"))->toArray();
             $vehicleStatuses = ($mappings["vehicle_statuses"] ?? VehicleStatus::pluck("id", "name"))->toArray();
-            
+
             // Traiter les enregistrements
             $records = Statement::create()->process($csv);
             $recordsArray = iterator_to_array($records);
-            
+
             $successCount = 0;
             $errorRows = [];
-            
+
             DB::beginTransaction();
-            
+
             try {
                 foreach ($recordsArray as $offset => $record) {
                     $lineNumber = $offset + 2; // +1 pour l'en-tête, +1 pour commencer à 1
-                    
+
                     // Nettoyer et préparer les données
                     $data = $this->prepareVehicleData($record, $vehicleTypes, $fuelTypes, $transmissionTypes, $vehicleStatuses);
-                    
+
                     // Valider les données
                     $validator = Validator::make($data, $this->getVehicleValidationRules());
-                    
+
                     if ($validator->fails()) {
                         // Enregistrer les erreurs
                         $errorRows[] = [
@@ -111,10 +111,10 @@ class ImportExportService
                         $successCount++;
                     }
                 }
-                
+
                 // Valider la transaction si tout s'est bien passé
                 DB::commit();
-                
+
                 // Journaliser le résultat
                 Log::info('Importation de véhicules terminée', [
                     'import_id' => $importId,
@@ -122,7 +122,7 @@ class ImportExportService
                     'success_count' => $successCount,
                     'error_count' => count($errorRows)
                 ]);
-                
+
                 return [
                     'success_count' => $successCount,
                     'error_rows' => $errorRows,
@@ -156,23 +156,23 @@ class ImportExportService
     {
         return response()->streamDownload(function () use ($errorRows) {
             $csv = Writer::createFromString();
-            
+
             // Si aucune erreur, retourner un fichier vide avec en-têtes
             if (empty($errorRows)) {
                 $csv->insertOne(['Aucune erreur à exporter']);
                 echo $csv->toString();
                 return;
             }
-            
+
             // Récupérer les en-têtes à partir de la première ligne d'erreur
             $headers = array_keys($errorRows[0]['data']);
             $csv->insertOne($headers);
-            
+
             // Ajouter les lignes en erreur
             foreach ($errorRows as $error) {
                 $csv->insertOne(array_values($error['data']));
             }
-            
+
             echo $csv->toString();
         }, 'erreurs_import_vehicules_' . substr($importId, 0, 8) . '.csv', [
             'Content-Type' => 'text/csv',
@@ -191,18 +191,18 @@ class ImportExportService
     {
         // Si un encodage spécifique est demandé (sauf 'auto'), l'utiliser
         if ($requestedEncoding !== 'auto') {
-            return match($requestedEncoding) {
+            return match ($requestedEncoding) {
                 'utf8' => 'UTF-8',
                 'iso' => 'ISO-8859-1',
                 'windows' => 'Windows-1252',
                 default => 'UTF-8'
             };
         }
-        
+
         // Sinon, tenter de détecter automatiquement
         $content = file_get_contents($filePath);
         $encodings = ['UTF-8', 'ISO-8859-1', 'Windows-1252'];
-        
+
         foreach ($encodings as $encoding) {
             $sample = mb_convert_encoding($content, 'UTF-8', $encoding);
             // Si la conversion ne produit pas de caractères invalides, c'est probablement le bon encodage
@@ -210,7 +210,7 @@ class ImportExportService
                 return $encoding;
             }
         }
-        
+
         // Par défaut, utiliser UTF-8
         return 'UTF-8';
     }
@@ -236,19 +236,19 @@ class ImportExportService
             'vehicle_type_id' => $vehicleTypes[strtolower($record['type_vehicule'] ?? '')] ?? null,
             'fuel_type_id' => $fuelTypes[strtolower($record['type_carburant'] ?? '')] ?? null,
             'transmission_type_id' => $transmissionTypes[strtolower($record['type_transmission'] ?? '')] ?? null,
-            'vehicle_status_id' => $vehicleStatuses[strtolower($record['statut'] ?? '')] ?? null,
-            'year' => $record['annee_fabrication'] ?? null,
+            'vehicle_status_id' => $vehicleStatuses[strtolower($record['statut'] ?? '')] ?? ($vehicleStatuses['parking'] ?? null), // Default to Parking, ensure 'parking' exists
+            'manufacturing_year' => $record['annee_fabrication'] ?? null, // Correction de la clé (year -> manufacturing_year)
             'acquisition_date' => $this->formatDate($record['date_acquisition'] ?? null),
             'purchase_price' => $this->formatDecimal($record['prix_achat'] ?? null),
             'current_value' => $this->formatDecimal($record['valeur_actuelle'] ?? null),
             'initial_mileage' => $this->formatInteger($record['kilometrage_initial'] ?? null),
-            'engine_capacity' => $this->formatInteger($record['cylindree_cc'] ?? null),
-            'power' => $this->formatInteger($record['puissance_cv'] ?? null),
+            'engine_displacement_cc' => $this->formatInteger($record['cylindree_cc'] ?? null), // Correction du mapping
+            'power_hp' => $this->formatInteger($record['puissance_cv'] ?? null), // Correction du mapping (power -> power_hp)
             'seats' => $this->formatInteger($record['nombre_places'] ?? null),
             'notes' => $record['notes'] ?? null,
             'organization_id' => auth()->user()->organization_id,
         ];
-        
+
         // Nettoyer les valeurs vides
         return array_map(function ($value) {
             return $value === '' ? null : $value;
@@ -266,19 +266,19 @@ class ImportExportService
             'registration_plate' => 'required|string|max:20',
             'vin' => 'nullable|string|max:50',
             'brand' => 'required|string|max:50',
-            'model' => 'required|string|max:50',
+            'model' => 'nullable|string|max:50', // Facultatif
             'color' => 'nullable|string|max:30',
-            'vehicle_type_id' => 'required|exists:vehicle_types,id',
+            'vehicle_type_id' => 'nullable|exists:vehicle_types,id', // Facultatif
             'fuel_type_id' => 'required|exists:fuel_types,id',
-            'transmission_type_id' => 'required|exists:transmission_types,id',
-            'vehicle_status_id' => 'required|exists:vehicle_statuses,id',
-            'year' => 'nullable|integer|min:1900|max:' . (date('Y') + 1),
+            'transmission_type_id' => 'nullable|exists:transmission_types,id', // Facultatif
+            'vehicle_status_id' => 'nullable|exists:vehicle_statuses,id', // Facultatif (défaut appliqué)
+            'manufacturing_year' => 'nullable|integer|min:1900|max:' . (date('Y') + 1),
             'acquisition_date' => 'nullable|date',
             'purchase_price' => 'nullable|numeric|min:0',
             'current_value' => 'nullable|numeric|min:0',
             'initial_mileage' => 'nullable|integer|min:0',
-            'engine_capacity' => 'nullable|integer|min:0',
-            'power' => 'nullable|integer|min:0',
+            'engine_displacement_cc' => 'nullable|integer|min:0', // Correction nom champ
+            'power_hp' => 'nullable|integer|min:0', // Correction nom champ
             'seats' => 'nullable|integer|min:0',
             'notes' => 'nullable|string',
             'organization_id' => 'required|exists:organizations,id',
@@ -296,17 +296,17 @@ class ImportExportService
         if (empty($date)) {
             return null;
         }
-        
+
         // Essayer plusieurs formats de date courants
         $formats = ['Y-m-d', 'd/m/Y', 'm/d/Y', 'd-m-Y', 'Y/m/d'];
-        
+
         foreach ($formats as $format) {
             $dateObj = \DateTime::createFromFormat($format, $date);
             if ($dateObj !== false) {
                 return $dateObj->format('Y-m-d');
             }
         }
-        
+
         return null;
     }
 
@@ -321,10 +321,10 @@ class ImportExportService
         if (empty($value)) {
             return null;
         }
-        
+
         // Nettoyer la valeur (supprimer espaces, séparateurs de milliers)
         $value = str_replace([' ', ','], ['', '.'], $value);
-        
+
         return is_numeric($value) ? (float) $value : null;
     }
 
@@ -339,10 +339,10 @@ class ImportExportService
         if (empty($value)) {
             return null;
         }
-        
+
         // Nettoyer la valeur (supprimer espaces, séparateurs de milliers)
         $value = str_replace([' ', ',', '.'], '', $value);
-        
+
         return is_numeric($value) ? (int) $value : null;
     }
 }

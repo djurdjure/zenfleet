@@ -145,6 +145,34 @@ class VehicleStatusBadgeUltraPro extends Component
                 $enum = VehicleStatusEnum::tryFrom($generatedSlug);
             }
 
+            // ⚠️ FALLBACK 3: Mapping explicite pour les termes français/anglais courants
+            if (!$enum) {
+                $map = [
+                    'disponible' => VehicleStatusEnum::PARKING,
+                    'available' => VehicleStatusEnum::PARKING,
+                    'parking' => VehicleStatusEnum::PARKING,
+                    'active' => VehicleStatusEnum::AFFECTE,
+                    'actif' => VehicleStatusEnum::AFFECTE,
+                    'assigned' => VehicleStatusEnum::AFFECTE,
+                    'broken' => VehicleStatusEnum::EN_PANNE,
+                    'panne' => VehicleStatusEnum::EN_PANNE,
+                    'maintenance' => VehicleStatusEnum::EN_MAINTENANCE,
+                    'repair' => VehicleStatusEnum::EN_MAINTENANCE,
+                    'sold' => VehicleStatusEnum::VENDU,
+                    'vendu' => VehicleStatusEnum::VENDU,
+                    'retired' => VehicleStatusEnum::REFORME,
+                    'reforme' => VehicleStatusEnum::REFORME,
+                ];
+
+                $normalizedSlug = str_replace(['-', '_'], '', strtolower($slug));
+                foreach ($map as $key => $targetEnum) {
+                    if ($key === $slug || $key === $normalizedSlug || str_contains($slug, $key)) {
+                        $enum = $targetEnum;
+                        break;
+                    }
+                }
+            }
+
             // 📊 LOGGING: Si aucun enum trouvé, logger pour debugging
             if (!$enum) {
                 Log::warning('VehicleStatusEnum not found for vehicle status', [
@@ -341,11 +369,18 @@ class VehicleStatusBadgeUltraPro extends Component
      */
     protected function canUpdateStatus(): bool
     {
+        /** @var \App\Models\User $user */
+        $user = auth()->user();
+
+        if ($user->hasRole(['Super Admin', 'Admin'])) {
+            return true;
+        }
+
         // Vérifier plusieurs permissions possibles
-        return auth()->user()->can('update vehicles') ||
-            auth()->user()->can('update-vehicle-status') ||
-            auth()->user()->can('manage vehicles') ||
-            auth()->user()->hasRole(['admin', 'super-admin', 'fleet-manager']);
+        return $user->can('update vehicles') ||
+            $user->can('update-vehicle-status') ||
+            $user->can('manage vehicles') ||
+            $user->hasRole('fleet-manager');
     }
 
     /**
