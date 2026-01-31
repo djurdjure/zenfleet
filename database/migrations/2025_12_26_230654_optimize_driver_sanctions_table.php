@@ -39,12 +39,24 @@ return new class extends Migration
             // Add strategic indexes for Enterprise performance
             // Check if indexes exist first to avoid errors? Laravel usually handles this but let's be safe or just standard
             // Standard Laravel way:
-            $table->index('deleted_at');
-            $table->index('driver_id');
-            $table->index('status');
+            if (Schema::hasColumn('driver_sanctions', 'deleted_at')) {
+                $table->index('deleted_at');
+            }
+
+            if (Schema::hasColumn('driver_sanctions', 'driver_id')) {
+                $table->index('driver_id');
+            }
+
+            if (Schema::hasColumn('driver_sanctions', 'status')) {
+                $table->index('status');
+            }
 
             // Compound index for common filtered queries
-            $table->index(['driver_id', 'status', 'deleted_at']);
+            if (Schema::hasColumn('driver_sanctions', 'driver_id')
+                && Schema::hasColumn('driver_sanctions', 'status')
+                && Schema::hasColumn('driver_sanctions', 'deleted_at')) {
+                $table->index(['driver_id', 'status', 'deleted_at']);
+            }
         });
     }
 

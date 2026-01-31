@@ -15,6 +15,7 @@ use Livewire\Attributes\Computed;
 use Carbon\Carbon;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 /**
  * 📝 Composant Formulaire d'Affectation - Enterprise Grade
@@ -842,37 +843,82 @@ class AssignmentForm extends Component
     private function loadOptions()
     {
         $organizationId = auth()->user()->organization_id;
+        $hasVehicleAvailability = Schema::hasColumn('vehicles', 'is_available')
+            && Schema::hasColumn('vehicles', 'assignment_status');
+        $hasVehicleCurrentDriver = Schema::hasColumn('vehicles', 'current_driver_id');
 
-        // CORRECTION ENTERPRISE V2: Utilisation des bons status_id et triple vérification
-        $this->vehicleOptions = Vehicle::where('organization_id', $organizationId)
-            ->where(function($query) {
-                // Véhicules au parking (disponibles) OU marqués comme disponibles
-                $query->where('status_id', 8) // Parking
-                      ->orWhere(function($q) {
-                          $q->where('is_available', true)
-                            ->where('assignment_status', 'available')
-                            ->whereNull('current_driver_id');
-                      });
-            })
+        $hasDriverAvailability = Schema::hasColumn('drivers', 'is_available')
+            && Schema::hasColumn('drivers', 'assignment_status');
+        $hasDriverCurrentVehicle = Schema::hasColumn('drivers', 'current_vehicle_id');
+
+        $vehicleBaseQuery = Vehicle::where('organization_id', $organizationId)
             ->where('is_archived', false)
             ->select('id', 'registration_plate', 'brand', 'model', 'current_mileage')
-            ->orderBy('registration_plate')
-            ->get();
+            ->orderBy('registration_plate');
 
-        // CORRECTION ENTERPRISE V2: Support des statuts multiples pour les chauffeurs
-        $this->driverOptions = Driver::where('organization_id', $organizationId)
-            ->where(function($query) {
-                // Chauffeurs avec statut Actif (1) OU Disponible (7) OU marqués comme disponibles
-                $query->whereIn('status_id', [1, 7]) // Actif ou Disponible
-                      ->orWhere(function($q) {
-                          $q->where('is_available', true)
-                            ->where('assignment_status', 'available')
-                            ->whereNull('current_vehicle_id');
-                      });
-            })
+        $vehicleAvailabilityQuery = (clone $vehicleBaseQuery);
+
+        if ($hasVehicleAvailability) {
+            $vehicleAvailabilityQuery->where('is_available', true)
+                ->where('assignment_status', 'available');
+
+            if ($hasVehicleCurrentDriver) {
+                $vehicleAvailabilityQuery->whereNull('current_driver_id');
+            }
+        }
+
+        $vehicleOptions = $hasVehicleAvailability ? $vehicleAvailabilityQuery->get() : collect();
+
+        if ($vehicleOptions->isEmpty()) {
+            $vehicleOptions = (clone $vehicleBaseQuery)
+                ->when($hasVehicleCurrentDriver, function ($query) {
+                    $query->whereNull('current_driver_id');
+                })
+                ->where(function ($query) {
+                    $query->whereHas('vehicleStatus', function ($statusQuery) {
+                        $statusQuery->where('is_active', true)
+                            ->where('can_be_assigned', true);
+                    })->orWhereDoesntHave('vehicleStatus');
+                })
+                ->get();
+        }
+
+        $this->vehicleOptions = $vehicleOptions;
+
+        $driverBaseQuery = Driver::where('organization_id', $organizationId)
             ->select('id', 'first_name', 'last_name', 'license_number')
             ->orderBy('last_name')
-            ->get();
+            ->orderBy('first_name');
+
+        $driverAvailabilityQuery = (clone $driverBaseQuery);
+
+        if ($hasDriverAvailability) {
+            $driverAvailabilityQuery->where('is_available', true)
+                ->where('assignment_status', 'available');
+
+            if ($hasDriverCurrentVehicle) {
+                $driverAvailabilityQuery->whereNull('current_vehicle_id');
+            }
+        }
+
+        $driverOptions = $hasDriverAvailability ? $driverAvailabilityQuery->get() : collect();
+
+        if ($driverOptions->isEmpty()) {
+            $driverOptions = (clone $driverBaseQuery)
+                ->when($hasDriverCurrentVehicle, function ($query) {
+                    $query->whereNull('current_vehicle_id');
+                })
+                ->where(function ($query) {
+                    $query->whereHas('driverStatus', function ($statusQuery) {
+                        $statusQuery->where('is_active', true)
+                            ->where('can_assign', true)
+                            ->where('can_drive', true);
+                    })->orWhereDoesntHave('driverStatus');
+                })
+                ->get();
+        }
+
+        $this->driverOptions = $driverOptions;
     }
 
     /**
