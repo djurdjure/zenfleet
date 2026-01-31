@@ -635,7 +635,7 @@
 
  <div wire:loading
  wire:target="create"
- class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center"
+ class="fixed inset-0 bg-gray-900/40 backdrop-blur-sm z-50 flex items-center justify-center"
  role="status"
  aria-live="assertive">
  <div class="bg-white rounded-xl p-8 shadow-2xl">

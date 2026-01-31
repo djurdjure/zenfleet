@@ -6,6 +6,10 @@ use Livewire\Component;
 use Livewire\WithPagination;
 use App\Services\Maintenance\MaintenanceService;
 use App\Models\MaintenanceOperation;
+use App\Models\MaintenanceType;
+use App\Models\Supplier;
+use App\Models\Vehicle;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 /**
  * 📊 COMPOSANT TABLE MAINTENANCE ENTERPRISE
@@ -17,7 +21,7 @@ use App\Models\MaintenanceOperation;
  */
 class MaintenanceTable extends Component
 {
-    use WithPagination;
+    use WithPagination, AuthorizesRequests;
 
     // Filters
     public $search = '';
@@ -35,7 +39,7 @@ class MaintenanceTable extends Component
     public $sortDirection = 'desc';
 
     // Pagination
-    public $perPage = 15;
+    public int $perPage = 15;
 
     // Listeners
     protected $listeners = [
@@ -50,7 +54,13 @@ class MaintenanceTable extends Component
         'status' => ['except' => ''],
         'sortField' => ['except' => 'scheduled_date'],
         'sortDirection' => ['except' => 'desc'],
+        'perPage' => ['except' => 15],
     ];
+
+    public function mount(): void
+    {
+        $this->authorize('viewAny', MaintenanceOperation::class);
+    }
 
     /**
      * Reset filters
@@ -69,6 +79,11 @@ class MaintenanceTable extends Component
             'overdue'
         ]);
 
+        $this->resetPage();
+    }
+
+    public function updatedPerPage(): void
+    {
         $this->resetPage();
     }
 
@@ -105,11 +120,43 @@ class MaintenanceTable extends Component
         $this->resetPage();
     }
 
+    public function updatingProviderId()
+    {
+        $this->resetPage();
+    }
+
+    public function updatingVehicleId()
+    {
+        $this->resetPage();
+    }
+
+    public function updatingCategory()
+    {
+        $this->resetPage();
+    }
+
+    public function updatingDateFrom()
+    {
+        $this->resetPage();
+    }
+
+    public function updatingDateTo()
+    {
+        $this->resetPage();
+    }
+
+    public function updatingOverdue()
+    {
+        $this->resetPage();
+    }
+
     /**
      * Render component
      */
     public function render(MaintenanceService $maintenanceService)
     {
+        $this->authorize('viewAny', MaintenanceOperation::class);
+
         $filters = [
             'search' => $this->search,
             'status' => $this->status,
@@ -125,9 +172,40 @@ class MaintenanceTable extends Component
         ];
 
         $operations = $maintenanceService->getOperations($filters, $this->perPage);
+        $analytics = $maintenanceService->getAnalytics();
+
+        $organizationId = auth()->user()?->organization_id;
+
+        $maintenanceTypes = MaintenanceType::where('organization_id', $organizationId)
+            ->orderBy('name')
+            ->get(['id', 'name', 'category']);
+
+        $vehicles = Vehicle::where('organization_id', $organizationId)
+            ->whereNull('deleted_at')
+            ->orderBy('registration_plate')
+            ->get(['id', 'registration_plate', 'brand', 'model']);
+
+        $maintenanceSupplierTypes = [
+            Supplier::TYPE_MECANICIEN,
+            Supplier::TYPE_PEINTURE_CARROSSERIE,
+            Supplier::TYPE_ELECTRICITE_AUTO,
+            Supplier::TYPE_PNEUMATIQUES,
+            Supplier::TYPE_CONTROLE_TECHNIQUE,
+            Supplier::TYPE_PIECES_DETACHEES,
+        ];
+
+        $providers = Supplier::where('organization_id', $organizationId)
+            ->whereIn('supplier_type', $maintenanceSupplierTypes)
+            ->where('is_active', true)
+            ->orderBy('company_name')
+            ->get(['id', 'company_name', 'contact_phone']);
 
         return view('livewire.admin.maintenance.maintenance-table', [
             'operations' => $operations,
-        ]);
+            'analytics' => $analytics,
+            'maintenanceTypes' => $maintenanceTypes,
+            'vehicles' => $vehicles,
+            'providers' => $providers,
+        ])->extends('layouts.admin.catalyst')->section('content');
     }
 }

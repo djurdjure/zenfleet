@@ -30,6 +30,23 @@ class VehicleExpense extends Model
     public const CATEGORY_FORMATION_CHAUFFEUR = 'formation_chauffeur';
     public const CATEGORY_AUTRE = 'autre';
 
+    public const EXPENSE_CATEGORIES = [
+        self::CATEGORY_MAINTENANCE_PREVENTIVE => 'Maintenance Préventive',
+        self::CATEGORY_REPARATION => 'Réparation',
+        self::CATEGORY_PIECES_DETACHEES => 'Pièces Détachées',
+        self::CATEGORY_CARBURANT => 'Carburant',
+        self::CATEGORY_ASSURANCE => 'Assurance',
+        self::CATEGORY_CONTROLE_TECHNIQUE => 'Contrôle Technique',
+        self::CATEGORY_VIGNETTE => 'Vignette',
+        self::CATEGORY_AMENDES => 'Amendes',
+        self::CATEGORY_PEAGE => 'Péage',
+        self::CATEGORY_PARKING => 'Parking',
+        self::CATEGORY_LAVAGE => 'Lavage',
+        self::CATEGORY_TRANSPORT => 'Transport',
+        self::CATEGORY_FORMATION_CHAUFFEUR => 'Formation Chauffeur',
+        self::CATEGORY_AUTRE => 'Autre',
+    ];
+
     // Statuts de paiement
     public const PAYMENT_PENDING = 'pending';
     public const PAYMENT_PAID = 'paid';

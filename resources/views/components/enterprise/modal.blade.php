@@ -85,7 +85,7 @@ $variantIcons = [
         x-transition:leave="ease-in duration-200"
         x-transition:leave-start="opacity-100"
         x-transition:leave-end="opacity-0"
-        class="fixed inset-0 bg-gray-500/75 backdrop-blur-sm"
+        class="fixed inset-0 bg-gray-900/40 backdrop-blur-sm z-40"
         @if($closeOnClick) @click="show = false" @endif></div>
 
     {{-- Modal Container --}}
@@ -97,8 +97,8 @@ $variantIcons = [
         x-transition:leave="ease-in duration-200"
         x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
         x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-        class="relative transform transition-all sm:w-full {{ $maxWidthClass }} sm:mx-auto">
-        <div class="bg-white rounded-2xl shadow-2xl overflow-hidden">
+        class="relative z-50 transform transition-all sm:w-full {{ $maxWidthClass }} sm:mx-auto">
+        <div class="bg-white rounded-2xl shadow-2xl overflow-hidden relative z-50">
             {{-- Header avec gradient subtil --}}
             @if($title || $closeable)
             <div class="bg-gradient-to-r {{ $variantColors[$variant] }} px-6 py-4 border-b">

@@ -153,7 +153,7 @@
              x-transition:leave="ease-in duration-200"
              x-transition:leave-start="opacity-100"
              x-transition:leave-end="opacity-0"
-             class="fixed inset-0 bg-gray-900 bg-opacity-50 backdrop-blur-sm transition-opacity">
+             class="fixed inset-0 bg-gray-900/40 backdrop-blur-sm transition-opacity z-40">
         </div>
 
         {{-- Modal Container --}}
@@ -165,7 +165,7 @@
                  x-transition:leave="ease-in duration-200"
                  x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
                  x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-                 class="relative transform overflow-hidden rounded-2xl bg-white text-left shadow-2xl transition-all sm:my-8 sm:w-full sm:max-w-lg">
+                 class="relative transform overflow-hidden rounded-2xl bg-white text-left shadow-2xl transition-all sm:my-8 sm:w-full sm:max-w-lg z-50">
                 
                 {{-- Header avec gradient --}}
                 <div class="bg-gradient-to-r from-blue-500 to-blue-600 px-6 py-4">

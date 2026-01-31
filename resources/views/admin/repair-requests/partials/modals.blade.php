@@ -1,8 +1,8 @@
 {{-- Modal d'approbation --}}
 <div id="approveModal" class="fixed inset-0 z-50 overflow-y-auto" style="display: none;">
  <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
- <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"></div>
- <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+ <div class="fixed inset-0 bg-gray-900/40 backdrop-blur-sm transition-opacity z-40"></div>
+ <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full relative z-50">
  <form action="{{ route('admin.repair-requests.approve', $repairRequest) }}" method="POST">
  @csrf
  <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
@@ -40,8 +40,8 @@
 {{-- Modal de rejet --}}
 <div id="rejectModal" class="fixed inset-0 z-50 overflow-y-auto" style="display: none;">
  <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
- <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"></div>
- <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+ <div class="fixed inset-0 bg-gray-900/40 backdrop-blur-sm transition-opacity z-40"></div>
+ <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full relative z-50">
  <form action="{{ route('admin.repair-requests.reject', $repairRequest) }}" method="POST">
  @csrf
  <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
@@ -79,8 +79,8 @@
 {{-- Modal de validation définitive --}}
 <div id="validateModal" class="fixed inset-0 z-50 overflow-y-auto" style="display: none;">
  <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
- <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"></div>
- <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+ <div class="fixed inset-0 bg-gray-900/40 backdrop-blur-sm transition-opacity z-40"></div>
+ <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full relative z-50">
  <form action="{{ route('admin.repair-requests.validate', $repairRequest) }}" method="POST">
  @csrf
  <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
@@ -118,8 +118,8 @@
 {{-- Modal de refus par manager --}}
 <div id="rejectByManagerModal" class="fixed inset-0 z-50 overflow-y-auto" style="display: none;">
  <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
- <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"></div>
- <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+ <div class="fixed inset-0 bg-gray-900/40 backdrop-blur-sm transition-opacity z-40"></div>
+ <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full relative z-50">
  <form action="{{ route('admin.repair-requests.reject-by-manager', $repairRequest) }}" method="POST">
  @csrf
  <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
@@ -157,8 +157,8 @@
 {{-- Modal de mise à jour du statut --}}
 <div id="updateProgressModal" class="fixed inset-0 z-50 overflow-y-auto" style="display: none;">
  <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
- <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"></div>
- <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+ <div class="fixed inset-0 bg-gray-900/40 backdrop-blur-sm transition-opacity z-40"></div>
+ <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full relative z-50">
  <form action="{{ route('admin.repair-requests.update-progress', $repairRequest) }}" method="POST">
  @csrf
  @method('PATCH')

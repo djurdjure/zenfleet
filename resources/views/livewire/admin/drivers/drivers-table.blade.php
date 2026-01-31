@@ -138,16 +138,15 @@
  </div>
  <input
  type="text"
- wire:model.live.debounce.300ms="search"
+ wire:model.live.debounce.500ms="search"
  placeholder="Rechercher par nom, prénom, matricule, email..."
- class="pl-10 pr-4 py-2.5 block w-full border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm shadow-sm">
+ wire:loading.attr="aria-busy"
+ wire:target="search"
+ class="pl-10 pr-4 py-2.5 block w-full bg-white border border-gray-300 rounded-lg shadow-sm hover:border-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm">
  
  {{-- Loading Indicator --}}
- <div wire:loading wire:target="search" class="absolute inset-y-0 right-0 pr-3 flex items-center">
- <svg class="animate-spin h-5 w-5 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
- <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
- <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
- </svg>
+ <div wire:loading.delay wire:target="search" class="absolute inset-y-0 right-0 pr-3 flex items-center">
+ <x-iconify icon="lucide:loader-2" class="w-4 h-4 text-blue-500 animate-spin" />
  </div>
  </div>
  </div>
@@ -357,4 +356,3 @@
  </td>
 
  {{-- Chauffeur (suite dans le prochain message car limite de caractères) --}}
-

@@ -76,6 +76,7 @@ class AssignmentFiltersEnhanced extends Component
     public array $savedFilterPresets = [];
     public string $currentPresetName = '';
     public bool $showAllByDefault = true; // NOUVEAU: Flag pour afficher tout par défaut
+    public int $perPage = 20;
     
     // =========================================================================
     // STATISTIQUES TEMPS RÉEL AVANCÉES
@@ -107,7 +108,8 @@ class AssignmentFiltersEnhanced extends Component
         'driverId' => ['except' => ''],
         'dateFrom' => ['except' => ''],
         'dateTo' => ['except' => ''],
-        'datePreset' => ['except' => '']
+        'datePreset' => ['except' => ''],
+        'perPage' => ['except' => 20],
     ];
     
     protected $listeners = [
@@ -116,6 +118,11 @@ class AssignmentFiltersEnhanced extends Component
         'applyPreset' => 'loadFilterPreset',
         'showAll' => 'showAllAssignments'  // NOUVEAU: Listener pour afficher tout
     ];
+
+    public function updatedPerPage()
+    {
+        $this->resetPage();
+    }
     
     protected $rules = [
         'dateFrom' => 'nullable|date',
@@ -246,13 +253,13 @@ class AssignmentFiltersEnhanced extends Component
         
         // Si aucun filtre n'est actif, ne pas utiliser le cache pour toujours avoir les données fraîches
         if (!$this->hasActiveFilters) {
-            return $this->buildFilterQuery($organizationId)->paginate(20);
+            return $this->buildFilterQuery($organizationId)->paginate($this->perPage);
         }
         
         // Utiliser le cache seulement si des filtres sont actifs
         $cacheKey = $this->generateCacheKey();
         return Cache::remember($cacheKey, 60, function () use ($organizationId) {
-            return $this->buildFilterQuery($organizationId)->paginate(20);
+            return $this->buildFilterQuery($organizationId)->paginate($this->perPage);
         });
     }
 

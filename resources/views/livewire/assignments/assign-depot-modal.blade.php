@@ -11,7 +11,7 @@
                     x-transition:leave="ease-in duration-200"
                     x-transition:leave-start="opacity-100"
                     x-transition:leave-end="opacity-0"
-                    class="fixed inset-0 transition-opacity bg-gray-500 bg-opacity-75"
+                    class="fixed inset-0 transition-opacity bg-gray-900/40 backdrop-blur-sm z-40"
                     wire:click="close"
                 ></div>
 
@@ -24,7 +24,7 @@
                     x-transition:leave="ease-in duration-200"
                     x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
                     x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-                    class="inline-block w-full max-w-3xl p-6 my-8 overflow-hidden text-left align-middle transition-all transform bg-white shadow-xl rounded-lg"
+                    class="inline-block w-full max-w-3xl p-6 my-8 overflow-hidden text-left align-middle transition-all transform bg-white shadow-xl rounded-lg relative z-50"
                 >
                     {{-- Header --}}
                     <div class="flex justify-between items-center mb-6">

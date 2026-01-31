@@ -322,7 +322,7 @@
  role="dialog"
  aria-modal="true"
  style="display: none;">
- <div class="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm transition-opacity"
+ <div class="fixed inset-0 bg-gray-900/40 backdrop-blur-sm transition-opacity z-40"
  x-show="showDeleteModal"
  x-transition:enter="ease-out duration-300"
  x-transition:enter-start="opacity-0"
@@ -333,7 +333,7 @@
 
  <div class="fixed inset-0 z-10 w-screen overflow-y-auto">
  <div class="flex min-h-full items-center justify-center p-4">
- <div class="relative transform overflow-hidden rounded-2xl bg-white px-6 pb-6 pt-8 text-left shadow-2xl transition-all sm:my-8 sm:w-full sm:max-w-lg border border-gray-200"
+ <div class="relative transform overflow-hidden rounded-2xl bg-white px-6 pb-6 pt-8 text-left shadow-2xl transition-all sm:my-8 sm:w-full sm:max-w-lg border border-gray-200 z-50"
  x-show="showDeleteModal"
  x-transition:enter="ease-out duration-300"
  x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"

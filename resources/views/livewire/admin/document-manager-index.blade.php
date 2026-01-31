@@ -85,9 +85,14 @@
                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                         <x-iconify icon="lucide:search" class="w-5 h-5 text-gray-400" />
                     </div>
-                    <input wire:model.live.debounce.300ms="search" type="text"
-                        class="pl-10 pr-4 py-2.5 block w-full border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm shadow-sm"
+                    <input wire:model.live.debounce.500ms="search" type="text"
+                        wire:loading.attr="aria-busy"
+                        wire:target="search"
+                        class="pl-10 pr-4 py-2.5 block w-full bg-white border border-gray-300 rounded-lg shadow-sm hover:border-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
                         placeholder="Rechercher (nom, description)...">
+                    <div wire:loading.delay wire:target="search" class="absolute inset-y-0 right-0 pr-3 flex items-center">
+                        <x-iconify icon="lucide:loader-2" class="w-4 h-4 text-blue-500 animate-spin" />
+                    </div>
                 </div>
             </x-slot:search>
 
@@ -95,7 +100,7 @@
                 <button @click="showFilters = !showFilters" type="button"
                     class="inline-flex items-center gap-2 p-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-all duration-200 shadow-sm hover:shadow-md">
                     <x-iconify icon="lucide:filter" class="w-5 h-5 text-gray-500" />
-                    <x-iconify icon="heroicons:chevron-down" class="w-4 h-4 text-gray-400" />
+                    <x-iconify icon="heroicons:chevron-down" class="w-4 h-4 text-gray-400 transition-transform duration-200" x-bind:class="showFilters ? 'rotate-180' : ''" />
                 </button>
             </x-slot:filters>
 
@@ -127,6 +132,15 @@
                             <option value="archived">Archivé</option>
                         </select>
                     </div>
+
+                    <x-slot:reset>
+                        @if($search || $categoryFilter || $statusFilter)
+                        <button wire:click="resetFilters" class="text-sm text-red-600 hover:text-red-800 flex items-center gap-1 font-medium bg-red-50 hover:bg-red-100 px-3 py-1.5 rounded-md transition-colors">
+                            <x-iconify icon="lucide:x" class="w-4 h-4" />
+                            Réinitialiser
+                        </button>
+                        @endif
+                    </x-slot:reset>
                 </x-page-filters-panel>
             </x-slot:filtersPanel>
         </x-page-search-bar>
@@ -234,9 +248,11 @@
                     </tbody>
                 </table>
             </div>
-            <div class="bg-gray-50 px-6 py-4 border-t border-gray-200">
-                {{ $documents->links() }}
-            </div>
+        </div>
+
+        {{-- Pagination --}}
+        <div class="mt-4">
+            <x-pagination :paginator="$documents" :records-per-page="$perPage" wire:model.live="perPage" />
         </div>
     </div>
 
@@ -246,11 +262,11 @@
     @if($showUploadModal)
     <div class="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
         <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" wire:click="closeUploadModal"></div>
+            <div class="fixed inset-0 bg-gray-900/40 backdrop-blur-sm transition-opacity z-40" wire:click="closeUploadModal"></div>
 
             <span class="hidden sm:inline-block sm:align-middle sm:h-screen">&#8203;</span>
 
-            <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-2xl sm:w-full">
+            <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-2xl sm:w-full relative z-50">
 
                 {{-- Validated Header Logic --}}
                 <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4 border-b border-gray-100">

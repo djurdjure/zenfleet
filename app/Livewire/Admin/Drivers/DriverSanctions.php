@@ -8,6 +8,7 @@ use Livewire\Component;
 use Livewire\WithPagination;
 use Livewire\WithFileUploads;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Schema;
 use Carbon\Carbon;
 
 /**
@@ -66,6 +67,12 @@ class DriverSanctions extends Component
     public string $status = 'active'; // active, appealed, cancelled
     public ?string $notes = null;
 
+    // Schéma (compatibilité migrations)
+    protected bool $hasSeverityColumn = true;
+    protected bool $hasDurationColumn = true;
+    protected bool $hasStatusColumn = true;
+    protected bool $hasNotesColumn = true;
+
     // ===============================================
     // PROPRIÉTÉS MODALES CONFIRMATION
     // ===============================================
@@ -120,6 +127,10 @@ class DriverSanctions extends Component
     public function mount(): void
     {
         $this->sanction_date = now()->format('Y-m-d');
+        $this->hasSeverityColumn = Schema::hasColumn('driver_sanctions', 'severity');
+        $this->hasDurationColumn = Schema::hasColumn('driver_sanctions', 'duration_days');
+        $this->hasStatusColumn = Schema::hasColumn('driver_sanctions', 'status');
+        $this->hasNotesColumn = Schema::hasColumn('driver_sanctions', 'notes');
     }
 
     public function updated($propertyName): void
@@ -210,14 +221,26 @@ class DriverSanctions extends Component
                 'organization_id' => auth()->user()->organization_id,
                 'driver_id' => $this->driver_id,
                 'sanction_type' => $this->sanction_type,
-                'severity' => $this->severity ?? 'medium',
                 'reason' => $this->reason,
                 'sanction_date' => $this->sanction_date,
-                'duration_days' => $this->duration_days,
-                'status' => $this->status ?? 'active',
-                'notes' => $this->notes,
                 'supervisor_id' => auth()->id(),
             ];
+
+            if ($this->hasSeverityColumn) {
+                $data['severity'] = $this->severity ?? 'medium';
+            }
+
+            if ($this->hasDurationColumn) {
+                $data['duration_days'] = $this->duration_days;
+            }
+
+            if ($this->hasStatusColumn) {
+                $data['status'] = $this->status ?? 'active';
+            }
+
+            if ($this->hasNotesColumn) {
+                $data['notes'] = $this->notes;
+            }
 
             // Upload attachment
             if ($this->attachment) {
@@ -435,7 +458,7 @@ class DriverSanctions extends Component
             ->when($this->sanctionTypeFilter, function ($query) {
                 $query->where('sanction_type', $this->sanctionTypeFilter);
             })
-            ->when($this->severityFilter, function ($query) {
+            ->when($this->severityFilter && $this->hasSeverityColumn, function ($query) {
                 $query->where('severity', $this->severityFilter);
             })
             ->when($this->dateFrom, function ($query) {
@@ -471,23 +494,28 @@ class DriverSanctions extends Component
 
     protected function getStatistics(): array
     {
-        $query = DriverSanction::query();
+        $baseQuery = DriverSanction::query();
 
-        if (!$this->showArchived) {
-            $query->where('status', '!=', 'archived');
+        if ($this->showArchived) {
+            $baseQuery->onlyTrashed();
         }
 
-        $total = $query->count();
-        $active = $query->where('status', 'active')->count();
-        $byType = $query->select('sanction_type', \DB::raw('count(*) as count'))
+        $total = (clone $baseQuery)->count();
+        $active = $this->hasStatusColumn
+            ? (clone $baseQuery)->where('status', 'active')->count()
+            : $total;
+
+        $byType = (clone $baseQuery)->select('sanction_type', \DB::raw('count(*) as count'))
             ->groupBy('sanction_type')
             ->pluck('count', 'sanction_type')
             ->toArray();
 
-        $bySeverity = $query->select('severity', \DB::raw('count(*) as count'))
-            ->groupBy('severity')
-            ->pluck('count', 'severity')
-            ->toArray();
+        $bySeverity = $this->hasSeverityColumn
+            ? (clone $baseQuery)->select('severity', \DB::raw('count(*) as count'))
+                ->groupBy('severity')
+                ->pluck('count', 'severity')
+                ->toArray()
+            : [];
 
         return [
             'total' => $total,

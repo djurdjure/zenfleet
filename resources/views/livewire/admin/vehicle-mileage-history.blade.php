@@ -273,14 +273,19 @@
                         {{-- Recherche Compacte --}}
                         <div class="flex-1 max-w-md">
                             <div class="relative">
-                                <div class="absolute inset-y-0 left-0 pl-2.5 flex items-center pointer-events-none">
-                                    <x-iconify icon="lucide:search" class="w-4 h-4 text-gray-400" />
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <x-iconify icon="lucide:search" class="w-5 h-5 text-gray-400" />
                                 </div>
                                 <input
-                                    wire:model.live.debounce.300ms="search"
+                                    wire:model.live.debounce.500ms="search"
                                     type="text"
                                     placeholder="Rechercher (km, notes, auteur)..."
-                                    class="block w-full pl-8 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm shadow-sm bg-gray-50 hover:border-gray-400 transition-colors">
+                                    wire:loading.attr="aria-busy"
+                                    wire:target="search"
+                                    class="pl-10 pr-4 py-2.5 block w-full bg-white border border-gray-300 rounded-lg shadow-sm hover:border-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm">
+                                <div wire:loading.delay wire:target="search" class="absolute inset-y-0 right-0 pr-3 flex items-center">
+                                    <x-iconify icon="lucide:loader-2" class="w-4 h-4 text-blue-500 animate-spin" />
+                                </div>
                             </div>
                         </div>
 
@@ -291,9 +296,9 @@
                                 @click="showFilters = !showFilters"
                                 type="button"
                                 title="Filtres"
-                                class="inline-flex items-center justify-center w-9 h-9 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-all duration-200 shadow-sm relative"
-                                :class="showFilters ? 'ring-2 ring-blue-500 bg-blue-50' : ''">
-                                <x-iconify icon="lucide:filter" class="w-4 h-4 text-gray-600" />
+                                class="inline-flex items-center gap-2 p-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-all duration-200 shadow-sm hover:shadow-md relative">
+                                <x-iconify icon="lucide:filter" class="w-5 h-5 text-gray-500" />
+                                <x-iconify icon="heroicons:chevron-down" class="w-4 h-4 text-gray-400 transition-transform duration-200" x-bind:class="showFilters ? 'rotate-180' : ''" />
                                 @if($methodFilter || $dateFrom || $dateTo || $authorFilter)
                                 <span class="absolute -top-1 -right-1 flex h-4 w-4">
                                     <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
@@ -319,8 +324,9 @@
                                     @click.outside="showExportMenu = false"
                                     type="button"
                                     title="Export"
-                                    class="inline-flex items-center justify-center w-9 h-9 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors shadow-sm">
-                                    <x-iconify icon="lucide:download" class="w-4 h-4 text-gray-600" />
+                                    class="inline-flex items-center gap-2 p-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors shadow-sm hover:shadow-md">
+                                    <x-iconify icon="lucide:download" class="w-5 h-5 text-gray-500" />
+                                    <x-iconify icon="heroicons:chevron-down" class="w-4 h-4 text-gray-400" />
                                 </button>
 
                                 <div x-show="showExportMenu"
@@ -846,14 +852,11 @@
                     @endforelse
                 </div>
 
-                {{-- ===============================================
-                PAGINATION PROFESSIONNELLE
-            =============================================== --}}
-                @if ($readings->hasPages())
-                <div class="bg-gray-50 px-6 py-4 border-t border-gray-200">
-                    <x-pagination :paginator="$readings" :records-per-page="$perPage" wire:model.live="perPage" />
-                </div>
-                @endif
+            </div>
+
+            {{-- Pagination --}}
+            <div class="mt-4">
+                <x-pagination :paginator="$readings" :records-per-page="$perPage" wire:model.live="perPage" />
             </div>
 
         </div>
@@ -885,7 +888,7 @@
                 x-transition:leave="ease-in duration-200"
                 x-transition:leave-start="opacity-100"
                 x-transition:leave-end="opacity-0"
-                class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"
+                class="fixed inset-0 bg-gray-900/40 backdrop-blur-sm transition-opacity z-40"
                 aria-hidden="true"
                 wire:click="closeAddModal"></div>
 
@@ -899,7 +902,7 @@
                 x-transition:leave="ease-in duration-200"
                 x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
                 x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-                class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-2xl sm:w-full">
+                class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-2xl sm:w-full relative z-50">
 
                 {{-- Header avec fond dégradé --}}
                 <div class="bg-gradient-to-br from-blue-50 to-indigo-50 px-6 py-5 border-b border-blue-100">

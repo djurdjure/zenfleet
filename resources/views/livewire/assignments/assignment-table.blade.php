@@ -70,7 +70,22 @@
  {{-- Recherche globale --}}
  <div class="col-span-1 sm:col-span-2">
  <label for="search" class="block text-sm font-medium text-gray-700 mb-1">Recherche</label>
- <input wire:model.live.debounce.300ms="search" type="text" id="search" placeholder="Véhicule, chauffeur, motif..." class="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm">
+ <div class="relative">
+ <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+ <x-iconify icon="lucide:search" class="w-5 h-5 text-gray-400" />
+ </div>
+ <input
+ wire:model.live.debounce.500ms="search"
+ type="text"
+ id="search"
+ placeholder="Véhicule, chauffeur, motif..."
+ wire:loading.attr="aria-busy"
+ wire:target="search"
+ class="pl-10 pr-4 py-2.5 block w-full bg-white border border-gray-300 rounded-lg shadow-sm hover:border-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm">
+ <div wire:loading.delay wire:target="search" class="absolute inset-y-0 right-0 pr-3 flex items-center">
+ <x-iconify icon="lucide:loader-2" class="w-4 h-4 text-blue-500 animate-spin" />
+ </div>
+ </div>
  </div>
 
  {{-- Filtre statut --}}
@@ -127,17 +142,13 @@
  <span class="ml-2 text-sm text-gray-700">Seulement en cours</span>
  </label>
 
- <select wire:model.live="perPage" class="rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm">
- <option value="25">25 par page</option>
- <option value="50">50 par page</option>
- <option value="100">100 par page</option>
- </select>
- </div>
+</div>
 
- <button wire:click="resetFilters" class="text-sm text-gray-500 hover:text-gray-700">
- Réinitialiser filtres
+ <button wire:click="resetFilters" class="text-sm text-red-600 hover:text-red-800 flex items-center gap-1 font-medium bg-red-50 hover:bg-red-100 px-3 py-1.5 rounded-md transition-colors">
+ <x-iconify icon="lucide:x" class="w-4 h-4" />
+ Réinitialiser
  </button>
- </div>
+</div>
  </div>
 
  {{-- Tableau --}}
@@ -310,8 +321,8 @@
  </div>
 
  {{-- Pagination --}}
- <div class="px-6 py-4 border-t border-gray-200">
- {{ $assignments->links() }}
+ <div class="mt-4">
+ <x-pagination :paginator="$assignments" :records-per-page="$perPage" wire:model.live="perPage" />
  </div>
  @else
  {{-- État vide --}}
@@ -329,8 +340,9 @@
  </p>
  <div class="mt-6">
  @if($search || $statusFilter || $vehicleFilter || $driverFilter || $dateFromFilter || $dateToFilter || $onlyOngoing)
- <button wire:click="resetFilters" class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
- Réinitialiser les filtres
+ <button wire:click="resetFilters" class="text-sm text-red-600 hover:text-red-800 flex items-center gap-1 font-medium bg-red-50 hover:bg-red-100 px-3 py-1.5 rounded-md transition-colors">
+ <x-iconify icon="lucide:x" class="w-4 h-4" />
+ Réinitialiser
  </button>
  @else
  @can('create', App\Models\Assignment::class)
@@ -354,9 +366,9 @@
  @if($showFormModal)
  <div class="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
  <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
- <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" wire:click="closeFormModal"></div>
+ <div class="fixed inset-0 bg-gray-900/40 backdrop-blur-sm transition-opacity z-40" wire:click="closeFormModal"></div>
  <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
- <div class="inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-4xl sm:w-full sm:p-6">
+ <div class="inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-4xl sm:w-full sm:p-6 relative z-50">
  <livewire:assignments.assignment-form :assignment="$selectedAssignment" :key="'assignment-form-' . ($selectedAssignment?->id ?? 'new')" />
  </div>
  </div>
@@ -367,9 +379,9 @@
  @if($showEndModal && $selectedAssignment)
  <div class="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
  <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
- <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" wire:click="closeEndModal"></div>
+ <div class="fixed inset-0 bg-gray-900/40 backdrop-blur-sm transition-opacity z-40" wire:click="closeEndModal"></div>
  <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
- <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-2xl sm:w-full">
+ <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-2xl sm:w-full relative z-50">
  
  {{-- En-tête --}}
  <div class="bg-gradient-to-r from-green-500 to-emerald-600 px-6 py-4">
@@ -535,9 +547,9 @@
  @if($showDeleteModal && $selectedAssignment)
  <div class="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
  <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
- <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" wire:click="closeDeleteModal"></div>
+ <div class="fixed inset-0 bg-gray-900/40 backdrop-blur-sm transition-opacity z-40" wire:click="closeDeleteModal"></div>
  <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
- <div class="inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full sm:p-6">
+ <div class="inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full sm:p-6 relative z-50">
  <div class="sm:flex sm:items-start">
  <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
  <svg class="h-6 w-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">

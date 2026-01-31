@@ -632,9 +632,9 @@
                 x-transition:leave-start="opacity-100"
                 x-transition:leave-end="opacity-0"
                 class="relative z-50 lg:hidden">
-                <div class="fixed inset-0 bg-gray-500/75 backdrop-blur-sm" @click="open = false"></div>
+                <div class="fixed inset-0 bg-gray-900/40 backdrop-blur-sm z-40" @click="open = false"></div>
 
-                <div class="fixed inset-0 flex">
+                <div class="fixed inset-0 flex z-50">
                     <div x-show="open"
                         x-transition:enter="transition ease-in-out duration-300 transform"
                         x-transition:enter-start="-translate-x-full"

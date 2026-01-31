@@ -64,11 +64,11 @@ default => 'max-w-lg',
         x-transition:leave="ease-in duration-200"
         x-transition:leave-start="opacity-100"
         x-transition:leave-end="opacity-0"
-        class="fixed inset-0 bg-gray-500/75 backdrop-blur-sm transition-opacity"
+        class="fixed inset-0 bg-gray-900/40 backdrop-blur-sm transition-opacity z-40"
         aria-hidden="true"></div>
 
     {{-- Modal Container - Fixed positioning avec z-index supérieur --}}
-    <div class="fixed inset-0 z-10 overflow-y-auto">
+    <div class="fixed inset-0 z-50 overflow-y-auto">
         <div class="flex min-h-full items-center justify-center p-4 text-center sm:p-0">
             {{-- Modal Dialog --}}
             <div
@@ -80,7 +80,7 @@ default => 'max-w-lg',
                 x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
                 x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
                 @click.away="@if($closeable) show = false @endif"
-                class="relative transform overflow-hidden rounded-xl bg-white text-left shadow-2xl transition-all w-full {{ $maxWidthClasses }}">
+                class="relative transform overflow-hidden rounded-xl bg-white text-left shadow-2xl transition-all w-full {{ $maxWidthClasses }} z-50">
                 {{-- Header --}}
                 @if($title || $closeable)
                 <div class="flex items-center justify-between px-6 py-4 border-b border-gray-200 bg-gray-50">

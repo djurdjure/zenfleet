@@ -7,7 +7,7 @@
 <div class="space-y-6" wire:init="$refresh">
     {{-- Indicateur de chargement global --}}
     <div wire:loading.flex wire:target="applyFilters, resetAllFilters, exportFiltered"
-         class="fixed inset-0 bg-black bg-opacity-50 z-50 items-center justify-center">
+         class="fixed inset-0 bg-gray-900/40 backdrop-blur-sm z-50 items-center justify-center">
         <div class="bg-white rounded-lg p-6 flex items-center gap-3 shadow-xl">
             <svg class="animate-spin h-5 w-5 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
@@ -28,9 +28,9 @@
             </div>
             
             <input type="text"
-                   wire:model.live.debounce.300ms="search"
+                   wire:model.live.debounce.500ms="search"
                    placeholder="Recherche intelligente (véhicule, chauffeur, ID...)"
-                   class="pl-10 pr-24 py-2.5 block w-full border border-gray-300 rounded-lg 
+                   class="pl-10 pr-24 py-2.5 block w-full bg-white border border-gray-300 rounded-lg 
                           focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm shadow-sm
                           transition-all duration-200 hover:border-gray-400">
             
@@ -886,25 +886,10 @@
                 </table>
             </div>
 
-            {{-- Pagination améliorée --}}
-            @if($assignments->hasPages())
-                <div class="bg-gray-50 px-6 py-4 border-t border-gray-200">
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-center gap-2 text-sm text-gray-700">
-                            <span>Affichage</span>
-                            <select wire:model="perPage" class="px-3 py-1 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500">
-                                <option value="10">10</option>
-                                <option value="20">20</option>
-                                <option value="50">50</option>
-                                <option value="100">100</option>
-                            </select>
-                            <span>par page</span>
-                        </div>
-                        
-                        {{ $assignments->links('pagination::tailwind') }}
-                    </div>
-                </div>
-            @endif
+            {{-- Pagination --}}
+            <div class="mt-4">
+                <x-pagination :paginator="$assignments" :records-per-page="$perPage" wire:model.live="perPage" />
+            </div>
         </div>
     @else
         {{-- État vide amélioré --}}

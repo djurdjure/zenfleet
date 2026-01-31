@@ -30,6 +30,7 @@ class ManageDepots extends Component
     public $capacityFilter = 'all'; // all, available, full
     public $sortBy = 'name';
     public $sortDirection = 'asc';
+    public int $perPage = 12;
 
     // Modal state
     public $showModal = false;
@@ -59,6 +60,7 @@ class ManageDepots extends Component
         'capacityFilter' => ['except' => 'all'],
         'sortBy' => ['except' => 'name'],
         'sortDirection' => ['except' => 'asc'],
+        'perPage' => ['except' => 12],
     ];
 
     protected function rules()
@@ -85,6 +87,11 @@ class ManageDepots extends Component
     public function mount()
     {
         // Initialize component
+    }
+
+    public function updatedPerPage()
+    {
+        $this->resetPage();
     }
 
     public function render()
@@ -132,7 +139,7 @@ class ManageDepots extends Component
         // Sorting
         $query->orderBy($this->sortBy, $this->sortDirection);
 
-        return $query->paginate(12);
+        return $query->paginate($this->perPage);
     }
 
     protected function getOverallStats()
@@ -178,6 +185,18 @@ class ManageDepots extends Component
             $this->sortBy = $field;
             $this->sortDirection = 'asc';
         }
+    }
+
+    public function resetFilters(): void
+    {
+        $this->reset([
+            'search',
+            'statusFilter',
+            'capacityFilter',
+            'sortBy',
+            'sortDirection',
+        ]);
+        $this->resetPage();
     }
 
     public function openCreateModal()

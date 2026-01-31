@@ -1,227 +1,212 @@
 <div>
-    <div class="bg-gray-50 min-h-screen">
-        <div class="py-4 px-4 mx-auto max-w-7xl lg:py-6">
+    <div class="py-4 px-4 mx-auto max-w-7xl lg:py-6">
 
-            {{-- HEADER --}}
-            <div class="mb-4">
-                <h1 class="text-2xl font-bold text-gray-900 flex items-center gap-2.5">
-                    <x-iconify icon="lucide:car" class="w-6 h-6 text-blue-600" />
-                    Gestion des Véhicules
-                    <span class="ml-2 text-sm font-normal text-gray-500">
-                        ({{ $vehicles->total() }})
-                    </span>
-                </h1>
+        {{-- HEADER ULTRA-COMPACT --}}
+        <div class="mb-4 flex justify-between items-center">
+            <h1 class="text-2xl font-bold text-gray-900 flex items-center gap-2.5">
+                <x-iconify icon="lucide:car" class="w-6 h-6 text-blue-600" />
+                Gestion des Véhicules
+                <span class="ml-2 text-sm font-normal text-gray-500">
+                    ({{ $vehicles->total() }})
+                </span>
+            </h1>
+
+            {{-- Loading Indicator (no layout shift) --}}
+            <div
+                class="flex items-center gap-2 text-blue-600 opacity-0 transition-opacity duration-150"
+                wire:loading.delay.class="opacity-100"
+                wire:loading.delay.class.remove="opacity-0"
+                wire:target="search"
+                aria-live="polite">
+                <x-iconify icon="lucide:loader-2" class="w-5 h-5 animate-spin" />
+                <span class="text-sm font-medium">Chargement...</span>
             </div>
+        </div>
 
-            {{-- ANALYTICS CARDS --}}
-            <x-page-analytics-grid columns="6">
-                {{-- Total --}}
-                <div class="bg-white rounded-lg border border-gray-200 p-4 hover:shadow-lg transition-shadow duration-300">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-xs font-medium text-gray-600">Total véhicules</p>
-                            <p class="text-xl font-bold text-gray-900 mt-1">{{ $analytics['total_vehicles'] }}</p>
-                        </div>
-                        <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                            <x-iconify icon="lucide:car" class="w-5 h-5 text-blue-600" />
-                        </div>
+        {{-- ANALYTICS CARDS --}}
+        <x-page-analytics-grid columns="5">
+            {{-- Total --}}
+            <div class="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-lg transition-shadow duration-300">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-gray-600">Total véhicules</p>
+                        <p class="text-2xl font-bold text-gray-900 mt-1">{{ $analytics['total_vehicles'] }}</p>
+                    </div>
+                    <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                        <x-iconify icon="lucide:car" class="w-6 h-6 text-blue-600" />
                     </div>
                 </div>
+            </div>
 
                 {{-- Disponibles --}}
-                <div class="bg-white rounded-lg border border-gray-200 p-4 hover:shadow-lg transition-shadow duration-300">
+                <div class="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-lg transition-shadow duration-300">
                     <div class="flex items-center justify-between">
                         <div>
-                            <p class="text-xs font-medium text-gray-600">Disponibles</p>
-                            <p class="text-xl font-bold text-green-600 mt-1">{{ $analytics['available_vehicles'] }}</p>
+                            <p class="text-sm font-medium text-gray-600">Disponibles</p>
+                            <p class="text-2xl font-bold text-green-600 mt-1">{{ $analytics['available_vehicles'] }}</p>
                         </div>
-                        <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
-                            <x-iconify icon="lucide:check-circle-2" class="w-5 h-5 text-green-600" />
+                        <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                            <x-iconify icon="lucide:check-circle-2" class="w-6 h-6 text-green-600" />
                         </div>
                     </div>
                 </div>
 
                 {{-- Affectés --}}
-                <div class="bg-white rounded-lg border border-gray-200 p-4 hover:shadow-lg transition-shadow duration-300">
+                <div class="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-lg transition-shadow duration-300">
                     <div class="flex items-center justify-between">
                         <div>
-                            <p class="text-xs font-medium text-gray-600">Affectés</p>
-                            <p class="text-xl font-bold text-orange-600 mt-1">{{ $analytics['assigned_vehicles'] }}</p>
+                            <p class="text-sm font-medium text-gray-600">Affectés</p>
+                            <p class="text-2xl font-bold text-orange-600 mt-1">{{ $analytics['assigned_vehicles'] }}</p>
                         </div>
-                        <div class="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center">
-                            <x-iconify icon="lucide:user-check" class="w-5 h-5 text-orange-600" />
+                        <div class="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
+                            <x-iconify icon="lucide:user-check" class="w-6 h-6 text-orange-600" />
                         </div>
                     </div>
                 </div>
 
                 {{-- Maintenance --}}
-                <div class="bg-white rounded-lg border border-gray-200 p-4 hover:shadow-lg transition-shadow duration-300">
+                <div class="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-lg transition-shadow duration-300">
                     <div class="flex items-center justify-between">
                         <div>
-                            <p class="text-xs font-medium text-gray-600">En maintenance</p>
-                            <p class="text-xl font-bold text-amber-600 mt-1">{{ $analytics['maintenance_vehicles'] }}</p>
+                            <p class="text-sm font-medium text-gray-600">En maintenance</p>
+                            <p class="text-2xl font-bold text-amber-600 mt-1">{{ $analytics['maintenance_vehicles'] }}</p>
                         </div>
-                        <div class="w-10 h-10 bg-amber-100 rounded-lg flex items-center justify-center">
-                            <x-iconify icon="lucide:wrench" class="w-5 h-5 text-amber-600" />
+                        <div class="w-12 h-12 bg-amber-100 rounded-lg flex items-center justify-center">
+                            <x-iconify icon="lucide:wrench" class="w-6 h-6 text-amber-600" />
                         </div>
                     </div>
                 </div>
 
                 {{-- En Panne --}}
-                <div class="bg-white rounded-lg border border-gray-200 p-4 hover:shadow-lg transition-shadow duration-300">
+                <div class="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-lg transition-shadow duration-300">
                     <div class="flex items-center justify-between">
                         <div>
-                            <p class="text-xs font-medium text-gray-600">En panne</p>
-                            <p class="text-xl font-bold text-rose-600 mt-1">{{ $analytics['broken_vehicles'] }}</p>
+                            <p class="text-sm font-medium text-gray-600">En panne</p>
+                            <p class="text-2xl font-bold text-rose-600 mt-1">{{ $analytics['broken_vehicles'] }}</p>
                         </div>
-                        <div class="w-10 h-10 bg-rose-100 rounded-lg flex items-center justify-center">
-                            <x-iconify icon="lucide:alert-triangle" class="w-5 h-5 text-rose-600" />
+                        <div class="w-12 h-12 bg-rose-100 rounded-lg flex items-center justify-center">
+                            <x-iconify icon="lucide:alert-triangle" class="w-6 h-6 text-rose-600" />
                         </div>
                     </div>
                 </div>
             </x-page-analytics-grid>
-
-            {{-- FILTERS & ACTIONS --}}
-            {{-- FILTERS & ACTIONS --}}
-            <div class="mb-6" x-data="{ showFilters: false }">
-                <div class="flex flex-col lg:flex-row items-start lg:items-center gap-3">
-                    {{-- Search --}}
-                    <div class="flex-1 w-full lg:w-auto">
-                        <div class="relative">
-                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                <x-iconify icon="lucide:search" class="w-5 h-5 text-gray-400" />
-                            </div>
-                            <input
-                                wire:model.live.debounce.300ms="search"
-                                type="text"
-                                placeholder="Rechercher par immatriculation, marque, modèle..."
-                                class="pl-10 pr-4 py-2.5 block w-full border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm shadow-sm">
-                        </div>
+        {{-- FILTERS & ACTIONS (Unified) --}}
+        <x-page-search-bar x-data="{ showFilters: false }">
+            <x-slot:search>
+                <div class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <x-iconify icon="lucide:search" class="w-5 h-5 text-gray-400" />
                     </div>
+                    <input
+                        wire:model.live.debounce.500ms="search"
+                        type="text"
+                        placeholder="Rechercher par immatriculation, marque, modèle..."
+                        wire:loading.attr="aria-busy"
+                        wire:target="search"
+                        class="pl-10 pr-4 py-2.5 block w-full bg-white border border-gray-300 rounded-lg shadow-sm hover:border-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm">
+                    <div wire:loading.delay wire:target="search" class="absolute inset-y-0 right-0 pr-3 flex items-center">
+                        <x-iconify icon="lucide:loader-2" class="w-4 h-4 text-blue-500 animate-spin" />
+                    </div>
+                </div>
+            </x-slot:search>
 
-                    {{-- Toggle Filters --}}
+            <x-slot:filters>
+                <button
+                    @click="showFilters = !showFilters"
+                    type="button"
+                    title="Filtres"
+                    class="inline-flex items-center gap-2 p-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-all duration-200 shadow-sm hover:shadow-md">
+                    <x-iconify icon="lucide:filter" class="w-5 h-5 text-gray-500" />
+                    <x-iconify icon="heroicons:chevron-down" class="w-4 h-4 text-gray-400 transition-transform duration-200" x-bind:class="showFilters ? 'rotate-180' : ''" />
+                </button>
+            </x-slot:filters>
+
+            <x-slot:actions>
+                @if($visibility === 'archived')
+                <button wire:click="$set('visibility', 'active')"
+                    title="Voir Actifs"
+                    class="inline-flex items-center gap-2 p-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-all duration-200 shadow-sm hover:shadow-md">
+                    <x-iconify icon="lucide:list" class="w-5 h-5" />
+                </button>
+                @else
+                <button wire:click="$set('visibility', 'archived')"
+                    title="Voir Archives"
+                    class="inline-flex items-center gap-2 p-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-all duration-200 shadow-sm hover:shadow-md">
+                    <x-iconify icon="lucide:archive" class="w-5 h-5 text-amber-600" />
+                </button>
+                @endif
+
+                {{-- Export Dropdown --}}
+                <div class="relative" x-data="{ exportOpen: false }">
                     <button
-                        @click="showFilters = !showFilters"
+                        @click="exportOpen = !exportOpen"
+                        @click.away="exportOpen = false"
                         type="button"
-                        title="Filtres"
-                        class="inline-flex items-center gap-2 p-2.5 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-all duration-200 shadow-sm">
-                        <x-iconify icon="lucide:filter" class="w-5 h-5 text-gray-500" />
-                        <x-iconify icon="heroicons:chevron-down" class="w-4 h-4 text-gray-400" x-bind:class="showFilters ? 'rotate-180' : ''" />
+                        title="Exporter"
+                        class="inline-flex items-center gap-2 p-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-all duration-200 shadow-sm hover:shadow-md">
+                        <x-iconify icon="lucide:download" class="w-5 h-5 text-gray-500" />
+                        <x-iconify icon="heroicons:chevron-down" class="w-4 h-4 text-gray-400" />
                     </button>
-
-                    {{-- Actions --}}
-                    <div class="flex items-center gap-2">
-
-                        @if($visibility === 'archived')
-                        <button wire:click="$set('visibility', 'active')"
-                            class="inline-flex items-center gap-2 p-2.5 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-all shadow-sm"
-                            title="Voir Actifs">
-                            <x-iconify icon="lucide:list" class="w-5 h-5" />
-                        </button>
-                        @else
-                        <button wire:click="$set('visibility', 'archived')"
-                            class="inline-flex items-center gap-2 p-2.5 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-all shadow-sm"
-                            title="Voir Archives">
-                            <x-iconify icon="lucide:archive" class="w-5 h-5 text-amber-600" />
-                        </button>
-                        @endif
-
-                        {{-- Export Dropdown --}}
-                        <div class="relative" x-data="{ open: false }">
-                            <button
-                                @click="open = !open"
-                                @click.away="open = false"
-                                type="button"
-                                title="Exporter"
-                                class="inline-flex items-center gap-2 p-2.5 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-all shadow-sm">
-                                <x-iconify icon="lucide:download" class="w-5 h-5 text-gray-500" />
-                                <x-iconify icon="lucide:chevron-down" class="w-4 h-4 text-gray-400" x-bind:class="open ? 'rotate-180' : ''" />
+                    {{-- Dropdown --}}
+                    <div
+                        x-show="exportOpen"
+                        x-transition
+                        class="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-lg bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
+                        style="display: none;">
+                        <div class="py-1">
+                            <button wire:click="exportPdf"
+                                @click="exportOpen = false"
+                                wire:loading.attr="disabled"
+                                wire:target="exportPdf"
+                                class="group flex w-full items-center gap-2 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-wait">
+                                <x-iconify icon="lucide:loader-2" class="w-4 h-4 text-gray-400 animate-spin" wire:loading wire:target="exportPdf" />
+                                <x-iconify icon="lucide:file-text" class="w-4 h-4 text-red-500" wire:loading.remove wire:target="exportPdf" />
+                                <span>Export PDF</span>
+                                <span class="ml-auto text-xs text-gray-400" wire:loading wire:target="exportPdf">Génération...</span>
                             </button>
-
-                            <div
-                                x-show="open"
-                                x-transition:enter="transition ease-out duration-100"
-                                x-transition:enter-start="transform opacity-0 scale-95"
-                                x-transition:enter-end="transform opacity-100 scale-100"
-                                x-transition:leave="transition ease-in duration-75"
-                                x-transition:leave-start="transform opacity-100 scale-100"
-                                x-transition:leave-end="transform opacity-0 scale-95"
-                                class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-xl border border-gray-100 z-50 py-1"
-                                style="display: none;">
-
-                                <button wire:click="exportPdf"
-                                    @click="open = false"
-                                    wire:loading.attr="disabled"
-                                    wire:target="exportPdf"
-                                    class="w-full text-left px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2 transition-colors disabled:opacity-50 disabled:cursor-wait">
-                                    <x-iconify icon="lucide:loader-2"
-                                        class="w-4 h-4 text-gray-400 animate-spin"
-                                        wire:loading
-                                        wire:target="exportPdf" />
-                                    <x-iconify icon="lucide:file-text"
-                                        class="w-4 h-4 text-red-500"
-                                        wire:loading.remove
-                                        wire:target="exportPdf" />
-                                    <span>Export PDF</span>
-                                    <span class="ml-auto text-xs text-gray-400" wire:loading wire:target="exportPdf">Génération...</span>
-                                </button>
-
-                                <button wire:click="exportExcel"
-                                    @click="open = false"
-                                    wire:loading.attr="disabled"
-                                    wire:target="exportExcel"
-                                    class="w-full text-left px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2 transition-colors disabled:opacity-50 disabled:cursor-wait">
-                                    <x-iconify icon="lucide:loader-2"
-                                        class="w-4 h-4 text-gray-400 animate-spin"
-                                        wire:loading
-                                        wire:target="exportExcel" />
-                                    <x-iconify icon="lucide:file-spreadsheet"
-                                        class="w-4 h-4 text-green-600"
-                                        wire:loading.remove
-                                        wire:target="exportExcel" />
-                                    <span>Export Excel</span>
-                                    <span class="ml-auto text-xs text-gray-400" wire:loading wire:target="exportExcel">Génération...</span>
-                                </button>
-
-                                <button wire:click="exportCsv"
-                                    @click="open = false"
-                                    wire:loading.attr="disabled"
-                                    wire:target="exportCsv"
-                                    class="w-full text-left px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2 transition-colors disabled:opacity-50 disabled:cursor-wait">
-                                    <x-iconify icon="lucide:loader-2"
-                                        class="w-4 h-4 text-gray-400 animate-spin"
-                                        wire:loading
-                                        wire:target="exportCsv" />
-                                    <x-iconify icon="lucide:file-code"
-                                        class="w-4 h-4 text-blue-500"
-                                        wire:loading.remove
-                                        wire:target="exportCsv" />
-                                    <span>Export CSV</span>
-                                    <span class="ml-auto text-xs text-gray-400" wire:loading wire:target="exportCsv">Génération...</span>
-                                </button>
-                            </div>
+                            <button wire:click="exportExcel"
+                                @click="exportOpen = false"
+                                wire:loading.attr="disabled"
+                                wire:target="exportExcel"
+                                class="group flex w-full items-center gap-2 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-wait">
+                                <x-iconify icon="lucide:loader-2" class="w-4 h-4 text-gray-400 animate-spin" wire:loading wire:target="exportExcel" />
+                                <x-iconify icon="lucide:file-spreadsheet" class="w-4 h-4 text-green-600" wire:loading.remove wire:target="exportExcel" />
+                                <span>Export Excel</span>
+                                <span class="ml-auto text-xs text-gray-400" wire:loading wire:target="exportExcel">Génération...</span>
+                            </button>
+                            <button wire:click="exportCsv"
+                                @click="exportOpen = false"
+                                wire:loading.attr="disabled"
+                                wire:target="exportCsv"
+                                class="group flex w-full items-center gap-2 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-wait">
+                                <x-iconify icon="lucide:loader-2" class="w-4 h-4 text-gray-400 animate-spin" wire:loading wire:target="exportCsv" />
+                                <x-iconify icon="lucide:file-code" class="w-4 h-4 text-blue-500" wire:loading.remove wire:target="exportCsv" />
+                                <span>Export CSV</span>
+                                <span class="ml-auto text-xs text-gray-400" wire:loading wire:target="exportCsv">Génération...</span>
+                            </button>
                         </div>
-
-                        @can('create vehicles')
-                        {{-- Import --}}
-                        <a href="{{ route('admin.vehicles.import.show') }}"
-                            title="Importer"
-                            class="inline-flex items-center gap-2 p-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-all duration-200 shadow-sm hover:shadow-md">
-                            <x-iconify icon="lucide:upload" class="w-5 h-5" />
-                        </a>
-
-                        {{-- Nouveau Véhicule --}}
-                        <a href="{{ route('admin.vehicles.create') }}"
-                            title="Nouveau Véhicule"
-                            class="inline-flex items-center gap-2 p-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all duration-200 shadow-sm hover:shadow-md">
-                            <x-iconify icon="lucide:plus" class="w-5 h-5" />
-                        </a>
-                        @endcan
                     </div>
                 </div>
 
-                {{-- Filters Panel --}}
-                <x-page-filters-panel x-show="showFilters" columns="4">
+                @can('create vehicles')
+                {{-- Import --}}
+                <a href="{{ route('admin.vehicles.import.show') }}"
+                    title="Importer"
+                    class="inline-flex items-center gap-2 p-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-all duration-200 shadow-sm hover:shadow-md">
+                    <x-iconify icon="lucide:upload" class="w-5 h-5" />
+                </a>
+
+                {{-- Nouveau Véhicule --}}
+                <a href="{{ route('admin.vehicles.create') }}"
+                    title="Nouveau Véhicule"
+                    class="inline-flex items-center gap-2 p-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all duration-200 shadow-sm hover:shadow-md">
+                    <x-iconify icon="lucide:plus" class="w-5 h-5" />
+                </a>
+                @endcan
+            </x-slot:actions>
+
+            <x-slot:filtersPanel>
+                <x-page-filters-panel columns="4">
                     {{-- Depot --}}
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Dépôt</label>
@@ -301,15 +286,20 @@
                     </div>
 
                     <x-slot:reset>
-                        <button wire:click="resetFilters" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors text-sm font-medium">
+                        @if($search || $status_id || $depot_id || $fuel_type_id || $brand || $acquisition_date_from || $acquisition_date_to || $mileage_min || $mileage_max)
+                        <button wire:click="resetFilters" class="text-sm text-red-600 hover:text-red-800 flex items-center gap-1 font-medium bg-red-50 hover:bg-red-100 px-3 py-1.5 rounded-md transition-colors">
+                            <x-iconify icon="lucide:x" class="w-4 h-4" />
                             Réinitialiser
                         </button>
+                        @endif
                     </x-slot:reset>
                 </x-page-filters-panel>
+            </x-slot:filtersPanel>
+        </x-page-search-bar>
 
-                {{-- TABLE --}}
-                <x-card padding="p-0" margin="mb-6">
-                    <div class="overflow-x-auto">
+        {{-- TABLE --}}
+        <div class="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden relative">
+            <div class="overflow-x-auto">
                         <table class="min-w-full divide-y divide-gray-200">
                             <thead class="bg-gray-50">
                                 <tr>
@@ -520,12 +510,13 @@
                                 @endforelse
                             </tbody>
                         </table>
-                    </div>
-                    <div class="px-4 py-3 border-t border-gray-200">
-                        <x-pagination :paginator="$vehicles" :records-per-page="$perPage" wire:model.live="perPage" class="pagination-wrapper" />
-                    </div>
-                </x-card>
             </div>
+        </div>
+
+        {{-- Pagination --}}
+        <div class="mt-4">
+            <x-pagination :paginator="$vehicles" :records-per-page="$perPage" wire:model.live="perPage" />
+        </div>
 
             {{-- ================================================================
     🎯 BULK ACTIONS FLOATING MENU - Enterprise Grade
@@ -626,9 +617,9 @@
             @if($showBulkDepotModal)
             <div class="fixed inset-0 z-50 overflow-y-auto" wire:key="bulk-depot-modal">
                 <div class="flex items-center justify-center min-h-screen px-4">
-                    <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" wire:click="$set('showBulkDepotModal', false)"></div>
+                    <div class="fixed inset-0 bg-gray-900/40 backdrop-blur-sm transition-opacity z-40" wire:click="$set('showBulkDepotModal', false)"></div>
 
-                    <div class="relative bg-white rounded-lg shadow-xl max-w-md w-full p-6">
+                    <div class="relative bg-white rounded-lg shadow-xl max-w-md w-full p-6 z-50">
                         <div class="flex items-center justify-between mb-4">
                             <h3 class="text-lg font-semibold text-gray-900 flex items-center gap-2">
                                 <x-iconify icon="lucide:building-2" class="w-5 h-5 text-purple-600" />
@@ -671,9 +662,9 @@
             @if($showBulkStatusModal)
             <div class="fixed inset-0 z-50 overflow-y-auto" wire:key="bulk-status-modal">
                 <div class="flex items-center justify-center min-h-screen px-4">
-                    <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" wire:click="$set('showBulkStatusModal', false)"></div>
+                    <div class="fixed inset-0 bg-gray-900/40 backdrop-blur-sm transition-opacity z-40" wire:click="$set('showBulkStatusModal', false)"></div>
 
-                    <div class="relative bg-white rounded-lg shadow-xl max-w-md w-full p-6">
+                    <div class="relative bg-white rounded-lg shadow-xl max-w-md w-full p-6 z-50">
                         <div class="flex items-center justify-between mb-4">
                             <h3 class="text-lg font-semibold text-gray-900 flex items-center gap-2">
                                 <x-iconify icon="lucide:refresh-cw" class="w-5 h-5 text-amber-600" />
@@ -716,9 +707,9 @@
             @if($showBulkArchiveModal)
             <div class="fixed inset-0 z-50 overflow-y-auto" wire:key="bulk-archive-modal">
                 <div class="flex items-center justify-center min-h-screen px-4">
-                    <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" wire:click="$set('showBulkArchiveModal', false)"></div>
+                    <div class="fixed inset-0 bg-gray-900/40 backdrop-blur-sm transition-opacity z-40" wire:click="$set('showBulkArchiveModal', false)"></div>
 
-                    <div class="relative bg-white rounded-lg shadow-xl max-w-md w-full p-6">
+                    <div class="relative bg-white rounded-lg shadow-xl max-w-md w-full p-6 z-50">
                         <div class="flex items-center justify-between mb-4">
                             <h3 class="text-lg font-semibold text-gray-900 flex items-center gap-2">
                                 <x-iconify icon="lucide:archive" class="w-5 h-5 text-gray-600" />
@@ -766,9 +757,9 @@
             @if($showRestoreModal)
             <div class="fixed inset-0 z-50 overflow-y-auto" wire:key="restore-modal">
                 <div class="flex items-center justify-center min-h-screen px-4">
-                    <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" wire:click="cancelRestore"></div>
+                    <div class="fixed inset-0 bg-gray-900/40 backdrop-blur-sm transition-opacity z-40" wire:click="cancelRestore"></div>
 
-                    <div class="relative bg-white rounded-lg shadow-xl max-w-md w-full p-6">
+                    <div class="relative bg-white rounded-lg shadow-xl max-w-md w-full p-6 z-50">
                         <div class="flex items-center justify-between mb-4">
                             <h3 class="text-lg font-semibold text-gray-900 flex items-center gap-2">
                                 <x-iconify icon="lucide:rotate-ccw" class="w-5 h-5 text-green-600" />
@@ -816,9 +807,9 @@
             @if($showForceDeleteModal)
             <div class="fixed inset-0 z-50 overflow-y-auto" wire:key="force-delete-modal">
                 <div class="flex items-center justify-center min-h-screen px-4">
-                    <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" wire:click="cancelForceDelete"></div>
+                    <div class="fixed inset-0 bg-gray-900/40 backdrop-blur-sm transition-opacity z-40" wire:click="cancelForceDelete"></div>
 
-                    <div class="relative bg-white rounded-lg shadow-xl max-w-md w-full p-6">
+                    <div class="relative bg-white rounded-lg shadow-xl max-w-md w-full p-6 z-50">
                         <div class="flex items-center justify-between mb-4">
                             <h3 class="text-lg font-semibold text-gray-900 flex items-center gap-2">
                                 <x-iconify icon="lucide:trash-2" class="w-5 h-5 text-red-600" />
@@ -874,9 +865,9 @@
             @if($showArchiveModal)
             <div class="fixed inset-0 z-50 overflow-y-auto" wire:key="archive-modal">
                 <div class="flex items-center justify-center min-h-screen px-4">
-                    <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" wire:click="cancelArchive"></div>
+                    <div class="fixed inset-0 bg-gray-900/40 backdrop-blur-sm transition-opacity z-40" wire:click="cancelArchive"></div>
 
-                    <div class="relative bg-white rounded-lg shadow-xl max-w-md w-full p-6">
+                    <div class="relative bg-white rounded-lg shadow-xl max-w-md w-full p-6 z-50">
                         <div class="flex items-center justify-between mb-4">
                             <h3 class="text-lg font-semibold text-gray-900 flex items-center gap-2">
                                 <x-iconify icon="lucide:archive" class="w-5 h-5 text-orange-600" />
@@ -924,9 +915,9 @@
             @if($showIndividualStatusModal)
             <div class="fixed inset-0 z-50 overflow-y-auto" wire:key="individual-status-modal">
                 <div class="flex items-center justify-center min-h-screen px-4">
-                    <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" wire:click="cancelIndividualStatusChange"></div>
+                    <div class="fixed inset-0 bg-gray-900/40 backdrop-blur-sm transition-opacity z-40" wire:click="cancelIndividualStatusChange"></div>
 
-                    <div class="relative bg-white rounded-lg shadow-xl max-w-md w-full p-6">
+                    <div class="relative bg-white rounded-lg shadow-xl max-w-md w-full p-6 z-50">
                         <div class="flex items-center justify-between mb-4">
                             <h3 class="text-lg font-semibold text-gray-900 flex items-center gap-2">
                                 <x-iconify icon="lucide:refresh-cw" class="w-5 h-5 text-amber-600" />
@@ -972,3 +963,5 @@
             </div>
             @endif
         </div>
+    </div>
+</div>

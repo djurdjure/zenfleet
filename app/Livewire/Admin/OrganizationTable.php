@@ -5,6 +5,8 @@
 namespace App\Livewire\Admin;
 
 use App\Models\Organization;
+use App\Models\User;
+use App\Models\Vehicle;
 use Livewire\Attributes\On;
 use Livewire\Attributes\Url;
 use Livewire\Component;
@@ -35,6 +37,9 @@ class OrganizationTable extends Component
     public array $selectedOrganizations = [];
 
     public bool $selectAll = false;
+    public int $perPage = 20;
+    public bool $showDeleteModal = false;
+    public ?int $deleteOrganizationId = null;
 
     protected $queryString = [
         'search' => ['except' => ''],
@@ -43,6 +48,7 @@ class OrganizationTable extends Component
         'type' => ['except' => ''],
         'sortField' => ['except' => 'created_at'],
         'sortDirection' => ['except' => 'desc'],
+        'perPage' => ['except' => 20],
     ];
 
     public function mount($initialFilters = [])
@@ -58,6 +64,21 @@ class OrganizationTable extends Component
     }
 
     public function updatedStatus()
+    {
+        $this->resetPage();
+    }
+
+    public function updatedWilaya()
+    {
+        $this->resetPage();
+    }
+
+    public function updatedType()
+    {
+        $this->resetPage();
+    }
+
+    public function updatedPerPage()
     {
         $this->resetPage();
     }
@@ -112,6 +133,45 @@ class OrganizationTable extends Component
         }
     }
 
+    public function confirmDelete(int $organizationId): void
+    {
+        $this->deleteOrganizationId = $organizationId;
+        $this->showDeleteModal = true;
+    }
+
+    public function cancelDelete(): void
+    {
+        $this->showDeleteModal = false;
+        $this->deleteOrganizationId = null;
+    }
+
+    public function deleteOrganization(): void
+    {
+        if (!$this->deleteOrganizationId) {
+            return;
+        }
+
+        $organization = Organization::find($this->deleteOrganizationId);
+        if ($organization) {
+            $organization->delete();
+        }
+
+        $this->cancelDelete();
+        $this->dispatch('status-updated', [
+            'message' => 'Organisation supprimée avec succès',
+            'type' => 'success',
+        ]);
+    }
+
+    public function getDeletingOrganizationProperty(): ?Organization
+    {
+        if (!$this->deleteOrganizationId) {
+            return null;
+        }
+
+        return Organization::find($this->deleteOrganizationId);
+    }
+
     #[On('refreshTable')]
     public function refreshTable()
     {
@@ -155,13 +215,21 @@ class OrganizationTable extends Component
             $query->orderBy($this->sortField, $this->sortDirection);
         }
 
-        return $query->paginate(20);
+        return $query->paginate($this->perPage);
     }
 
     public function render()
     {
+        $analytics = [
+            'total' => Organization::count(),
+            'active' => Organization::where('status', 'active')->count(),
+            'users' => User::count(),
+            'vehicles' => Vehicle::count(),
+        ];
+
         return view('livewire.admin.organization-table', [
             'organizations' => $this->organizations,
+            'analytics' => $analytics,
             'filterOptions' => [
                 'statuses' => [
                     'active' => 'Actif',
@@ -180,6 +248,6 @@ class OrganizationTable extends Component
                     'public' => 'Secteur Public',
                 ],
             ],
-        ]);
+        ])->extends('layouts.admin.catalyst')->section('content');
     }
 }

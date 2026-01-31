@@ -78,7 +78,7 @@
 
                 {{-- Grille GANTT --}}
                 <div class="overflow-x-auto border border-gray-200 rounded-lg bg-white">
-                    <div class="grid" style="grid-template-columns: minmax(250px, 1.5fr) repeat({{ $totalUnits }}, minmax(60px, 1fr));">
+                    <div class="grid" x-ref="ganttGrid" data-total-units="{{ $totalUnits }}" :style="ganttGridStyle">
 
                         {{-- En-tête de Colonne Asset --}}
                         <div class="sticky left-0 z-20 bg-gray-100 border-b border-r border-gray-200 p-2 flex items-center justify-between">
@@ -116,7 +116,7 @@
                             </div>
                         </div>
 
-                        <div x-ref="gridRow_{{ $vehicle->id }}" data-vehicle-id="{{ $vehicle->id }}" class="col-span-{{ $totalUnits }} grid relative" style="grid-template-columns: repeat({{ $totalUnits }}, minmax(60px, 1fr));">
+                        <div x-ref="gridRow_{{ $vehicle->id }}" data-vehicle-id="{{ $vehicle->id }}" class="col-span-{{ $totalUnits }} grid relative" :style="rowGridStyle">
                             {{-- Ligne de fond de la grille --}}
                             @foreach ($period as $index => $date)
                             <div class="border-r border-b border-gray-200 {{ $date->isSameDay($today) ? 'bg-primary-50/50' : '' }}" data-date-index="{{ $index }}"></div>
@@ -193,14 +193,14 @@
 </div>
 
 {{-- Placeholders for Modals and Side Panels --}}
-<div x-show="showFilterPanel" @click.away="showFilterPanel = false" class="fixed inset-0 z-40 bg-gray-500/75 backdrop-blur-sm" x-transition>
+<div x-show="showFilterPanel" @click.away="showFilterPanel = false" class="fixed inset-0 z-50 bg-gray-900/40 backdrop-blur-sm" x-transition>
     <div class="absolute top-0 right-0 h-full bg-white w-96 p-6 shadow-lg">
         <h3 class="text-lg font-semibold mb-4">Filtres Avancés</h3>
         <p class="text-gray-600">Les options de filtre seront ici.</p>
     </div>
 </div>
 
-<div x-show="showAssignmentModal" class="fixed inset-0 z-40 flex items-center justify-center bg-gray-500/75 backdrop-blur-sm" x-transition>
+<div x-show="showAssignmentModal" class="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/40 backdrop-blur-sm" x-transition>
     <div @click.away="showAssignmentModal = false" class="bg-white rounded-lg shadow-xl p-6 w-full max-w-2xl">
         <h3 class="text-xl font-semibold text-gray-800 mb-4" x-text="modalTitle"></h3>
         <p class="text-gray-600">Le formulaire de création/édition d'affectation sera ici.</p>
@@ -211,19 +211,56 @@
 </div>
 </div>
 
+<div id="planning-data"
+    data-view-mode="{{ $viewMode }}"
+    data-base-date="{{ $baseDate->toDateString() }}"
+    data-filters='@json($filters)'
+    data-range-start="{{ $dateRange['start']->toIso8601String() }}"
+    data-range-end="{{ $dateRange['end']->toIso8601String() }}"
+    class="hidden"></div>
+
 @push('scripts')
 <script>
+    const planningData = document.getElementById('planning-data');
+    const parsePlanningJson = (value, fallback) => {
+        if (!value) return fallback;
+        try {
+            return JSON.parse(value);
+        } catch (error) {
+            console.warn('Planning filters parse failed', error);
+            return fallback;
+        }
+    };
+
+    const initialViewMode = planningData?.dataset.viewMode || 'month';
+    const initialBaseDate = planningData?.dataset.baseDate || '';
+    const initialFilters = parsePlanningJson(planningData?.dataset.filters, {});
+    const initialRangeStart = planningData?.dataset.rangeStart || '';
+    const initialRangeEnd = planningData?.dataset.rangeEnd || '';
+
     function planningGantt() {
         return {
-            viewMode: @json($viewMode),
+            viewMode: initialViewMode,
             activeView: 'gantt', // or 'table'
-            baseDate: @json($baseDate - > toDateString()),
-            filters: @json($filters),
+            baseDate: initialBaseDate,
+            filters: initialFilters,
+            rangeStart: initialRangeStart,
+            rangeEnd: initialRangeEnd,
+            totalUnits: 0,
+            ganttGridStyle: '',
+            rowGridStyle: '',
             showFilterPanel: false,
             showAssignmentModal: false,
             modalTitle: '',
 
             init() {
+                const gridEl = this.$refs.ganttGrid;
+                this.totalUnits = gridEl ? Number(gridEl.dataset.totalUnits || 0) : 0;
+                if (this.totalUnits) {
+                    this.ganttGridStyle = `grid-template-columns: minmax(250px, 1.5fr) repeat(${this.totalUnits}, minmax(60px, 1fr));`;
+                    this.rowGridStyle = `grid-template-columns: repeat(${this.totalUnits}, minmax(60px, 1fr));`;
+                }
+
                 console.log('Planning component initialized.');
                 this.initSortable();
             },
@@ -245,13 +282,10 @@
                                 const totalWidth = toRow.offsetWidth;
                                 const leftPosition = item.offsetLeft;
 
-                                const totalMinutesInView = (new Date('{{ $dateRange['
-                                    end ']->toDateTimeString() }}') - new Date('{{ $dateRange['
-                                    start ']->toDateTimeString() }}')) / 60000;
+                                const totalMinutesInView = (new Date(this.rangeEnd) - new Date(this.rangeStart)) / 60000;
                                 const minutesOffset = (leftPosition / totalWidth) * totalMinutesInView;
 
-                                let newStartDate = new Date('{{ $dateRange['
-                                    start ']->toDateTimeString() }}');
+                                let newStartDate = new Date(this.rangeStart);
                                 newStartDate.setMinutes(newStartDate.getMinutes() + minutesOffset);
 
                                 let durationMinutes = parseInt(item.dataset.durationMinutes, 10);

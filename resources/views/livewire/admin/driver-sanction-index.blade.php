@@ -57,59 +57,59 @@
         =============================================== --}}
         <x-page-analytics-grid class="mb-6" columns="4">
             {{-- Total Sanctions --}}
-            <div class="bg-white rounded-lg border border-gray-200 p-4 hover:shadow-lg transition-shadow duration-300">
+            <div class="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-lg transition-shadow duration-300">
                 <div class="flex items-center justify-between">
                     <div>
-                        <p class="text-xs font-medium text-gray-600">Total Sanctions</p>
+                        <p class="text-sm font-medium text-gray-600">Total Sanctions</p>
                         <p class="text-2xl font-bold text-gray-900 mt-1">{{ $this->sanctions->total() }}</p>
                     </div>
-                    <div class="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center">
-                        <x-iconify icon="heroicons:scale" class="w-5 h-5 text-gray-600" />
+                    <div class="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center">
+                        <x-iconify icon="heroicons:scale" class="w-6 h-6 text-gray-600" />
                     </div>
                 </div>
             </div>
 
             {{-- Actives --}}
-            <div class="bg-white rounded-lg border border-gray-200 p-4 hover:shadow-lg transition-shadow duration-300">
+            <div class="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-lg transition-shadow duration-300">
                 <div class="flex items-center justify-between">
                     <div>
-                        <p class="text-xs font-medium text-gray-600">Sanctions Actives</p>
+                        <p class="text-sm font-medium text-gray-600">Sanctions Actives</p>
                         <p class="text-2xl font-bold text-red-600 mt-1">
                             {{ \App\Models\DriverSanction::whereNull('archived_at')->count() }}
                         </p>
                     </div>
-                    <div class="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center">
-                        <x-iconify icon="heroicons:exclamation-circle" class="w-5 h-5 text-red-600" />
+                    <div class="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center">
+                        <x-iconify icon="heroicons:exclamation-circle" class="w-6 h-6 text-red-600" />
                     </div>
                 </div>
             </div>
 
             {{-- Archivées --}}
-            <div class="bg-white rounded-lg border border-gray-200 p-4 hover:shadow-lg transition-shadow duration-300">
+            <div class="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-lg transition-shadow duration-300">
                 <div class="flex items-center justify-between">
                     <div>
-                        <p class="text-xs font-medium text-gray-600">Archivées</p>
+                        <p class="text-sm font-medium text-gray-600">Archivées</p>
                         <p class="text-2xl font-bold text-gray-500 mt-1">
                             {{ \App\Models\DriverSanction::whereNotNull('archived_at')->count() }}
                         </p>
                     </div>
-                    <div class="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center">
-                        <x-iconify icon="heroicons:archive-box" class="w-5 h-5 text-gray-500" />
+                    <div class="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center">
+                        <x-iconify icon="heroicons:archive-box" class="w-6 h-6 text-gray-500" />
                     </div>
                 </div>
             </div>
 
             {{-- Cette semaine --}}
-            <div class="bg-white rounded-lg border border-gray-200 p-4 hover:shadow-lg transition-shadow duration-300">
+            <div class="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-lg transition-shadow duration-300">
                 <div class="flex items-center justify-between">
                     <div>
-                        <p class="text-xs font-medium text-gray-600">Cette semaine</p>
+                        <p class="text-sm font-medium text-gray-600">Cette semaine</p>
                         <p class="text-2xl font-bold text-blue-600 mt-1">
                             {{ \App\Models\DriverSanction::whereBetween('sanction_date', [now()->startOfWeek(), now()->endOfWeek()])->count() }}
                         </p>
                     </div>
-                    <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                        <x-iconify icon="heroicons:calendar" class="w-5 h-5 text-blue-600" />
+                    <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                        <x-iconify icon="heroicons:calendar" class="w-6 h-6 text-blue-600" />
                     </div>
                 </div>
             </div>
@@ -122,13 +122,18 @@
             <x-slot:search>
                 <div class="relative">
                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <x-iconify icon="lucide:search" class="w-4 h-4 text-gray-400" />
+                        <x-iconify icon="lucide:search" class="w-5 h-5 text-gray-400" />
                     </div>
                     <input
-                        wire:model.live.debounce.300ms="search"
+                        wire:model.live.debounce.500ms="search"
                         type="text"
                         placeholder="Rechercher..."
-                        class="pl-10 pr-4 py-2 block w-full border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm shadow-sm">
+                        wire:loading.attr="aria-busy"
+                        wire:target="search"
+                        class="pl-10 pr-4 py-2.5 block w-full bg-white border border-gray-300 rounded-lg shadow-sm hover:border-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm">
+                    <div wire:loading.delay wire:target="search" class="absolute inset-y-0 right-0 pr-3 flex items-center">
+                        <x-iconify icon="lucide:loader-2" class="w-4 h-4 text-blue-500 animate-spin" />
+                    </div>
                 </div>
             </x-slot:search>
 
@@ -137,9 +142,9 @@
                     wire:click="toggleFilters"
                     type="button"
                     title="Filtres"
-                    class="inline-flex items-center justify-center w-9 h-9 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-all duration-200 shadow-sm relative"
-                    :class="showFilters ? 'ring-2 ring-blue-500 bg-blue-50' : ''">
-                    <x-iconify icon="lucide:filter" class="w-4 h-4 text-gray-600" />
+                    class="inline-flex items-center gap-2 p-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-all duration-200 shadow-sm hover:shadow-md relative">
+                    <x-iconify icon="lucide:filter" class="w-5 h-5 text-gray-500" />
+                    <x-iconify icon="heroicons:chevron-down" class="w-4 h-4 text-gray-400 transition-transform duration-200" x-bind:class="showFilters ? 'rotate-180' : ''" />
                     @if($filterSanctionType || $filterDriverId || $filterDateFrom || $filterDateTo || $filterArchived !== 'active')
                     <span class="absolute -top-1 -right-1 flex h-4 w-4">
                         <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
@@ -156,7 +161,7 @@
                 <button
                     type="button"
                     wire:click="openCreateModal"
-                    class="inline-flex items-center justify-center w-9 h-9 bg-red-600 hover:bg-red-700 text-white rounded-lg shadow-sm hover:shadow transition-all"
+                    class="inline-flex items-center gap-2 p-2 bg-red-600 hover:bg-red-700 text-white rounded-lg shadow-sm hover:shadow transition-all"
                     title="Nouvelle Sanction">
                     <x-iconify icon="heroicons:plus" class="h-5 w-5" />
                 </button>
@@ -408,13 +413,11 @@
                     </tbody>
                 </table>
             </div>
+        </div>
 
-            {{-- Pagination --}}
-            @if($sanctions->hasPages())
-            <div class="px-6 py-4 border-t border-gray-200">
-                <x-pagination :paginator="$sanctions" :records-per-page="$perPage" wire:model.live="perPage" />
-            </div>
-            @endif
+        {{-- Pagination --}}
+        <div class="mt-4">
+            <x-pagination :paginator="$sanctions" :records-per-page="$perPage" wire:model.live="perPage" />
         </div>
     </div>
 
@@ -423,13 +426,13 @@
     <div class="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
         <div class="flex items-start justify-center min-h-screen pt-10 px-4 pb-20 text-center sm:block sm:p-0">
             {{-- Overlay --}}
-            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" wire:click="closeModal"></div>
+            <div class="fixed inset-0 bg-gray-900/40 backdrop-blur-sm transition-opacity z-40" wire:click="closeModal"></div>
 
             {{-- Centrage du modal --}}
             <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
 
             {{-- Contenu du modal --}}
-            <div class="inline-block align-top bg-white rounded-lg text-left shadow-xl transform transition-all sm:my-8 sm:max-w-2xl sm:w-full max-h-[90vh] overflow-y-auto">
+            <div class="inline-block align-top bg-white rounded-lg text-left shadow-xl transform transition-all sm:my-8 sm:max-w-2xl sm:w-full max-h-[90vh] overflow-y-auto relative z-50">
                 <form wire:submit.prevent="save">
                     {{-- Header --}}
                     <div class="bg-gradient-to-r from-red-600 to-red-700 px-6 py-4 sticky top-0 z-10">
@@ -635,13 +638,13 @@
     <div class="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
         <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
             {{-- Overlay --}}
-            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" wire:click="cancelDelete"></div>
+            <div class="fixed inset-0 bg-gray-900/40 backdrop-blur-sm transition-opacity z-40" wire:click="cancelDelete"></div>
 
             {{-- Centrage du modal --}}
             <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
 
             {{-- Contenu du modal --}}
-            <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+            <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full relative z-50">
                 <div class="bg-white px-6 pt-5 pb-4">
                     <div class="sm:flex sm:items-start">
                         <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">

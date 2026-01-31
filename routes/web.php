@@ -124,8 +124,8 @@ Route::middleware(['auth', 'verified'])
 
             // 🏢 ✅ ORGANISATIONS - INTERFACE ULTRA-PROFESSIONNELLE INTÉGRÉE
             Route::prefix('organizations')->name('organizations.')->group(function () {
-                // Route principale avec données
-                Route::get('/', [OrganizationController::class, 'index'])->name('index');
+                // Route principale (Livewire standard)
+                Route::get('/', \App\Livewire\Admin\OrganizationTable::class)->name('index');
 
                 // Routes CRUD traditionnelles pour compatibilité
                 Route::get('/create', [OrganizationController::class, 'create'])->name('create');
@@ -419,7 +419,8 @@ Route::middleware(['auth', 'verified'])
 
             // 🏪 Fournisseurs et Catégories - ENTERPRISE GRADE V2.0
             Route::get('suppliers/export', [SupplierController::class, 'export'])->name('suppliers.export');
-            Route::resource('suppliers', SupplierController::class);
+            Route::get('suppliers', \App\Livewire\Admin\Suppliers\SupplierIndex::class)->name('suppliers.index');
+            Route::resource('suppliers', SupplierController::class)->except('index');
             Route::resource('supplier-categories', SupplierCategoryController::class);
 
             /*
@@ -490,7 +491,7 @@ Route::middleware(['auth', 'verified'])
             // 💰 MODULE DÉPENSES - Traçabilité Maximale
             Route::prefix('vehicle-expenses')->name('vehicle-expenses.')->group(function () {
                 // Dashboard principal avec analytics
-                Route::get('/', [\App\Http\Controllers\Admin\VehicleExpenseController::class, 'index'])->name('index');
+                Route::get('/', \App\Livewire\Admin\VehicleExpenses\ExpenseManager::class)->name('index');
                 Route::get('/dashboard', [\App\Http\Controllers\Admin\VehicleExpenseController::class, 'dashboard'])->name('dashboard');
 
                 // CRUD operations
@@ -637,7 +638,7 @@ Route::middleware(['auth', 'verified'])
 
             // 🔧 Gestion des Opérations de Maintenance
             Route::prefix('operations')->name('operations.')->group(function () {
-                Route::get('/', [\App\Http\Controllers\Admin\MaintenanceOperationController::class, 'index'])->name('index');
+                Route::get('/', \App\Livewire\Admin\Maintenance\MaintenanceTable::class)->name('index');
                 Route::get('/create', [\App\Http\Controllers\Admin\MaintenanceOperationController::class, 'create'])->name('create');
                 Route::post('/', [\App\Http\Controllers\Admin\MaintenanceOperationController::class, 'store'])->name('store');
                 Route::get('/{operation}', [\App\Http\Controllers\Admin\MaintenanceOperationController::class, 'show'])->name('show');

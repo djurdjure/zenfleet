@@ -1,5 +1,13 @@
 @props(['paginator', 'recordsPerPage' => 25])
 
+@php
+    $perPageOptions = [10, 25, 50, 100];
+    if (!in_array($recordsPerPage, $perPageOptions, true)) {
+        $perPageOptions[] = (int) $recordsPerPage;
+        sort($perPageOptions);
+    }
+@endphp
+
 <div class="pagination-footer mt-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3" style="margin-top: 1rem; display: flex; flex-direction: row; align-items: center; justify-content: space-between; gap: 0.75rem;">
     <!-- Left: Nombre d'éléments par page -->
     <div class="flex items-center text-sm text-gray-700">
@@ -7,10 +15,9 @@
         <select
             class="block rounded-md border-0 py-1.5 pl-3 pr-8 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-blue-600 sm:text-sm"
             wire:model.live="perPage">
-            <option value="10">10</option>
-            <option value="25">25</option>
-            <option value="50">50</option>
-            <option value="100">100</option>
+            @foreach($perPageOptions as $option)
+            <option value="{{ $option }}">{{ $option }}</option>
+            @endforeach
         </select>
         <span class="ml-2">par page</span>
     </div>

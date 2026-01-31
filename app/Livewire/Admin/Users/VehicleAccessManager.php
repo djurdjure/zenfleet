@@ -15,6 +15,7 @@ class VehicleAccessManager extends Component
     public User $user;
     public $search = '';
     public $filter = 'all'; // all, assigned, unassigned
+    public int $perPage = 12;
 
     protected $listeners = ['refresh' => '$refresh'];
 
@@ -30,6 +31,11 @@ class VehicleAccessManager extends Component
     }
 
     public function updatedSearch()
+    {
+        $this->resetPage();
+    }
+
+    public function updatedPerPage()
     {
         $this->resetPage();
     }
@@ -157,7 +163,7 @@ class VehicleAccessManager extends Component
             });
         }
 
-        $vehicles = $query->paginate(12);
+        $vehicles = $query->paginate($this->perPage);
 
         return view('livewire.admin.users.vehicle-access-manager', [
             'vehicles' => $vehicles

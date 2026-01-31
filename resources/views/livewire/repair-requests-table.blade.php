@@ -7,13 +7,23 @@
  <label for="search" class="block text-sm font-medium text-gray-700 mb-2">
  Recherche
  </label>
+ <div class="relative">
+ <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+ <x-iconify icon="lucide:search" class="w-5 h-5 text-gray-400" />
+ </div>
  <input
  type="text"
  id="search"
- wire:model.live.debounce.300ms="search"
+ wire:model.live.debounce.500ms="search"
  placeholder="Rechercher par titre, description, véhicule, chauffeur..."
- class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 "
+ wire:loading.attr="aria-busy"
+ wire:target="search"
+ class="pl-10 pr-4 py-2.5 block w-full bg-white border border-gray-300 rounded-lg shadow-sm hover:border-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
  >
+ <div wire:loading.delay wire:target="search" class="absolute inset-y-0 right-0 pr-3 flex items-center">
+ <x-iconify icon="lucide:loader-2" class="w-4 h-4 text-blue-500 animate-spin" />
+ </div>
+ </div>
  </div>
 
  {{-- Filtre statut --}}
@@ -54,14 +64,9 @@
  {{-- Bouton reset filtres --}}
  @if($search || $statusFilter || $urgencyFilter)
  <div class="mt-4">
- <button
- wire:click="resetFilters"
- class="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 :bg-gray-600"
- >
- <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
- <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
- </svg>
- Réinitialiser les filtres
+ <button wire:click="resetFilters" class="text-sm text-red-600 hover:text-red-800 flex items-center gap-1 font-medium bg-red-50 hover:bg-red-100 px-3 py-1.5 rounded-md transition-colors">
+ <x-iconify icon="lucide:x" class="w-4 h-4" />
+ Réinitialiser
  </button>
  </div>
  @endif
@@ -287,9 +292,9 @@
  </table>
  </div>
 
- {{-- 📄 PAGINATION --}}
- <div class="px-6 py-4 bg-gray-50 border-t border-gray-200 ">
- {{ $repairRequests->links() }}
+ {{-- Pagination --}}
+ <div class="mt-4">
+ <x-pagination :paginator="$repairRequests" :records-per-page="$perPage" wire:model.live="perPage" />
  </div>
- </div>
+</div>
 </div>

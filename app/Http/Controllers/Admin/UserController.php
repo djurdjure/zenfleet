@@ -17,7 +17,7 @@ use Spatie\Permission\Models\Role;
 
 class UserController extends Controller
 {
-    public function index(): View
+    public function index(Request $request): View
     {
         $this->authorize('view users');
 
@@ -28,7 +28,8 @@ class UserController extends Controller
             $query->where('organization_id', auth()->user()->organization_id);
         }
 
-        $users = $query->orderBy('id', 'desc')->paginate(15);
+        $perPage = (int) $request->input('per_page', 15);
+        $users = $query->orderBy('id', 'desc')->paginate($perPage)->withQueryString();
 
         return view('admin.users.index', compact('users'));
     }

@@ -469,9 +469,16 @@
     </div>
 </section>
 
+<div id="zenfleet-driver-errors-data" data-errors='@json($errors->messages())' class="hidden"></div>
+
 @push('scripts')
 <script>
-    window.zenfleetDriverErrors = @json($errors -> messages());
+    (() => {
+        const errorsData = document.getElementById('zenfleet-driver-errors-data');
+        window.zenfleetDriverErrors = errorsData
+            ? JSON.parse(errorsData.dataset.errors || '{}')
+            : {};
+    })();
 </script>
 @endpush
 @endsection

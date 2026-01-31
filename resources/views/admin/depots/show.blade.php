@@ -398,7 +398,7 @@
 </div>
 
 {{-- Modal confirmation suppression --}}
-<div id="deleteModal" style="display: none;" class="fixed inset-0 bg-gray-500/75 backdrop-blur-sm z-50 print:hidden">
+<div id="deleteModal" style="display: none;" class="fixed inset-0 bg-gray-900/40 backdrop-blur-sm z-50 print:hidden">
     <div class="flex min-h-full items-center justify-center p-4">
         <div class="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
             <div class="flex items-center mb-4">

@@ -354,6 +354,7 @@
                                 step="0.1" />
                         </div>
 
+                        <div x-data="{ showBlacklistReason: {{ old('blacklisted', $supplier->blacklisted) ? 'true' : 'false' }} }">
                         {{-- Checkboxes --}}
                         <div class="flex flex-wrap items-center gap-6 mb-6">
                             <div class="flex items-center">
@@ -399,8 +400,7 @@
                                     {{ old('blacklisted', $supplier->blacklisted) ? 'checked' : '' }}
                                     id="blacklisted"
                                     class="w-4 h-4 text-red-600 bg-gray-100 border-gray-300 rounded focus:ring-red-500"
-                                    x-data
-                                    @change="document.getElementById('blacklist_reason_section').style.display = $event.target.checked ? 'block' : 'none'">
+                                    @change="showBlacklistReason = $event.target.checked">
                                 <label for="blacklisted" class="ml-2 text-sm font-medium text-gray-900">
                                     Liste noire
                                 </label>
@@ -408,7 +408,7 @@
                         </div>
 
                         {{-- Raison blacklist --}}
-                        <div id="blacklist_reason_section" class="mb-6" style="display: {{ old('blacklisted', $supplier->blacklisted) ? 'block' : 'none' }}">
+                        <div id="blacklist_reason_section" class="mb-6" x-show="showBlacklistReason" x-cloak>
                             <label for="blacklist_reason" class="block mb-2 text-sm font-medium text-gray-900">
                                 Raison Liste Noire
                             </label>
@@ -417,6 +417,7 @@
                                 name="blacklist_reason"
                                 rows="2"
                                 class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">{{ old('blacklist_reason', $supplier->blacklist_reason) }}</textarea>
+                        </div>
                         </div>
 
                         {{-- Notes --}}
@@ -459,6 +460,8 @@
     </div>
 </section>
 
+<div id="supplier-errors-data" data-error-keys='@json($errors->keys())' class="hidden"></div>
+
 {{-- ================================================================
     ALPINE.JS VALIDATION SYSTEM - ENTERPRISE GRADE
     ================================================================
@@ -469,6 +472,19 @@
     - Validation côté client synchronisée avec serveur
 ================================================================ --}}
 <script>
+    const getSupplierErrorKeys = () => {
+        const dataEl = document.getElementById('supplier-errors-data');
+        if (!dataEl || !dataEl.dataset.errorKeys) {
+            return [];
+        }
+        try {
+            return JSON.parse(dataEl.dataset.errorKeys);
+        } catch (error) {
+            console.warn('Supplier error keys parse failed', error);
+            return [];
+        }
+    };
+
     function supplierFormValidation() {
         return {
             fieldErrors: {},
@@ -476,12 +492,13 @@
 
             init() {
                 // Initialiser avec les erreurs serveur si présentes
-                @if($errors - > any())
-                @foreach($errors - > keys() as $field)
-                this.fieldErrors['{{ $field }}'] = true;
-                this.touchedFields['{{ $field }}'] = true;
-                @endforeach
-                @endif
+                const errorKeys = getSupplierErrorKeys();
+                if (errorKeys.length) {
+                    errorKeys.forEach(field => {
+                        this.fieldErrors[field] = true;
+                        this.touchedFields[field] = true;
+                    });
+                }
             },
 
             validateField(fieldName, value) {
@@ -579,7 +596,6 @@
     .animate-shake {
         animation: shake 0.5s ease-in-out;
     }
+</style>
 
-
-
-    @endsection
+@endsection

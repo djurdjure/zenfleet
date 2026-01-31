@@ -1,0 +1,22 @@
+Logging in as User ID: 1 (Org: 1)
+
+   TypeError 
+
+  Illuminate\Auth\SessionGuard::setRequest(): Argument #1 ($request) must be of type Symfony\Component\HttpFoundation\Request, null given, called in /var/www/html/vendor/laravel/framework/src/Illuminate/Auth/AuthManager.php on line 139
+
+  at vendor/laravel/framework/src/Illuminate/Auth/SessionGuard.php:996
+     992▕      *
+     993▕      * @param  \Symfony\Component\HttpFoundation\Request  $request
+     994▕      * @return $this
+     995▕      */
+  ➜  996▕     public function setRequest(Request $request)
+     997▕     {
+     998▕         $this->request = $request;
+     999▕ 
+    1000▕         return $this;
+
+      [2m+5 vendor frames [22m
+
+  6   verify_rls.php:24
+      Illuminate\Support\Facades\Facade::__callStatic("login")
+

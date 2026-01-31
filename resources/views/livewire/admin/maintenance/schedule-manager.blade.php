@@ -103,10 +103,12 @@
  {{-- Barre de recherche --}}
  <div class="flex-1 max-w-md">
  <div class="relative">
- <input wire:model.live.debounce.300ms="search"
+ <input wire:model.live.debounce.500ms="search"
  type="text"
  placeholder="Rechercher par véhicule ou type..."
- class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+ wire:loading.attr="aria-busy"
+ wire:target="search"
+ class="w-full pl-10 pr-4 py-2.5 bg-white border border-gray-300 rounded-lg shadow-sm hover:border-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm">
  <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
  <i class="fas fa-search text-gray-400"></i>
  </div>
@@ -325,12 +327,12 @@
  </table>
  </div>
 
- {{-- Pagination --}}
- @if($schedules->hasPages())
- <div class="px-6 py-4 border-t border-gray-200">
- {{ $schedules->links() }}
  </div>
- @endif
+
+ {{-- Pagination --}}
+ <div class="mt-4">
+ <x-pagination :paginator="$schedules" :records-per-page="$perPage" wire:model.live="perPage" />
+ </div>
  </div>
  @else
  {{-- Vue Calendrier --}}
@@ -374,7 +376,7 @@
 
  {{-- Modal de création/édition --}}
  @if($showModal)
- <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+ <div class="fixed inset-0 bg-gray-900/40 backdrop-blur-sm flex items-center justify-center p-4 z-50">
  <div class="bg-white rounded-2xl shadow-xl max-w-2xl w-full max-h-screen overflow-y-auto">
  <div class="px-6 py-4 border-b border-gray-200">
  <h3 class="text-lg font-semibold text-gray-900">

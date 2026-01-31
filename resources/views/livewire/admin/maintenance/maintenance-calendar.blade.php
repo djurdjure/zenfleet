@@ -124,7 +124,7 @@
                 x-transition:leave="ease-in duration-200"
                 x-transition:leave-start="opacity-100"
                 x-transition:leave-end="opacity-0"
-                class="fixed inset-0 transition-opacity bg-gray-500 bg-opacity-75">
+                class="fixed inset-0 transition-opacity bg-gray-900/40 backdrop-blur-sm z-40">
             </div>
 
             <span class="hidden sm:inline-block sm:align-middle sm:h-screen">&#8203;</span>
@@ -138,7 +138,7 @@
                 x-transition:leave="ease-in duration-200"
                 x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
                 x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-                class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+                class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full relative z-50">
                 
                 <div class="bg-white px-6 pt-5 pb-4">
                     <div class="flex items-start justify-between mb-4">

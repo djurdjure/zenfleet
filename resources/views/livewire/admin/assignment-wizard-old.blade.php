@@ -414,7 +414,7 @@
     </div>
 
     {{-- Loading overlay --}}
-    <div wire:loading.flex class="fixed inset-0 bg-black bg-opacity-50 items-center justify-center z-50">
+    <div wire:loading.flex class="fixed inset-0 bg-gray-900/40 backdrop-blur-sm items-center justify-center z-50">
         <div class="bg-white rounded-lg p-8 flex flex-col items-center">
             <i class="fas fa-spinner fa-spin text-4xl text-purple-600 mb-4"></i>
             <p class="text-gray-700 font-medium">Traitement en cours...</p>

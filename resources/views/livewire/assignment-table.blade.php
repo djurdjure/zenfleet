@@ -36,11 +36,22 @@
  {{-- Recherche globale --}}
  <div class="lg:col-span-2">
  <label for="search" class="block text-sm font-medium text-gray-700 mb-1">Recherche</label>
- <input wire:model.live.debounce.300ms="search"
+ <div class="relative">
+ <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+ <x-iconify icon="lucide:search" class="w-5 h-5 text-gray-400" />
+ </div>
+ <input
+ wire:model.live.debounce.500ms="search"
  type="text"
  id="search"
  placeholder="Véhicule, chauffeur, motif..."
- class="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm">
+ wire:loading.attr="aria-busy"
+ wire:target="search"
+ class="pl-10 pr-4 py-2.5 block w-full bg-white border border-gray-300 rounded-lg shadow-sm hover:border-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm">
+ <div wire:loading.delay wire:target="search" class="absolute inset-y-0 right-0 pr-3 flex items-center">
+ <x-iconify icon="lucide:loader-2" class="w-4 h-4 text-blue-500 animate-spin" />
+ </div>
+ </div>
  </div>
 
  {{-- Filtre véhicule --}}
@@ -110,17 +121,10 @@
  </div>
 
  <div class="flex items-end space-x-2">
- <button wire:click="resetFilters"
- class="inline-flex items-center px-3 py-2 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50">
+ <button wire:click="resetFilters" class="text-sm text-red-600 hover:text-red-800 flex items-center gap-1 font-medium bg-red-50 hover:bg-red-100 px-3 py-1.5 rounded-md transition-colors">
+ <x-iconify icon="lucide:x" class="w-4 h-4" />
  Réinitialiser
  </button>
-
- <select wire:model.live="perPage"
- class="block rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm">
- @foreach($perPageOptions as $option)
- <option value="{{ $option }}">{{ $option }}/page</option>
- @endforeach
- </select>
  </div>
  </div>
  </div>
@@ -344,8 +348,8 @@
  </div>
 
  {{-- Pagination --}}
- <div class="bg-white px-6 py-3 border-t border-gray-200">
- {{ $assignments->links() }}
+ <div class="mt-4">
+ <x-pagination :paginator="$assignments" :records-per-page="$perPage" wire:model.live="perPage" />
  </div>
  @else
  {{-- État vide --}}
@@ -357,8 +361,9 @@
  <p class="mt-2 text-sm text-gray-500">
  @if($search || $vehicleFilter || $driverFilter || $statusFilter || $dateFromFilter || $dateToFilter || $onlyOngoing)
  Aucune affectation ne correspond aux critères de filtre actuels.
- <button wire:click="resetFilters" class="text-blue-600 hover:text-blue-800 font-medium">
- Réinitialiser les filtres
+ <button wire:click="resetFilters" class="text-sm text-red-600 hover:text-red-800 flex items-center gap-1 font-medium bg-red-50 hover:bg-red-100 px-3 py-1.5 rounded-md transition-colors">
+ <x-iconify icon="lucide:x" class="w-4 h-4" />
+ Réinitialiser
  </button>
  @else
  Commencez par créer votre première affectation véhicule ↔ chauffeur.
@@ -383,9 +388,9 @@
  @if($showTerminateModal && $selectedAssignment)
  <div class="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
  <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
- <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" wire:click="closeModals"></div>
+ <div class="fixed inset-0 bg-gray-900/40 backdrop-blur-sm transition-opacity z-40" wire:click="closeModals"></div>
 
- <div class="inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full sm:p-6">
+ <div class="inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full sm:p-6 relative z-50">
  <div class="sm:flex sm:items-start">
  <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-yellow-100 sm:mx-0 sm:h-10 sm:w-10">
  <svg class="h-6 w-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -478,9 +483,9 @@
  @if($showDeleteModal && $selectedAssignment)
  <div class="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
  <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
- <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" wire:click="closeModals"></div>
+ <div class="fixed inset-0 bg-gray-900/40 backdrop-blur-sm transition-opacity z-40" wire:click="closeModals"></div>
 
- <div class="inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full sm:p-6">
+ <div class="inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full sm:p-6 relative z-50">
  <div class="sm:flex sm:items-start">
  <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
  <svg class="h-6 w-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">

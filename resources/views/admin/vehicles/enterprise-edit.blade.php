@@ -348,12 +348,20 @@
     </div>
 </section>
 
+<div id="zenfleet-errors-data"
+    data-has-errors="{{ $errors->any() ? '1' : '0' }}"
+    data-keys='@json($errors->keys())'
+    class="hidden"></div>
+
 @push('scripts')
 <script>
-    window.zenfleetErrors = {
-        hasErrors: @json($errors -> any()),
-        keys: @json($errors -> keys())
-    };
+    (() => {
+        const errorsData = document.getElementById('zenfleet-errors-data');
+        window.zenfleetErrors = {
+            hasErrors: errorsData ? errorsData.dataset.hasErrors === '1' : false,
+            keys: errorsData && errorsData.dataset.keys ? JSON.parse(errorsData.dataset.keys) : []
+        };
+    })();
 </script>
 @endpush
 

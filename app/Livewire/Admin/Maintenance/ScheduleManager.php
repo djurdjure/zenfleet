@@ -28,6 +28,7 @@ class ScheduleManager extends Component
     public string $typeFilter = 'all';
     public string $sortBy = 'urgency';
     public string $sortDirection = 'asc';
+    public int $perPage = 15;
 
     // Propriétés pour le modal de création/édition
     public bool $showModal = false;
@@ -60,6 +61,7 @@ class ScheduleManager extends Component
         'typeFilter' => ['except' => 'all'],
         'sortBy' => ['except' => 'urgency'],
         'viewMode' => ['except' => 'list'],
+        'perPage' => ['except' => 15],
     ];
 
     /**
@@ -68,6 +70,11 @@ class ScheduleManager extends Component
     public function mount(): void
     {
         $this->currentMonth = Carbon::now()->format('Y-m');
+    }
+
+    public function updatedPerPage(): void
+    {
+        $this->resetPage();
     }
 
     /**
@@ -102,7 +109,7 @@ class ScheduleManager extends Component
     #[Computed]
     public function schedules()
     {
-        return $this->getSchedulesQuery()->paginate(15);
+        return $this->getSchedulesQuery()->paginate($this->perPage);
     }
 
     /**

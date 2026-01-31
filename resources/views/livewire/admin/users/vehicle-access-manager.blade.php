@@ -27,7 +27,17 @@
                             <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                 <x-iconify icon="lucide:search" class="h-5 w-5 text-gray-400" />
                             </div>
-                            <input wire:model.live.debounce.300ms="search" id="search" class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" placeholder="Rechercher un véhicule..." type="search">
+                            <input
+                                wire:model.live.debounce.500ms="search"
+                                id="search"
+                                type="search"
+                                placeholder="Rechercher un véhicule..."
+                                wire:loading.attr="aria-busy"
+                                wire:target="search"
+                                class="pl-10 pr-4 py-2.5 block w-full bg-white border border-gray-300 rounded-lg shadow-sm hover:border-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm">
+                            <div wire:loading.delay wire:target="search" class="absolute inset-y-0 right-0 pr-3 flex items-center">
+                                <x-iconify icon="lucide:loader-2" class="w-4 h-4 text-blue-500 animate-spin" />
+                            </div>
                         </div>
                     </div>
                     
@@ -119,8 +129,8 @@
                 @endforelse
             </ul>
             
-            <div class="bg-white px-4 py-3 border-t border-gray-200 sm:px-6">
-                {{ $vehicles->links() }}
+            <div class="mt-4 px-4 sm:px-6">
+                <x-pagination :paginator="$vehicles" :records-per-page="$perPage" wire:model.live="perPage" />
             </div>
         </div>
     </div>

@@ -21,7 +21,7 @@
     </div>
 
     {{-- Loader --}}
-    <div wire:loading class="fixed inset-0 bg-gray-500/75 backdrop-blur-sm flex items-center justify-center z-50">
+    <div wire:loading class="fixed inset-0 bg-gray-900/40 backdrop-blur-sm flex items-center justify-center z-50">
         <div class="bg-white p-4 rounded-lg shadow-xl flex items-center space-x-3">
             <svg class="animate-spin h-6 w-6 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>

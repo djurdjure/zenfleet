@@ -21,6 +21,7 @@ class ExpenseManager extends Component
     // Filtres
     public $search = '';
     public $status = '';
+    public $filter = '';
     public $vehicle_id = '';
     public $supplier_id = '';
     public $expense_group_id = '';
@@ -31,6 +32,7 @@ class ExpenseManager extends Component
     public $dateTo = '';
     public $sortField = 'expense_date';
     public $sortDirection = 'desc';
+    public int $perPage = 20;
     
     // Actions en masse
     public $selectedExpenses = [];
@@ -52,10 +54,26 @@ class ExpenseManager extends Component
     protected $queryString = [
         'search' => ['except' => ''],
         'status' => ['except' => ''],
+        'filter' => ['except' => ''],
         'vehicle_id' => ['except' => ''],
         'supplier_id' => ['except' => ''],
         'category' => ['except' => ''],
         'approval_status' => ['except' => ''],
+        'perPage' => ['except' => 20],
+    ];
+
+    protected array $resetPageOnUpdate = [
+        'search',
+        'status',
+        'filter',
+        'vehicle_id',
+        'supplier_id',
+        'expense_group_id',
+        'category',
+        'payment_status',
+        'approval_status',
+        'dateFrom',
+        'dateTo',
     ];
 
     protected $listeners = [
@@ -67,7 +85,21 @@ class ExpenseManager extends Component
 
     public function mount()
     {
+        $this->authorize('view expenses');
         $this->loadStatistics();
+        $this->filter = request()->get('filter', $this->filter);
+    }
+
+    public function updating($property)
+    {
+        if (in_array($property, $this->resetPageOnUpdate, true)) {
+            $this->resetPage();
+        }
+    }
+
+    public function updatedPerPage()
+    {
+        $this->resetPage();
     }
 
     public function render()
@@ -75,7 +107,7 @@ class ExpenseManager extends Component
         $expenses = $this->getFilteredExpenses();
         
         $vehicles = Vehicle::where('organization_id', Auth::user()->organization_id)
-            ->orderBy('license_plate')
+            ->orderBy('registration_plate')
             ->get();
             
         $suppliers = Supplier::where('organization_id', Auth::user()->organization_id)
@@ -93,7 +125,7 @@ class ExpenseManager extends Component
             'suppliers' => $suppliers,
             'expenseGroups' => $expenseGroups,
             'categories' => VehicleExpense::EXPENSE_CATEGORIES,
-        ]);
+        ])->extends('layouts.admin.catalyst')->section('content');
     }
 
     private function getFilteredExpenses()
@@ -111,11 +143,13 @@ class ExpenseManager extends Component
         // Recherche
         if ($this->search) {
             $query->where(function ($q) {
-                $q->where('expense_number', 'like', '%' . $this->search . '%')
+                    $q->where('invoice_number', 'like', '%' . $this->search . '%')
+                    ->orWhere('receipt_number', 'like', '%' . $this->search . '%')
                     ->orWhere('description', 'like', '%' . $this->search . '%')
-                    ->orWhere('reference_number', 'like', '%' . $this->search . '%')
+                    ->orWhere('expense_type', 'like', '%' . $this->search . '%')
+                    ->orWhere('expense_subtype', 'like', '%' . $this->search . '%')
                     ->orWhereHas('vehicle', function ($q) {
-                        $q->where('license_plate', 'like', '%' . $this->search . '%');
+                        $q->where('registration_plate', 'like', '%' . $this->search . '%');
                     })
                     ->orWhereHas('supplier', function ($q) {
                         $q->where('name', 'like', '%' . $this->search . '%');
@@ -137,7 +171,7 @@ class ExpenseManager extends Component
         }
 
         if ($this->category) {
-            $query->where('category', $this->category);
+            $query->where('expense_category', $this->category);
         }
 
         if ($this->payment_status) {
@@ -146,6 +180,13 @@ class ExpenseManager extends Component
 
         if ($this->approval_status) {
             $query->where('approval_status', $this->approval_status);
+        }
+
+        if ($this->filter === 'pending_approval' && !$this->approval_status) {
+            $query->whereIn('approval_status', [
+                VehicleExpense::APPROVAL_PENDING_LEVEL1,
+                VehicleExpense::APPROVAL_PENDING_LEVEL2,
+            ]);
         }
 
         if ($this->dateFrom) {
@@ -159,14 +200,14 @@ class ExpenseManager extends Component
         // Tri
         $query->orderBy($this->sortField, $this->sortDirection);
 
-        return $query->paginate(20);
+        return $query->paginate($this->perPage);
     }
 
     public function loadStatistics()
     {
         $stats = VehicleExpense::where('organization_id', Auth::user()->organization_id)
             ->selectRaw('
-                SUM(total_amount) as total,
+                SUM(total_ttc) as total,
                 COUNT(CASE WHEN approval_status = ? THEN 1 END) as pending,
                 COUNT(CASE WHEN approval_status = ? THEN 1 END) as approved
             ', ['pending_level1', 'approved'])
@@ -182,7 +223,7 @@ class ExpenseManager extends Component
         $sixMonthsAgo = now()->subMonths(6);
         $avgStats = VehicleExpense::where('organization_id', Auth::user()->organization_id)
             ->where('expense_date', '>=', $sixMonthsAgo)
-            ->avg('total_amount');
+            ->avg('total_ttc');
         
         $this->monthlyAverage = $avgStats ?? 0;
     }
@@ -200,9 +241,17 @@ class ExpenseManager extends Component
     public function resetFilters()
     {
         $this->reset([
-            'search', 'status', 'vehicle_id', 'supplier_id', 
-            'expense_group_id', 'category', 'payment_status', 
-            'approval_status', 'dateFrom', 'dateTo'
+            'search',
+            'status',
+            'filter',
+            'vehicle_id',
+            'supplier_id',
+            'expense_group_id',
+            'category',
+            'payment_status',
+            'approval_status',
+            'dateFrom',
+            'dateTo'
         ]);
     }
 

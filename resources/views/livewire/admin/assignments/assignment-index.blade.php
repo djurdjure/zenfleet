@@ -85,10 +85,12 @@
                     </div>
                     <input
                         type="text"
-                        wire:model.live.debounce.300ms="search"
+                        wire:model.live.debounce.500ms="search"
                         placeholder="Rechercher..."
-                        class="pl-10 pr-4 py-2.5 block w-full border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm shadow-sm">
-                    <div wire:loading wire:target="search" class="absolute inset-y-0 right-0 pr-3 flex items-center">
+                        wire:loading.attr="aria-busy"
+                        wire:target="search"
+                        class="pl-10 pr-4 py-2.5 block w-full bg-white border border-gray-300 rounded-lg shadow-sm hover:border-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm">
+                    <div wire:loading.delay wire:target="search" class="absolute inset-y-0 right-0 pr-3 flex items-center">
                         <x-iconify icon="lucide:loader-2" class="w-4 h-4 text-blue-500 animate-spin" />
                     </div>
                 </div>
@@ -447,7 +449,7 @@
                 x-transition:leave="ease-in duration-200"
                 x-transition:leave-start="opacity-100"
                 x-transition:leave-end="opacity-0"
-                class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity backdrop-blur-sm"></div>
+                class="fixed inset-0 bg-gray-900/40 backdrop-blur-sm transition-opacity z-40"></div>
 
             <span class="hidden sm:inline-block sm:align-middle sm:h-screen">&#8203;</span>
 
@@ -459,7 +461,7 @@
                 x-transition:leave="ease-in duration-200"
                 x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
                 x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-                class="inline-block align-bottom bg-white rounded-2xl px-4 pt-5 pb-4 text-left overflow-visible shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full sm:p-6 relative">
+                class="inline-block align-bottom bg-white rounded-2xl px-4 pt-5 pb-4 text-left overflow-visible shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full sm:p-6 relative z-50">
 
                 {{-- Close Button (Top Right) --}}
                 <button type="button" @click="show = false"
@@ -606,7 +608,7 @@
                 x-transition:leave="ease-in duration-200"
                 x-transition:leave-start="opacity-100"
                 x-transition:leave-end="opacity-0"
-                class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity backdrop-blur-sm"></div>
+                class="fixed inset-0 bg-gray-900/40 backdrop-blur-sm transition-opacity z-40"></div>
 
             <span class="hidden sm:inline-block sm:align-middle sm:h-screen">&#8203;</span>
 
@@ -617,7 +619,7 @@
                 x-transition:leave="ease-in duration-200"
                 x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
                 x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-                class="inline-block align-bottom bg-white rounded-2xl px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full sm:p-6">
+                class="inline-block align-bottom bg-white rounded-2xl px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full sm:p-6 relative z-50">
 
                 <div class="sm:flex sm:items-start">
                     <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
