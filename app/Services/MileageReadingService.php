@@ -431,7 +431,7 @@ class MileageReadingService
             ->whereDoesntHave('mileageReadings', function ($query) {
                 $query->where('recorded_at', '>=', now()->subDays(30));
             })
-            ->where('status_id', 1) // Actifs uniquement
+            ->active()
             ->limit(50)
             ->get();
 

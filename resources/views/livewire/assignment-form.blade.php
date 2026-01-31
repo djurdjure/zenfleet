@@ -144,14 +144,14 @@ Design surpassant Fleetio, Samsara et Verizon Connect:
             {{-- ===============================================
             SECTION 1: RESSOURCES À AFFECTER (ENTERPRISE V3 - FOND BLEU)
             =============================================== --}}
-            <x-card class="bg-gradient-to-br from-blue-50 to-cyan-50 border-2 border-blue-200">
+            <x-card class="bg-gradient-to-br from-gray-50 to-slate-50 border border-gray-200">
                 <div class="space-y-6">
-                    <div class="pb-4 border-b border-blue-200">
-                        <h2 class="text-lg font-semibold text-blue-900 mb-1 flex items-center gap-2">
-                            <x-iconify icon="heroicons:users" class="w-5 h-5 text-blue-600" />
+                    <div class="pb-4 border-b border-gray-200">
+                        <h2 class="text-lg font-semibold text-gray-900 mb-1 flex items-center gap-2">
+                            <x-iconify icon="heroicons:users" class="w-5 h-5 text-gray-600" />
                             Ressources à Affecter
                         </h2>
-                        <p class="text-sm text-blue-700">Sélectionnez le véhicule et le chauffeur pour cette affectation.</p>
+                        <p class="text-sm text-gray-600">Sélectionnez le véhicule et le chauffeur pour cette affectation.</p>
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">

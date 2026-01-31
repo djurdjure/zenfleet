@@ -192,6 +192,10 @@ class AssignmentForm extends Component
     // 🆕 WATCHERS POUR DATE/HEURE SÉPARÉES
     public function updatedStartDate()
     {
+        if ($this->start_date && preg_match('/^\d{4}-\d{2}-\d{2}$/', $this->start_date)) {
+            $this->start_date = $this->formatDateForDisplay($this->start_date);
+        }
+
         // 🔥 ENTERPRISE FIX: NE PAS convertir ici pour garder le format français dans l'UI
         // La conversion vers ISO se fera temporairement dans combineDateTime()
         // Cela évite que Livewire envoie une valeur ISO au navigateur que Flatpickr ne peut pas parser
@@ -212,6 +216,10 @@ class AssignmentForm extends Component
 
     public function updatedEndDate()
     {
+        if ($this->end_date && preg_match('/^\d{4}-\d{2}-\d{2}$/', $this->end_date)) {
+            $this->end_date = $this->formatDateForDisplay($this->end_date);
+        }
+
         // 🔥 ENTERPRISE FIX: NE PAS convertir ici, garder format français
         // La conversion se fera dans combineDateTime()
 
@@ -852,7 +860,9 @@ class AssignmentForm extends Component
         $hasDriverCurrentVehicle = Schema::hasColumn('drivers', 'current_vehicle_id');
 
         $vehicleBaseQuery = Vehicle::where('organization_id', $organizationId)
-            ->where('is_archived', false)
+            ->when(Schema::hasColumn('vehicles', 'is_archived'), function ($query) {
+                $query->where('is_archived', false);
+            })
             ->select('id', 'registration_plate', 'brand', 'model', 'current_mileage')
             ->orderBy('registration_plate');
 
@@ -877,7 +887,11 @@ class AssignmentForm extends Component
                 ->where(function ($query) {
                     $query->whereHas('vehicleStatus', function ($statusQuery) {
                         $statusQuery->where('is_active', true)
-                            ->where('can_be_assigned', true);
+                            ->where(function ($statusScope) {
+                                $statusScope->where('can_be_assigned', true)
+                                    ->orWhereIn('slug', ['parking', 'available'])
+                                    ->orWhereIn('name', ['Parking', 'Disponible', 'Available']);
+                            });
                     })->orWhereDoesntHave('vehicleStatus');
                 })
                 ->get();
@@ -911,8 +925,13 @@ class AssignmentForm extends Component
                 ->where(function ($query) {
                     $query->whereHas('driverStatus', function ($statusQuery) {
                         $statusQuery->where('is_active', true)
-                            ->where('can_assign', true)
-                            ->where('can_drive', true);
+                            ->where(function ($statusScope) {
+                                $statusScope->where(function ($q) {
+                                    $q->where('can_assign', true)->where('can_drive', true);
+                                })
+                                    ->orWhereIn('slug', ['disponible', 'active', 'available'])
+                                    ->orWhereIn('name', ['Disponible', 'Actif', 'Active', 'Available']);
+                            });
                     })->orWhereDoesntHave('driverStatus');
                 })
                 ->get();

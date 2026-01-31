@@ -424,9 +424,8 @@ class AssignmentGantt extends Component
                 ->active() // Scope: status_id = 1 (Actif)
                 ->select('id', 'registration_plate', 'brand', 'model');
         } else {
-            // TODO: Créer scope active() pour Driver (status_id)
             $query = Driver::where('organization_id', $organizationId)
-                ->where('status_id', 1) // CORRECTION TEMPORAIRE: utiliser status_id
+                ->active($organizationId)
                 ->select('id', 'first_name', 'last_name', 'license_number');
         }
 

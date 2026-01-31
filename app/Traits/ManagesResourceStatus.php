@@ -6,7 +6,7 @@ use App\Models\Assignment;
 use App\Models\Driver;
 use App\Models\Vehicle;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 /**
  * Trait Enterprise-Grade pour la gestion intelligente des statuts de ressources.
@@ -37,13 +37,29 @@ trait ManagesResourceStatus
 
             if ($resource instanceof Vehicle) {
                 // Statut métier "Parking" pour le véhicule
-                $parkingStatusId = DB::table('vehicle_statuses')->where('name', 'Parking')->value('id') ?? 1;
-                $updateData['status_id'] = $parkingStatusId;
+                $statusSync = app(\App\Services\ResourceStatusSynchronizer::class);
+                $parkingStatusId = $statusSync->resolveVehicleStatusIdForAvailable($resource->organization_id);
+                if ($parkingStatusId) {
+                    $updateData['status_id'] = $parkingStatusId;
+                } else {
+                    Log::warning('[ManagesResourceStatus] Statut PARKING introuvable - status_id non modifié', [
+                        'vehicle_id' => $resource->id,
+                        'organization_id' => $resource->organization_id,
+                    ]);
+                }
                 $updateData['current_driver_id'] = null;
             } elseif ($resource instanceof Driver) {
                 // Statut métier "Disponible" pour le chauffeur
-                $availableStatusId = DB::table('driver_statuses')->where('name', 'Disponible')->value('id') ?? 1;
-                $updateData['status_id'] = $availableStatusId;
+                $statusSync = app(\App\Services\ResourceStatusSynchronizer::class);
+                $availableStatusId = $statusSync->resolveDriverStatusIdForAvailable($resource->organization_id);
+                if ($availableStatusId) {
+                    $updateData['status_id'] = $availableStatusId;
+                } else {
+                    Log::warning('[ManagesResourceStatus] Statut DISPONIBLE introuvable - status_id non modifié', [
+                        'driver_id' => $resource->id,
+                        'organization_id' => $resource->organization_id,
+                    ]);
+                }
                 $updateData['current_vehicle_id'] = null;
             }
 

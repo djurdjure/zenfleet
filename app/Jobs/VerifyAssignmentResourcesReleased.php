@@ -101,9 +101,9 @@ class VerifyAssignmentResourcesReleased implements ShouldQueue
                 // Pas d'autre affectation, le véhicule DEVRAIT être disponible
 
                 // Vérifier status_id
-                $expectedStatusId = \App\Services\ResourceStatusSynchronizer::VEHICLE_STATUS_PARKING; // 8
+                $expectedStatusId = $sync->resolveVehicleStatusIdForAvailable($assignment->organization_id);
 
-                if ($vehicle->status_id !== $expectedStatusId && $vehicle->is_available && $vehicle->assignment_status === 'available') {
+                if ($expectedStatusId && $vehicle->status_id !== $expectedStatusId && $vehicle->is_available && $vehicle->assignment_status === 'available') {
                     // Incohérence détectée : ressource marquée disponible mais status_id incorrect
                     Log::warning('[VerifyRelease] 🔧 Véhicule status_id incohérent - correction en cours', [
                         'vehicle_id' => $vehicle->id,
@@ -142,9 +142,9 @@ class VerifyAssignmentResourcesReleased implements ShouldQueue
                 // Pas d'autre affectation, le chauffeur DEVRAIT être disponible
 
                 // Vérifier status_id
-                $expectedStatusId = \App\Services\ResourceStatusSynchronizer::DRIVER_STATUS_DISPONIBLE; // 7
+                $expectedStatusId = $sync->resolveDriverStatusIdForAvailable($assignment->organization_id);
 
-                if ($driver->status_id !== $expectedStatusId && $driver->is_available && $driver->assignment_status === 'available') {
+                if ($expectedStatusId && $driver->status_id !== $expectedStatusId && $driver->is_available && $driver->assignment_status === 'available') {
                     // Incohérence détectée : ressource marquée disponible mais status_id incorrect
                     Log::warning('[VerifyRelease] 🔧 Chauffeur status_id incohérent - correction en cours', [
                         'driver_id' => $driver->id,

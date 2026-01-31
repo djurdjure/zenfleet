@@ -10,10 +10,15 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 // CORRECTION : Ajout des bons namespaces pour les relations
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Schema;
 
 class Driver extends Model
 {
     use HasFactory, SoftDeletes, BelongsToOrganization, HasStatusBadge;
+
+    private static array $activeStatusIdsCache = [];
+    private static ?bool $driverStatusesHasOrgColumn = null;
 
     protected $fillable = [
         // Champs de base
@@ -117,6 +122,56 @@ class Driver extends Model
     public function sanctions(): HasMany
     {
         return $this->hasMany(DriverSanction::class);
+    }
+
+    // =========================================================================
+    // QUERY SCOPES - ENTERPRISE GRADE
+    // =========================================================================
+
+    /**
+     * 🎯 SCOPE: Chauffeurs actifs uniquement (statuts actifs)
+     */
+    public function scopeActive($query, ?int $organizationId = null)
+    {
+        $orgId = $organizationId ?? auth()->user()?->organization_id;
+        $cacheKey = $orgId ?? 'global';
+
+        if (!array_key_exists($cacheKey, self::$activeStatusIdsCache)) {
+            $statusQuery = DriverStatus::query()->where('is_active', true);
+
+            if (self::driverStatusesHaveOrgColumn()) {
+                if ($orgId !== null) {
+                    $statusQuery->where(function ($q) use ($orgId) {
+                        $q->whereNull('organization_id')
+                            ->orWhere('organization_id', $orgId);
+                    });
+                } else {
+                    $statusQuery->whereNull('organization_id');
+                }
+            }
+
+            self::$activeStatusIdsCache[$cacheKey] = $statusQuery->pluck('id')->all();
+        }
+
+        $activeStatusIds = self::$activeStatusIdsCache[$cacheKey];
+
+        if (empty($activeStatusIds)) {
+            Log::warning('[Driver] Aucun statut actif résolu - scopeActive() ignoré', [
+                'organization_id' => $orgId,
+            ]);
+            return $query;
+        }
+
+        return $query->whereIn('status_id', $activeStatusIds);
+    }
+
+    private static function driverStatusesHaveOrgColumn(): bool
+    {
+        if (self::$driverStatusesHasOrgColumn === null) {
+            self::$driverStatusesHasOrgColumn = Schema::hasColumn('driver_statuses', 'organization_id');
+        }
+
+        return self::$driverStatusesHasOrgColumn;
     }
 
     /**

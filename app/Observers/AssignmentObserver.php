@@ -309,6 +309,11 @@ class AssignmentObserver
      */
     private function releaseResourcesIfNoOtherActiveAssignment(Assignment $assignment): void
     {
+        $statusSync = app(\App\Services\ResourceStatusSynchronizer::class);
+        $organizationId = $assignment->organization_id;
+        $parkingStatusId = $statusSync->resolveVehicleStatusIdForAvailable($organizationId);
+        $availableDriverStatusId = $statusSync->resolveDriverStatusIdForAvailable($organizationId);
+
         // Vérifier le véhicule
         $hasOtherVehicleAssignment = Assignment::where('vehicle_id', $assignment->vehicle_id)
             ->where('id', '!=', $assignment->id)
@@ -317,22 +322,33 @@ class AssignmentObserver
             ->exists();
 
         if (!$hasOtherVehicleAssignment && $assignment->vehicle) {
+            if (!$parkingStatusId) {
+                Log::warning('[AssignmentObserver] Statut PARKING introuvable - libération véhicule sans status_id', [
+                    'vehicle_id' => $assignment->vehicle_id,
+                    'assignment_id' => $assignment->id,
+                ]);
+            }
+
             // 🚀 UPDATE DIRECT sans déclencher les événements Eloquent (évite boucles infinies)
+            $vehicleUpdate = [
+                'is_available' => true,
+                'current_driver_id' => null,
+                'assignment_status' => 'available',
+                'last_assignment_end' => now(),
+                'updated_at' => now()
+            ];
+            if ($parkingStatusId) {
+                $vehicleUpdate['status_id'] = $parkingStatusId;
+            }
+
             \DB::table('vehicles')
                 ->where('id', $assignment->vehicle_id)
-                ->update([
-                    'is_available' => true,
-                    'current_driver_id' => null,
-                    'assignment_status' => 'available',
-                    'status_id' => \App\Services\ResourceStatusSynchronizer::VEHICLE_STATUS_PARKING,
-                    'last_assignment_end' => now(),
-                    'updated_at' => now()
-                ]);
+                ->update($vehicleUpdate);
 
             Log::info('[AssignmentObserver] ✅ Véhicule libéré automatiquement avec synchronisation complète', [
                 'vehicle_id' => $assignment->vehicle_id,
                 'assignment_id' => $assignment->id,
-                'status_id' => \App\Services\ResourceStatusSynchronizer::VEHICLE_STATUS_PARKING
+                'status_id' => $parkingStatusId
             ]);
         }
 
@@ -344,22 +360,33 @@ class AssignmentObserver
             ->exists();
 
         if (!$hasOtherDriverAssignment && $assignment->driver) {
+            if (!$availableDriverStatusId) {
+                Log::warning('[AssignmentObserver] Statut DISPONIBLE introuvable - libération chauffeur sans status_id', [
+                    'driver_id' => $assignment->driver_id,
+                    'assignment_id' => $assignment->id,
+                ]);
+            }
+
             // 🚀 UPDATE DIRECT sans déclencher les événements Eloquent (évite boucles infinies)
+            $driverUpdate = [
+                'is_available' => true,
+                'current_vehicle_id' => null,
+                'assignment_status' => 'available',
+                'last_assignment_end' => now(),
+                'updated_at' => now()
+            ];
+            if ($availableDriverStatusId) {
+                $driverUpdate['status_id'] = $availableDriverStatusId;
+            }
+
             \DB::table('drivers')
                 ->where('id', $assignment->driver_id)
-                ->update([
-                    'is_available' => true,
-                    'current_vehicle_id' => null,
-                    'assignment_status' => 'available',
-                    'status_id' => \App\Services\ResourceStatusSynchronizer::DRIVER_STATUS_DISPONIBLE,
-                    'last_assignment_end' => now(),
-                    'updated_at' => now()
-                ]);
+                ->update($driverUpdate);
 
             Log::info('[AssignmentObserver] ✅ Chauffeur libéré automatiquement avec synchronisation complète', [
                 'driver_id' => $assignment->driver_id,
                 'assignment_id' => $assignment->id,
-                'status_id' => \App\Services\ResourceStatusSynchronizer::DRIVER_STATUS_DISPONIBLE
+                'status_id' => $availableDriverStatusId
             ]);
         }
     }
@@ -376,41 +403,68 @@ class AssignmentObserver
      */
     private function lockResources(Assignment $assignment): void
     {
+        $statusSync = app(\App\Services\ResourceStatusSynchronizer::class);
+        $organizationId = $assignment->organization_id;
+        $assignedVehicleStatusId = $statusSync->resolveVehicleStatusIdForAssigned($organizationId);
+        $assignedDriverStatusId = $statusSync->resolveDriverStatusIdForAssigned($organizationId);
+
         if ($assignment->vehicle) {
+            if (!$assignedVehicleStatusId) {
+                Log::warning('[AssignmentObserver] Statut AFFECTE introuvable - verrouillage véhicule sans status_id', [
+                    'vehicle_id' => $assignment->vehicle_id,
+                    'assignment_id' => $assignment->id,
+                ]);
+            }
+
             // 🚀 UPDATE DIRECT sans déclencher les événements Eloquent (évite boucles infinies)
+            $vehicleUpdate = [
+                'is_available' => false,
+                'current_driver_id' => $assignment->driver_id,
+                'assignment_status' => 'assigned',
+                'updated_at' => now()
+            ];
+            if ($assignedVehicleStatusId) {
+                $vehicleUpdate['status_id'] = $assignedVehicleStatusId;
+            }
+
             \DB::table('vehicles')
                 ->where('id', $assignment->vehicle_id)
-                ->update([
-                    'is_available' => false,
-                    'current_driver_id' => $assignment->driver_id,
-                    'assignment_status' => 'assigned',
-                    'status_id' => \App\Services\ResourceStatusSynchronizer::VEHICLE_STATUS_AFFECTE,
-                    'updated_at' => now()
-                ]);
+                ->update($vehicleUpdate);
 
             Log::info('[AssignmentObserver] 🔒 Véhicule verrouillé automatiquement avec synchronisation', [
                 'vehicle_id' => $assignment->vehicle_id,
                 'assignment_id' => $assignment->id,
-                'status_id' => \App\Services\ResourceStatusSynchronizer::VEHICLE_STATUS_AFFECTE
+                'status_id' => $assignedVehicleStatusId
             ]);
         }
 
         if ($assignment->driver) {
+            if (!$assignedDriverStatusId) {
+                Log::warning('[AssignmentObserver] Statut EN_MISSION introuvable - verrouillage chauffeur sans status_id', [
+                    'driver_id' => $assignment->driver_id,
+                    'assignment_id' => $assignment->id,
+                ]);
+            }
+
             // 🚀 UPDATE DIRECT sans déclencher les événements Eloquent (évite boucles infinies)
+            $driverUpdate = [
+                'is_available' => false,
+                'current_vehicle_id' => $assignment->vehicle_id,
+                'assignment_status' => 'assigned',
+                'updated_at' => now()
+            ];
+            if ($assignedDriverStatusId) {
+                $driverUpdate['status_id'] = $assignedDriverStatusId;
+            }
+
             \DB::table('drivers')
                 ->where('id', $assignment->driver_id)
-                ->update([
-                    'is_available' => false,
-                    'current_vehicle_id' => $assignment->vehicle_id,
-                    'assignment_status' => 'assigned',
-                    'status_id' => \App\Services\ResourceStatusSynchronizer::DRIVER_STATUS_EN_MISSION,
-                    'updated_at' => now()
-                ]);
+                ->update($driverUpdate);
 
             Log::info('[AssignmentObserver] 🔒 Chauffeur verrouillé automatiquement avec synchronisation', [
                 'driver_id' => $assignment->driver_id,
                 'assignment_id' => $assignment->id,
-                'status_id' => \App\Services\ResourceStatusSynchronizer::DRIVER_STATUS_EN_MISSION
+                'status_id' => $assignedDriverStatusId
             ]);
         }
     }

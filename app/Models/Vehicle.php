@@ -14,10 +14,16 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 // CORRECTION : Ajout des bons namespaces pour les relations
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Schema;
 
 class Vehicle extends Model
 {
     use HasFactory, SoftDeletes, BelongsToOrganization, HasStatusBadge;
+
+    private static array $resolvedStatusIdsCache = [];
+    private static array $statusByIdCache = [];
+    private static ?bool $vehicleStatusesHasOrgColumn = null;
 
     /**
      * 🔒 The "booted" method of the model.
@@ -446,8 +452,21 @@ class Vehicle extends Model
      */
     public function scopeActive($query)
     {
-        // Status ID 1 = "Actif" (voir table vehicle_statuses)
-        return $query->where('status_id', 1);
+        $organizationId = auth()->user()?->organization_id;
+        $statusIds = self::resolveStatusIds(
+            ['parking', 'actif', 'active'],
+            ['Parking', 'Actif', 'Active'],
+            $organizationId
+        );
+
+        if (empty($statusIds)) {
+            Log::warning('[Vehicle] Aucun statut actif résolu - scopeActive() ignoré', [
+                'organization_id' => $organizationId,
+            ]);
+            return $query;
+        }
+
+        return $query->whereIn('status_id', $statusIds);
     }
 
     /**
@@ -462,8 +481,21 @@ class Vehicle extends Model
      */
     public function scopeInMaintenance($query)
     {
-        // Status ID 2 = "En maintenance" (voir table vehicle_statuses)
-        return $query->where('status_id', 2);
+        $organizationId = auth()->user()?->organization_id;
+        $statusIds = self::resolveStatusIds(
+            ['en_maintenance', 'maintenance'],
+            ['En maintenance', 'Maintenance'],
+            $organizationId
+        );
+
+        if (empty($statusIds)) {
+            Log::warning('[Vehicle] Aucun statut maintenance résolu - scopeInMaintenance() ignoré', [
+                'organization_id' => $organizationId,
+            ]);
+            return $query;
+        }
+
+        return $query->whereIn('status_id', $statusIds);
     }
 
     /**
@@ -478,8 +510,21 @@ class Vehicle extends Model
      */
     public function scopeInactive($query)
     {
-        // Status ID 3 = "Inactif" (voir table vehicle_statuses)
-        return $query->where('status_id', 3);
+        $organizationId = auth()->user()?->organization_id;
+        $statusIds = self::resolveStatusIds(
+            ['inactif', 'inactive', 'reforme', 'hors_service', 'hors-service', 'archive', 'archived'],
+            ['Inactif', 'Inactive', 'Réformé', 'Reforme', 'Hors service', 'Archivé', 'Archive'],
+            $organizationId
+        );
+
+        if (empty($statusIds)) {
+            Log::warning('[Vehicle] Aucun statut inactif résolu - scopeInactive() ignoré', [
+                'organization_id' => $organizationId,
+            ]);
+            return $query;
+        }
+
+        return $query->whereIn('status_id', $statusIds);
     }
 
     /**
@@ -569,7 +614,7 @@ class Vehicle extends Model
      */
     public function isActive(): bool
     {
-        return $this->status_id === 1;
+        return $this->matchesStatus(['parking', 'actif', 'active'], ['Parking', 'Actif', 'Active']);
     }
 
     /**
@@ -579,7 +624,7 @@ class Vehicle extends Model
      */
     public function isInMaintenance(): bool
     {
-        return $this->status_id === 2;
+        return $this->matchesStatus(['en_maintenance', 'maintenance'], ['En maintenance', 'Maintenance']);
     }
 
     /**
@@ -589,7 +634,10 @@ class Vehicle extends Model
      */
     public function isInactive(): bool
     {
-        return $this->status_id === 3;
+        return $this->matchesStatus(
+            ['inactif', 'inactive', 'reforme', 'hors_service', 'hors-service', 'archive', 'archived'],
+            ['Inactif', 'Inactive', 'Réformé', 'Reforme', 'Hors service', 'Archivé', 'Archive']
+        );
     }
 
     /**
@@ -599,12 +647,12 @@ class Vehicle extends Model
      */
     public function getStatusName(): string
     {
-        return match ($this->status_id) {
-            1 => 'Actif',
-            2 => 'En maintenance',
-            3 => 'Inactif',
-            default => 'Inconnu'
-        };
+        if ($this->relationLoaded('vehicleStatus') && $this->vehicleStatus) {
+            return $this->vehicleStatus->name;
+        }
+
+        $status = self::resolveStatusById($this->status_id);
+        return $status?->name ?? 'Inconnu';
     }
 
     /**
@@ -614,11 +662,122 @@ class Vehicle extends Model
      */
     public function getStatusBadgeClass(): string
     {
-        return match ($this->status_id) {
-            1 => 'bg-green-100 text-green-800',
-            2 => 'bg-yellow-100 text-yellow-800',
-            3 => 'bg-red-100 text-red-800',
-            default => 'bg-gray-100 text-gray-800'
-        };
+        if ($this->relationLoaded('vehicleStatus') && $this->vehicleStatus) {
+            return $this->vehicleStatus->badge_class;
+        }
+
+        $status = self::resolveStatusById($this->status_id);
+        return $status?->badge_class ?? 'bg-gray-100 text-gray-800';
+    }
+
+    private static function resolveStatusIds(array $slugs, array $names, ?int $organizationId = null): array
+    {
+        $slugs = self::normalizeStatusSlugs($slugs);
+        $names = array_values(array_unique(array_filter($names)));
+
+        if (empty($slugs) && empty($names)) {
+            return [];
+        }
+
+        $cacheKey = ($organizationId ?? 'global') . ':' . implode('|', $slugs) . ':' . implode('|', $names);
+
+        if (array_key_exists($cacheKey, self::$resolvedStatusIdsCache)) {
+            return self::$resolvedStatusIdsCache[$cacheKey];
+        }
+
+        $query = VehicleStatus::query()
+            ->where(function ($q) use ($slugs, $names) {
+                if (!empty($slugs)) {
+                    $q->whereIn('slug', $slugs);
+                }
+                if (!empty($names)) {
+                    if (!empty($slugs)) {
+                        $q->orWhereIn('name', $names);
+                    } else {
+                        $q->whereIn('name', $names);
+                    }
+                }
+            });
+
+        if ($organizationId !== null && self::vehicleStatusesHaveOrgColumn()) {
+            $query->where(function ($q) use ($organizationId) {
+                $q->whereNull('organization_id')
+                    ->orWhere('organization_id', $organizationId);
+            });
+        }
+
+        $ids = $query->orderBy('id')->pluck('id')->all();
+        self::$resolvedStatusIdsCache[$cacheKey] = $ids;
+
+        return $ids;
+    }
+
+    private static function resolveStatusById(?int $statusId): ?VehicleStatus
+    {
+        if (!$statusId) {
+            return null;
+        }
+
+        if (array_key_exists($statusId, self::$statusByIdCache)) {
+            return self::$statusByIdCache[$statusId];
+        }
+
+        $status = VehicleStatus::query()->find($statusId);
+        self::$statusByIdCache[$statusId] = $status;
+
+        return $status;
+    }
+
+    private static function normalizeStatusSlugs(array $slugs): array
+    {
+        $normalized = [];
+
+        foreach ($slugs as $slug) {
+            if (!is_string($slug) || $slug === '') {
+                continue;
+            }
+            $normalized[] = $slug;
+            if (str_contains($slug, '_')) {
+                $normalized[] = str_replace('_', '-', $slug);
+            }
+            if (str_contains($slug, '-')) {
+                $normalized[] = str_replace('-', '_', $slug);
+            }
+        }
+
+        return array_values(array_unique($normalized));
+    }
+
+    private static function vehicleStatusesHaveOrgColumn(): bool
+    {
+        if (self::$vehicleStatusesHasOrgColumn === null) {
+            self::$vehicleStatusesHasOrgColumn = Schema::hasColumn('vehicle_statuses', 'organization_id');
+        }
+
+        return self::$vehicleStatusesHasOrgColumn;
+    }
+
+    private function matchesStatus(array $slugs, array $names): bool
+    {
+        $slugs = self::normalizeStatusSlugs($slugs);
+
+        if ($this->vehicleStatus) {
+            $statusSlug = $this->vehicleStatus->slug;
+            if ($statusSlug && in_array($statusSlug, $slugs, true)) {
+                return true;
+            }
+
+            $statusName = $this->vehicleStatus->name;
+            if ($statusName && in_array($statusName, $names, true)) {
+                return true;
+            }
+        }
+
+        if (!$this->status_id) {
+            return false;
+        }
+
+        $statusIds = self::resolveStatusIds($slugs, $names, $this->organization_id);
+        return in_array($this->status_id, $statusIds, true);
     }
 }

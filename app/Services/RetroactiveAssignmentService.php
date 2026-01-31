@@ -5,6 +5,8 @@ namespace App\Services;
 use App\Models\Assignment;
 use App\Models\Vehicle;
 use App\Models\Driver;
+use App\Models\VehicleStatus;
+use App\Models\DriverStatus;
 use App\Models\VehicleMileageReading;
 use App\Models\MileageHistory;
 use Carbon\Carbon;
@@ -28,6 +30,7 @@ use Illuminate\Support\Facades\Schema;
 class RetroactiveAssignmentService
 {
     private OverlapCheckService $overlapService;
+    private array $statusIdCache = [];
     
     public function __construct(OverlapCheckService $overlapService)
     {
@@ -186,7 +189,9 @@ class RetroactiveAssignmentService
                     ->first();
 
                 if ($statusHistory) {
-                    $wasAvailable = in_array($statusHistory->status_id, [8, 1]); // Parking ou Disponible
+                    $availableStatusIds = $this->resolveVehicleAvailableStatusIds($vehicle->organization_id);
+                    $wasAvailable = $statusHistory->status_id
+                        && in_array($statusHistory->status_id, $availableStatusIds, true);
                     return [
                         'was_available' => $wasAvailable,
                         'status_at_date' => $statusHistory->status_name ?? "Status ID: {$statusHistory->status_id}",
@@ -213,7 +218,10 @@ class RetroactiveAssignmentService
 
         // Si aucune affectation durant période ET véhicule disponible actuellement
         // → Déduction raisonnable: était probablement disponible
-        $currentlyAvailable = $vehicle->status_id == 8 || $vehicle->is_available;
+        $availableStatusIds = $this->resolveVehicleAvailableStatusIds($vehicle->organization_id);
+        $currentlyAvailable = ($vehicle->status_id
+            && in_array($vehicle->status_id, $availableStatusIds, true))
+            || $vehicle->is_available;
         $wasLikelyAvailable = !$hadAssignmentsDuringPeriod && $currentlyAvailable;
 
         return [
@@ -251,7 +259,9 @@ class RetroactiveAssignmentService
                     ->first();
 
                 if ($statusHistory) {
-                    $wasAvailable = in_array($statusHistory->status_id, [9, 1]); // Available ou Actif
+                    $availableStatusIds = $this->resolveDriverAvailableStatusIds($driver->organization_id);
+                    $wasAvailable = $statusHistory->status_id
+                        && in_array($statusHistory->status_id, $availableStatusIds, true);
                     return [
                         'was_available' => $wasAvailable,
                         'status_at_date' => $statusHistory->status_name ?? "Status ID: {$statusHistory->status_id}",
@@ -278,7 +288,10 @@ class RetroactiveAssignmentService
 
         // Si aucune affectation durant période ET chauffeur disponible actuellement
         // → Déduction raisonnable: était probablement disponible
-        $currentlyAvailable = $driver->status_id == 9 || $driver->is_available;
+        $availableStatusIds = $this->resolveDriverAvailableStatusIds($driver->organization_id);
+        $currentlyAvailable = ($driver->status_id
+            && in_array($driver->status_id, $availableStatusIds, true))
+            || $driver->is_available;
         $wasLikelyAvailable = !$hadAssignmentsDuringPeriod && $currentlyAvailable;
 
         return [
@@ -472,5 +485,75 @@ class RetroactiveAssignmentService
 
             return $assignment;
         });
+    }
+
+    private function resolveVehicleAvailableStatusIds(?int $organizationId = null): array
+    {
+        $cacheKey = 'vehicle_available:' . ($organizationId ?? 'global');
+        if (array_key_exists($cacheKey, $this->statusIdCache)) {
+            return $this->statusIdCache[$cacheKey];
+        }
+
+        $ids = [];
+        $statusSync = app(ResourceStatusSynchronizer::class);
+        $primaryId = $statusSync->resolveVehicleStatusIdForAvailable($organizationId);
+        if ($primaryId) {
+            $ids[] = $primaryId;
+        }
+
+        $query = VehicleStatus::query()
+            ->where(function ($q) {
+                $q->whereIn('slug', ['parking', 'available', 'actif', 'active'])
+                    ->orWhereIn('name', ['Parking', 'Disponible', 'Actif', 'Active']);
+            });
+
+        if ($organizationId !== null && Schema::hasColumn('vehicle_statuses', 'organization_id')) {
+            $query->where(function ($q) use ($organizationId) {
+                $q->whereNull('organization_id')
+                    ->orWhere('organization_id', $organizationId);
+            });
+        }
+
+        $ids = array_merge($ids, $query->pluck('id')->all());
+        $ids = array_values(array_unique($ids));
+
+        $this->statusIdCache[$cacheKey] = $ids;
+
+        return $ids;
+    }
+
+    private function resolveDriverAvailableStatusIds(?int $organizationId = null): array
+    {
+        $cacheKey = 'driver_available:' . ($organizationId ?? 'global');
+        if (array_key_exists($cacheKey, $this->statusIdCache)) {
+            return $this->statusIdCache[$cacheKey];
+        }
+
+        $ids = [];
+        $statusSync = app(ResourceStatusSynchronizer::class);
+        $primaryId = $statusSync->resolveDriverStatusIdForAvailable($organizationId);
+        if ($primaryId) {
+            $ids[] = $primaryId;
+        }
+
+        $query = DriverStatus::query()
+            ->where(function ($q) {
+                $q->whereIn('slug', ['disponible', 'available', 'active', 'actif'])
+                    ->orWhereIn('name', ['Disponible', 'Available', 'Active', 'Actif']);
+            });
+
+        if ($organizationId !== null && Schema::hasColumn('driver_statuses', 'organization_id')) {
+            $query->where(function ($q) use ($organizationId) {
+                $q->whereNull('organization_id')
+                    ->orWhere('organization_id', $organizationId);
+            });
+        }
+
+        $ids = array_merge($ids, $query->pluck('id')->all());
+        $ids = array_values(array_unique($ids));
+
+        $this->statusIdCache[$cacheKey] = $ids;
+
+        return $ids;
     }
 }

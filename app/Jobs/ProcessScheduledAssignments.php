@@ -76,15 +76,19 @@ class ProcessScheduledAssignments implements ShouldQueue, ShouldBeUnique
      */
     private function updateVehicleStatus(Vehicle $vehicle, int $driverId): void
     {
-        // Récupérer l'ID du statut métier "En mission" (à adapter si l'ID 8 n'est pas garanti)
-        $assignedStatusId = DB::table('vehicle_statuses')->where('name', 'En mission')->value('id') ?? 8;
+        $statusSync = app(\App\Services\ResourceStatusSynchronizer::class);
+        $assignedStatusId = $statusSync->resolveVehicleStatusIdForAssigned($vehicle->organization_id);
 
-        $vehicle->update([
-            'status_id' => $assignedStatusId,
+        $update = [
             'is_available' => false,
             'assignment_status' => 'assigned',
             'current_driver_id' => $driverId, // Lien direct pour cohérence immédiate
-        ]);
+        ];
+        if ($assignedStatusId) {
+            $update['status_id'] = $assignedStatusId;
+        }
+
+        $vehicle->update($update);
     }
 
     /**
@@ -92,14 +96,18 @@ class ProcessScheduledAssignments implements ShouldQueue, ShouldBeUnique
      */
     private function updateDriverStatus(Driver $driver, int $vehicleId): void
     {
-        // Récupérer l'ID du statut métier "En mission" (à adapter si l'ID 8 n'est pas garanti)
-        $assignedStatusId = DB::table('driver_statuses')->where('name', 'En mission')->value('id') ?? 8;
+        $statusSync = app(\App\Services\ResourceStatusSynchronizer::class);
+        $assignedStatusId = $statusSync->resolveDriverStatusIdForAssigned($driver->organization_id);
 
-        $driver->update([
-            'status_id' => $assignedStatusId,
+        $update = [
             'is_available' => false,
             'assignment_status' => 'assigned',
             'current_vehicle_id' => $vehicleId, // Lien direct pour cohérence immédiate
-        ]);
+        ];
+        if ($assignedStatusId) {
+            $update['status_id'] = $assignedStatusId;
+        }
+
+        $driver->update($update);
     }
 }

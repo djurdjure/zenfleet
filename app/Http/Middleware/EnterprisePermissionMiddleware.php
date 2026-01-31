@@ -157,6 +157,23 @@ class EnterprisePermissionMiddleware
     ];
 
     /**
+     * Alias permissions to ensure backward/forward compatibility.
+     *
+     * Example: legacy "create assignments" should satisfy modern "assignments.create".
+     */
+    private array $permissionAliases = [
+        // Affectations
+        'assignments.view' => ['view assignments'],
+        'assignments.create' => ['create assignments'],
+        'assignments.update' => ['edit assignments'],
+        'assignments.end' => ['end assignments'],
+        'assignments.delete' => ['delete assignments'],
+        'assignments.export' => ['export assignments', 'view assignments'],
+        'assignments.view-gantt' => ['view assignments'],
+        'assignments.view-stats' => ['view assignment statistics', 'view assignments'],
+    ];
+
+    /**
      * Handle an incoming request with enterprise security
      */
     public function handle(Request $request, Closure $next, ...$permissions): Response
@@ -201,7 +218,7 @@ class EnterprisePermissionMiddleware
         $user = Auth::user();
 
         foreach ($permissions as $permission) {
-            if (!$user->can($permission)) {
+            if (!$this->hasPermission($user, $permission)) {
                 return $this->handleUnauthorized(
                     $request,
                     "Permission requise: {$permission}",
@@ -262,29 +279,53 @@ class EnterprisePermissionMiddleware
     private function hasPermissionHierarchical($user, string $permission): bool
     {
         // Vérification directe
-        if ($user->can($permission)) {
+        if ($this->hasPermission($user, $permission)) {
             return true;
         }
 
         // Permissions hiérarchiques pour les relevés kilométriques
         if ($permission === 'view own mileage readings') {
-            return $user->can('view team mileage readings') || $user->can('view all mileage readings');
+            return $this->hasPermission($user, 'view team mileage readings')
+                || $this->hasPermission($user, 'view all mileage readings');
         }
 
         if ($permission === 'view team mileage readings') {
-            return $user->can('view all mileage readings');
+            return $this->hasPermission($user, 'view all mileage readings');
         }
 
         // Permissions hiérarchiques pour les demandes de réparation
         if ($permission === 'view own repair requests') {
-            return $user->can('view team repair requests') || $user->can('view all repair requests');
+            return $this->hasPermission($user, 'view team repair requests')
+                || $this->hasPermission($user, 'view all repair requests');
         }
 
         if ($permission === 'view team repair requests') {
-            return $user->can('view all repair requests');
+            return $this->hasPermission($user, 'view all repair requests');
         }
 
         // Aucune permission hiérarchique trouvée
+        return false;
+    }
+
+    /**
+     * Vérifie une permission avec support des alias.
+     */
+    private function hasPermission($user, string $permission): bool
+    {
+        if ($user->can($permission)) {
+            return true;
+        }
+
+        if (!isset($this->permissionAliases[$permission])) {
+            return false;
+        }
+
+        foreach ($this->permissionAliases[$permission] as $alias) {
+            if ($user->can($alias)) {
+                return true;
+            }
+        }
+
         return false;
     }
 
