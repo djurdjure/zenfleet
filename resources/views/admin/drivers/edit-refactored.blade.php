@@ -33,7 +33,7 @@
 @endif
 
 <section class="bg-gray-50 min-h-screen">
-    <div class="py-6 px-4 mx-auto max-w-7xl lg:py-12">
+    <div class="py-6 px-4 mx-auto max-w-7xl lg:py-12 lg:mx-0">
 
         {{-- Header COMPACT et MODERNE --}}
         <div class="mb-6">
@@ -76,39 +76,21 @@
         @endif
 
         {{-- ====================================================================
- FORMULAIRE MULTI-ÉTAPES AVEC VALIDATION ALPINE.JS
+ FORMULAIRE SINGLE-PAGE AVEC VALIDATION ALPINE.JS
  ==================================================================== --}}
-        <div x-data="driverFormValidation()" x-init="init()">
+        <div x-data="driverFormValidationEdit()" x-init="init()">
 
-            <x-card padding="p-0" margin="mb-6">
-                {{-- Stepper --}}
-                <x-stepper
-                    :steps="[
- ['label' => 'Informations Personnelles', 'icon' => 'user'],
- ['label' => 'Informations Professionnelles', 'icon' => 'briefcase'],
- ['label' => 'Permis de Conduire', 'icon' => 'identification'],
- ['label' => 'Compte & Urgence', 'icon' => 'link']
- ]"
-                    currentStepVar="currentStep" />
-
-                {{-- Formulaire --}}
-                <form method="POST" action="{{ route('admin.drivers.update', $driver) }}" enctype="multipart/form-data" @submit="onSubmit" class="p-6">
+            {{-- Formulaire --}}
+            <form method="POST" action="{{ route('admin.drivers.update', $driver) }}" enctype="multipart/form-data" @submit="onSubmit" class="space-y-8">
                     @csrf
                     @method('PUT')
-                    <input type="hidden" name="current_step" x-model="currentStep">
 
                     {{-- PHASE 1: INFORMATIONS PERSONNELLES --}}
-                    <div x-show="currentStep === 1" x-transition:enter="transition ease-out duration-200"
-                        x-transition:enter-start="opacity-0 transform translate-x-4"
-                        x-transition:enter-end="opacity-100 transform translate-x-0">
-                        <div class="space-y-6">
-                            <div>
-                                <h3 class="text-lg font-medium text-gray-900 mb-4 flex items-center gap-2">
-                                    <x-iconify icon="heroicons:user" class="w-5 h-5 text-blue-600" />
-                                    Informations Personnelles
-                                </h3>
-
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <x-form-section
+                        title="Informations Personnelles"
+                        icon="heroicons:user"
+                        subtitle="Identité, coordonnées et informations de base du chauffeur">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     <x-input
                                         name="first_name"
                                         label="Prénom"
@@ -224,24 +206,15 @@
                                             </div>
                                         </div>
                                     </div>
-                                </div>
-                            </div>
                         </div>
-                    </div>
+                    </x-form-section>
 
                     {{-- PHASE 2: INFORMATIONS PROFESSIONNELLES --}}
-                    <div x-show="currentStep === 2" x-transition:enter="transition ease-out duration-200"
-                        x-transition:enter-start="opacity-0 transform translate-x-4"
-                        x-transition:enter-end="opacity-100 transform translate-x-0"
-                        style="display: none;">
-                        <div class="space-y-6">
-                            <div>
-                                <h3 class="text-lg font-medium text-gray-900 mb-4 flex items-center gap-2">
-                                    <x-iconify icon="heroicons:briefcase" class="w-5 h-5 text-blue-600" />
-                                    Informations Professionnelles
-                                </h3>
-
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <x-form-section
+                        title="Informations Professionnelles"
+                        icon="heroicons:briefcase"
+                        subtitle="Matricule, statut et informations de recrutement">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     <x-input
                                         name="employee_number"
                                         label="Matricule"
@@ -289,24 +262,15 @@
                                             :error="$errors->first('notes')"
                                             helpText="Compétences, formations, remarques, etc." />
                                     </div>
-                                </div>
-                            </div>
                         </div>
-                    </div>
+                    </x-form-section>
 
                     {{-- PHASE 3: PERMIS DE CONDUIRE --}}
-                    <div x-show="currentStep === 3" x-transition:enter="transition ease-out duration-200"
-                        x-transition:enter-start="opacity-0 transform translate-x-4"
-                        x-transition:enter-end="opacity-100 transform translate-x-0"
-                        style="display: none;">
-                        <div class="space-y-6">
-                            <div>
-                                <h3 class="text-lg font-medium text-gray-900 mb-4 flex items-center gap-2">
-                                    <x-iconify icon="heroicons:identification" class="w-5 h-5 text-blue-600" />
-                                    Permis de Conduire
-                                </h3>
-
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <x-form-section
+                        title="Permis de Conduire"
+                        icon="heroicons:identification"
+                        subtitle="Numéro, catégories et dates de validité">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     <x-input
                                         name="license_number"
                                         label="Numéro de permis"
@@ -372,23 +336,21 @@
                                             </span>
                                         </label>
                                     </div>
-                                </div>
-                            </div>
                         </div>
-                    </div>
+                    </x-form-section>
 
                     {{-- PHASE 4: COMPTE & CONTACT D'URGENCE --}}
-                    <div x-show="currentStep === 4" x-transition:enter="transition ease-out duration-200"
-                        x-transition:enter-start="opacity-0 transform translate-x-4"
-                        x-transition:enter-end="opacity-100 transform translate-x-0"
-                        style="display: none;">
+                    <x-form-section
+                        title="Compte & Contact d'Urgence"
+                        icon="heroicons:link"
+                        subtitle="Accès applicatif optionnel et personne à contacter">
                         <div class="space-y-6">
                             {{-- Compte Utilisateur --}}
                             <div>
-                                <h3 class="text-lg font-medium text-gray-900 mb-4 flex items-center gap-2">
-                                    <x-iconify icon="heroicons:user-circle" class="w-5 h-5 text-blue-600" />
+                                <h4 class="text-sm font-semibold text-slate-900 mb-3 flex items-center gap-2">
+                                    <x-iconify icon="heroicons:user-circle" class="w-4 h-4 text-blue-600" />
                                     Compte Utilisateur (Optionnel)
-                                </h3>
+                                </h4>
 
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     <x-slim-select
@@ -404,10 +366,10 @@
 
                             {{-- Contact d'Urgence --}}
                             <div>
-                                <h3 class="text-lg font-medium text-gray-900 mb-4 flex items-center gap-2">
-                                    <x-iconify icon="heroicons:phone" class="w-5 h-5 text-red-600" />
+                                <h4 class="text-sm font-semibold text-slate-900 mb-3 flex items-center gap-2">
+                                    <x-iconify icon="heroicons:phone" class="w-4 h-4 text-red-600" />
                                     Contact d'Urgence
-                                </h3>
+                                </h4>
 
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     <x-input
@@ -437,48 +399,23 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    </x-form-section>
 
                     {{-- ACTIONS FOOTER --}}
-                    <div class="mt-8 pt-6 border-t border-gray-200 flex items-center justify-between">
-                        <div>
-                            <button
-                                type="button"
-                                @click="prevStep()"
-                                x-show="currentStep > 1"
-                                class="inline-flex items-center gap-2 px-4 py-2.5 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors text-sm font-medium text-gray-700">
-                                <x-iconify icon="heroicons:arrow-left" class="w-4 h-4" />
-                                Précédent
-                            </button>
-                        </div>
+                    <div class="rounded-2xl border border-slate-200 bg-white p-5 flex items-center justify-between">
+                        <a href="{{ route('admin.drivers.show', $driver) }}"
+                            class="text-gray-600 hover:text-gray-900 font-medium text-sm transition-colors">
+                            Annuler
+                        </a>
 
-                        <div class="flex items-center gap-4">
-                            <a href="{{ route('admin.drivers.show', $driver) }}"
-                                class="text-gray-600 hover:text-gray-900 font-medium text-sm transition-colors">
-                                Annuler
-                            </a>
-
-                            <button
-                                type="button"
-                                @click="nextStep()"
-                                x-show="currentStep < 4"
-                                class="inline-flex items-center gap-2 px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors shadow-sm hover:shadow-md text-sm">
-                                Suivant
-                                <x-iconify icon="heroicons:arrow-right" class="w-4 h-4" />
-                            </button>
-
-                            <button
-                                type="submit"
-                                x-show="currentStep === 4"
-                                x-cloak
-                                class="inline-flex items-center gap-2 px-6 py-2.5 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg transition-colors shadow-sm hover:shadow-md text-sm">
-                                <x-iconify icon="heroicons:check" class="w-5 h-5" />
-                                Enregistrer les Modifications
-                            </button>
-                        </div>
+                        <button
+                            type="submit"
+                            class="inline-flex items-center gap-2 px-6 py-2.5 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg transition-colors shadow-sm hover:shadow-md text-sm">
+                            <x-iconify icon="heroicons:check" class="w-5 h-5" />
+                            Enregistrer les Modifications
+                        </button>
                     </div>
-                </form>
-            </x-card>
+            </form>
 
         </div>
     </div>
@@ -486,106 +423,7 @@
 
 @push('scripts')
 <script>
-    function driverFormValidation() {
-        return {
-            currentStep: {
-                {
-                    old('current_step', 1)
-                }
-            },
-            photoPreview: null,
-            errors: {},
-            touched: {},
-
-            init() {
-                @if($errors - > any())
-                this.handleValidationErrors();
-                @endif
-            },
-
-            updatePhotoPreview(event) {
-                const file = event.target.files[0];
-                if (file) {
-                    const reader = new FileReader();
-                    reader.onload = (e) => {
-                        this.photoPreview = e.target.result;
-                    };
-                    reader.readAsDataURL(file);
-                }
-            },
-
-            validateField(fieldName, value) {
-                this.touched[fieldName] = true;
-                // Validation logic similar to create
-            },
-
-            nextStep() {
-                if (this.currentStep < 4) {
-                    this.currentStep++;
-                    window.scrollTo({
-                        top: 0,
-                        behavior: 'smooth'
-                    });
-                }
-            },
-
-            prevStep() {
-                if (this.currentStep > 1) {
-                    this.currentStep--;
-                    window.scrollTo({
-                        top: 0,
-                        behavior: 'smooth'
-                    });
-                }
-            },
-
-            onSubmit(event) {
-                // Validation before submit
-            },
-
-            handleValidationErrors() {
-                const fieldToStepMap = {
-                    'first_name': 1,
-                    'last_name': 1,
-                    'birth_date': 1,
-                    'personal_phone': 1,
-                    'address': 1,
-                    'blood_type': 1,
-                    'personal_email': 1,
-                    'photo': 1,
-                    'employee_number': 2,
-                    'recruitment_date': 2,
-                    'contract_end_date': 2,
-                    'status_id': 2,
-                    'notes': 2,
-                    'license_number': 3,
-                    'license_category': 3,
-                    'license_issue_date': 3,
-                    'license_expiry_date': 3,
-                    'license_authority': 3,
-                    'license_verified': 3,
-                    'user_id': 4,
-                    'emergency_contact_name': 4,
-                    'emergency_contact_phone': 4,
-                    'emergency_contact_relationship': 4
-                };
-
-                const errors = @json($errors - > keys());
-                let firstErrorStep = null;
-
-                for (const field of errors) {
-                    if (fieldToStepMap[field]) {
-                        firstErrorStep = fieldToStepMap[field];
-                        break;
-                    }
-                }
-
-                if (firstErrorStep) {
-                    this.currentStep = firstErrorStep;
-                }
-            }
-        }
-    }
+    window.zenfleetDriverErrors = @json($errors->messages());
 </script>
 @endpush
 @endsection

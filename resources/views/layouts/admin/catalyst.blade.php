@@ -31,6 +31,7 @@
 
 
     <!-- 🚀 Performance: Load CSS in Parallel (No JS blocking) -->
+    @livewireScriptConfig
     @vite(['resources/css/app.css', 'resources/css/admin/app.css', 'resources/js/admin/app.js'])
     @stack('styles')
     @livewireStyles
@@ -942,26 +943,28 @@
             // ====================================================================
             // TOM SELECT - Initialisation Globale
             // ====================================================================
-            document.querySelectorAll('.tomselect').forEach(function(el) {
-                if (el.tomselect) return; // Déjà initialisé
+            if (window.TomSelect) {
+                document.querySelectorAll('.tomselect').forEach(function(el) {
+                    if (el.tomselect) return; // Déjà initialisé
 
-                new TomSelect(el, {
-                    plugins: ['clear_button', 'remove_button'],
-                    maxOptions: 100,
-                    placeholder: el.getAttribute('data-placeholder') || 'Rechercher...',
-                    allowEmptyOption: true,
-                    create: false,
-                    sortField: {
-                        field: "text",
-                        direction: "asc"
-                    },
-                    render: {
-                        no_results: function(data, escape) {
-                            return '<div class="no-results p-2 text-sm text-gray-500">Aucun résultat trouvé</div>';
+                    new TomSelect(el, {
+                        plugins: ['clear_button', 'remove_button'],
+                        maxOptions: 100,
+                        placeholder: el.getAttribute('data-placeholder') || 'Rechercher...',
+                        allowEmptyOption: true,
+                        create: false,
+                        sortField: {
+                            field: "text",
+                            direction: "asc"
+                        },
+                        render: {
+                            no_results: function(data, escape) {
+                                return '<div class="no-results p-2 text-sm text-gray-500">Aucun résultat trouvé</div>';
+                            }
                         }
-                    }
+                    });
                 });
-            });
+            }
 
             // ====================================================================
             // FLATPICKR DATEPICKER - Initialisation Globale
@@ -1052,17 +1055,19 @@
         // ====================================================================
         document.addEventListener('livewire:navigated', function() {
             // Réinitialiser Tom Select
-            document.querySelectorAll('.tomselect').forEach(function(el) {
-                if (!el.tomselect) {
-                    new TomSelect(el, {
-                        plugins: ['clear_button', 'remove_button'],
-                        maxOptions: 100,
-                        placeholder: el.getAttribute('data-placeholder') || 'Rechercher...',
-                        allowEmptyOption: true,
-                        create: false,
-                    });
-                }
-            });
+            if (window.TomSelect) {
+                document.querySelectorAll('.tomselect').forEach(function(el) {
+                    if (!el.tomselect) {
+                        new TomSelect(el, {
+                            plugins: ['clear_button', 'remove_button'],
+                            maxOptions: 100,
+                            placeholder: el.getAttribute('data-placeholder') || 'Rechercher...',
+                            allowEmptyOption: true,
+                            create: false,
+                        });
+                    }
+                });
+            }
 
             // Réinitialiser Flatpickr
             document.querySelectorAll('.datepicker, .timepicker').forEach(function(el) {
@@ -1210,7 +1215,6 @@
             }
         }
     </script>
-    @livewireScriptConfig
 </body>
 
 </html>

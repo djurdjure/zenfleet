@@ -5,10 +5,10 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="csrf-token" content="Pvm3yjCAZeHGNl7uL7BBnE8scngjAaS6utgmQ4R2">
+    <meta name="csrf-token" content="bEwJ66fcBeySZV1izFVsCmjw8GzH806w9hgV23ZN">
         <meta name="user-data" content="{&quot;id&quot;:2,&quot;name&quot;:&quot;el hadi chemli&quot;,&quot;role&quot;:&quot;Admin&quot;}">
     
-    <title>Ajouter un Nouveau Véhicule - ZenFleet</title>
+    <title>Ajouter un Nouveau Chauffeur - ZenFleet</title>
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.bunny.net">
@@ -23,6 +23,7 @@
 
 
     <!-- 🚀 Performance: Load CSS in Parallel (No JS blocking) -->
+    <script data-navigate-once="true">window.livewireScriptConfig = {"csrf":"bEwJ66fcBeySZV1izFVsCmjw8GzH806w9hgV23ZN","uri":"\/livewire\/update","progressBar":"","nonce":""};</script>
     <script type="module" src="http://localhost:5173/@vite/client" data-navigate-track="reload"></script><link rel="stylesheet" href="http://localhost:5173/resources/css/app.css" data-navigate-track="reload" /><link rel="stylesheet" href="http://localhost:5173/resources/css/admin/app.css" data-navigate-track="reload" /><script type="module" src="http://localhost:5173/resources/js/admin/app.js" data-navigate-track="reload"></script>        <!-- Livewire Styles --><style >[wire\:loading][wire\:loading], [wire\:loading\.delay][wire\:loading\.delay], [wire\:loading\.inline-block][wire\:loading\.inline-block], [wire\:loading\.inline][wire\:loading\.inline], [wire\:loading\.block][wire\:loading\.block], [wire\:loading\.flex][wire\:loading\.flex], [wire\:loading\.table][wire\:loading\.table], [wire\:loading\.grid][wire\:loading\.grid], [wire\:loading\.inline-flex][wire\:loading\.inline-flex] {display: none;}[wire\:loading\.delay\.none][wire\:loading\.delay\.none], [wire\:loading\.delay\.shortest][wire\:loading\.delay\.shortest], [wire\:loading\.delay\.shorter][wire\:loading\.delay\.shorter], [wire\:loading\.delay\.short][wire\:loading\.delay\.short], [wire\:loading\.delay\.default][wire\:loading\.delay\.default], [wire\:loading\.delay\.long][wire\:loading\.delay\.long], [wire\:loading\.delay\.longer][wire\:loading\.delay\.longer], [wire\:loading\.delay\.longest][wire\:loading\.delay\.longest] {display: none;}[wire\:offline][wire\:offline] {display: none;}[wire\:dirty]:not(textarea):not(input):not(select) {display: none;}:root {--livewire-progress-bar-color: #2299dd;}[x-cloak] {display: none !important;}[wire\:cloak] {display: none !important;}</style>
 </head>
 
@@ -74,11 +75,11 @@
                         </li>
                         
                         
-                                                <li class="flex flex-col" x-data="{ open: true }">
+                                                <li class="flex flex-col" x-data="{ open: false }">
                             <button @click="open = !open"
-                                class="flex items-center w-full h-11 px-3.5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 bg-blue-600 text-white shadow-md">
+                                class="flex items-center w-full h-11 px-3.5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 text-gray-700 hover:bg-white hover:text-gray-900 hover:shadow-sm">
                                 <span
-    class="iconify block w-5 h-5 mr-3 text-white"
+    class="iconify block w-5 h-5 mr-3 text-gray-600"
     data-icon="mdi:car-multiple"
     data-inline="false"></span>                                <span class="flex-1 text-left">Véhicules</span>
                                 <span
@@ -115,11 +116,11 @@
                         </li>
                         
                         
-                                                <li class="flex flex-col" x-data="{ open: false }">
+                                                <li class="flex flex-col" x-data="{ open: true }">
                             <button @click="open = !open"
-                                class="flex items-center w-full h-11 px-3.5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 text-gray-700 hover:bg-white hover:text-gray-900 hover:shadow-sm">
+                                class="flex items-center w-full h-11 px-3.5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 bg-blue-600 text-white shadow-md">
                                 <span
-    class="iconify block w-5 h-5 mr-3 text-gray-600"
+    class="iconify block w-5 h-5 mr-3 text-white"
     data-icon="mdi:account-group"
     data-inline="false"></span>                                <span class="flex-1 text-left">Chauffeurs</span>
                                 <span
@@ -542,9 +543,9 @@
                                             
                                             
                                             
-                                                                                        <li x-data="{ open: true }">
+                                                                                        <li x-data="{ open: false }">
                                                 <button @click="open = !open"
-                                                    class="group flex w-full gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold bg-blue-600 text-white">
+                                                    class="group flex w-full gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold text-gray-700 hover:text-gray-900 hover:bg-gray-100">
                                                     <span
     class="iconify block h-5 w-5 shrink-0"
     data-icon="heroicons:truck"
@@ -559,7 +560,7 @@
                                                             <div class="absolute left-0 top-0 bottom-0 w-px bg-zinc-300"></div>
                                                             <div class="absolute left-0 top-3 w-3 h-px bg-zinc-300"></div>
                                                             <a href="http://localhost/admin/vehicles"
-                                                                class="group flex gap-x-3 rounded-md p-2 pl-4 text-sm leading-6 font-medium bg-blue-50 text-blue-700">
+                                                                class="group flex gap-x-3 rounded-md p-2 pl-4 text-sm leading-6 font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50">
                                                                 <span
     class="iconify block h-4 w-4 shrink-0"
     data-icon="heroicons:truck"
@@ -584,7 +585,7 @@
                                             
                                                                                         <li>
                                                 <a href="http://localhost/admin/drivers"
-                                                    class="group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold text-zinc-700 hover:text-zinc-950 hover:bg-zinc-100">
+                                                    class="group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold bg-zinc-950 text-white">
                                                     <span
     class="iconify block h-5 w-5 shrink-0"
     data-icon="heroicons:user"
@@ -793,7 +794,7 @@
                                     </a>
                                     <div class="border-t border-zinc-100 my-1"></div>
                                     <form method="POST" action="http://localhost/logout">
-                                        <input type="hidden" name="_token" value="Pvm3yjCAZeHGNl7uL7BBnE8scngjAaS6utgmQ4R2" autocomplete="off">                                        <button type="submit"
+                                        <input type="hidden" name="_token" value="bEwJ66fcBeySZV1izFVsCmjw8GzH806w9hgV23ZN" autocomplete="off">                                        <button type="submit"
                                             class="group flex w-full items-center px-4 py-2 text-sm text-zinc-700 hover:bg-zinc-50">
                                             <span
     class="iconify block mr-3 h-4 w-4 text-zinc-400 group-hover:text-zinc-600"
@@ -816,185 +817,61 @@
 
 
 <section class="bg-gray-50 min-h-screen">
-    <div class="py-6 px-4 mx-auto max-w-7xl lg:py-12">
+    <div class="py-6 px-4 mx-auto max-w-7xl lg:py-12 lg:mx-0">
 
         
         <div class="mb-6">
             <h1 class="text-2xl font-bold text-gray-900 mb-1 flex items-center gap-2.5">
                 <span
     class="iconify block w-6 h-6 text-blue-600"
-    data-icon="heroicons:truck"
-    data-inline="false"></span>                Ajouter un Nouveau Véhicule
+    data-icon="heroicons:user-plus"
+    data-inline="false"></span>                Ajouter un Nouveau Chauffeur
             </h1>
             <p class="text-sm text-gray-600 ml-8.5">
-                Complétez les 3 étapes pour enregistrer un véhicule
+                Complétez les sections ci-dessous pour enregistrer un chauffeur
             </p>
         </div>
 
         
         
         
-        <div x-data="vehicleFormValidation()" x-init="init()">
+        <div x-data="driverFormValidationCreate()" x-init="init()">
 
-            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-0 mb-6">
- 
- <div class="w-full bg-white border-b border-gray-200 py-8">
-    <div class="px-4 mx-auto">
-        <ol class="flex items-start justify-center gap-0 w-full max-w-4xl mx-auto">
-                            
-                <li class="flex flex-col items-center relative flex-1">
-
-                    
-                    <div class="flex items-center w-full relative z-10">
-
-                        
-                        <div class="flex items-center justify-center w-12 h-12 rounded-full flex-shrink-0 bg-white border-2 transition-all duration-300 relative"
-                            x-bind:class="{
-                                'border-blue-600 shadow-lg shadow-blue-500/40': currentStep === 1,
-                                'border-blue-600 shadow-md shadow-blue-500/20': currentStep &gt; 1,
-                                'border-gray-300 shadow-sm': currentStep &lt; 1
-                            }">
-
-                            
-                            <span class="iconify w-6 h-6 transition-colors duration-300"
-                                x-bind:class="{
-                                    'text-gray-400': currentStep === 1,      
-                                    'text-blue-600': currentStep &gt; 1,   
-                                    'text-gray-300': currentStep &lt; 1       
-                                }"
-                                x-bind:data-icon="'lucide:' + &quot;file-text&quot;"
-                                data-inline="false">
-                            </span>
-                        </div>
-
-                        
-                                                    <div class="flex-1 h-1 mx-2 rounded-full transition-all duration-300"
-                                x-bind:class="currentStep &gt; 1 ? 'bg-blue-600 shadow-sm' : 'bg-gray-300'">
-                            </div>
-                        
-                    </div>
-
-                    
-                    <span class="mt-4 text-center text-sm font-semibold transition-all duration-200 whitespace-nowrap leading-snug"
-                        x-bind:class="{
-                            'text-blue-600 font-bold text-sm': currentStep === 1,
-                            'text-blue-600 font-semibold': currentStep &gt; 1,
-                            'text-gray-500': currentStep &lt; 1
-                        }">
-                        Identification
-                    </span>
-
-                </li>
-                            
-                <li class="flex flex-col items-center relative flex-1">
-
-                    
-                    <div class="flex items-center w-full relative z-10">
-
-                        
-                        <div class="flex items-center justify-center w-12 h-12 rounded-full flex-shrink-0 bg-white border-2 transition-all duration-300 relative"
-                            x-bind:class="{
-                                'border-blue-600 shadow-lg shadow-blue-500/40': currentStep === 2,
-                                'border-blue-600 shadow-md shadow-blue-500/20': currentStep &gt; 2,
-                                'border-gray-300 shadow-sm': currentStep &lt; 2
-                            }">
-
-                            
-                            <span class="iconify w-6 h-6 transition-colors duration-300"
-                                x-bind:class="{
-                                    'text-gray-400': currentStep === 2,      
-                                    'text-blue-600': currentStep &gt; 2,   
-                                    'text-gray-300': currentStep &lt; 2       
-                                }"
-                                x-bind:data-icon="'lucide:' + &quot;settings&quot;"
-                                data-inline="false">
-                            </span>
-                        </div>
-
-                        
-                                                    <div class="flex-1 h-1 mx-2 rounded-full transition-all duration-300"
-                                x-bind:class="currentStep &gt; 2 ? 'bg-blue-600 shadow-sm' : 'bg-gray-300'">
-                            </div>
-                        
-                    </div>
-
-                    
-                    <span class="mt-4 text-center text-sm font-semibold transition-all duration-200 whitespace-nowrap leading-snug"
-                        x-bind:class="{
-                            'text-blue-600 font-bold text-sm': currentStep === 2,
-                            'text-blue-600 font-semibold': currentStep &gt; 2,
-                            'text-gray-500': currentStep &lt; 2
-                        }">
-                        Caractéristiques
-                    </span>
-
-                </li>
-                            
-                <li class="flex flex-col items-center relative flex-none">
-
-                    
-                    <div class="flex items-center w-full relative z-10">
-
-                        
-                        <div class="flex items-center justify-center w-12 h-12 rounded-full flex-shrink-0 bg-white border-2 transition-all duration-300 relative"
-                            x-bind:class="{
-                                'border-blue-600 shadow-lg shadow-blue-500/40': currentStep === 3,
-                                'border-blue-600 shadow-md shadow-blue-500/20': currentStep &gt; 3,
-                                'border-gray-300 shadow-sm': currentStep &lt; 3
-                            }">
-
-                            
-                            <span class="iconify w-6 h-6 transition-colors duration-300"
-                                x-bind:class="{
-                                    'text-gray-400': currentStep === 3,      
-                                    'text-blue-600': currentStep &gt; 3,   
-                                    'text-gray-300': currentStep &lt; 3       
-                                }"
-                                x-bind:data-icon="'lucide:' + &quot;receipt&quot;"
-                                data-inline="false">
-                            </span>
-                        </div>
-
-                        
-                        
-                    </div>
-
-                    
-                    <span class="mt-4 text-center text-sm font-semibold transition-all duration-200 whitespace-nowrap leading-snug"
-                        x-bind:class="{
-                            'text-blue-600 font-bold text-sm': currentStep === 3,
-                            'text-blue-600 font-semibold': currentStep &gt; 3,
-                            'text-gray-500': currentStep &lt; 3
-                        }">
-                        Acquisition
-                    </span>
-
-                </li>
-                    </ol>
-    </div>
-</div>
-
+            
+            <form method="POST" action="http://localhost/admin/drivers" enctype="multipart/form-data" @submit="onSubmit" class="space-y-8">
+                <input type="hidden" name="_token" value="bEwJ66fcBeySZV1izFVsCmjw8GzH806w9hgV23ZN" autocomplete="off">
                 
-                <form method="POST" action="http://localhost/admin/vehicles" @submit="onSubmit" class="p-6">
-                    <input type="hidden" name="_token" value="Pvm3yjCAZeHGNl7uL7BBnE8scngjAaS6utgmQ4R2" autocomplete="off">                    <input type="hidden" name="current_step" x-model="currentStep">
+                <div class="relative">
+            <div class="absolute left-5 top-6 bottom-6 w-px bg-slate-200/80"></div>
+    
+    <div class="relative pl-12">
+                    <div class="absolute left-1.5 top-6">
+                <span class="inline-flex h-9 w-9 items-center justify-center rounded-full bg-white text-blue-600 shadow-sm ring-2 ring-blue-100">
+                    <span
+    class="iconify block w-5 h-5"
+    data-icon="heroicons:user"
+    data-inline="false"></span>                </span>
+            </div>
+        
+        <section class="rounded-2xl border border-slate-200 bg-white shadow-sm">
+            <div class="flex items-center justify-between gap-4 px-6 py-4 bg-slate-50/70 border-b border-slate-200">
+                <div>
+                                        <h3 class="text-sm font-semibold text-slate-900">Informations Personnelles</h3>
+                                            <p class="text-xs text-slate-500 mt-0.5">Identité, coordonnées et informations de base du chauffeur</p>
+                                    </div>
+                
+            </div>
 
-                    
-                    <div x-show="currentStep === 1" x-transition:enter="transition ease-out duration-200"
-                        x-transition:enter-start="opacity-0 transform translate-x-4"
-                        x-transition:enter-end="opacity-100 transform translate-x-0">
-                        <div class="space-y-6">
-                            <div>
-                                <h3 class="text-lg font-medium text-gray-900 mb-4 flex items-center gap-2">
-                                    <span
-    class="iconify block w-5 h-5 text-blue-600"
-    data-icon="heroicons:identification"
-    data-inline="false"></span>                                    Informations d'Identification
-                                </h3>
-
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                    <div class="" @blur="validateField('registration_plate', $event.target.value)">
-        <label for="registration_plate" class="block mb-2 text-sm font-medium text-gray-900">
-        Immatriculation
+            <div class="p-6 ">
+                <div class="col-span-full w-full min-w-0 grid grid-cols-1 md:grid-cols-2 gap-6"
+        style="position: relative;"
+    >
+        
+    <div class="hidden md:block absolute left-1/2 top-4 bottom-4 w-px bg-gradient-to-b from-transparent via-slate-200 to-transparent" aria-hidden="true"></div>
+    
+    <div class="" @blur="validateField('first_name', $event.target.value)">
+        <label for="first_name" class="block mb-2 text-sm font-medium text-gray-900">
+        Prénom
                 <span class="text-red-600">*</span>
             </label>
     
@@ -1002,84 +879,41 @@
                 <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
             <span
     class="iconify block w-5 h-5 text-gray-400"
-    data-icon="heroicons:identification"
+    data-icon="heroicons:user"
     data-inline="false"></span>        </div>
         
         <input
             type="text"
-            name="registration_plate"
-            id="registration_plate"
+            name="first_name"
+            id="first_name"
             class="bg-gray-50 border text-gray-900 text-sm rounded-lg block w-full p-2.5 transition-colors duration-200 border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 bg-gray-50 pl-10"
-            placeholder="Ex: 16-12345-23"
+            placeholder="Ex: Ahmed"
             value=""
              required                         
-            x-bind:class="(typeof fieldErrors !== 'undefined' && fieldErrors && fieldErrors['registration_plate'] && typeof touchedFields !== 'undefined' && touchedFields && touchedFields['registration_plate']) ? '!border-red-500 !focus:ring-2 !focus:ring-red-500 !focus:border-red-500 !bg-red-50' : ''"
-            @blur="validateField('registration_plate', $event.target.value)" />
+            x-bind:class="(typeof fieldErrors !== 'undefined' && fieldErrors && fieldErrors['first_name'] && typeof touchedFields !== 'undefined' && touchedFields && touchedFields['first_name']) ? '!border-red-500 !focus:ring-2 !focus:ring-red-500 !focus:border-red-500 !bg-red-50' : ''"
+            @blur="validateField('first_name', $event.target.value)" />
     </div>
-</div>
 
-<p class="mt-2 text-sm text-gray-600">
-    Numéro d&#039;immatriculation officiel du véhicule
-</p>
-
-
-<p x-show="typeof fieldErrors !== 'undefined' && fieldErrors && fieldErrors['registration_plate'] && typeof touchedFields !== 'undefined' && touchedFields && touchedFields['registration_plate']"
-    x-transition:enter="transition ease-out duration-200"
-    x-transition:enter-start="opacity-0 transform -translate-y-1"
-    x-transition:enter-end="opacity-100 transform translate-y-0"
-    class="mt-2 text-sm text-red-600 flex items-start font-medium"
-    style="display: none;">
-    <span
-    class="iconify block w-4 h-4 mr-1.5 mt-0.5 flex-shrink-0"
-    data-icon="lucide:circle-alert"
-    data-inline="false"></span>    <span>Ce champ est obligatoire et doit être correctement rempli</span>
-</p>
-</div>
-                                    <div class="" maxlength="17" @blur="validateField('vin', $event.target.value)">
-        <label for="vin" class="block mb-2 text-sm font-medium text-gray-900">
-        Numéro de série (VIN)
-            </label>
+        <p class="mt-2 text-sm text-gray-600">
+        Prénom du chauffeur
+    </p>
     
-    <div class="relative">
-                <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-            <span
-    class="iconify block w-5 h-5 text-gray-400"
-    data-icon="heroicons:finger-print"
-    data-inline="false"></span>        </div>
-        
-        <input
-            type="text"
-            name="vin"
-            id="vin"
-            class="bg-gray-50 border text-gray-900 text-sm rounded-lg block w-full p-2.5 transition-colors duration-200 border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 bg-gray-50 pl-10"
-            placeholder="Ex: 1HGBH41JXMN109186"
-            value=""
-                                    
-            x-bind:class="(typeof fieldErrors !== 'undefined' && fieldErrors && fieldErrors['vin'] && typeof touchedFields !== 'undefined' && touchedFields && touchedFields['vin']) ? '!border-red-500 !focus:ring-2 !focus:ring-red-500 !focus:border-red-500 !bg-red-50' : ''"
-            maxlength="17" @blur="validateField('vin', $event.target.value)" />
-    </div>
-</div>
-
-<p class="mt-2 text-sm text-gray-600">
-    17 caractères
-</p>
-
-
-<p x-show="typeof fieldErrors !== 'undefined' && fieldErrors && fieldErrors['vin'] && typeof touchedFields !== 'undefined' && touchedFields && touchedFields['vin']"
-    x-transition:enter="transition ease-out duration-200"
-    x-transition:enter-start="opacity-0 transform -translate-y-1"
-    x-transition:enter-end="opacity-100 transform translate-y-0"
-    class="mt-2 text-sm text-red-600 flex items-start font-medium"
-    style="display: none;">
-    <span
+    
+    <p x-show="typeof fieldErrors !== 'undefined' && fieldErrors && fieldErrors['first_name'] && typeof touchedFields !== 'undefined' && touchedFields && touchedFields['first_name']"
+        x-transition:enter="transition ease-out duration-200"
+        x-transition:enter-start="opacity-0 transform -translate-y-1"
+        x-transition:enter-end="opacity-100 transform translate-y-0"
+        class="mt-2 text-sm text-red-600 flex items-start font-medium"
+        style="display: none;">
+        <span
     class="iconify block w-4 h-4 mr-1.5 mt-0.5 flex-shrink-0"
     data-icon="lucide:circle-alert"
-    data-inline="false"></span>    <span>Ce champ est obligatoire et doit être correctement rempli</span>
-</p>
+    data-inline="false"></span>        <span>Ce champ est obligatoire et doit être correctement rempli</span>
+    </p>
 </div>
-                                    <div class="" @blur="validateField('brand', $event.target.value)">
-        <label for="brand" class="block mb-2 text-sm font-medium text-gray-900">
-        Marque
+                        <div class="" @blur="validateField('last_name', $event.target.value)">
+        <label for="last_name" class="block mb-2 text-sm font-medium text-gray-900">
+        Nom
                 <span class="text-red-600">*</span>
             </label>
     
@@ -1087,654 +921,51 @@
                 <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
             <span
     class="iconify block w-5 h-5 text-gray-400"
-    data-icon="heroicons:building-storefront"
+    data-icon="heroicons:user"
     data-inline="false"></span>        </div>
         
         <input
             type="text"
-            name="brand"
-            id="brand"
+            name="last_name"
+            id="last_name"
             class="bg-gray-50 border text-gray-900 text-sm rounded-lg block w-full p-2.5 transition-colors duration-200 border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 bg-gray-50 pl-10"
-            placeholder="Ex: Renault, Peugeot, Toyota..."
+            placeholder="Ex: Benali"
             value=""
              required                         
-            x-bind:class="(typeof fieldErrors !== 'undefined' && fieldErrors && fieldErrors['brand'] && typeof touchedFields !== 'undefined' && touchedFields && touchedFields['brand']) ? '!border-red-500 !focus:ring-2 !focus:ring-red-500 !focus:border-red-500 !bg-red-50' : ''"
-            @blur="validateField('brand', $event.target.value)" />
+            x-bind:class="(typeof fieldErrors !== 'undefined' && fieldErrors && fieldErrors['last_name'] && typeof touchedFields !== 'undefined' && touchedFields && touchedFields['last_name']) ? '!border-red-500 !focus:ring-2 !focus:ring-red-500 !focus:border-red-500 !bg-red-50' : ''"
+            @blur="validateField('last_name', $event.target.value)" />
     </div>
-</div>
 
-
-
-<p x-show="typeof fieldErrors !== 'undefined' && fieldErrors && fieldErrors['brand'] && typeof touchedFields !== 'undefined' && touchedFields && touchedFields['brand']"
-    x-transition:enter="transition ease-out duration-200"
-    x-transition:enter-start="opacity-0 transform -translate-y-1"
-    x-transition:enter-end="opacity-100 transform translate-y-0"
-    class="mt-2 text-sm text-red-600 flex items-start font-medium"
-    style="display: none;">
-    <span
+    
+    
+    <p x-show="typeof fieldErrors !== 'undefined' && fieldErrors && fieldErrors['last_name'] && typeof touchedFields !== 'undefined' && touchedFields && touchedFields['last_name']"
+        x-transition:enter="transition ease-out duration-200"
+        x-transition:enter-start="opacity-0 transform -translate-y-1"
+        x-transition:enter-end="opacity-100 transform translate-y-0"
+        class="mt-2 text-sm text-red-600 flex items-start font-medium"
+        style="display: none;">
+        <span
     class="iconify block w-4 h-4 mr-1.5 mt-0.5 flex-shrink-0"
     data-icon="lucide:circle-alert"
-    data-inline="false"></span>    <span>Ce champ est obligatoire et doit être correctement rempli</span>
-</p>
+    data-inline="false"></span>        <span>Ce champ est obligatoire et doit être correctement rempli</span>
+    </p>
 </div>
-                                    <div class="" @blur="validateField('model', $event.target.value)">
-        <label for="model" class="block mb-2 text-sm font-medium text-gray-900">
-        Modèle
-            </label>
+</div>
+
+                    <div class="col-span-full w-full min-w-0 grid grid-cols-1 md:grid-cols-2 gap-6 mt-6"
+        style="position: relative;"
+    >
+        
+    <div class="hidden md:block absolute left-1/2 top-4 bottom-4 w-px bg-gradient-to-b from-transparent via-slate-200 to-transparent" aria-hidden="true"></div>
     
-    <div class="relative">
-                <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-            <span
-    class="iconify block w-5 h-5 text-gray-400"
-    data-icon="heroicons:truck"
-    data-inline="false"></span>        </div>
-        
-        <input
-            type="text"
-            name="model"
-            id="model"
-            class="bg-gray-50 border text-gray-900 text-sm rounded-lg block w-full p-2.5 transition-colors duration-200 border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 bg-gray-50 pl-10"
-            placeholder="Ex: Clio, 208, Corolla..."
-            value=""
-                                    
-            x-bind:class="(typeof fieldErrors !== 'undefined' && fieldErrors && fieldErrors['model'] && typeof touchedFields !== 'undefined' && touchedFields && touchedFields['model']) ? '!border-red-500 !focus:ring-2 !focus:ring-red-500 !focus:border-red-500 !bg-red-50' : ''"
-            @blur="validateField('model', $event.target.value)" />
-    </div>
-</div>
-
-
-
-<p x-show="typeof fieldErrors !== 'undefined' && fieldErrors && fieldErrors['model'] && typeof touchedFields !== 'undefined' && touchedFields && touchedFields['model']"
-    x-transition:enter="transition ease-out duration-200"
-    x-transition:enter-start="opacity-0 transform -translate-y-1"
-    x-transition:enter-end="opacity-100 transform translate-y-0"
-    class="mt-2 text-sm text-red-600 flex items-start font-medium"
-    style="display: none;">
-    <span
-    class="iconify block w-4 h-4 mr-1.5 mt-0.5 flex-shrink-0"
-    data-icon="lucide:circle-alert"
-    data-inline="false"></span>    <span>Ce champ est obligatoire et doit être correctement rempli</span>
-</p>
-</div>
-                                    <div class="md:col-span-2">
-                                        <div class="">
-        <label for="color" class="block mb-2 text-sm font-medium text-gray-900">
-        Couleur
-            </label>
-    
-    <div class="relative">
-                <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-            <span
-    class="iconify block w-5 h-5 text-gray-400"
-    data-icon="heroicons:swatch"
-    data-inline="false"></span>        </div>
-        
-        <input
-            type="text"
-            name="color"
-            id="color"
-            class="bg-gray-50 border text-gray-900 text-sm rounded-lg block w-full p-2.5 transition-colors duration-200 border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 bg-gray-50 pl-10"
-            placeholder="Ex: Blanc, Noir, Gris métallisé..."
-            value=""
-                                    
-            x-bind:class="(typeof fieldErrors !== 'undefined' && fieldErrors && fieldErrors['color'] && typeof touchedFields !== 'undefined' && touchedFields && touchedFields['color']) ? '!border-red-500 !focus:ring-2 !focus:ring-red-500 !focus:border-red-500 !bg-red-50' : ''"
-             />
-    </div>
-</div>
-
-
-
-<p x-show="typeof fieldErrors !== 'undefined' && fieldErrors && fieldErrors['color'] && typeof touchedFields !== 'undefined' && touchedFields && touchedFields['color']"
-    x-transition:enter="transition ease-out duration-200"
-    x-transition:enter-start="opacity-0 transform -translate-y-1"
-    x-transition:enter-end="opacity-100 transform translate-y-0"
-    class="mt-2 text-sm text-red-600 flex items-start font-medium"
-    style="display: none;">
-    <span
-    class="iconify block w-4 h-4 mr-1.5 mt-0.5 flex-shrink-0"
-    data-icon="lucide:circle-alert"
-    data-inline="false"></span>    <span>Ce champ est obligatoire et doit être correctement rempli</span>
-</p>
-</div>                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    
-                    <div x-show="currentStep === 2" x-transition:enter="transition ease-out duration-200"
-                        x-transition:enter-start="opacity-0 transform translate-x-4"
-                        x-transition:enter-end="opacity-100 transform translate-x-0"
-                        style="display: none;">
-                        <div class="space-y-6">
-                            <div>
-                                <h3 class="text-lg font-medium text-gray-900 mb-4 flex items-center gap-2">
-                                    <span
-    class="iconify block w-5 h-5 text-blue-600"
-    data-icon="heroicons:cog-6-tooth"
-    data-inline="false"></span>                                    Caractéristiques Techniques
-                                </h3>
-
-                                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                                    <div wire:ignore
-    x-data="{
-        instance: null,
-        initSelect() {
-            if (this.instance) return;
-            this.instance = new SlimSelect({
-                select: this.$refs.select,
-                settings: {
-                    showSearch: true,
-                    searchPlaceholder: 'Rechercher...',
-                    searchText: 'Aucun résultat',
-                    searchingText: 'Recherche...',
-                    placeholderText: 'Sélectionnez un type...',
-                    allowDeselect: true,
-                    hideSelected: false,
-                },
-                events: {
-                    afterChange: (newVal) => {
-                        // Dispatch event for Livewire/Alpine
-                        this.$refs.select.dispatchEvent(new Event('change', { bubbles: true }));
-                    }
-                }
-            });
-        }
-    }"
-    x-init="initSelect()"
-    class="" @change="validateField('vehicle_type_id', $event.target.value)">
-
-        <label for="slimselect-vehicle_type_id-6976aba26b553" class="block mb-2 text-sm font-medium text-gray-900">
-        Type de Véhicule
-            </label>
-    
-    <select
-        x-ref="select"
-        name="vehicle_type_id"
-        id="slimselect-vehicle_type_id-6976aba26b553"
-        class="slimselect-field w-full"
-                        @change="validateField('vehicle_type_id', $event.target.value)">
-
-        
-                        <option value="" data-placeholder="true">Sélectionnez un type...</option>
-        
-                <option
-            value="21"
-            >
-            Autocar
-        </option>
-                <option
-            value="9"
-            >
-            Autre
-        </option>
-                <option
-            value="10"
-            >
-            Berline
-        </option>
-                <option
-            value="13"
-            >
-            Break
-        </option>
-                <option
-            value="6"
-            >
-            Bus
-        </option>
-                <option
-            value="15"
-            >
-            Cabriolet
-        </option>
-                <option
-            value="2"
-            >
-            Camion
-        </option>
-                <option
-            value="20"
-            >
-            Camionnette
-        </option>
-                <option
-            value="12"
-            >
-            Citadine
-        </option>
-                <option
-            value="14"
-            >
-            Coupé
-        </option>
-                <option
-            value="17"
-            >
-            Crossover
-        </option>
-                <option
-            value="4"
-            >
-            Engin
-        </option>
-                <option
-            value="5"
-            >
-            Fourgonnette
-        </option>
-                <option
-            value="22"
-            >
-            Minibus
-        </option>
-                <option
-            value="16"
-            >
-            Monospace
-        </option>
-                <option
-            value="3"
-            >
-            Moto
-        </option>
-                <option
-            value="18"
-            >
-            Pick-up
-        </option>
-                <option
-            value="24"
-            >
-            Quad
-        </option>
-                <option
-            value="25"
-            >
-            Remorque
-        </option>
-                <option
-            value="11"
-            >
-            SUV
-        </option>
-                <option
-            value="23"
-            >
-            Scooter
-        </option>
-                <option
-            value="8"
-            >
-            Semi-remorque
-        </option>
-                <option
-            value="19"
-            >
-            Utilitaire léger
-        </option>
-                <option
-            value="7"
-            >
-            VUL
-        </option>
-                <option
-            value="1"
-            >
-            Voiture
-        </option>
-                    </select>
-
-    </div>
-                                    <div wire:ignore
-    x-data="{
-        instance: null,
-        initSelect() {
-            if (this.instance) return;
-            this.instance = new SlimSelect({
-                select: this.$refs.select,
-                settings: {
-                    showSearch: true,
-                    searchPlaceholder: 'Rechercher...',
-                    searchText: 'Aucun résultat',
-                    searchingText: 'Recherche...',
-                    placeholderText: 'Sélectionnez un carburant...',
-                    allowDeselect: true,
-                    hideSelected: false,
-                },
-                events: {
-                    afterChange: (newVal) => {
-                        // Dispatch event for Livewire/Alpine
-                        this.$refs.select.dispatchEvent(new Event('change', { bubbles: true }));
-                    }
-                }
-            });
-        }
-    }"
-    x-init="initSelect()"
-    class="" @change="validateField('fuel_type_id', $event.target.value)">
-
-        <label for="slimselect-fuel_type_id-6976aba26b806" class="block mb-2 text-sm font-medium text-gray-900">
-        Type de Carburant
-                <span class="text-red-500">*</span>
-            </label>
-    
-    <select
-        x-ref="select"
-        name="fuel_type_id"
-        id="slimselect-fuel_type_id-6976aba26b806"
-        class="slimselect-field w-full"
-                        @change="validateField('fuel_type_id', $event.target.value)">
-
-        
-                        <option value="" data-placeholder="true">Sélectionnez un carburant...</option>
-        
-                <option
-            value="10"
-            >
-            Bioéthanol
-        </option>
-                <option
-            value="2"
-            >
-            Diesel
-        </option>
-                <option
-            value="1"
-            >
-            Essence
-        </option>
-                <option
-            value="7"
-            >
-            Ethanol
-        </option>
-                <option
-            value="9"
-            >
-            GNV
-        </option>
-                <option
-            value="3"
-            >
-            GPL
-        </option>
-                <option
-            value="5"
-            >
-            Hybride
-        </option>
-                <option
-            value="6"
-            >
-            Hybride Rechargeable
-        </option>
-                <option
-            value="8"
-            >
-            Hydrogène
-        </option>
-                <option
-            value="4"
-            >
-            Électrique
-        </option>
-                    </select>
-
-    </div>
-                                    <div wire:ignore
-    x-data="{
-        instance: null,
-        initSelect() {
-            if (this.instance) return;
-            this.instance = new SlimSelect({
-                select: this.$refs.select,
-                settings: {
-                    showSearch: true,
-                    searchPlaceholder: 'Rechercher...',
-                    searchText: 'Aucun résultat',
-                    searchingText: 'Recherche...',
-                    placeholderText: 'Sélectionnez une transmission...',
-                    allowDeselect: true,
-                    hideSelected: false,
-                },
-                events: {
-                    afterChange: (newVal) => {
-                        // Dispatch event for Livewire/Alpine
-                        this.$refs.select.dispatchEvent(new Event('change', { bubbles: true }));
-                    }
-                }
-            });
-        }
-    }"
-    x-init="initSelect()"
-    class="" @change="validateField('transmission_type_id', $event.target.value)">
-
-        <label for="slimselect-transmission_type_id-6976aba26b8e1" class="block mb-2 text-sm font-medium text-gray-900">
-        Type de Transmission
-            </label>
-    
-    <select
-        x-ref="select"
-        name="transmission_type_id"
-        id="slimselect-transmission_type_id-6976aba26b8e1"
-        class="slimselect-field w-full"
-                        @change="validateField('transmission_type_id', $event.target.value)">
-
-        
-                        <option value="" data-placeholder="true">Sélectionnez une transmission...</option>
-        
-                <option
-            value="2"
-            >
-            Automatique
-        </option>
-                <option
-            value="4"
-            >
-            CVT
-        </option>
-                <option
-            value="1"
-            >
-            Manuelle
-        </option>
-                <option
-            value="3"
-            >
-            Semi-automatique
-        </option>
-                    </select>
-
-    </div>
-                                    <div class="" min="1950" max="2027">
-        <label for="manufacturing_year" class="block mb-2 text-sm font-medium text-gray-900">
-        Année de Fabrication
-            </label>
-    
-    <div class="relative">
-                <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-            <span
-    class="iconify block w-5 h-5 text-gray-400"
-    data-icon="heroicons:calendar"
-    data-inline="false"></span>        </div>
-        
-        <input
-            type="number"
-            name="manufacturing_year"
-            id="manufacturing_year"
-            class="bg-gray-50 border text-gray-900 text-sm rounded-lg block w-full p-2.5 transition-colors duration-200 border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 bg-gray-50 pl-10"
-            placeholder="Ex: 2024"
-            value=""
-                                    
-            x-bind:class="(typeof fieldErrors !== 'undefined' && fieldErrors && fieldErrors['manufacturing_year'] && typeof touchedFields !== 'undefined' && touchedFields && touchedFields['manufacturing_year']) ? '!border-red-500 !focus:ring-2 !focus:ring-red-500 !focus:border-red-500 !bg-red-50' : ''"
-            min="1950" max="2027" />
-    </div>
-</div>
-
-
-
-<p x-show="typeof fieldErrors !== 'undefined' && fieldErrors && fieldErrors['manufacturing_year'] && typeof touchedFields !== 'undefined' && touchedFields && touchedFields['manufacturing_year']"
-    x-transition:enter="transition ease-out duration-200"
-    x-transition:enter-start="opacity-0 transform -translate-y-1"
-    x-transition:enter-end="opacity-100 transform translate-y-0"
-    class="mt-2 text-sm text-red-600 flex items-start font-medium"
-    style="display: none;">
-    <span
-    class="iconify block w-4 h-4 mr-1.5 mt-0.5 flex-shrink-0"
-    data-icon="lucide:circle-alert"
-    data-inline="false"></span>    <span>Ce champ est obligatoire et doit être correctement rempli</span>
-</p>
-</div>
-                                    <div class="" min="1" max="99">
-        <label for="seats" class="block mb-2 text-sm font-medium text-gray-900">
-        Nombre de places
-            </label>
-    
-    <div class="relative">
-                <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-            <span
-    class="iconify block w-5 h-5 text-gray-400"
-    data-icon="heroicons:user-group"
-    data-inline="false"></span>        </div>
-        
-        <input
-            type="number"
-            name="seats"
-            id="seats"
-            class="bg-gray-50 border text-gray-900 text-sm rounded-lg block w-full p-2.5 transition-colors duration-200 border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 bg-gray-50 pl-10"
-            placeholder="Ex: 5"
-            value=""
-                                    
-            x-bind:class="(typeof fieldErrors !== 'undefined' && fieldErrors && fieldErrors['seats'] && typeof touchedFields !== 'undefined' && touchedFields && touchedFields['seats']) ? '!border-red-500 !focus:ring-2 !focus:ring-red-500 !focus:border-red-500 !bg-red-50' : ''"
-            min="1" max="99" />
-    </div>
-</div>
-
-
-
-<p x-show="typeof fieldErrors !== 'undefined' && fieldErrors && fieldErrors['seats'] && typeof touchedFields !== 'undefined' && touchedFields && touchedFields['seats']"
-    x-transition:enter="transition ease-out duration-200"
-    x-transition:enter-start="opacity-0 transform -translate-y-1"
-    x-transition:enter-end="opacity-100 transform translate-y-0"
-    class="mt-2 text-sm text-red-600 flex items-start font-medium"
-    style="display: none;">
-    <span
-    class="iconify block w-4 h-4 mr-1.5 mt-0.5 flex-shrink-0"
-    data-icon="lucide:circle-alert"
-    data-inline="false"></span>    <span>Ce champ est obligatoire et doit être correctement rempli</span>
-</p>
-</div>
-                                    <div class="" min="0">
-        <label for="power_hp" class="block mb-2 text-sm font-medium text-gray-900">
-        Puissance (CV)
-            </label>
-    
-    <div class="relative">
-                <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-            <span
-    class="iconify block w-5 h-5 text-gray-400"
-    data-icon="heroicons:bolt"
-    data-inline="false"></span>        </div>
-        
-        <input
-            type="number"
-            name="power_hp"
-            id="power_hp"
-            class="bg-gray-50 border text-gray-900 text-sm rounded-lg block w-full p-2.5 transition-colors duration-200 border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 bg-gray-50 pl-10"
-            placeholder="Ex: 90"
-            value=""
-                                    
-            x-bind:class="(typeof fieldErrors !== 'undefined' && fieldErrors && fieldErrors['power_hp'] && typeof touchedFields !== 'undefined' && touchedFields && touchedFields['power_hp']) ? '!border-red-500 !focus:ring-2 !focus:ring-red-500 !focus:border-red-500 !bg-red-50' : ''"
-            min="0" />
-    </div>
-</div>
-
-
-
-<p x-show="typeof fieldErrors !== 'undefined' && fieldErrors && fieldErrors['power_hp'] && typeof touchedFields !== 'undefined' && touchedFields && touchedFields['power_hp']"
-    x-transition:enter="transition ease-out duration-200"
-    x-transition:enter-start="opacity-0 transform -translate-y-1"
-    x-transition:enter-end="opacity-100 transform translate-y-0"
-    class="mt-2 text-sm text-red-600 flex items-start font-medium"
-    style="display: none;">
-    <span
-    class="iconify block w-4 h-4 mr-1.5 mt-0.5 flex-shrink-0"
-    data-icon="lucide:circle-alert"
-    data-inline="false"></span>    <span>Ce champ est obligatoire et doit être correctement rempli</span>
-</p>
-</div>
-                                    <div class="lg:col-span-3">
-                                        <div class="" min="0">
-        <label for="engine_displacement_cc" class="block mb-2 text-sm font-medium text-gray-900">
-        Cylindrée (cc)
-            </label>
-    
-    <div class="relative">
-                <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-            <span
-    class="iconify block w-5 h-5 text-gray-400"
-    data-icon="heroicons:wrench-screwdriver"
-    data-inline="false"></span>        </div>
-        
-        <input
-            type="number"
-            name="engine_displacement_cc"
-            id="engine_displacement_cc"
-            class="bg-gray-50 border text-gray-900 text-sm rounded-lg block w-full p-2.5 transition-colors duration-200 border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 bg-gray-50 pl-10"
-            placeholder="Ex: 1500"
-            value=""
-                                    
-            x-bind:class="(typeof fieldErrors !== 'undefined' && fieldErrors && fieldErrors['engine_displacement_cc'] && typeof touchedFields !== 'undefined' && touchedFields && touchedFields['engine_displacement_cc']) ? '!border-red-500 !focus:ring-2 !focus:ring-red-500 !focus:border-red-500 !bg-red-50' : ''"
-            min="0" />
-    </div>
-</div>
-
-<p class="mt-2 text-sm text-gray-600">
-    Capacité du moteur en centimètres cubes
-</p>
-
-
-<p x-show="typeof fieldErrors !== 'undefined' && fieldErrors && fieldErrors['engine_displacement_cc'] && typeof touchedFields !== 'undefined' && touchedFields && touchedFields['engine_displacement_cc']"
-    x-transition:enter="transition ease-out duration-200"
-    x-transition:enter-start="opacity-0 transform -translate-y-1"
-    x-transition:enter-end="opacity-100 transform translate-y-0"
-    class="mt-2 text-sm text-red-600 flex items-start font-medium"
-    style="display: none;">
-    <span
-    class="iconify block w-4 h-4 mr-1.5 mt-0.5 flex-shrink-0"
-    data-icon="lucide:circle-alert"
-    data-inline="false"></span>    <span>Ce champ est obligatoire et doit être correctement rempli</span>
-</p>
-</div>                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    
-                    <div x-show="currentStep === 3" x-transition:enter="transition ease-out duration-200"
-                        x-transition:enter-start="opacity-0 transform translate-x-4"
-                        x-transition:enter-end="opacity-100 transform translate-x-0"
-                        style="display: none;">
-                        <div class="space-y-6">
-                            <div>
-                                <h3 class="text-lg font-medium text-gray-900 mb-4 flex items-center gap-2">
-                                    <span
-    class="iconify block w-5 h-5 text-blue-600"
-    data-icon="heroicons:currency-dollar"
-    data-inline="false"></span>                                    Acquisition & Statut
-                                </h3>
-
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                    <div
+    <div
     class="w-full"
     x-data="zenfleetDatepicker"
     data-value=""
     data-display-value=""
-         data-max-date="26/01/2026"     wire:ignore>
-        <label for="datepicker-6976aba26bc6e" class="block mb-2 text-sm font-medium text-gray-900">
-        Date d&#039;acquisition
+         data-max-date="31/01/2026"     wire:ignore>
+        <label for="datepicker-697d451178543" class="block mb-2 text-sm font-medium text-gray-900">
+        Date de naissance
             </label>
     
     <div class="relative">
@@ -1749,7 +980,7 @@
         <input
             x-ref="displayInput"
             type="text"
-            id="datepicker-6976aba26bc6e"
+            id="datepicker-697d451178543"
             class="block w-full !pl-10 p-2.5 bg-gray-50 border-2 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 border-gray-300"
             placeholder="Choisir une date"
             x-model="displayValue"
@@ -1759,141 +990,340 @@
         
         <input
             type="hidden"
-            name="acquisition_date"
+            name="birth_date"
             x-model="serverDate"
             value="">
     </div>
 
-        <p class="mt-1 text-xs text-gray-500">Date d&#039;achat du véhicule</p>
+        <p class="mt-1 text-xs text-gray-500">Date de naissance du chauffeur</p>
     </div>
-                                    <div class="" step="0.01" min="0">
-        <label for="purchase_price" class="block mb-2 text-sm font-medium text-gray-900">
-        Prix d&#039;achat (DA)
+                        <div class="">
+        <label for="personal_phone" class="block mb-2 text-sm font-medium text-gray-900">
+        Téléphone personnel
             </label>
     
     <div class="relative">
                 <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
             <span
     class="iconify block w-5 h-5 text-gray-400"
-    data-icon="heroicons:currency-dollar"
+    data-icon="heroicons:phone"
     data-inline="false"></span>        </div>
         
         <input
-            type="number"
-            name="purchase_price"
-            id="purchase_price"
+            type="tel"
+            name="personal_phone"
+            id="personal_phone"
             class="bg-gray-50 border text-gray-900 text-sm rounded-lg block w-full p-2.5 transition-colors duration-200 border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 bg-gray-50 pl-10"
-            placeholder="Ex: 2500000"
+            placeholder="Ex: 0555123456"
             value=""
                                     
-            x-bind:class="(typeof fieldErrors !== 'undefined' && fieldErrors && fieldErrors['purchase_price'] && typeof touchedFields !== 'undefined' && touchedFields && touchedFields['purchase_price']) ? '!border-red-500 !focus:ring-2 !focus:ring-red-500 !focus:border-red-500 !bg-red-50' : ''"
-            step="0.01" min="0" />
+            x-bind:class="(typeof fieldErrors !== 'undefined' && fieldErrors && fieldErrors['personal_phone'] && typeof touchedFields !== 'undefined' && touchedFields && touchedFields['personal_phone']) ? '!border-red-500 !focus:ring-2 !focus:ring-red-500 !focus:border-red-500 !bg-red-50' : ''"
+             />
     </div>
-</div>
 
-<p class="mt-2 text-sm text-gray-600">
-    Prix d&#039;achat en Dinars Algériens
-</p>
-
-
-<p x-show="typeof fieldErrors !== 'undefined' && fieldErrors && fieldErrors['purchase_price'] && typeof touchedFields !== 'undefined' && touchedFields && touchedFields['purchase_price']"
-    x-transition:enter="transition ease-out duration-200"
-    x-transition:enter-start="opacity-0 transform -translate-y-1"
-    x-transition:enter-end="opacity-100 transform translate-y-0"
-    class="mt-2 text-sm text-red-600 flex items-start font-medium"
-    style="display: none;">
-    <span
+    
+    
+    <p x-show="typeof fieldErrors !== 'undefined' && fieldErrors && fieldErrors['personal_phone'] && typeof touchedFields !== 'undefined' && touchedFields && touchedFields['personal_phone']"
+        x-transition:enter="transition ease-out duration-200"
+        x-transition:enter-start="opacity-0 transform -translate-y-1"
+        x-transition:enter-end="opacity-100 transform translate-y-0"
+        class="mt-2 text-sm text-red-600 flex items-start font-medium"
+        style="display: none;">
+        <span
     class="iconify block w-4 h-4 mr-1.5 mt-0.5 flex-shrink-0"
     data-icon="lucide:circle-alert"
-    data-inline="false"></span>    <span>Ce champ est obligatoire et doit être correctement rempli</span>
-</p>
+    data-inline="false"></span>        <span>Ce champ est obligatoire et doit être correctement rempli</span>
+    </p>
 </div>
-                                    <div class="" step="0.01" min="0">
-        <label for="current_value" class="block mb-2 text-sm font-medium text-gray-900">
-        Valeur actuelle (DA)
+                        <div class="">
+        <label for="personal_email" class="block mb-2 text-sm font-medium text-gray-900">
+        Email personnel
             </label>
     
     <div class="relative">
                 <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
             <span
     class="iconify block w-5 h-5 text-gray-400"
-    data-icon="heroicons:currency-dollar"
+    data-icon="heroicons:envelope"
     data-inline="false"></span>        </div>
         
         <input
-            type="number"
-            name="current_value"
-            id="current_value"
+            type="email"
+            name="personal_email"
+            id="personal_email"
             class="bg-gray-50 border text-gray-900 text-sm rounded-lg block w-full p-2.5 transition-colors duration-200 border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 bg-gray-50 pl-10"
-            placeholder="Ex: 2000000"
+            placeholder="Ex: ahmed.benali@email.com"
             value=""
                                     
-            x-bind:class="(typeof fieldErrors !== 'undefined' && fieldErrors && fieldErrors['current_value'] && typeof touchedFields !== 'undefined' && touchedFields && touchedFields['current_value']) ? '!border-red-500 !focus:ring-2 !focus:ring-red-500 !focus:border-red-500 !bg-red-50' : ''"
-            step="0.01" min="0" />
+            x-bind:class="(typeof fieldErrors !== 'undefined' && fieldErrors && fieldErrors['personal_email'] && typeof touchedFields !== 'undefined' && touchedFields && touchedFields['personal_email']) ? '!border-red-500 !focus:ring-2 !focus:ring-red-500 !focus:border-red-500 !bg-red-50' : ''"
+             />
+    </div>
+
+    
+    
+    <p x-show="typeof fieldErrors !== 'undefined' && fieldErrors && fieldErrors['personal_email'] && typeof touchedFields !== 'undefined' && touchedFields && touchedFields['personal_email']"
+        x-transition:enter="transition ease-out duration-200"
+        x-transition:enter-start="opacity-0 transform -translate-y-1"
+        x-transition:enter-end="opacity-100 transform translate-y-0"
+        class="mt-2 text-sm text-red-600 flex items-start font-medium"
+        style="display: none;">
+        <span
+    class="iconify block w-4 h-4 mr-1.5 mt-0.5 flex-shrink-0"
+    data-icon="lucide:circle-alert"
+    data-inline="false"></span>        <span>Ce champ est obligatoire et doit être correctement rempli</span>
+    </p>
+</div>
+                        <div class="">
+  <label for="blood_type" class="block mb-2 text-sm font-medium text-gray-900 ">
+ Groupe sanguin
+  </label>
+ 
+ <select
+ name="blood_type"
+ id="blood_type"
+ class="bg-gray-50 border text-gray-900 text-sm rounded-lg block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white border-gray-300 focus:ring-primary-500 focus:border-primary-500 dark:focus:ring-primary-500 dark:focus:border-primary-500"
+   
+ >
+ 
+  
+ 
+  <option value="" selected>
+ Sélectionner
+ </option>
+  <option value="A+" >
+ A+
+ </option>
+  <option value="A-" >
+ A-
+ </option>
+  <option value="B+" >
+ B+
+ </option>
+  <option value="B-" >
+ B-
+ </option>
+  <option value="AB+" >
+ AB+
+ </option>
+  <option value="AB-" >
+ AB-
+ </option>
+  <option value="O+" >
+ O+
+ </option>
+  <option value="O-" >
+ O-
+ </option>
+   </select>
+
+ </div>
+</div>
+
+                    <div class="col-span-6 mt-6">
+                        <div class="">
+  <label for="address" class="block mb-2 text-sm font-medium text-gray-900">
+ Adresse
+  </label>
+ 
+ <textarea
+ name="address"
+ id="address"
+ rows="3"
+ class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border transition-colors duration-200 border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 !bg-gray-50"
+ placeholder="Adresse complète du chauffeur..."
+   
+ ></textarea>
+
+ </div>
+                    </div>
+
+                    
+                    <div class="col-span-6 mt-6">
+                        <label for="photo" class="block text-sm font-medium text-gray-700 mb-2">
+                            Photo du chauffeur
+                        </label>
+                        <div class="flex items-center gap-6">
+                            
+                            <div class="flex-shrink-0">
+                                <div x-show="!photoPreview" class="h-24 w-24 rounded-full bg-gray-100 flex items-center justify-center">
+                                    <span
+    class="iconify block w-12 h-12 text-gray-400"
+    data-icon="heroicons:user"
+    data-inline="false"></span>                                </div>
+                                <img x-show="photoPreview" :src="photoPreview" class="h-24 w-24 rounded-full object-cover ring-2 ring-blue-100" alt="Prévisualisation" x-cloak>
+                            </div>
+                            
+                            <div class="flex-1">
+                                <input
+                                    type="file"
+                                    name="photo"
+                                    id="photo"
+                                    accept="image/*"
+                                    @change="updatePhotoPreview($event)"
+                                    class="block w-full text-sm text-gray-500
+                                        file:mr-4 file:py-2 file:px-4
+                                        file:rounded-lg file:border-0
+                                        file:text-sm file:font-medium
+                                        file:bg-blue-50 file:text-blue-700
+                                        hover:file:bg-blue-100
+                                        cursor-pointer">
+                                <p class="mt-1 text-xs text-gray-500">PNG, JPG, GIF jusqu'à 5MB</p>
+                                                            </div>
+                        </div>
+                    </div>
+            </div>
+        </section>
     </div>
 </div>
 
-<p class="mt-2 text-sm text-gray-600">
-    Valeur estimée actuelle
-</p>
+                
+                <div class="relative">
+            <div class="absolute left-5 top-6 bottom-6 w-px bg-slate-200/80"></div>
+    
+    <div class="relative pl-12">
+                    <div class="absolute left-1.5 top-6">
+                <span class="inline-flex h-9 w-9 items-center justify-center rounded-full bg-white text-blue-600 shadow-sm ring-2 ring-blue-100">
+                    <span
+    class="iconify block w-5 h-5"
+    data-icon="heroicons:briefcase"
+    data-inline="false"></span>                </span>
+            </div>
+        
+        <section class="rounded-2xl border border-slate-200 bg-white shadow-sm">
+            <div class="flex items-center justify-between gap-4 px-6 py-4 bg-slate-50/70 border-b border-slate-200">
+                <div>
+                                        <h3 class="text-sm font-semibold text-slate-900">Informations Professionnelles</h3>
+                                            <p class="text-xs text-slate-500 mt-0.5">Matricule, statut et informations de recrutement</p>
+                                    </div>
+                
+            </div>
 
-
-<p x-show="typeof fieldErrors !== 'undefined' && fieldErrors && fieldErrors['current_value'] && typeof touchedFields !== 'undefined' && touchedFields && touchedFields['current_value']"
-    x-transition:enter="transition ease-out duration-200"
-    x-transition:enter-start="opacity-0 transform -translate-y-1"
-    x-transition:enter-end="opacity-100 transform translate-y-0"
-    class="mt-2 text-sm text-red-600 flex items-start font-medium"
-    style="display: none;">
-    <span
-    class="iconify block w-4 h-4 mr-1.5 mt-0.5 flex-shrink-0"
-    data-icon="lucide:circle-alert"
-    data-inline="false"></span>    <span>Ce champ est obligatoire et doit être correctement rempli</span>
-</p>
-</div>
-                                    <div class="" min="0">
-        <label for="initial_mileage" class="block mb-2 text-sm font-medium text-gray-900">
-        Kilométrage Initial
+            <div class="p-6 ">
+                <div class="col-span-full w-full min-w-0 grid grid-cols-1 md:grid-cols-2 gap-6"
+        style="position: relative;"
+    >
+        
+    <div class="hidden md:block absolute left-1/2 top-4 bottom-4 w-px bg-gradient-to-b from-transparent via-slate-200 to-transparent" aria-hidden="true"></div>
+    
+    <div class="">
+        <label for="employee_number" class="block mb-2 text-sm font-medium text-gray-900">
+        Matricule
             </label>
     
     <div class="relative">
                 <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
             <span
     class="iconify block w-5 h-5 text-gray-400"
-    data-icon="heroicons:chart-bar"
+    data-icon="heroicons:identification"
     data-inline="false"></span>        </div>
         
         <input
-            type="number"
-            name="initial_mileage"
-            id="initial_mileage"
+            type="text"
+            name="employee_number"
+            id="employee_number"
             class="bg-gray-50 border text-gray-900 text-sm rounded-lg block w-full p-2.5 transition-colors duration-200 border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 bg-gray-50 pl-10"
-            placeholder="Ex: 0"
-            value="0"
+            placeholder="Ex: EMP-2024-001"
+            value=""
                                     
-            x-bind:class="(typeof fieldErrors !== 'undefined' && fieldErrors && fieldErrors['initial_mileage'] && typeof touchedFields !== 'undefined' && touchedFields && touchedFields['initial_mileage']) ? '!border-red-500 !focus:ring-2 !focus:ring-red-500 !focus:border-red-500 !bg-red-50' : ''"
-            min="0" />
+            x-bind:class="(typeof fieldErrors !== 'undefined' && fieldErrors && fieldErrors['employee_number'] && typeof touchedFields !== 'undefined' && touchedFields && touchedFields['employee_number']) ? '!border-red-500 !focus:ring-2 !focus:ring-red-500 !focus:border-red-500 !bg-red-50' : ''"
+             />
     </div>
-</div>
 
-<p class="mt-2 text-sm text-gray-600">
-    Kilométrage au moment de l&#039;acquisition
-</p>
-
-
-<p x-show="typeof fieldErrors !== 'undefined' && fieldErrors && fieldErrors['initial_mileage'] && typeof touchedFields !== 'undefined' && touchedFields && touchedFields['initial_mileage']"
-    x-transition:enter="transition ease-out duration-200"
-    x-transition:enter-start="opacity-0 transform -translate-y-1"
-    x-transition:enter-end="opacity-100 transform translate-y-0"
-    class="mt-2 text-sm text-red-600 flex items-start font-medium"
-    style="display: none;">
-    <span
+        <p class="mt-2 text-sm text-gray-600">
+        Numéro matricule unique
+    </p>
+    
+    
+    <p x-show="typeof fieldErrors !== 'undefined' && fieldErrors && fieldErrors['employee_number'] && typeof touchedFields !== 'undefined' && touchedFields && touchedFields['employee_number']"
+        x-transition:enter="transition ease-out duration-200"
+        x-transition:enter-start="opacity-0 transform -translate-y-1"
+        x-transition:enter-end="opacity-100 transform translate-y-0"
+        class="mt-2 text-sm text-red-600 flex items-start font-medium"
+        style="display: none;">
+        <span
     class="iconify block w-4 h-4 mr-1.5 mt-0.5 flex-shrink-0"
     data-icon="lucide:circle-alert"
-    data-inline="false"></span>    <span>Ce champ est obligatoire et doit être correctement rempli</span>
-</p>
+    data-inline="false"></span>        <span>Ce champ est obligatoire et doit être correctement rempli</span>
+    </p>
 </div>
-                                    <div class="md:col-span-2">
-                                        <div wire:ignore
+                        <div
+    class="w-full"
+    x-data="zenfleetDatepicker"
+    data-value=""
+    data-display-value=""
+         data-max-date="31/01/2026"     wire:ignore>
+        <label for="datepicker-697d451178953" class="block mb-2 text-sm font-medium text-gray-900">
+        Date de recrutement
+            </label>
+    
+    <div class="relative">
+        
+        <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none z-10">
+            <svg class="w-4 h-4 text-gray-500" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M20 4a2 2 0 0 0-2-2h-2V1a1 1 0 0 0-2 0v1h-3V1a1 1 0 0 0-2 0v1H6V1a1 1 0 0 0-2 0v1H2a2 2 0 0 0-2 2v2h20V4ZM0 18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8H0v10Zm5-8h10a1 1 0 0 1 0 2H5a1 1 0 0 1 0-2Z" />
+            </svg>
+        </div>
+
+        
+        <input
+            x-ref="displayInput"
+            type="text"
+            id="datepicker-697d451178953"
+            class="block w-full !pl-10 p-2.5 bg-gray-50 border-2 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 border-gray-300"
+            placeholder="Choisir une date"
+            x-model="displayValue"
+                                    autocomplete="off"
+            readonly>
+
+        
+        <input
+            type="hidden"
+            name="recruitment_date"
+            x-model="serverDate"
+            value="">
+    </div>
+
+    </div>
+                        <div
+    class="w-full"
+    x-data="zenfleetDatepicker"
+    data-value=""
+    data-display-value=""
+     data-min-date="31/01/2026"         wire:ignore>
+        <label for="datepicker-697d451178994" class="block mb-2 text-sm font-medium text-gray-900">
+        Fin de contrat
+            </label>
+    
+    <div class="relative">
+        
+        <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none z-10">
+            <svg class="w-4 h-4 text-gray-500" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M20 4a2 2 0 0 0-2-2h-2V1a1 1 0 0 0-2 0v1h-3V1a1 1 0 0 0-2 0v1H6V1a1 1 0 0 0-2 0v1H2a2 2 0 0 0-2 2v2h20V4ZM0 18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8H0v10Zm5-8h10a1 1 0 0 1 0 2H5a1 1 0 0 1 0-2Z" />
+            </svg>
+        </div>
+
+        
+        <input
+            x-ref="displayInput"
+            type="text"
+            id="datepicker-697d451178994"
+            class="block w-full !pl-10 p-2.5 bg-gray-50 border-2 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 border-gray-300"
+            placeholder="Choisir une date"
+            x-model="displayValue"
+                                    autocomplete="off"
+            readonly>
+
+        
+        <input
+            type="hidden"
+            name="contract_end_date"
+            x-model="serverDate"
+            value="">
+    </div>
+
+        <p class="mt-1 text-xs text-gray-500">Date de fin du contrat (optionnel)</p>
+    </div>
+                        <div wire:ignore
     x-data="{
         instance: null,
         initSelect() {
@@ -1921,14 +1351,15 @@
     x-init="initSelect()"
     class="" @change="validateField('status_id', $event.target.value)">
 
-        <label for="slimselect-status_id-6976aba26bee1" class="block mb-2 text-sm font-medium text-gray-900">
-        Statut Initial
+        <label for="slimselect-status_id-697d4511789df" class="block mb-2 text-sm font-medium text-gray-900">
+        Statut du Chauffeur
+                <span class="text-red-500">*</span>
             </label>
     
     <select
         x-ref="select"
         name="status_id"
-        id="slimselect-status_id-6976aba26bee1"
+        id="slimselect-status_id-697d4511789df"
         class="slimselect-field w-full"
                         @change="validateField('status_id', $event.target.value)">
 
@@ -1936,44 +1367,683 @@
                         <option value="" data-placeholder="true">Sélectionnez un statut...</option>
         
                 <option
-            value="2"
+            value="7"
             >
-            Affecté
+            Disponible
         </option>
                 <option
-            value="4"
+            value="8"
             >
-            En maintenance
+            En mission
         </option>
                 <option
-            value="3"
+            value="11"
             >
-            En panne
+            En formation
         </option>
                 <option
-            value="1"
+            value="9"
             >
-            Parking
+            En congé
         </option>
                 <option
-            value="5"
+            value="10"
             >
-            Réformé
-        </option>
-                <option
-            value="6"
-            >
-            Vendu
+            Autre
         </option>
                     </select>
 
-        <p class="mt-2 text-sm text-gray-500">
-        État opérationnel du véhicule
-    </p>
-    </div>                                    </div>
+    </div>
+</div>
 
-                                    <div class="md:col-span-2">
-                                        <div wire:ignore
+                    <div class="col-span-6 mt-6">
+                        <div class="">
+  <label for="notes" class="block mb-2 text-sm font-medium text-gray-900">
+ Notes professionnelles
+  </label>
+ 
+ <textarea
+ name="notes"
+ id="notes"
+ rows="4"
+ class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border transition-colors duration-200 border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 !bg-gray-50"
+ placeholder="Informations complémentaires sur le chauffeur..."
+   
+ ></textarea>
+
+  <p class="mt-2 text-sm text-gray-600">
+ Compétences, formations, remarques, etc.
+ </p>
+ </div>
+                    </div>
+            </div>
+        </section>
+    </div>
+</div>
+
+                
+                <div class="relative">
+            <div class="absolute left-5 top-6 bottom-6 w-px bg-slate-200/80"></div>
+    
+    <div class="relative pl-12">
+                    <div class="absolute left-1.5 top-6">
+                <span class="inline-flex h-9 w-9 items-center justify-center rounded-full bg-white text-blue-600 shadow-sm ring-2 ring-blue-100">
+                    <span
+    class="iconify block w-5 h-5"
+    data-icon="heroicons:identification"
+    data-inline="false"></span>                </span>
+            </div>
+        
+        <section class="rounded-2xl border border-slate-200 bg-white shadow-sm">
+            <div class="flex items-center justify-between gap-4 px-6 py-4 bg-slate-50/70 border-b border-slate-200">
+                <div>
+                                        <h3 class="text-sm font-semibold text-slate-900">Permis de Conduire</h3>
+                                            <p class="text-xs text-slate-500 mt-0.5">Numéro, catégories et dates de validité</p>
+                                    </div>
+                
+            </div>
+
+            <div class="p-6 ">
+                <div class="col-span-full w-full min-w-0 grid grid-cols-1 md:grid-cols-2 gap-6"
+        style="position: relative;"
+    >
+        
+    <div class="hidden md:block absolute left-1/2 top-4 bottom-4 w-px bg-gradient-to-b from-transparent via-slate-200 to-transparent" aria-hidden="true"></div>
+    
+    <div class="">
+        <label for="license_number" class="block mb-2 text-sm font-medium text-gray-900">
+        Numéro de permis
+                <span class="text-red-600">*</span>
+            </label>
+    
+    <div class="relative">
+                <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+            <span
+    class="iconify block w-5 h-5 text-gray-400"
+    data-icon="heroicons:identification"
+    data-inline="false"></span>        </div>
+        
+        <input
+            type="text"
+            name="license_number"
+            id="license_number"
+            class="bg-gray-50 border text-gray-900 text-sm rounded-lg block w-full p-2.5 transition-colors duration-200 border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 bg-gray-50 pl-10"
+            placeholder="Ex: 123456789"
+            value=""
+             required                         
+            x-bind:class="(typeof fieldErrors !== 'undefined' && fieldErrors && fieldErrors['license_number'] && typeof touchedFields !== 'undefined' && touchedFields && touchedFields['license_number']) ? '!border-red-500 !focus:ring-2 !focus:ring-red-500 !focus:border-red-500 !bg-red-50' : ''"
+             />
+    </div>
+
+        <p class="mt-2 text-sm text-gray-600">
+        Numéro du permis de conduire
+    </p>
+    
+    
+    <p x-show="typeof fieldErrors !== 'undefined' && fieldErrors && fieldErrors['license_number'] && typeof touchedFields !== 'undefined' && touchedFields && touchedFields['license_number']"
+        x-transition:enter="transition ease-out duration-200"
+        x-transition:enter-start="opacity-0 transform -translate-y-1"
+        x-transition:enter-end="opacity-100 transform translate-y-0"
+        class="mt-2 text-sm text-red-600 flex items-start font-medium"
+        style="display: none;">
+        <span
+    class="iconify block w-4 h-4 mr-1.5 mt-0.5 flex-shrink-0"
+    data-icon="lucide:circle-alert"
+    data-inline="false"></span>        <span>Ce champ est obligatoire et doit être correctement rempli</span>
+    </p>
+</div>
+                        
+                        
+                        <div>
+                            <div x-data="{ 
+    open: false, 
+    selected: [], 
+    options: JSON.parse('[\u0022A1\u0022,\u0022A\u0022,\u0022B\u0022,\u0022BE\u0022,\u0022C1\u0022,\u0022C1E\u0022,\u0022C\u0022,\u0022CE\u0022,\u0022D\u0022,\u0022DE\u0022,\u0022F\u0022]'),
+    toggle(value) {
+        const index = this.selected.indexOf(value);
+        if (index === -1) {
+            this.selected.push(value);
+        } else {
+            this.selected.splice(index, 1);
+        }
+        // Dispatch change event pour la validation Alpine.js externe
+        this.$el.dispatchEvent(new CustomEvent('change', { detail: { selected: this.selected } }));
+    },
+    isSelected(value) {
+        return this.selected.includes(value);
+    },
+    get selectedLabels() {
+        if (this.selected.length === 0) {
+            return 'Sélectionnez les catégories de permis...';
+        }
+        // Afficher uniquement les abréviations (valeurs) pour optimiser l'affichage
+        return this.selected.join(', ');
+    }
+}"
+    @click.outside="open = false"
+    class="relative" @change="validateField('license_categories', $event.detail.selected)">
+
+        <label for="multi-select-license_categories-697d451178b31" class="block mb-2 text-sm font-medium text-gray-900">
+        Catégories de permis
+                <span class="text-red-500">*</span>
+            </label>
+    
+    <!-- Bouton d'affichage -->
+    <button type="button"
+        @click="open = !open"
+        :aria-expanded="open"
+        aria-haspopup="true"
+        class="w-full bg-gray-50 border border-gray-300 text-gray-900 rounded-lg shadow-sm px-4 py-2.5 text-left cursor-default focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition duration-150 ease-in-out"
+        :class="{ 'border-red-500 focus:ring-red-500 focus:border-red-500': '' }">
+        <span x-text="selectedLabels" class="block truncate" :class="{ 'text-gray-500': selected.length === 0 }"></span>
+        <span class="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
+            <svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                <path fill-rule="evenodd" d="M10 3a1 1 0 01.707.293l3 3a1 1 0 01-1.414 1.414L10 5.414 7.707 7.707a1 1 0 01-1.414-1.414l3-3A1 1 0 0110 3zm-3.707 9.293a1 1 0 011.414 0L10 14.586l2.293-2.293a1 1 0 011.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" />
+            </svg>
+        </span>
+    </button>
+
+    <!-- Liste des options -->
+    <div x-show="open"
+        x-transition:enter="transition ease-out duration-100"
+        x-transition:enter-start="transform opacity-0 scale-95"
+        x-transition:enter-end="transform opacity-100 scale-100"
+        x-transition:leave="transition ease-in duration-75"
+        x-transition:leave-start="transform opacity-100 scale-100"
+        x-transition:leave-end="transform opacity-0 scale-95"
+        class="absolute z-10 mt-1 w-full rounded-lg bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none max-h-60 overflow-auto"
+        style="display: none;">
+
+        <ul class="py-1 text-base ring-1 ring-gray-200 rounded-lg">
+                        <li class="text-gray-900 cursor-default select-none relative py-2 pl-3 pr-9 hover:bg-gray-100 transition duration-100 ease-in-out"
+                @click.stop="toggle('A1')">
+
+                <div class="flex items-center">
+                    <!-- Case à cocher invisible pour la soumission -->
+                    <input type="checkbox"
+                        name="license_categories[]"
+                        value="A1"
+                        :checked="isSelected('A1')"
+                        class="hidden"
+                        :id="'multi-select-license_categories-697d451178b31-A1'">
+
+                    <!-- Affichage de la case à cocher custom -->
+                    <div class="w-4 h-4 rounded border border-gray-300 flex items-center justify-center mr-3 transition duration-150 ease-in-out"
+                        :class="{ 'bg-blue-600 border-blue-600': isSelected('A1'), 'bg-white': !isSelected('A1') }">
+                        <svg x-show="isSelected('A1')" class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                        </svg>
+                    </div>
+
+                    <span class="font-normal block truncate">
+                        A1 - Motocyclettes légères
+                    </span>
+                </div>
+            </li>
+                        <li class="text-gray-900 cursor-default select-none relative py-2 pl-3 pr-9 hover:bg-gray-100 transition duration-100 ease-in-out"
+                @click.stop="toggle('A')">
+
+                <div class="flex items-center">
+                    <!-- Case à cocher invisible pour la soumission -->
+                    <input type="checkbox"
+                        name="license_categories[]"
+                        value="A"
+                        :checked="isSelected('A')"
+                        class="hidden"
+                        :id="'multi-select-license_categories-697d451178b31-A'">
+
+                    <!-- Affichage de la case à cocher custom -->
+                    <div class="w-4 h-4 rounded border border-gray-300 flex items-center justify-center mr-3 transition duration-150 ease-in-out"
+                        :class="{ 'bg-blue-600 border-blue-600': isSelected('A'), 'bg-white': !isSelected('A') }">
+                        <svg x-show="isSelected('A')" class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                        </svg>
+                    </div>
+
+                    <span class="font-normal block truncate">
+                        A - Motocyclettes
+                    </span>
+                </div>
+            </li>
+                        <li class="text-gray-900 cursor-default select-none relative py-2 pl-3 pr-9 hover:bg-gray-100 transition duration-100 ease-in-out"
+                @click.stop="toggle('B')">
+
+                <div class="flex items-center">
+                    <!-- Case à cocher invisible pour la soumission -->
+                    <input type="checkbox"
+                        name="license_categories[]"
+                        value="B"
+                        :checked="isSelected('B')"
+                        class="hidden"
+                        :id="'multi-select-license_categories-697d451178b31-B'">
+
+                    <!-- Affichage de la case à cocher custom -->
+                    <div class="w-4 h-4 rounded border border-gray-300 flex items-center justify-center mr-3 transition duration-150 ease-in-out"
+                        :class="{ 'bg-blue-600 border-blue-600': isSelected('B'), 'bg-white': !isSelected('B') }">
+                        <svg x-show="isSelected('B')" class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                        </svg>
+                    </div>
+
+                    <span class="font-normal block truncate">
+                        B - Véhicules légers
+                    </span>
+                </div>
+            </li>
+                        <li class="text-gray-900 cursor-default select-none relative py-2 pl-3 pr-9 hover:bg-gray-100 transition duration-100 ease-in-out"
+                @click.stop="toggle('BE')">
+
+                <div class="flex items-center">
+                    <!-- Case à cocher invisible pour la soumission -->
+                    <input type="checkbox"
+                        name="license_categories[]"
+                        value="BE"
+                        :checked="isSelected('BE')"
+                        class="hidden"
+                        :id="'multi-select-license_categories-697d451178b31-BE'">
+
+                    <!-- Affichage de la case à cocher custom -->
+                    <div class="w-4 h-4 rounded border border-gray-300 flex items-center justify-center mr-3 transition duration-150 ease-in-out"
+                        :class="{ 'bg-blue-600 border-blue-600': isSelected('BE'), 'bg-white': !isSelected('BE') }">
+                        <svg x-show="isSelected('BE')" class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                        </svg>
+                    </div>
+
+                    <span class="font-normal block truncate">
+                        B(E) - Véhicules légers avec remorque
+                    </span>
+                </div>
+            </li>
+                        <li class="text-gray-900 cursor-default select-none relative py-2 pl-3 pr-9 hover:bg-gray-100 transition duration-100 ease-in-out"
+                @click.stop="toggle('C1')">
+
+                <div class="flex items-center">
+                    <!-- Case à cocher invisible pour la soumission -->
+                    <input type="checkbox"
+                        name="license_categories[]"
+                        value="C1"
+                        :checked="isSelected('C1')"
+                        class="hidden"
+                        :id="'multi-select-license_categories-697d451178b31-C1'">
+
+                    <!-- Affichage de la case à cocher custom -->
+                    <div class="w-4 h-4 rounded border border-gray-300 flex items-center justify-center mr-3 transition duration-150 ease-in-out"
+                        :class="{ 'bg-blue-600 border-blue-600': isSelected('C1'), 'bg-white': !isSelected('C1') }">
+                        <svg x-show="isSelected('C1')" class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                        </svg>
+                    </div>
+
+                    <span class="font-normal block truncate">
+                        C1 - Poids lourds légers
+                    </span>
+                </div>
+            </li>
+                        <li class="text-gray-900 cursor-default select-none relative py-2 pl-3 pr-9 hover:bg-gray-100 transition duration-100 ease-in-out"
+                @click.stop="toggle('C1E')">
+
+                <div class="flex items-center">
+                    <!-- Case à cocher invisible pour la soumission -->
+                    <input type="checkbox"
+                        name="license_categories[]"
+                        value="C1E"
+                        :checked="isSelected('C1E')"
+                        class="hidden"
+                        :id="'multi-select-license_categories-697d451178b31-C1E'">
+
+                    <!-- Affichage de la case à cocher custom -->
+                    <div class="w-4 h-4 rounded border border-gray-300 flex items-center justify-center mr-3 transition duration-150 ease-in-out"
+                        :class="{ 'bg-blue-600 border-blue-600': isSelected('C1E'), 'bg-white': !isSelected('C1E') }">
+                        <svg x-show="isSelected('C1E')" class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                        </svg>
+                    </div>
+
+                    <span class="font-normal block truncate">
+                        C1(E) - Poids lourds légers avec remorque
+                    </span>
+                </div>
+            </li>
+                        <li class="text-gray-900 cursor-default select-none relative py-2 pl-3 pr-9 hover:bg-gray-100 transition duration-100 ease-in-out"
+                @click.stop="toggle('C')">
+
+                <div class="flex items-center">
+                    <!-- Case à cocher invisible pour la soumission -->
+                    <input type="checkbox"
+                        name="license_categories[]"
+                        value="C"
+                        :checked="isSelected('C')"
+                        class="hidden"
+                        :id="'multi-select-license_categories-697d451178b31-C'">
+
+                    <!-- Affichage de la case à cocher custom -->
+                    <div class="w-4 h-4 rounded border border-gray-300 flex items-center justify-center mr-3 transition duration-150 ease-in-out"
+                        :class="{ 'bg-blue-600 border-blue-600': isSelected('C'), 'bg-white': !isSelected('C') }">
+                        <svg x-show="isSelected('C')" class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                        </svg>
+                    </div>
+
+                    <span class="font-normal block truncate">
+                        C - Poids lourds
+                    </span>
+                </div>
+            </li>
+                        <li class="text-gray-900 cursor-default select-none relative py-2 pl-3 pr-9 hover:bg-gray-100 transition duration-100 ease-in-out"
+                @click.stop="toggle('CE')">
+
+                <div class="flex items-center">
+                    <!-- Case à cocher invisible pour la soumission -->
+                    <input type="checkbox"
+                        name="license_categories[]"
+                        value="CE"
+                        :checked="isSelected('CE')"
+                        class="hidden"
+                        :id="'multi-select-license_categories-697d451178b31-CE'">
+
+                    <!-- Affichage de la case à cocher custom -->
+                    <div class="w-4 h-4 rounded border border-gray-300 flex items-center justify-center mr-3 transition duration-150 ease-in-out"
+                        :class="{ 'bg-blue-600 border-blue-600': isSelected('CE'), 'bg-white': !isSelected('CE') }">
+                        <svg x-show="isSelected('CE')" class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                        </svg>
+                    </div>
+
+                    <span class="font-normal block truncate">
+                        C(E) - Poids lourds avec remorque
+                    </span>
+                </div>
+            </li>
+                        <li class="text-gray-900 cursor-default select-none relative py-2 pl-3 pr-9 hover:bg-gray-100 transition duration-100 ease-in-out"
+                @click.stop="toggle('D')">
+
+                <div class="flex items-center">
+                    <!-- Case à cocher invisible pour la soumission -->
+                    <input type="checkbox"
+                        name="license_categories[]"
+                        value="D"
+                        :checked="isSelected('D')"
+                        class="hidden"
+                        :id="'multi-select-license_categories-697d451178b31-D'">
+
+                    <!-- Affichage de la case à cocher custom -->
+                    <div class="w-4 h-4 rounded border border-gray-300 flex items-center justify-center mr-3 transition duration-150 ease-in-out"
+                        :class="{ 'bg-blue-600 border-blue-600': isSelected('D'), 'bg-white': !isSelected('D') }">
+                        <svg x-show="isSelected('D')" class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                        </svg>
+                    </div>
+
+                    <span class="font-normal block truncate">
+                        D - Transport de personnes
+                    </span>
+                </div>
+            </li>
+                        <li class="text-gray-900 cursor-default select-none relative py-2 pl-3 pr-9 hover:bg-gray-100 transition duration-100 ease-in-out"
+                @click.stop="toggle('DE')">
+
+                <div class="flex items-center">
+                    <!-- Case à cocher invisible pour la soumission -->
+                    <input type="checkbox"
+                        name="license_categories[]"
+                        value="DE"
+                        :checked="isSelected('DE')"
+                        class="hidden"
+                        :id="'multi-select-license_categories-697d451178b31-DE'">
+
+                    <!-- Affichage de la case à cocher custom -->
+                    <div class="w-4 h-4 rounded border border-gray-300 flex items-center justify-center mr-3 transition duration-150 ease-in-out"
+                        :class="{ 'bg-blue-600 border-blue-600': isSelected('DE'), 'bg-white': !isSelected('DE') }">
+                        <svg x-show="isSelected('DE')" class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                        </svg>
+                    </div>
+
+                    <span class="font-normal block truncate">
+                        D(E) - Transport de personnes avec remorque
+                    </span>
+                </div>
+            </li>
+                        <li class="text-gray-900 cursor-default select-none relative py-2 pl-3 pr-9 hover:bg-gray-100 transition duration-100 ease-in-out"
+                @click.stop="toggle('F')">
+
+                <div class="flex items-center">
+                    <!-- Case à cocher invisible pour la soumission -->
+                    <input type="checkbox"
+                        name="license_categories[]"
+                        value="F"
+                        :checked="isSelected('F')"
+                        class="hidden"
+                        :id="'multi-select-license_categories-697d451178b31-F'">
+
+                    <!-- Affichage de la case à cocher custom -->
+                    <div class="w-4 h-4 rounded border border-gray-300 flex items-center justify-center mr-3 transition duration-150 ease-in-out"
+                        :class="{ 'bg-blue-600 border-blue-600': isSelected('F'), 'bg-white': !isSelected('F') }">
+                        <svg x-show="isSelected('F')" class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                        </svg>
+                    </div>
+
+                    <span class="font-normal block truncate">
+                        F - Véhicules agricoles
+                    </span>
+                </div>
+            </li>
+                    </ul>
+    </div>
+
+    <!-- Le champ caché qui envoyait une chaîne de caractères a été supprimé. 
+    La soumission est maintenant gérée par les checkboxes cachées avec name="license_categories[]", 
+    ce qui assure que le serveur reçoit un tableau comme requis par la validation. -->
+
+        <p class="mt-2 text-sm text-gray-500">
+        Sélectionnez toutes les catégories de permis détenues par le chauffeur
+    </p>
+    
+    
+    <p x-show="fieldErrors && fieldErrors['license_categories'] && touchedFields && touchedFields['license_categories']"
+        x-transition:enter="transition ease-out duration-200"
+        x-transition:enter-start="opacity-0 transform -translate-y-1"
+        x-transition:enter-end="opacity-100 transform translate-y-0"
+        class="mt-2 text-sm text-red-600 flex items-start font-medium"
+        style="display: none;">
+        <span
+    class="iconify block w-4 h-4 mr-1.5 mt-0.5 flex-shrink-0"
+    data-icon="lucide:circle-alert"
+    data-inline="false"></span>        <span x-text="fieldErrors['license_categories']"></span>
+    </p>
+</div>                        </div>
+
+                        <div
+    class="w-full"
+    x-data="zenfleetDatepicker"
+    data-value=""
+    data-display-value=""
+         data-max-date="31/01/2026"     wire:ignore>
+        <label for="datepicker-697d451178bfa" class="block mb-2 text-sm font-medium text-gray-900">
+        Date de délivrance
+                <span class="text-red-500 ml-0.5">*</span>
+            </label>
+    
+    <div class="relative">
+        
+        <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none z-10">
+            <svg class="w-4 h-4 text-gray-500" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M20 4a2 2 0 0 0-2-2h-2V1a1 1 0 0 0-2 0v1h-3V1a1 1 0 0 0-2 0v1H6V1a1 1 0 0 0-2 0v1H2a2 2 0 0 0-2 2v2h20V4ZM0 18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8H0v10Zm5-8h10a1 1 0 0 1 0 2H5a1 1 0 0 1 0-2Z" />
+            </svg>
+        </div>
+
+        
+        <input
+            x-ref="displayInput"
+            type="text"
+            id="datepicker-697d451178bfa"
+            class="block w-full !pl-10 p-2.5 bg-gray-50 border-2 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 border-gray-300"
+            placeholder="Choisir une date"
+            x-model="displayValue"
+                         required             autocomplete="off"
+            readonly>
+
+        
+        <input
+            type="hidden"
+            name="license_issue_date"
+            x-model="serverDate"
+            value="">
+    </div>
+
+    </div>
+                        <div
+    class="w-full"
+    x-data="zenfleetDatepicker"
+    data-value=""
+    data-display-value=""
+     data-min-date="31/01/2026"         wire:ignore>
+        <label for="datepicker-697d451178c3f" class="block mb-2 text-sm font-medium text-gray-900">
+        Date d&#039;expiration
+                <span class="text-red-500 ml-0.5">*</span>
+            </label>
+    
+    <div class="relative">
+        
+        <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none z-10">
+            <svg class="w-4 h-4 text-gray-500" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M20 4a2 2 0 0 0-2-2h-2V1a1 1 0 0 0-2 0v1h-3V1a1 1 0 0 0-2 0v1H6V1a1 1 0 0 0-2 0v1H2a2 2 0 0 0-2 2v2h20V4ZM0 18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8H0v10Zm5-8h10a1 1 0 0 1 0 2H5a1 1 0 0 1 0-2Z" />
+            </svg>
+        </div>
+
+        
+        <input
+            x-ref="displayInput"
+            type="text"
+            id="datepicker-697d451178c3f"
+            class="block w-full !pl-10 p-2.5 bg-gray-50 border-2 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 border-gray-300"
+            placeholder="Choisir une date"
+            x-model="displayValue"
+                         required             autocomplete="off"
+            readonly>
+
+        
+        <input
+            type="hidden"
+            name="license_expiry_date"
+            x-model="serverDate"
+            value="">
+    </div>
+
+        <p class="mt-1 text-xs text-gray-500">Date d&#039;expiration du permis</p>
+    </div>
+                        <div class="">
+        <label for="license_authority" class="block mb-2 text-sm font-medium text-gray-900">
+        Autorité de délivrance
+            </label>
+    
+    <div class="relative">
+                <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+            <span
+    class="iconify block w-5 h-5 text-gray-400"
+    data-icon="heroicons:building-office-2"
+    data-inline="false"></span>        </div>
+        
+        <input
+            type="text"
+            name="license_authority"
+            id="license_authority"
+            class="bg-gray-50 border text-gray-900 text-sm rounded-lg block w-full p-2.5 transition-colors duration-200 border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 bg-gray-50 pl-10"
+            placeholder="Ex: Wilaya d&#039;Alger"
+            value=""
+                                    
+            x-bind:class="(typeof fieldErrors !== 'undefined' && fieldErrors && fieldErrors['license_authority'] && typeof touchedFields !== 'undefined' && touchedFields && touchedFields['license_authority']) ? '!border-red-500 !focus:ring-2 !focus:ring-red-500 !focus:border-red-500 !bg-red-50' : ''"
+             />
+    </div>
+
+    
+    
+    <p x-show="typeof fieldErrors !== 'undefined' && fieldErrors && fieldErrors['license_authority'] && typeof touchedFields !== 'undefined' && touchedFields && touchedFields['license_authority']"
+        x-transition:enter="transition ease-out duration-200"
+        x-transition:enter-start="opacity-0 transform -translate-y-1"
+        x-transition:enter-end="opacity-100 transform translate-y-0"
+        class="mt-2 text-sm text-red-600 flex items-start font-medium"
+        style="display: none;">
+        <span
+    class="iconify block w-4 h-4 mr-1.5 mt-0.5 flex-shrink-0"
+    data-icon="lucide:circle-alert"
+    data-inline="false"></span>        <span>Ce champ est obligatoire et doit être correctement rempli</span>
+    </p>
+</div>
+                        <div class="flex items-center h-full pt-6">
+                            <label class="inline-flex items-center cursor-pointer">
+                                <input
+                                    type="checkbox"
+                                    name="license_verified"
+                                    value="1"
+                                    
+                                    class="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50">
+                                <span class="ml-2 text-sm text-gray-700 font-medium">
+                                    <span
+    class="iconify block w-4 h-4 inline text-blue-600"
+    data-icon="heroicons:check-badge"
+    data-inline="false"></span>                                    Permis vérifié
+                                </span>
+                            </label>
+                        </div>
+</div>
+            </div>
+        </section>
+    </div>
+</div>
+
+                
+                <div class="relative">
+            <div class="absolute left-5 top-6 bottom-6 w-px bg-slate-200/80"></div>
+    
+    <div class="relative pl-12">
+                    <div class="absolute left-1.5 top-6">
+                <span class="inline-flex h-9 w-9 items-center justify-center rounded-full bg-white text-blue-600 shadow-sm ring-2 ring-blue-100">
+                    <span
+    class="iconify block w-5 h-5"
+    data-icon="heroicons:link"
+    data-inline="false"></span>                </span>
+            </div>
+        
+        <section class="rounded-2xl border border-slate-200 bg-white shadow-sm">
+            <div class="flex items-center justify-between gap-4 px-6 py-4 bg-slate-50/70 border-b border-slate-200">
+                <div>
+                                        <h3 class="text-sm font-semibold text-slate-900">Compte &amp; Contact d&#039;Urgence</h3>
+                                            <p class="text-xs text-slate-500 mt-0.5">Accès applicatif optionnel et personne à contacter</p>
+                                    </div>
+                
+            </div>
+
+            <div class="p-6 ">
+                <div class="space-y-6">
+                        
+                        <div>
+                            <h4 class="text-sm font-semibold text-slate-900 mb-3 flex items-center gap-2">
+                                <span
+    class="iconify block w-4 h-4 text-blue-600"
+    data-icon="heroicons:user-circle"
+    data-inline="false"></span>                                Compte Utilisateur (Optionnel)
+                            </h4>
+
+                            <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+                                <div class="flex">
+                                    <span
+    class="iconify block w-5 h-5 text-blue-600 mr-2 mt-0.5 flex-shrink-0"
+    data-icon="heroicons:information-circle"
+    data-inline="false"></span>                                    <div>
+                                        <p class="text-sm font-medium text-blue-900">Création de compte optionnelle</p>
+                                        <p class="text-xs text-blue-700 mt-1">
+                                            Si vous associez un compte utilisateur, le chauffeur pourra se connecter à l'application.
+                                            Vous pouvez aussi le faire plus tard.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                                                <div wire:ignore
     x-data="{
         instance: null,
         initSelect() {
@@ -1985,7 +2055,7 @@
                     searchPlaceholder: 'Rechercher...',
                     searchText: 'Aucun résultat',
                     searchingText: 'Recherche...',
-                    placeholderText: 'Rechercher des utilisateurs...',
+                    placeholderText: 'Rechercher un utilisateur...',
                     allowDeselect: true,
                     hideSelected: false,
                 },
@@ -2001,19 +2071,20 @@
     x-init="initSelect()"
     class="">
 
-        <label for="slimselect-users-6976aba26bf40" class="block mb-2 text-sm font-medium text-gray-900">
-        Utilisateurs Autorisés
+        <label for="slimselect-user_id-697d451178dc2" class="block mb-2 text-sm font-medium text-gray-900">
+        Compte utilisateur
             </label>
     
     <select
         x-ref="select"
-        name="users"
-        id="slimselect-users-6976aba26bf40"
+        name="user_id"
+        id="slimselect-user_id-697d451178dc2"
         class="slimselect-field w-full"
-                 multiple         >
+                        >
 
         
-                
+                        <option value="" data-placeholder="true">Rechercher un utilisateur...</option>
+        
                 <option
             value="2"
             >
@@ -2022,102 +2093,163 @@
                     </select>
 
         <p class="mt-2 text-sm text-gray-500">
-        Sélectionnez les utilisateurs autorisés à utiliser ce véhicule
+        Sélectionnez un compte existant ou laissez vide (optionnel)
     </p>
-    </div>                                    </div>
-
-                                    <div class="md:col-span-2">
-                                        <div class="">
-  <label for="notes" class="block mb-2 text-sm font-medium text-gray-900">
- Notes
-  </label>
- 
- <textarea
- name="notes"
- id="notes"
- rows="4"
- class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border transition-colors duration-200 border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 !bg-gray-50"
- placeholder="Informations complémentaires sur le véhicule..."
-   
- ></textarea>
-
-  <p class="mt-2 text-sm text-gray-600">
- Ajoutez toute information utile (état, équipements, historique...)
- </p>
- </div>
-                                    </div>
-                                </div>
-                            </div>
+    </div>                            </div>
                         </div>
-                    </div>
 
-                    
-                    <div class="mt-8 pt-6 border-t border-gray-200 flex items-center justify-between">
+                        
                         <div>
-                            <!--[if BLOCK]><![endif]--> <button
- type="button"
- class="inline-flex items-center justify-center font-medium rounded-lg transition-all duration-200 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed text-gray-900 bg-white border border-gray-200 hover:bg-gray-100 hover:text-blue-700 active:bg-gray-200 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700 dark:active:bg-gray-600 px-5 py-2.5 text-sm"
-  x-show="currentStep > 1" @click="previousStep()"
- >
- <!--[if BLOCK]><![endif]--> <span
-    class="iconify block w-5 h-5 mr-2"
-    data-icon="heroicons:arrow-left"
-    data-inline="false"></span> <!--[if ENDBLOCK]><![endif]-->
+                            <h4 class="text-sm font-semibold text-slate-900 mb-3 flex items-center gap-2">
+                                <span
+    class="iconify block w-4 h-4 text-red-600"
+    data-icon="heroicons:phone"
+    data-inline="false"></span>                                Contact d'Urgence
+                            </h4>
 
- Précédent
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div class="">
+        <label for="emergency_contact_name" class="block mb-2 text-sm font-medium text-gray-900">
+        Nom du contact
+            </label>
+    
+    <div class="relative">
+                <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+            <span
+    class="iconify block w-5 h-5 text-gray-400"
+    data-icon="heroicons:user"
+    data-inline="false"></span>        </div>
+        
+        <input
+            type="text"
+            name="emergency_contact_name"
+            id="emergency_contact_name"
+            class="bg-gray-50 border text-gray-900 text-sm rounded-lg block w-full p-2.5 transition-colors duration-200 border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 bg-gray-50 pl-10"
+            placeholder="Ex: Fatima Benali"
+            value=""
+                                    
+            x-bind:class="(typeof fieldErrors !== 'undefined' && fieldErrors && fieldErrors['emergency_contact_name'] && typeof touchedFields !== 'undefined' && touchedFields && touchedFields['emergency_contact_name']) ? '!border-red-500 !focus:ring-2 !focus:ring-red-500 !focus:border-red-500 !bg-red-50' : ''"
+             />
+    </div>
 
- <!--[if BLOCK]><![endif]--><!--[if ENDBLOCK]><![endif]-->
- </button>
-<!--[if ENDBLOCK]><![endif]-->
-                        </div>
+    
+    
+    <p x-show="typeof fieldErrors !== 'undefined' && fieldErrors && fieldErrors['emergency_contact_name'] && typeof touchedFields !== 'undefined' && touchedFields && touchedFields['emergency_contact_name']"
+        x-transition:enter="transition ease-out duration-200"
+        x-transition:enter-start="opacity-0 transform -translate-y-1"
+        x-transition:enter-end="opacity-100 transform translate-y-0"
+        class="mt-2 text-sm text-red-600 flex items-start font-medium"
+        style="display: none;">
+        <span
+    class="iconify block w-4 h-4 mr-1.5 mt-0.5 flex-shrink-0"
+    data-icon="lucide:circle-alert"
+    data-inline="false"></span>        <span>Ce champ est obligatoire et doit être correctement rempli</span>
+    </p>
+</div>
+                                <div class="">
+        <label for="emergency_contact_phone" class="block mb-2 text-sm font-medium text-gray-900">
+        Téléphone du contact
+            </label>
+    
+    <div class="relative">
+                <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+            <span
+    class="iconify block w-5 h-5 text-gray-400"
+    data-icon="heroicons:phone"
+    data-inline="false"></span>        </div>
+        
+        <input
+            type="tel"
+            name="emergency_contact_phone"
+            id="emergency_contact_phone"
+            class="bg-gray-50 border text-gray-900 text-sm rounded-lg block w-full p-2.5 transition-colors duration-200 border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 bg-gray-50 pl-10"
+            placeholder="Ex: 0555987654"
+            value=""
+                                    
+            x-bind:class="(typeof fieldErrors !== 'undefined' && fieldErrors && fieldErrors['emergency_contact_phone'] && typeof touchedFields !== 'undefined' && touchedFields && touchedFields['emergency_contact_phone']) ? '!border-red-500 !focus:ring-2 !focus:ring-red-500 !focus:border-red-500 !bg-red-50' : ''"
+             />
+    </div>
 
-                        <div class="flex items-center gap-3">
-                            <a href="http://localhost/admin/vehicles"
-                                class="text-sm font-semibold text-gray-600 hover:text-gray-900 transition-colors">
-                                Annuler
-                            </a>
+    
+    
+    <p x-show="typeof fieldErrors !== 'undefined' && fieldErrors && fieldErrors['emergency_contact_phone'] && typeof touchedFields !== 'undefined' && touchedFields && touchedFields['emergency_contact_phone']"
+        x-transition:enter="transition ease-out duration-200"
+        x-transition:enter-start="opacity-0 transform -translate-y-1"
+        x-transition:enter-end="opacity-100 transform translate-y-0"
+        class="mt-2 text-sm text-red-600 flex items-start font-medium"
+        style="display: none;">
+        <span
+    class="iconify block w-4 h-4 mr-1.5 mt-0.5 flex-shrink-0"
+    data-icon="lucide:circle-alert"
+    data-inline="false"></span>        <span>Ce champ est obligatoire et doit être correctement rempli</span>
+    </p>
+</div>
+                                <div class="">
+        <label for="emergency_contact_relationship" class="block mb-2 text-sm font-medium text-gray-900">
+        Lien de parenté
+            </label>
+    
+    <div class="relative">
+                <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+            <span
+    class="iconify block w-5 h-5 text-gray-400"
+    data-icon="heroicons:users"
+    data-inline="false"></span>        </div>
+        
+        <input
+            type="text"
+            name="emergency_contact_relationship"
+            id="emergency_contact_relationship"
+            class="bg-gray-50 border text-gray-900 text-sm rounded-lg block w-full p-2.5 transition-colors duration-200 border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 bg-gray-50 pl-10"
+            placeholder="Ex: Épouse, Frère, Mère"
+            value=""
+                                    
+            x-bind:class="(typeof fieldErrors !== 'undefined' && fieldErrors && fieldErrors['emergency_contact_relationship'] && typeof touchedFields !== 'undefined' && touchedFields && touchedFields['emergency_contact_relationship']) ? '!border-red-500 !focus:ring-2 !focus:ring-red-500 !focus:border-red-500 !bg-red-50' : ''"
+             />
+    </div>
 
-                            <!--[if BLOCK]><![endif]--> <button
- type="button"
- class="inline-flex items-center justify-center font-medium rounded-lg transition-all duration-200 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed text-white bg-blue-600 hover:bg-blue-700 active:bg-blue-800 dark:bg-blue-600 dark:hover:bg-blue-700 dark:active:bg-blue-800 px-5 py-2.5 text-sm"
-  x-show="currentStep < 3" @click="nextStep()"
- >
- <!--[if BLOCK]><![endif]--><!--[if ENDBLOCK]><![endif]-->
-
- Suivant
-
- <!--[if BLOCK]><![endif]--> <span
-    class="iconify block w-5 h-5 ml-2"
-    data-icon="heroicons:arrow-right"
-    data-inline="false"></span> <!--[if ENDBLOCK]><![endif]-->
- </button>
-<!--[if ENDBLOCK]><![endif]-->
-
-                            <!--[if BLOCK]><![endif]--> <button
- type="submit"
- class="inline-flex items-center justify-center font-medium rounded-lg transition-all duration-200 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed text-white bg-green-600 hover:bg-green-700 active:bg-green-800 dark:bg-green-500 dark:hover:bg-green-600 dark:active:bg-green-700 px-5 py-2.5 text-sm"
-  x-show="currentStep === 3"
- >
- <!--[if BLOCK]><![endif]--> <span
-    class="iconify block w-5 h-5 mr-2"
-    data-icon="heroicons:check-circle"
-    data-inline="false"></span> <!--[if ENDBLOCK]><![endif]-->
-
- Enregistrer le Véhicule
-
- <!--[if BLOCK]><![endif]--><!--[if ENDBLOCK]><![endif]-->
- </button>
-<!--[if ENDBLOCK]><![endif]-->
+    
+    
+    <p x-show="typeof fieldErrors !== 'undefined' && fieldErrors && fieldErrors['emergency_contact_relationship'] && typeof touchedFields !== 'undefined' && touchedFields && touchedFields['emergency_contact_relationship']"
+        x-transition:enter="transition ease-out duration-200"
+        x-transition:enter-start="opacity-0 transform -translate-y-1"
+        x-transition:enter-end="opacity-100 transform translate-y-0"
+        class="mt-2 text-sm text-red-600 flex items-start font-medium"
+        style="display: none;">
+        <span
+    class="iconify block w-4 h-4 mr-1.5 mt-0.5 flex-shrink-0"
+    data-icon="lucide:circle-alert"
+    data-inline="false"></span>        <span>Ce champ est obligatoire et doit être correctement rempli</span>
+    </p>
+</div>                            </div>
                         </div>
                     </div>
-                </form>
+            </div>
+        </section>
+    </div>
 </div>
 
-        </div>
+                
+                <div class="rounded-2xl border border-slate-200 bg-white p-5 flex items-center justify-between">
+                    <a href="http://localhost/admin/drivers"
+                        class="text-gray-600 hover:text-gray-900 font-medium text-sm transition-colors">
+                        Annuler
+                    </a>
 
+                    <button
+                        type="submit"
+                        class="inline-flex items-center gap-2 px-6 py-2.5 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg transition-colors shadow-sm hover:shadow-md text-sm">
+                        <span
+    class="iconify block w-5 h-5"
+    data-icon="heroicons:check"
+    data-inline="false"></span>                        Créer le Chauffeur
+                    </button>
+                </div>
+            </form>
+
+        </div>
     </div>
 </section>
-
 
                 </div>
             </main>
@@ -2140,26 +2272,28 @@
             // ====================================================================
             // TOM SELECT - Initialisation Globale
             // ====================================================================
-            document.querySelectorAll('.tomselect').forEach(function(el) {
-                if (el.tomselect) return; // Déjà initialisé
+            if (window.TomSelect) {
+                document.querySelectorAll('.tomselect').forEach(function(el) {
+                    if (el.tomselect) return; // Déjà initialisé
 
-                new TomSelect(el, {
-                    plugins: ['clear_button', 'remove_button'],
-                    maxOptions: 100,
-                    placeholder: el.getAttribute('data-placeholder') || 'Rechercher...',
-                    allowEmptyOption: true,
-                    create: false,
-                    sortField: {
-                        field: "text",
-                        direction: "asc"
-                    },
-                    render: {
-                        no_results: function(data, escape) {
-                            return '<div class="no-results p-2 text-sm text-gray-500">Aucun résultat trouvé</div>';
+                    new TomSelect(el, {
+                        plugins: ['clear_button', 'remove_button'],
+                        maxOptions: 100,
+                        placeholder: el.getAttribute('data-placeholder') || 'Rechercher...',
+                        allowEmptyOption: true,
+                        create: false,
+                        sortField: {
+                            field: "text",
+                            direction: "asc"
+                        },
+                        render: {
+                            no_results: function(data, escape) {
+                                return '<div class="no-results p-2 text-sm text-gray-500">Aucun résultat trouvé</div>';
+                            }
                         }
-                    }
+                    });
                 });
-            });
+            }
 
             // ====================================================================
             // FLATPICKR DATEPICKER - Initialisation Globale
@@ -2250,17 +2384,19 @@
         // ====================================================================
         document.addEventListener('livewire:navigated', function() {
             // Réinitialiser Tom Select
-            document.querySelectorAll('.tomselect').forEach(function(el) {
-                if (!el.tomselect) {
-                    new TomSelect(el, {
-                        plugins: ['clear_button', 'remove_button'],
-                        maxOptions: 100,
-                        placeholder: el.getAttribute('data-placeholder') || 'Rechercher...',
-                        allowEmptyOption: true,
-                        create: false,
-                    });
-                }
-            });
+            if (window.TomSelect) {
+                document.querySelectorAll('.tomselect').forEach(function(el) {
+                    if (!el.tomselect) {
+                        new TomSelect(el, {
+                            plugins: ['clear_button', 'remove_button'],
+                            maxOptions: 100,
+                            placeholder: el.getAttribute('data-placeholder') || 'Rechercher...',
+                            allowEmptyOption: true,
+                            create: false,
+                        });
+                    }
+                });
+            }
 
             // Réinitialiser Flatpickr
             document.querySelectorAll('.datepicker, .timepicker').forEach(function(el) {
@@ -2276,346 +2412,8 @@
     </script>
 
     <script>
-    /* eslint-disable */
-    // @ts-nocheck
-    /**
-     * ====================================================================
-     * 🎯 ALPINE.JS VALIDATION SYSTEM - ENTERPRISE GRADE
-     * ====================================================================
-     * 
-     * Système de validation en temps réel ultra-professionnel
-     * 
-     * FEATURES:
-     * - Validation par phase avec état persistant
-     * - Empêchement navigation si étape invalide
-     * - Indicateurs visuels de validation
-     * - Messages d'erreur contextuels
-     * - Validation côté client synchronisée avec serveur
-     * 
-     * @version 3.0-Enterprise
-     * @since 2025-01-19
-     * ====================================================================
-     */
-
-    // Données d'erreurs serveur (injectées depuis PHP)
-    window.zenfleetErrors = {
-        hasErrors: {
-            {
-                $errors - > any() ? 'true' : 'false'
-            }
-        },
-        keys: {
-            !!json_encode($errors - > keys()) !!
-        }
-    };
-
-    function vehicleFormValidation() {
-        return {
-            currentStep: {
-                {
-                    old('current_step', 1)
-                }
-            },
-
-            steps: [{
-                    label: 'Identification',
-                    icon: 'file-text',
-                    validated: false,
-                    touched: false,
-                    requiredFields: ['registration_plate', 'brand']
-                },
-                {
-                    label: 'Caractéristiques',
-                    icon: 'settings',
-                    validated: false,
-                    touched: false,
-                    requiredFields: ['fuel_type_id']
-                },
-                {
-                    label: 'Acquisition',
-                    icon: 'receipt',
-                    validated: false,
-                    touched: false,
-                    requiredFields: []
-                }
-            ],
-
-            fieldErrors: {},
-
-            // ⚠️NOUVEAU: Tracking des champs touchés pour validation temps réel
-            touchedFields: {},
-
-            init() {
-                // Initialiser avec les erreurs serveur si présentes
-                if (window.zenfleetErrors.hasErrors) {
-                    this.markStepsWithErrors();
-                    // Marquer tous les champs avec erreurs comme touchés
-                    window.zenfleetErrors.keys.forEach(function(field) {
-                        this.touchedFields[field] = true;
-                    }.bind(this));
-                }
-
-                // NE PAS valider au chargement (pas de bordures rouges initiales)
-                // La validation se fait uniquement après interaction utilisateur
-            },
-
-            /**
-             * Marquer les étapes ayant des erreurs serveur
-             */
-            markStepsWithErrors() {
-                const fieldToStepMap = {
-                    'registration_plate': 0,
-                    'vin': 0,
-                    'brand': 0,
-                    'model': 0,
-                    'color': 0,
-                    'vehicle_type_id': 1,
-                    'fuel_type_id': 1,
-                    'transmission_type_id': 1,
-                    'manufacturing_year': 1,
-                    'seats': 1,
-                    'power_hp': 1,
-                    'engine_displacement_cc': 1,
-                    'acquisition_date': 2,
-                    'purchase_price': 2,
-                    'current_value': 2,
-                    'initial_mileage': 2,
-                    'status_id': 2,
-                    'notes': 2
-                };
-
-                window.zenfleetErrors.keys.forEach(function(field) {
-                    var stepIndex = fieldToStepMap[field];
-                    if (stepIndex !== undefined) {
-                        this.steps[stepIndex].touched = true;
-                        this.steps[stepIndex].validated = false;
-                    }
-                }.bind(this));
-            },
-
-            /**
-             * Valider un champ individuel
-             * ⚠️ VALIDATION TEMPS RÉEL: Marque le champ comme touché + valide
-             */
-            validateField(fieldName, value) {
-                // ✅ ÉTAPE 1: Marquer le champ comme TOUCHÉ (interaction utilisateur)
-                this.touchedFields[fieldName] = true;
-
-                // ✅ ÉTAPE 2: Valider selon les règles
-                const rules = {
-                    'registration_plate': (v) => v && v.length > 0 && v.length <= 50,
-                    'brand': (v) => v && v.length > 0 && v.length <= 100,
-                    'model': (v) => !v || (v.length > 0 && v.length <= 100),
-                    'vin': (v) => !v || v.length === 17,
-                    'vehicle_type_id': (v) => true,
-                    'fuel_type_id': (v) => v && v.length > 0,
-                    'transmission_type_id': (v) => true,
-                    'acquisition_date': (v) => true,
-                    'status_id': (v) => true,
-                };
-
-                const isValid = rules[fieldName] ? rules[fieldName](value) : true;
-
-                // ✅ ÉTAPE 3: Gérer les erreurs
-                if (!isValid) {
-                    // Marquer le champ comme en erreur
-                    this.fieldErrors[fieldName] = true;
-
-                    // Ajouter classe slimselect-error pour SlimSelect
-                    const input = document.querySelector(`[name="${fieldName}"]`);
-                    if (input) {
-                        const tsWrapper = input.closest('.ss-main');
-                        if (tsWrapper) {
-                            tsWrapper.classList.add('slimselect-error');
-                        }
-                    }
-                } else {
-                    // Nettoyer l'erreur si le champ devient valide
-                    this.clearFieldError(fieldName);
-                }
-
-                return isValid;
-            },
-
-            /**
-             * Valider l'étape actuelle
-             */
-            validateCurrentStep() {
-                const stepIndex = this.currentStep - 1;
-                const step = this.steps[stepIndex];
-
-                // Marquer comme touchée
-                step.touched = true;
-
-                // Valider tous les champs requis de l'étape
-                let allValid = true;
-
-                step.requiredFields.forEach(fieldName => {
-                    const input = document.querySelector(`[name="${fieldName}"]`);
-                    if (input) {
-                        const value = input.value;
-                        const isValid = this.validateField(fieldName, value);
-                        if (!isValid) {
-                            allValid = false;
-                        }
-                    }
-                });
-
-                step.validated = allValid;
-                return allValid;
-            },
-
-            /**
-             * Passer à l'étape suivante (avec validation)
-             */
-            nextStep() {
-                // Valider l'étape actuelle
-                const isValid = this.validateCurrentStep();
-
-                if (!isValid) {
-                    // Afficher message d'erreur
-                    this.$dispatch('show-toast', {
-                        type: 'error',
-                        message: 'Veuillez remplir tous les champs obligatoires avant de continuer'
-                    });
-
-                    // Faire vibrer les champs invalides
-                    this.highlightInvalidFields();
-                    return;
-                }
-
-                // Passer à l'étape suivante
-                if (this.currentStep < 3) {
-                    this.currentStep++;
-                }
-            },
-
-            /**
-             * Retourner à l'étape précédente
-             */
-            previousStep() {
-                if (this.currentStep > 1) {
-                    this.currentStep--;
-                }
-            },
-
-            /**
-             * Mettre en évidence les champs invalides
-             * ⚠️ VALIDATION TEMPS RÉEL: Marque les champs comme touchés lors du clic "Suivant"
-             */
-            highlightInvalidFields() {
-                const stepIndex = this.currentStep - 1;
-                const step = this.steps[stepIndex];
-
-                step.requiredFields.forEach(fieldName => {
-                    const input = document.querySelector(`[name="${fieldName}"]`);
-                    if (input && !input.value) {
-                        // ✅ Marquer le champ comme TOUCHÉ (utilisateur a tenté de passer à l'étape suivante)
-                        this.touchedFields[fieldName] = true;
-
-                        // Ajouter animation shake (temporaire)
-                        input.classList.add('animate-shake');
-
-                        // Gérer SlimSelect (wrapper avec classe .ss-main)
-                        const tsWrapper = input.closest('.ss-main');
-                        if (tsWrapper) {
-                            tsWrapper.classList.add('slimselect-error');
-                        }
-
-                        // Retirer seulement l'animation shake après 500ms
-                        // ⚠️ LA BORDURE ROUGE RESTE (gérée par fieldErrors + touchedFields)
-                        setTimeout(() => {
-                            input.classList.remove('animate-shake');
-                        }, 500);
-                    }
-                });
-            },
-
-            /**
-             * Retirer l'erreur d'un champ quand il devient valide
-             */
-            clearFieldError(fieldName) {
-                delete this.fieldErrors[fieldName];
-
-                // Retirer la classe slimselect-error si c'est un SlimSelect
-                const input = document.querySelector(`[name="${fieldName}"]`);
-                if (input) {
-                    const tsWrapper = input.closest('.ss-main');
-                    if (tsWrapper) {
-                        tsWrapper.classList.remove('slimselect-error');
-                    }
-                }
-            },
-
-            /**
-             * Validation finale avant soumission
-             */
-            onSubmit(e) {
-                // Valider toutes les étapes
-                let allValid = true;
-
-                this.steps.forEach((step, index) => {
-                    const tempCurrent = this.currentStep;
-                    this.currentStep = index + 1;
-                    const isValid = this.validateCurrentStep();
-                    this.currentStep = tempCurrent;
-
-                    if (!isValid) {
-                        allValid = false;
-                    }
-                });
-
-                if (!allValid) {
-                    e.preventDefault();
-
-                    // Aller à la première étape invalide
-                    const firstInvalidStep = this.steps.findIndex(s => s.touched && !s.validated);
-                    if (firstInvalidStep !== -1) {
-                        this.currentStep = firstInvalidStep + 1;
-                    }
-
-                    this.$dispatch('show-toast', {
-                        type: 'error',
-                        message: 'Veuillez corriger les erreurs avant d\'enregistrer'
-                    });
-
-                    return false;
-                }
-
-                return true;
-            }
-        };
-    }
+    window.zenfleetDriverErrors = [];
 </script>
-
-<style>
-    @keyframes shake {
-
-        0%,
-        100% {
-            transform: translateX(0);
-        }
-
-        10%,
-        30%,
-        50%,
-        70%,
-        90% {
-            transform: translateX(-4px);
-        }
-
-        20%,
-        40%,
-        60%,
-        80% {
-            transform: translateX(4px);
-        }
-    }
-
-    .animate-shake {
-        animation: shake 0.5s ease-in-out;
-    }
-</style>
     
 
     
@@ -2739,7 +2537,6 @@
             }
         }
     </script>
-    <script data-navigate-once="true">window.livewireScriptConfig = {"csrf":"Pvm3yjCAZeHGNl7uL7BBnE8scngjAaS6utgmQ4R2","uri":"\/livewire\/update","progressBar":"","nonce":""};</script>
 </body>
 
 </html>

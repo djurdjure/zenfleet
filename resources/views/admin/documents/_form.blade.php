@@ -190,6 +190,7 @@ document.addEventListener('alpine:init', () => {
  },
  
  initializeTomSelect() {
+ if (!window.TomSelect) return;
  const tomSelectConfig = {
  plugins: ['remove_button'],
  sortField: { field: 'text', direction: 'asc' }
@@ -205,6 +206,7 @@ document.addEventListener('alpine:init', () => {
  
  // Initialize dynamic Tom Select fields after DOM update
  this.$nextTick(() => {
+ if (!window.TomSelect) return;
  if (this.selectedCategoryMetaSchema && this.selectedCategoryMetaSchema.fields) {
  this.selectedCategoryMetaSchema.fields.forEach(field => {
  if (field.type === 'multiselect' || field.type === 'entity_select') {

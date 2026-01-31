@@ -47,27 +47,26 @@ $inputId = $component->getId();
             x-bind:class="(typeof fieldErrors !== 'undefined' && fieldErrors && fieldErrors['{{ $name }}'] && typeof touchedFields !== 'undefined' && touchedFields && touchedFields['{{ $name }}']) ? '!border-red-500 !focus:ring-2 !focus:ring-red-500 !focus:border-red-500 !bg-red-50' : ''"
             {{ $attributes->except(['class']) }} />
     </div>
-</div>
 
-@if($error)
-<p class="mt-2 text-sm text-red-600 flex items-start font-medium">
-    <x-iconify icon="lucide:circle-alert" class="w-4 h-4 mr-1.5 mt-0.5 flex-shrink-0" />
-    <span>{{ $error }}</span>
-</p>
-@elseif($helpText)
-<p class="mt-2 text-sm text-gray-600">
-    {{ $helpText }}
-</p>
-@endif
+    @if($error)
+    <p class="mt-2 text-sm text-red-600 flex items-start font-medium">
+        <x-iconify icon="lucide:circle-alert" class="w-4 h-4 mr-1.5 mt-0.5 flex-shrink-0" />
+        <span>{{ $error }}</span>
+    </p>
+    @elseif($helpText)
+    <p class="mt-2 text-sm text-gray-600">
+        {{ $helpText }}
+    </p>
+    @endif
 
-{{-- ⚠️ Erreur dynamique Alpine.js - SEULEMENT si champ touché ET invalide --}}
-<p x-show="typeof fieldErrors !== 'undefined' && fieldErrors && fieldErrors['{{ $name }}'] && typeof touchedFields !== 'undefined' && touchedFields && touchedFields['{{ $name }}']"
-    x-transition:enter="transition ease-out duration-200"
-    x-transition:enter-start="opacity-0 transform -translate-y-1"
-    x-transition:enter-end="opacity-100 transform translate-y-0"
-    class="mt-2 text-sm text-red-600 flex items-start font-medium"
-    style="display: none;">
-    <x-iconify icon="lucide:circle-alert" class="w-4 h-4 mr-1.5 mt-0.5 flex-shrink-0" />
-    <span>Ce champ est obligatoire et doit être correctement rempli</span>
-</p>
+    {{-- ⚠️ Erreur dynamique Alpine.js - SEULEMENT si champ touché ET invalide --}}
+    <p x-show="typeof fieldErrors !== 'undefined' && fieldErrors && fieldErrors['{{ $name }}'] && typeof touchedFields !== 'undefined' && touchedFields && touchedFields['{{ $name }}']"
+        x-transition:enter="transition ease-out duration-200"
+        x-transition:enter-start="opacity-0 transform -translate-y-1"
+        x-transition:enter-end="opacity-100 transform translate-y-0"
+        class="mt-2 text-sm text-red-600 flex items-start font-medium"
+        style="display: none;">
+        <x-iconify icon="lucide:circle-alert" class="w-4 h-4 mr-1.5 mt-0.5 flex-shrink-0" />
+        <span>Ce champ est obligatoire et doit être correctement rempli</span>
+    </p>
 </div>

@@ -33,7 +33,7 @@
 @endif
 
 <section class="bg-gray-50 min-h-screen">
-    <div class="py-6 px-4 mx-auto max-w-7xl lg:py-12">
+    <div class="py-6 px-4 mx-auto max-w-7xl lg:py-12 lg:mx-0">
 
         {{-- Header COMPACT et MODERNE --}}
         <div class="mb-6">
@@ -76,91 +76,73 @@
         @endif
 
         {{-- ====================================================================
- FORMULAIRE MULTI-ÉTAPES AVEC VALIDATION ALPINE.JS
+ FORMULAIRE SINGLE-PAGE AVEC VALIDATION ALPINE.JS
  ==================================================================== --}}
-        <div x-data="driverFormValidation()" x-init="init()">
+        <div x-data="driverFormValidationEdit()" x-init="init()">
 
-            <x-card padding="p-0" margin="mb-6">
-                {{-- Stepper --}}
-                <x-stepper
-                    :steps="[
- ['label' => 'Informations Personnelles', 'icon' => 'user'],
- ['label' => 'Informations Professionnelles', 'icon' => 'briefcase'],
- ['label' => 'Permis de Conduire', 'icon' => 'id-card'],
- ['label' => 'Compte & Urgence', 'icon' => 'link']
- ]"
-                    currentStepVar="currentStep" />
+            {{-- Formulaire --}}
+            <form method="POST" action="{{ route('admin.drivers.update', $driver) }}" enctype="multipart/form-data" @submit="onSubmit" class="space-y-8">
+                @csrf
+                @method('PUT')
 
-                {{-- Formulaire --}}
-                <form method="POST" action="{{ route('admin.drivers.update', $driver) }}" enctype="multipart/form-data" @submit="onSubmit" class="p-6">
-                    @csrf
-                    @method('PUT')
-                    <input type="hidden" name="current_step" x-model="currentStep">
+                {{-- PHASE 1: INFORMATIONS PERSONNELLES --}}
+                <x-form-section
+                    title="Informations Personnelles"
+                    icon="heroicons:user"
+                    subtitle="Identité, coordonnées et informations de base du chauffeur">
+                    <x-field-group :columns="2">
+                        <x-input
+                            name="first_name"
+                            label="Prénom"
+                            icon="user"
+                            placeholder="Ex: Ahmed"
+                            :value="old('first_name', $driver->first_name)"
+                            required
+                            :error="$errors->first('first_name')"
+                            @blur="validateField('first_name', $event.target.value)" />
 
-                    {{-- PHASE 1: INFORMATIONS PERSONNELLES --}}
-                    <div x-show="currentStep === 1" x-transition:enter="transition ease-out duration-200"
-                        x-transition:enter-start="opacity-0 transform translate-x-4"
-                        x-transition:enter-end="opacity-100 transform translate-x-0">
-                        <div class="space-y-6">
-                            <div>
-                                <h3 class="text-lg font-medium text-gray-900 mb-4 flex items-center gap-2">
-                                    <x-iconify icon="heroicons:user" class="w-5 h-5 text-blue-600" />
-                                    Informations Personnelles
-                                </h3>
+                        <x-input
+                            name="last_name"
+                            label="Nom"
+                            icon="user"
+                            placeholder="Ex: Benali"
+                            :value="old('last_name', $driver->last_name)"
+                            required
+                            :error="$errors->first('last_name')"
+                            @blur="validateField('last_name', $event.target.value)" />
 
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                    <x-input
-                                        name="first_name"
-                                        label="Prénom"
-                                        icon="user"
-                                        placeholder="Ex: Ahmed"
-                                        :value="old('first_name', $driver->first_name)"
-                                        required
-                                        :error="$errors->first('first_name')"
-                                        @blur="validateField('first_name', $event.target.value)" />
+                        <x-datepicker
+                            name="birth_date"
+                            label="Date de naissance"
+                            :value="old('birth_date', $driver->birth_date ? $driver->birth_date->format('d/m/Y') : '')"
+                            format="d/m/Y"
+                            :error="$errors->first('birth_date')"
+                            placeholder="Choisir une date"
+                            :maxDate="date('Y-m-d')" />
 
-                                    <x-input
-                                        name="last_name"
-                                        label="Nom"
-                                        icon="user"
-                                        placeholder="Ex: Benali"
-                                        :value="old('last_name', $driver->last_name)"
-                                        required
-                                        :error="$errors->first('last_name')"
-                                        @blur="validateField('last_name', $event.target.value)" />
+                        <x-input
+                            name="personal_phone"
+                            type="tel"
+                            label="Téléphone personnel"
+                            icon="phone"
+                            placeholder="Ex: 0555123456"
+                            :value="old('personal_phone', $driver->personal_phone)"
+                            :error="$errors->first('personal_phone')" />
 
-                                    <x-datepicker
-                                        name="birth_date"
-                                        label="Date de naissance"
-                                        :value="old('birth_date', $driver->birth_date ? $driver->birth_date->format('d/m/Y') : '')"
-                                        format="d/m/Y"
-                                        :error="$errors->first('birth_date')"
-                                        placeholder="Choisir une date"
-                                        :maxDate="date('Y-m-d')" />
+                        <x-input
+                            name="personal_email"
+                            type="email"
+                            label="Email personnel"
+                            icon="envelope"
+                            placeholder="Ex: ahmed.benali@email.com"
+                            :value="old('personal_email', $driver->personal_email)"
+                            :error="$errors->first('personal_email')" />
 
-                                    <x-input
-                                        name="personal_phone"
-                                        type="tel"
-                                        label="Téléphone personnel"
-                                        icon="phone"
-                                        placeholder="Ex: 0555123456"
-                                        :value="old('personal_phone', $driver->personal_phone)"
-                                        :error="$errors->first('personal_phone')" />
-
-                                    <x-input
-                                        name="personal_email"
-                                        type="email"
-                                        label="Email personnel"
-                                        icon="envelope"
-                                        placeholder="Ex: ahmed.benali@email.com"
-                                        :value="old('personal_email', $driver->personal_email)"
-                                        :error="$errors->first('personal_email')" />
-
-                                    {{-- Groupe sanguin avec affichage de la valeur actuelle --}}
-                                    <x-slim-select
-                                        name="blood_type"
-                                        label="Groupe sanguin"
-                                        :options="[
+                        {{-- Groupe sanguin avec affichage de la valeur actuelle --}}
+                        <x-slim-select
+                            name="blood_type"
+                            label="Groupe sanguin"
+                            :options="[
                                             '' => 'Sélectionner',
                                             'A+' => 'A+',
                                             'A-' => 'A-',
@@ -171,352 +153,310 @@
                                             'O+' => 'O+',
                                             'O-' => 'O-'
                                         ]"
-                                        :selected="old('blood_type', $driver->blood_type)"
-                                        placeholder="Sélectionnez un groupe sanguin..."
-                                        :error="$errors->first('blood_type')" />
+                            :selected="old('blood_type', $driver->blood_type)"
+                            placeholder="Sélectionnez un groupe sanguin..."
+                            :error="$errors->first('blood_type')" />
 
 
-                                    <div class="md:col-span-2">
-                                        <x-textarea
-                                            name="address"
-                                            label="Adresse"
-                                            rows="3"
-                                            placeholder="Adresse complète du chauffeur..."
-                                            :value="old('address', $driver->address)"
-                                            :error="$errors->first('address')" />
-                                    </div>
+                    </x-field-group>
 
-                                    {{-- Photo --}}
-                                    <div class="md:col-span-2">
-                                        <label class="block text-sm font-medium text-gray-700 mb-2">
-                                            Photo du chauffeur
-                                        </label>
-                                        <div class="flex items-center gap-6">
-                                            {{-- Prévisualisation --}}
-                                            <div class="flex-shrink-0">
-                                                @if($driver->photo)
-                                                <div x-show="!photoPreview">
-                                                    <img src="{{ asset('storage/' . $driver->photo) }}" class="h-24 w-24 rounded-full object-cover ring-2 ring-blue-100" alt="Photo actuelle">
-                                                </div>
-                                                @else
-                                                <div x-show="!photoPreview" class="h-24 w-24 rounded-full bg-gray-100 flex items-center justify-center">
-                                                    <x-iconify icon="heroicons:user" class="w-12 h-12 text-gray-400" />
-                                                </div>
-                                                @endif
-                                                <img x-show="photoPreview" :src="photoPreview" class="h-24 w-24 rounded-full object-cover ring-2 ring-blue-100" alt="Nouvelle photo" x-cloak>
-                                            </div>
-                                            {{-- Input file --}}
-                                            <div class="flex-1">
-                                                <input
-                                                    type="file"
-                                                    name="photo"
-                                                    id="photo"
-                                                    accept="image/*"
-                                                    @change="updatePhotoPreview($event)"
-                                                    class="block w-full text-sm text-gray-500
+                    <div class="col-span-6 mt-6">
+                        <x-textarea
+                            name="address"
+                            label="Adresse"
+                            rows="3"
+                            placeholder="Adresse complète du chauffeur..."
+                            :value="old('address', $driver->address)"
+                            :error="$errors->first('address')" />
+                    </div>
+
+                    {{-- Photo --}}
+                    <div class="md:col-span-2">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            Photo du chauffeur
+                        </label>
+                        <div class="flex items-center gap-6">
+                            {{-- Prévisualisation --}}
+                            <div class="flex-shrink-0">
+                                @if($driver->photo)
+                                <div x-show="!photoPreview">
+                                    <img src="{{ asset('storage/' . $driver->photo) }}" class="h-24 w-24 rounded-full object-cover ring-2 ring-blue-100" alt="Photo actuelle">
+                                </div>
+                                @else
+                                <div x-show="!photoPreview" class="h-24 w-24 rounded-full bg-gray-100 flex items-center justify-center">
+                                    <x-iconify icon="heroicons:user" class="w-12 h-12 text-gray-400" />
+                                </div>
+                                @endif
+                                <img x-show="photoPreview" :src="photoPreview" class="h-24 w-24 rounded-full object-cover ring-2 ring-blue-100" alt="Nouvelle photo" x-cloak>
+                            </div>
+                            {{-- Input file --}}
+                            <div class="flex-1">
+                                <input
+                                    type="file"
+                                    name="photo"
+                                    id="photo"
+                                    accept="image/*"
+                                    @change="updatePhotoPreview($event)"
+                                    class="block w-full text-sm text-gray-500
  file:mr-4 file:py-2 file:px-4
  file:rounded-lg file:border-0
  file:text-sm file:font-medium
  file:bg-blue-50 file:text-blue-700
  hover:file:bg-blue-100
  cursor-pointer">
-                                                <p class="mt-1 text-xs text-gray-500">PNG, JPG, GIF jusqu'à 5MB. Laissez vide pour conserver la photo actuelle.</p>
-                                                @error('photo')
-                                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                                                @enderror
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
+                                <p class="mt-1 text-xs text-gray-500">PNG, JPG, GIF jusqu'à 5MB. Laissez vide pour conserver la photo actuelle.</p>
+                                @error('photo')
+                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                @enderror
                             </div>
                         </div>
                     </div>
-
-                    {{-- PHASE 2: INFORMATIONS PROFESSIONNELLES --}}
-                    <div x-show="currentStep === 2" x-transition:enter="transition ease-out duration-200"
-                        x-transition:enter-start="opacity-0 transform translate-x-4"
-                        x-transition:enter-end="opacity-100 transform translate-x-0"
-                        style="display: none;">
-                        <div class="space-y-6">
-                            <div>
-                                <h3 class="text-lg font-medium text-gray-900 mb-4 flex items-center gap-2">
-                                    <x-iconify icon="heroicons:briefcase" class="w-5 h-5 text-blue-600" />
-                                    Informations Professionnelles
-                                </h3>
-
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                    <x-input
-                                        name="employee_number"
-                                        label="Matricule"
-                                        icon="identification"
-                                        placeholder="Ex: EMP-2024-001"
-                                        :value="old('employee_number', $driver->employee_number)"
-                                        :error="$errors->first('employee_number')" />
-
-                                    <x-datepicker
-                                        name="recruitment_date"
-                                        label="Date de recrutement"
-                                        :value="old('recruitment_date', $driver->recruitment_date ? $driver->recruitment_date->format('d/m/Y') : '')"
-                                        format="d/m/Y"
-                                        :error="$errors->first('recruitment_date')"
-                                        placeholder="Choisir une date"
-                                        :maxDate="date('Y-m-d')" />
-
-                                    <x-datepicker
-                                        name="contract_end_date"
-                                        label="Fin de contrat"
-                                        :value="old('contract_end_date', $driver->contract_end_date ? $driver->contract_end_date->format('d/m/Y') : '')"
-                                        format="d/m/Y"
-                                        :error="$errors->first('contract_end_date')"
-                                        placeholder="Choisir une date"
-                                        :minDate="date('Y-m-d')"
-                                        helpText="Date de fin du contrat (optionnel)" />
-
-                                    <x-slim-select
-                                        name="status_id"
-                                        label="Statut du Chauffeur"
-                                        :options="$driverStatuses->pluck('name', 'id')->toArray()"
-                                        :selected="old('status_id', $driver->status_id)"
-                                        placeholder="Sélectionnez un statut..."
-                                        required
-                                        :error="$errors->first('status_id')"
-                                        @change="validateField('status_id', $event.target.value)" />
-
-                                    <div class="md:col-span-2">
-                                        <x-textarea
-                                            name="notes"
-                                            label="Notes professionnelles"
-                                            rows="4"
-                                            placeholder="Informations complémentaires sur le chauffeur..."
-                                            :value="old('notes', $driver->notes)"
-                                            :error="$errors->first('notes')"
-                                            helpText="Compétences, formations, remarques, etc." />
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    {{-- PHASE 3: PERMIS DE CONDUIRE --}}
-                    <div x-show="currentStep === 3" x-transition:enter="transition ease-out duration-200"
-                        x-transition:enter-start="opacity-0 transform translate-x-4"
-                        x-transition:enter-end="opacity-100 transform translate-x-0"
-                        style="display: none;">
-                        <div class="space-y-6">
-                            <div>
-                                <h3 class="text-lg font-medium text-gray-900 mb-4 flex items-center gap-2">
-                                    <x-iconify icon="heroicons:identification" class="w-5 h-5 text-blue-600" />
-                                    Permis de Conduire
-                                </h3>
-
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                    <x-input
-                                        name="license_number"
-                                        label="Numéro de permis"
-                                        icon="id-card"
-                                        placeholder="Ex: 123456789"
-                                        :value="old('license_number', $driver->license_number)"
-                                        :error="$errors->first('license_number')"
-                                        required />
-
-                                    {{-- Catégorie de permis avec SlimSelect (Simple sélection) --}}
-                                    @php
-                                        // Liste complète des catégories de permis disponibles (sélection unique)
-                                        $licenseCategories = [
-                                            '' => 'Sélectionner une catégorie',
-                                            'A1' => 'A1 (Motos légères ≤125cc)',
-                                            'A' => 'A (Motos illimitées)',
-                                            'B' => 'B (Véhicules légers ≤3500kg)',
-                                            'BE' => 'BE (Remorques catégorie B)',
-                                            'C1' => 'C1 (Véhicules moyens 3500-7500kg)',
-                                            'C1E' => 'C1E (Remorques catégorie C1)',
-                                            'C' => 'C (Poids lourds >7500kg)',
-                                            'CE' => 'CE (Remorques catégorie C)',
-                                            'D' => 'D (Autobus >16 places)',
-                                            'DE' => 'DE (Remorques catégorie D)',
-                                            'F' => 'F (Tracteurs agricoles)',
-                                        ];
-                                        // Récupération des valeurs actuelles (multiples catégories)
-                                        $selectedCategories = old('license_categories', $driver->license_categories ?? []);
-                                        if (!is_array($selectedCategories)) $selectedCategories = [];
-                                    @endphp
-                                    <x-multi-checkbox-select
-                                        name="license_categories"
-                                        label="Catégories de permis"
-                                        :options="$licenseCategories"
-                                        :selected="$selectedCategories"
-                                        placeholder="Sélectionnez les catégories de permis..."
-                                        :error="$errors->first('license_categories')"
-                                        required
-                                        helpText="Sélectionnez toutes les catégories de permis détenues par le chauffeur" />
-
-                                    <x-datepicker
-                                        name="license_issue_date"
-                                        label="Date de délivrance"
-                                        :value="old('license_issue_date', $driver->license_issue_date ? $driver->license_issue_date->format('d/m/Y') : '')"
-                                        format="d/m/Y"
-                                        :error="$errors->first('license_issue_date')"
-                                        placeholder="Choisir une date"
-                                        required />
-
-                                    <x-datepicker
-                                        name="license_expiry_date"
-                                        label="Date d'expiration"
-                                        :value="old('license_expiry_date', $driver->license_expiry_date ? $driver->license_expiry_date->format('d/m/Y') : '')"
-                                        format="d/m/Y"
-                                        :error="$errors->first('license_expiry_date')"
-                                        placeholder="Choisir une date"
-                                        :minDate="date('Y-m-d')"
-                                        required />
-
-                                    <x-input
-                                        name="license_authority"
-                                        label="Autorité de délivrance"
-                                        icon="building-office-2"
-                                        placeholder="Ex: Wilaya d'Alger"
-                                        :value="old('license_authority', $driver->license_authority)"
-                                        :error="$errors->first('license_authority')" />
-
-                                    <div class="flex items-center h-full pt-6">
-                                        <label class="inline-flex items-center cursor-pointer">
-                                            <input
-                                                type="checkbox"
-                                                name="license_verified"
-                                                value="1"
-                                                {{ old('license_verified', $driver->license_verified) ? 'checked' : '' }}
-                                                class="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50">
-                                            <span class="ml-2 text-sm text-gray-700 font-medium">
-                                                <x-iconify icon="heroicons:check-badge" class="w-4 h-4 inline text-blue-600" />
-                                                Permis vérifié
-                                            </span>
-                                        </label>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    {{-- PHASE 4: COMPTE & CONTACT D'URGENCE --}}
-                    <div x-show="currentStep === 4" x-transition:enter="transition ease-out duration-200"
-                        x-transition:enter-start="opacity-0 transform translate-x-4"
-                        x-transition:enter-end="opacity-100 transform translate-x-0"
-                        style="display: none;">
-                        <div class="space-y-6">
-                            {{-- Compte Utilisateur --}}
-                            <div class="space-y-6">
-                                <h3 class="text-lg font-medium text-gray-900 mb-4 flex items-center gap-2">
-                                    <x-iconify icon="heroicons:user-circle" class="w-5 h-5 text-blue-600" />
-                                    Compte Utilisateur (Optionnel)
-                                </h3>
-
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                    {{-- Compte utilisateur avec SlimSelect --}}
-                                    @php
-                                    $userOptions = isset($linkableUsers)
-                                    ? $linkableUsers->mapWithKeys(function($user) {
-                                    return [$user->id => $user->name . ' (' . $user->email . ')'];
-                                    })->toArray()
-                                    : [];
-                                    @endphp
-                                    <x-slim-select
-                                        name="user_id"
-                                        label="Compte utilisateur"
-                                        :options="$userOptions"
-                                        :selected="old('user_id', $driver->user_id)"
-                                        placeholder="Rechercher un utilisateur..."
-                                        :error="$errors->first('user_id')"
-                                        helpText="Sélectionnez un compte existant ou laissez vide (optionnel)">
-                                        @if($driver->user)
-                                        <x-slot name="label">
-                                            Compte utilisateur
-                                            <span class="ml-2 text-xs text-gray-500 font-normal">
-                                                (Actuel: {{ $driver->user->name }})
-                                            </span>
-                                        </x-slot>
-                                        @endif
-                                    </x-slim-select>
-                                </div>
-                            </div>
-
-                            {{-- Contact d'Urgence --}}
-                            <div>
-                                <h3 class="text-lg font-medium text-gray-900 mb-4 flex items-center gap-2">
-                                    <x-iconify icon="heroicons:phone" class="w-5 h-5 text-red-600" />
-                                    Contact d'Urgence
-                                </h3>
-
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                    <x-input
-                                        name="emergency_contact_name"
-                                        label="Nom du contact"
-                                        icon="user"
-                                        placeholder="Ex: Fatima Benali"
-                                        :value="old('emergency_contact_name', $driver->emergency_contact_name)"
-                                        :error="$errors->first('emergency_contact_name')" />
-
-                                    <x-input
-                                        name="emergency_contact_phone"
-                                        type="tel"
-                                        label="Téléphone du contact"
-                                        icon="phone"
-                                        placeholder="Ex: 0555987654"
-                                        :value="old('emergency_contact_phone', $driver->emergency_contact_phone)"
-                                        :error="$errors->first('emergency_contact_phone')" />
-
-                                    <x-input
-                                        name="emergency_contact_relationship"
-                                        label="Lien de parenté"
-                                        icon="users"
-                                        placeholder="Ex: Épouse, Frère, Mère"
-                                        :value="old('emergency_contact_relationship', $driver->emergency_contact_relationship)"
-                                        :error="$errors->first('emergency_contact_relationship')" />
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    {{-- ACTIONS FOOTER --}}
-                    <div class="mt-8 pt-6 border-t border-gray-200 flex items-center justify-between">
-                        <div>
-                            <button
-                                type="button"
-                                @click="prevStep()"
-                                x-show="currentStep > 1"
-                                class="inline-flex items-center gap-2 px-4 py-2.5 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors text-sm font-medium text-gray-700">
-                                <x-iconify icon="heroicons:arrow-left" class="w-4 h-4" />
-                                Précédent
-                            </button>
-                        </div>
-
-                        <div class="flex items-center gap-4">
-                            <a href="{{ route('admin.drivers.show', $driver) }}"
-                                class="text-gray-600 hover:text-gray-900 font-medium text-sm transition-colors">
-                                Annuler
-                            </a>
-
-                            <button
-                                type="button"
-                                @click="nextStep()"
-                                x-show="currentStep < 4"
-                                class="inline-flex items-center gap-2 px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors shadow-sm hover:shadow-md text-sm">
-                                Suivant
-                                <x-iconify icon="heroicons:arrow-right" class="w-4 h-4" />
-                            </button>
-
-                            <button
-                                type="submit"
-                                x-show="currentStep === 4"
-                                x-cloak
-                                class="inline-flex items-center gap-2 px-6 py-2.5 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg transition-colors shadow-sm hover:shadow-md text-sm">
-                                <x-iconify icon="heroicons:check" class="w-5 h-5" />
-                                Enregistrer les Modifications
-                            </button>
-                        </div>
-                    </div>
-                </form>
-            </x-card>
-
         </div>
+        </x-form-section>
+
+        {{-- PHASE 2: INFORMATIONS PROFESSIONNELLES --}}
+        <x-form-section
+            title="Informations Professionnelles"
+            icon="heroicons:briefcase"
+            subtitle="Matricule, statut et informations de recrutement">
+            <x-field-group :columns="2">
+                <x-input
+                    name="employee_number"
+                    label="Matricule"
+                    icon="identification"
+                    placeholder="Ex: EMP-2024-001"
+                    :value="old('employee_number', $driver->employee_number)"
+                    :error="$errors->first('employee_number')" />
+
+                <x-datepicker
+                    name="recruitment_date"
+                    label="Date de recrutement"
+                    :value="old('recruitment_date', $driver->recruitment_date ? $driver->recruitment_date->format('d/m/Y') : '')"
+                    format="d/m/Y"
+                    :error="$errors->first('recruitment_date')"
+                    placeholder="Choisir une date"
+                    :maxDate="date('Y-m-d')" />
+
+                <x-datepicker
+                    name="contract_end_date"
+                    label="Fin de contrat"
+                    :value="old('contract_end_date', $driver->contract_end_date ? $driver->contract_end_date->format('d/m/Y') : '')"
+                    format="d/m/Y"
+                    :error="$errors->first('contract_end_date')"
+                    placeholder="Choisir une date"
+                    :minDate="date('Y-m-d')"
+                    helpText="Date de fin du contrat (optionnel)" />
+
+                <x-slim-select
+                    name="status_id"
+                    label="Statut du Chauffeur"
+                    :options="$driverStatuses->pluck('name', 'id')->toArray()"
+                    :selected="old('status_id', $driver->status_id)"
+                    placeholder="Sélectionnez un statut..."
+                    required
+                    :error="$errors->first('status_id')"
+                    @change="validateField('status_id', $event.target.value)" />
+
+            </x-field-group>
+
+            <div class="col-span-6 mt-6">
+                <x-textarea
+                    name="notes"
+                    label="Notes professionnelles"
+                    rows="4"
+                    placeholder="Informations complémentaires sur le chauffeur..."
+                    :value="old('notes', $driver->notes)"
+                    :error="$errors->first('notes')"
+                    helpText="Compétences, formations, remarques, etc." />
+            </div>
+        </x-form-section>
+
+        {{-- PHASE 3: PERMIS DE CONDUIRE --}}
+        <x-form-section
+            title="Permis de Conduire"
+            icon="heroicons:identification"
+            subtitle="Numéro, catégories et dates de validité">
+            <x-field-group :columns="2">
+                <x-input
+                    name="license_number"
+                    label="Numéro de permis"
+                    icon="id-card"
+                    placeholder="Ex: 123456789"
+                    :value="old('license_number', $driver->license_number)"
+                    :error="$errors->first('license_number')"
+                    required />
+
+                {{-- Catégorie de permis avec SlimSelect (Simple sélection) --}}
+                @php
+                // Liste complète des catégories de permis disponibles (sélection unique)
+                $licenseCategories = [
+                '' => 'Sélectionner une catégorie',
+                'A1' => 'A1 (Motos légères ≤125cc)',
+                'A' => 'A (Motos illimitées)',
+                'B' => 'B (Véhicules légers ≤3500kg)',
+                'BE' => 'BE (Remorques catégorie B)',
+                'C1' => 'C1 (Véhicules moyens 3500-7500kg)',
+                'C1E' => 'C1E (Remorques catégorie C1)',
+                'C' => 'C (Poids lourds >7500kg)',
+                'CE' => 'CE (Remorques catégorie C)',
+                'D' => 'D (Autobus >16 places)',
+                'DE' => 'DE (Remorques catégorie D)',
+                'F' => 'F (Tracteurs agricoles)',
+                ];
+                // Récupération des valeurs actuelles (multiples catégories)
+                $selectedCategories = old('license_categories', $driver->license_categories ?? []);
+                if (!is_array($selectedCategories)) $selectedCategories = [];
+                @endphp
+                <x-multi-checkbox-select
+                    name="license_categories"
+                    label="Catégories de permis"
+                    :options="$licenseCategories"
+                    :selected="$selectedCategories"
+                    placeholder="Sélectionnez les catégories de permis..."
+                    :error="$errors->first('license_categories')"
+                    required
+                    helpText="Sélectionnez toutes les catégories de permis détenues par le chauffeur" />
+
+                <x-datepicker
+                    name="license_issue_date"
+                    label="Date de délivrance"
+                    :value="old('license_issue_date', $driver->license_issue_date ? $driver->license_issue_date->format('d/m/Y') : '')"
+                    format="d/m/Y"
+                    :error="$errors->first('license_issue_date')"
+                    placeholder="Choisir une date"
+                    required />
+
+                <x-datepicker
+                    name="license_expiry_date"
+                    label="Date d'expiration"
+                    :value="old('license_expiry_date', $driver->license_expiry_date ? $driver->license_expiry_date->format('d/m/Y') : '')"
+                    format="d/m/Y"
+                    :error="$errors->first('license_expiry_date')"
+                    placeholder="Choisir une date"
+                    :minDate="date('Y-m-d')"
+                    required />
+
+                <x-input
+                    name="license_authority"
+                    label="Autorité de délivrance"
+                    icon="building-office-2"
+                    placeholder="Ex: Wilaya d'Alger"
+                    :value="old('license_authority', $driver->license_authority)"
+                    :error="$errors->first('license_authority')" />
+
+                <div class="flex items-center h-full pt-6">
+                    <label class="inline-flex items-center cursor-pointer">
+                        <input
+                            type="checkbox"
+                            name="license_verified"
+                            value="1"
+                            {{ old('license_verified', $driver->license_verified) ? 'checked' : '' }}
+                            class="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50">
+                        <span class="ml-2 text-sm text-gray-700 font-medium">
+                            <x-iconify icon="heroicons:check-badge" class="w-4 h-4 inline text-blue-600" />
+                            Permis vérifié
+                        </span>
+                    </label>
+                </div>
+            </x-field-group>
+        </x-form-section>
+
+        {{-- PHASE 4: COMPTE & CONTACT D'URGENCE --}}
+        <x-form-section
+            title="Compte & Contact d'Urgence"
+            icon="heroicons:link"
+            subtitle="Accès applicatif optionnel et personne à contacter">
+            <div class="space-y-6">
+                {{-- Compte Utilisateur --}}
+                <div class="space-y-6">
+                    <h4 class="text-sm font-semibold text-slate-900 mb-3 flex items-center gap-2">
+                        <x-iconify icon="heroicons:user-circle" class="w-4 h-4 text-blue-600" />
+                        Compte Utilisateur (Optionnel)
+                    </h4>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        {{-- Compte utilisateur avec SlimSelect --}}
+                        @php
+                        $userOptions = isset($linkableUsers)
+                        ? $linkableUsers->mapWithKeys(function($user) {
+                        return [$user->id => $user->name . ' (' . $user->email . ')'];
+                        })->toArray()
+                        : [];
+                        @endphp
+                        <x-slim-select
+                            name="user_id"
+                            label="Compte utilisateur"
+                            :options="$userOptions"
+                            :selected="old('user_id', $driver->user_id)"
+                            placeholder="Rechercher un utilisateur..."
+                            :error="$errors->first('user_id')"
+                            helpText="Sélectionnez un compte existant ou laissez vide (optionnel)">
+                            @if($driver->user)
+                            <x-slot name="label">
+                                Compte utilisateur
+                                <span class="ml-2 text-xs text-gray-500 font-normal">
+                                    (Actuel: {{ $driver->user->name }})
+                                </span>
+                            </x-slot>
+                            @endif
+                        </x-slim-select>
+                    </div>
+                </div>
+
+                {{-- Contact d'Urgence --}}
+                <div>
+                    <h4 class="text-sm font-semibold text-slate-900 mb-3 flex items-center gap-2">
+                        <x-iconify icon="heroicons:phone" class="w-4 h-4 text-red-600" />
+                        Contact d'Urgence
+                    </h4>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <x-input
+                            name="emergency_contact_name"
+                            label="Nom du contact"
+                            icon="user"
+                            placeholder="Ex: Fatima Benali"
+                            :value="old('emergency_contact_name', $driver->emergency_contact_name)"
+                            :error="$errors->first('emergency_contact_name')" />
+
+                        <x-input
+                            name="emergency_contact_phone"
+                            type="tel"
+                            label="Téléphone du contact"
+                            icon="phone"
+                            placeholder="Ex: 0555987654"
+                            :value="old('emergency_contact_phone', $driver->emergency_contact_phone)"
+                            :error="$errors->first('emergency_contact_phone')" />
+
+                        <x-input
+                            name="emergency_contact_relationship"
+                            label="Lien de parenté"
+                            icon="users"
+                            placeholder="Ex: Épouse, Frère, Mère"
+                            :value="old('emergency_contact_relationship', $driver->emergency_contact_relationship)"
+                            :error="$errors->first('emergency_contact_relationship')" />
+                    </div>
+                </div>
+            </div>
+        </x-form-section>
+
+        {{-- ACTIONS FOOTER --}}
+        <div class="rounded-2xl border border-slate-200 bg-white p-5 flex items-center justify-between">
+            <a href="{{ route('admin.drivers.show', $driver) }}"
+                class="text-gray-600 hover:text-gray-900 font-medium text-sm transition-colors">
+                Annuler
+            </a>
+
+            <button
+                type="submit"
+                class="inline-flex items-center gap-2 px-6 py-2.5 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg transition-colors shadow-sm hover:shadow-md text-sm">
+                <x-iconify icon="heroicons:check" class="w-5 h-5" />
+                Enregistrer les Modifications
+            </button>
+        </div>
+        </form>
+
+    </div>
     </div>
 </section>
 
@@ -524,187 +464,6 @@
 
 @push('scripts')
 <script>
-    document.addEventListener('alpine:init', () => {
-        Alpine.data('driverFormValidation', () => ({
-            currentStep: {{ old('current_step', 1) }},
-            photoPreview: null,
-            fieldErrors: {},
-            touchedFields: {},
-
-            init() {
-                // Initialisation des champs si nécessaire
-                this.fieldErrors = {
-                    first_name: '',
-                    last_name: '',
-                    email: '',
-                    personal_phone: '',
-                    'birth_date': '',
-                    'license_number': '',
-                    'license_category': '', // Modifié: licence_categories[] → license_category
-                    license_issue_date: '',
-                    license_expiry_date: '',
-                    recruitment_date: '',
-                    contract_end_date: '',
-                    user_id: ''
-                };
-
-                this.touchedFields = {
-                    first_name: false,
-                    last_name: false,
-                    email: false,
-                    personal_phone: false,
-                    'birth_date': false,
-                    'license_number': false,
-                    'license_categories': false,
-                    license_issue_date: false,
-                    license_expiry_date: false,
-                    recruitment_date: false,
-                    contract_end_date: false,
-                    user_id: false
-                };
-
-                @if($errors->any())
-                this.handleValidationErrors(@json($errors->messages()));
-                @endif
-            },
-
-            updatePhotoPreview(event) {
-                const file = event.target.files[0];
-                if (file) {
-                    const reader = new FileReader();
-                    reader.onload = (e) => {
-                        this.photoPreview = e.target.result;
-                    };
-                    reader.readAsDataURL(file);
-                }
-            },
-
-            validateField(fieldName, value = null) {
-                this.touchedFields[fieldName] = true;
-                // Logique de validation simple côté client (optionnel mais recommandé pour l'UX immédiate)
-                if (fieldName === 'license_categories') {
-                    // Pour license_categories, value est un tableau (selected)
-                    if (!value || value.length === 0) {
-                        this.fieldErrors.license_categories = 'Au moins une catégorie de permis est obligatoire';
-                    } else {
-                        this.fieldErrors.license_categories = '';
-                    }
-                } else if (value === '') {
-                    // Reset error if value is provided (very basic)
-                    this.fieldErrors[fieldName] = '';
-                }
-            },
-
-            nextStep() {
-                if (this.currentStep < 4) {
-                    this.currentStep++;
-                    window.scrollTo({
-                        top: 0,
-                        behavior: 'smooth'
-                    });
-                }
-            },
-
-            prevStep() {
-                if (this.currentStep > 1) {
-                    this.currentStep--;
-                    window.scrollTo({
-                        top: 0,
-                        behavior: 'smooth'
-                    });
-                }
-            },
-
-            onSubmit(event) {
-                this.convertDatesBeforeSubmit(event);
-            },
-
-            convertDatesBeforeSubmit(event) {
-                const form = event.target;
-                const dateFields = [
-                    'birth_date', 'recruitment_date', 'contract_end_date',
-                    'license_issue_date', 'license_expiry_date'
-                ];
-
-                dateFields.forEach(fieldName => {
-                    const input = form.querySelector(`[name="${fieldName}"]`);
-                    if (input && input.value) {
-                        const convertedDate = this.convertDateFormat(input.value);
-                        if (convertedDate) {
-                            input.value = convertedDate;
-                        }
-                    }
-                });
-            },
-
-            convertDateFormat(dateString) {
-                if (!dateString) return null;
-                if (/^\d{4}-\d{2}-\d{2}$/.test(dateString)) return dateString;
-
-                // Support dd/mm/yyyy
-                const match = dateString.match(/^(\d{1,2})[\/\-\.](\d{1,2})[\/\-\.](\d{4})$/);
-                if (match) {
-                    const day = match[1].padStart(2, '0');
-                    const month = match[2].padStart(2, '0');
-                    const year = match[3];
-                    return `${year}-${month}-${day}`;
-                }
-                return null;
-            },
-
-            handleValidationErrors(errors) {
-                console.log('Server Errors:', errors);
-
-                // Map server errors to fieldErrors
-                Object.keys(errors).forEach(field => {
-                    this.fieldErrors[field] = errors[field][0];
-                    this.touchedFields[field] = true;
-                });
-
-                // Mapping des champs vers les étapes
-                const fieldToStepMap = {
-                    'first_name': 1,
-                    'last_name': 1,
-                    'birth_date': 1,
-                    'personal_phone': 1,
-                    'address': 1,
-                    'blood_type': 1,
-                    'personal_email': 1,
-                    'photo': 1,
-                    'employee_number': 2,
-                    'recruitment_date': 2,
-                    'contract_end_date': 2,
-                    'status_id': 2,
-                    'notes': 2,
-                    'license_number': 3,
-                    'license_categories': 3,
-                    'license_issue_date': 3,
-                    'license_expiry_date': 3,
-                    'license_authority': 3,
-                    'license_verified': 3,
-                    'user_id': 4,
-                    'emergency_contact_name': 4,
-                    'emergency_contact_phone': 4,
-                    'emergency_contact_relationship': 4
-                };
-
-                // Trouver la première étape contenant une erreur
-                const errorFields = Object.keys(errors);
-                let firstErrorStep = null;
-
-                for (const field of errorFields) {
-                    if (fieldToStepMap[field]) {
-                        if (firstErrorStep === null || fieldToStepMap[field] < firstErrorStep) {
-                            firstErrorStep = fieldToStepMap[field];
-                        }
-                    }
-                }
-
-                if (firstErrorStep) {
-                    this.currentStep = firstErrorStep;
-                }
-            }
-        }));
-    });
+    window.zenfleetDriverErrors = @json($errors -> messages());
 </script>
 @endpush
