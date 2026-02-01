@@ -38,7 +38,7 @@
 @endif
 
 <section class="bg-gray-50 min-h-screen">
-    <div class="py-6 px-4 mx-auto max-w-7xl lg:py-12">
+    <div class="py-6 px-4 mx-auto max-w-7xl lg:py-12 lg:mx-0">
 
         {{-- Header COMPACT et MODERNE --}}
         <div class="mb-6">
@@ -65,488 +65,327 @@
 
         {{-- FORMULAIRE AVEC ALPINE.JS VALIDATION --}}
         <div x-data="supplierFormValidation()" x-init="init()">
-            <x-card padding="p-0" margin="mb-6">
-                <form method="POST" action="{{ route('admin.suppliers.store') }}" class="p-6" @submit="onSubmit">
-                    @csrf
+            <form method="POST" action="{{ route('admin.suppliers.store') }}" @submit="onSubmit" class="space-y-8">
+                @csrf
 
-                    {{-- SECTION 1: INFORMATIONS GÉNÉRALES --}}
-                    <div class="mb-8">
-                        <h3 class="text-lg font-medium text-gray-900 mb-4 flex items-center gap-2">
-                            <x-iconify icon="heroicons:identification" class="w-5 h-5 text-blue-600" />
-                            Informations Générales
-                        </h3>
+                <x-form-section
+                    title="Informations Générales"
+                    icon="heroicons:identification"
+                    subtitle="Données d'identité et légales du fournisseur">
+                    <x-field-group :columns="2">
+                        <x-input
+                            name="company_name"
+                            label="Raison Sociale"
+                            icon="building-office"
+                            placeholder="Ex: SARL Transport Alger"
+                            :value="old('company_name')"
+                            required
+                            :error="$errors->first('company_name')"
+                            helpText="Nom officiel de l'entreprise"
+                            @blur="validateField('company_name', $event.target.value)" />
 
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            {{-- Raison Sociale --}}
-                            <div class="md:col-span-2" @blur="validateField('company_name', $event.target.value)">
-                                <label for="company_name" class="block mb-2 text-sm font-medium text-gray-900">
-                                    Raison Sociale <span class="text-red-600">*</span>
-                                </label>
-                                <div class="relative">
-                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                        <x-iconify icon="heroicons:building-office" class="w-5 h-5 text-gray-400" />
-                                    </div>
-                                    <input
-                                        type="text"
-                                        name="company_name"
-                                        id="company_name"
-                                        required
-                                        placeholder="Ex: SARL Transport Alger"
-                                        value="{{ old('company_name') }}"
-                                        class="bg-gray-50 border text-gray-900 text-sm rounded-lg block w-full p-2.5 transition-colors duration-200 border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 pl-10"
-                                        x-bind:class="(fieldErrors && fieldErrors['company_name'] && touchedFields && touchedFields['company_name']) ? '!border-red-500 !focus:ring-2 !focus:ring-red-500 !focus:border-red-500 !bg-red-50' : ''"
-                                        @blur="validateField('company_name', $event.target.value)" />
-                                </div>
-                                <p class="mt-2 text-sm text-gray-600">Nom officiel de l'entreprise</p>
-                                <p x-show="fieldErrors && fieldErrors['company_name'] && touchedFields && touchedFields['company_name']"
-                                    x-transition:enter="transition ease-out duration-200"
-                                    x-transition:enter-start="opacity-0 transform -translate-y-1"
-                                    x-transition:enter-end="opacity-100 transform translate-y-0"
-                                    class="mt-2 text-sm text-red-600 flex items-start font-medium"
-                                    style="display: none;">
-                                    <x-iconify icon="lucide:circle-alert" class="w-4 h-4 mr-1.5 mt-0.5 flex-shrink-0" />
-                                    <span>Ce champ est obligatoire</span>
-                                </p>
-                            </div>
+                        <x-slim-select
+                            name="supplier_type"
+                            label="Type de Fournisseur"
+                            :options="App\Models\Supplier::getSupplierTypes()"
+                            :selected="old('supplier_type')"
+                            placeholder="Sélectionnez un type..."
+                            required
+                            :error="$errors->first('supplier_type')"
+                            @change="validateField('supplier_type', $event.target.value)" />
+                    </x-field-group>
 
-                            {{-- Type --}}
-                            <x-slim-select
-                                name="supplier_type"
-                                label="Type de Fournisseur"
-                                :options="App\Models\Supplier::getSupplierTypes()"
-                                :selected="old('supplier_type')"
-                                placeholder="Sélectionnez un type..."
-                                required
-                                :error="$errors->first('supplier_type')" />
+                    <x-field-group :columns="2" class="mt-6">
+                        @if(isset($categories) && $categories->count() > 0)
+                        <x-slim-select
+                            name="supplier_category_id"
+                            label="Catégorie"
+                            :options="$categories->pluck('name', 'id')->toArray()"
+                            :selected="old('supplier_category_id')"
+                            placeholder="Sélectionnez une catégorie..."
+                            :error="$errors->first('supplier_category_id')" />
+                        @endif
 
-                            {{-- Catégorie --}}
-                            @if(isset($categories) && $categories->count() > 0)
-                            <x-slim-select
-                                name="supplier_category_id"
-                                label="Catégorie"
-                                :options="$categories->pluck('name', 'id')->toArray()"
-                                :selected="old('supplier_category_id')"
-                                placeholder="Sélectionnez une catégorie..."
-                                :error="$errors->first('supplier_category_id')" />
-                            @endif
+                        <x-input
+                            name="trade_register"
+                            label="Registre du Commerce"
+                            icon="identification"
+                            placeholder="Ex: 16/00-23A1234567"
+                            :value="old('trade_register')"
+                            :error="$errors->first('trade_register')"
+                            helpText="Format: XX/XX-XXAXXXXXXX"
+                            pattern="[0-9]{2}/[0-9]{2}-[0-9]{2}[A-Z][0-9]{7}" />
 
-                            {{-- Registre Commerce --}}
-                            <x-input
-                                name="trade_register"
-                                label="Registre du Commerce"
-                                icon="identification"
-                                placeholder="Ex: 16/00-23A1234567"
-                                :value="old('trade_register')"
-                                :error="$errors->first('trade_register')"
-                                helpText="Format: XX/XX-XXAXXXXXXX"
-                                pattern="[0-9]{2}/[0-9]{2}-[0-9]{2}[A-Z][0-9]{7}" />
+                        <x-input
+                            name="nif"
+                            label="NIF"
+                            icon="finger-print"
+                            placeholder="Ex: 099116000987654"
+                            :value="old('nif')"
+                            :error="$errors->first('nif')"
+                            helpText="15 chiffres"
+                            maxlength="15"
+                            pattern="[0-9]{15}" />
 
-                            {{-- NIF --}}
-                            <x-input
-                                name="nif"
-                                label="NIF"
-                                icon="finger-print"
-                                placeholder="Ex: 099116000987654"
-                                :value="old('nif')"
-                                :error="$errors->first('nif')"
-                                helpText="15 chiffres"
-                                maxlength="15"
-                                pattern="[0-9]{15}" />
+                        <x-input
+                            name="nis"
+                            label="NIS"
+                            icon="document-text"
+                            placeholder="Numéro NIS"
+                            :value="old('nis')"
+                            :error="$errors->first('nis')" />
 
-                            {{-- NIS --}}
-                            <x-input
-                                name="nis"
-                                label="NIS"
-                                icon="document-text"
-                                placeholder="Numéro NIS"
-                                :value="old('nis')"
-                                :error="$errors->first('nis')" />
+                        <x-input
+                            name="ai"
+                            label="Article d'Imposition"
+                            icon="document-check"
+                            placeholder="Article d'imposition"
+                            :value="old('ai')"
+                            :error="$errors->first('ai')" />
+                    </x-field-group>
+                </x-form-section>
 
-                            {{-- AI --}}
-                            <x-input
-                                name="ai"
-                                label="Article d'Imposition"
-                                icon="document-check"
-                                placeholder="Article d'imposition"
-                                :value="old('ai')"
-                                :error="$errors->first('ai')" />
-                        </div>
+                <x-form-section
+                    title="Contact Principal"
+                    icon="heroicons:user"
+                    subtitle="Coordonnées et informations de contact">
+                    <x-field-group :columns="2">
+                        <x-input
+                            name="contact_first_name"
+                            label="Prénom"
+                            icon="user"
+                            placeholder="Prénom du contact"
+                            :value="old('contact_first_name')"
+                            required
+                            :error="$errors->first('contact_first_name')"
+                            @blur="validateField('contact_first_name', $event.target.value)" />
+
+                        <x-input
+                            name="contact_last_name"
+                            label="Nom"
+                            icon="user"
+                            placeholder="Nom du contact"
+                            :value="old('contact_last_name')"
+                            required
+                            :error="$errors->first('contact_last_name')"
+                            @blur="validateField('contact_last_name', $event.target.value)" />
+                    </x-field-group>
+
+                    <x-field-group :columns="2" class="mt-6">
+                        <x-input
+                            name="contact_phone"
+                            type="tel"
+                            label="Téléphone"
+                            icon="phone"
+                            placeholder="Ex: 0561234567"
+                            :value="old('contact_phone')"
+                            required
+                            :error="$errors->first('contact_phone')"
+                            @blur="validateField('contact_phone', $event.target.value)" />
+
+                        <x-input
+                            type="email"
+                            name="contact_email"
+                            label="Email"
+                            icon="envelope"
+                            placeholder="contact@entreprise.dz"
+                            :value="old('contact_email')"
+                            :error="$errors->first('contact_email')" />
+
+                        <x-input
+                            type="tel"
+                            name="phone"
+                            label="Téléphone Entreprise"
+                            icon="phone"
+                            placeholder="Ex: 021234567"
+                            :value="old('phone')"
+                            :error="$errors->first('phone')" />
+
+                        <x-input
+                            type="email"
+                            name="email"
+                            label="Email Entreprise"
+                            icon="envelope"
+                            placeholder="info@entreprise.dz"
+                            :value="old('email')"
+                            :error="$errors->first('email')" />
+
+                        <x-input
+                            type="url"
+                            name="website"
+                            label="Site Web"
+                            icon="globe-alt"
+                            placeholder="https://www.entreprise.dz"
+                            :value="old('website')"
+                            :error="$errors->first('website')"
+                            class="md:col-span-2" />
+                    </x-field-group>
+                </x-form-section>
+
+                <x-form-section
+                    title="Localisation"
+                    icon="heroicons:map-pin"
+                    subtitle="Adresse et informations géographiques">
+                    <x-field-group :columns="1">
+                        <x-textarea
+                            name="address"
+                            label="Adresse complète"
+                            rows="3"
+                            placeholder="Adresse complète du fournisseur"
+                            :value="old('address')"
+                            required
+                            :error="$errors->first('address')"
+                            x-bind:class="(fieldErrors && fieldErrors['address'] && touchedFields && touchedFields['address']) ? '!border-red-500 !bg-red-50' : ''"
+                            @blur="validateField('address', $event.target.value)" />
+                        <p x-show="fieldErrors && fieldErrors['address'] && touchedFields && touchedFields['address']"
+                            x-transition:enter="transition ease-out duration-200"
+                            x-transition:enter-start="opacity-0 transform -translate-y-1"
+                            x-transition:enter-end="opacity-100 transform translate-y-0"
+                            class="mt-2 text-sm text-red-600 flex items-start font-medium"
+                            style="display: none;">
+                            <x-iconify icon="lucide:circle-alert" class="w-4 h-4 mr-1.5 mt-0.5 flex-shrink-0" />
+                            <span>Ce champ est obligatoire</span>
+                        </p>
+                    </x-field-group>
+
+                    <x-field-group :columns="2" class="mt-6">
+                        <x-slim-select
+                            name="wilaya"
+                            label="Wilaya"
+                            :options="App\Models\Supplier::WILAYAS"
+                            :selected="old('wilaya')"
+                            placeholder="Rechercher une wilaya..."
+                            required
+                            :error="$errors->first('wilaya')"
+                            @change="validateField('wilaya', $event.target.value)" />
+
+                        <x-input
+                            name="city"
+                            label="Ville"
+                            icon="building-office-2"
+                            placeholder="Ville"
+                            :value="old('city')"
+                            required
+                            :error="$errors->first('city')"
+                            @blur="validateField('city', $event.target.value)" />
+
+                        <x-input
+                            name="commune"
+                            label="Commune"
+                            icon="map"
+                            placeholder="Commune"
+                            :value="old('commune')"
+                            :error="$errors->first('commune')" />
+
+                        <x-input
+                            name="postal_code"
+                            label="Code Postal"
+                            icon="map-pin"
+                            placeholder="16000"
+                            :value="old('postal_code')"
+                            :error="$errors->first('postal_code')" />
+                    </x-field-group>
+                </x-form-section>
+
+                <x-form-section
+                    title="Paramètres & Notes"
+                    icon="heroicons:cog-6-tooth"
+                    subtitle="Critères qualité et informations complémentaires">
+                    <x-field-group :columns="3">
+                        <x-input
+                            type="number"
+                            name="rating"
+                            label="Rating (0-5)"
+                            icon="star"
+                            placeholder="5.0"
+                            :value="old('rating', 5)"
+                            :error="$errors->first('rating')"
+                            min="0"
+                            max="5"
+                            step="0.1" />
+
+                        <x-input
+                            type="number"
+                            name="quality_score"
+                            label="Score Qualité (%)"
+                            icon="chart-bar"
+                            placeholder="100"
+                            :value="old('quality_score')"
+                            :error="$errors->first('quality_score')"
+                            min="0"
+                            max="100"
+                            step="0.1" />
+
+                        <x-input
+                            type="number"
+                            name="reliability_score"
+                            label="Score Fiabilité (%)"
+                            icon="shield-check"
+                            placeholder="100"
+                            :value="old('reliability_score')"
+                            :error="$errors->first('reliability_score')"
+                            min="0"
+                            max="100"
+                            step="0.1" />
+                    </x-field-group>
+
+                    <div class="mt-6 flex flex-wrap items-center gap-6 rounded-xl border border-slate-200 bg-slate-50/60 px-4 py-3">
+                        <label class="inline-flex items-center gap-2 text-sm font-medium text-slate-700">
+                            <input type="checkbox"
+                                name="is_active"
+                                value="1"
+                                {{ old('is_active', true) ? 'checked' : '' }}
+                                class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500">
+                            Actif
+                        </label>
+
+                        <label class="inline-flex items-center gap-2 text-sm font-medium text-slate-700">
+                            <input type="checkbox"
+                                name="is_preferred"
+                                value="1"
+                                {{ old('is_preferred') ? 'checked' : '' }}
+                                class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500">
+                            Préféré
+                        </label>
+
+                        <label class="inline-flex items-center gap-2 text-sm font-medium text-slate-700">
+                            <input type="checkbox"
+                                name="is_certified"
+                                value="1"
+                                {{ old('is_certified') ? 'checked' : '' }}
+                                class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500">
+                            Certifié
+                        </label>
                     </div>
 
-                    {{-- SECTION 2: CONTACT PRINCIPAL --}}
-                    <div class="mb-8">
-                        <h3 class="text-lg font-medium text-gray-900 mb-4 flex items-center gap-2">
-                            <x-iconify icon="heroicons:user" class="w-5 h-5 text-blue-600" />
-                            Contact Principal
-                        </h3>
-
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            {{-- Prénom --}}
-                            <div @blur="validateField('contact_first_name', $event.target.value)">
-                                <label for="contact_first_name" class="block mb-2 text-sm font-medium text-gray-900">
-                                    Prénom <span class="text-red-600">*</span>
-                                </label>
-
-                                <div class="relative">
-                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                        <x-iconify icon="heroicons:user" class="w-5 h-5 text-gray-400" />
-                                    </div>
-
-                                    <input
-                                        type="text"
-                                        name="contact_first_name"
-                                        id="contact_first_name"
-                                        required
-                                        placeholder="Prénom du contact"
-                                        value="{{ old('contact_first_name') }}"
-                                        class="bg-gray-50 border text-gray-900 text-sm rounded-lg block w-full p-2.5 transition-colors duration-200 border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 pl-10"
-                                        x-bind:class="(fieldErrors && fieldErrors['contact_first_name'] && touchedFields && touchedFields['contact_first_name']) ? '!border-red-500 !focus:ring-2 !focus:ring-red-500 !focus:border-red-500 !bg-red-50' : ''"
-                                        @blur="validateField('contact_first_name', $event.target.value)" />
-                                </div>
-
-                                <p x-show="fieldErrors && fieldErrors['contact_first_name'] && touchedFields && touchedFields['contact_first_name']"
-                                    x-transition:enter="transition ease-out duration-200"
-                                    x-transition:enter-start="opacity-0 transform -translate-y-1"
-                                    x-transition:enter-end="opacity-100 transform translate-y-0"
-                                    class="mt-2 text-sm text-red-600 flex items-start font-medium"
-                                    style="display: none;">
-                                    <x-iconify icon="lucide:circle-alert" class="w-4 h-4 mr-1.5 mt-0.5 flex-shrink-0" />
-                                    <span>Ce champ est obligatoire</span>
-                                </p>
-                            </div>
-
-                            {{-- Nom --}}
-                            <div @blur="validateField('contact_last_name', $event.target.value)">
-                                <label for="contact_last_name" class="block mb-2 text-sm font-medium text-gray-900">
-                                    Nom <span class="text-red-600">*</span>
-                                </label>
-
-                                <div class="relative">
-                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                        <x-iconify icon="heroicons:user" class="w-5 h-5 text-gray-400" />
-                                    </div>
-
-                                    <input
-                                        type="text"
-                                        name="contact_last_name"
-                                        id="contact_last_name"
-                                        required
-                                        placeholder="Nom du contact"
-                                        value="{{ old('contact_last_name') }}"
-                                        class="bg-gray-50 border text-gray-900 text-sm rounded-lg block w-full p-2.5 transition-colors duration-200 border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 pl-10"
-                                        x-bind:class="(fieldErrors && fieldErrors['contact_last_name'] && touchedFields && touchedFields['contact_last_name']) ? '!border-red-500 !focus:ring-2 !focus:ring-red-500 !focus:border-red-500 !bg-red-50' : ''"
-                                        @blur="validateField('contact_last_name', $event.target.value)" />
-                                </div>
-
-                                <p x-show="fieldErrors && fieldErrors['contact_last_name'] && touchedFields && touchedFields['contact_last_name']"
-                                    x-transition:enter="transition ease-out duration-200"
-                                    x-transition:enter-start="opacity-0 transform -translate-y-1"
-                                    x-transition:enter-end="opacity-100 transform translate-y-0"
-                                    class="mt-2 text-sm text-red-600 flex items-start font-medium"
-                                    style="display: none;">
-                                    <x-iconify icon="lucide:circle-alert" class="w-4 h-4 mr-1.5 mt-0.5 flex-shrink-0" />
-                                    <span>Ce champ est obligatoire</span>
-                                </p>
-                            </div>
-
-                            {{-- Téléphone --}}
-                            <div @blur="validateField('contact_phone', $event.target.value)">
-                                <label for="contact_phone" class="block mb-2 text-sm font-medium text-gray-900">
-                                    Téléphone <span class="text-red-600">*</span>
-                                </label>
-
-                                <div class="relative">
-                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                        <x-iconify icon="heroicons:phone" class="w-5 h-5 text-gray-400" />
-                                    </div>
-
-                                    <input
-                                        type="tel"
-                                        name="contact_phone"
-                                        id="contact_phone"
-                                        required
-                                        placeholder="Ex: 0561234567"
-                                        value="{{ old('contact_phone') }}"
-                                        class="bg-gray-50 border text-gray-900 text-sm rounded-lg block w-full p-2.5 transition-colors duration-200 border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 pl-10"
-                                        x-bind:class="(fieldErrors && fieldErrors['contact_phone'] && touchedFields && touchedFields['contact_phone']) ? '!border-red-500 !focus:ring-2 !focus:ring-red-500 !focus:border-red-500 !bg-red-50' : ''"
-                                        @blur="validateField('contact_phone', $event.target.value)" />
-                                </div>
-
-                                <p x-show="fieldErrors && fieldErrors['contact_phone'] && touchedFields && touchedFields['contact_phone']"
-                                    x-transition:enter="transition ease-out duration-200"
-                                    x-transition:enter-start="opacity-0 transform -translate-y-1"
-                                    x-transition:enter-end="opacity-100 transform translate-y-0"
-                                    class="mt-2 text-sm text-red-600 flex items-start font-medium"
-                                    style="display: none;">
-                                    <x-iconify icon="lucide:circle-alert" class="w-4 h-4 mr-1.5 mt-0.5 flex-shrink-0" />
-                                    <span>Ce champ est obligatoire</span>
-                                </p>
-                            </div>
-
-                            {{-- Email --}}
-                            <x-input
-                                type="email"
-                                name="contact_email"
-                                label="Email"
-                                icon="envelope"
-                                placeholder="contact@entreprise.dz"
-                                :value="old('contact_email')"
-                                :error="$errors->first('contact_email')" />
-
-                            {{-- Téléphone Entreprise --}}
-                            <x-input
-                                type="tel"
-                                name="phone"
-                                label="Téléphone Entreprise"
-                                icon="phone"
-                                placeholder="Ex: 021234567"
-                                :value="old('phone')"
-                                :error="$errors->first('phone')" />
-
-                            {{-- Email Entreprise --}}
-                            <x-input
-                                type="email"
-                                name="email"
-                                label="Email Entreprise"
-                                icon="envelope"
-                                placeholder="info@entreprise.dz"
-                                :value="old('email')"
-                                :error="$errors->first('email')" />
-
-                            {{-- Site Web --}}
-                            <div class="md:col-span-2">
-                                <x-input
-                                    type="url"
-                                    name="website"
-                                    label="Site Web"
-                                    icon="globe-alt"
-                                    placeholder="https://www.entreprise.dz"
-                                    :value="old('website')"
-                                    :error="$errors->first('website')" />
-                            </div>
-                        </div>
+                    <div class="mt-6">
+                        <x-textarea
+                            name="notes"
+                            label="Notes Internes"
+                            rows="4"
+                            placeholder="Notes internes, commentaires, observations..."
+                            :value="old('notes')" />
                     </div>
+                </x-form-section>
 
-                    {{-- SECTION 3: LOCALISATION --}}
-                    <div class="mb-8">
-                        <h3 class="text-lg font-medium text-gray-900 mb-4 flex items-center gap-2">
-                            <x-iconify icon="heroicons:map-pin" class="w-5 h-5 text-blue-600" />
-                            Localisation
-                        </h3>
+                <div class="flex items-center justify-between pt-6 border-t border-gray-200">
+                    <x-button
+                        href="{{ route('admin.suppliers.index') }}"
+                        variant="secondary"
+                        icon="arrow-left"
+                        iconPosition="left">
+                        Annuler
+                    </x-button>
 
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            {{-- Adresse --}}
-                            <div class="md:col-span-2">
-                                <label for="address" class="block mb-2 text-sm font-medium text-gray-900">
-                                    Adresse Complète <span class="text-red-600">*</span>
-                                </label>
-                                <textarea
-                                    id="address"
-                                    name="address"
-                                    rows="3"
-                                    required
-                                    placeholder="Adresse complète du fournisseur"
-                                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
-                                    x-bind:class="(fieldErrors && fieldErrors['address'] && touchedFields && touchedFields['address']) ? '!border-red-500 !bg-red-50' : ''"
-                                    @blur="validateField('address', $event.target.value)">{{ old('address') }}</textarea>
-
-                                <p x-show="fieldErrors && fieldErrors['address'] && touchedFields && touchedFields['address']"
-                                    x-transition:enter="transition ease-out duration-200"
-                                    x-transition:enter-start="opacity-0 transform -translate-y-1"
-                                    x-transition:enter-end="opacity-100 transform translate-y-0"
-                                    class="mt-2 text-sm text-red-600 flex items-start font-medium"
-                                    style="display: none;">
-                                    <x-iconify icon="lucide:circle-alert" class="w-4 h-4 mr-1.5 mt-0.5 flex-shrink-0" />
-                                    <span>Ce champ est obligatoire</span>
-                                </p>
-                            </div>
-
-                            {{-- Wilaya avec Tom Select --}}
-                            <x-slim-select
-                                name="wilaya"
-                                label="Wilaya"
-                                :options="App\Models\Supplier::WILAYAS"
-                                :selected="old('wilaya')"
-                                placeholder="Rechercher une wilaya..."
-                                required
-                                :error="$errors->first('wilaya')" />
-
-                            {{-- Ville --}}
-                            <div @blur="validateField('city', $event.target.value)">
-                                <label for="city" class="block mb-2 text-sm font-medium text-gray-900">
-                                    Ville <span class="text-red-600">*</span>
-                                </label>
-
-                                <div class="relative">
-                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                        <x-iconify icon="heroicons:building-office-2" class="w-5 h-5 text-gray-400" />
-                                    </div>
-
-                                    <input
-                                        type="text"
-                                        name="city"
-                                        id="city"
-                                        required
-                                        placeholder="Ville"
-                                        value="{{ old('city') }}"
-                                        class="bg-gray-50 border text-gray-900 text-sm rounded-lg block w-full p-2.5 transition-colors duration-200 border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 pl-10"
-                                        x-bind:class="(fieldErrors && fieldErrors['city'] && touchedFields && touchedFields['city']) ? '!border-red-500 !focus:ring-2 !focus:ring-red-500 !focus:border-red-500 !bg-red-50' : ''"
-                                        @blur="validateField('city', $event.target.value)" />
-                                </div>
-
-                                <p x-show="fieldErrors && fieldErrors['city'] && touchedFields && touchedFields['city']"
-                                    x-transition:enter="transition ease-out duration-200"
-                                    x-transition:enter-start="opacity-0 transform -translate-y-1"
-                                    x-transition:enter-end="opacity-100 transform translate-y-0"
-                                    class="mt-2 text-sm text-red-600 flex items-start font-medium"
-                                    style="display: none;">
-                                    <x-iconify icon="lucide:circle-alert" class="w-4 h-4 mr-1.5 mt-0.5 flex-shrink-0" />
-                                    <span>Ce champ est obligatoire</span>
-                                </p>
-                            </div>
-
-                            {{-- Commune --}}
-                            <x-input
-                                name="commune"
-                                label="Commune"
-                                icon="map"
-                                placeholder="Commune"
-                                :value="old('commune')"
-                                :error="$errors->first('commune')" />
-
-                            {{-- Code Postal --}}
-                            <x-input
-                                name="postal_code"
-                                label="Code Postal"
-                                icon="map-pin"
-                                placeholder="16000"
-                                :value="old('postal_code')"
-                                :error="$errors->first('postal_code')" />
-                        </div>
-                    </div>
-
-                    {{-- SECTION 4: PARAMÈTRES --}}
-                    <div class="mb-8">
-                        <h3 class="text-lg font-medium text-gray-900 mb-4 flex items-center gap-2">
-                            <x-iconify icon="heroicons:cog-6-tooth" class="w-5 h-5 text-blue-600" />
-                            Paramètres & Notes
-                        </h3>
-
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-                            {{-- Rating --}}
-                            <x-input
-                                type="number"
-                                name="rating"
-                                label="Rating (0-5)"
-                                icon="star"
-                                placeholder="5.0"
-                                :value="old('rating', 5)"
-                                :error="$errors->first('rating')"
-                                min="0"
-                                max="5"
-                                step="0.1" />
-
-                            {{-- Score Qualité --}}
-                            <x-input
-                                type="number"
-                                name="quality_score"
-                                label="Score Qualité (%)"
-                                icon="chart-bar"
-                                placeholder="100"
-                                :value="old('quality_score')"
-                                :error="$errors->first('quality_score')"
-                                min="0"
-                                max="100"
-                                step="0.1" />
-
-                            {{-- Score Fiabilité --}}
-                            <x-input
-                                type="number"
-                                name="reliability_score"
-                                label="Score Fiabilité (%)"
-                                icon="shield-check"
-                                placeholder="100"
-                                :value="old('reliability_score')"
-                                :error="$errors->first('reliability_score')"
-                                min="0"
-                                max="100"
-                                step="0.1" />
-                        </div>
-
-                        {{-- Checkboxes --}}
-                        <div class="flex flex-wrap items-center gap-6 mb-6">
-                            <div class="flex items-center">
-                                <input type="checkbox"
-                                    name="is_active"
-                                    value="1"
-                                    {{ old('is_active', true) ? 'checked' : '' }}
-                                    id="is_active"
-                                    class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500">
-                                <label for="is_active" class="ml-2 text-sm font-medium text-gray-900">
-                                    Actif
-                                </label>
-                            </div>
-
-                            <div class="flex items-center">
-                                <input type="checkbox"
-                                    name="is_preferred"
-                                    value="1"
-                                    {{ old('is_preferred') ? 'checked' : '' }}
-                                    id="is_preferred"
-                                    class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500">
-                                <label for="is_preferred" class="ml-2 text-sm font-medium text-gray-900">
-                                    Préféré
-                                </label>
-                            </div>
-
-                            <div class="flex items-center">
-                                <input type="checkbox"
-                                    name="is_certified"
-                                    value="1"
-                                    {{ old('is_certified') ? 'checked' : '' }}
-                                    id="is_certified"
-                                    class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500">
-                                <label for="is_certified" class="ml-2 text-sm font-medium text-gray-900">
-                                    Certifié
-                                </label>
-                            </div>
-                        </div>
-
-                        {{-- Notes --}}
-                        <div>
-                            <label for="notes" class="block mb-2 text-sm font-medium text-gray-900">
-                                Notes Internes
-                            </label>
-                            <textarea
-                                id="notes"
-                                name="notes"
-                                rows="4"
-                                placeholder="Notes internes, commentaires, observations..."
-                                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">{{ old('notes') }}</textarea>
-                        </div>
-                    </div>
-
-                    {{-- ACTIONS --}}
-                    <div class="flex items-center justify-between pt-6 border-t border-gray-200">
-                        <x-button
-                            href="{{ route('admin.suppliers.index') }}"
-                            variant="secondary"
-                            icon="arrow-left"
-                            iconPosition="left">
-                            Annuler
-                        </x-button>
-
-                        <x-button
-                            type="submit"
-                            variant="primary"
-                            icon="check"
-                            iconPosition="left">
-                            Créer le Fournisseur
-                        </x-button>
-                    </div>
-
-                </form>
-            </x-card>
+                    <x-button
+                        type="submit"
+                        variant="primary"
+                        icon="check"
+                        iconPosition="left">
+                        Créer le Fournisseur
+                    </x-button>
+                </div>
+            </form>
         </div>
 
     </div>
@@ -569,8 +408,8 @@
 
             init() {
                 // Initialiser avec les erreurs serveur si présentes
-                @if($errors - > any())
-                @foreach($errors - > keys() as $field)
+                @if($errors -> any())
+                @foreach($errors -> keys() as $field)
                 this.fieldErrors['{{ $field }}'] = true;
                 this.touchedFields['{{ $field }}'] = true;
                 @endforeach
@@ -673,6 +512,6 @@
         animation: shake 0.5s ease-in-out;
     }
 
+</style>
 
-
-    @endsection
+@endsection

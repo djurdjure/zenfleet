@@ -172,26 +172,73 @@
                 </a>
                 @endcan
 
-                <div class="relative" x-data="{ open: false }">
+                <div class="relative"
+                    x-data="{
+                        open: false,
+                        styles: '',
+                        direction: 'down',
+                        toggle() {
+                            this.open = !this.open;
+                            if (this.open) {
+                                this.$nextTick(() => requestAnimationFrame(() => this.updatePosition()));
+                            }
+                        },
+                        close() { this.open = false; },
+                        updatePosition() {
+                            if (!this.$refs.trigger || !this.$refs.menu) return;
+                            const rect = this.$refs.trigger.getBoundingClientRect();
+                            const width = 192; // w-48
+                            const padding = 12;
+                            const menuHeight = this.$refs.menu.offsetHeight || 180;
+                            const spaceBelow = window.innerHeight - rect.bottom - padding;
+                            const spaceAbove = rect.top - padding;
+                            const shouldOpenUp = spaceBelow < menuHeight && spaceAbove > spaceBelow;
+                            this.direction = shouldOpenUp ? 'up' : 'down';
+
+                            let top = shouldOpenUp ? (rect.top - menuHeight - 8) : (rect.bottom + 8);
+                            if (top < padding) top = padding;
+                            if (top + menuHeight > window.innerHeight - padding) {
+                                top = window.innerHeight - padding - menuHeight;
+                            }
+
+                            let left = rect.right - width;
+                            const maxLeft = window.innerWidth - width - padding;
+                            if (left > maxLeft) left = maxLeft;
+                            if (left < padding) left = padding;
+
+                            this.styles = `position: fixed; top: ${top}px; left: ${left}px; width: ${width}px; z-index: 80;`;
+                        }
+                    }"
+                    x-init="
+                        window.addEventListener('scroll', () => { if (open) updatePosition(); }, true);
+                        window.addEventListener('resize', () => { if (open) updatePosition(); });
+                    ">
                     <button
-                        @click="open = !open"
-                        @click.away="open = false"
+                        x-ref="trigger"
+                        @click="toggle"
+                        @click.outside="close"
                         title="Exporter"
                         class="inline-flex items-center gap-2 p-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-all duration-200 shadow-sm hover:shadow-md">
                         <x-iconify icon="lucide:download" class="w-5 h-5 text-gray-500" />
                         <x-iconify icon="heroicons:chevron-down" class="w-4 h-4 text-gray-400" />
                     </button>
-                    <div
-                        x-show="open"
-                        x-transition
-                        class="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-lg bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
-                        style="display: none;">
-                        <div class="py-1">
-                            <button wire:click="exportData('csv')" class="block w-full text-left px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-100">Export CSV</button>
-                            <button wire:click="exportData('excel')" class="block w-full text-left px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-100">Export Excel</button>
-                            <button wire:click="exportData('pdf')" class="block w-full text-left px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-100">Export PDF</button>
+                    <template x-teleport="body">
+                        <div
+                            x-show="open"
+                            x-transition
+                            :style="styles"
+                            @click.outside="close"
+                            x-ref="menu"
+                            :class="direction === 'up' ? 'origin-bottom-right' : 'origin-top-right'"
+                            class="fixed z-[80] rounded-lg bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
+                            style="display: none;">
+                            <div class="py-1">
+                                <button wire:click="exportData('csv')" class="block w-full text-left px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-100">Export CSV</button>
+                                <button wire:click="exportData('excel')" class="block w-full text-left px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-100">Export Excel</button>
+                                <button wire:click="exportData('pdf')" class="block w-full text-left px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-100">Export PDF</button>
+                            </div>
                         </div>
-                    </div>
+                    </template>
                 </div>
             </x-slot:actions>
 

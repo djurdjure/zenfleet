@@ -37,37 +37,90 @@
  Actualiser
  </button>
 
- <div class="relative" x-data="{ open: false }">
- <button @click="open = !open"
+ <div class="relative"
+ x-data="{
+ open: false,
+ styles: '',
+ direction: 'down',
+ align: 'right',
+ toggle() {
+ if (this.open) { this.close(); return; }
+ this.open = true;
+ this.$nextTick(() => {
+ this.updatePosition();
+ requestAnimationFrame(() => this.updatePosition());
+ });
+ },
+ close() { this.open = false; },
+ updatePosition() {
+ if (!this.$refs.trigger || !this.$refs.menu) return;
+ const rect = this.$refs.trigger.getBoundingClientRect();
+ const menuHeight = this.$refs.menu.offsetHeight || 200;
+ const menuWidth = this.$refs.menu.offsetWidth || 192;
+ const padding = 12;
+ const spaceBelow = window.innerHeight - rect.bottom;
+ const spaceAbove = rect.top;
+ const shouldOpenUp = spaceBelow < menuHeight && spaceAbove > spaceBelow;
+ this.direction = shouldOpenUp ? 'up' : 'down';
+ let top = shouldOpenUp ? (rect.top - menuHeight - 8) : (rect.bottom + 8);
+ if (top + menuHeight > window.innerHeight - padding) {
+ top = window.innerHeight - padding - menuHeight;
+ }
+ if (top < padding) top = padding;
+ let left = this.align === 'right' ? (rect.right - menuWidth) : rect.left;
+ if (left + menuWidth > window.innerWidth - padding) {
+ left = window.innerWidth - padding - menuWidth;
+ }
+ if (left < padding) left = padding;
+ this.styles = `position: fixed; top: ${top}px; left: ${left}px; width: ${menuWidth}px; z-index: 9999;`;
+ }
+ }"
+ x-init="$watch('open', value => {
+ if (value) {
+ $nextTick(() => {
+ this.updatePosition();
+ requestAnimationFrame(() => this.updatePosition());
+ });
+ }
+ })"
+ @keydown.escape.window="close()"
+ @scroll.window="open && updatePosition()"
+ @resize.window="open && updatePosition()">
+ <button @click="toggle()" x-ref="trigger"
  class="zenfleet-btn-enterprise-secondary">
  <i class="fas fa-cog mr-2"></i>
  Paramètres
  </button>
 
+ <template x-teleport="body">
  <div x-show="open"
- @click.away="open = false"
+ x-ref="menu"
+ @click.outside="close()"
  x-transition:enter="transition ease-out duration-100"
  x-transition:enter-start="transform opacity-0 scale-95"
  x-transition:enter-end="transform opacity-100 scale-100"
  x-transition:leave="transition ease-in duration-75"
  x-transition:leave-start="transform opacity-100 scale-100"
  x-transition:leave-end="transform opacity-0 scale-95"
- class="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-2xl bg-white shadow-xl ring-1 ring-black ring-opacity-5 focus:outline-none">
+ :style="styles"
+ class="rounded-2xl bg-white shadow-xl ring-1 ring-black ring-opacity-5 focus:outline-none z-[9999]"
+ x-cloak>
  <div class="py-1">
- <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
+ <a href="#" @click="close()" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
  <i class="fas fa-user-cog mr-2"></i>
  Profil
  </a>
- <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
+ <a href="#" @click="close()" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
  <i class="fas fa-bell mr-2"></i>
  Notifications
  </a>
- <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
+ <a href="#" @click="close()" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
  <i class="fas fa-download mr-2"></i>
  Rapports
  </a>
  </div>
  </div>
+ </template>
  </div>
  </div>
  </div>

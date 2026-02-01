@@ -71,56 +71,110 @@
             </button>
 
             {{-- Export multi-format avec animation --}}
-            <div class="relative" x-data="{ open: false }">
-                <button @click="open = !open"
-                        @click.away="open = false"
+            <div class="relative"
+                 x-data="{
+                    open: false,
+                    styles: '',
+                    direction: 'down',
+                    align: 'right',
+                    toggle() {
+                        if (this.open) { this.close(); return; }
+                        this.open = true;
+                        this.$nextTick(() => {
+                            this.updatePosition();
+                            requestAnimationFrame(() => this.updatePosition());
+                        });
+                    },
+                    close() { this.open = false; },
+                    updatePosition() {
+                        if (!this.$refs.trigger || !this.$refs.menu) return;
+                        const rect = this.$refs.trigger.getBoundingClientRect();
+                        const menuHeight = this.$refs.menu.offsetHeight || 220;
+                        const menuWidth = this.$refs.menu.offsetWidth || 224;
+                        const padding = 12;
+                        const spaceBelow = window.innerHeight - rect.bottom;
+                        const spaceAbove = rect.top;
+                        const shouldOpenUp = spaceBelow < menuHeight && spaceAbove > spaceBelow;
+                        this.direction = shouldOpenUp ? 'up' : 'down';
+                        let top = shouldOpenUp ? (rect.top - menuHeight - 8) : (rect.bottom + 8);
+                        if (top + menuHeight > window.innerHeight - padding) {
+                            top = window.innerHeight - padding - menuHeight;
+                        }
+                        if (top < padding) top = padding;
+                        let left = this.align === 'right' ? (rect.right - menuWidth) : rect.left;
+                        if (left + menuWidth > window.innerWidth - padding) {
+                            left = window.innerWidth - padding - menuWidth;
+                        }
+                        if (left < padding) left = padding;
+                        this.styles = `position: fixed; top: ${top}px; left: ${left}px; width: ${menuWidth}px; z-index: 9999;`;
+                    }
+                 }"
+                 x-init="$watch('open', value => {
+                    if (value) {
+                        $nextTick(() => {
+                            this.updatePosition();
+                            requestAnimationFrame(() => this.updatePosition());
+                        });
+                    }
+                 })"
+                 @keydown.escape.window="close()"
+                 @scroll.window="open && updatePosition()"
+                 @resize.window="open && updatePosition()">
+                <button @click="toggle()"
+                        x-ref="trigger"
                         class="inline-flex items-center gap-2 px-4 py-2.5 bg-white border border-gray-300 
                                rounded-lg hover:bg-gray-50 transition-all duration-200 shadow-sm hover:shadow-md group">
                     <x-iconify icon="lucide:download" class="w-5 h-5 text-gray-500 group-hover:text-gray-700" />
                     <span class="font-medium text-gray-700">Export</span>
                     <x-iconify icon="lucide:chevron-down" class="w-4 h-4 text-gray-400 transition-transform" 
-                               x-bindx-bind:class="open ? 'rotate-180' : ''" />
+                               :class="open ? 'rotate-180' : ''" />
                 </button>
                 
-                <div x-show="open"
-                     x-transition:enter="transition ease-out duration-100"
-                     x-transition:enter-start="transform opacity-0 scale-95"
-                     x-transition:enter-end="transform opacity-100 scale-100"
-                     x-transition:leave="transition ease-in duration-75"
-                     x-transition:leave-start="transform opacity-100 scale-100"
-                     x-transition:leave-end="transform opacity-0 scale-95"
-                     class="absolute right-0 z-20 mt-2 w-56 rounded-lg shadow-lg bg-white ring-1 ring-black ring-opacity-5 divide-y divide-gray-100">
-                    
-                    <div class="py-1">
-                        <button wire:click="exportFiltered('csv')" @click="open = false"
-                                class="flex w-full items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-green-50 hover:text-green-700 transition-colors group">
-                            <x-iconify icon="lucide:file-text" class="w-4 h-4 mr-3 text-green-600 group-hover:scale-110 transition-transform" />
-                            <span class="flex-1 text-left">Export CSV</span>
-                            <span class="text-xs text-gray-400">Rapide</span>
-                        </button>
+                <template x-teleport="body">
+                    <div x-show="open"
+                         x-ref="menu"
+                         @click.outside="close()"
+                         x-transition:enter="transition ease-out duration-100"
+                         x-transition:enter-start="transform opacity-0 scale-95"
+                         x-transition:enter-end="transform opacity-100 scale-100"
+                         x-transition:leave="transition ease-in duration-75"
+                         x-transition:leave-start="transform opacity-100 scale-100"
+                         x-transition:leave-end="transform opacity-0 scale-95"
+                         :style="styles"
+                         class="rounded-lg shadow-lg bg-white ring-1 ring-black ring-opacity-5 divide-y divide-gray-100 z-[9999]"
+                         x-cloak>
                         
-                        <button wire:click="exportFiltered('excel')" @click="open = false"
-                                class="flex w-full items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-emerald-50 hover:text-emerald-700 transition-colors group">
-                            <x-iconify icon="lucide:file-spreadsheet" class="w-4 h-4 mr-3 text-emerald-600 group-hover:scale-110 transition-transform" />
-                            <span class="flex-1 text-left">Export Excel</span>
-                            <span class="text-xs text-gray-400">Complet</span>
-                        </button>
+                        <div class="py-1">
+                            <button wire:click="exportFiltered('csv')" @click="close()"
+                                    class="flex w-full items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-green-50 hover:text-green-700 transition-colors group">
+                                <x-iconify icon="lucide:file-text" class="w-4 h-4 mr-3 text-green-600 group-hover:scale-110 transition-transform" />
+                                <span class="flex-1 text-left">Export CSV</span>
+                                <span class="text-xs text-gray-400">Rapide</span>
+                            </button>
+                            
+                            <button wire:click="exportFiltered('excel')" @click="close()"
+                                    class="flex w-full items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-emerald-50 hover:text-emerald-700 transition-colors group">
+                                <x-iconify icon="lucide:file-spreadsheet" class="w-4 h-4 mr-3 text-emerald-600 group-hover:scale-110 transition-transform" />
+                                <span class="flex-1 text-left">Export Excel</span>
+                                <span class="text-xs text-gray-400">Complet</span>
+                            </button>
+                            
+                            <button wire:click="exportFiltered('pdf')" @click="close()"
+                                    class="flex w-full items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-red-50 hover:text-red-700 transition-colors group">
+                                <x-iconify icon="lucide:file" class="w-4 h-4 mr-3 text-red-600 group-hover:scale-110 transition-transform" />
+                                <span class="flex-1 text-left">Export PDF</span>
+                                <span class="text-xs text-gray-400">Impression</span>
+                            </button>
+                        </div>
                         
-                        <button wire:click="exportFiltered('pdf')" @click="open = false"
-                                class="flex w-full items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-red-50 hover:text-red-700 transition-colors group">
-                            <x-iconify icon="lucide:file" class="w-4 h-4 mr-3 text-red-600 group-hover:scale-110 transition-transform" />
-                            <span class="flex-1 text-left">Export PDF</span>
-                            <span class="text-xs text-gray-400">Impression</span>
-                        </button>
+                        <div class="px-4 py-2 bg-gray-50">
+                            <p class="text-xs text-gray-500">
+                                <x-iconify icon="lucide:info" class="w-3 h-3 inline mr-1" />
+                                {{ $stats['filtered'] ?? 0 }} enregistrement(s) à exporter
+                            </p>
+                        </div>
                     </div>
-                    
-                    <div class="px-4 py-2 bg-gray-50">
-                        <p class="text-xs text-gray-500">
-                            <x-iconify icon="lucide:info" class="w-3 h-3 inline mr-1" />
-                            {{ $stats['filtered'] ?? 0 }} enregistrement(s) à exporter
-                        </p>
-                    </div>
-                </div>
+                </template>
             </div>
 
             {{-- Nouvelle affectation --}}
@@ -827,7 +881,55 @@
 
                                 {{-- Actions avec dropdown --}}
                                 <td class="px-6 py-4 whitespace-nowrap text-center">
-                                    <div class="flex items-center justify-center gap-1" x-data="{ open: false }">
+                                    <div class="flex items-center justify-center gap-1"
+                                         x-data="{
+                                            open: false,
+                                            styles: '',
+                                            direction: 'down',
+                                            align: 'right',
+                                            toggle() {
+                                                if (this.open) { this.close(); return; }
+                                                this.open = true;
+                                                this.$nextTick(() => {
+                                                    this.updatePosition();
+                                                    requestAnimationFrame(() => this.updatePosition());
+                                                });
+                                            },
+                                            close() { this.open = false; },
+                                            updatePosition() {
+                                                if (!this.$refs.trigger || !this.$refs.menu) return;
+                                                const rect = this.$refs.trigger.getBoundingClientRect();
+                                                const menuHeight = this.$refs.menu.offsetHeight || 200;
+                                                const menuWidth = this.$refs.menu.offsetWidth || 192;
+                                                const padding = 12;
+                                                const spaceBelow = window.innerHeight - rect.bottom;
+                                                const spaceAbove = rect.top;
+                                                const shouldOpenUp = spaceBelow < menuHeight && spaceAbove > spaceBelow;
+                                                this.direction = shouldOpenUp ? 'up' : 'down';
+                                                let top = shouldOpenUp ? (rect.top - menuHeight - 8) : (rect.bottom + 8);
+                                                if (top + menuHeight > window.innerHeight - padding) {
+                                                    top = window.innerHeight - padding - menuHeight;
+                                                }
+                                                if (top < padding) top = padding;
+                                                let left = this.align === 'right' ? (rect.right - menuWidth) : rect.left;
+                                                if (left + menuWidth > window.innerWidth - padding) {
+                                                    left = window.innerWidth - padding - menuWidth;
+                                                }
+                                                if (left < padding) left = padding;
+                                                this.styles = `position: fixed; top: ${top}px; left: ${left}px; width: ${menuWidth}px; z-index: 9999;`;
+                                            }
+                                         }"
+                                         x-init="$watch('open', value => {
+                                            if (value) {
+                                                $nextTick(() => {
+                                                    this.updatePosition();
+                                                    requestAnimationFrame(() => this.updatePosition());
+                                                });
+                                            }
+                                         })"
+                                         @keydown.escape.window="close()"
+                                         @scroll.window="open && updatePosition()"
+                                         @resize.window="open && updatePosition()">
                                         <a href="{{ route('admin.assignments.show', $assignment) }}"
                                            class="inline-flex items-center p-1.5 text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-lg transition-all duration-200 group"
                                            title="Voir détails">
@@ -849,17 +951,23 @@
                                         @endif
                                         
                                         <div class="relative">
-                                            <button @click="open = !open"
-                                                    @click.away="open = false"
+                                            <button @click="toggle()"
+                                                    x-ref="trigger"
                                                     class="inline-flex items-center p-1.5 text-gray-600 hover:text-gray-700 hover:bg-gray-50 rounded-lg transition-all duration-200 group">
                                                 <x-iconify icon="lucide:more-vertical" class="w-4 h-4 group-hover:scale-110 transition-transform" />
                                             </button>
-                                            
+                                        </div>
+
+                                        <template x-teleport="body">
                                             <div x-show="open"
+                                                 x-ref="menu"
+                                                 @click.outside="close()"
                                                  x-transition:enter="transition ease-out duration-100"
                                                  x-transition:enter-start="transform opacity-0 scale-95"
                                                  x-transition:enter-end="transform opacity-100 scale-100"
-                                                 class="absolute right-0 z-10 mt-2 w-48 rounded-lg shadow-lg bg-white ring-1 ring-black ring-opacity-5 divide-y divide-gray-100">
+                                                 :style="styles"
+                                                 class="rounded-lg shadow-lg bg-white ring-1 ring-black ring-opacity-5 divide-y divide-gray-100 z-[9999]"
+                                                 x-cloak>
                                                 <div class="py-1">
                                                     <a href="#" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
                                                         <x-iconify icon="lucide:printer" class="w-4 h-4 mr-2 text-gray-400" />
@@ -877,7 +985,7 @@
                                                     @endif
                                                 </div>
                                             </div>
-                                        </div>
+                                        </template>
                                     </div>
                                 </td>
                             </tr>

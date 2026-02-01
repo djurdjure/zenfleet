@@ -408,16 +408,67 @@ DESIGN PRINCIPLES:
                                     </a>
 
                                     {{-- Three-Dot Menu --}}
-                                    <div class="relative inline-block text-left" x-data="{ open: false }">
-                                        <button @click="open = !open"
-                                            @click.away="open = false"
+                                    <div class="relative inline-block text-left"
+                                         x-data="{
+                                            open: false,
+                                            styles: '',
+                                            direction: 'down',
+                                            align: 'right',
+                                            toggle() {
+                                                if (this.open) { this.close(); return; }
+                                                this.open = true;
+                                                this.$nextTick(() => {
+                                                    this.updatePosition();
+                                                    requestAnimationFrame(() => this.updatePosition());
+                                                });
+                                            },
+                                            close() { this.open = false; },
+                                            updatePosition() {
+                                                if (!this.$refs.trigger || !this.$refs.menu) return;
+                                                const rect = this.$refs.trigger.getBoundingClientRect();
+                                                const menuHeight = this.$refs.menu.offsetHeight || 240;
+                                                const menuWidth = this.$refs.menu.offsetWidth || 224;
+                                                const padding = 12;
+                                                const spaceBelow = window.innerHeight - rect.bottom;
+                                                const spaceAbove = rect.top;
+                                                const shouldOpenUp = spaceBelow < menuHeight && spaceAbove > spaceBelow;
+                                                this.direction = shouldOpenUp ? 'up' : 'down';
+                                                let top = shouldOpenUp ? (rect.top - menuHeight - 8) : (rect.bottom + 8);
+                                                if (top + menuHeight > window.innerHeight - padding) {
+                                                    top = window.innerHeight - padding - menuHeight;
+                                                }
+                                                if (top < padding) top = padding;
+                                                let left = this.align === 'right' ? (rect.right - menuWidth) : rect.left;
+                                                if (left + menuWidth > window.innerWidth - padding) {
+                                                    left = window.innerWidth - padding - menuWidth;
+                                                }
+                                                if (left < padding) left = padding;
+                                                this.styles = `position: fixed; top: ${top}px; left: ${left}px; width: ${menuWidth}px; z-index: 9999;`;
+                                            }
+                                         }"
+                                         x-init="$watch('open', value => {
+                                            if (value) {
+                                                $nextTick(() => {
+                                                    this.updatePosition();
+                                                    requestAnimationFrame(() => this.updatePosition());
+                                                });
+                                            }
+                                         })"
+                                         @keydown.escape.window="close()"
+                                         @scroll.window="open && updatePosition()"
+                                         @resize.window="open && updatePosition()">
+                                        <button @click="toggle()"
+                                            x-ref="trigger"
                                             type="button"
                                             class="inline-flex items-center p-1.5 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-all duration-200"
                                             id="assignment-menu-{{ $assignment->id }}">
                                             <x-iconify icon="lucide:more-vertical" class="w-4 h-4" />
                                         </button>
 
+                                        <template x-teleport="body">
                                         <div x-show="open"
+                                            x-ref="menu"
+                                            @click.outside="close()"
                                             x-cloak
                                             x-transition:enter="transition ease-out duration-100"
                                             x-transition:enter-start="transform opacity-0 scale-95"
@@ -425,7 +476,8 @@ DESIGN PRINCIPLES:
                                             x-transition:leave="transition ease-in duration-75"
                                             x-transition:leave-start="transform opacity-100 scale-100"
                                             x-transition:leave-end="transform opacity-0 scale-95"
-                                            class="absolute right-0 z-50 mt-2 w-56 rounded-lg shadow-lg bg-white ring-1 ring-black ring-opacity-5 divide-y divide-gray-100">
+                                            :style="styles"
+                                            class="rounded-lg shadow-lg bg-white ring-1 ring-black ring-opacity-5 divide-y divide-gray-100 z-[9999]">
                                             <div class="py-1">
                                                 {{-- Edit --}}
                                                 @if($assignment->canBeEdited())
@@ -460,8 +512,10 @@ DESIGN PRINCIPLES:
                                                     </button>
                                                 </div>
                                                 @endif
+                                                </div>
                                             </div>
                                         </div>
+                                        </template>
                                     </div>
                                 </div>
                             </td>

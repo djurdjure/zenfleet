@@ -298,8 +298,8 @@
         </x-page-search-bar>
 
         {{-- TABLE --}}
-        <div class="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden relative">
-            <div class="overflow-x-auto">
+        <div class="bg-white rounded-lg border border-gray-200 shadow-sm overflow-visible relative">
+            <div class="overflow-x-auto overflow-y-visible">
                         <table class="min-w-full divide-y divide-gray-200">
                             <thead class="bg-gray-50">
                                 <tr>
@@ -416,81 +416,128 @@
                                             @endcan
 
                                             {{-- Dropdown Menu --}}
-                                            <div class="relative inline-block text-left" x-data="{ open: false }">
-                                                <button @click="open = !open"
-                                                    @click.away="open = false"
+                                            <div class="relative inline-block text-left"
+                                                x-data="{
+                                                    open: false,
+                                                    styles: '',
+                                                    direction: 'down',
+                                                    toggle() {
+                                                        this.open = !this.open;
+                                                        if (this.open) {
+                                                            this.$nextTick(() => requestAnimationFrame(() => this.updatePosition()));
+                                                        }
+                                                    },
+                                                    close() { this.open = false; },
+                                                    updatePosition() {
+                                                        if (!this.$refs.trigger || !this.$refs.menu) return;
+                                                        const rect = this.$refs.trigger.getBoundingClientRect();
+                                                        const width = 192; // w-48
+                                                        const padding = 12;
+                                                        const menuHeight = this.$refs.menu.offsetHeight || 200;
+                                                        const spaceBelow = window.innerHeight - rect.bottom - padding;
+                                                        const spaceAbove = rect.top - padding;
+                                                        const shouldOpenUp = spaceBelow < menuHeight && spaceAbove > spaceBelow;
+                                                        this.direction = shouldOpenUp ? 'up' : 'down';
+
+                                                        let top = shouldOpenUp ? (rect.top - menuHeight - 8) : (rect.bottom + 8);
+                                                        if (top < padding) top = padding;
+                                                        if (top + menuHeight > window.innerHeight - padding) {
+                                                            top = window.innerHeight - padding - menuHeight;
+                                                        }
+
+                                                        let left = rect.right - width;
+                                                        const maxLeft = window.innerWidth - width - padding;
+                                                        if (left > maxLeft) left = maxLeft;
+                                                        if (left < padding) left = padding;
+
+                                                        this.styles = `position: fixed; top: ${top}px; left: ${left}px; width: ${width}px; z-index: 80;`;
+                                                    }
+                                                }"
+                                                x-init="
+                                                    window.addEventListener('scroll', () => { if (open) updatePosition(); }, true);
+                                                    window.addEventListener('resize', () => { if (open) updatePosition(); });
+                                                ">
+                                                <button x-ref="trigger"
+                                                    @click="toggle"
+                                                    @click.outside="close"
                                                     type="button"
                                                     class="p-2 rounded-full bg-gray-50 text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-all duration-200 group"
                                                     title="Plus d'actions">
                                                     <x-iconify icon="lucide:more-vertical" class="w-3.5 h-3.5 group-hover:scale-110 transition-transform" />
                                                 </button>
 
-                                                <div x-show="open"
-                                                    x-cloak
-                                                    x-transition:enter="transition ease-out duration-100"
-                                                    x-transition:enter-start="transform opacity-0 scale-95"
-                                                    x-transition:enter-end="transform opacity-100 scale-100"
-                                                    x-transition:leave="transition ease-in duration-75"
-                                                    x-transition:leave-start="transform opacity-100 scale-100"
-                                                    x-transition:leave-end="transform opacity-0 scale-95"
-                                                    class="absolute right-0 z-50 mt-2 w-48 rounded-lg shadow-lg bg-white ring-1 ring-black ring-opacity-5 divide-y divide-gray-100">
-                                                    <div class="py-1">
-                                                        @if($visibility === 'archived')
-                                                        {{-- Restore --}}
-                                                        <button wire:click="confirmRestore({{ $vehicle->id }})"
-                                                            @click="open = false"
-                                                            class="flex w-full items-center px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
-                                                            <x-iconify icon="lucide:rotate-ccw" class="w-4 h-4 mr-2 text-green-600" />
-                                                            Restaurer
-                                                        </button>
-
-                                                        {{-- Force Delete --}}
-                                                        <button wire:click="confirmForceDelete({{ $vehicle->id }})"
-                                                            @click="open = false"
-                                                            class="flex w-full items-center px-3 py-2 text-sm text-gray-700 hover:bg-red-50 transition-colors">
-                                                            <x-iconify icon="lucide:trash-2" class="w-4 h-4 mr-2 text-red-600" />
-                                                            Supprimer
-                                                        </button>
-                                                        @else
-                                                        {{-- Duplicate --}}
-                                                        @can('create vehicles')
-                                                        <a href="{{ route('admin.vehicles.duplicate', $vehicle) }}"
-                                                            class="flex items-center px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
-                                                            <x-iconify icon="lucide:copy" class="w-4 h-4 mr-2 text-purple-600" />
-                                                            Dupliquer
-                                                        </a>
-                                                        @endcan
-
-                                                        {{-- History --}}
-                                                        <a href="{{ route('admin.vehicles.history', $vehicle) }}"
-                                                            class="flex items-center px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
-                                                            <x-iconify icon="lucide:clock" class="w-4 h-4 mr-2 text-cyan-600" />
-                                                            Historique
-                                                        </a>
-
-
-
-                                                        {{-- Export PDF --}}
-                                                        <a href="{{ route('admin.vehicles.export.single.pdf', $vehicle) }}"
-                                                            class="flex items-center px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
-                                                            <x-iconify icon="lucide:file-text" class="w-4 h-4 mr-2 text-emerald-600" />
-                                                            Exporter PDF
-                                                        </a>
-
-                                                        {{-- Archive --}}
-                                                        @can('delete vehicles')
-                                                        <div class="border-t border-gray-100">
-                                                            <button wire:click="confirmArchive({{ $vehicle->id }})"
-                                                                @click="open = false"
+                                                <template x-teleport="body">
+                                                    <div x-show="open"
+                                                        x-cloak
+                                                        x-transition:enter="transition ease-out duration-100"
+                                                        x-transition:enter-start="transform opacity-0 scale-95"
+                                                        x-transition:enter-end="transform opacity-100 scale-100"
+                                                        x-transition:leave="transition ease-in duration-75"
+                                                        x-transition:leave-start="transform opacity-100 scale-100"
+                                                        x-transition:leave-end="transform opacity-0 scale-95"
+                                                        :style="styles"
+                                                        @click.outside="close"
+                                                        x-ref="menu"
+                                                        :class="direction === 'up' ? 'origin-bottom-right' : 'origin-top-right'"
+                                                        class="fixed z-[80] rounded-lg shadow-lg bg-white ring-1 ring-black ring-opacity-5 divide-y divide-gray-100">
+                                                        <div class="py-1">
+                                                            @if($visibility === 'archived')
+                                                            {{-- Restore --}}
+                                                            <button wire:click="confirmRestore({{ $vehicle->id }})"
+                                                                @click="close"
                                                                 class="flex w-full items-center px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
-                                                                <x-iconify icon="lucide:archive" class="w-4 h-4 mr-2 text-orange-600" />
-                                                                Archiver
+                                                                <x-iconify icon="lucide:rotate-ccw" class="w-4 h-4 mr-2 text-green-600" />
+                                                                Restaurer
                                                             </button>
+
+                                                            {{-- Force Delete --}}
+                                                            <button wire:click="confirmForceDelete({{ $vehicle->id }})"
+                                                                @click="close"
+                                                                class="flex w-full items-center px-3 py-2 text-sm text-gray-700 hover:bg-red-50 transition-colors">
+                                                                <x-iconify icon="lucide:trash-2" class="w-4 h-4 mr-2 text-red-600" />
+                                                                Supprimer
+                                                            </button>
+                                                            @else
+                                                            {{-- Duplicate --}}
+                                                            @can('create vehicles')
+                                                            <a href="{{ route('admin.vehicles.duplicate', $vehicle) }}"
+                                                                class="flex items-center px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
+                                                                <x-iconify icon="lucide:copy" class="w-4 h-4 mr-2 text-purple-600" />
+                                                                Dupliquer
+                                                            </a>
+                                                            @endcan
+
+                                                            {{-- History --}}
+                                                            <a href="{{ route('admin.vehicles.history', $vehicle) }}"
+                                                                class="flex items-center px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
+                                                                <x-iconify icon="lucide:clock" class="w-4 h-4 mr-2 text-cyan-600" />
+                                                                Historique
+                                                            </a>
+
+
+
+                                                            {{-- Export PDF --}}
+                                                            <a href="{{ route('admin.vehicles.export.single.pdf', $vehicle) }}"
+                                                                class="flex items-center px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
+                                                                <x-iconify icon="lucide:file-text" class="w-4 h-4 mr-2 text-emerald-600" />
+                                                                Exporter PDF
+                                                            </a>
+
+                                                            {{-- Archive --}}
+                                                            @can('delete vehicles')
+                                                            <div class="border-t border-gray-100">
+                                                                <button type="button"
+                                                                    @click="close(); $wire.confirmArchive({{ $vehicle->id }})"
+                                                                    class="flex w-full items-center px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
+                                                                    <x-iconify icon="lucide:archive" class="w-4 h-4 mr-2 text-orange-600" />
+                                                                    Archiver
+                                                                </button>
+                                                            </div>
+                                                            @endcan
+                                                            @endif
                                                         </div>
-                                                        @endcan
-                                                        @endif
                                                     </div>
-                                                </div>
+                                                </template>
                                             </div>
                                         </div>
                                     </td>

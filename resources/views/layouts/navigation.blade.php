@@ -350,8 +350,56 @@
 
     {{-- Section Utilisateur Enterprise --}}
     <div class="mt-auto shrink-0 p-4 border-t border-gray-200">
-        <div x-data="{ open: false }" @keydown.escape.window="open = false" @click.away="open = false" class="relative">
-            <button @click="open = !open" class="w-full flex items-center space-x-3 group p-3 rounded-xl hover:bg-gray-100 transition-all duration-300">
+        <div class="relative"
+             x-data="{
+                open: false,
+                styles: '',
+                direction: 'up',
+                align: 'left',
+                toggle() {
+                    if (this.open) { this.close(); return; }
+                    this.open = true;
+                    this.$nextTick(() => {
+                        this.updatePosition();
+                        requestAnimationFrame(() => this.updatePosition());
+                    });
+                },
+                close() { this.open = false; },
+                updatePosition() {
+                    if (!this.$refs.trigger || !this.$refs.menu) return;
+                    const rect = this.$refs.trigger.getBoundingClientRect();
+                    const menuHeight = this.$refs.menu.offsetHeight || 320;
+                    const menuWidth = rect.width || this.$refs.menu.offsetWidth || 280;
+                    const padding = 12;
+                    const spaceBelow = window.innerHeight - rect.bottom;
+                    const spaceAbove = rect.top;
+                    const shouldOpenUp = spaceBelow < menuHeight && spaceAbove > spaceBelow;
+                    this.direction = shouldOpenUp ? 'up' : 'down';
+                    let top = shouldOpenUp ? (rect.top - menuHeight - 8) : (rect.bottom + 8);
+                    if (top + menuHeight > window.innerHeight - padding) {
+                        top = window.innerHeight - padding - menuHeight;
+                    }
+                    if (top < padding) top = padding;
+                    let left = this.align === 'left' ? rect.left : (rect.right - menuWidth);
+                    if (left + menuWidth > window.innerWidth - padding) {
+                        left = window.innerWidth - padding - menuWidth;
+                    }
+                    if (left < padding) left = padding;
+                    this.styles = `position: fixed; top: ${top}px; left: ${left}px; width: ${menuWidth}px; z-index: 9999;`;
+                }
+             }"
+             x-init="$watch('open', value => {
+                if (value) {
+                    $nextTick(() => {
+                        this.updatePosition();
+                        requestAnimationFrame(() => this.updatePosition());
+                    });
+                }
+             })"
+             @keydown.escape.window="close()"
+             @scroll.window="open && updatePosition()"
+             @resize.window="open && updatePosition()">
+            <button @click="toggle()" x-ref="trigger" class="w-full flex items-center space-x-3 group p-3 rounded-xl hover:bg-gray-100 transition-all duration-300">
                 <div class="relative">
                     <div class="h-12 w-12 rounded-full bg-gradient-to-r from-blue-500 to-indigo-600 flex items-center justify-center shadow-lg">
                         <span class="text-white font-bold text-lg">{{ strtoupper(substr(Auth::user()->name, 0, 2)) }}</span>
@@ -371,15 +419,19 @@
                 <x-iconify icon="heroicons:chevron-up" class="h-4 w-4 text-gray-400 shrink-0 transition-transform duration-200" :class="open ? 'rotate-180' : ''" / />
             </button>
 
+            <template x-teleport="body">
             <div x-show="open"
+                x-ref="menu"
+                @click.outside="close()"
                 x-transition:enter="transition ease-out duration-200"
                 x-transition:enter-start="transform opacity-0 scale-95"
                 x-transition:enter-end="transform opacity-100 scale-100"
                 x-transition:leave="transition ease-in duration-150"
                 x-transition:leave-start="transform opacity-100 scale-100"
                 x-transition:leave-end="transform opacity-0 scale-95"
-                class="absolute bottom-full left-0 right-0 mb-2 w-full origin-bottom z-50"
-                style="display: none;">
+                :style="styles"
+                class="origin-bottom z-[9999]"
+                x-cloak>
                 <div class="bg-white rounded-xl shadow-2xl ring-1 ring-gray-200 p-2 backdrop-blur-sm border border-gray-100">
                     <div class="space-y-1">
                         <a href="{{ route('profile.edit') }}"
@@ -441,6 +493,7 @@
                     <div class="text-xs text-gray-500">Affectations</div>
                 </div>
             </div>
+            </template>
         </div>
     </div>
 </nav>

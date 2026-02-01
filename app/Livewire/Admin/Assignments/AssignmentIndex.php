@@ -153,6 +153,8 @@ class AssignmentIndex extends Component
 
     public function endAssignment()
     {
+        $this->endTime = trim((string) $this->endTime);
+
         // ✅ MODIFIÉ: Validation des champs séparés
         $this->validate([
             'endDate' => 'required|date',
@@ -193,6 +195,11 @@ class AssignmentIndex extends Component
 
     // --- ACTIONS: DELETE ASSIGNMENT ---
 
+    public function confirmDeleteAssignment($id)
+    {
+        return $this->confirmDelete($id);
+    }
+
     public function confirmDelete($id)
     {
         $assignment = Assignment::with(['vehicle', 'driver'])->find($id);
@@ -230,6 +237,14 @@ class AssignmentIndex extends Component
 
         $this->showDeleteModal = false;
         $this->deletingAssignmentId = null;
+        $this->deletingAssignmentDescription = '';
+    }
+
+    public function cancelDelete()
+    {
+        $this->showDeleteModal = false;
+        $this->deletingAssignmentId = null;
+        $this->deletingAssignmentDescription = '';
     }
 
     // --- DATA FETCHING ---

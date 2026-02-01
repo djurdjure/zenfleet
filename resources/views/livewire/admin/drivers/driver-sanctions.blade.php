@@ -369,20 +369,70 @@
                                     </a>
 
                                     {{-- Dropdown Menu (3 points) --}}
-                                    <div class="relative inline-block text-left" x-data="{ open: false }">
-                                        <button @click="open = !open" @click.away="open = false"
+                                    <div class="relative inline-block text-left"
+                                        x-data="{
+                                            open: false,
+                                            styles: '',
+                                            direction: 'down',
+                                            toggle() {
+                                                this.open = !this.open;
+                                                if (this.open) {
+                                                    this.$nextTick(() => requestAnimationFrame(() => this.updatePosition()));
+                                                }
+                                            },
+                                            close() { this.open = false; },
+                                            updatePosition() {
+                                                if (!this.$refs.trigger || !this.$refs.menu) return;
+                                                const rect = this.$refs.trigger.getBoundingClientRect();
+                                                const width = 192; // w-48
+                                                const padding = 12;
+                                                const menuHeight = this.$refs.menu.offsetHeight || 220;
+                                                const spaceBelow = window.innerHeight - rect.bottom - padding;
+                                                const spaceAbove = rect.top - padding;
+                                                const shouldOpenUp = spaceBelow < menuHeight && spaceAbove > spaceBelow;
+                                                this.direction = shouldOpenUp ? 'up' : 'down';
+
+                                                let top = shouldOpenUp ? (rect.top - menuHeight - 8) : (rect.bottom + 8);
+                                                if (top < padding) top = padding;
+                                                if (top + menuHeight > window.innerHeight - padding) {
+                                                    top = window.innerHeight - padding - menuHeight;
+                                                }
+
+                                                let left = rect.right - width;
+                                                const maxLeft = window.innerWidth - width - padding;
+                                                if (left > maxLeft) left = maxLeft;
+                                                if (left < padding) left = padding;
+
+                                                this.styles = `position: fixed; top: ${top}px; left: ${left}px; width: ${width}px; z-index: 80;`;
+                                            }
+                                        }"
+                                        x-init="
+                                            window.addEventListener('scroll', () => { if (open) updatePosition(); }, true);
+                                            window.addEventListener('resize', () => { if (open) updatePosition(); });
+                                        ">
+                                        <button x-ref="trigger"
+                                            @click="toggle"
+                                            @click.outside="close"
                                             type="button"
                                             class="p-2 rounded-full bg-gray-50 text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-all duration-200 group"
                                             title="Plus d'actions">
                                             <x-iconify icon="lucide:more-vertical" class="w-3.5 h-3.5 group-hover:scale-110 transition-transform" />
                                         </button>
 
-                                        <div x-show="open" x-cloak
-                                            x-transition:enter="transition ease-out duration-100"
-                                            x-transition:enter-start="transform opacity-0 scale-95"
-                                            x-transition:enter-end="transform opacity-100 scale-100"
-                                            class="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none z-50">
-                                            <div class="py-1">
+                                        <template x-teleport="body">
+                                            <div x-show="open" x-cloak
+                                                x-transition:enter="transition ease-out duration-100"
+                                                x-transition:enter-start="transform opacity-0 scale-95"
+                                                x-transition:enter-end="transform opacity-100 scale-100"
+                                                x-transition:leave="transition ease-in duration-75"
+                                                x-transition:leave-start="transform opacity-100 scale-100"
+                                                x-transition:leave-end="transform opacity-0 scale-95"
+                                                :style="styles"
+                                                @click.outside="close"
+                                                x-ref="menu"
+                                                :class="direction === 'up' ? 'origin-bottom-right' : 'origin-top-right'"
+                                                class="fixed z-[80] rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                                                <div class="py-1">
                                                 {{-- Modifier --}}
                                                 <button @click="$wire.call('openEditModal', {{ $sanction->id }}); open = false"
                                                     class="group flex w-full items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
@@ -393,14 +443,14 @@
                                                 @if($sanction->trashed())
                                                 <div class="border-t border-gray-100 my-1"></div>
                                                 {{-- Restaurer --}}
-                                                <button wire:click="confirmRestore({{ $sanction->id }}); open = false"
+                                                <button wire:click="confirmRestore({{ $sanction->id }}); close()"
                                                     class="group flex w-full items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
                                                     <x-iconify icon="heroicons:arrow-path" class="mr-3 h-4 w-4 text-gray-400 group-hover:text-green-500" />
                                                     Restaurer
                                                 </button>
 
                                                 {{-- Supprimer définitivement --}}
-                                                <button wire:click="confirmForceDelete({{ $sanction->id }}); open = false"
+                                                <button wire:click="confirmForceDelete({{ $sanction->id }}); close()"
                                                     class="group flex w-full items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
                                                     <x-iconify icon="heroicons:trash" class="mr-3 h-4 w-4 text-gray-400 group-hover:text-red-500" />
                                                     Supprimer définitivement
@@ -408,7 +458,7 @@
                                                 @else
                                                 <div class="border-t border-gray-100 my-1"></div>
                                                 {{-- Archiver --}}
-                                                <button wire:click="confirmSoftDelete({{ $sanction->id }}); open = false"
+                                                <button wire:click="confirmSoftDelete({{ $sanction->id }}); close()"
                                                     class="group flex w-full items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
                                                     <x-iconify icon="heroicons:archive-box-arrow-down" class="mr-3 h-4 w-4 text-gray-400 group-hover:text-amber-500" />
                                                     Archiver
@@ -416,6 +466,7 @@
                                                 @endif
                                             </div>
                                         </div>
+                                        </template>
                                     </div>
                                 </div>
                             </td>

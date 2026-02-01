@@ -342,22 +342,69 @@
                                         </a>
 
                                         {{-- Three-Dot Menu --}}
-                                        <div class="relative inline-block text-left" x-data="{ open: false }">
-                                            <button @click="open = !open" @click.away="open = false"
+                                        <div class="relative inline-block text-left"
+                                            x-data="{
+                                                open: false,
+                                                styles: '',
+                                                direction: 'down',
+                                                toggle() {
+                                                    this.open = !this.open;
+                                                    if (this.open) {
+                                                        this.$nextTick(() => requestAnimationFrame(() => this.updatePosition()));
+                                                    }
+                                                },
+                                                close() { this.open = false; },
+                                                updatePosition() {
+                                                    if (!this.$refs.trigger || !this.$refs.menu) return;
+                                                    const rect = this.$refs.trigger.getBoundingClientRect();
+                                                    const width = 224; // w-56
+                                                    const padding = 12;
+                                                    const menuHeight = this.$refs.menu.offsetHeight || 240;
+                                                    const spaceBelow = window.innerHeight - rect.bottom - padding;
+                                                    const spaceAbove = rect.top - padding;
+                                                    const shouldOpenUp = spaceBelow < menuHeight && spaceAbove > spaceBelow;
+                                                    this.direction = shouldOpenUp ? 'up' : 'down';
+
+                                                    let top = shouldOpenUp ? (rect.top - menuHeight - 8) : (rect.bottom + 8);
+                                                    if (top < padding) top = padding;
+                                                    if (top + menuHeight > window.innerHeight - padding) {
+                                                        top = window.innerHeight - padding - menuHeight;
+                                                    }
+
+                                                    let left = rect.right - width;
+                                                    const maxLeft = window.innerWidth - width - padding;
+                                                    if (left > maxLeft) left = maxLeft;
+                                                    if (left < padding) left = padding;
+
+                                                    this.styles = `position: fixed; top: ${top}px; left: ${left}px; width: ${width}px; z-index: 80;`;
+                                                }
+                                            }"
+                                            x-init="
+                                                window.addEventListener('scroll', () => { if (open) updatePosition(); }, true);
+                                                window.addEventListener('resize', () => { if (open) updatePosition(); });
+                                            ">
+                                            <button x-ref="trigger"
+                                                @click="toggle"
+                                                @click.outside="close"
                                                 type="button"
                                                 class="p-2 rounded-full bg-gray-50 text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-all duration-200 group">
                                                 <x-iconify icon="lucide:more-vertical" class="w-3.5 h-3.5 group-hover:scale-110 transition-transform" />
                                             </button>
 
-                                            <div x-show="open" x-cloak
-                                                x-transition:enter="transition ease-out duration-100"
-                                                x-transition:enter-start="transform opacity-0 scale-95"
-                                                x-transition:enter-end="transform opacity-100 scale-100"
-                                                x-transition:leave="transition ease-in duration-75"
-                                                x-transition:leave-start="transform opacity-100 scale-100"
-                                                x-transition:leave-end="transform opacity-0 scale-95"
-                                                class="absolute right-0 z-50 mt-2 w-56 rounded-lg shadow-lg bg-white ring-1 ring-black ring-opacity-5 divide-y divide-gray-100">
-                                                <div class="py-1">
+                                            <template x-teleport="body">
+                                                <div x-show="open" x-cloak
+                                                    x-transition:enter="transition ease-out duration-100"
+                                                    x-transition:enter-start="transform opacity-0 scale-95"
+                                                    x-transition:enter-end="transform opacity-100 scale-100"
+                                                    x-transition:leave="transition ease-in duration-75"
+                                                    x-transition:leave-start="transform opacity-100 scale-100"
+                                                    x-transition:leave-end="transform opacity-0 scale-95"
+                                                    :style="styles"
+                                                    @click.outside="close"
+                                                    x-ref="menu"
+                                                    :class="direction === 'up' ? 'origin-bottom-right' : 'origin-top-right'"
+                                                    class="fixed z-[80] rounded-lg shadow-lg bg-white ring-1 ring-black ring-opacity-5 divide-y divide-gray-100">
+                                                    <div class="py-1">
                                                     @if($assignment->canBeEdited())
                                                     <a href="{{ route('admin.assignments.edit', $assignment) }}"
                                                         class="group flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
@@ -395,13 +442,17 @@
 
                                                     @if($assignment->canBeDeleted())
                                                     <div class="border-t border-gray-100 my-1"></div>
-                                                    <button wire:click="confirmDeleteAssignment({{ $assignment->id }})"
+                                                    <button type="button"
+                                                        @click="close(); $wire.confirmDeleteAssignment({{ $assignment->id }})"
                                                         class="group flex w-full items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
                                                         <x-iconify icon="lucide:trash-2" class="mr-3 h-4 w-4 text-gray-400 group-hover:text-red-500" />
                                                         Supprimer
                                                     </button>
                                                     @endif
                                                 </div>
+                                            </div>
+                                        </template>
+                                    </div>
                                 </td>
                             </tr>
                             @endforeach
@@ -530,7 +581,7 @@
                                                     for ($m=0; $m < 60; $m +=30) {
                                                     $time=sprintf('%02d:%02d', $h, $m);
                                                     $selected=($endTime===$time) ? 'selected' : '' ;
-                                                    echo "<option value=\" {$time}\" {$selected}>{$time}</option>";
+                                                    echo "<option value=\"{$time}\" {$selected}>{$time}</option>";
                                                     }
                                                     }
                                                     @endphp
@@ -595,32 +646,12 @@
     </div>
 
     {{-- Delete Confirmation Modal --}}
-    <div x-data="{ show: @entangle('showDeleteModal') }"
-        x-show="show"
-        x-cloak
-        class="fixed inset-0 z-50 overflow-y-auto"
-        aria-labelledby="modal-title" role="dialog" aria-modal="true">
-        <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-            <div x-show="show"
-                x-transition:enter="ease-out duration-300"
-                x-transition:enter-start="opacity-0"
-                x-transition:enter-end="opacity-100"
-                x-transition:leave="ease-in duration-200"
-                x-transition:leave-start="opacity-100"
-                x-transition:leave-end="opacity-0"
-                class="fixed inset-0 bg-gray-900/40 backdrop-blur-sm transition-opacity z-40"></div>
+    @if($showDeleteModal)
+    <div class="fixed inset-0 z-50 overflow-y-auto" wire:key="assignment-delete-modal" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+        <div class="flex items-center justify-center min-h-screen px-4">
+            <div class="fixed inset-0 bg-gray-900/40 backdrop-blur-sm transition-opacity z-40" wire:click="cancelDelete"></div>
 
-            <span class="hidden sm:inline-block sm:align-middle sm:h-screen">&#8203;</span>
-
-            <div x-show="show"
-                x-transition:enter="ease-out duration-300"
-                x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-                x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
-                x-transition:leave="ease-in duration-200"
-                x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
-                x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-                class="inline-block align-bottom bg-white rounded-2xl px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full sm:p-6 relative z-50">
-
+            <div class="relative bg-white rounded-2xl px-6 py-6 text-left shadow-xl transform transition-all sm:max-w-lg sm:w-full z-50">
                 <div class="sm:flex sm:items-start">
                     <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
                         <x-iconify icon="lucide:alert-triangle" class="h-6 w-6 text-red-600" />
@@ -648,7 +679,7 @@
                         <x-iconify icon="lucide:loader-2" class="w-4 h-4 mr-2 animate-spin" wire:loading wire:target="deleteAssignment" />
                         Supprimer
                     </button>
-                    <button type="button" @click="show = false"
+                    <button type="button" wire:click="cancelDelete"
                         class="mt-3 w-full inline-flex justify-center rounded-lg border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:mt-0 sm:w-auto sm:text-sm transition-colors">
                         Annuler
                     </button>
@@ -656,6 +687,7 @@
             </div>
         </div>
     </div>
+    @endif
 
 </section>
 
@@ -690,7 +722,7 @@
                         events: {
                             afterChange: (newVal) => {
                                 if (newVal && newVal[0]) {
-                                    const value = newVal[0].value || '';
+                                    const value = (newVal[0].value || '').trim();
                                     // Sync with Livewire
                                     @this.set('endTime', value, false);
                                 }

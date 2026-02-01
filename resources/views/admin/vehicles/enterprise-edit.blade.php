@@ -128,7 +128,6 @@
                             icon="truck"
                             placeholder="Ex: Clio, 208, Corolla..."
                             :value="old('model', $vehicle->model)"
-                            required
                             :error="$errors->first('model')"
                             @blur="validateField('model', $event.target.value)" />
 
@@ -159,7 +158,6 @@
                             :options="$vehicleTypes->pluck('name', 'id')->toArray()"
                             :selected="old('vehicle_type_id', $vehicle->vehicle_type_id)"
                             placeholder="Sélectionnez un type..."
-                            required
                             :error="$errors->first('vehicle_type_id')"
                             @change="validateField('vehicle_type_id', $event.target.value)" />
 
@@ -179,7 +177,6 @@
                             :options="$transmissionTypes->pluck('name', 'id')->toArray()"
                             :selected="old('transmission_type_id', $vehicle->transmission_type_id)"
                             placeholder="Sélectionnez une transmission..."
-                            required
                             :error="$errors->first('transmission_type_id')"
                             @change="validateField('transmission_type_id', $event.target.value)" />
 
@@ -246,7 +243,6 @@
                             format="d/m/Y"
                             :error="$errors->first('acquisition_date')"
                             placeholder="Choisir une date"
-                            required
                             :maxDate="date('Y-m-d')"
                             helpText="Date d'achat du véhicule" />
 
@@ -294,7 +290,6 @@
                             :options="$vehicleStatuses->pluck('name', 'id')->toArray()"
                             :selected="old('status_id', $vehicle->status_id)"
                             placeholder="Sélectionnez un statut..."
-                            required
                             :error="$errors->first('status_id')"
                             helpText="État opérationnel du véhicule"
                             @change="validateField('status_id', $event.target.value)" />

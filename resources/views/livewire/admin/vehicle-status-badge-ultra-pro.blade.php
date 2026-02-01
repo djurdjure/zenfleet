@@ -2,18 +2,59 @@
      x-data="{ 
          open: false, 
          confirmModal: @entangle('showConfirmModal').live,
-         toggle() { this.open = !this.open; },
+         styles: '',
+         listStyles: '',
+         direction: 'down',
+         toggle() {
+             this.open = !this.open;
+             if (this.open) {
+                 this.$nextTick(() => requestAnimationFrame(() => this.updatePosition()));
+             }
+         },
          close() { this.open = false; },
          selectStatus(status) { 
              this.open = false; 
              $wire.prepareStatusChange(status); 
+         },
+         updatePosition() {
+             if (!this.$refs.trigger || !this.$refs.menu) return;
+             const rect = this.$refs.trigger.getBoundingClientRect();
+             const width = 288; // w-72
+             let left = rect.left;
+             const padding = 12;
+             const maxLeft = window.innerWidth - width - padding;
+             if (left > maxLeft) left = maxLeft;
+             if (left < padding) left = padding;
+
+             const menuHeight = this.$refs.menu.offsetHeight || 320;
+             const spaceBelow = window.innerHeight - rect.bottom - padding;
+             const spaceAbove = rect.top - padding;
+             const shouldOpenUp = spaceBelow < menuHeight && spaceAbove > spaceBelow;
+             this.direction = shouldOpenUp ? 'up' : 'down';
+
+             const maxHeight = Math.max(220, shouldOpenUp ? spaceAbove : spaceBelow);
+             const listMax = Math.max(160, maxHeight - 140);
+             this.listStyles = `max-height: ${listMax}px; overflow-y: auto;`;
+
+             let top = shouldOpenUp ? (rect.top - Math.min(menuHeight, maxHeight) - 8) : (rect.bottom + 12);
+             if (top < padding) top = padding;
+             if (top + menuHeight > window.innerHeight - padding) {
+                 top = window.innerHeight - padding - menuHeight;
+             }
+
+             this.styles = `position: fixed; top: ${top}px; left: ${left}px; width: ${width}px; z-index: 80;`;
          }
      }" 
      @click.stop
-     x-init="$watch('confirmModal', value => { if (value) open = false; })">
+     x-init="
+        $watch('confirmModal', value => { if (value) open = false; });
+        window.addEventListener('scroll', () => { if (open) updatePosition(); }, true);
+        window.addEventListener('resize', () => { if (open) updatePosition(); });
+     ">
     {{-- 🎯 Badge de Statut Ultra-Professionnel - Enterprise Grade --}}
     @if($canUpdate && count($allowedStatuses) > 0)
         <button
+            x-ref="trigger"
             @click.stop="toggle"
             @click.away="close"
             type="button"
@@ -59,16 +100,21 @@
 
     {{-- 🎯 Popover des Statuts Disponibles - Option A (Contextuel & Élégant) --}}
     @if($canUpdate && count($allowedStatuses) > 0)
-        <div
-            x-show="open"
-            x-transition:enter="transition ease-out duration-200"
-            x-transition:enter-start="transform opacity-0 scale-95 translate-y-2"
-            x-transition:enter-end="transform opacity-100 scale-100 translate-y-0"
-            x-transition:leave="transition ease-in duration-150"
-            x-transition:leave-start="transform opacity-100 scale-100 translate-y-0"
-            x-transition:leave-end="transform opacity-0 scale-95 translate-y-2"
-            class="absolute left-0 mt-3 w-72 rounded-xl shadow-[0_10px_40px_-10px_rgba(0,0,0,0.2)] bg-white ring-1 ring-black/5 z-50 overflow-visible"
-            style="display: none;">
+        <template x-teleport="body">
+            <div
+                x-show="open"
+                x-transition:enter="transition ease-out duration-200"
+                x-transition:enter-start="transform opacity-0 scale-95 translate-y-2"
+                x-transition:enter-end="transform opacity-100 scale-100 translate-y-0"
+                x-transition:leave="transition ease-in duration-150"
+                x-transition:leave-start="transform opacity-100 scale-100 translate-y-0"
+                x-transition:leave-end="transform opacity-0 scale-95 translate-y-2"
+                :style="styles"
+                @click.outside="close"
+                x-ref="menu"
+                :class="direction === 'up' ? 'origin-bottom-left' : 'origin-top-left'"
+                class="fixed rounded-xl shadow-[0_10px_40px_-10px_rgba(0,0,0,0.2)] bg-white ring-1 ring-black/5 z-[80] overflow-visible"
+                style="display: none;">
             
             {{-- Flèche du Popover --}}
             <div class="absolute -top-2 left-6 w-4 h-4 bg-white transform rotate-45 border-t border-l border-gray-100 shadow-sm"></div>
@@ -88,7 +134,7 @@
                 </div>
     
                 {{-- Liste des statuts disponibles --}}
-                <div class="py-2 max-h-[300px] overflow-y-auto custom-scrollbar">
+                <div class="py-2 custom-scrollbar" :style="listStyles">
                     @forelse($allowedStatuses as $status)
                         <button
                             @click.stop="selectStatus('{{ $status->value }}')"
@@ -134,7 +180,8 @@
                     </div>
                 @endif
             </div>
-        </div>
+            </div>
+        </template>
     @endif
 
     {{-- 🎯 Modal de Confirmation - Design Enterprise Ultra-Pro --}}

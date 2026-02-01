@@ -132,8 +132,48 @@ $currentThemeClass = $themeClasses[$theme] ?? $themeClasses['gradient'];
 
  {{-- Export --}}
  @if($exportable)
- <div class="relative" x-data="{ open: false }">
- <button @click="open = !open" type="button"
+ <div class="relative"
+ x-data="{
+     open: false,
+     styles: '',
+     direction: 'down',
+     toggle() {
+         this.open = !this.open;
+         if (this.open) {
+             this.$nextTick(() => requestAnimationFrame(() => this.updatePosition()));
+         }
+     },
+     close() { this.open = false; },
+     updatePosition() {
+         if (!this.$refs.trigger || !this.$refs.menu) return;
+         const rect = this.$refs.trigger.getBoundingClientRect();
+         const width = 192; // w-48
+         const padding = 12;
+         const menuHeight = this.$refs.menu.offsetHeight || 180;
+         const spaceBelow = window.innerHeight - rect.bottom - padding;
+         const spaceAbove = rect.top - padding;
+         const shouldOpenUp = spaceBelow < menuHeight && spaceAbove > spaceBelow;
+         this.direction = shouldOpenUp ? 'up' : 'down';
+
+         let top = shouldOpenUp ? (rect.top - menuHeight - 8) : (rect.bottom + 8);
+         if (top < padding) top = padding;
+         if (top + menuHeight > window.innerHeight - padding) {
+             top = window.innerHeight - padding - menuHeight;
+         }
+
+         let left = rect.right - width;
+         const maxLeft = window.innerWidth - width - padding;
+         if (left > maxLeft) left = maxLeft;
+         if (left < padding) left = padding;
+
+         this.styles = `position: fixed; top: ${top}px; left: ${left}px; width: ${width}px; z-index: 80;`;
+     }
+ }"
+ x-init="
+     window.addEventListener('scroll', () => { if (open) updatePosition(); }, true);
+     window.addEventListener('resize', () => { if (open) updatePosition(); });
+ ">
+ <button x-ref="trigger" @click="toggle" @click.outside="close" type="button"
  class="inline-flex items-center px-4 py-2 border-2 border-gray-300 text-sm font-medium rounded-xl text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all hover:scale-105">
  <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
@@ -141,12 +181,17 @@ $currentThemeClass = $themeClasses[$theme] ?? $themeClasses['gradient'];
  Exporter
  </button>
 
- <div x-show="open" @click.away="open = false" x-transition
- class="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-lg border border-gray-200 py-1 z-10">
+ <template x-teleport="body">
+ <div x-show="open" @click.outside="close" x-transition
+ :style="styles"
+ x-ref="menu"
+ :class="direction === 'up' ? 'origin-bottom-right' : 'origin-top-right'"
+ class="fixed bg-white rounded-xl shadow-lg border border-gray-200 py-1 z-[80]">
  <button @click="exportData('csv')" class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">CSV</button>
  <button @click="exportData('excel')" class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Excel</button>
  <button @click="exportData('pdf')" class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">PDF</button>
  </div>
+ </template>
  </div>
  @endif
  </div>
