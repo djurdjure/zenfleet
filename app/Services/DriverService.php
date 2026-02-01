@@ -62,13 +62,19 @@ class DriverService
                     $counter++;
                 }
 
-                // Générer mot de passe fort : Chauffeur@2025 + 4 chiffres
-                $generatedPassword = 'Chauffeur@2025' . rand(1000, 9999);
+                // Générer mot de passe : 1ère lettre prénom (maj) + Nom (1ère lettre maj) + @ + année (YYYY)
+                $firstInitial = Str::upper(Str::substr(trim((string) $data['first_name']), 0, 1));
+                $lastName = trim((string) $data['last_name']);
+                $lastName = $lastName !== '' ? (Str::upper(Str::substr($lastName, 0, 1)) . Str::substr($lastName, 1)) : '';
+                $generatedPassword = $firstInitial . $lastName . '@' . now()->format('Y');
 
                 // Créer l'utilisateur
                 $user = User::create([
                     'name' => $data['first_name'] . ' ' . $data['last_name'],
+                    'first_name' => $data['first_name'],
+                    'last_name' => $data['last_name'],
                     'email' => $email,
+                    'phone' => $data['personal_phone'] ?? null,
                     'password' => Hash::make($generatedPassword),
                     'organization_id' => $data['organization_id'],
                     'email_verified_at' => now(), // ✅ Auto-vérifier pour éviter problèmes de connexion

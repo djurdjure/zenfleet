@@ -4,6 +4,75 @@
      ==================================================================== --}}
 
     <div class="py-4 px-4 mx-auto max-w-7xl lg:py-6">
+        @php
+            $driverSuccess = session('driver_success');
+        @endphp
+
+        @if($driverSuccess)
+            <div x-data="{ open: true }" x-show="open" x-cloak class="fixed inset-0 z-50 overflow-y-auto">
+                <div class="flex items-center justify-center min-h-screen px-4">
+                    <div class="fixed inset-0 bg-gray-900/40 backdrop-blur-sm transition-opacity" @click="open = false"></div>
+
+                    <div class="relative bg-white rounded-2xl shadow-xl max-w-lg w-full p-6 z-50">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-lg font-semibold text-gray-900 flex items-center gap-2">
+                                <x-iconify icon="lucide:user-plus" class="w-5 h-5 text-blue-600" />
+                                Compte chauffeur créé
+                            </h3>
+                            <button type="button" @click="open = false" class="text-gray-400 hover:text-gray-600">
+                                <x-iconify icon="lucide:x" class="w-5 h-5" />
+                            </button>
+                        </div>
+
+                        <div class="space-y-4">
+                            <div class="rounded-lg border border-gray-200 bg-gray-50 p-4">
+                                <p class="text-sm text-gray-600">Chauffeur</p>
+                                <p class="text-sm font-semibold text-gray-900">{{ $driverSuccess['driver_name'] ?? '—' }}</p>
+                                @if(!empty($driverSuccess['driver_employee_number']))
+                                    <p class="text-xs text-gray-500">Matricule: {{ $driverSuccess['driver_employee_number'] }}</p>
+                                @endif
+                            </div>
+
+                            <div class="rounded-lg border border-gray-200 p-4">
+                                <p class="text-sm text-gray-600">Email de connexion</p>
+                                <p class="text-sm font-semibold text-gray-900">{{ $driverSuccess['user_email'] ?? '—' }}</p>
+                            </div>
+
+                            @if(!empty($driverSuccess['user_was_created']) && !empty($driverSuccess['user_password']))
+                                <div class="rounded-lg border border-orange-200 bg-orange-50 p-4">
+                                    <p class="text-sm text-orange-700 font-medium">Mot de passe généré</p>
+                                    <div class="mt-2 flex items-center justify-between gap-3">
+                                        <span class="font-mono text-sm text-gray-900 bg-white border border-orange-200 rounded-md px-3 py-1.5">
+                                            {{ $driverSuccess['user_password'] }}
+                                        </span>
+                                        <button type="button"
+                                            @click="navigator.clipboard.writeText('{{ $driverSuccess['user_password'] }}')"
+                                            class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-orange-700 bg-white border border-orange-200 rounded-md hover:bg-orange-100 transition">
+                                            <x-iconify icon="lucide:copy" class="w-4 h-4" />
+                                            Copier
+                                        </button>
+                                    </div>
+                                    <p class="mt-2 text-xs text-orange-700">
+                                        Conseillé: demander au chauffeur de modifier ce mot de passe lors de sa première connexion.
+                                    </p>
+                                </div>
+                            @else
+                                <div class="rounded-lg border border-gray-200 bg-gray-50 p-4 text-sm text-gray-600">
+                                    Compte utilisateur existant associé. Aucun nouveau mot de passe généré.
+                                </div>
+                            @endif
+                        </div>
+
+                        <div class="mt-6 flex justify-end">
+                            <button type="button" @click="open = false"
+                                class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                                Fermer
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        @endif
 
         {{-- ===============================================
             HEADER ULTRA-COMPACT
