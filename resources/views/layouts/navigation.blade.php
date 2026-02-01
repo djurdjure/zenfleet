@@ -330,10 +330,12 @@
             </button>
             <div x-show="expanded" x-collapse class="mt-2 ml-6 space-y-1">
                 @role('Super Admin')
+                @can('view organizations')
                 <a href="{{ route('admin.organizations.index') }}" class="flex items-center px-4 py-2 rounded-lg text-gray-500 hover:text-gray-900 hover:bg-gray-100 transition-all duration-200 {{ request()->routeIs('admin.organizations.*') ? 'text-blue-600 bg-blue-50 font-medium' : '' }}">
                     <x-iconify icon="heroicons:building-office" class="h-4 w-4 mr-3" / />
                     Organisations
                 </a>
+                @endcan
                 @endrole
                 <a href="{{ route('admin.users.index') }}" class="flex items-center px-4 py-2 rounded-lg text-gray-500 hover:text-gray-900 hover:bg-gray-100 transition-all duration-200 {{ request()->routeIs('admin.users.*') ? 'text-blue-600 bg-blue-50 font-medium' : '' }}">
                     <x-iconify icon="heroicons:user-cog" class="h-4 w-4 mr-3" / />

@@ -16,7 +16,28 @@ class RoleController extends Controller
      */
     public function index(): View
     {
-        $roles = Role::orderBy('name')->get();
+        $user = auth()->user();
+        $organizationId = $user?->organization_id;
+        $isSuperAdmin = $user?->hasRole('Super Admin');
+
+        $rolesQuery = Role::query()
+            ->when(!$isSuperAdmin, function ($query) use ($organizationId) {
+                $query->where(function ($subQuery) use ($organizationId) {
+                    $subQuery->whereNull('organization_id')
+                        ->orWhere('organization_id', $organizationId);
+                });
+            })
+            ->orderBy('name');
+
+        $roles = $rolesQuery->get();
+
+        if ($organizationId) {
+            $roles = $roles->sortByDesc(function ($role) use ($organizationId) {
+                return (int) ($role->organization_id === $organizationId);
+            });
+        }
+
+        $roles = $roles->unique('name')->values();
 
         return view('admin.roles.index', compact('roles'));
     }
