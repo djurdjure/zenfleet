@@ -370,7 +370,9 @@ class DriversImport extends Component
         $warnings = [];
 
         // Vérifier les doublons
-        $existing = Driver::where('license_number', $data['license_number'])->first();
+        $existing = Driver::where('license_number', $data['license_number'])
+            ->where('organization_id', auth()->user()->organization_id)
+            ->first();
 
         if ($existing) {
             if ($this->skipDuplicates && !$this->updateExisting) {
