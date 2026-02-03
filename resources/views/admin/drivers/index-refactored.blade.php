@@ -239,7 +239,7 @@
 
  {{-- Boutons d'actions --}}
  <div class="flex items-center gap-2">
- @can('export drivers')
+ @can('drivers.export')
  <a href="{{ route('admin.drivers.export') }}"
  class="inline-flex items-center gap-2 px-4 py-2.5 bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 font-medium rounded-lg transition-colors duration-200 text-sm shadow-sm hover:shadow-md">
  <x-iconify icon="heroicons:arrow-down-tray" class="w-5 h-5" />
@@ -247,7 +247,7 @@
  </a>
  @endcan
 
- @can('import drivers')
+ @can('drivers.import')
  <a href="{{ route('admin.drivers.import.show') }}"
  class="inline-flex items-center gap-2 px-4 py-2.5 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg transition-colors duration-200 text-sm shadow-sm hover:shadow-md">
  <x-iconify icon="heroicons:arrow-up-tray" class="w-5 h-5" />
@@ -261,7 +261,7 @@
  <span class="hidden sm:inline">Archives</span>
  </a>
 
- @can('create drivers')
+ @can('drivers.create')
  <a href="{{ route('admin.drivers.create') }}"
  class="inline-flex items-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors duration-200 text-sm shadow-sm hover:shadow-md">
  <x-iconify icon="heroicons:plus-circle" class="w-5 h-5" />
@@ -511,7 +511,7 @@
  <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
  <div class="flex items-center justify-end gap-3">
  @if(!$driver->deleted_at)
- @can('view drivers')
+ @can('drivers.view')
  <a href="{{ route('admin.drivers.show', $driver) }}"
  class="text-blue-600 hover:text-blue-900 transition-colors"
  title="Voir">
@@ -519,7 +519,7 @@
  </a>
  @endcan
 
- @can('edit drivers')
+ @can('drivers.update')
  <a href="{{ route('admin.drivers.edit', $driver) }}"
  class="text-green-600 hover:text-green-900 transition-colors"
  title="Modifier">
@@ -527,7 +527,7 @@
  </a>
  @endcan
 
- @can('delete drivers')
+ @can('drivers.delete')
  <button
  onclick="showDeleteConfirmation({{ $driver->id }}, '{{ $driver->first_name }}', '{{ $driver->last_name }}', '{{ $driver->employee_number ?? 'N/A' }}')"
  class="text-amber-600 hover:text-amber-900 transition-colors"
@@ -536,7 +536,7 @@
  </button>
  @endcan
  @else
- @can('restore drivers')
+ @can('drivers.restore')
  <button
  onclick="showRestoreConfirmation({{ $driver->id }}, '{{ $driver->first_name }}', '{{ $driver->last_name }}', '{{ $driver->employee_number ?? 'N/A' }}')"
  class="text-green-600 hover:text-green-900 transition-colors"
@@ -545,7 +545,7 @@
  </button>
  @endcan
 
- @can('force-delete drivers')
+@can('drivers.force-delete')
  <button
  onclick="showForceDeleteConfirmation({{ $driver->id }}, '{{ $driver->first_name }}', '{{ $driver->last_name }}', '{{ $driver->employee_number ?? 'N/A' }}')"
  class="text-red-600 hover:text-red-900 transition-colors"
@@ -625,7 +625,7 @@
  Réinitialiser les filtres
  </a>
  @else
- @can('create drivers')
+ @can('drivers.create')
  <a href="{{ route('admin.drivers.create') }}"
  class="inline-flex items-center gap-2 px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors duration-200 shadow-sm hover:shadow-md">
  <x-iconify icon="heroicons:plus-circle" class="w-5 h-5" />

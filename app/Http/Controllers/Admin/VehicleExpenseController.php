@@ -84,7 +84,7 @@ class VehicleExpenseController extends Controller
     public function index(Request $request): View
     {
         // Vérifier la permission
-        Gate::authorize('view expenses');
+        Gate::authorize('expenses.view');
 
         // Obtenir l'organisation de l'utilisateur
         $organizationId = auth()->user()->organization_id;
@@ -179,7 +179,7 @@ class VehicleExpenseController extends Controller
      */
     public function dashboard(): View
     {
-        Gate::authorize('view expense analytics');
+        Gate::authorize('expenses.analytics.view');
 
         $organizationId = auth()->user()->organization_id;
         
@@ -212,7 +212,7 @@ class VehicleExpenseController extends Controller
      */
     public function create(): View
     {
-        Gate::authorize('create expenses');
+        Gate::authorize('expenses.create');
 
         $organizationId = auth()->user()->organization_id;
 
@@ -248,7 +248,7 @@ class VehicleExpenseController extends Controller
     public function store(VehicleExpenseRequest $request): RedirectResponse
     {
         try {
-            Gate::authorize('create expenses');
+            Gate::authorize('expenses.create');
         } catch (\Illuminate\Auth\Access\AuthorizationException $e) {
             Log::error('Autorisation refusée pour créer une dépense', [
                 'user_id' => auth()->id(),
@@ -759,7 +759,7 @@ class VehicleExpenseController extends Controller
      */
     public function markAsPaid(Request $request, VehicleExpense $expense): RedirectResponse
     {
-        Gate::authorize('edit expenses');
+        Gate::authorize('expenses.update');
 
         if ($expense->payment_status === 'paid') {
             return back()->with('warning', 'Cette dépense est déjà marquée comme payée.');
@@ -823,7 +823,7 @@ class VehicleExpenseController extends Controller
      */
     public function analytics(Request $request): View
     {
-        Gate::authorize('view expense analytics');
+        Gate::authorize('expenses.analytics.view');
 
         $organizationId = auth()->user()->organization_id;
 
@@ -853,7 +853,7 @@ class VehicleExpenseController extends Controller
      */
     public function export(Request $request)
     {
-        Gate::authorize('export expenses');
+        Gate::authorize('expenses.export');
 
         $request->validate([
             'format' => 'required|in:csv,excel,pdf',
@@ -895,7 +895,7 @@ class VehicleExpenseController extends Controller
      */
     public function import(Request $request): RedirectResponse
     {
-        Gate::authorize('create expenses');
+        Gate::authorize('expenses.create');
 
         $request->validate([
             'file' => 'required|file|mimes:csv,xlsx,xls|max:10240', // 10MB max

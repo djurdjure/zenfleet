@@ -85,7 +85,7 @@ class ExpenseManager extends Component
 
     public function mount()
     {
-        $this->authorize('view expenses');
+        $this->authorize('expenses.view');
         $this->loadStatistics();
         $this->filter = request()->get('filter', $this->filter);
     }
@@ -111,7 +111,7 @@ class ExpenseManager extends Component
             ->get();
             
         $suppliers = Supplier::where('organization_id', Auth::user()->organization_id)
-            ->orderBy('name')
+            ->orderBy('company_name')
             ->get();
             
         $expenseGroups = ExpenseGroup::where('organization_id', Auth::user()->organization_id)
@@ -152,7 +152,7 @@ class ExpenseManager extends Component
                         $q->where('registration_plate', 'like', '%' . $this->search . '%');
                     })
                     ->orWhereHas('supplier', function ($q) {
-                        $q->where('name', 'like', '%' . $this->search . '%');
+                        $q->where('company_name', 'like', '%' . $this->search . '%');
                     });
             });
         }

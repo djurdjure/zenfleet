@@ -158,7 +158,7 @@ class UpdateVehicleMileageReadingRequest extends FormRequest
         $reading = $this->route('mileage_reading');
 
         // SÉCURITÉ: Prevent updating automatic readings (unless admin)
-        if ($reading->is_automatic && !$this->user()->can('manage automatic mileage readings')) {
+        if ($reading->is_automatic && !$this->user()->can('mileage-readings.manage.automatic')) {
             abort(403, 'Les relevés automatiques ne peuvent pas être modifiés manuellement.');
         }
     }

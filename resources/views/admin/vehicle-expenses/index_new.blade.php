@@ -294,7 +294,7 @@
                     </button>
 
                     {{-- Nouvelle Dépense --}}
-                    @can('create expenses')
+                    @can('expenses.create')
                     <a href="{{ route('admin.vehicle-expenses.create') }}"
                        class="inline-flex items-center gap-2 px-4 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all duration-200 shadow-sm hover:shadow-md">
                         <x-iconify icon="lucide:plus" class="w-5 h-5" />
@@ -608,7 +608,7 @@
                                         </a>
                                         
                                         {{-- Approbation rapide si nécessaire --}}
-                                        @if(in_array($expense->approval_status, ['pending_level1', 'pending_level2']) && auth()->user()->can('approve expenses'))
+                                        @if(in_array($expense->approval_status, ['pending_level1', 'pending_level2']) && auth()->user()->can('expenses.approve'))
                                             <button
                                                 onclick="quickApprove({{ $expense->id }})"
                                                 class="inline-flex items-center p-1.5 text-green-600 hover:text-green-900 hover:bg-green-50 rounded-lg transition-colors"
@@ -623,7 +623,7 @@
                                             </button>
                                         @endif
                                         
-                                        @if($expense->approval_status == 'draft' || ($expense->approval_status == 'rejected' && auth()->user()->can('update expenses')))
+                                        @if($expense->approval_status == 'draft' || ($expense->approval_status == 'rejected' && auth()->user()->can('expenses.update')))
                                             <a href="{{ route('admin.vehicle-expenses.edit', $expense) }}"
                                                class="inline-flex items-center p-1.5 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
                                                title="Modifier">
@@ -631,7 +631,7 @@
                                             </a>
                                         @endif
                                         
-                                        @if($expense->approval_status == 'draft' && auth()->user()->can('delete expenses'))
+                                        @if($expense->approval_status == 'draft' && auth()->user()->can('expenses.delete'))
                                             <button
                                                 onclick="deleteExpense({{ $expense->id }})"
                                                 class="inline-flex items-center p-1.5 text-orange-600 hover:text-orange-900 hover:bg-orange-50 rounded-lg transition-colors"
@@ -659,7 +659,7 @@
                         <x-iconify icon="lucide:receipt" class="w-16 h-16 text-gray-300 mb-4" />
                         <h3 class="text-lg font-medium text-gray-900 mb-2">Aucune dépense trouvée</h3>
                         <p class="text-sm text-gray-500 mb-4">Commencez par ajouter votre première dépense véhicule</p>
-                        @can('create expenses')
+                        @can('expenses.create')
                         <a href="{{ route('admin.vehicle-expenses.create') }}"
                            class="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
                             <x-iconify icon="lucide:plus" class="w-5 h-5" />

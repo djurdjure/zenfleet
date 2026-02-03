@@ -67,7 +67,6 @@ class RolePolicy
      */
     public function manage(User $user): bool
     {
-        return $user->can('manage roles') || $user->hasRole(['Super Admin', 'Admin']);
+        return $user->can('roles.manage') || $user->hasRole(['Super Admin', 'Admin']);
     }
 }
-

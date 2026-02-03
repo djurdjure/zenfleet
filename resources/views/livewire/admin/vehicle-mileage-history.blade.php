@@ -317,7 +317,7 @@
                             </button>
 
                             {{-- Bouton Export (Icon-only) --}}
-                            @can('export mileage readings')
+                            @can('mileage-readings.export')
                             <div class="relative" x-data="{ showExportMenu: false }">
                                 <button
                                     @click="showExportMenu = !showExportMenu"
@@ -344,7 +344,7 @@
                             @endcan
 
                             {{-- Bouton Nouveau Relevé (Icon-only) --}}
-                            @can('create mileage readings')
+                            @can('mileage-readings.create')
                             <button wire:click="openAddModal"
                                 title="Nouveau relevé"
                                 class="inline-flex items-center justify-center w-9 h-9 bg-blue-600 hover:bg-blue-700 text-white rounded-lg shadow-sm hover:shadow transition-all">
@@ -842,7 +842,7 @@
                         </div>
                         <p class="text-lg font-medium text-gray-900">Aucun relevé trouvé</p>
                         <p class="text-sm text-gray-500 mt-1">Commencez par enregistrer un premier relevé kilométrique</p>
-                        @can('create mileage readings')
+                        @can('mileage-readings.create')
                         <button wire:click="openAddModal" class="mt-4 inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors">
                             <x-iconify icon="lucide:plus" class="w-4 h-4" />
                             Nouveau relevé

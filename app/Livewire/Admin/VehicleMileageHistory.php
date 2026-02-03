@@ -319,7 +319,7 @@ class VehicleMileageHistory extends Component
     public function openAddModal(): void
     {
         // Vérifier la permission
-        if (!auth()->user()->can('create mileage readings')) {
+        if (!auth()->user()->can('mileage-readings.create')) {
             session()->flash('error', 'Vous n\'avez pas la permission de créer des relevés kilométriques.');
             return;
         }
@@ -355,7 +355,7 @@ class VehicleMileageHistory extends Component
     public function saveReading(): void
     {
         // Vérifier la permission
-        if (!auth()->user()->can('create mileage readings')) {
+        if (!auth()->user()->can('mileage-readings.create')) {
             session()->flash('error', 'Vous n\'avez pas la permission de créer des relevés kilométriques.');
             $this->closeAddModal();
             return;
@@ -404,7 +404,7 @@ class VehicleMileageHistory extends Component
     public function exportCsv(): void
     {
         // Vérifier la permission
-        if (!auth()->user()->can('export mileage readings')) {
+        if (!auth()->user()->can('mileage-readings.export')) {
             session()->flash('error', 'Vous n\'avez pas la permission d\'exporter les relevés kilométriques.');
             return;
         }
@@ -418,7 +418,7 @@ class VehicleMileageHistory extends Component
     public function exportExcel(): void
     {
         // Vérifier la permission
-        if (!auth()->user()->can('export mileage readings')) {
+        if (!auth()->user()->can('mileage-readings.export')) {
             session()->flash('error', 'Vous n\'avez pas la permission d\'exporter les relevés kilométriques.');
             return;
         }

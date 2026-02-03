@@ -188,7 +188,7 @@
                     </div>
                 </div>
 
-                @can('create vehicles')
+                @can('vehicles.create')
                 {{-- Import --}}
                 <a href="{{ route('admin.vehicles.import.show') }}"
                     title="Importer"
@@ -399,7 +399,7 @@
                                     <td class="px-3 py-2 whitespace-nowrap text-center text-sm font-medium">
                                         <div class="flex items-center justify-center gap-2">
                                             {{-- Quick Actions --}}
-                                            @can('view vehicles')
+                                            @can('vehicles.view')
                                             <a href="{{ route('admin.vehicles.show', $vehicle) }}"
                                                 class="p-2 rounded-full bg-gray-50 text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition-all duration-200 group"
                                                 title="Voir">
@@ -407,7 +407,7 @@
                                             </a>
                                             @endcan
 
-                                            @can('edit vehicles')
+                                            @can('vehicles.update')
                                             <a href="{{ route('admin.vehicles.edit', $vehicle) }}"
                                                 class="p-2 rounded-full bg-gray-50 text-gray-400 hover:text-amber-600 hover:bg-amber-50 transition-all duration-200 group"
                                                 title="Modifier">
@@ -499,7 +499,7 @@
                                                             </button>
                                                             @else
                                                             {{-- Duplicate --}}
-                                                            @can('create vehicles')
+                                                            @can('vehicles.create')
                                                             <a href="{{ route('admin.vehicles.duplicate', $vehicle) }}"
                                                                 class="flex items-center px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
                                                                 <x-iconify icon="lucide:copy" class="w-4 h-4 mr-2 text-purple-600" />
@@ -524,7 +524,7 @@
                                                             </a>
 
                                                             {{-- Archive --}}
-                                                            @can('delete vehicles')
+                                                            @can('vehicles.delete')
                                                             <div class="border-t border-gray-100">
                                                                 <button type="button"
                                                                     @click="close(); $wire.confirmArchive({{ $vehicle->id }})"

@@ -90,14 +90,14 @@
 
                 {{-- Actions --}}
                 <div class="flex items-center gap-2">
-                    @can('edit suppliers')
+                    @can('suppliers.update')
                         <a href="{{ route('admin.suppliers.edit', $supplier) }}"
                            class="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200 font-semibold shadow-sm">
                             <x-iconify icon="lucide:pencil" class="w-5 h-5" />
                             Modifier
                         </a>
                     @endcan
-                    @can('delete suppliers')
+                    @can('suppliers.delete')
                         <form action="{{ route('admin.suppliers.destroy', $supplier) }}" 
                               method="POST" 
                               class="inline"

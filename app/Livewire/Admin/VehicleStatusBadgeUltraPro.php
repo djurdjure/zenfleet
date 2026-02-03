@@ -377,9 +377,9 @@ class VehicleStatusBadgeUltraPro extends Component
         }
 
         // Vérifier plusieurs permissions possibles
-        return $user->can('update vehicles') ||
-            $user->can('update-vehicle-status') ||
-            $user->can('manage vehicles') ||
+        return $user->can('vehicles.update') ||
+            $user->can('vehicles.status.update') ||
+            $user->can('vehicles.manage') ||
             $user->hasRole('fleet-manager');
     }
 

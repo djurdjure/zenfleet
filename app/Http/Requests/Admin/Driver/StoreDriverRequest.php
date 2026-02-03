@@ -12,7 +12,7 @@ class StoreDriverRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return $this->user()->can('create drivers');
+        return $this->user()->can('drivers.create');
     }
 
     /**

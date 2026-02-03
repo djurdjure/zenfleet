@@ -330,7 +330,7 @@ class MaintenanceDocument extends Model
         }
 
         // Vérifier les permissions spécifiques
-        return $user->can('view maintenance_operations');
+        return $user->can('maintenance.operations.view');
     }
 
     /**

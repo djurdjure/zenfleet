@@ -18,7 +18,7 @@ class MaintenanceOperationPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->can("view maintenance");
+        return $user->can("maintenance.view");
     }
 
     /**
@@ -35,7 +35,7 @@ class MaintenanceOperationPolicy
             return true;
         }
 
-        return $user->can("view maintenance") 
+        return $user->can("maintenance.view") 
             && $maintenanceOperation->vehicle->organization_id === $user->organization_id;
     }
 
@@ -44,7 +44,7 @@ class MaintenanceOperationPolicy
      */
     public function create(User $user): bool
     {
-        return $user->can("create maintenance operations");
+        return $user->can("maintenance.operations.create");
     }
 
     /**
@@ -56,7 +56,7 @@ class MaintenanceOperationPolicy
             return true;
         }
 
-        return $user->can("edit maintenance operations")
+        return $user->can("maintenance.operations.update")
             && $maintenanceOperation->vehicle->organization_id === $user->organization_id;
     }
 
@@ -69,7 +69,7 @@ class MaintenanceOperationPolicy
             return true;
         }
 
-        return $user->can("delete maintenance operations")
+        return $user->can("maintenance.operations.delete")
             && $maintenanceOperation->vehicle->organization_id === $user->organization_id;
     }
 
@@ -82,7 +82,7 @@ class MaintenanceOperationPolicy
             return true;
         }
 
-        return $user->can("delete maintenance operations")
+        return $user->can("maintenance.operations.delete")
             && $maintenanceOperation->vehicle->organization_id === $user->organization_id;
     }
 
@@ -95,7 +95,7 @@ class MaintenanceOperationPolicy
             return true;
         }
 
-        return $user->can("delete maintenance operations")
+        return $user->can("maintenance.operations.delete")
             && $maintenanceOperation->vehicle->organization_id === $user->organization_id;
     }
 
@@ -108,7 +108,7 @@ class MaintenanceOperationPolicy
             return true;
         }
 
-        return $user->can("edit maintenance operations")
+        return $user->can("maintenance.operations.update")
             && $maintenanceOperation->status === 'planned'
             && $maintenanceOperation->vehicle->organization_id === $user->organization_id;
     }
@@ -122,7 +122,7 @@ class MaintenanceOperationPolicy
             return true;
         }
 
-        return $user->can("edit maintenance operations")
+        return $user->can("maintenance.operations.update")
             && $maintenanceOperation->status === 'in_progress'
             && $maintenanceOperation->vehicle->organization_id === $user->organization_id;
     }
@@ -136,7 +136,7 @@ class MaintenanceOperationPolicy
             return true;
         }
 
-        return $user->can("edit maintenance operations")
+        return $user->can("maintenance.operations.update")
             && in_array($maintenanceOperation->status, ['planned', 'in_progress'])
             && $maintenanceOperation->vehicle->organization_id === $user->organization_id;
     }
@@ -146,6 +146,6 @@ class MaintenanceOperationPolicy
      */
     public function export(User $user): bool
     {
-        return $user->can("view maintenance");
+        return $user->can("maintenance.view");
     }
 }

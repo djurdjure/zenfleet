@@ -27,7 +27,7 @@ class ChangeVehicleStatusRequest extends FormRequest
     public function authorize(): bool
     {
         // Vérifier que l'utilisateur a la permission de changer le statut des véhicules
-        return $this->user()->can('update-vehicle-status');
+        return $this->user()->can('vehicles.status.update');
     }
 
     /**

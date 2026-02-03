@@ -19,7 +19,7 @@
         </h1>
 
         <div class="flex items-center gap-2">
-            @can('create users')
+            @can('users.create')
             <a href="{{ route('admin.users.create') }}"
                 title="Nouvel Utilisateur"
                 class="inline-flex items-center gap-2 p-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all duration-200 shadow-sm hover:shadow-md">
@@ -129,7 +129,7 @@
                 class="inline-flex items-center gap-2 p-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-all duration-200 shadow-sm hover:shadow-md">
                 <x-iconify icon="lucide:download" class="w-5 h-5 text-gray-500" />
             </a>
-            @can('create users')
+            @can('users.create')
             <a href="{{ route('admin.users.create') }}"
                 title="Nouvel Utilisateur"
                 class="inline-flex items-center gap-2 p-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all duration-200 shadow-sm hover:shadow-md">
@@ -242,7 +242,7 @@
                         </td>
                         <td class="px-6 py-4 text-right">
                                 <div class="flex items-center justify-end gap-2">
-                                    @can('edit users')
+                                    @can('users.update')
                                     <a href="{{ route('admin.users.permissions', $user) }}"
                                         title="Gérer les Permissions"
                                         class="p-2 rounded-full bg-gray-50 text-gray-400 hover:text-purple-600 hover:bg-purple-50 transition-all duration-200 group">
@@ -250,7 +250,7 @@
                                     </a>
                                     @endcan
 
-                                    @can('edit users')
+                                    @can('users.update')
                                     <a href="{{ route('admin.users.vehicles.manage', $user) }}"
                                         title="Gérer l'accès aux véhicules"
                                         class="p-2 rounded-full bg-gray-50 text-gray-400 hover:text-green-600 hover:bg-green-50 transition-all duration-200 group">
@@ -258,7 +258,7 @@
                                     </a>
                                     @endcan
 
-                                    @can('edit users')
+                                    @can('users.update')
                                     <a href="{{ route('admin.users.edit', $user) }}"
                                         title="Modifier"
                                         class="p-2 rounded-full bg-gray-50 text-gray-400 hover:text-amber-600 hover:bg-amber-50 transition-all duration-200 group">
@@ -266,7 +266,7 @@
                                     </a>
                                     @endcan
 
-                                    @can('delete users')
+                                    @can('users.delete')
                                     @if(auth()->id() !== $user->id)
                                     <button type="button"
                                         @click="showConfirmModal = true; userToDelete = {{ json_encode($user->only(['id', 'name', 'email'])) }}; deleteFormUrl = '{{ route('admin.users.destroy', $user->id) }}'"

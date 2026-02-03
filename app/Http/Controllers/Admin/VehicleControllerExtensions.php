@@ -69,7 +69,7 @@ trait VehicleControllerExtensions
 
         try {
             // Vérifier les permissions
-            if (!Auth::user()->can('export vehicles')) {
+            if (!Auth::user()->can('vehicles.export')) {
                 abort(403, 'Non autorisé à exporter les véhicules');
             }
 
@@ -92,7 +92,7 @@ trait VehicleControllerExtensions
 
         try {
             // Vérifier les permissions
-            if (!Auth::user()->can('export vehicles')) {
+            if (!Auth::user()->can('vehicles.export')) {
                 abort(403, 'Non autorisé à exporter les véhicules');
             }
 
@@ -115,7 +115,7 @@ trait VehicleControllerExtensions
 
         try {
             // Vérifier les permissions
-            if (!Auth::user()->can('view vehicles')) {
+            if (!Auth::user()->can('vehicles.view')) {
                 abort(403, 'Non autorisé à voir ce véhicule');
             }
 
@@ -146,7 +146,7 @@ trait VehicleControllerExtensions
 
         try {
             // Vérifier les permissions
-            if (!Auth::user()->can('create vehicles')) {
+            if (!Auth::user()->can('vehicles.create')) {
                 abort(403, 'Non autorisé à créer des véhicules');
             }
 
@@ -236,7 +236,7 @@ trait VehicleControllerExtensions
 
         try {
             // Vérifier les permissions
-            if (!Auth::user()->can('view vehicles')) {
+            if (!Auth::user()->can('vehicles.view')) {
                 abort(403, 'Non autorisé à voir l\'historique');
             }
 

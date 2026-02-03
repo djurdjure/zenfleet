@@ -192,15 +192,15 @@ class DiagnoseMileageReadings extends Command
         // Permissions mileage
         $this->line("  📋 Permissions mileage:");
 
-        $canViewOwn = $user->can('view own mileage readings');
-        $canViewTeam = $user->can('view team mileage readings');
-        $canViewAll = $user->can('view all mileage readings');
-        $canCreate = $user->can('create mileage readings');
+        $canViewOwn = $user->can('mileage-readings.view.own');
+        $canViewTeam = $user->can('mileage-readings.view.team');
+        $canViewAll = $user->can('mileage-readings.view.all');
+        $canCreate = $user->can('mileage-readings.create');
 
-        $this->line("    view own mileage readings:  " . ($canViewOwn ? '✅ OUI' : '❌ NON'));
-        $this->line("    view team mileage readings: " . ($canViewTeam ? '✅ OUI' : '❌ NON'));
-        $this->line("    view all mileage readings:  " . ($canViewAll ? '✅ OUI' : '❌ NON'));
-        $this->line("    create mileage readings:    " . ($canCreate ? '✅ OUI' : '❌ NON'));
+        $this->line("    mileage-readings.view.own:  " . ($canViewOwn ? '✅ OUI' : '❌ NON'));
+        $this->line("    mileage-readings.view.team: " . ($canViewTeam ? '✅ OUI' : '❌ NON'));
+        $this->line("    mileage-readings.view.all:  " . ($canViewAll ? '✅ OUI' : '❌ NON'));
+        $this->line("    mileage-readings.create:    " . ($canCreate ? '✅ OUI' : '❌ NON'));
 
         $this->newLine();
 
@@ -221,7 +221,7 @@ class DiagnoseMileageReadings extends Command
                     $q->where('depot_id', $user->depot_id);
                 });
             } else {
-                $this->warn("    ⚠️  Utilisateur a 'view team mileage readings' mais pas de depot_id!");
+                $this->warn("    ⚠️  Utilisateur a 'mileage-readings.view.team' mais pas de depot_id!");
             }
         } elseif ($canViewOwn) {
             $scope = 'PROPRES (recorded_by)';

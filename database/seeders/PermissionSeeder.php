@@ -6,6 +6,7 @@ use Illuminate\Database\Seeder;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\PermissionRegistrar;
+use App\Enums\Permission as PermissionEnum;
 
 class PermissionSeeder extends Seeder
 {
@@ -14,19 +15,7 @@ class PermissionSeeder extends Seeder
         app()[PermissionRegistrar::class]->forgetCachedPermissions();
 
         // --- Définition de toutes les permissions ---
-        $permissions = [
-            'view organizations', 'create organizations', 'edit organizations', 'delete organizations',
-            'manage roles', 'view users', 'create users', 'edit users', 'delete users',
-            'view vehicles', 'create vehicles', 'edit vehicles', 'delete vehicles', 'restore vehicles', 'force delete vehicles',
-            'view drivers', 'create drivers', 'edit drivers', 'delete drivers', 'restore drivers', 'force delete drivers',
-            'view assignments', 'create assignments', 'edit assignments', 'end assignments',
-            'view maintenance', 'manage maintenance plans', 'log maintenance',
-            'create handovers', 'view handovers', 'edit handovers', 'delete handovers', 'upload signed handovers',
-            'view suppliers', 'create suppliers', 'edit suppliers', 'delete suppliers',
-            'view documents', 'create documents', 'edit documents', 'delete documents',
-            'manage document_categories',
-            'view depots', 'create depots', 'edit depots', 'delete depots',
-        ];
+        $permissions = PermissionEnum::all();
 
         foreach ($permissions as $permission) {
             Permission::firstOrCreate(['name' => $permission, 'guard_name' => 'web']);
@@ -49,20 +38,38 @@ class PermissionSeeder extends Seeder
         $this->command->info('Permissions granted to Admin role.');
 
         $managerRole->syncPermissions([
-            'view vehicles', 'create vehicles', 'edit vehicles', 'delete vehicles', 'restore vehicles',
-            'view drivers', 'create drivers', 'edit drivers', 'delete drivers', 'restore drivers',
-            'view assignments', 'create assignments', 'edit assignments', 'end assignments',
-            'view maintenance', 'manage maintenance plans', 'log maintenance',
-            'create handovers', 'view handovers', 'edit handovers',
-            'view documents', 'create documents', 'edit documents', 'delete documents',
-            'manage document_categories',
+            PermissionEnum::VIEW_VEHICLES->value,
+            PermissionEnum::CREATE_VEHICLES->value,
+            PermissionEnum::EDIT_VEHICLES->value,
+            PermissionEnum::DELETE_VEHICLES->value,
+            PermissionEnum::RESTORE_VEHICLES->value,
+            PermissionEnum::VIEW_DRIVERS->value,
+            PermissionEnum::CREATE_DRIVERS->value,
+            PermissionEnum::EDIT_DRIVERS->value,
+            PermissionEnum::DELETE_DRIVERS->value,
+            PermissionEnum::RESTORE_DRIVERS->value,
+            PermissionEnum::VIEW_ASSIGNMENTS->value,
+            PermissionEnum::CREATE_ASSIGNMENTS->value,
+            PermissionEnum::EDIT_ASSIGNMENTS->value,
+            PermissionEnum::END_ASSIGNMENTS->value,
+            PermissionEnum::VIEW_MAINTENANCE->value,
+            PermissionEnum::MANAGE_MAINTENANCE_PLANS->value,
+            PermissionEnum::LOG_MAINTENANCE->value,
+            PermissionEnum::CREATE_HANDOVERS->value,
+            PermissionEnum::VIEW_HANDOVERS->value,
+            PermissionEnum::EDIT_HANDOVERS->value,
+            PermissionEnum::VIEW_DOCUMENTS->value,
+            PermissionEnum::CREATE_DOCUMENTS->value,
+            PermissionEnum::EDIT_DOCUMENTS->value,
+            PermissionEnum::DELETE_DOCUMENTS->value,
+            PermissionEnum::MANAGE_DOCUMENT_CATEGORIES->value,
         ]);
         $this->command->info('Permissions granted to "Gestionnaire Flotte" role.');
 
         // Le rôle Chauffeur peut voir les véhicules et ses affectations.
         $driverRole->syncPermissions([
-            'view vehicles',
-            'view assignments',
+            PermissionEnum::VIEW_VEHICLES->value,
+            PermissionEnum::VIEW_ASSIGNMENTS->value,
         ]);
         $this->command->info('Permissions for "Chauffeur" role have been set.');
     }

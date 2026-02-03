@@ -36,7 +36,7 @@
                     <a href="{{ route('admin.vehicles.export.single.pdf', $vehicle) }}" class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
                         <x-iconify icon="ph:file-pdf" class="text-sm" /> Exporter PDF
                     </a>
-                    @can('edit vehicles')
+                    @can('vehicles.update')
                     <a href="{{ route('admin.vehicles.edit', $vehicle) }}" class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-gray-100 text-gray-800 rounded-lg hover:bg-gray-200 transition-colors">
                         <x-iconify icon="ph:pencil-simple" class="text-sm" /> Modifier
                     </a>

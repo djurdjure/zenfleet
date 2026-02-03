@@ -59,11 +59,11 @@ class PermissionMatrix extends Component
     {
         return [
             'organizations' => ['view', 'create', 'edit', 'delete', 'restore', 'export', 'manage settings', 'view statistics'],
-            'users' => ['view', 'create', 'edit', 'delete', 'restore', 'export', 'manage roles', 'reset passwords', 'impersonate'],
+            'users' => ['view', 'create', 'edit', 'delete', 'restore', 'export', 'roles.manage', 'reset passwords', 'impersonate'],
             'roles' => ['view', 'manage'],
             'vehicles' => ['view', 'create', 'edit', 'delete', 'restore', 'export', 'import', 'view history', 'manage maintenance', 'manage documents'],
             'drivers' => ['view', 'create', 'edit', 'delete', 'restore', 'export', 'import', 'view history', 'assign to vehicles', 'manage licenses'],
-            'assignments' => ['view', 'create', 'edit', 'delete', 'end', 'extend', 'export', 'view calendar', 'view gantt'],
+            'assignments' => ['view', 'create', 'edit', 'delete', 'end', 'extend', 'export', 'view calendar', 'assignments.view-gantt'],
             'maintenance' => ['view', 'manage plans', 'create operations', 'edit operations', 'delete operations', 'approve operations', 'export reports'],
             'repair_requests' => [
                 'view own', 'view team', 'view all',
@@ -76,7 +76,7 @@ class PermissionMatrix extends Component
                 'create', 'edit', 'delete', 'export'
             ],
             'suppliers' => ['view', 'create', 'edit', 'delete', 'restore', 'export', 'manage contracts'],
-            'expenses' => ['view', 'create', 'edit', 'delete', 'approve', 'export', 'view analytics'],
+            'expenses' => ['view', 'create', 'edit', 'delete', 'approve', 'export', 'analytics.view'],
             'documents' => ['view', 'create', 'edit', 'delete', 'download', 'approve', 'export'],
             'analytics' => ['view', 'view performance metrics', 'view roi metrics', 'export'],
             'alerts' => ['view', 'create', 'edit', 'delete', 'mark as read', 'export'],
@@ -505,7 +505,7 @@ class PermissionMatrix extends Component
             'approve level 2' => 'Approuver (N2)',
             'reject' => 'Rejeter',
             'assign to vehicles' => 'Assigner aux véhicules',
-            'manage roles' => 'Gérer rôles',
+            'roles.manage' => 'Gérer rôles',
             'manage licenses' => 'Gérer permis',
             'manage contracts' => 'Gérer contrats',
             'manage plans' => 'Gérer plans',
@@ -516,9 +516,9 @@ class PermissionMatrix extends Component
             'approve operations' => 'Approuver opérations',
             'view history' => 'Voir historique',
             'view calendar' => 'Voir calendrier',
-            'view gantt' => 'Voir Gantt',
+            'assignments.view-gantt' => 'Voir Gantt',
             'view statistics' => 'Voir statistiques',
-            'view analytics' => 'Voir analytics',
+            'analytics.view' => 'Voir analytics',
             'view performance metrics' => 'Voir métriques performance',
             'view roi metrics' => 'Voir métriques ROI',
             'view logs' => 'Voir logs',

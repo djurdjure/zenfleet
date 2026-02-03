@@ -25,7 +25,7 @@ class AssignmentPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->can('view assignments');
+        return $user->can('assignments.view');
     }
 
     /**
@@ -33,7 +33,7 @@ class AssignmentPolicy
      */
     public function view(User $user, Assignment $assignment): bool
     {
-        return $user->can('view assignments') &&
+        return $user->can('assignments.view') &&
             $assignment->organization_id === $user->organization_id;
     }
 
@@ -42,8 +42,7 @@ class AssignmentPolicy
      */
     public function create(User $user): bool
     {
-        return $user->can('create assignments') ||
-            $user->can('assignments.create') ||
+        return $user->can('assignments.create') ||
             $user->hasRole(['Super Admin', 'Admin', 'Gestionnaire Flotte']);
     }
 
@@ -52,7 +51,7 @@ class AssignmentPolicy
      */
     public function update(User $user, Assignment $assignment): bool
     {
-        return ($user->can('edit assignments') || $user->can('assignments.edit')) &&
+        return $user->can('assignments.update') &&
             $assignment->organization_id === $user->organization_id;
     }
 
@@ -61,7 +60,7 @@ class AssignmentPolicy
      */
     public function end(User $user, Assignment $assignment): bool
     {
-        return ($user->can('end assignments') || $user->can('assignments.end')) &&
+        return $user->can('assignments.end') &&
             $assignment->organization_id === $user->organization_id;
     }
 
@@ -70,7 +69,7 @@ class AssignmentPolicy
      */
     public function delete(User $user, Assignment $assignment): bool
     {
-        return ($user->can('delete assignments') || $user->can('assignments.delete')) &&
+        return $user->can('assignments.delete') &&
             $assignment->organization_id === $user->organization_id;
     }
 
@@ -79,7 +78,7 @@ class AssignmentPolicy
      */
     public function restore(User $user, Assignment $assignment): bool
     {
-        return ($user->can('restore assignments') || $user->can('assignments.restore')) &&
+        return $user->can('assignments.restore') &&
             $assignment->organization_id === $user->organization_id;
     }
 
@@ -88,7 +87,7 @@ class AssignmentPolicy
      */
     public function forceDelete(User $user, Assignment $assignment): bool
     {
-        return ($user->can('force delete assignments') || $user->can('assignments.force-delete')) &&
+        return $user->can('assignments.force-delete') &&
             $assignment->organization_id === $user->organization_id;
     }
 
@@ -97,8 +96,7 @@ class AssignmentPolicy
      */
     public function export(User $user): bool
     {
-        return $user->can('export assignments') ||
-            $user->can('assignments.export') ||
+        return $user->can('assignments.export') ||
             $user->hasRole(['Super Admin', 'Admin', 'Manager', 'Fleet Manager']);
     }
 
@@ -107,8 +105,7 @@ class AssignmentPolicy
      */
     public function viewGantt(User $user): bool
     {
-        return $user->can('view gantt') ||
-            $user->can('assignments.view-gantt') ||
+        return $user->can('assignments.view-gantt') ||
             $user->hasRole(['Super Admin', 'Admin', 'Manager', 'Fleet Manager']);
     }
 
@@ -117,8 +114,7 @@ class AssignmentPolicy
      */
     public function viewStats(User $user): bool
     {
-        return $user->can('view assignment statistics') ||
-            $user->can('assignments.view-stats') ||
+        return $user->can('assignments.view-stats') ||
             $user->hasRole(['Super Admin', 'Admin', 'Manager']);
     }
 
@@ -128,8 +124,7 @@ class AssignmentPolicy
      */
     public function createBatch(User $user): bool
     {
-        return $user->can('create batch assignments') ||
-            $user->can('assignments.create-batch') ||
+        return $user->can('assignments.create-batch') ||
             $user->hasRole(['Super Admin', 'Admin', 'Fleet Manager']);
     }
 
@@ -138,8 +133,7 @@ class AssignmentPolicy
      */
     public function viewConflicts(User $user): bool
     {
-        return $user->can('view conflicts') ||
-            $user->can('assignments.view-conflicts') ||
+        return $user->can('assignments.view-conflicts') ||
             $user->hasRole(['Super Admin', 'Admin', 'Manager', 'Fleet Manager']);
     }
 

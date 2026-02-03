@@ -27,7 +27,7 @@ class ChangeDriverStatusRequest extends FormRequest
     public function authorize(): bool
     {
         // Vérifier que l'utilisateur a la permission de changer le statut des chauffeurs
-        return $this->user()->can('update-driver-status');
+        return $this->user()->can('drivers.status.update');
     }
 
     /**

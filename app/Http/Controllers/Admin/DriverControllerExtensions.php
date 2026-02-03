@@ -32,7 +32,7 @@ trait DriverControllerExtensions
 
         try {
             // Vérifier les permissions
-            if (!Auth::user()->can('view drivers')) {
+            if (!Auth::user()->can('drivers.view')) {
                 abort(403, 'Non autorisé à exporter les chauffeurs');
             }
 
@@ -56,7 +56,7 @@ trait DriverControllerExtensions
 
         try {
             // Vérifier les permissions
-            if (!Auth::user()->can('view drivers')) {
+            if (!Auth::user()->can('drivers.view')) {
                 abort(403, 'Non autorisé à exporter les chauffeurs');
             }
 
@@ -80,7 +80,7 @@ trait DriverControllerExtensions
 
         try {
             // Vérifier les permissions
-            if (!Auth::user()->can('view drivers')) {
+            if (!Auth::user()->can('drivers.view')) {
                 abort(403, 'Non autorisé à exporter les chauffeurs');
             }
 

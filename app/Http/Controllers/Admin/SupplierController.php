@@ -26,7 +26,7 @@ class SupplierController extends Controller
 
     public function index(Request $request): View
     {
-        $this->authorize('view suppliers');
+        $this->authorize('suppliers.view');
         
         // Filtres avancés
         $filters = $request->only([
@@ -69,7 +69,7 @@ class SupplierController extends Controller
 
     public function create(): View
     {
-        $this->authorize('create suppliers');
+        $this->authorize('suppliers.create');
 
         // La méthode du service retourne déjà un tableau prêt pour la vue.
         $data = $this->supplierService->getDataForCreateForm();
@@ -85,7 +85,7 @@ class SupplierController extends Controller
 
     public function edit(Supplier $supplier): View
     {
-        $this->authorize('edit suppliers');
+        $this->authorize('suppliers.update');
         $data = $this->supplierService->getDataForCreateForm();
         $data['supplier'] = $supplier;
         return view('admin.suppliers.edit', $data);
@@ -99,7 +99,7 @@ class SupplierController extends Controller
 
     public function show(Supplier $supplier): View
     {
-        $this->authorize('view suppliers');
+        $this->authorize('suppliers.view');
         
         // Récupérer les données enrichies du fournisseur
         $supplier->load(['category']);
@@ -109,7 +109,7 @@ class SupplierController extends Controller
 
     public function destroy(Supplier $supplier): RedirectResponse
     {
-        $this->authorize('delete suppliers');
+        $this->authorize('suppliers.delete');
         $this->supplierService->archiveSupplier($supplier);
         return redirect()->route('admin.suppliers.index')->with('success', 'Fournisseur archivé avec succès.');
     }
@@ -119,7 +119,7 @@ class SupplierController extends Controller
      */
     public function export(Request $request)
     {
-        $this->authorize('view suppliers');
+        $this->authorize('suppliers.view');
         
         $filters = $request->only([
             'search', 'supplier_type', 'category_id', 'wilaya', 

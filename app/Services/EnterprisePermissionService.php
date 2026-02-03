@@ -425,4 +425,3 @@ class EnterprisePermissionService
         return $organization->gdpr_compliant ? 'compliant' : 'pending';
     }
 }
-

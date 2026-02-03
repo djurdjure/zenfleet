@@ -24,7 +24,7 @@ class StoreRepairRequestRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return $this->user()->can('create repair requests');
+        return $this->user()->can('repair-requests.create');
     }
 
     /**

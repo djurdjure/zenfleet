@@ -13,7 +13,7 @@ class StoreAssignmentRequest extends FormRequest
     public function authorize(): bool
     {
         // L'utilisateur doit avoir la permission de créer des affectations.
-        return $this->user()->can('create assignments');
+        return $this->user()->can('assignments.create');
     }
 
     /**

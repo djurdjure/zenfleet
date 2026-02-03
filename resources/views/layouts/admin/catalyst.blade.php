@@ -76,7 +76,7 @@
                         </li>
 
                         {{-- Organisations --}}
-                        @can('view organizations')
+                        @can('organizations.view')
                         <li class="flex">
                             <a href="{{ route('admin.organizations.index') }}"
                                 class="flex items-center w-full h-11 px-3.5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 {{ request()->routeIs('admin.organizations.*') ? 'bg-blue-600 text-white shadow-md' : 'text-gray-700 hover:bg-white hover:text-gray-900 hover:shadow-sm' }}">
@@ -87,7 +87,7 @@
                         @endcan
 
                         {{-- Véhicules avec sous-menu --}}
-                        @canany(['view vehicles', 'view assignments'])
+                        @canany(['vehicles.view', 'assignments.view'])
                         <li class="flex flex-col" x-data="{ open: {{ request()->routeIs('admin.vehicles.*', 'admin.assignments.*') ? 'true' : 'false' }} }">
                             <button @click="open = !open"
                                 class="flex items-center w-full h-11 px-3.5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 {{ request()->routeIs('admin.vehicles.*', 'admin.assignments.*') ? 'bg-blue-600 text-white shadow-md' : 'text-gray-700 hover:bg-white hover:text-gray-900 hover:shadow-sm' }}">
@@ -109,14 +109,14 @@
                                         </div>
                                     </div>
                                     <div class="flex-1 min-w-0 space-y-1.5">
-                                        @can('view vehicles')
+                                        @can('vehicles.view')
                                         <a href="{{ route('admin.vehicles.index') }}"
                                             class="flex items-center w-full h-9 px-2.5 py-1.5 rounded-md text-sm font-medium transition-all duration-200 {{ request()->routeIs('admin.vehicles.index') ? 'bg-blue-100 text-blue-700' : 'text-gray-700 hover:bg-white/70 hover:text-gray-900' }}">
                                             <x-iconify icon="mdi:format-list-bulleted" class="w-4 h-4 mr-2.5 {{ request()->routeIs('admin.vehicles.index') ? 'text-blue-600' : 'text-gray-600' }}" />
                                             Gestion Véhicules
                                         </a>
                                         @endcan
-                                        @can('view assignments')
+                                        @can('assignments.view')
                                         <a href="{{ route('admin.assignments.index') }}"
                                             class="flex items-center w-full h-9 px-2.5 py-1.5 rounded-md text-sm font-medium transition-all duration-200 {{ request()->routeIs('admin.assignments.*') ? 'bg-blue-100 text-blue-700' : 'text-gray-700 hover:bg-white/70 hover:text-gray-900' }}">
                                             <x-iconify icon="mdi:clipboard-text" class="w-4 h-4 mr-2.5 {{ request()->routeIs('admin.assignments.*') ? 'text-blue-600' : 'text-gray-600' }}" />
@@ -130,7 +130,7 @@
                         @endcanany
 
                         {{-- Chauffeurs avec sous-menu --}}
-                        @canany(['view drivers', 'view all driver sanctions', 'view team driver sanctions', 'view own driver sanctions'])
+                        @canany(['drivers.view', 'driver-sanctions.view.all', 'driver-sanctions.view.team', 'driver-sanctions.view.own'])
                         <li class="flex flex-col" x-data="{ open: {{ request()->routeIs(['admin.drivers.*', 'admin.sanctions.*']) ? 'true' : 'false' }} }">
                             <button @click="open = !open"
                                 class="flex items-center w-full h-11 px-3.5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 {{ request()->routeIs(['admin.drivers.*', 'admin.sanctions.*']) ? 'bg-blue-600 text-white shadow-md' : 'text-gray-700 hover:bg-white hover:text-gray-900 hover:shadow-sm' }}">
@@ -159,14 +159,14 @@
                                         </div>
                                     </div>
                                     <div class="flex-1 min-w-0 space-y-1">
-                                        @can('view drivers')
+                                        @can('drivers.view')
                                         <a href="{{ route('admin.drivers.index') }}"
                                             class="flex items-center w-full h-9 px-2.5 py-1.5 rounded-md text-sm font-semibold transition-all duration-200 {{ request()->routeIs('admin.drivers.index') ? 'bg-blue-100 text-blue-700' : 'text-gray-700 hover:bg-white/70 hover:text-gray-900' }}">
                                             <x-iconify icon="mdi:view-list" class="w-4 h-4 mr-2.5 {{ request()->routeIs('admin.drivers.index') ? 'text-blue-600' : 'text-gray-600' }}" />
                                             Liste
                                         </a>
                                         @endcan
-                                        @canany(['view all driver sanctions', 'view team driver sanctions', 'view own driver sanctions'])
+                                        @canany(['driver-sanctions.view.all', 'driver-sanctions.view.team', 'driver-sanctions.view.own'])
                                         <a href="{{ route('admin.drivers.sanctions.index') }}"
                                             class="flex items-center w-full h-9 px-2.5 py-1.5 rounded-md text-sm font-semibold transition-all duration-200 {{ request()->routeIs('admin.drivers.sanctions.*') ? 'bg-blue-100 text-blue-700' : 'text-gray-700 hover:bg-white/70 hover:text-gray-900' }}">
                                             <x-iconify icon="mdi:gavel" class="w-4 h-4 mr-2.5 {{ request()->routeIs('admin.drivers.sanctions.*') ? 'text-blue-600' : 'text-gray-600' }}" />
@@ -180,7 +180,7 @@
                         @endcanany
 
                         {{-- Dépôts - ENTERPRISE GRADE --}}
-                        @can('view depots')
+                        @can('depots.view')
                         <li class="flex">
                             <a href="{{ route('admin.depots.index') }}"
                                 class="flex items-center w-full h-11 px-3.5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 {{ request()->routeIs('admin.depots.*') ? 'bg-blue-600 text-white shadow-md' : 'text-gray-700 hover:bg-white hover:text-gray-900 hover:shadow-sm' }}">
@@ -192,7 +192,7 @@
 
                         {{-- Demandes de Réparation - Chauffeurs uniquement (menu séparé) --}}
                         @hasrole('Chauffeur')
-                        @can('view own repair requests')
+                        @can('repair-requests.view.own')
                         <li class="flex">
                             <a href="{{ route('driver.repair-requests.index') }}"
                                 class="flex items-center w-full h-11 px-3.5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 {{ request()->routeIs('driver.repair-requests.*') ? 'bg-blue-600 text-white shadow-md' : 'text-gray-700 hover:bg-white hover:text-gray-900 hover:shadow-sm' }}">
@@ -204,7 +204,7 @@
                         @endhasrole
 
                         {{-- Kilométrage avec sous-menus - Accessible à tous les rôles avec permission --}}
-                        @canany(['view own mileage readings', 'view team mileage readings', 'view all mileage readings'])
+                        @canany(['mileage-readings.view.own', 'mileage-readings.view.team', 'mileage-readings.view.all'])
                         <li class="flex flex-col" x-data="{ open: {{ request()->routeIs('admin.mileage-readings.*', 'driver.mileage.*', 'admin.vehicles.*.mileage-history') ? 'true' : 'false' }} }">
                             <button @click="open = !open"
                                 class="flex items-center w-full h-11 px-3.5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 {{ request()->routeIs('admin.mileage-readings.*', 'driver.mileage.*', 'admin.vehicles.*.mileage-history') ? 'bg-blue-600 text-white shadow-md' : 'text-gray-700 hover:bg-white hover:text-gray-900 hover:shadow-sm' }}">
@@ -240,7 +240,7 @@
                                             </a>
                                         </li>
                                         {{-- Mettre à jour --}}
-                                        @can('create mileage readings')
+                                        @can('mileage-readings.create')
                                         <li>
                                             @php
                                             $mileageUpdateRoute = auth()->user()->hasRole('Chauffeur')
@@ -272,7 +272,7 @@
  @version 2.0 Ultra-Professional
  @since 2025-10-23
  ==================================================================== --}}
-                        @canany(['view maintenance', 'view team repair requests', 'view all repair requests', 'view own repair requests'])
+                        @canany(['maintenance.view', 'repair-requests.view.team', 'repair-requests.view.all', 'repair-requests.view.own'])
                         <li class="flex flex-col" x-data="{ open: {{ request()->routeIs('admin.maintenance.*', 'admin.repair-requests.*') ? 'true' : 'false' }} }">
                             <button @click="open = !open"
                                 class="flex items-center w-full h-11 px-3.5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 {{ request()->routeIs('admin.maintenance.*', 'admin.repair-requests.*') ? 'bg-blue-600 text-white shadow-md' : 'text-gray-700 hover:bg-white hover:text-gray-900 hover:shadow-sm' }}">
@@ -359,7 +359,7 @@
                                         </a>
 
                                         {{-- Demandes de Réparation --}}
-                                        @canany(['view team repair requests', 'view all repair requests'])
+                                        @canany(['repair-requests.view.team', 'repair-requests.view.all'])
                                         <a href="{{ route('admin.repair-requests.index') }}"
                                             class="flex items-center w-full h-9 px-2.5 py-1.5 rounded-md text-sm font-medium transition-all duration-200 {{ request()->routeIs('admin.repair-requests.*') ? 'bg-blue-100 text-blue-700' : 'text-gray-700 hover:bg-white/70 hover:text-gray-900' }}">
                                             <x-iconify icon="lucide:hammer" class="w-4 h-4 mr-2.5 {{ request()->routeIs('admin.repair-requests.*') ? 'text-blue-600' : 'text-gray-600' }}" />
@@ -373,7 +373,7 @@
                         @endcanany
 
                         {{-- Alertes --}}
-                        @can('view alerts')
+                        @can('alerts.view')
                         <li class="flex">
                             <a href="{{ route('admin.alerts.index') }}"
                                 class="flex items-center w-full h-11 px-3.5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 {{ request()->routeIs('admin.alerts.*') ? 'bg-blue-600 text-white shadow-md' : 'text-gray-700 hover:bg-white hover:text-gray-900 hover:shadow-sm' }}">
@@ -384,7 +384,7 @@
                         @endcan
 
                         {{-- Documents --}}
-                        @can('view documents')
+                        @can('documents.view')
                         <li class="flex">
                             <a href="{{ route('admin.documents.index') }}"
                                 class="flex items-center w-full h-11 px-3.5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 {{ request()->routeIs('admin.documents.*') ? 'bg-blue-600 text-white shadow-md' : 'text-gray-700 hover:bg-white hover:text-gray-900 hover:shadow-sm' }}">
@@ -395,7 +395,7 @@
                         @endcan
 
                         {{-- Fournisseurs --}}
-                        @can('view suppliers')
+                        @can('suppliers.view')
                         <li class="flex">
                             <a href="{{ route('admin.suppliers.index') }}"
                                 class="flex items-center w-full h-11 px-3.5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 {{ request()->routeIs('admin.suppliers.*') ? 'bg-blue-600 text-white shadow-md' : 'text-gray-700 hover:bg-white hover:text-gray-900 hover:shadow-sm' }}">
@@ -416,7 +416,7 @@
  @version 1.0 Enterprise Ultra-Pro
  @since 2025-10-27
  ==================================================================== --}}
-                        @canany(['view expenses', 'create expenses', 'approve expenses'])
+                        @canany(['expenses.view', 'expenses.create', 'expenses.approve'])
                         <li class="flex flex-col" x-data="{ open: {{ request()->routeIs('admin.vehicle-expenses.*') ? 'true' : 'false' }} }">
                             <button @click="open = !open"
                                 class="flex items-center w-full h-11 px-3.5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 {{ request()->routeIs('admin.vehicle-expenses.*') ? 'bg-blue-600 text-white shadow-md' : 'text-gray-700 hover:bg-white hover:text-gray-900 hover:shadow-sm' }}">
@@ -486,7 +486,7 @@
                                         </a>
 
                                         {{-- Nouvelle dépense --}}
-                                        @can('create expenses')
+                                        @can('expenses.create')
                                         <a href="{{ route('admin.vehicle-expenses.create') }}"
                                             class="flex items-center w-full h-9 px-2.5 py-1.5 rounded-md text-sm font-medium transition-all duration-200 {{ request()->routeIs('admin.vehicle-expenses.create') ? 'bg-blue-100 text-blue-700' : 'text-gray-700 hover:bg-white/70 hover:text-gray-900' }}">
                                             <x-iconify icon="lucide:plus-circle" class="w-4 h-4 mr-2.5 {{ request()->routeIs('admin.vehicle-expenses.create') ? 'text-blue-600' : 'text-gray-600' }}" />
@@ -495,7 +495,7 @@
                                         @endcan
 
                                         {{-- Analytics --}}
-                                        @can('view expense analytics')
+                                        @can('expenses.analytics.view')
                                         <a href="{{ route('admin.vehicle-expenses.dashboard') }}"
                                             class="flex items-center w-full h-9 px-2.5 py-1.5 rounded-md text-sm font-medium transition-all duration-200 {{ request()->routeIs('admin.vehicle-expenses.dashboard') ? 'bg-blue-100 text-blue-700' : 'text-gray-700 hover:bg-white/70 hover:text-gray-900' }}">
                                             <x-iconify icon="lucide:chart-line" class="w-4 h-4 mr-2.5 {{ request()->routeIs('admin.vehicle-expenses.dashboard') ? 'text-blue-600' : 'text-gray-600' }}" />
@@ -504,7 +504,7 @@
                                         @endcan
 
                                         {{-- En attente d'approbation --}}
-                                        @can('approve expenses')
+                                        @can('expenses.approve')
                                         <a href="{{ route('admin.vehicle-expenses.index') }}?filter=pending_approval"
                                             class="flex items-center w-full h-9 px-2.5 py-1.5 rounded-md text-sm font-medium transition-all duration-200 {{ request()->get('filter') == 'pending_approval' ? 'bg-blue-100 text-blue-700' : 'text-gray-700 hover:bg-white/70 hover:text-gray-900' }}">
                                             <x-iconify icon="lucide:clock" class="w-4 h-4 mr-2.5 {{ request()->get('filter') == 'pending_approval' ? 'text-blue-600' : 'text-gray-600' }}" />
@@ -523,7 +523,7 @@
                                         </a>
 
                                         {{-- Export --}}
-                                        @can('export expenses')
+                                        @can('expenses.export')
                                         <a href="{{ route('admin.vehicle-expenses.export') }}"
                                             class="flex items-center w-full h-9 px-2.5 py-1.5 rounded-md text-sm font-medium transition-all duration-200 {{ request()->routeIs('admin.vehicle-expenses.export') ? 'bg-blue-100 text-blue-700' : 'text-gray-700 hover:bg-white/70 hover:text-gray-900' }}">
                                             <x-iconify icon="lucide:download" class="w-4 h-4 mr-2.5 {{ request()->routeIs('admin.vehicle-expenses.export') ? 'text-blue-600' : 'text-gray-600' }}" />
@@ -532,7 +532,7 @@
                                         @endcan
 
                                         {{-- TCO & Rapports --}}
-                                        @can('view expense analytics')
+                                        @can('expenses.analytics.view')
                                         <a href="{{ route('admin.vehicle-expenses.analytics.cost-trends') }}"
                                             class="flex items-center w-full h-9 px-2.5 py-1.5 rounded-md text-sm font-medium transition-all duration-200 {{ request()->routeIs('admin.vehicle-expenses.analytics.cost-trends') ? 'bg-blue-100 text-blue-700' : 'text-gray-700 hover:bg-white/70 hover:text-gray-900' }}">
                                             <x-iconify icon="lucide:trending-up" class="w-4 h-4 mr-2.5 {{ request()->routeIs('admin.vehicle-expenses.analytics.cost-trends') ? 'text-blue-600' : 'text-gray-600' }}" />
@@ -546,7 +546,7 @@
                         @endcanany
 
                         {{-- Rapports --}}
-                        @can('view analytics')
+                        @can('analytics.view')
                         <li class="flex">
                             <a href="{{ route('admin.reports.index') }}"
                                 class="flex items-center w-full h-11 px-3.5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 {{ request()->routeIs('admin.reports.*') ? 'bg-blue-600 text-white shadow-md' : 'text-gray-700 hover:bg-white hover:text-gray-900 hover:shadow-sm' }}">
@@ -557,7 +557,7 @@
                         @endcan
 
                         {{-- Administration avec sous-menu --}}
-                        @canany(['view users', 'view roles', 'view audit logs'])
+                        @canany(['users.view', 'roles.view', 'audit-logs.view'])
                         <li class="flex flex-col" x-data="{ open: {{ request()->routeIs('admin.users.*', 'admin.roles.*', 'admin.audit.*') ? 'true' : 'false' }} }">
                             <button @click="open = !open"
                                 class="flex items-center w-full h-11 px-3.5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 {{ request()->routeIs('admin.users.*', 'admin.roles.*', 'admin.audit.*') ? 'bg-blue-600 text-white shadow-md' : 'text-gray-700 hover:bg-white hover:text-gray-900 hover:shadow-sm' }}">
@@ -586,21 +586,21 @@
                                         </div>
                                     </div>
                                     <div class="flex-1 min-w-0 space-y-1">
-                                        @can('view users')
+                                        @can('users.view')
                                         <a href="{{ route('admin.users.index') }}"
                                             class="flex items-center w-full h-9 px-2.5 py-1.5 rounded-md text-sm font-semibold transition-all duration-200 {{ request()->routeIs('admin.users.*') ? 'bg-blue-100 text-blue-700' : 'text-gray-700 hover:bg-white/70 hover:text-gray-900' }}">
                                             <x-iconify icon="mdi:account-multiple" class="w-4 h-4 mr-2.5 {{ request()->routeIs('admin.users.*') ? 'text-blue-600' : 'text-gray-600' }}" />
                                             Utilisateurs
                                         </a>
                                         @endcan
-                                        @can('view roles')
+                                        @can('roles.view')
                                         <a href="{{ route('admin.roles.index') }}"
                                             class="flex items-center w-full h-9 px-2.5 py-1.5 rounded-md text-sm font-semibold transition-all duration-200 {{ request()->routeIs('admin.roles.*') ? 'bg-blue-100 text-blue-700' : 'text-gray-700 hover:bg-white/70 hover:text-gray-900' }}">
                                             <x-iconify icon="mdi:shield-check" class="w-4 h-4 mr-2.5 {{ request()->routeIs('admin.roles.*') ? 'text-blue-600' : 'text-gray-600' }}" />
                                             Rôles & Permissions
                                         </a>
                                         @endcan
-                                        @can('view audit logs')
+                                        @can('audit-logs.view')
                                         @hasrole('Super Admin')
                                         <a href="{{ route('admin.audit.index') }}"
                                             class="flex items-center w-full h-9 px-2.5 py-1.5 rounded-md text-sm font-semibold transition-all duration-200 {{ request()->routeIs('admin.audit.*') ? 'bg-blue-100 text-blue-700' : 'text-gray-700 hover:bg-white/70 hover:text-gray-900' }}">

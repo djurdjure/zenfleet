@@ -676,7 +676,7 @@
                 <x-iconify icon="lucide:printer" class="w-4 h-4" />
                 Imprimer
             </button>
-            @can('edit vehicles')
+            @can('vehicles.update')
             <a href="{{ route('admin.vehicles.edit', $vehicle) }}" class="btn btn-secondary">
                 <x-iconify icon="lucide:edit" class="w-4 h-4" />
                 Modifier

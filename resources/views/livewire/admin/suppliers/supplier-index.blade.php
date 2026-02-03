@@ -134,7 +134,7 @@
                     class="inline-flex items-center gap-2 p-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-all duration-200 shadow-sm hover:shadow-md">
                     <x-iconify icon="lucide:download" class="w-5 h-5 text-gray-500" />
                 </a>
-                @can('create suppliers')
+                @can('suppliers.create')
                 <a href="{{ route('admin.suppliers.create') }}"
                     title="Nouveau Fournisseur"
                     class="inline-flex items-center gap-2 p-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all duration-200 shadow-sm hover:shadow-md">
@@ -317,21 +317,21 @@
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-right">
                                 <div class="flex items-center justify-end gap-2">
-                                    @can('view suppliers')
+                                    @can('suppliers.view')
                                     <a href="{{ route('admin.suppliers.show', $supplier) }}"
                                         class="p-2 rounded-full bg-gray-50 text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition-all duration-200 group"
                                         title="Voir">
                                         <x-iconify icon="lucide:eye" class="w-4 h-4 group-hover:scale-110 transition-transform" />
                                     </a>
                                     @endcan
-                                    @can('edit suppliers')
+                                    @can('suppliers.update')
                                     <a href="{{ route('admin.suppliers.edit', $supplier) }}"
                                         class="p-2 rounded-full bg-gray-50 text-gray-400 hover:text-amber-600 hover:bg-amber-50 transition-all duration-200 group"
                                         title="Modifier">
                                         <x-iconify icon="lucide:edit-3" class="w-4 h-4 group-hover:scale-110 transition-transform" />
                                     </a>
                                     @endcan
-                                    @can('delete suppliers')
+                                    @can('suppliers.delete')
                                     <form action="{{ route('admin.suppliers.destroy', $supplier) }}"
                                         method="POST"
                                         class="inline"
@@ -363,7 +363,7 @@
                                         Commencez par ajouter un fournisseur.
                                         @endif
                                     </p>
-                                    @can('create suppliers')
+                                    @can('suppliers.create')
                                     <a href="{{ route('admin.suppliers.create') }}"
                                         class="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-semibold">
                                         <x-iconify icon="lucide:plus" class="w-4 h-4" />

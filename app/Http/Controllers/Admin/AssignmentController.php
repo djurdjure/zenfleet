@@ -39,7 +39,7 @@ class AssignmentController extends Controller
                         'user' => $request->user()->email,
                         'method' => $request->method(),
                         'path' => $request->path(),
-                        'can_create' => $request->user()->can('create assignments'),
+                        'can_create' => $request->user()->can('assignments.create'),
                         'all_permissions' => $request->user()->getAllPermissions()->pluck('name')
                     ]);
                 }
@@ -53,7 +53,7 @@ class AssignmentController extends Controller
      */
     public function index(Request $request): View
     {
-        $this->authorize('view assignments');
+        $this->authorize('assignments.view');
 
         // Construction de la requête avec filtres
         $query = Assignment::with(['vehicle' => function ($query) {
@@ -292,7 +292,7 @@ class AssignmentController extends Controller
      */
     public function show(Assignment $assignment): View
     {
-        $this->authorize('view assignments');
+        $this->authorize('assignments.view');
         $assignment->load(['vehicle', 'driver', 'creator', 'handoverForm']);
 
         return view('admin.assignments.show', compact('assignment'));
@@ -303,7 +303,7 @@ class AssignmentController extends Controller
      */
     public function edit(Assignment $assignment): View
     {
-        $this->authorize('edit assignments');
+        $this->authorize('assignments.update');
         $assignment->load(['vehicle', 'driver']);
 
         return view('admin.assignments.edit', compact('assignment'));
@@ -619,7 +619,7 @@ class AssignmentController extends Controller
      */
     public function gantt(): View
     {
-        $this->authorize('view assignments');
+        $this->authorize('assignments.view');
 
         return view('admin.assignments.gantt', [
             'title' => 'Planning Gantt des Affectations',
@@ -636,7 +636,7 @@ class AssignmentController extends Controller
      */
     public function export(Request $request): JsonResponse|\Symfony\Component\HttpFoundation\StreamedResponse
     {
-        $this->authorize('view assignments');
+        $this->authorize('assignments.view');
 
         $format = $request->input('format', 'csv');
         $filters = $request->only(['status', 'vehicle_id', 'driver_id', 'date_from', 'date_to']);
@@ -679,7 +679,7 @@ class AssignmentController extends Controller
      */
     public function stats(Request $request): JsonResponse
     {
-        $this->authorize('view assignment statistics');
+        $this->authorize('assignments.view-stats');
 
         $organizationId = auth()->user()->organization_id;
 
@@ -791,7 +791,7 @@ class AssignmentController extends Controller
      */
     public function availableVehicles(Request $request): JsonResponse
     {
-        $this->authorize('view assignments');
+        $this->authorize('assignments.view');
 
         $vehicles = Vehicle::where('organization_id', auth()->user()->organization_id)
             ->where('status', 'active')
@@ -812,7 +812,7 @@ class AssignmentController extends Controller
      */
     public function availableDrivers(Request $request): JsonResponse
     {
-        $this->authorize('view assignments');
+        $this->authorize('assignments.view');
 
         $drivers = Driver::where('organization_id', auth()->user()->organization_id)
             ->whereHas('driverStatus', function ($statusQuery) {

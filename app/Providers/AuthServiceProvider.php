@@ -14,6 +14,7 @@ use App\Models\Assignment;
 use App\Models\RepairRequest;
 use App\Models\VehicleMileageReading;
 use App\Models\MaintenanceOperation;
+use App\Support\PermissionAliases;
 use App\Policies\DocumentPolicy;
 use App\Policies\DocumentCategoryPolicy;
 use App\Policies\UserPolicy;
@@ -88,6 +89,22 @@ class AuthServiceProvider extends ServiceProvider
             }
             
             return null; // Continuer avec les policies normales
+        });
+
+        // ✅ Dual-read permissions: allow legacy + canonical names during RBAC migration
+        Gate::before(function (User $user, string $ability) {
+            if (!PermissionAliases::isRelevant($ability)) {
+                return null;
+            }
+
+            $permissionNames = $user->getAllPermissions()->pluck('name');
+            foreach (PermissionAliases::resolve($ability) as $permission) {
+                if ($permissionNames->contains($permission)) {
+                    return true;
+                }
+            }
+
+            return null;
         });
 
         // 🛡️ GATES PERSONNALISÉS DE SÉCURITÉ

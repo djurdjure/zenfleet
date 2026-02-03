@@ -90,7 +90,7 @@
                         </div>
                     </div>
 
-                    @can('upload signed handovers')
+                    @can('handovers.signed.upload')
                     <div x-data="{ showUpload: false }">
                         <button @click="showUpload = !showUpload" class="text-sm text-gray-600 hover:text-gray-900 underline">
                             Remplacer le fichier
@@ -112,7 +112,7 @@
                 </div>
             </div>
             @else
-            @can('upload signed handovers')
+            @can('handovers.signed.upload')
             <div class="bg-white p-6 rounded-md border border-dashed border-gray-300 text-center">
                 <x-iconify icon="lucide:upload-cloud" class="w-12 h-12 text-gray-400 mx-auto mb-3" />
                 <p class="text-gray-600 mb-4">Aucune fiche signée n'a été téléversée pour le moment.</p>

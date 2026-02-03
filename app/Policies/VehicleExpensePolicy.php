@@ -24,14 +24,14 @@ class VehicleExpensePolicy
     use HandlesAuthorization;
 
     /**
-     * Determine whether the user can view any expenses.
+     * Determine whether the user can expenses.view.any.
      * 
      * @param  \App\Models\User  $user
      * @return bool
      */
     public function viewAny(User $user): bool
     {
-        return $user->can('view expenses') || $user->can('view any expenses');
+        return $user->can('expenses.view') || $user->can('expenses.view.any');
     }
 
     /**
@@ -49,7 +49,7 @@ class VehicleExpensePolicy
         }
 
         // Vérifier la permission générale
-        if (!$user->can('view expense')) {
+        if (!$user->can('expenses.view')) {
             return false;
         }
 
@@ -59,7 +59,7 @@ class VehicleExpensePolicy
         }
 
         // Permission spéciale pour voir toutes les dépenses de l'organisation
-        if ($user->can('view all organization expenses')) {
+        if ($user->can('expenses.view.all')) {
             return true;
         }
 
@@ -81,14 +81,14 @@ class VehicleExpensePolicy
     }
 
     /**
-     * Determine whether the user can create expenses.
+     * Determine whether the user can expenses.create.
      * 
      * @param  \App\Models\User  $user
      * @return bool
      */
     public function create(User $user): bool
     {
-        return $user->can('create expenses');
+        return $user->can('expenses.create');
     }
 
     /**
@@ -101,7 +101,7 @@ class VehicleExpensePolicy
     public function update(User $user, VehicleExpense $expense): bool
     {
         // Vérifier la permission de base
-        if (!$user->can('edit expenses') && !$user->can('update expenses')) {
+        if (!$user->can('expenses.update')) {
             return false;
         }
 
@@ -113,7 +113,7 @@ class VehicleExpensePolicy
         // Super Admin et Admin peuvent tout modifier
         if ($user->hasAnyRole(['Super Admin', 'Admin', 'Finance'])) {
             // Vérifier si la dépense est approuvée
-            if ($expense->approval_status === 'approved' && !$user->can('edit approved expenses')) {
+            if ($expense->approval_status === 'approved' && !$user->can('expenses.update.approved')) {
                 return false;
             }
             return true;
@@ -121,7 +121,7 @@ class VehicleExpensePolicy
 
         // Les dépenses approuvées ne peuvent pas être modifiées sauf permission spéciale
         if ($expense->approval_status === 'approved') {
-            return $user->can('edit approved expenses');
+            return $user->can('expenses.update.approved');
         }
 
         // Les dépenses payées ne peuvent jamais être modifiées
@@ -154,7 +154,7 @@ class VehicleExpensePolicy
     public function delete(User $user, VehicleExpense $expense): bool
     {
         // Vérifier la permission de base
-        if (!$user->can('delete expenses')) {
+        if (!$user->can('expenses.delete')) {
             return false;
         }
 
@@ -165,7 +165,7 @@ class VehicleExpensePolicy
 
         // Les dépenses approuvées ne peuvent être supprimées qu'avec permission spéciale
         if ($expense->approval_status === 'approved') {
-            return $user->can('delete approved expenses');
+            return $user->can('expenses.delete.approved');
         }
 
         // Les dépenses payées ne peuvent jamais être supprimées
@@ -196,7 +196,7 @@ class VehicleExpensePolicy
     public function restore(User $user, VehicleExpense $expense): bool
     {
         // Vérifier la permission
-        if (!$user->can('restore expenses')) {
+        if (!$user->can('expenses.restore')) {
             return false;
         }
 
@@ -223,7 +223,7 @@ class VehicleExpensePolicy
         }
 
         // Vérifier la permission
-        if (!$user->can('force delete expenses')) {
+        if (!$user->can('expenses.force-delete')) {
             return false;
         }
 
@@ -252,24 +252,24 @@ class VehicleExpensePolicy
         // Ne peut pas approuver ses propres dépenses
         if ($expense->recorded_by === $user->id || $expense->requester_id === $user->id) {
             // Sauf si permission spéciale
-            if (!$user->can('bypass expense approval')) {
+            if (!$user->can('expenses.approval.bypass')) {
                 return false;
             }
         }
 
         // Vérifier le niveau d'approbation requis
         if ($expense->approval_status === 'pending_level1') {
-            return $user->can('approve expenses level1') || 
-                   $user->can('approve expenses');
+            return $user->can('expenses.approve.level1') || 
+                   $user->can('expenses.approve');
         }
 
         if ($expense->approval_status === 'pending_level2') {
-            return $user->can('approve expenses level2') || 
-                   $user->can('approve expenses');
+            return $user->can('expenses.approve.level2') || 
+                   $user->can('expenses.approve');
         }
 
         // Permission générale d'approbation
-        return $user->can('approve expenses');
+        return $user->can('expenses.approve');
     }
 
     /**
@@ -287,7 +287,7 @@ class VehicleExpensePolicy
         }
 
         // Vérifier la permission
-        if (!$user->can('reject expenses')) {
+        if (!$user->can('expenses.reject')) {
             return false;
         }
 
@@ -315,7 +315,7 @@ class VehicleExpensePolicy
         }
 
         // Vérifier la permission
-        if (!$user->can('mark expenses as paid')) {
+        if (!$user->can('expenses.mark-paid')) {
             return false;
         }
 
@@ -329,69 +329,69 @@ class VehicleExpensePolicy
     }
 
     /**
-     * Determine whether the user can export expenses.
+     * Determine whether the user can expenses.export.
      * 
      * @param  \App\Models\User  $user
      * @return bool
      */
     public function export(User $user): bool
     {
-        return $user->can('export expenses');
+        return $user->can('expenses.export');
     }
 
     /**
-     * Determine whether the user can import expenses.
+     * Determine whether the user can expenses.import.
      * 
      * @param  \App\Models\User  $user
      * @return bool
      */
     public function import(User $user): bool
     {
-        return $user->can('import expenses');
+        return $user->can('expenses.import');
     }
 
     /**
-     * Determine whether the user can view analytics.
+     * Determine whether the user can analytics.view.
      * 
      * @param  \App\Models\User  $user
      * @return bool
      */
     public function viewAnalytics(User $user): bool
     {
-        return $user->can('view expense analytics') || 
-               $user->can('view expense dashboard');
+        return $user->can('expenses.analytics.view') || 
+               $user->can('expenses.dashboard.view');
     }
 
     /**
-     * Determine whether the user can manage expense groups.
+     * Determine whether the user can expenses.groups.manage.
      * 
      * @param  \App\Models\User  $user
      * @return bool
      */
     public function manageGroups(User $user): bool
     {
-        return $user->can('manage expense groups');
+        return $user->can('expenses.groups.manage');
     }
 
     /**
-     * Determine whether the user can manage expense budgets.
+     * Determine whether the user can expenses.budgets.manage.
      * 
      * @param  \App\Models\User  $user
      * @return bool
      */
     public function manageBudgets(User $user): bool
     {
-        return $user->can('manage expense budgets');
+        return $user->can('expenses.budgets.manage');
     }
 
     /**
-     * Determine whether the user can view audit logs.
+     * Determine whether the user can audit-logs.view.
      * 
      * @param  \App\Models\User  $user
      * @return bool
      */
     public function viewAuditLogs(User $user): bool
     {
-        return $user->can('view expense audit logs');
+        return $user->can('expenses.audit.view');
     }
 }

@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Collection;
+use App\Support\PermissionAliases;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
@@ -26,33 +28,33 @@ class EnterprisePermissionMiddleware
     /**
      * Mapping des routes vers les permissions requises
      *
-     * ⚠️ IMPORTANT: Utilise le format Spatie avec ESPACES (ex: 'view vehicles')
-     * Les permissions Spatie sont définies avec des espaces, pas des underscores
+     * ⚠️ IMPORTANT: Utilise la notation canonique "resource.action"
+     * Exemple: "vehicles.view", "drivers.create"
      */
     private array $routePermissionMap = [
         // Véhicules
-        'admin.vehicles.index' => 'view vehicles',
-        'admin.vehicles.create' => 'create vehicles',
-        'admin.vehicles.store' => 'create vehicles',
-        'admin.vehicles.show' => 'view vehicles',
-        'admin.vehicles.edit' => 'edit vehicles',
-        'admin.vehicles.update' => 'edit vehicles',
-        'admin.vehicles.destroy' => 'delete vehicles',
-        'admin.vehicles.restore' => 'restore vehicles',
-        'admin.vehicles.export' => 'view vehicles', // Basé sur view
-        'admin.vehicles.import.*' => 'create vehicles', // Basé sur create
+        'admin.vehicles.index' => 'vehicles.view',
+        'admin.vehicles.create' => 'vehicles.create',
+        'admin.vehicles.store' => 'vehicles.create',
+        'admin.vehicles.show' => 'vehicles.view',
+        'admin.vehicles.edit' => 'vehicles.update',
+        'admin.vehicles.update' => 'vehicles.update',
+        'admin.vehicles.destroy' => 'vehicles.delete',
+        'admin.vehicles.restore' => 'vehicles.restore',
+        'admin.vehicles.export' => 'vehicles.export',
+        'admin.vehicles.import.*' => 'vehicles.import',
 
         // Chauffeurs
-        'admin.drivers.index' => 'view drivers',
-        'admin.drivers.create' => 'create drivers',
-        'admin.drivers.store' => 'create drivers',
-        'admin.drivers.show' => 'view drivers',
-        'admin.drivers.edit' => 'edit drivers',
-        'admin.drivers.update' => 'edit drivers',
-        'admin.drivers.destroy' => 'delete drivers',
-        'admin.drivers.restore' => 'restore drivers',
-        'admin.drivers.export' => 'view drivers', // Basé sur view
-        'admin.drivers.import.*' => 'create drivers', // Basé sur create
+        'admin.drivers.index' => 'drivers.view',
+        'admin.drivers.create' => 'drivers.create',
+        'admin.drivers.store' => 'drivers.create',
+        'admin.drivers.show' => 'drivers.view',
+        'admin.drivers.edit' => 'drivers.update',
+        'admin.drivers.update' => 'drivers.update',
+        'admin.drivers.destroy' => 'drivers.delete',
+        'admin.drivers.restore' => 'drivers.restore',
+        'admin.drivers.export' => 'drivers.export',
+        'admin.drivers.import.*' => 'drivers.import',
 
         // Affectations - FORMAT MODERNE (dot notation)
         'admin.assignments.index' => 'assignments.view',
@@ -61,117 +63,101 @@ class EnterprisePermissionMiddleware
         'admin.assignments.show' => 'assignments.view',
         'admin.assignments.edit' => 'assignments.update',
         'admin.assignments.update' => 'assignments.update',
-        'admin.assignments.destroy' => 'assignments.view', // Pas de delete assignment
+        'admin.assignments.destroy' => 'assignments.delete',
         'admin.assignments.end' => 'assignments.end',
-        'admin.assignments.export' => 'assignments.view',
+        'admin.assignments.export' => 'assignments.export',
 
         // Utilisateurs
-        'admin.users.index' => 'view users',
-        'admin.users.create' => 'create users',
-        'admin.users.store' => 'create users',
-        'admin.users.show' => 'view users',
-        'admin.users.edit' => 'edit users',
-        'admin.users.update' => 'edit users',
-        'admin.users.destroy' => 'delete users',
-        'admin.users.export' => 'view users',
+        'admin.users.index' => 'users.view',
+        'admin.users.create' => 'users.create',
+        'admin.users.store' => 'users.create',
+        'admin.users.show' => 'users.view',
+        'admin.users.edit' => 'users.update',
+        'admin.users.update' => 'users.update',
+        'admin.users.destroy' => 'users.delete',
+        'admin.users.export' => 'users.export',
 
         // Rôles et Permissions
-        'admin.roles.index' => 'manage roles',
-        'admin.roles.show' => 'manage roles',
-        'admin.roles.edit' => 'manage roles',
-        'admin.roles.update' => 'manage roles',
-        'admin.permissions.index' => 'manage roles',
+        'admin.roles.index' => 'roles.manage',
+        'admin.roles.show' => 'roles.manage',
+        'admin.roles.edit' => 'roles.manage',
+        'admin.roles.update' => 'roles.manage',
+        'admin.permissions.index' => 'permissions.manage',
 
         // Documents
-        'admin.documents.index' => 'view documents',
-        'admin.documents.create' => 'create documents',
-        'admin.documents.store' => 'create documents',
-        'admin.documents.show' => 'view documents',
-        'admin.documents.edit' => 'edit documents',
-        'admin.documents.update' => 'edit documents',
-        'admin.documents.destroy' => 'delete documents',
+        'admin.documents.index' => 'documents.view',
+        'admin.documents.create' => 'documents.create',
+        'admin.documents.store' => 'documents.create',
+        'admin.documents.show' => 'documents.view',
+        'admin.documents.edit' => 'documents.update',
+        'admin.documents.update' => 'documents.update',
+        'admin.documents.destroy' => 'documents.delete',
 
         // Fournisseurs
-        'admin.suppliers.index' => 'view suppliers',
-        'admin.suppliers.create' => 'create suppliers',
-        'admin.suppliers.store' => 'create suppliers',
-        'admin.suppliers.show' => 'view suppliers',
-        'admin.suppliers.edit' => 'edit suppliers',
-        'admin.suppliers.update' => 'edit suppliers',
-        'admin.suppliers.destroy' => 'delete suppliers',
+        'admin.suppliers.index' => 'suppliers.view',
+        'admin.suppliers.create' => 'suppliers.create',
+        'admin.suppliers.store' => 'suppliers.create',
+        'admin.suppliers.show' => 'suppliers.view',
+        'admin.suppliers.edit' => 'suppliers.update',
+        'admin.suppliers.update' => 'suppliers.update',
+        'admin.suppliers.destroy' => 'suppliers.delete',
 
         // Maintenance
-        'admin.maintenance.*' => 'view maintenance',
-        'admin.maintenance.create' => 'manage maintenance plans',
-        'admin.maintenance.store' => 'manage maintenance plans',
-        'admin.maintenance.edit' => 'manage maintenance plans',
-        'admin.maintenance.update' => 'manage maintenance plans',
-        'admin.maintenance.destroy' => 'manage maintenance plans',
+        'admin.maintenance.*' => 'maintenance.view',
+        'admin.maintenance.create' => 'maintenance.plans.manage',
+        'admin.maintenance.store' => 'maintenance.plans.manage',
+        'admin.maintenance.edit' => 'maintenance.plans.manage',
+        'admin.maintenance.update' => 'maintenance.plans.manage',
+        'admin.maintenance.destroy' => 'maintenance.plans.manage',
 
         // Demandes de Réparation
-        'admin.repair-requests.index' => 'view own repair requests', // Minimum permission
-        'admin.repair-requests.create' => 'create repair requests',
-        'admin.repair-requests.store' => 'create repair requests',
-        'admin.repair-requests.show' => 'view own repair requests',
-        'admin.repair-requests.edit' => 'update own repair requests',
-        'admin.repair-requests.update' => 'update own repair requests',
-        'admin.repair-requests.destroy' => 'delete repair requests',
-        'admin.repair-requests.approve-level-one' => 'approve repair requests level 1',
-        'admin.repair-requests.reject-level-one' => 'approve repair requests level 1',
-        'admin.repair-requests.approve-level-two' => 'approve repair requests level 2',
-        'admin.repair-requests.reject-level-two' => 'approve repair requests level 2',
+        'admin.repair-requests.index' => 'repair-requests.view.own', // Minimum permission
+        'admin.repair-requests.create' => 'repair-requests.create',
+        'admin.repair-requests.store' => 'repair-requests.create',
+        'admin.repair-requests.show' => 'repair-requests.view.own',
+        'admin.repair-requests.edit' => 'repair-requests.update.own',
+        'admin.repair-requests.update' => 'repair-requests.update.own',
+        'admin.repair-requests.destroy' => 'repair-requests.delete',
+        'admin.repair-requests.approve-level-one' => 'repair-requests.approve.level1',
+        'admin.repair-requests.reject-level-one' => 'repair-requests.reject.level1',
+        'admin.repair-requests.approve-level-two' => 'repair-requests.approve.level2',
+        'admin.repair-requests.reject-level-two' => 'repair-requests.reject.level2',
 
         // Relevés Kilométriques
-        'admin.mileage-readings.index' => 'view own mileage readings', // Minimum permission
-        'admin.mileage-readings.create' => 'create mileage readings',
-        'admin.mileage-readings.store' => 'create mileage readings',
-        'admin.mileage-readings.show' => 'view own mileage readings',
-        'admin.mileage-readings.edit' => 'edit mileage readings',
-        'admin.mileage-readings.update' => 'edit mileage readings', // Corrigé: edit au lieu de update
-        'admin.mileage-readings.destroy' => 'delete mileage readings',
-        'admin.mileage-readings.export' => 'export mileage readings',
-        'admin.mileage-readings.statistics' => 'view all mileage readings', // Corrigé: view all au lieu de view statistics
+        'admin.mileage-readings.index' => 'mileage-readings.view.own', // Minimum permission
+        'admin.mileage-readings.create' => 'mileage-readings.create',
+        'admin.mileage-readings.store' => 'mileage-readings.create',
+        'admin.mileage-readings.show' => 'mileage-readings.view.own',
+        'admin.mileage-readings.edit' => 'mileage-readings.update.own',
+        'admin.mileage-readings.update' => 'mileage-readings.update.own',
+        'admin.mileage-readings.destroy' => 'mileage-readings.delete',
+        'admin.mileage-readings.export' => 'mileage-readings.export',
+        'admin.mileage-readings.statistics' => 'mileage-readings.view.statistics',
 
         // Organisations (Super Admin seulement)
-        'admin.organizations.*' => 'view organizations',
-        'admin.organizations.create' => 'create organizations',
-        'admin.organizations.store' => 'create organizations',
-        'admin.organizations.edit' => 'edit organizations',
-        'admin.organizations.update' => 'edit organizations',
-        'admin.organizations.destroy' => 'delete organizations',
+        'admin.organizations.*' => 'organizations.view',
+        'admin.organizations.create' => 'organizations.create',
+        'admin.organizations.store' => 'organizations.create',
+        'admin.organizations.edit' => 'organizations.update',
+        'admin.organizations.update' => 'organizations.update',
+        'admin.organizations.destroy' => 'organizations.delete',
 
         // Dépôts - GESTION
-        'admin.depots.index' => 'view depots', // ou 'view vehicles' si permission manquante
-        'admin.depots.show' => 'view depots',
-        'admin.depots.create' => 'create depots', // ou 'create vehicles'
-        'admin.depots.store' => 'create depots',
-        'admin.depots.edit' => 'edit depots', // ou 'edit vehicles'
-        'admin.depots.update' => 'edit depots',
-        'admin.depots.destroy' => 'delete depots', // ou 'delete vehicles'
-        'admin.depots.export.pdf' => 'view depots',
-        'admin.depots.restore' => 'restore depots',
+        'admin.depots.index' => 'depots.view',
+        'admin.depots.show' => 'depots.view',
+        'admin.depots.create' => 'depots.create',
+        'admin.depots.store' => 'depots.create',
+        'admin.depots.edit' => 'depots.update',
+        'admin.depots.update' => 'depots.update',
+        'admin.depots.destroy' => 'depots.delete',
+        'admin.depots.export.pdf' => 'depots.export',
+        'admin.depots.restore' => 'depots.restore',
 
         // Système (Super Admin seulement)
-        'admin.system.*' => 'view organizations', // Super Admin only
-        'admin.audit.*' => 'view organizations', // Super Admin only
+        'admin.system.*' => 'system.view',
+        'admin.audit.*' => 'audit-logs.view',
     ];
-
-    /**
-     * Alias permissions to ensure backward/forward compatibility.
-     *
-     * Example: legacy "create assignments" should satisfy modern "assignments.create".
-     */
-    private array $permissionAliases = [
-        // Affectations
-        'assignments.view' => ['view assignments'],
-        'assignments.create' => ['create assignments'],
-        'assignments.update' => ['edit assignments'],
-        'assignments.end' => ['end assignments'],
-        'assignments.delete' => ['delete assignments'],
-        'assignments.export' => ['export assignments', 'view assignments'],
-        'assignments.view-gantt' => ['view assignments'],
-        'assignments.view-stats' => ['view assignment statistics', 'view assignments'],
-    ];
+    private ?Collection $cachedUserPermissions = null;
 
     /**
      * Handle an incoming request with enterprise security
@@ -284,23 +270,23 @@ class EnterprisePermissionMiddleware
         }
 
         // Permissions hiérarchiques pour les relevés kilométriques
-        if ($permission === 'view own mileage readings') {
-            return $this->hasPermission($user, 'view team mileage readings')
-                || $this->hasPermission($user, 'view all mileage readings');
+        if ($permission === 'mileage-readings.view.own') {
+            return $this->hasPermission($user, 'mileage-readings.view.team')
+                || $this->hasPermission($user, 'mileage-readings.view.all');
         }
 
-        if ($permission === 'view team mileage readings') {
-            return $this->hasPermission($user, 'view all mileage readings');
+        if ($permission === 'mileage-readings.view.team') {
+            return $this->hasPermission($user, 'mileage-readings.view.all');
         }
 
         // Permissions hiérarchiques pour les demandes de réparation
-        if ($permission === 'view own repair requests') {
-            return $this->hasPermission($user, 'view team repair requests')
-                || $this->hasPermission($user, 'view all repair requests');
+        if ($permission === 'repair-requests.view.own') {
+            return $this->hasPermission($user, 'repair-requests.view.team')
+                || $this->hasPermission($user, 'repair-requests.view.all');
         }
 
-        if ($permission === 'view team repair requests') {
-            return $this->hasPermission($user, 'view all repair requests');
+        if ($permission === 'repair-requests.view.team') {
+            return $this->hasPermission($user, 'repair-requests.view.all');
         }
 
         // Aucune permission hiérarchique trouvée
@@ -312,21 +298,26 @@ class EnterprisePermissionMiddleware
      */
     private function hasPermission($user, string $permission): bool
     {
-        if ($user->can($permission)) {
-            return true;
-        }
+        $permissionNames = $this->getCachedUserPermissions($user);
 
-        if (!isset($this->permissionAliases[$permission])) {
-            return false;
-        }
-
-        foreach ($this->permissionAliases[$permission] as $alias) {
-            if ($user->can($alias)) {
+        foreach (PermissionAliases::resolve($permission) as $alias) {
+            if ($permissionNames->contains($alias)) {
                 return true;
             }
         }
 
         return false;
+    }
+
+    private function getCachedUserPermissions($user): Collection
+    {
+        if ($this->cachedUserPermissions instanceof Collection) {
+            return $this->cachedUserPermissions;
+        }
+
+        $this->cachedUserPermissions = $user->getAllPermissions()->pluck('name');
+
+        return $this->cachedUserPermissions;
     }
 
     /**
@@ -401,6 +392,44 @@ class EnterprisePermissionMiddleware
     private function getContextualErrorMessage(?string $permission): string
     {
         $messages = [
+            // Canonical (dot notation)
+            'vehicles.view' => 'Vous n\'avez pas l\'autorisation de consulter les véhicules.',
+            'vehicles.create' => 'Vous n\'avez pas l\'autorisation de créer des véhicules.',
+            'vehicles.update' => 'Vous n\'avez pas l\'autorisation de modifier les véhicules.',
+            'vehicles.delete' => 'Vous n\'avez pas l\'autorisation de supprimer des véhicules.',
+            'vehicles.restore' => 'Vous n\'avez pas l\'autorisation de restaurer des véhicules.',
+            'vehicles.export' => 'Vous n\'avez pas l\'autorisation d\'exporter les véhicules.',
+            'drivers.view' => 'Vous n\'avez pas l\'autorisation de consulter les chauffeurs.',
+            'drivers.create' => 'Vous n\'avez pas l\'autorisation de créer des chauffeurs.',
+            'drivers.update' => 'Vous n\'avez pas l\'autorisation de modifier les chauffeurs.',
+            'drivers.delete' => 'Vous n\'avez pas l\'autorisation de supprimer des chauffeurs.',
+            'drivers.restore' => 'Vous n\'avez pas l\'autorisation de restaurer des chauffeurs.',
+            'users.view' => 'Vous n\'avez pas l\'autorisation de consulter les utilisateurs.',
+            'users.create' => 'Vous n\'avez pas l\'autorisation de créer des utilisateurs.',
+            'users.update' => 'Vous n\'avez pas l\'autorisation de modifier les utilisateurs.',
+            'users.delete' => 'Vous n\'avez pas l\'autorisation de supprimer des utilisateurs.',
+            'roles.manage' => 'Vous n\'avez pas l\'autorisation de gérer les rôles et permissions.',
+            'permissions.manage' => 'Vous n\'avez pas l\'autorisation de gérer les rôles et permissions.',
+            'assignments.view' => 'Vous n\'avez pas l\'autorisation de consulter les affectations.',
+            'assignments.create' => 'Vous n\'avez pas l\'autorisation de créer des affectations.',
+            'assignments.update' => 'Vous n\'avez pas l\'autorisation de modifier les affectations.',
+            'assignments.delete' => 'Vous n\'avez pas l\'autorisation de supprimer des affectations.',
+            'assignments.end' => 'Vous n\'avez pas l\'autorisation de terminer des affectations.',
+            'maintenance.view' => 'Vous n\'avez pas l\'autorisation de consulter la maintenance.',
+            'maintenance.plans.manage' => 'Vous n\'avez pas l\'autorisation de gérer les plans de maintenance.',
+            'suppliers.view' => 'Vous n\'avez pas l\'autorisation de consulter les fournisseurs.',
+            'documents.view' => 'Vous n\'avez pas l\'autorisation de consulter les documents.',
+            'organizations.view' => 'Vous n\'avez pas l\'autorisation d\'accéder aux organisations (Super Admin uniquement).',
+            'audit-logs.view' => 'Vous n\'avez pas l\'autorisation de consulter les journaux d\'audit.',
+            'system.view' => 'Vous n\'avez pas l\'autorisation d\'accéder aux paramètres système.',
+            'mileage-readings.view.own' => 'Vous n\'avez pas l\'autorisation de consulter les relevés kilométriques.',
+            'mileage-readings.view.team' => 'Vous n\'avez pas l\'autorisation de consulter les relevés kilométriques de votre équipe.',
+            'mileage-readings.view.all' => 'Vous n\'avez pas l\'autorisation de consulter tous les relevés kilométriques.',
+            'mileage-readings.create' => 'Vous n\'avez pas l\'autorisation de créer des relevés kilométriques.',
+            'mileage-readings.delete' => 'Vous n\'avez pas l\'autorisation de supprimer des relevés kilométriques.',
+            'mileage-readings.export' => 'Vous n\'avez pas l\'autorisation d\'exporter les relevés kilométriques.',
+
+            // Legacy aliases (fallback)
             'view vehicles' => 'Vous n\'avez pas l\'autorisation de consulter les véhicules.',
             'create vehicles' => 'Vous n\'avez pas l\'autorisation de créer des véhicules.',
             'edit vehicles' => 'Vous n\'avez pas l\'autorisation de modifier les véhicules.',
@@ -420,12 +449,6 @@ class EnterprisePermissionMiddleware
             'create assignments' => 'Vous n\'avez pas l\'autorisation de créer des affectations.',
             'edit assignments' => 'Vous n\'avez pas l\'autorisation de modifier les affectations.',
             'end assignments' => 'Vous n\'avez pas l\'autorisation de terminer des affectations.',
-            // Format moderne (dot notation)
-            'assignments.view' => 'Vous n\'avez pas l\'autorisation de consulter les affectations.',
-            'assignments.create' => 'Vous n\'avez pas l\'autorisation de créer des affectations.',
-            'assignments.update' => 'Vous n\'avez pas l\'autorisation de modifier les affectations.',
-            'assignments.delete' => 'Vous n\'avez pas l\'autorisation de supprimer des affectations.',
-            'assignments.end' => 'Vous n\'avez pas l\'autorisation de terminer des affectations.',
             'view maintenance' => 'Vous n\'avez pas l\'autorisation de consulter la maintenance.',
             'manage maintenance plans' => 'Vous n\'avez pas l\'autorisation de gérer les plans de maintenance.',
             'view suppliers' => 'Vous n\'avez pas l\'autorisation de consulter les fournisseurs.',

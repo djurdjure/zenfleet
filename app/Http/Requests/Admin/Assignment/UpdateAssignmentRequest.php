@@ -22,7 +22,7 @@ class UpdateAssignmentRequest extends FormRequest
     public function authorize(): bool
     {
         // L'utilisateur doit avoir la permission de modifier des affectations.
-        return $this->user()->can('edit assignments');
+        return $this->user()->can('assignments.update');
     }
 
     /**

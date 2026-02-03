@@ -205,7 +205,7 @@
                 </a>
 
                 {{-- Workflow d'approbation --}}
-                @can('approve expenses')
+                @can('expenses.approve')
                 <a href="{{ route('admin.vehicle-expenses.index') }}?filter=pending_approval"
                     class="flex items-center px-4 py-2 rounded-lg text-gray-500 hover:text-gray-900 hover:bg-gray-100 transition-all duration-200">
                     <x-iconify icon="carbon:task-approved" class="h-4 w-4 mr-3" />
@@ -236,7 +236,7 @@
                 </a>
 
                 {{-- Rapports TCO --}}
-                @can('view expense analytics')
+                @can('expenses.analytics.view')
                 <a href="{{ route('admin.vehicle-expenses.analytics.cost-trends') }}"
                     class="flex items-center px-4 py-2 rounded-lg text-gray-500 hover:text-gray-900 hover:bg-gray-100 transition-all duration-200">
                     <x-iconify icon="carbon:chart-line" class="h-4 w-4 mr-3" />
@@ -330,7 +330,7 @@
             </button>
             <div x-show="expanded" x-collapse class="mt-2 ml-6 space-y-1">
                 @role('Super Admin')
-                @can('view organizations')
+                @can('organizations.view')
                 <a href="{{ route('admin.organizations.index') }}" class="flex items-center px-4 py-2 rounded-lg text-gray-500 hover:text-gray-900 hover:bg-gray-100 transition-all duration-200 {{ request()->routeIs('admin.organizations.*') ? 'text-blue-600 bg-blue-50 font-medium' : '' }}">
                     <x-iconify icon="heroicons:building-office" class="h-4 w-4 mr-3" / />
                     Organisations

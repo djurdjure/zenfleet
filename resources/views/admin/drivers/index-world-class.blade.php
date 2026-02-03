@@ -51,7 +51,7 @@
  ['label' => 'Chauffeurs', 'url' => null]
  ]">
             <x-slot name="actions">
-                @can('export drivers')
+                @can('drivers.export')
                 <button type="button"
                     class="zenfleet-btn bg-white text-gray-700 border-gray-300 hover:bg-gray-50 shadow-zenfleet"
                     title="Exporter (Ctrl+E)">
@@ -60,7 +60,7 @@
                 </button>
                 @endcan
 
-                @can('import drivers')
+                @can('drivers.import')
                 <a href="{{ route('admin.drivers.import.show') }}"
                     class="zenfleet-btn bg-green-600 text-white hover:bg-green-700 shadow-zenfleet">
                     <x-iconify icon="heroicons:arrow-up-tray" class="w-5 h-5" />
@@ -74,7 +74,7 @@
                     <span class="hidden xl:inline">Archives</span>
                 </a>
 
-                @can('create drivers')
+                @can('drivers.create')
                 <a href="{{ route('admin.drivers.create') }}"
                     class="zenfleet-btn bg-blue-600 text-white hover:bg-blue-700 shadow-zenfleet-lg">
                     <x-iconify icon="heroicons:plus-circle" class="w-5 h-5" />
@@ -477,21 +477,21 @@
                 {{-- Actions --}}
                 <td class="px-6 py-4 whitespace-nowrap text-center">
                     <div class="flex items-center justify-center gap-1">
-                        @can('view drivers')
+                        @can('drivers.view')
                         <a href="{{ route('admin.drivers.show', $driver) }}"
                             class="p-2 text-blue-600 hover:text-blue-900 hover:bg-blue-50 rounded-lg transition-all duration-200 group/btn"
                             title="Voir les détails">
                             <x-iconify icon="heroicons:eye" class="w-5 h-5 group-hover/btn:scale-110 transition-transform" />
                         </a>
                         @endcan
-                        @can('edit drivers')
+                        @can('drivers.update')
                         <a href="{{ route('admin.drivers.edit', $driver) }}"
                             class="p-2 text-amber-600 hover:text-amber-900 hover:bg-amber-50 rounded-lg transition-all duration-200 group/btn"
                             title="Modifier">
                             <x-iconify icon="heroicons:pencil-square" class="w-5 h-5 group-hover/btn:scale-110 transition-transform" />
                         </a>
                         @endcan
-                        @can('delete drivers')
+                        @can('drivers.delete')
                         <button
                             onclick="deleteDriver({{ $driver->id }}, '{{ $driver->first_name }} {{ $driver->last_name }}')"
                             class="p-2 text-red-600 hover:text-red-900 hover:bg-red-50 rounded-lg transition-all duration-200 group/btn"
@@ -563,7 +563,7 @@
                     </a>
                     @endif
 
-                    @can('create drivers')
+                    @can('drivers.create')
                     <a href="{{ route('admin.drivers.create') }}"
                         class="zenfleet-btn bg-blue-600 text-white hover:bg-blue-700 shadow-zenfleet-lg">
                         <x-iconify icon="heroicons:plus-circle" class="w-5 h-5" />

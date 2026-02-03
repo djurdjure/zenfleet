@@ -14,7 +14,7 @@ class StoreVehicleRequest extends FormRequest
     {
         /** @var \App\Models\User|null $user */
         $user = \Illuminate\Support\Facades\Auth::user();
-        return $user && $user->can('create vehicles');
+        return $user && $user->can('vehicles.create');
     }
 
     /**

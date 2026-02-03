@@ -126,10 +126,10 @@ class RepairRequestController extends Controller
                 'direction' => $sortDirection,
             ],
             'can' => [
-                'create' => $request->user()->can('create repair requests'),
-                'approveLevel1' => $request->user()->can('approve repair requests level 1'),
-                'approveLevel2' => $request->user()->can('approve repair requests level 2'),
-                'export' => $request->user()->can('export repair requests'),
+                'create' => $request->user()->can('repair-requests.create'),
+                'approveLevel1' => $request->user()->can('repair-requests.approve.level1'),
+                'approveLevel2' => $request->user()->can('repair-requests.approve.level2'),
+                'export' => $request->user()->can('repair-requests.export'),
             ],
         ]);
     }

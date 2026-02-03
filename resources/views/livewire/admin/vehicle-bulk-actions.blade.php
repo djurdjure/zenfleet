@@ -57,7 +57,7 @@
             {{-- Section centrale : Actions bulk --}}
             <div class="flex items-center gap-2">
                 @foreach($bulkActions as $action => $config)
-                @can($action === 'delete' ? 'delete vehicles' : 'edit vehicles')
+                @can($action === 'delete' ? 'vehicles.delete' : 'vehicles.update')
                 <div class="relative" x-data="{ showSubmenu: false }">
                     <button @click="showSubmenu = !showSubmenu"
                         wire:loading.attr="disabled"

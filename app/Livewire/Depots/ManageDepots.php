@@ -5,6 +5,7 @@ namespace App\Livewire\Depots;
 use App\Models\VehicleDepot;
 use App\Services\DepotAssignmentService;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rule;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -65,9 +66,18 @@ class ManageDepots extends Component
 
     protected function rules()
     {
+        $organizationId = Auth::user()->organization_id;
+
         return [
             'name' => 'required|string|max:255',
-            'code' => 'nullable|string|max:50|unique:vehicle_depots,code,' . $this->selectedDepotId,
+            'code' => [
+                'nullable',
+                'string',
+                'max:50',
+                Rule::unique('vehicle_depots', 'code')
+                    ->where(fn ($query) => $query->where('organization_id', $organizationId))
+                    ->ignore($this->selectedDepotId ?: 0),
+            ],
             'address' => 'nullable|string|max:500',
             'city' => 'nullable|string|max:100',
             'wilaya' => 'nullable|string|max:100',

@@ -92,7 +92,7 @@
 
  {{-- Actions --}}
  <div class="flex items-center gap-3">
- @can('edit drivers')
+ @can('drivers.update')
  <a href="{{ route('admin.drivers.edit', $driver) }}"
  class="inline-flex items-center gap-2 px-4 py-2.5 bg-amber-600 hover:bg-amber-700 text-white font-medium rounded-lg transition-colors duration-200 text-sm shadow-sm hover:shadow-md">
  <x-iconify icon="heroicons:pencil" class="w-5 h-5" />

@@ -15,7 +15,7 @@ class DocumentPolicy
      */
     public function viewAny(User $user)
     {
-        return $user->can('view documents');
+        return $user->can('documents.view');
     }
 
     /**
@@ -23,7 +23,7 @@ class DocumentPolicy
      */
     public function view(User $user, Document $document)
     {
-        return $user->can('view documents') && $user->organization_id === $document->organization_id;
+        return $user->can('documents.view') && $user->organization_id === $document->organization_id;
     }
 
     /**
@@ -31,7 +31,7 @@ class DocumentPolicy
      */
     public function create(User $user)
     {
-        return $user->can('create documents');
+        return $user->can('documents.create');
     }
 
     /**
@@ -39,7 +39,7 @@ class DocumentPolicy
      */
     public function update(User $user, Document $document)
     {
-        return $user->can('edit documents') && $user->organization_id === $document->organization_id;
+        return $user->can('documents.update') && $user->organization_id === $document->organization_id;
     }
 
     /**
@@ -47,7 +47,7 @@ class DocumentPolicy
      */
     public function delete(User $user, Document $document)
     {
-        return $user->can('delete documents') && $user->organization_id === $document->organization_id;
+        return $user->can('documents.delete') && $user->organization_id === $document->organization_id;
     }
 
     /**
@@ -55,7 +55,7 @@ class DocumentPolicy
      */
     public function restore(User $user, Document $document)
     {
-        return $user->can('edit documents') && $user->organization_id === $document->organization_id;
+        return $user->can('documents.update') && $user->organization_id === $document->organization_id;
     }
 
     /**
@@ -63,6 +63,6 @@ class DocumentPolicy
      */
     public function forceDelete(User $user, Document $document)
     {
-        return $user->can('delete documents') && $user->organization_id === $document->organization_id;
+        return $user->can('documents.delete') && $user->organization_id === $document->organization_id;
     }
 }

@@ -41,7 +41,7 @@ class VehicleHandoverController extends Controller
     /**
      * Affiche la vue de création d’une fiche de remise pour une affectation donnée.
     {
-        $this->authorize('create handovers');
+        $this->authorize('handovers.create');
 
         $assignment->load(['vehicle.vehicleType', 'driver']);
 
@@ -71,7 +71,7 @@ class VehicleHandoverController extends Controller
      */
     public function store(Request $request, HandoverChecklistService $checklistService): RedirectResponse
     {
-        $this->authorize('create handovers');
+        $this->authorize('handovers.create');
 
         // Basic validation
         $basicValidated = $request->validate([
@@ -156,7 +156,7 @@ class VehicleHandoverController extends Controller
      */
     public function show(VehicleHandoverForm $handover, HandoverChecklistService $checklistService): View
     {
-        $this->authorize('view handovers');
+        $this->authorize('handovers.view');
 
         $handover->load(['assignment.vehicle.vehicleType', 'assignment.driver', 'assignment.organization', 'details']);
         $checklist = $handover->details->groupBy('category');
@@ -179,7 +179,7 @@ class VehicleHandoverController extends Controller
      */
     public function edit(VehicleHandoverForm $handover, HandoverChecklistService $checklistService): View
     {
-        $this->authorize('edit handovers');
+        $this->authorize('handovers.update');
 
         $handover->load(['assignment.vehicle.vehicleType', 'assignment.driver', 'details']);
 
@@ -204,7 +204,7 @@ class VehicleHandoverController extends Controller
      */
     public function update(Request $request, VehicleHandoverForm $handover): RedirectResponse
     {
-        $this->authorize('edit handovers');
+        $this->authorize('handovers.update');
 
         $validated = $request->validate([
             'issue_date' => 'required|date',
@@ -269,7 +269,7 @@ class VehicleHandoverController extends Controller
      */
     public function uploadSigned(Request $request, VehicleHandoverForm $handover): RedirectResponse
     {
-        $this->authorize('upload signed handovers');
+        $this->authorize('handovers.signed.upload');
 
         $request->validate([
             'signed_form' => ['required', 'file', 'mimes:pdf,jpg,jpeg,png', 'max:5120'],
@@ -312,7 +312,7 @@ class VehicleHandoverController extends Controller
      */
     public function destroy(VehicleHandoverForm $handover): RedirectResponse
     {
-        $this->authorize('delete handovers');
+        $this->authorize('handovers.delete');
 
         $assignmentId = $handover->assignment_id;
 
@@ -354,7 +354,7 @@ class VehicleHandoverController extends Controller
      */
     public function downloadPdf(VehicleHandoverForm $handover, PdfGenerationService $pdfService, HandoverChecklistService $checklistService)
     {
-        $this->authorize('view handovers');
+        $this->authorize('handovers.view');
 
         $handover->load(['assignment.vehicle.vehicleType', 'assignment.driver', 'assignment.organization', 'details']);
         $checklist = $handover->details->groupBy('category');

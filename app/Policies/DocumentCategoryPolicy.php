@@ -17,7 +17,7 @@ class DocumentCategoryPolicy
     {
         // Anyone with the permission can view the list page.
         // The controller will scope the query by organization.
-        return $user->can('manage document_categories');
+        return $user->can('document-categories.manage');
     }
 
     /**
@@ -26,7 +26,7 @@ class DocumentCategoryPolicy
     public function view(User $user, DocumentCategory $documentCategory)
     {
         // User can view if they have the permission AND belong to the same organization.
-        return $user->can('manage document_categories') && $user->organization_id === $documentCategory->organization_id;
+        return $user->can('document-categories.manage') && $user->organization_id === $documentCategory->organization_id;
     }
 
     /**
@@ -34,7 +34,7 @@ class DocumentCategoryPolicy
      */
     public function create(User $user)
     {
-        return $user->can('manage document_categories');
+        return $user->can('document-categories.manage');
     }
 
     /**
@@ -43,7 +43,7 @@ class DocumentCategoryPolicy
     public function update(User $user, DocumentCategory $documentCategory)
     {
         // User can update if they have the permission AND belong to the same organization.
-        return $user->can('manage document_categories') && $user->organization_id === $documentCategory->organization_id;
+        return $user->can('document-categories.manage') && $user->organization_id === $documentCategory->organization_id;
     }
 
     /**
@@ -52,6 +52,6 @@ class DocumentCategoryPolicy
     public function delete(User $user, DocumentCategory $documentCategory)
     {
         // User can delete if they have the permission AND belong to the same organization.
-        return $user->can('manage document_categories') && $user->organization_id === $documentCategory->organization_id;
+        return $user->can('document-categories.manage') && $user->organization_id === $documentCategory->organization_id;
     }
 }

@@ -25,7 +25,7 @@ class PlanningController extends Controller
      */
     public function index(Request $request): View
     {
-        $this->authorize('view assignments'); // Reuse permission from assignments
+        $this->authorize('assignments.view'); // Reuse permission from assignments
 
         // --- Gestion de la Période ---
         $viewMode = $request->input('view_mode', 'week');

@@ -185,7 +185,7 @@
  <div class="p-6 text-gray-900">
  <div class="flex justify-between items-center mb-6">
  <h3 class="text-xl font-semibold text-gray-700">Tous les Plans Programmés</h3>
- @can('manage maintenance plans')
+ @can('maintenance.plans.manage')
  <a href="{{ route('admin.maintenance.plans.create') }}" class="inline-flex items-center px-4 py-2 bg-violet-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-violet-700">
  Ajouter un Plan
  </a>
@@ -239,14 +239,14 @@
  </td>
  <td class="px-6 py-3 whitespace-nowrap text-right text-sm font-medium">
  <div class="flex items-center justify-end space-x-2">
- @can('log maintenance')
+ @can('maintenance.log')
  <button type="button" @click="openLogModal({{ $plan->id }})" title="Enregistrer une intervention" class="p-2 rounded-full text-gray-400 hover:bg-green-100 hover:text-green-600">
  <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
  <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
  </svg>
  </button>
  @endcan
- @can('manage maintenance plans')
+ @can('maintenance.plans.manage')
  <button type="button" @click="openEditModal({{ $plan->id }})" title="Modifier le plan" class="p-2 rounded-full text-gray-400 hover:bg-violet-100 hover:text-violet-600">
  <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
  <path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.536L16.732 3.732z" />

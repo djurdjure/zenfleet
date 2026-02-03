@@ -543,7 +543,7 @@ class ExpenseApprovalService
         
         // Vérifier si l'utilisateur peut payer
         if ($expense->approved && $expense->payment_status !== 'paid' && 
-            $user->can('pay vehicle expenses')) {
+            $user->can('expenses.pay')) {
             return true;
         }
         

@@ -14,101 +14,101 @@ namespace App\Enums;
 enum Permission: string
 {
     // === ORGANISATIONS ===
-    case VIEW_ORGANIZATIONS = 'view organizations';
-    case CREATE_ORGANIZATIONS = 'create organizations';
-    case EDIT_ORGANIZATIONS = 'edit organizations';
-    case DELETE_ORGANIZATIONS = 'delete organizations';
+    case VIEW_ORGANIZATIONS = 'organizations.view';
+    case CREATE_ORGANIZATIONS = 'organizations.create';
+    case EDIT_ORGANIZATIONS = 'organizations.update';
+    case DELETE_ORGANIZATIONS = 'organizations.delete';
 
     // === GESTION DES RÔLES ===
-    case MANAGE_ROLES = 'manage roles';
+    case MANAGE_ROLES = 'roles.manage';
 
     // === UTILISATEURS ===
-    case VIEW_USERS = 'view users';
-    case CREATE_USERS = 'create users';
-    case EDIT_USERS = 'edit users';
-    case DELETE_USERS = 'delete users';
+    case VIEW_USERS = 'users.view';
+    case CREATE_USERS = 'users.create';
+    case EDIT_USERS = 'users.update';
+    case DELETE_USERS = 'users.delete';
 
     // === VÉHICULES ===
-    case VIEW_VEHICLES = 'view vehicles';
-    case CREATE_VEHICLES = 'create vehicles';
-    case EDIT_VEHICLES = 'edit vehicles';
-    case DELETE_VEHICLES = 'delete vehicles';
-    case RESTORE_VEHICLES = 'restore vehicles';
-    case FORCE_DELETE_VEHICLES = 'force delete vehicles';
+    case VIEW_VEHICLES = 'vehicles.view';
+    case CREATE_VEHICLES = 'vehicles.create';
+    case EDIT_VEHICLES = 'vehicles.update';
+    case DELETE_VEHICLES = 'vehicles.delete';
+    case RESTORE_VEHICLES = 'vehicles.restore';
+    case FORCE_DELETE_VEHICLES = 'vehicles.force-delete';
 
     // === CHAUFFEURS ===
-    case VIEW_DRIVERS = 'view drivers';
-    case CREATE_DRIVERS = 'create drivers';
-    case EDIT_DRIVERS = 'edit drivers';
-    case DELETE_DRIVERS = 'delete drivers';
-    case RESTORE_DRIVERS = 'restore drivers';
-    case FORCE_DELETE_DRIVERS = 'force delete drivers';
+    case VIEW_DRIVERS = 'drivers.view';
+    case CREATE_DRIVERS = 'drivers.create';
+    case EDIT_DRIVERS = 'drivers.update';
+    case DELETE_DRIVERS = 'drivers.delete';
+    case RESTORE_DRIVERS = 'drivers.restore';
+    case FORCE_DELETE_DRIVERS = 'drivers.force-delete';
 
     // === AFFECTATIONS ===
-    case VIEW_ASSIGNMENTS = 'view assignments';
-    case CREATE_ASSIGNMENTS = 'create assignments';
-    case EDIT_ASSIGNMENTS = 'edit assignments';
-    case END_ASSIGNMENTS = 'end assignments';
+    case VIEW_ASSIGNMENTS = 'assignments.view';
+    case CREATE_ASSIGNMENTS = 'assignments.create';
+    case EDIT_ASSIGNMENTS = 'assignments.update';
+    case END_ASSIGNMENTS = 'assignments.end';
 
     // === MAINTENANCE ===
-    case VIEW_MAINTENANCE = 'view maintenance';
-    case MANAGE_MAINTENANCE_PLANS = 'manage maintenance plans';
-    case LOG_MAINTENANCE = 'log maintenance';
+    case VIEW_MAINTENANCE = 'maintenance.view';
+    case MANAGE_MAINTENANCE_PLANS = 'maintenance.plans.manage';
+    case LOG_MAINTENANCE = 'maintenance.log';
 
     // === HANDOVERS (Prise en charge) ===
-    case CREATE_HANDOVERS = 'create handovers';
-    case VIEW_HANDOVERS = 'view handovers';
-    case EDIT_HANDOVERS = 'edit handovers';
-    case DELETE_HANDOVERS = 'delete handovers';
-    case UPLOAD_SIGNED_HANDOVERS = 'upload signed handovers';
+    case CREATE_HANDOVERS = 'handovers.create';
+    case VIEW_HANDOVERS = 'handovers.view';
+    case EDIT_HANDOVERS = 'handovers.update';
+    case DELETE_HANDOVERS = 'handovers.delete';
+    case UPLOAD_SIGNED_HANDOVERS = 'handovers.signed.upload';
 
     // === FOURNISSEURS ===
-    case VIEW_SUPPLIERS = 'view suppliers';
-    case CREATE_SUPPLIERS = 'create suppliers';
-    case EDIT_SUPPLIERS = 'edit suppliers';
-    case DELETE_SUPPLIERS = 'delete suppliers';
+    case VIEW_SUPPLIERS = 'suppliers.view';
+    case CREATE_SUPPLIERS = 'suppliers.create';
+    case EDIT_SUPPLIERS = 'suppliers.update';
+    case DELETE_SUPPLIERS = 'suppliers.delete';
 
     // === DOCUMENTS ===
-    case VIEW_DOCUMENTS = 'view documents';
-    case CREATE_DOCUMENTS = 'create documents';
-    case EDIT_DOCUMENTS = 'edit documents';
-    case DELETE_DOCUMENTS = 'delete documents';
-    case MANAGE_DOCUMENT_CATEGORIES = 'manage document_categories';
+    case VIEW_DOCUMENTS = 'documents.view';
+    case CREATE_DOCUMENTS = 'documents.create';
+    case EDIT_DOCUMENTS = 'documents.update';
+    case DELETE_DOCUMENTS = 'documents.delete';
+    case MANAGE_DOCUMENT_CATEGORIES = 'document-categories.manage';
 
     // === DEMANDES DE RÉPARATION ===
-    case VIEW_OWN_REPAIR_REQUESTS = 'view own repair requests';
-    case VIEW_TEAM_REPAIR_REQUESTS = 'view team repair requests';
-    case VIEW_ALL_REPAIR_REQUESTS = 'view all repair requests';
-    case CREATE_REPAIR_REQUESTS = 'create repair requests';
-    case UPDATE_OWN_REPAIR_REQUESTS = 'update own repair requests';
-    case UPDATE_ANY_REPAIR_REQUESTS = 'update any repair requests';
-    case APPROVE_REPAIR_REQUESTS_L1 = 'approve repair requests level 1';
-    case REJECT_REPAIR_REQUESTS_L1 = 'reject repair requests level 1';
-    case APPROVE_REPAIR_REQUESTS_L2 = 'approve repair requests level 2';
-    case REJECT_REPAIR_REQUESTS_L2 = 'reject repair requests level 2';
-    case DELETE_REPAIR_REQUESTS = 'delete repair requests';
-    case FORCE_DELETE_REPAIR_REQUESTS = 'force delete repair requests';
-    case RESTORE_REPAIR_REQUESTS = 'restore repair requests';
-    case VIEW_REPAIR_REQUEST_HISTORY = 'view repair request history';
-    case VIEW_REPAIR_REQUEST_NOTIFICATIONS = 'view repair request notifications';
-    case EXPORT_REPAIR_REQUESTS = 'export repair requests';
-    case MANAGE_VEHICLE_CATEGORIES = 'manage vehicle categories';
-    case MANAGE_VEHICLE_DEPOTS = 'manage vehicle depots';
+    case VIEW_OWN_REPAIR_REQUESTS = 'repair-requests.view.own';
+    case VIEW_TEAM_REPAIR_REQUESTS = 'repair-requests.view.team';
+    case VIEW_ALL_REPAIR_REQUESTS = 'repair-requests.view.all';
+    case CREATE_REPAIR_REQUESTS = 'repair-requests.create';
+    case UPDATE_OWN_REPAIR_REQUESTS = 'repair-requests.update.own';
+    case UPDATE_ANY_REPAIR_REQUESTS = 'repair-requests.update.any';
+    case APPROVE_REPAIR_REQUESTS_L1 = 'repair-requests.approve.level1';
+    case REJECT_REPAIR_REQUESTS_L1 = 'repair-requests.reject.level1';
+    case APPROVE_REPAIR_REQUESTS_L2 = 'repair-requests.approve.level2';
+    case REJECT_REPAIR_REQUESTS_L2 = 'repair-requests.reject.level2';
+    case DELETE_REPAIR_REQUESTS = 'repair-requests.delete';
+    case FORCE_DELETE_REPAIR_REQUESTS = 'repair-requests.force-delete';
+    case RESTORE_REPAIR_REQUESTS = 'repair-requests.restore';
+    case VIEW_REPAIR_REQUEST_HISTORY = 'repair-requests.view.history';
+    case VIEW_REPAIR_REQUEST_NOTIFICATIONS = 'repair-requests.view.notifications';
+    case EXPORT_REPAIR_REQUESTS = 'repair-requests.export';
+    case MANAGE_VEHICLE_CATEGORIES = 'vehicle-categories.manage';
+    case MANAGE_VEHICLE_DEPOTS = 'depots.manage';
 
     // === RELEVÉS KILOMÉTRIQUES ===
-    case VIEW_OWN_MILEAGE_READINGS = 'view own mileage readings';
-    case VIEW_TEAM_MILEAGE_READINGS = 'view team mileage readings';
-    case VIEW_ALL_MILEAGE_READINGS = 'view all mileage readings';
-    case CREATE_MILEAGE_READINGS = 'create mileage readings';
-    case UPDATE_OWN_MILEAGE_READINGS = 'update own mileage readings';
-    case UPDATE_ANY_MILEAGE_READINGS = 'update any mileage readings';
-    case DELETE_MILEAGE_READINGS = 'delete mileage readings';
-    case FORCE_DELETE_MILEAGE_READINGS = 'force delete mileage readings';
-    case RESTORE_MILEAGE_READINGS = 'restore mileage readings';
-    case MANAGE_AUTOMATIC_MILEAGE_READINGS = 'manage automatic mileage readings';
-    case EXPORT_MILEAGE_READINGS = 'export mileage readings';
-    case VIEW_MILEAGE_STATISTICS = 'view mileage statistics';
-    case VIEW_MILEAGE_READING_HISTORY = 'view mileage reading history';
+    case VIEW_OWN_MILEAGE_READINGS = 'mileage-readings.view.own';
+    case VIEW_TEAM_MILEAGE_READINGS = 'mileage-readings.view.team';
+    case VIEW_ALL_MILEAGE_READINGS = 'mileage-readings.view.all';
+    case CREATE_MILEAGE_READINGS = 'mileage-readings.create';
+    case UPDATE_OWN_MILEAGE_READINGS = 'mileage-readings.update.own';
+    case UPDATE_ANY_MILEAGE_READINGS = 'mileage-readings.update.any';
+    case DELETE_MILEAGE_READINGS = 'mileage-readings.delete';
+    case FORCE_DELETE_MILEAGE_READINGS = 'mileage-readings.force-delete';
+    case RESTORE_MILEAGE_READINGS = 'mileage-readings.restore';
+    case MANAGE_AUTOMATIC_MILEAGE_READINGS = 'mileage-readings.manage.automatic';
+    case EXPORT_MILEAGE_READINGS = 'mileage-readings.export';
+    case VIEW_MILEAGE_STATISTICS = 'mileage-readings.view.statistics';
+    case VIEW_MILEAGE_READING_HISTORY = 'mileage-readings.view.history';
 
     /**
      * Retourne toutes les permissions sous forme de tableau de valeurs

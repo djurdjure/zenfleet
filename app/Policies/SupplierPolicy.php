@@ -15,7 +15,7 @@ class SupplierPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->can("view suppliers");
+        return $user->can("suppliers.view");
     }
 
     /**
@@ -23,15 +23,15 @@ class SupplierPolicy
      */
     public function view(User $user, Supplier $supplier): bool
     {
-        return $user->can("view suppliers") && $supplier->organization_id === $user->organization_id;
+        return $user->can("suppliers.view") && $supplier->organization_id === $user->organization_id;
     }
 
     /**
-     * Determine whether the user can create suppliers.
+     * Determine whether the user can suppliers.create.
      */
     public function create(User $user): bool
     {
-        return $user->can("create suppliers");
+        return $user->can("suppliers.create");
     }
 
     /**
@@ -39,7 +39,7 @@ class SupplierPolicy
      */
     public function update(User $user, Supplier $supplier): bool
     {
-        return $user->can("edit suppliers") && $supplier->organization_id === $user->organization_id;
+        return $user->can("suppliers.update") && $supplier->organization_id === $user->organization_id;
     }
 
     /**
@@ -47,7 +47,7 @@ class SupplierPolicy
      */
     public function delete(User $user, Supplier $supplier): bool
     {
-        return $user->can("delete suppliers") && $supplier->organization_id === $user->organization_id;
+        return $user->can("suppliers.delete") && $supplier->organization_id === $user->organization_id;
     }
 
     /**
@@ -63,6 +63,6 @@ class SupplierPolicy
      */
     public function forceDelete(User $user, Supplier $supplier): bool
     {
-        return $user->can("force delete suppliers") && $supplier->organization_id === $user->organization_id;
+        return $user->can("force suppliers.delete") && $supplier->organization_id === $user->organization_id;
     }
 }

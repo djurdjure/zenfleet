@@ -18,7 +18,7 @@ class VehiclePolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->can("view vehicles");
+        return $user->can("vehicles.view");
     }
 
     /**
@@ -35,15 +35,15 @@ class VehiclePolicy
             return true;
         }
 
-        return $user->can("view vehicles") && $vehicle->organization_id === $user->organization_id;
+        return $user->can("vehicles.view") && $vehicle->organization_id === $user->organization_id;
     }
 
     /**
-     * Determine whether the user can create vehicles.
+     * Determine whether the user can vehicles.create.
      */
     public function create(User $user): bool
     {
-        return $user->can("create vehicles");
+        return $user->can("vehicles.create");
     }
 
     /**
@@ -55,7 +55,7 @@ class VehiclePolicy
             return true;
         }
 
-        return $user->can("edit vehicles") && $vehicle->organization_id === $user->organization_id;
+        return $user->can("vehicles.update") && $vehicle->organization_id === $user->organization_id;
     }
 
     /**
@@ -67,7 +67,7 @@ class VehiclePolicy
             return true;
         }
 
-        return $user->can("delete vehicles") && $vehicle->organization_id === $user->organization_id;
+        return $user->can("vehicles.delete") && $vehicle->organization_id === $user->organization_id;
     }
 
     /**
@@ -79,7 +79,7 @@ class VehiclePolicy
             return true;
         }
 
-        return $user->can("restore vehicles") && $vehicle->organization_id === $user->organization_id;
+        return $user->can("vehicles.restore") && $vehicle->organization_id === $user->organization_id;
     }
 
     /**
@@ -91,7 +91,7 @@ class VehiclePolicy
             return true;
         }
 
-        return $user->can("force delete vehicles") && $vehicle->organization_id === $user->organization_id;
+        return $user->can("vehicles.force-delete") && $vehicle->organization_id === $user->organization_id;
     }
 
     /**
@@ -121,19 +121,19 @@ class VehiclePolicy
 
         // Vérifier les permissions kilométrage de manière hiérarchique
         // view all > view team > view own
-        if ($user->can('view all mileage readings')) {
+        if ($user->can('mileage-readings.view.all')) {
             return true;
         }
 
         // Superviseur/Chef de Parc: véhicules de son dépôt uniquement
-        if ($user->can('view team mileage readings')) {
+        if ($user->can('mileage-readings.view.team')) {
             if ($user->depot_id && $vehicle->depot_id === $user->depot_id) {
                 return true;
             }
         }
 
         // Chauffeur: uniquement son véhicule assigné
-        if ($user->can('view own mileage readings')) {
+        if ($user->can('mileage-readings.view.own')) {
             if ($user->driver_id) {
                 // Vérifier si le véhicule est assigné à ce chauffeur
                 return $vehicle->currentAssignments()
@@ -145,4 +145,3 @@ class VehiclePolicy
         return false;
     }
 }
-

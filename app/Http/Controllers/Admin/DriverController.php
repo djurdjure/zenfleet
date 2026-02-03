@@ -59,7 +59,7 @@ class DriverController extends Controller
      */
     public function create()
     {
-        $this->authorize('create drivers');
+        $this->authorize('drivers.create');
 
         try {
             // 🎯 Mode arrays pour Alpine.js dans les formulaires
@@ -141,7 +141,7 @@ class DriverController extends Controller
      */
     public function edit(Driver $driver)
     {
-        $this->authorize('edit drivers');
+        $this->authorize('drivers.update');
 
         try {
             // Vérification des permissions pour l'organisation
@@ -230,7 +230,7 @@ class DriverController extends Controller
      */
     public function destroy(Driver $driver): RedirectResponse
     {
-        $this->authorize('delete drivers');
+        $this->authorize('drivers.delete');
 
         try {
             // Vérification des permissions pour l'organisation
@@ -279,7 +279,7 @@ class DriverController extends Controller
      */
     public function restore($driverId): RedirectResponse
     {
-        $this->authorize('restore drivers');
+        $this->authorize('drivers.restore');
 
         try {
             $driver = Driver::withTrashed()->findOrFail($driverId);
@@ -341,7 +341,7 @@ class DriverController extends Controller
      */
     public function forceDelete($driverId): RedirectResponse
     {
-        $this->authorize('force delete drivers');
+        $this->authorize('drivers.force-delete');
 
         try {
             $driver = Driver::withTrashed()->findOrFail($driverId);
@@ -383,7 +383,7 @@ class DriverController extends Controller
      */
     public function exportArchived(Request $request)
     {
-        $this->authorize('view drivers');
+        $this->authorize('drivers.view');
 
         try {
             // Récupérer les filtres
@@ -419,7 +419,7 @@ class DriverController extends Controller
      */
     public function bulkRestore(Request $request): RedirectResponse
     {
-        $this->authorize('restore drivers');
+        $this->authorize('drivers.restore');
 
         try {
             $driverIds = $request->input('driver_ids', []);
@@ -588,7 +588,7 @@ class DriverController extends Controller
      */
     public function show(Driver $driver)
     {
-        $this->authorize('view drivers');
+        $this->authorize('drivers.view');
 
         try {
             // Vérification des permissions pour l'organisation
@@ -654,7 +654,7 @@ class DriverController extends Controller
      */
     public function export(Request $request)
     {
-        $this->authorize('view drivers');
+        $this->authorize('drivers.view');
 
         try {
             $filters = $request->only(['search', 'status_id', 'view_deleted']);
@@ -675,7 +675,7 @@ class DriverController extends Controller
      */
     public function statistics(): View
     {
-        $this->authorize('view drivers');
+        $this->authorize('drivers.view');
 
         try {
             $stats = [
@@ -1235,7 +1235,7 @@ class DriverController extends Controller
      */
     public function showImportResults(): View
     {
-        $this->authorize('create drivers');
+        $this->authorize('drivers.create');
 
         $successCount = session('successCount', 0);
         $errorRows = session('errorRows', []);

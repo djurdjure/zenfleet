@@ -585,18 +585,18 @@ class VehicleBulkActions extends Component
     private function canExecuteAction(string $action): bool
     {
         $permissions = [
-            'change_status' => 'edit vehicles',
-            'assign_depot' => 'edit vehicles',
+            'change_status' => 'vehicles.update',
+            'assign_depot' => 'vehicles.update',
             'assign_driver' => 'manage assignments',
             'archive' => 'archive vehicles',
-            'delete' => 'delete vehicles',
-            'export' => 'export vehicles',
+            'delete' => 'vehicles.delete',
+            'export' => 'vehicles.export',
             'schedule_maintenance' => 'manage maintenance',
-            'generate_qr' => 'manage vehicles',
+            'generate_qr' => 'vehicles.manage',
             'send_notification' => 'send notifications'
         ];
 
-        return auth()->user()->can($permissions[$action] ?? 'manage vehicles');
+        return auth()->user()->can($permissions[$action] ?? 'vehicles.manage');
     }
 
     /**

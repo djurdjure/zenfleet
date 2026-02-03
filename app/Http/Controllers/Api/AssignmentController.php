@@ -23,7 +23,7 @@ class AssignmentController extends Controller
      */
     public function show(Assignment $assignment): JsonResponse
     {
-        $this->authorize('view assignments');
+        $this->authorize('assignments.view');
         $assignment->load(['vehicle', 'driver']);
         return response()->json($assignment);
     }
@@ -33,7 +33,7 @@ class AssignmentController extends Controller
      */
     public function store(StoreAssignmentRequest $request): JsonResponse
     {
-        $this->authorize('create assignments');
+        $this->authorize('assignments.create');
         $assignment = $this->assignmentService->createAssignment($request->validated());
         return response()->json($assignment, 201);
     }
@@ -43,7 +43,7 @@ class AssignmentController extends Controller
      */
     public function update(Request $request, Assignment $assignment): JsonResponse
     {
-        $this->authorize('edit assignments');
+        $this->authorize('assignments.update');
         // Validation will be more detailed later
         $validated = $request->validate([
             'driver_id' => 'sometimes|required|exists:drivers,id',
@@ -62,7 +62,7 @@ class AssignmentController extends Controller
      */
     public function destroy(Assignment $assignment): JsonResponse
     {
-        $this->authorize('delete assignments');
+        $this->authorize('assignments.delete');
         $assignment->delete();
         return response()->json(null, 204);
     }
@@ -72,7 +72,7 @@ class AssignmentController extends Controller
      */
     public function move(Request $request, Assignment $assignment): JsonResponse
     {
-        $this->authorize('edit assignments');
+        $this->authorize('assignments.update');
 
         $validated = $request->validate([
             'start_datetime' => 'required|date',

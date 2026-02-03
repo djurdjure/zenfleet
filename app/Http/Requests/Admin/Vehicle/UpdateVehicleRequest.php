@@ -9,7 +9,7 @@ class UpdateVehicleRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return $this->user()->can('edit vehicles');
+        return $this->user()->can('vehicles.update');
     }
 
     public function messages(): array

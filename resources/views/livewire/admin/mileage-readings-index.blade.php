@@ -246,7 +246,7 @@
 
             <x-slot:actions>
                 {{-- Bouton Export (Icon-only) --}}
-                @can('export mileage readings')
+                @can('mileage-readings.export')
                 <div class="relative" x-data="{ showExportMenu: false }">
                     <button
                         @click="showExportMenu = !showExportMenu"
@@ -285,7 +285,7 @@
                 @endcan
 
                 {{-- Bouton Nouveau Relevé (Icon-only) --}}
-                @can('create mileage readings')
+                @can('mileage-readings.create')
                 <a href="{{ route('admin.mileage-readings.update') }}"
                     title="Nouveau relevé"
                     class="inline-flex items-center gap-2 p-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg shadow-sm hover:shadow transition-all">
@@ -608,14 +608,14 @@
                                         title="Voir historique">
                                         <x-iconify icon="lucide:history" class="w-3.5 h-3.5 group-hover:scale-110 transition-transform" />
                                     </a>
-                                    @can('update mileage readings')
+                                    @canany(['mileage-readings.update.any', 'mileage-readings.update.own'])
                                     <button wire:click="editReading({{ $reading->id }})"
                                         class="p-2 rounded-full bg-gray-50 text-gray-400 hover:text-amber-600 hover:bg-amber-50 transition-all duration-200 group"
                                         title="Modifier">
                                         <x-iconify icon="lucide:edit-3" class="w-3.5 h-3.5 group-hover:scale-110 transition-transform" />
                                     </button>
-                                    @endcan
-                                    @can('delete mileage readings')
+                                    @endcanany
+                                    @can('mileage-readings.delete')
                                     <button wire:click="confirmDelete({{ $reading->id }})"
                                         class="p-2 rounded-full bg-gray-50 text-gray-400 hover:text-red-600 hover:bg-red-50 transition-all duration-200 group"
                                         title="Supprimer">
@@ -648,7 +648,7 @@
                                         Effacer les filtres
                                     </button>
                                     @else
-                                    @can('create mileage readings')
+                                    @can('mileage-readings.create')
                                     <a href="{{ route('admin.mileage-readings.update') }}"
                                         class="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg shadow-sm transition-colors">
                                         <x-iconify icon="lucide:plus" class="w-4 h-4" />

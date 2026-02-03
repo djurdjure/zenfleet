@@ -15,7 +15,7 @@ class DriverPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->can("view drivers");
+        return $user->can("drivers.view");
     }
 
     /**
@@ -23,15 +23,15 @@ class DriverPolicy
      */
     public function view(User $user, Driver $driver): bool
     {
-        return $user->can("view drivers") && $driver->organization_id === $user->organization_id;
+        return $user->can("drivers.view") && $driver->organization_id === $user->organization_id;
     }
 
     /**
-     * Determine whether the user can create drivers.
+     * Determine whether the user can drivers.create.
      */
     public function create(User $user): bool
     {
-        return $user->can("create drivers");
+        return $user->can("drivers.create");
     }
 
     /**
@@ -39,7 +39,7 @@ class DriverPolicy
      */
     public function update(User $user, Driver $driver): bool
     {
-        return $user->can("edit drivers") && $driver->organization_id === $user->organization_id;
+        return $user->can("drivers.update") && $driver->organization_id === $user->organization_id;
     }
 
     /**
@@ -47,7 +47,7 @@ class DriverPolicy
      */
     public function delete(User $user, Driver $driver): bool
     {
-        return $user->can("delete drivers") && $driver->organization_id === $user->organization_id;
+        return $user->can("drivers.delete") && $driver->organization_id === $user->organization_id;
     }
 
     /**
@@ -55,7 +55,7 @@ class DriverPolicy
      */
     public function restore(User $user, Driver $driver): bool
     {
-        return $user->can("restore drivers") && $driver->organization_id === $user->organization_id;
+        return $user->can("drivers.restore") && $driver->organization_id === $user->organization_id;
     }
 
     /**
@@ -63,6 +63,6 @@ class DriverPolicy
      */
     public function forceDelete(User $user, Driver $driver): bool
     {
-        return $user->can("force delete drivers") && $driver->organization_id === $user->organization_id;
+        return $user->can("force drivers.delete") && $driver->organization_id === $user->organization_id;
     }
 }

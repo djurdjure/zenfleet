@@ -327,7 +327,7 @@ class EnterpriseVehicleController extends Controller
      */
     public function export(Request $request): \Symfony\Component\HttpFoundation\BinaryFileResponse
     {
-        $this->authorize('export_vehicles');
+        $this->authorize('vehicles.export');
         $this->logUserAction('vehicle.export.requested', $request);
 
         try {

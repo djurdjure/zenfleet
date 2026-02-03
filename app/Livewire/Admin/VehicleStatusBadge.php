@@ -55,7 +55,7 @@ class VehicleStatusBadge extends Component
      */
     public function toggleDropdown()
     {
-        if (!auth()->user()->can('update-vehicle-status')) {
+        if (!auth()->user()->can('vehicles.status.update')) {
             $this->dispatch('toast', [
                 'type' => 'error',
                 'message' => 'Vous n\'avez pas la permission de changer les statuts.'
@@ -73,7 +73,7 @@ class VehicleStatusBadge extends Component
     {
         try {
             // Vérification permission
-            if (!auth()->user()->can('update-vehicle-status')) {
+            if (!auth()->user()->can('vehicles.status.update')) {
                 throw new \Exception('Permission refusée');
             }
 
@@ -166,7 +166,7 @@ class VehicleStatusBadge extends Component
         return view('livewire.admin.vehicle-status-badge', [
             'currentEnum' => $currentEnum,
             'allowedStatuses' => $allowedStatuses,
-            'canUpdate' => auth()->user()->can('update-vehicle-status'),
+            'canUpdate' => auth()->user()->can('vehicles.status.update'),
         ]);
     }
 }

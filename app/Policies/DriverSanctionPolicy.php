@@ -27,9 +27,9 @@ class DriverSanctionPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->can('view own driver sanctions')
-            || $user->can('view team driver sanctions')
-            || $user->can('view all driver sanctions');
+        return $user->can('driver-sanctions.view.own')
+            || $user->can('driver-sanctions.view.team')
+            || $user->can('driver-sanctions.view.all');
     }
 
     /**
@@ -42,7 +42,7 @@ class DriverSanctionPolicy
     public function view(User $user, DriverSanction $driverSanction): bool
     {
         // Permission de voir toutes les sanctions
-        if ($user->can('view all driver sanctions')) {
+        if ($user->can('driver-sanctions.view.all')) {
             // Pour Admin: vérifier l'organisation
             if ($user->hasRole('Admin')) {
                 return $user->organization_id === $driverSanction->organization_id;
@@ -52,12 +52,12 @@ class DriverSanctionPolicy
         }
 
         // Permission de voir les sanctions de l'équipe
-        if ($user->can('view team driver sanctions')) {
+        if ($user->can('driver-sanctions.view.team')) {
             return $user->organization_id === $driverSanction->organization_id;
         }
 
         // Permission de voir ses propres sanctions créées
-        if ($user->can('view own driver sanctions')) {
+        if ($user->can('driver-sanctions.view.own')) {
             return $driverSanction->supervisor_id === $user->id;
         }
 
@@ -72,7 +72,7 @@ class DriverSanctionPolicy
      */
     public function create(User $user): bool
     {
-        return $user->can('create driver sanctions');
+        return $user->can('driver-sanctions.create');
     }
 
     /**
@@ -90,7 +90,7 @@ class DriverSanctionPolicy
         }
 
         // Permission de modifier n'importe quelle sanction
-        if ($user->can('update any driver sanctions')) {
+        if ($user->can('driver-sanctions.update.any')) {
             // Pour Admin: vérifier l'organisation
             if ($user->hasRole('Admin')) {
                 return $user->organization_id === $driverSanction->organization_id;
@@ -100,7 +100,7 @@ class DriverSanctionPolicy
         }
 
         // Permission de modifier ses propres sanctions
-        if ($user->can('update own driver sanctions') && $driverSanction->supervisor_id === $user->id) {
+        if ($user->can('driver-sanctions.update.own') && $driverSanction->supervisor_id === $user->id) {
             // Autoriser la modification dans les 24h suivant la création
             return $driverSanction->created_at->diffInHours(now()) <= 24;
         }
@@ -117,7 +117,7 @@ class DriverSanctionPolicy
      */
     public function delete(User $user, DriverSanction $driverSanction): bool
     {
-        if (!$user->can('delete driver sanctions')) {
+        if (!$user->can('driver-sanctions.delete')) {
             return false;
         }
 
@@ -144,7 +144,7 @@ class DriverSanctionPolicy
             return false;
         }
 
-        if (!$user->can('archive driver sanctions')) {
+        if (!$user->can('driver-sanctions.archive')) {
             return false;
         }
 
@@ -180,7 +180,7 @@ class DriverSanctionPolicy
             return false;
         }
 
-        if (!$user->can('unarchive driver sanctions')) {
+        if (!$user->can('driver-sanctions.unarchive')) {
             return false;
         }
 
@@ -202,7 +202,7 @@ class DriverSanctionPolicy
      */
     public function restore(User $user, DriverSanction $driverSanction): bool
     {
-        if (!$user->can('restore driver sanctions')) {
+        if (!$user->can('driver-sanctions.restore')) {
             return false;
         }
 
@@ -219,7 +219,7 @@ class DriverSanctionPolicy
      */
     public function forceDelete(User $user, DriverSanction $driverSanction): bool
     {
-        if (!$user->can('force delete driver sanctions')) {
+        if (!$user->can('driver-sanctions.force-delete')) {
             return false;
         }
 

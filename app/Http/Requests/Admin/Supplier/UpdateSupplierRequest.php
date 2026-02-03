@@ -12,7 +12,7 @@ class UpdateSupplierRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return $this->user()->can('edit suppliers');
+        return $this->user()->can('suppliers.update');
     }
 
     /**

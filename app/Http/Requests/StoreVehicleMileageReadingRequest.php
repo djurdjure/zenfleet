@@ -25,7 +25,7 @@ class StoreVehicleMileageReadingRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return $this->user()->can('create mileage readings');
+        return $this->user()->can('mileage-readings.create');
     }
 
     /**

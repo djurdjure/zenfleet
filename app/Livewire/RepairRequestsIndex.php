@@ -133,7 +133,7 @@ class RepairRequestsIndex extends Component
         $user = auth()->user();
         
         // Chargement dynamique des options selon les permissions
-        if ($user->can('view all repair requests')) {
+        if ($user->can('repair-requests.view.all')) {
             $this->vehicleOptions = Vehicle::where('organization_id', $user->organization_id)
                 ->orderBy('registration_plate')
                 ->get();

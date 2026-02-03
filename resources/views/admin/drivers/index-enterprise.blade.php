@@ -70,7 +70,7 @@
  
  {{-- Actions Rapides --}}
  <div class="flex flex-wrap gap-3 mt-6">
- @can('create drivers')
+ @can('drivers.create')
  <a href="{{ route('admin.drivers.create') }}" 
  class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl hover:from-blue-700 hover:to-indigo-700 transition-all shadow-lg hover:shadow-xl transform hover:scale-105">
  <i class="fas fa-user-plus mr-2"></i>
@@ -78,7 +78,7 @@
  </a>
  @endcan
  
- @can('export drivers')
+ @can('drivers.export')
  <button onclick="exportDrivers()" 
  class="inline-flex items-center px-5 py-3 bg-white text-gray-700 rounded-xl hover:bg-gray-50 transition-all shadow-md hover:shadow-lg border border-gray-200">
  <i class="fas fa-file-export mr-2"></i>
@@ -86,7 +86,7 @@
  </button>
  @endcan
  
- @can('import drivers')
+ @can('drivers.import')
  <button onclick="importDrivers()" 
  class="inline-flex items-center px-5 py-3 bg-white text-gray-700 rounded-xl hover:bg-gray-50 transition-all shadow-md hover:shadow-lg border border-gray-200">
  <i class="fas fa-file-import mr-2"></i>
@@ -447,7 +447,7 @@
  {{-- Actions --}}
  <td class="px-6 py-4 text-center">
  <div class="flex items-center justify-center gap-2">
- @can('view drivers')
+ @can('drivers.view')
  <a href="{{ route('admin.drivers.show', $driver) }}" 
  class="p-2 bg-blue-100 text-blue-600 rounded-lg hover:bg-blue-200 transition-colors"
  title="Voir les détails">
@@ -455,7 +455,7 @@
  </a>
  @endcan
  
- @can('edit drivers')
+ @can('drivers.update')
  <a href="{{ route('admin.drivers.edit', $driver) }}" 
  class="p-2 bg-yellow-100 text-yellow-600 rounded-lg hover:bg-yellow-200 transition-colors"
  title="Modifier">
@@ -463,7 +463,7 @@
  </a>
  @endcan
  
- @can('delete drivers')
+ @can('drivers.delete')
  <form action="{{ route('admin.drivers.destroy', $driver) }}" 
  method="POST" 
  class="inline"
@@ -511,7 +511,7 @@
  Réinitialiser les filtres
  </a>
  @else
- @can('create drivers')
+ @can('drivers.create')
  <a href="{{ route('admin.drivers.create') }}" 
  class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl hover:from-blue-700 hover:to-indigo-700 transition-all shadow-lg">
  <i class="fas fa-user-plus mr-2"></i>

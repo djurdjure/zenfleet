@@ -33,7 +33,7 @@ class UserPermissionManager extends Component
         $this->user = User::with(['roles', 'permissions'])->findOrFail($userId);
 
         // Vérifier les permissions
-        if (!Auth::user()->can('edit users') && !Auth::user()->hasRole('Super Admin')) {
+        if (!Auth::user()->can('users.update') && !Auth::user()->hasRole('Super Admin')) {
             abort(403, 'Accès non autorisé');
         }
 

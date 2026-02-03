@@ -478,7 +478,7 @@ class VehicleController extends Controller
      */
     public function archive(Vehicle $vehicle): RedirectResponse
     {
-        $this->authorize('delete vehicles');
+        $this->authorize('vehicles.delete');
         $this->logUserAction('vehicle.archive.attempted', null, ['vehicle_id' => $vehicle->id]);
 
         try {
@@ -505,7 +505,7 @@ class VehicleController extends Controller
      */
     public function unarchive(Vehicle $vehicle): RedirectResponse
     {
-        $this->authorize('delete vehicles');
+        $this->authorize('vehicles.delete');
         $this->logUserAction('vehicle.unarchive.attempted', null, ['vehicle_id' => $vehicle->id]);
 
         try {
@@ -532,7 +532,7 @@ class VehicleController extends Controller
      */
     public function batchArchive(Request $request): RedirectResponse
     {
-        $this->authorize('delete vehicles');
+        $this->authorize('vehicles.delete');
         $this->logUserAction('vehicle.batch_archive.attempted', $request);
 
         try {
@@ -571,7 +571,7 @@ class VehicleController extends Controller
      */
     public function batchStatus(Request $request): RedirectResponse
     {
-        $this->authorize('edit vehicles');
+        $this->authorize('vehicles.update');
         $this->logUserAction('vehicle.batch_status.attempted', $request);
 
         try {
@@ -615,7 +615,7 @@ class VehicleController extends Controller
      */
     public function export(Request $request): \Symfony\Component\HttpFoundation\BinaryFileResponse
     {
-        $this->authorize('export_vehicles');
+        $this->authorize('vehicles.export');
         $this->logUserAction('vehicle.export.requested', $request);
 
         try {
@@ -1364,7 +1364,7 @@ class VehicleController extends Controller
      */
     public function showImportForm(): View|RedirectResponse
     {
-        $this->authorize('create vehicles');
+        $this->authorize('vehicles.create');
         $this->logUserAction('vehicle.import.form_accessed');
 
         try {
@@ -1398,7 +1398,7 @@ class VehicleController extends Controller
      */
     public function handleImport(Request $request): RedirectResponse
     {
-        $this->authorize('create vehicles');
+        $this->authorize('vehicles.create');
         $this->logUserAction('vehicle.import.started', $request);
 
         try {
@@ -1464,7 +1464,7 @@ class VehicleController extends Controller
      */
     public function showImportResults(): View|RedirectResponse
     {
-        $this->authorize('create vehicles');
+        $this->authorize('vehicles.create');
         $this->logUserAction('vehicle.import.results_viewed');
 
         try {
@@ -1496,7 +1496,7 @@ class VehicleController extends Controller
      */
     public function downloadTemplate(): \Symfony\Component\HttpFoundation\BinaryFileResponse
     {
-        $this->authorize('create vehicles');
+        $this->authorize('vehicles.create');
         $this->logUserAction('vehicle.import.template_downloaded');
 
         try {
@@ -1522,7 +1522,7 @@ class VehicleController extends Controller
      */
     public function preValidateImportFile(Request $request): \Illuminate\Http\JsonResponse
     {
-        $this->authorize('create vehicles');
+        $this->authorize('vehicles.create');
         $this->logUserAction('vehicle.import.prevalidation', $request);
 
         try {

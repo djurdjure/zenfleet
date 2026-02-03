@@ -19,7 +19,7 @@ class UserController extends Controller
 {
     public function index(Request $request): View
     {
-        $this->authorize('view users');
+        $this->authorize('users.view');
 
         $query = User::with(['roles', 'organization'])->withCount('vehicles');
 
@@ -36,7 +36,7 @@ class UserController extends Controller
 
     public function create(): View
     {
-        $this->authorize('create users');
+        $this->authorize('users.create');
 
         // 🛡️ SÉCURITÉ: Filtrer les rôles selon les permissions
         $roles = $this->getAssignableRoles();
@@ -53,7 +53,7 @@ class UserController extends Controller
 
     public function store(Request $request): RedirectResponse
     {
-        $this->authorize('create users');
+        $this->authorize('users.create');
 
         $user = auth()->user();
         $organizationId = $user->hasRole('Super Admin') ? $request->input('organization_id') : $user->organization_id;
@@ -100,7 +100,7 @@ class UserController extends Controller
 
     public function edit(User $user): View
     {
-        $this->authorize('edit users');
+        $this->authorize('users.update');
 
         // 🛡️ SÉCURITÉ: Filtrer les rôles selon les permissions
         $roles = $this->getAssignableRoles();
@@ -122,7 +122,7 @@ class UserController extends Controller
 
     public function update(Request $request, User $user): RedirectResponse
     {
-        $this->authorize('edit users');
+        $this->authorize('users.update');
 
         $loggedInUser = auth()->user();
 
@@ -182,7 +182,7 @@ class UserController extends Controller
 
     public function destroy(User $user): RedirectResponse
     {
-        $this->authorize('delete users');
+        $this->authorize('users.delete');
 
         if (auth()->id() == $user->id) {
             return back()->with('error', 'Vous ne pouvez pas supprimer votre propre compte.');

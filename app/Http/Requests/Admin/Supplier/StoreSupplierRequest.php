@@ -14,7 +14,7 @@ class StoreSupplierRequest extends FormRequest
     {
         // Seuls les utilisateurs avec la permission peuvent créer des fournisseurs.
         // Nous créerons cette permission plus tard.
-        return $this->user()->can('create suppliers');
+        return $this->user()->can('suppliers.create');
     }
 
     /**

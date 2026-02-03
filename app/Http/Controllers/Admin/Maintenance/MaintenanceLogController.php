@@ -34,7 +34,7 @@ class MaintenanceLogController extends Controller
      */
     public function index(Request $request): View
     {
-        $this->authorize('view maintenance logs');
+        $this->authorize('maintenance.logs.view');
         
         $organizationId = Auth::user()->organization_id;
         
@@ -96,7 +96,7 @@ class MaintenanceLogController extends Controller
      */
     public function create(Request $request): View
     {
-        $this->authorize('log maintenance');
+        $this->authorize('maintenance.log');
         
         $organizationId = Auth::user()->organization_id;
         
@@ -142,7 +142,7 @@ class MaintenanceLogController extends Controller
      */
     public function store(Request $request): RedirectResponse
     {
-        $this->authorize('log maintenance');
+        $this->authorize('maintenance.log');
         
         $organizationId = Auth::user()->organization_id;
         
@@ -275,7 +275,7 @@ class MaintenanceLogController extends Controller
      */
     public function show(MaintenanceLog $log): View
     {
-        $this->authorize('view maintenance logs');
+        $this->authorize('maintenance.logs.view');
         
         $organizationId = Auth::user()->organization_id;
         if ($organizationId && $log->vehicle->organization_id !== $organizationId) {
@@ -304,7 +304,7 @@ class MaintenanceLogController extends Controller
      */
     public function edit(MaintenanceLog $log): View
     {
-        $this->authorize('edit maintenance logs');
+        $this->authorize('maintenance.logs.update');
         
         $organizationId = Auth::user()->organization_id;
         if ($organizationId && $log->vehicle->organization_id !== $organizationId) {
@@ -340,7 +340,7 @@ class MaintenanceLogController extends Controller
      */
     public function update(Request $request, MaintenanceLog $log): RedirectResponse
     {
-        $this->authorize('edit maintenance logs');
+        $this->authorize('maintenance.logs.update');
         
         $organizationId = Auth::user()->organization_id;
         if ($organizationId && $log->vehicle->organization_id !== $organizationId) {
@@ -412,7 +412,7 @@ class MaintenanceLogController extends Controller
      */
     public function exportPdf(MaintenanceLog $log)
     {
-        $this->authorize('view maintenance logs');
+        $this->authorize('maintenance.logs.view');
         
         $organizationId = Auth::user()->organization_id;
         if ($organizationId && $log->vehicle->organization_id !== $organizationId) {

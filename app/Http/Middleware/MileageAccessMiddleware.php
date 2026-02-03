@@ -33,17 +33,17 @@ class MileageAccessMiddleware
         }
 
         // Gestionnaire Flotte avec permission complète
-        if ($user->hasRole('Gestionnaire Flotte') && $user->can('view all mileage readings')) {
+        if ($user->hasRole('Gestionnaire Flotte') && $user->can('mileage-readings.view.all')) {
             return $next($request);
         }
 
         // Superviseur avec accès équipe
-        if ($user->hasRole('Superviseur') && $user->can('view team mileage readings')) {
+        if ($user->hasRole('Superviseur') && $user->can('mileage-readings.view.team')) {
             return $next($request);
         }
 
         // Chauffeur ou autre rôle avec accès limité
-        if ($user->can('view own mileage readings')) {
+        if ($user->can('mileage-readings.view.own')) {
             return $next($request);
         }
 

@@ -232,7 +232,7 @@
                                     </button>
                                     @endif
 
-                                    @can('delete documents')
+                                    @can('documents.delete')
                                     <button wire:click="delete({{ $document->id }})" wire:confirm="Êtes-vous sûr ?" class="p-2 rounded-full text-gray-400 hover:text-red-600 hover:bg-red-50 transition-colors" title="Supprimer">
                                         <x-iconify icon="lucide:trash-2" class="w-4 h-4" />
                                     </button>

@@ -228,7 +228,7 @@
                             <span class="hidden lg:inline font-medium text-gray-700">Export</span>
                         </button>
 
-                        @can('create expenses')
+                        @can('expenses.create')
                         <a href="{{ route('admin.expenses.create') }}"
                            class="inline-flex items-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors duration-200 text-sm shadow-sm hover:shadow-md">
                             <x-iconify icon="lucide:plus-circle" class="w-5 h-5" />
@@ -547,14 +547,14 @@
                                         <x-iconify icon="lucide:check" class="w-4 h-4" />
                                     </button>
                                     @endif
-                                    @can('update expenses')
+                                    @can('expenses.update')
                                     <a href="{{ route('admin.expenses.edit', $expense) }}"
                                        class="p-1.5 text-gray-600 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition-colors"
                                        title="Modifier">
                                         <x-iconify icon="lucide:pencil" class="w-4 h-4" />
                                     </a>
                                     @endcan
-                                    @can('delete expenses')
+                                    @can('expenses.delete')
                                     <button onclick="deleteExpense({{ $expense->id }})"
                                             class="p-1.5 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                                             title="Supprimer">
@@ -573,7 +573,7 @@
                                     </div>
                                     <h3 class="text-lg font-medium text-gray-900 mb-2">Aucune dépense trouvée</h3>
                                     <p class="text-gray-600 mb-4">Commencez par ajouter une nouvelle dépense</p>
-                                    @can('create expenses')
+                                    @can('expenses.create')
                                     <a href="{{ route('admin.expenses.create') }}"
                                        class="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
                                         <x-iconify icon="lucide:plus" class="w-4 h-4" />

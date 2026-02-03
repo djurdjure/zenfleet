@@ -35,7 +35,7 @@
                     <div class="flex justify-between items-center mb-6">
                         <h3 class="text-xl font-semibold text-gray-700">{{ __('Liste des Catégories') }}</h3>
                         <div class="flex space-x-2">
-                            @can('manage document_categories')
+                            @can('document-categories.manage')
                             <a href="{{ route('admin.document-categories.create') }}" class="inline-flex items-center px-4 py-2 bg-primary-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-primary-700">
                                 <x-iconify icon="heroicons:plus" -circle class="w-4 h-4 mr-2" stroke-width="1.5" / />
                                 Ajouter
@@ -66,7 +66,7 @@
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                         <div class="flex items-center justify-end space-x-2">
-                                            @can('manage document_categories')
+                                            @can('document-categories.manage')
                                             <a href="{{ route('admin.document-categories.edit', $category) }}" title="Modifier" class="p-2 rounded-full text-gray-400 hover:bg-primary-100 hover:text-primary-600">
                                                 <x-iconify icon="heroicons:document" -pen-line class="h-5 w-5" stroke-width="1.5" / />
                                             </a>

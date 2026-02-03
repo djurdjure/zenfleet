@@ -351,8 +351,8 @@ class DriverStatusBadgeUltraPro extends Component
      */
     protected function canUpdateStatus(): bool
     {
-        return auth()->user()->can('update drivers') ||
-            auth()->user()->can('manage drivers') ||
+        return auth()->user()->can('drivers.update') ||
+            auth()->user()->can('drivers.manage') ||
             auth()->user()->hasRole(['Admin', 'Super Admin', 'Fleet Manager', 'admin', 'super-admin', 'fleet-manager']);
     }
 

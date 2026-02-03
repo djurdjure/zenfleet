@@ -30,9 +30,9 @@ class VehicleMileageReadingPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->can('view own mileage readings')
-            || $user->can('view team mileage readings')
-            || $user->can('view all mileage readings');
+        return $user->can('mileage-readings.view.own')
+            || $user->can('mileage-readings.view.team')
+            || $user->can('mileage-readings.view.all');
     }
 
     /**
@@ -51,12 +51,12 @@ class VehicleMileageReadingPolicy
         }
 
         // View all: Admin, Fleet Manager
-        if ($user->can('view all mileage readings')) {
+        if ($user->can('mileage-readings.view.all')) {
             return true;
         }
 
         // View team: Supervisor (same team/depot)
-        if ($user->can('view team mileage readings')) {
+        if ($user->can('mileage-readings.view.team')) {
             // Check if user supervises the vehicle's depot or category
             $vehicle = $reading->vehicle;
 
@@ -69,7 +69,7 @@ class VehicleMileageReadingPolicy
         }
 
         // View own: Driver (readings they created)
-        if ($user->can('view own mileage readings')) {
+        if ($user->can('mileage-readings.view.own')) {
             return $reading->recorded_by_id === $user->id;
         }
 
@@ -77,11 +77,11 @@ class VehicleMileageReadingPolicy
     }
 
     /**
-     * Determine if user can create mileage readings.
+     * Determine if user can mileage-readings.create.
      */
     public function create(User $user): bool
     {
-        return $user->can('create mileage readings');
+        return $user->can('mileage-readings.create');
     }
 
     /**
@@ -100,17 +100,17 @@ class VehicleMileageReadingPolicy
         }
 
         // Automatic readings cannot be updated manually (only by admins)
-        if ($reading->is_automatic && !$user->can('manage automatic mileage readings')) {
+        if ($reading->is_automatic && !$user->can('mileage-readings.manage.automatic')) {
             return false;
         }
 
         // Update any: Admin, Fleet Manager
-        if ($user->can('update any mileage readings')) {
+        if ($user->can('mileage-readings.update.any')) {
             return true;
         }
 
         // Update own: Driver (within 24h of creation)
-        if ($user->can('update own mileage readings') && $reading->recorded_by_id === $user->id) {
+        if ($user->can('mileage-readings.update.own') && $reading->recorded_by_id === $user->id) {
             // Check if reading is less than 24 hours old
             $hoursOld = $reading->created_at->diffInHours(now());
 
@@ -138,19 +138,19 @@ class VehicleMileageReadingPolicy
         }
 
         // Force delete permission (admin only)
-        if ($user->can('force delete mileage readings')) {
+        if ($user->can('mileage-readings.force-delete')) {
             return true;
         }
 
         // Regular delete permission
-        if (!$user->can('delete mileage readings')) {
+        if (!$user->can('mileage-readings.delete')) {
             return false;
         }
 
         // Business rule: Cannot delete readings older than 7 days (except admins)
         $daysOld = $reading->created_at->diffInDays(now());
 
-        if ($daysOld > 7 && !$user->can('update any mileage readings')) {
+        if ($daysOld > 7 && !$user->can('mileage-readings.update.any')) {
             return false;
         }
 
@@ -172,7 +172,7 @@ class VehicleMileageReadingPolicy
             return false;
         }
 
-        return $user->can('restore mileage readings');
+        return $user->can('mileage-readings.restore');
     }
 
     /**
@@ -185,30 +185,30 @@ class VehicleMileageReadingPolicy
             return false;
         }
 
-        return $user->can('force delete mileage readings');
+        return $user->can('mileage-readings.force-delete');
     }
 
     /**
-     * Determine if user can manage automatic mileage readings.
+     * Determine if user can mileage-readings.manage.automatic.
      */
     public function manageAutomatic(User $user): bool
     {
-        return $user->can('manage automatic mileage readings');
+        return $user->can('mileage-readings.manage.automatic');
     }
 
     /**
-     * Determine if user can export mileage readings.
+     * Determine if user can mileage-readings.export.
      */
     public function export(User $user): bool
     {
-        return $user->can('export mileage readings');
+        return $user->can('mileage-readings.export');
     }
 
     /**
-     * Determine if user can view mileage statistics.
+     * Determine if user can mileage-readings.view.statistics.
      */
     public function viewStatistics(User $user): bool
     {
-        return $user->can('view mileage statistics');
+        return $user->can('mileage-readings.view.statistics');
     }
 }

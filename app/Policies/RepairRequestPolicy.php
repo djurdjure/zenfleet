@@ -40,9 +40,9 @@ class RepairRequestPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->can('view all repair requests')
-            || $user->can('view team repair requests')
-            || $user->can('view own repair requests');
+        return $user->can('repair-requests.view.all')
+            || $user->can('repair-requests.view.team')
+            || $user->can('repair-requests.view.own');
     }
 
     /**
@@ -56,17 +56,17 @@ class RepairRequestPolicy
         }
 
         // Admin and Fleet Manager can view all in their org
-        if ($user->can('view all repair requests')) {
+        if ($user->can('repair-requests.view.all')) {
             return true;
         }
 
         // Supervisor can view team requests (their supervised drivers)
-        if ($user->can('view team repair requests')) {
+        if ($user->can('repair-requests.view.team')) {
             return $this->isTeamRequest($user, $repairRequest);
         }
 
         // Driver can view their own requests
-        if ($user->can('view own repair requests')) {
+        if ($user->can('repair-requests.view.own')) {
             return $repairRequest->driver->user_id === $user->id;
         }
 
@@ -74,11 +74,11 @@ class RepairRequestPolicy
     }
 
     /**
-     * Determine whether the user can create repair requests.
+     * Determine whether the user can repair-requests.create.
      */
     public function create(User $user): bool
     {
-        return $user->can('create repair requests');
+        return $user->can('repair-requests.create');
     }
 
     /**
@@ -125,7 +125,7 @@ class RepairRequestPolicy
         }
 
         // Must have permission
-        if (!$user->can('approve repair requests level 1')) {
+        if (!$user->can('repair-requests.approve.level1')) {
             return false;
         }
 
@@ -163,7 +163,7 @@ class RepairRequestPolicy
         }
 
         // Must have permission
-        if (!$user->can('approve repair requests level 2')) {
+        if (!$user->can('repair-requests.approve.level2')) {
             return false;
         }
 
@@ -191,7 +191,7 @@ class RepairRequestPolicy
         }
 
         // Must have delete permission
-        if (!$user->can('delete repair requests')) {
+        if (!$user->can('repair-requests.delete')) {
             return false;
         }
 
@@ -219,7 +219,7 @@ class RepairRequestPolicy
         }
 
         // Only Admin can force delete
-        return $user->hasRole('Admin') && $user->can('force delete repair requests');
+        return $user->hasRole('Admin') && $user->can('repair-requests.force-delete');
     }
 
     /**
@@ -233,7 +233,7 @@ class RepairRequestPolicy
         }
 
         // Only Admin can restore
-        return $user->hasRole('Admin') && $user->can('restore repair requests');
+        return $user->hasRole('Admin') && $user->can('repair-requests.restore');
     }
 
     /**
@@ -264,11 +264,11 @@ class RepairRequestPolicy
     }
 
     /**
-     * Determine whether user can export repair requests.
+     * Determine whether user can repair-requests.export.
      */
     public function export(User $user): bool
     {
-        return $user->can('export repair requests')
+        return $user->can('repair-requests.export')
             || $user->hasRole(['Admin', 'Fleet Manager']);
     }
 }

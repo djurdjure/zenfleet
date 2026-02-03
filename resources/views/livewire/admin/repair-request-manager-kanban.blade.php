@@ -17,7 +17,7 @@
  Filtres
  <span x-show="showFilters" class="ml-2 text-xs bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full">Actifs</span>
  </button>
- @can('create repair requests')
+ @can('repair-requests.create')
  <button
  wire:click="openCreateModal"
  class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 transition-colors">

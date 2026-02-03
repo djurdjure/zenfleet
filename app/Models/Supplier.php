@@ -126,6 +126,11 @@ class Supplier extends Model
         'blacklisted' => 'boolean'
     ];
 
+    public function getNameAttribute(): string
+    {
+        return (string) ($this->company_name ?? '');
+    }
+
     // Relations
     public function repairRequests(): HasMany
     {

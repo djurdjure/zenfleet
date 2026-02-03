@@ -29,7 +29,7 @@
                     <div class="flex justify-between items-center mb-6">
                         <h3 class="text-xl font-semibold text-gray-700">{{ __('Liste des Documents') }}</h3>
                         <div class="flex space-x-2">
-                            @can('create documents')
+                            @can('documents.create')
                             <a href="{{ route('admin.documents.create') }}" class="inline-flex items-center px-4 py-2 bg-primary-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-primary-700">
                                 <x-iconify icon="heroicons:arrow-up-tray" class="w-4 h-4 mr-2" stroke-width="1.5" / />
                                 Importer
@@ -77,17 +77,17 @@
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $document->created_at->format('d/m/Y H:i') }}</td>
                                     <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                         <div class="flex items-center justify-end space-x-2">
-                                            @can('download documents')
+                                            @can('documents.download')
                                             <a href="#" title="Télécharger" class="p-2 rounded-full text-gray-400 hover:bg-primary-100 hover:text-primary-600">
                                                 <x-iconify icon="heroicons:arrow-down-tray" class="h-5 w-5" stroke-width="1.5" / />
                                             </a>
                                             @endcan
-                                            @can('edit documents')
+                                            @can('documents.update')
                                             <a href="{{ route('admin.documents.edit', $document) }}" title="Modifier" class="p-2 rounded-full text-gray-400 hover:bg-primary-100 hover:text-primary-600">
                                                 <x-iconify icon="heroicons:document" -pen-line class="h-5 w-5" stroke-width="1.5" / />
                                             </a>
                                             @endcan
-                                            @can('delete documents')
+                                            @can('documents.delete')
                                             <button type="button" @click="openModal($event)"
                                                 data-document='@json($document->only([' id', 'original_filename' ]))'
                                                 data-url="{{ route('admin.documents.destroy', $document) }}"

@@ -51,18 +51,18 @@ class AssignVehiclePermissionsCommand extends Command
      * 🎯 Permissions véhicules à assigner
      */
     private const VEHICLE_PERMISSIONS = [
-        'view vehicles',
-        'create vehicles',
-        'update vehicles',
-        'delete vehicles',
-        'restore vehicles',
-        'force-delete vehicles',
-        'export vehicles',
-        'import vehicles',
-        'view vehicle history',
-        'manage vehicle maintenance',
-        'manage vehicle documents',
-        'assign vehicles',
+        'vehicles.view',
+        'vehicles.create',
+        'vehicles.update',
+        'vehicles.delete',
+        'vehicles.restore',
+        'vehicles.force-delete',
+        'vehicles.export',
+        'vehicles.import',
+        'vehicles.history.view',
+        'vehicles.maintenance.manage',
+        'vehicles.documents.manage',
+        'vehicles.assign',
     ];
 
     /**
@@ -360,15 +360,15 @@ class AssignVehiclePermissionsCommand extends Command
 
         $user->load('roles.permissions');
 
-        $canView = $user->can('view vehicles');
-        $canCreate = $user->can('create vehicles');
-        $canUpdate = $user->can('update vehicles');
-        $canDelete = $user->can('delete vehicles');
+        $canView = $user->can('vehicles.view');
+        $canCreate = $user->can('vehicles.create');
+        $canUpdate = $user->can('vehicles.update');
+        $canDelete = $user->can('vehicles.delete');
 
-        $this->line("   " . ($canView ? "✅" : "❌") . " view vehicles");
-        $this->line("   " . ($canCreate ? "✅" : "❌") . " create vehicles");
-        $this->line("   " . ($canUpdate ? "✅" : "❌") . " update vehicles");
-        $this->line("   " . ($canDelete ? "✅" : "❌") . " delete vehicles");
+        $this->line("   " . ($canView ? "✅" : "❌") . " vehicles.view");
+        $this->line("   " . ($canCreate ? "✅" : "❌") . " vehicles.create");
+        $this->line("   " . ($canUpdate ? "✅" : "❌") . " vehicles.update");
+        $this->line("   " . ($canDelete ? "✅" : "❌") . " vehicles.delete");
 
         $allGranted = $canView && $canCreate && $canUpdate && $canDelete;
 

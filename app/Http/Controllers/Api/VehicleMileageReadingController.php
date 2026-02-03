@@ -63,10 +63,10 @@ class VehicleMileageReadingController extends Controller
             ->with(['vehicle', 'recordedBy', 'organization']);
 
         // Apply permission-based scoping
-        if ($user->can('view all mileage readings')) {
+        if ($user->can('mileage-readings.view.all')) {
             // Admin/Fleet Manager: See all organization readings
             // No additional filter needed
-        } elseif ($user->can('view team mileage readings')) {
+        } elseif ($user->can('mileage-readings.view.team')) {
             // Supervisor: See team readings (same depot)
             $query->whereHas('vehicle', function ($q) use ($user) {
                 if ($user->depot_id) {

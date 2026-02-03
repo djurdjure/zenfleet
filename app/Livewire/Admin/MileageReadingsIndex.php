@@ -162,9 +162,9 @@ class MileageReadingsIndex extends Component
             ->where('organization_id', $user->organization_id);
 
         // 🔐 PERMISSION-BASED SCOPING
-        if ($user->can('view all mileage readings')) {
+        if ($user->can('mileage-readings.view.all')) {
             // Tous les relevés de l'organisation
-        } elseif ($user->can('view team mileage readings')) {
+        } elseif ($user->can('mileage-readings.view.team')) {
             // Relevés de l'équipe/dépôt
             $query->whereHas('vehicle', function ($q) use ($user) {
                 if ($user->depot_id) {
@@ -353,7 +353,7 @@ class MileageReadingsIndex extends Component
             ->findOrFail($id);
 
         // Vérifier les permissions
-        if (!auth()->user()->can('delete mileage readings')) {
+        if (!auth()->user()->can('mileage-readings.delete')) {
             session()->flash('error', 'Vous n\'avez pas la permission de supprimer des relevés.');
             return;
         }
@@ -381,7 +381,7 @@ class MileageReadingsIndex extends Component
                 ->findOrFail($this->deleteId);
 
             // Vérifier les permissions
-            if (!auth()->user()->can('delete mileage readings')) {
+            if (!auth()->user()->can('mileage-readings.delete')) {
                 session()->flash('error', 'Vous n\'avez pas la permission de supprimer des relevés.');
                 return;
             }

@@ -48,7 +48,7 @@ class SupplierIndex extends Component
 
     public function mount(): void
     {
-        $this->authorize('view suppliers');
+        $this->authorize('suppliers.view');
     }
 
     public function updatingSearch(): void
@@ -125,7 +125,7 @@ class SupplierIndex extends Component
 
     public function render()
     {
-        $this->authorize('view suppliers');
+        $this->authorize('suppliers.view');
 
         $filters = [
             'search' => $this->search,

@@ -32,7 +32,7 @@ class MaintenancePlanController extends Controller
      */
     public function index(Request $request): View
     {
-        $this->authorize('manage maintenance plans');
+        $this->authorize('maintenance.plans.manage');
         
         try {
             $organizationId = Auth::user()->organization_id;
@@ -200,7 +200,7 @@ class MaintenancePlanController extends Controller
      */
     public function create(): View
     {
-        $this->authorize('manage maintenance plans');
+        $this->authorize('maintenance.plans.manage');
         
         $organizationId = Auth::user()->organization_id;
         
@@ -235,7 +235,7 @@ class MaintenancePlanController extends Controller
      */
     public function store(Request $request): RedirectResponse
     {
-        $this->authorize('manage maintenance plans');
+        $this->authorize('maintenance.plans.manage');
         
         $organizationId = Auth::user()->organization_id;
         
@@ -347,7 +347,7 @@ class MaintenancePlanController extends Controller
      */
     public function update(Request $request, MaintenancePlan $plan): RedirectResponse
     {
-        $this->authorize('manage maintenance plans');
+        $this->authorize('maintenance.plans.manage');
         
         // Vérifier l'accès à l'organisation
         $organizationId = Auth::user()->organization_id;
@@ -412,7 +412,7 @@ class MaintenancePlanController extends Controller
      */
     public function destroy(MaintenancePlan $plan): RedirectResponse
     {
-        $this->authorize('manage maintenance plans');
+        $this->authorize('maintenance.plans.manage');
         
         // Vérifier l'accès à l'organisation
         $organizationId = Auth::user()->organization_id;
@@ -472,7 +472,7 @@ class MaintenancePlanController extends Controller
      */
     public function duplicate(Request $request, MaintenancePlan $plan): RedirectResponse
     {
-        $this->authorize('manage maintenance plans');
+        $this->authorize('maintenance.plans.manage');
         
         $organizationId = Auth::user()->organization_id;
         if ($organizationId && $plan->vehicle->organization_id !== $organizationId) {
@@ -566,7 +566,7 @@ class MaintenancePlanController extends Controller
      */
     public function show(MaintenancePlan $plan): JsonResponse
     {
-        $this->authorize('manage maintenance plans');
+        $this->authorize('maintenance.plans.manage');
         
         $organizationId = Auth::user()->organization_id;
         if ($organizationId && $plan->vehicle->organization_id !== $organizationId) {
