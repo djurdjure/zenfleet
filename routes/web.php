@@ -92,7 +92,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 | 🏢 ZONE ADMINISTRATION - RBAC ULTRA-SÉCURISÉ
 |--------------------------------------------------------------------------
 */
-Route::middleware(['auth', 'verified'])
+Route::middleware(['auth', 'verified', 'audit.log'])
     ->prefix('admin')
     ->name('admin.')
     ->group(function () {

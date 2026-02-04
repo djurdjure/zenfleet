@@ -40,9 +40,25 @@ class EnterprisePermissionMiddleware
         'admin.vehicles.edit' => 'vehicles.update',
         'admin.vehicles.update' => 'vehicles.update',
         'admin.vehicles.destroy' => 'vehicles.delete',
+        'admin.vehicles.archived' => 'vehicles.view',
+        'admin.vehicles.archive' => 'vehicles.delete',
+        'admin.vehicles.unarchive' => 'vehicles.restore',
         'admin.vehicles.restore' => 'vehicles.restore',
+        'admin.vehicles.restore.soft' => 'vehicles.restore',
+        'admin.vehicles.force-delete' => 'vehicles.delete',
         'admin.vehicles.export' => 'vehicles.export',
+        'admin.vehicles.export.csv' => 'vehicles.export',
+        'admin.vehicles.export.excel' => 'vehicles.export',
+        'admin.vehicles.export.pdf' => 'vehicles.export',
+        'admin.vehicles.export.single.pdf' => 'vehicles.export',
         'admin.vehicles.import.*' => 'vehicles.import',
+        'admin.vehicles.batch.archive' => 'vehicles.delete',
+        'admin.vehicles.batch.status' => 'vehicles.update',
+        'admin.vehicles.history' => 'vehicles.history.view',
+        'admin.vehicles.maintenance' => 'vehicles.maintenance.manage',
+        'admin.vehicles.documents' => 'vehicles.documents.manage',
+        'admin.vehicles.duplicate' => 'vehicles.create',
+        'admin.vehicles.mileage-history' => 'mileage-readings.view.own',
 
         // Chauffeurs
         'admin.drivers.index' => 'drivers.view',
@@ -52,9 +68,20 @@ class EnterprisePermissionMiddleware
         'admin.drivers.edit' => 'drivers.update',
         'admin.drivers.update' => 'drivers.update',
         'admin.drivers.destroy' => 'drivers.delete',
+        'admin.drivers.force-delete' => 'drivers.delete',
+        'admin.drivers.archived' => 'drivers.view',
+        'admin.drivers.archived.export' => 'drivers.export',
+        'admin.drivers.archived.bulk-restore' => 'drivers.restore',
         'admin.drivers.restore' => 'drivers.restore',
         'admin.drivers.export' => 'drivers.export',
+        'admin.drivers.export.csv' => 'drivers.export',
+        'admin.drivers.export.excel' => 'drivers.export',
+        'admin.drivers.export.pdf' => 'drivers.export',
+        'admin.drivers.export.profile.pdf' => 'drivers.export',
+        'admin.drivers.statistics' => 'drivers.view',
         'admin.drivers.import.*' => 'drivers.import',
+        'admin.drivers.sanctions.index' => 'driver-sanctions.view.all',
+        'admin.drivers.sanctions.show' => 'driver-sanctions.view.all',
 
         // Affectations - FORMAT MODERNE (dot notation)
         'admin.assignments.index' => 'assignments.view',
@@ -66,6 +93,19 @@ class EnterprisePermissionMiddleware
         'admin.assignments.destroy' => 'assignments.delete',
         'admin.assignments.end' => 'assignments.end',
         'admin.assignments.export' => 'assignments.export',
+        'admin.assignments.export.pdf' => 'assignments.export',
+        'admin.assignments.calendar' => 'assignments.view',
+        'admin.assignments.gantt' => 'assignments.view-gantt',
+        'admin.assignments.stats' => 'assignments.view-stats',
+        'admin.assignments.health-dashboard' => 'assignments.view-stats',
+        'admin.assignments.health' => 'assignments.view-stats',
+        'admin.assignments.zombies' => 'assignments.view-stats',
+        'admin.assignments.metrics' => 'assignments.view-stats',
+        'admin.assignments.heal' => 'assignments.update',
+        'admin.assignments.details' => 'assignments.view',
+        'admin.assignments.extend' => 'assignments.update',
+        'admin.vehicles.available' => 'assignments.create',
+        'admin.drivers.available' => 'assignments.create',
 
         // Utilisateurs
         'admin.users.index' => 'users.view',
@@ -74,6 +114,12 @@ class EnterprisePermissionMiddleware
         'admin.users.show' => 'users.view',
         'admin.users.edit' => 'users.update',
         'admin.users.update' => 'users.update',
+        'admin.users.permissions' => 'users.update',
+        'admin.users.assign-role' => 'users.update',
+        'admin.users.toggle-status' => 'users.update',
+        'admin.users.reset-password' => 'users.update',
+        'admin.users.impersonate' => 'users.update',
+        'admin.users.vehicles.manage' => 'users.update',
         'admin.users.destroy' => 'users.delete',
         'admin.users.force-delete' => 'users.delete',
         'admin.users.export' => 'users.export',
@@ -102,6 +148,14 @@ class EnterprisePermissionMiddleware
         'admin.suppliers.edit' => 'suppliers.update',
         'admin.suppliers.update' => 'suppliers.update',
         'admin.suppliers.destroy' => 'suppliers.delete',
+        'admin.suppliers.export' => 'suppliers.view',
+        'admin.supplier-categories.index' => 'suppliers.update',
+        'admin.supplier-categories.create' => 'suppliers.update',
+        'admin.supplier-categories.store' => 'suppliers.update',
+        'admin.supplier-categories.show' => 'suppliers.update',
+        'admin.supplier-categories.edit' => 'suppliers.update',
+        'admin.supplier-categories.update' => 'suppliers.update',
+        'admin.supplier-categories.destroy' => 'suppliers.update',
 
         // Maintenance
         'admin.maintenance.*' => 'maintenance.view',
@@ -115,14 +169,15 @@ class EnterprisePermissionMiddleware
         'admin.repair-requests.index' => 'repair-requests.view.own', // Minimum permission
         'admin.repair-requests.create' => 'repair-requests.create',
         'admin.repair-requests.store' => 'repair-requests.create',
+        'admin.repair-requests.export' => 'repair-requests.export',
         'admin.repair-requests.show' => 'repair-requests.view.own',
         'admin.repair-requests.edit' => 'repair-requests.update.own',
         'admin.repair-requests.update' => 'repair-requests.update.own',
         'admin.repair-requests.destroy' => 'repair-requests.delete',
-        'admin.repair-requests.approve-level-one' => 'repair-requests.approve.level1',
-        'admin.repair-requests.reject-level-one' => 'repair-requests.reject.level1',
-        'admin.repair-requests.approve-level-two' => 'repair-requests.approve.level2',
-        'admin.repair-requests.reject-level-two' => 'repair-requests.reject.level2',
+        'admin.repair-requests.approve-supervisor' => 'repair-requests.approve.level1',
+        'admin.repair-requests.reject-supervisor' => 'repair-requests.reject.level1',
+        'admin.repair-requests.approve-fleet-manager' => 'repair-requests.approve.level2',
+        'admin.repair-requests.reject-fleet-manager' => 'repair-requests.reject.level2',
 
         // Relevés Kilométriques
         'admin.mileage-readings.index' => 'mileage-readings.view.own', // Minimum permission
@@ -133,6 +188,8 @@ class EnterprisePermissionMiddleware
         'admin.mileage-readings.update' => 'mileage-readings.update.own',
         'admin.mileage-readings.destroy' => 'mileage-readings.delete',
         'admin.mileage-readings.export' => 'mileage-readings.export',
+        'admin.mileage-readings.export.csv' => 'mileage-readings.export',
+        'admin.mileage-readings.export.pdf' => 'mileage-readings.export',
         'admin.mileage-readings.statistics' => 'mileage-readings.view.statistics',
 
         // Organisations (Super Admin seulement)
@@ -153,6 +210,44 @@ class EnterprisePermissionMiddleware
         'admin.depots.destroy' => 'depots.delete',
         'admin.depots.export.pdf' => 'depots.export',
         'admin.depots.restore' => 'depots.restore',
+
+        // Dépenses véhicules
+        'admin.vehicle-expenses.index' => 'expenses.view',
+        'admin.vehicle-expenses.dashboard' => 'expenses.dashboard.view',
+        'admin.vehicle-expenses.create' => 'expenses.create',
+        'admin.vehicle-expenses.store' => 'expenses.create',
+        'admin.vehicle-expenses.show' => 'expenses.view',
+        'admin.vehicle-expenses.edit' => 'expenses.update',
+        'admin.vehicle-expenses.update' => 'expenses.update',
+        'admin.vehicle-expenses.destroy' => 'expenses.delete',
+        'admin.vehicle-expenses.request-approval' => 'expenses.update',
+        'admin.vehicle-expenses.approve' => 'expenses.approve',
+        'admin.vehicle-expenses.reject-approval' => 'expenses.reject',
+        'admin.vehicle-expenses.mark-paid' => 'expenses.mark-paid',
+        'admin.vehicle-expenses.audit' => 'expenses.audit.view',
+        'admin.vehicle-expenses.import.show' => 'expenses.import',
+        'admin.vehicle-expenses.import.handle' => 'expenses.import',
+        'admin.vehicle-expenses.export' => 'expenses.export',
+        'admin.vehicle-expenses.create-recurring' => 'expenses.create',
+        'admin.vehicle-expenses.analytics.fuel-efficiency' => 'expenses.analytics.view',
+        'admin.vehicle-expenses.analytics.cost-trends' => 'expenses.analytics.view',
+        'admin.vehicle-expenses.analytics.budget-utilization' => 'expenses.analytics.view',
+
+        // Documents & catégories
+        'admin.documents.search' => 'documents.view',
+        'admin.documents.download' => 'documents.download',
+        'admin.documents.expired' => 'documents.view',
+        'admin.documents.expiring-soon' => 'documents.view',
+        'admin.document-categories.index' => 'document-categories.manage',
+        'admin.document-categories.create' => 'document-categories.manage',
+        'admin.document-categories.store' => 'document-categories.manage',
+        'admin.document-categories.show' => 'document-categories.manage',
+        'admin.document-categories.edit' => 'document-categories.manage',
+        'admin.document-categories.update' => 'document-categories.manage',
+        'admin.document-categories.destroy' => 'document-categories.manage',
+
+        // Modules temporaires
+        'admin.maintenance-temp.index' => 'maintenance.view',
 
         // Système (Super Admin seulement)
         'admin.system.*' => 'system.view',
@@ -176,8 +271,15 @@ class EnterprisePermissionMiddleware
         // Safety check for route name
         if (empty($routeName)) {
             Log::warning('Route accessed without name', ['url' => $request->fullUrl()]);
-            // Continue without permission check if route has no name (or handle strictly)
-            // For now, let it pass but log it safely
+            $this->logUnmappedRoute($request, 'unnamed');
+
+            if ($this->shouldFailClosed()) {
+                return $this->handleUnauthorized(
+                    $request,
+                    'Route sans nom (fail-closed)'
+                );
+            }
+
             return $next($request);
         }
 
@@ -234,15 +336,11 @@ class EnterprisePermissionMiddleware
 
         if (!$requiredPermission) {
             $this->logUnmappedRoute($request, $routeName);
-
-            if (app()->environment('local', 'development')) {
+            if (!$this->shouldFailClosed()) {
                 return $next($request);
             }
 
-            return $this->handleUnauthorized(
-                $request,
-                "Route non mappée: {$routeName}"
-            );
+            return $this->handleUnauthorized($request, "Route non mappée: {$routeName}");
         }
 
         // Vérifier la permission avec support hiérarchique
@@ -516,5 +614,10 @@ class EnterprisePermissionMiddleware
                 'error' => $e->getMessage()
             ]);
         }
+    }
+
+    private function shouldFailClosed(): bool
+    {
+        return (bool) config('security.fail_closed', true);
     }
 }
