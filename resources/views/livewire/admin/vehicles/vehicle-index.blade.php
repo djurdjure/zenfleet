@@ -188,14 +188,16 @@
                     </div>
                 </div>
 
-                @can('vehicles.create')
+                @can('vehicles.import')
                 {{-- Import --}}
                 <a href="{{ route('admin.vehicles.import.show') }}"
                     title="Importer"
                     class="inline-flex items-center gap-2 p-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-all duration-200 shadow-sm hover:shadow-md">
                     <x-iconify icon="lucide:upload" class="w-5 h-5" />
                 </a>
+                @endcan
 
+                @can('vehicles.create')
                 {{-- Nouveau Véhicule --}}
                 <a href="{{ route('admin.vehicles.create') }}"
                     title="Nouveau Véhicule"
@@ -599,7 +601,7 @@
                         @if($visibility === 'archived')
                         {{-- Restore --}}
                         <button
-                            wire:click="bulkRestore"
+                            wire:click="confirmBulkRestore"
                             wire:loading.attr="disabled"
                             wire:loading.class="opacity-50 cursor-not-allowed"
                             class="inline-flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg transition-colors shadow-sm">
@@ -610,8 +612,7 @@
 
                         {{-- Force Delete --}}
                         <button
-                            wire:click="bulkForceDelete"
-                            wire:confirm="Êtes-vous sûr de vouloir supprimer définitivement ces véhicules ? Cette action est irréversible."
+                            wire:click="confirmBulkForceDelete"
                             wire:loading.attr="disabled"
                             wire:loading.class="opacity-50 cursor-not-allowed"
                             class="inline-flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-medium rounded-lg transition-colors shadow-sm">
@@ -793,6 +794,150 @@
                                 class="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 inline-flex items-center gap-2">
                                 <x-iconify icon="lucide:loader-2" class="w-4 h-4 animate-spin" wire:loading wire:target="bulkArchive" />
                                 Archiver
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            @endif
+
+            {{-- Bulk Restore Confirmation Modal --}}
+            @if($showBulkRestoreModal)
+            <div class="fixed inset-0 z-50 overflow-y-auto" wire:key="bulk-restore-modal">
+                <div class="flex items-center justify-center min-h-screen px-4">
+                    <div class="fixed inset-0 bg-gray-900/40 backdrop-blur-sm transition-opacity z-40" wire:click="cancelBulkRestore"></div>
+
+                    <div class="relative bg-white rounded-lg shadow-xl max-w-md w-full p-6 z-50">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-lg font-semibold text-gray-900 flex items-center gap-2">
+                                <x-iconify icon="lucide:rotate-ccw" class="w-5 h-5 text-green-600" />
+                                Restaurer des Véhicules
+                            </h3>
+                            <button wire:click="cancelBulkRestore" class="text-gray-400 hover:text-gray-500">
+                                <x-iconify icon="lucide:x" class="w-5 h-5" />
+                            </button>
+                        </div>
+
+                        <div class="mb-6">
+                            <p class="text-sm text-gray-600">
+                                Êtes-vous sûr de vouloir restaurer <span class="font-bold text-gray-900">{{ count($selectedVehicles) }}</span> véhicule(s) ?
+                            </p>
+
+                            @if($this->selectedVehiclesPreview->count() > 0)
+                            <div class="mt-3 rounded-md border border-gray-200 bg-gray-50 p-3">
+                                <p class="text-xs font-semibold uppercase text-gray-600 mb-2">Résumé des véhicules</p>
+                                <ul class="space-y-1 text-sm text-gray-700">
+                                    @foreach($this->selectedVehiclesPreview as $previewVehicle)
+                                    <li class="flex items-center justify-between gap-3">
+                                        <span class="font-medium">{{ $previewVehicle->registration_plate }}</span>
+                                        <span class="text-xs text-gray-500">{{ $previewVehicle->brand }} {{ $previewVehicle->model }}</span>
+                                    </li>
+                                    @endforeach
+                                </ul>
+                                @if(count($selectedVehicles) > $this->selectedVehiclesPreview->count())
+                                <p class="mt-2 text-xs text-gray-500">
+                                    + {{ count($selectedVehicles) - $this->selectedVehiclesPreview->count() }} autres véhicules
+                                </p>
+                                @endif
+                            </div>
+                            @endif
+                        </div>
+
+                        <div class="flex gap-3 justify-end">
+                            <button wire:click="cancelBulkRestore"
+                                wire:loading.attr="disabled"
+                                class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200">
+                                Annuler
+                            </button>
+                            <button wire:click="bulkRestore"
+                                wire:loading.attr="disabled"
+                                wire:loading.class="opacity-50 cursor-not-allowed"
+                                class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 inline-flex items-center gap-2">
+                                <x-iconify icon="lucide:loader-2" class="w-4 h-4 animate-spin" wire:loading wire:target="bulkRestore" />
+                                Restaurer
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            @endif
+
+            {{-- Bulk Force Delete Confirmation Modal --}}
+            @if($showBulkForceDeleteModal)
+            <div class="fixed inset-0 z-50 overflow-y-auto" wire:key="bulk-force-delete-modal">
+                <div class="flex items-center justify-center min-h-screen px-4">
+                    <div class="fixed inset-0 bg-gray-900/40 backdrop-blur-sm transition-opacity z-40" wire:click="cancelBulkForceDelete"></div>
+
+                    <div class="relative bg-white rounded-lg shadow-xl max-w-md w-full p-6 z-50">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-lg font-semibold text-gray-900 flex items-center gap-2">
+                                <x-iconify icon="lucide:trash-2" class="w-5 h-5 text-red-600" />
+                                Suppression Définitive
+                            </h3>
+                            <button wire:click="cancelBulkForceDelete" class="text-gray-400 hover:text-gray-500">
+                                <x-iconify icon="lucide:x" class="w-5 h-5" />
+                            </button>
+                        </div>
+
+                        <div class="mb-6">
+                            <p class="text-sm text-gray-600">
+                                Êtes-vous sûr de vouloir supprimer définitivement <span class="font-bold text-gray-900">{{ count($selectedVehicles) }}</span> véhicule(s) ?
+                            </p>
+
+                            @if($this->selectedVehiclesPreview->count() > 0)
+                            <div class="mt-3 rounded-md border border-gray-200 bg-gray-50 p-3">
+                                <p class="text-xs font-semibold uppercase text-gray-600 mb-2">Résumé des véhicules</p>
+                                <ul class="space-y-1 text-sm text-gray-700">
+                                    @foreach($this->selectedVehiclesPreview as $previewVehicle)
+                                    <li class="flex items-center justify-between gap-3">
+                                        <span class="font-medium">{{ $previewVehicle->registration_plate }}</span>
+                                        <span class="text-xs text-gray-500">{{ $previewVehicle->brand }} {{ $previewVehicle->model }}</span>
+                                    </li>
+                                    @endforeach
+                                </ul>
+                                @if(count($selectedVehicles) > $this->selectedVehiclesPreview->count())
+                                <p class="mt-2 text-xs text-gray-500">
+                                    + {{ count($selectedVehicles) - $this->selectedVehiclesPreview->count() }} autres véhicules
+                                </p>
+                                @endif
+                            </div>
+                            @endif
+
+                            <div class="mt-4">
+                                <label class="block text-sm font-medium text-gray-700">Tapez <span class="font-semibold text-red-600">SUPPRIMER</span> pour confirmer</label>
+                                <input
+                                    type="text"
+                                    wire:model.live="bulkForceDeleteConfirm"
+                                    placeholder="SUPPRIMER"
+                                    class="mt-2 w-full rounded-md border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500 text-sm" />
+                            </div>
+
+                            <div class="mt-3 bg-red-50 border border-red-200 rounded-lg p-4">
+                                <div class="flex items-start gap-3">
+                                    <x-iconify icon="lucide:alert-triangle" class="w-5 h-5 text-red-600 mt-0.5" />
+                                    <div>
+                                        <p class="text-sm font-medium text-red-900">Attention : Action Irréversible</p>
+                                        <p class="text-sm text-red-700 mt-1">
+                                            Toutes les données associées à ces véhicules seront supprimées définitivement.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="flex gap-3 justify-end">
+                            <button wire:click="cancelBulkForceDelete"
+                                wire:loading.attr="disabled"
+                                class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200">
+                                Annuler
+                            </button>
+                            <button wire:click="bulkForceDelete"
+                                wire:loading.attr="disabled"
+                                wire:loading.class="opacity-50 cursor-not-allowed"
+                                {{ strtoupper(trim($bulkForceDeleteConfirm)) !== 'SUPPRIMER' ? 'disabled' : '' }}
+                                class="px-4 py-2 text-white rounded-lg inline-flex items-center gap-2 {{ strtoupper(trim($bulkForceDeleteConfirm)) !== 'SUPPRIMER' ? 'bg-red-300 cursor-not-allowed' : 'bg-red-600 hover:bg-red-700' }}">
+                                <x-iconify icon="lucide:loader-2" class="w-4 h-4 animate-spin" wire:loading wire:target="bulkForceDelete" />
+                                Supprimer
                             </button>
                         </div>
                     </div>

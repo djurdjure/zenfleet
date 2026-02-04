@@ -11,6 +11,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Validation\Rules;
 use Illuminate\View\View;
 use Spatie\Permission\Models\Role;
@@ -202,7 +203,7 @@ class UserController extends Controller
         }
 
         // 📝 AUDIT: Logger la suppression
-        Log::warning('Utilisateur supprimé', [
+        Log::warning('Utilisateur archivé', [
             'deleter' => auth()->user()->email,
             'deleted_user' => $user->email,
             'deleted_user_roles' => $user->getRoleNames()->toArray(),
@@ -211,7 +212,68 @@ class UserController extends Controller
 
         $user->delete();
 
-        return redirect()->route('admin.users.index')->with('success', 'Utilisateur supprimé avec succès.');
+        return redirect()->route('admin.users.index')->with('success', 'Utilisateur archivé avec succès.');
+    }
+
+    public function forceDelete(User $user): RedirectResponse
+    {
+        $this->authorize('users.delete');
+
+        if (auth()->id() == $user->id) {
+            return back()->with('error', 'Vous ne pouvez pas supprimer définitivement votre propre compte.');
+        }
+
+        // 🛡️ SÉCURITÉ: Empêcher la suppression du dernier Super Admin
+        if ($user->hasRole('Super Admin')) {
+            $superAdminCount = User::role('Super Admin')->count();
+            if ($superAdminCount <= 1) {
+                return back()->with('error', 'Impossible de supprimer le dernier Super Admin.');
+            }
+
+            // Seul un Super Admin peut supprimer un autre Super Admin
+            if (!auth()->user()->hasRole('Super Admin')) {
+                abort(403, 'Seul un Super Admin peut supprimer définitivement un autre Super Admin.');
+            }
+        }
+
+        DB::transaction(function () use ($user) {
+            // Dissocier un éventuel chauffeur lié
+            \App\Models\Driver::withTrashed()
+                ->where('user_id', $user->id)
+                ->update(['user_id' => null]);
+
+            // Révoquer accès véhicules
+            $user->vehicles()->detach();
+
+            // Supprimer tokens API si existants
+            if (method_exists($user, 'tokens')) {
+                $user->tokens()->delete();
+            }
+
+            // Nettoyer les pivots Spatie (roles/permissions)
+            DB::table('model_has_roles')
+                ->where('model_type', User::class)
+                ->where('model_id', $user->id)
+                ->delete();
+
+            if (Schema::hasTable('model_has_permissions')) {
+                DB::table('model_has_permissions')
+                    ->where('model_type', User::class)
+                    ->where('model_id', $user->id)
+                    ->delete();
+            }
+
+            $user->forceDelete();
+        });
+
+        Log::warning('Utilisateur supprimé définitivement', [
+            'deleter' => auth()->user()->email,
+            'deleted_user' => $user->email,
+            'deleted_user_roles' => $user->getRoleNames()->toArray(),
+            'ip' => request()->ip()
+        ]);
+
+        return redirect()->route('admin.users.index')->with('success', 'Utilisateur supprimé définitivement avec succès.');
     }
 
     /**

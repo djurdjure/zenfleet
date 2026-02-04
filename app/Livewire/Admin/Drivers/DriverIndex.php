@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Str;
 
 /**
  * 👨‍💼 DRIVER INDEX - ENTERPRISE LIVEWIRE COMPONENT
@@ -57,9 +58,16 @@ class DriverIndex extends Component
 
     public ?int $forceDeletingDriverId = null;
     public bool $showForceDeleteModal = false;
+    public string $forceDeleteConfirm = '';
 
     public ?int $archivingDriverId = null;
     public bool $showArchiveModal = false;
+
+    // 🧾 Bulk Confirmation Modals
+    public bool $showBulkArchiveModal = false;
+    public bool $showBulkRestoreModal = false;
+    public bool $showBulkForceDeleteModal = false;
+    public string $bulkForceDeleteConfirm = '';
 
     // 🧠 Computed Properties
     #[\Livewire\Attributes\Computed]
@@ -70,6 +78,34 @@ class DriverIndex extends Component
         if (!$id) return null;
 
         return Driver::withTrashed()->find($id);
+    }
+
+    #[\Livewire\Attributes\Computed]
+    public function confirmingDriverNonDriverRoles()
+    {
+        $driver = $this->confirmingDriver;
+        if (!$driver || !$driver->user) {
+            return collect();
+        }
+
+        return $driver->user->getRoleNames()
+            ->filter(fn ($role) => $role !== 'Chauffeur')
+            ->values();
+    }
+
+    #[\Livewire\Attributes\Computed]
+    public function selectedDriversPreview()
+    {
+        if (empty($this->selectedDrivers)) {
+            return collect();
+        }
+
+        return Driver::withTrashed()
+            ->whereIn('id', $this->selectedDrivers)
+            ->orderBy('last_name')
+            ->orderBy('first_name')
+            ->take(3)
+            ->get();
     }
 
     // Services
@@ -169,6 +205,16 @@ class DriverIndex extends Component
         $this->resetBulkState();
     }
 
+    public function confirmBulkArchive(): void
+    {
+        if (empty($this->selectedDrivers)) {
+            $this->dispatch('toast', ['type' => 'warning', 'message' => 'Aucun chauffeur sélectionné']);
+            return;
+        }
+
+        $this->showBulkArchiveModal = true;
+    }
+
     public function bulkRestore()
     {
         if (empty($this->selectedDrivers)) {
@@ -187,6 +233,16 @@ class DriverIndex extends Component
         $this->resetBulkState();
     }
 
+    public function confirmBulkRestore(): void
+    {
+        if (empty($this->selectedDrivers)) {
+            $this->dispatch('toast', ['type' => 'warning', 'message' => 'Aucun chauffeur sélectionné']);
+            return;
+        }
+
+        $this->showBulkRestoreModal = true;
+    }
+
     public function bulkForceDelete()
     {
         if (empty($this->selectedDrivers)) {
@@ -194,15 +250,42 @@ class DriverIndex extends Component
             return;
         }
 
+        if (Str::upper(trim($this->bulkForceDeleteConfirm)) !== 'SUPPRIMER') {
+            $this->dispatch('toast', ['type' => 'error', 'message' => 'Veuillez saisir SUPPRIMER pour confirmer la suppression.']);
+            return;
+        }
+
         $count = 0;
+        $warnings = [];
         foreach ($this->selectedDrivers as $id) {
-            if ($this->driverService->forceDeleteDriver($id)) {
+            $result = $this->driverService->forceDeleteDriver($id);
+            if (!empty($result['deleted'])) {
                 $count++;
+                if (!empty($result['user_skip_reason'])) {
+                    $warnings[] = $result['user_skip_reason'];
+                }
             }
         }
 
         $this->dispatch('toast', ['type' => 'success', 'message' => "$count chauffeur(s) supprimé(s) définitivement"]);
+        if (!empty($warnings)) {
+            $this->dispatch('toast', [
+                'type' => 'warning',
+                'message' => 'Certains comptes utilisateurs n\'ont pas été supprimés car ils possèdent d\'autres rôles.',
+            ]);
+        }
         $this->resetBulkState();
+    }
+
+    public function confirmBulkForceDelete(): void
+    {
+        if (empty($this->selectedDrivers)) {
+            $this->dispatch('toast', ['type' => 'warning', 'message' => 'Aucun chauffeur sélectionné']);
+            return;
+        }
+
+        $this->bulkForceDeleteConfirm = '';
+        $this->showBulkForceDeleteModal = true;
     }
 
     protected function resetBulkState()
@@ -212,6 +295,10 @@ class DriverIndex extends Component
         $this->showArchiveModal = false;
         $this->showRestoreModal = false;
         $this->showForceDeleteModal = false;
+        $this->showBulkArchiveModal = false;
+        $this->showBulkRestoreModal = false;
+        $this->showBulkForceDeleteModal = false;
+        $this->bulkForceDeleteConfirm = '';
     }
 
     // --- INDIVIDUAL ACTIONS ---
@@ -227,6 +314,11 @@ class DriverIndex extends Component
     {
         $this->archivingDriverId = null;
         $this->showArchiveModal = false;
+    }
+
+    public function cancelBulkArchive(): void
+    {
+        $this->showBulkArchiveModal = false;
     }
 
     public function archiveDriver()
@@ -281,6 +373,11 @@ class DriverIndex extends Component
         $this->showRestoreModal = false;
     }
 
+    public function cancelBulkRestore(): void
+    {
+        $this->showBulkRestoreModal = false;
+    }
+
     public function restoreDriver()
     {
         if (!$this->restoringDriverId) return;
@@ -297,6 +394,7 @@ class DriverIndex extends Component
     public function confirmForceDelete(int $id)
     {
         $this->forceDeletingDriverId = $id;
+        $this->forceDeleteConfirm = '';
         $this->showForceDeleteModal = true;
     }
 
@@ -304,14 +402,30 @@ class DriverIndex extends Component
     {
         $this->forceDeletingDriverId = null;
         $this->showForceDeleteModal = false;
+        $this->forceDeleteConfirm = '';
+    }
+
+    public function cancelBulkForceDelete(): void
+    {
+        $this->bulkForceDeleteConfirm = '';
+        $this->showBulkForceDeleteModal = false;
     }
 
     public function forceDeleteDriver()
     {
         if (!$this->forceDeletingDriverId) return;
 
-        if ($this->driverService->forceDeleteDriver($this->forceDeletingDriverId)) {
+        if (strtoupper(trim($this->forceDeleteConfirm)) !== 'SUPPRIMER') {
+            $this->dispatch('toast', ['type' => 'error', 'message' => 'Veuillez saisir SUPPRIMER pour confirmer la suppression.']);
+            return;
+        }
+
+        $result = $this->driverService->forceDeleteDriver($this->forceDeletingDriverId);
+        if (!empty($result['deleted'])) {
             $this->dispatch('toast', ['type' => 'success', 'message' => 'Chauffeur supprimé définitivement']);
+            if (!empty($result['user_skip_reason'])) {
+                $this->dispatch('toast', ['type' => 'warning', 'message' => $result['user_skip_reason']]);
+            }
         } else {
             $this->dispatch('toast', ['type' => 'error', 'message' => 'Erreur lors de la suppression']);
         }

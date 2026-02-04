@@ -208,6 +208,7 @@
                 </button>
                 @endif
 
+                @can('drivers.export')
                 {{-- Export Dropdown --}}
                 <div class="relative" x-data="{ exportOpen: false }">
                     <button
@@ -234,13 +235,16 @@
                         </div>
                     </div>
                 </div>
+                @endcan
 
+                @can('drivers.import')
                 {{-- Import --}}
                 <a href="{{ route('admin.drivers.import.show') }}"
                     title="Importer"
                     class="inline-flex items-center gap-2 p-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-all duration-200 shadow-sm hover:shadow-md">
                     <x-iconify icon="lucide:upload" class="w-5 h-5" />
                 </a>
+                @endcan
 
                 {{-- Nouveau Chauffeur --}}
                 <a href="{{ route('admin.drivers.create') }}"
@@ -302,16 +306,15 @@
                 </div>
                 <div class="flex items-center gap-2 px-4">
                     @if($visibility === 'archived')
-                    <button wire:click="bulkRestore" class="inline-flex items-center gap-1 px-3 py-1.5 bg-green-600 text-white text-sm font-medium rounded hover:bg-green-700">
+                    <button wire:click="confirmBulkRestore" class="inline-flex items-center gap-1 px-3 py-1.5 bg-green-600 text-white text-sm font-medium rounded hover:bg-green-700">
                         <x-iconify icon="lucide:rotate-ccw" class="w-4 h-4" /> Restaurer
                     </button>
-                    <button wire:click="bulkForceDelete"
-                        onclick="confirm('Êtes-vous sûr de vouloir supprimer définitivement ces chauffeurs ?') || event.stopImmediatePropagation()"
+                    <button wire:click="confirmBulkForceDelete"
                         class="inline-flex items-center gap-1 px-3 py-1.5 bg-red-600 text-white text-sm font-medium rounded hover:bg-red-700">
                         <x-iconify icon="lucide:trash-2" class="w-4 h-4" /> Supprimer
                     </button>
                     @else
-                    <button wire:click="bulkArchive" class="inline-flex items-center gap-1 px-3 py-1.5 bg-orange-600 text-white text-sm font-medium rounded hover:bg-orange-700">
+                    <button wire:click="confirmBulkArchive" class="inline-flex items-center gap-1 px-3 py-1.5 bg-orange-600 text-white text-sm font-medium rounded hover:bg-orange-700">
                         <x-iconify icon="lucide:archive" class="w-4 h-4" /> Archiver
                     </button>
                     @endif
@@ -578,6 +581,42 @@
     </div>
     @endif
 
+    {{-- Bulk Archive Modal --}}
+    @if($showBulkArchiveModal)
+    <div class="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+        <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div class="fixed inset-0 bg-gray-900/40 backdrop-blur-sm transition-opacity z-40" wire:click="cancelBulkArchive"></div>
+            <span class="hidden sm:inline-block sm:align-middle sm:h-screen">&#8203;</span>
+            <div class="inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full sm:p-6 relative z-50">
+                <div class="sm:flex sm:items-start">
+                    <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-orange-100 sm:mx-0 sm:h-10 sm:w-10">
+                        <x-iconify icon="lucide:archive" class="w-6 h-6 text-orange-600" />
+                    </div>
+                    <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+                        <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-title">Archiver des chauffeurs</h3>
+                        <div class="mt-2">
+                            <p class="text-sm text-gray-500">
+                                Êtes-vous sûr de vouloir archiver <span class="font-bold text-gray-900">{{ count($selectedDrivers) }}</span> chauffeur(s) ?
+                            </p>
+                            <p class="mt-2 text-sm text-gray-500">
+                                Les chauffeurs archivés ne seront plus visibles dans la liste active, mais pourront être restaurés.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse">
+                    <button wire:click="bulkArchive" type="button" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-orange-600 text-base font-medium text-white hover:bg-orange-700 focus:outline-none sm:ml-3 sm:w-auto sm:text-sm">
+                        Archiver
+                    </button>
+                    <button wire:click="cancelBulkArchive" type="button" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none sm:mt-0 sm:w-auto sm:text-sm">
+                        Annuler
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    @endif
+
     {{-- Restore Modal --}}
     @if($showRestoreModal)
     <div class="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
@@ -616,6 +655,42 @@
     </div>
     @endif
 
+    {{-- Bulk Restore Modal --}}
+    @if($showBulkRestoreModal)
+    <div class="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+        <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div class="fixed inset-0 bg-gray-900/40 backdrop-blur-sm transition-opacity z-40" wire:click="cancelBulkRestore"></div>
+            <span class="hidden sm:inline-block sm:align-middle sm:h-screen">&#8203;</span>
+            <div class="inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full sm:p-6 relative z-50">
+                <div class="sm:flex sm:items-start">
+                    <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-green-100 sm:mx-0 sm:h-10 sm:w-10">
+                        <x-iconify icon="lucide:rotate-ccw" class="w-6 h-6 text-green-600" />
+                    </div>
+                    <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+                        <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-title">Restaurer des chauffeurs</h3>
+                        <div class="mt-2">
+                            <p class="text-sm text-gray-500">
+                                Êtes-vous sûr de vouloir restaurer <span class="font-bold text-gray-900">{{ count($selectedDrivers) }}</span> chauffeur(s) ?
+                            </p>
+                            <p class="mt-2 text-sm text-gray-500">
+                                Les chauffeurs restaurés réapparaîtront dans la liste active.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse">
+                    <button wire:click="bulkRestore" type="button" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-green-600 text-base font-medium text-white hover:bg-green-700 focus:outline-none sm:ml-3 sm:w-auto sm:text-sm">
+                        Restaurer
+                    </button>
+                    <button wire:click="cancelBulkRestore" type="button" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none sm:mt-0 sm:w-auto sm:text-sm">
+                        Annuler
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    @endif
+
     {{-- Force Delete Modal --}}
     @if($showForceDeleteModal)
     <div class="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
@@ -635,6 +710,14 @@
                                 <span class="font-bold text-gray-900">{{ $this->confirmingDriver?->full_name }}</span>
                                 (<span class="font-medium">#{{ $this->confirmingDriver?->employee_number }}</span>) ?
                             </p>
+                            <div class="mt-4">
+                                <label class="block text-sm font-medium text-gray-700">Tapez <span class="font-semibold text-red-600">SUPPRIMER</span> pour confirmer</label>
+                                <input
+                                    type="text"
+                                    wire:model.live="forceDeleteConfirm"
+                                    placeholder="SUPPRIMER"
+                                    class="mt-2 w-full rounded-md border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500 text-sm" />
+                            </div>
                             <div class="mt-3 bg-red-50 border border-red-200 rounded-md p-3">
                                 <div class="flex">
                                     <div class="flex-shrink-0">
@@ -644,7 +727,103 @@
                                         <h3 class="text-sm font-medium text-red-800">Attention : Action irréversible</h3>
                                         <div class="mt-2 text-sm text-red-700">
                                             <ul role="list" class="list-disc pl-5 space-y-1">
-                                                <li>Toutes les données personnelles seront effacées.</li>
+                                                <li>Toutes les données du chauffeur seront effacées.</li>
+                                                <li>L'historique des affectations sera détaché.</li>
+                                                <li>Cette action ne peut pas être annulée.</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            @if($this->confirmingDriverNonDriverRoles->count() > 0)
+                            <div class="mt-3 bg-amber-50 border border-amber-200 rounded-md p-3">
+                                <div class="flex">
+                                    <div class="flex-shrink-0">
+                                        <x-iconify icon="lucide:alert-circle" class="h-5 w-5 text-amber-500" />
+                                    </div>
+                                    <div class="ml-3">
+                                        <h3 class="text-sm font-medium text-amber-800">Compte utilisateur conservé</h3>
+                                        <p class="mt-1 text-sm text-amber-700">
+                                            Le compte utilisateur ne sera pas supprimé car il possède d'autres rôles :
+                                            <span class="font-semibold">{{ $this->confirmingDriverNonDriverRoles->implode(', ') }}</span>.
+                                            Si nécessaire, supprimez le compte depuis la gestion des utilisateurs.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                            @endif
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse">
+                    <button wire:click="forceDeleteDriver" type="button"
+                        {{ strtoupper(trim($forceDeleteConfirm)) !== 'SUPPRIMER' ? 'disabled' : '' }}
+                        class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 text-base font-medium text-white focus:outline-none sm:ml-3 sm:w-auto sm:text-sm {{ strtoupper(trim($forceDeleteConfirm)) !== 'SUPPRIMER' ? 'bg-red-300 cursor-not-allowed' : 'bg-red-600 hover:bg-red-700' }}">
+                        Supprimer
+                    </button>
+                    <button wire:click="cancelForceDelete" type="button" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none sm:mt-0 sm:w-auto sm:text-sm">
+                        Annuler
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    @endif
+
+    {{-- Bulk Force Delete Modal --}}
+    @if($showBulkForceDeleteModal)
+    <div class="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+        <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div class="fixed inset-0 bg-gray-900/40 backdrop-blur-sm transition-opacity z-40" wire:click="cancelBulkForceDelete"></div>
+            <span class="hidden sm:inline-block sm:align-middle sm:h-screen">&#8203;</span>
+            <div class="inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full sm:p-6 relative z-50">
+                <div class="sm:flex sm:items-start">
+                    <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
+                        <x-iconify icon="lucide:trash-2" class="w-6 h-6 text-red-600" />
+                    </div>
+                    <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+                        <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-title">Suppression définitive</h3>
+                        <div class="mt-2">
+                            <p class="text-sm text-gray-500">
+                                Êtes-vous sûr de vouloir supprimer définitivement <span class="font-bold text-gray-900">{{ count($selectedDrivers) }}</span> chauffeur(s) ?
+                            </p>
+                            @if($this->selectedDriversPreview->count() > 0)
+                            <div class="mt-3 rounded-md border border-gray-200 bg-gray-50 p-3">
+                                <p class="text-xs font-semibold uppercase text-gray-600 mb-2">Résumé des chauffeurs</p>
+                                <ul class="space-y-1 text-sm text-gray-700">
+                                    @foreach($this->selectedDriversPreview as $previewDriver)
+                                    <li class="flex items-center justify-between gap-3">
+                                        <span class="font-medium">{{ $previewDriver->full_name }}</span>
+                                        <span class="text-xs text-gray-500">#{{ $previewDriver->employee_number ?? $previewDriver->id }}</span>
+                                    </li>
+                                    @endforeach
+                                </ul>
+                                @if(count($selectedDrivers) > $this->selectedDriversPreview->count())
+                                <p class="mt-2 text-xs text-gray-500">
+                                    + {{ count($selectedDrivers) - $this->selectedDriversPreview->count() }} autres chauffeurs
+                                </p>
+                                @endif
+                            </div>
+                            @endif
+
+                            <div class="mt-4">
+                                <label class="block text-sm font-medium text-gray-700">Tapez <span class="font-semibold text-red-600">SUPPRIMER</span> pour confirmer</label>
+                                <input
+                                    type="text"
+                                    wire:model.live="bulkForceDeleteConfirm"
+                                    placeholder="SUPPRIMER"
+                                    class="mt-2 w-full rounded-md border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500 text-sm" />
+                            </div>
+                            <div class="mt-3 bg-red-50 border border-red-200 rounded-md p-3">
+                                <div class="flex">
+                                    <div class="flex-shrink-0">
+                                        <x-iconify icon="lucide:alert-triangle" class="h-5 w-5 text-red-400" />
+                                    </div>
+                                    <div class="ml-3">
+                                        <h3 class="text-sm font-medium text-red-800">Attention : Action irréversible</h3>
+                                        <div class="mt-2 text-sm text-red-700">
+                                            <ul role="list" class="list-disc pl-5 space-y-1">
+                                                <li>Toutes les données du chauffeur seront effacées.</li>
                                                 <li>L'historique des affectations sera détaché.</li>
                                                 <li>Cette action ne peut pas être annulée.</li>
                                             </ul>
@@ -656,10 +835,14 @@
                     </div>
                 </div>
                 <div class="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse">
-                    <button wire:click="forceDeleteDriver" type="button" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none sm:ml-3 sm:w-auto sm:text-sm">
+                    <button
+                        wire:click="bulkForceDelete"
+                        type="button"
+                        {{ strtoupper(trim($bulkForceDeleteConfirm)) !== 'SUPPRIMER' ? 'disabled' : '' }}
+                        class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 text-base font-medium text-white focus:outline-none sm:ml-3 sm:w-auto sm:text-sm {{ strtoupper(trim($bulkForceDeleteConfirm)) !== 'SUPPRIMER' ? 'bg-red-300 cursor-not-allowed' : 'bg-red-600 hover:bg-red-700' }}">
                         Supprimer
                     </button>
-                    <button wire:click="cancelForceDelete" type="button" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none sm:mt-0 sm:w-auto sm:text-sm">
+                    <button wire:click="cancelBulkForceDelete" type="button" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none sm:mt-0 sm:w-auto sm:text-sm">
                         Annuler
                     </button>
                 </div>

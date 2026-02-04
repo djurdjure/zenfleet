@@ -75,6 +75,7 @@ class EnterprisePermissionMiddleware
         'admin.users.edit' => 'users.update',
         'admin.users.update' => 'users.update',
         'admin.users.destroy' => 'users.delete',
+        'admin.users.force-delete' => 'users.delete',
         'admin.users.export' => 'users.export',
 
         // Rôles et Permissions

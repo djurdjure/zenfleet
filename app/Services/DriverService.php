@@ -9,6 +9,7 @@ use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 
 class DriverService
@@ -54,61 +55,56 @@ class DriverService
                 // Générer email unique: prenom.nom@zenfleet.dz
                 $baseEmail = Str::slug($data['first_name'] . '.' . $data['last_name']) . '@zenfleet.dz';
                 $email = $baseEmail;
-                $counter = 1;
 
-                // Vérifier unicité email
-                while (User::where('email', $email)->exists()) {
-                    $email = Str::slug($data['first_name'] . '.' . $data['last_name']) . $counter . '@zenfleet.dz';
-                    $counter++;
-                }
+                // ✅ Restauration si un utilisateur supprimé existe (évite violation unique)
+                $existingUser = User::withTrashed()->where('email', $email)->first();
+                if ($existingUser && $existingUser->trashed()
+                    && (empty($existingUser->organization_id) || $existingUser->organization_id === $data['organization_id'])) {
+                    $generatedPassword = $this->generateDriverPassword($data['first_name'] ?? '', $data['last_name'] ?? '');
 
-                // Générer mot de passe : 1ère lettre prénom (maj) + Nom (1ère lettre maj) + @ + année (YYYY)
-                $firstInitial = Str::upper(Str::substr(trim((string) $data['first_name']), 0, 1));
-                $lastName = trim((string) $data['last_name']);
-                $lastName = $lastName !== '' ? (Str::upper(Str::substr($lastName, 0, 1)) . Str::substr($lastName, 1)) : '';
-                $generatedPassword = $firstInitial . $lastName . '@' . now()->format('Y');
-
-                // Créer l'utilisateur
-                $user = User::create([
-                    'name' => $data['first_name'] . ' ' . $data['last_name'],
-                    'first_name' => $data['first_name'],
-                    'last_name' => $data['last_name'],
-                    'email' => $email,
-                    'phone' => $data['personal_phone'] ?? null,
-                    'password' => Hash::make($generatedPassword),
-                    'organization_id' => $data['organization_id'],
-                    'email_verified_at' => now(), // ✅ Auto-vérifier pour éviter problèmes de connexion
-                ]);
-
-                // ✅ CORRECTION ENTERPRISE: Attribuer le rôle avec organization_id pour Spatie multi-tenant
-                // Trouver le rôle Chauffeur pour cette organisation
-                $role = \Spatie\Permission\Models\Role::where('name', 'Chauffeur')
-                    ->where('organization_id', $data['organization_id'])
-                    ->first();
-
-                if (!$role) {
-                    // Fallback: rôle global sans organization_id
-                    $role = \Spatie\Permission\Models\Role::where('name', 'Chauffeur')
-                        ->whereNull('organization_id')
-                        ->first();
-                }
-
-                if ($role) {
-                    // Assigner directement dans la table pivot avec organization_id
-                    DB::table('model_has_roles')->insert([
-                        'role_id' => $role->id,
-                        'model_type' => User::class,
-                        'model_id' => $user->id,
+                    $existingUser->restore();
+                    $existingUser->fill([
+                        'name' => $data['first_name'] . ' ' . $data['last_name'],
+                        'first_name' => $data['first_name'],
+                        'last_name' => $data['last_name'],
+                        'phone' => $data['personal_phone'] ?? null,
                         'organization_id' => $data['organization_id'],
+                        'email_verified_at' => now(),
+                    ]);
+                    $existingUser->password = Hash::make($generatedPassword);
+                    $existingUser->save();
+
+                    $this->ensureDriverRole($existingUser, $data['organization_id']);
+
+                    $user = $existingUser;
+                    $data['user_id'] = $user->id;
+                    $userWasCreated = true;
+                } else {
+                    $counter = 1;
+                    while (User::withTrashed()->where('email', $email)->exists()) {
+                        $email = Str::slug($data['first_name'] . '.' . $data['last_name']) . $counter . '@zenfleet.dz';
+                        $counter++;
+                    }
+
+                    $generatedPassword = $this->generateDriverPassword($data['first_name'] ?? '', $data['last_name'] ?? '');
+
+                    // Créer l'utilisateur
+                    $user = User::create([
+                        'name' => $data['first_name'] . ' ' . $data['last_name'],
+                        'first_name' => $data['first_name'],
+                        'last_name' => $data['last_name'],
+                        'email' => $email,
+                        'phone' => $data['personal_phone'] ?? null,
+                        'password' => Hash::make($generatedPassword),
+                        'organization_id' => $data['organization_id'],
+                        'email_verified_at' => now(), // ✅ Auto-vérifier pour éviter problèmes de connexion
                     ]);
 
-                    // Refresh permissions cache
-                    $user->load('roles');
-                    app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
-                }
+                    $this->ensureDriverRole($user, $data['organization_id']);
 
-                $data['user_id'] = $user->id;
-                $userWasCreated = true;
+                    $data['user_id'] = $user->id;
+                    $userWasCreated = true;
+                }
             } else {
                 // Récupérer l'utilisateur existant
                 $user = User::find($data['user_id']);
@@ -133,6 +129,40 @@ class DriverService
                 'was_created' => $userWasCreated,
             ];
         });
+    }
+
+    private function generateDriverPassword(string $firstName, string $lastName): string
+    {
+        $firstInitial = Str::upper(Str::substr(trim($firstName), 0, 1));
+        $lastName = trim($lastName);
+        $lastName = $lastName !== '' ? (Str::upper(Str::substr($lastName, 0, 1)) . Str::substr($lastName, 1)) : '';
+
+        return $firstInitial . $lastName . '@' . now()->format('Y');
+    }
+
+    private function ensureDriverRole(User $user, int $organizationId): void
+    {
+        $role = \Spatie\Permission\Models\Role::where('name', 'Chauffeur')
+            ->where('organization_id', $organizationId)
+            ->first();
+
+        if (!$role) {
+            $role = \Spatie\Permission\Models\Role::where('name', 'Chauffeur')
+                ->whereNull('organization_id')
+                ->first();
+        }
+
+        if ($role) {
+            DB::table('model_has_roles')->updateOrInsert([
+                'role_id' => $role->id,
+                'model_type' => User::class,
+                'model_id' => $user->id,
+                'organization_id' => $organizationId,
+            ], []);
+
+            $user->load('roles');
+            app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
+        }
     }
 
     public function updateDriver(Driver $driver, array $data): Driver
@@ -183,12 +213,15 @@ class DriverService
         return null;
     }
 
-    public function forceDeleteDriver(int $driverId): bool
+    public function forceDeleteDriver(int $driverId): array
     {
         $driver = $this->driverRepository->findTrashed($driverId);
 
         if ($driver) {
-            return DB::transaction(function () use ($driver) {
+            $userDeleted = false;
+            $userSkipReason = null;
+
+            $deleted = DB::transaction(function () use ($driver, &$userDeleted, &$userSkipReason) {
                 // ⚠️ SUPPRESSION EN CASCADE - TOUS LES ENREGISTREMENTS LIÉS
 
                 // 1. Supprimer les affectations (assignments)
@@ -227,6 +260,27 @@ class DriverService
                     ]);
                 }
 
+                // 4b. Supprimer définitivement le compte utilisateur associé (si Chauffeur uniquement)
+                if ($driver->user_id) {
+                    $user = User::withTrashed()->find($driver->user_id);
+                    if ($user) {
+                        $roleNames = $user->getRoleNames()->toArray();
+                        $nonDriverRoles = array_diff($roleNames, ['Chauffeur']);
+
+                        if (empty($nonDriverRoles)) {
+                            $this->forceDeleteUserAccount($user);
+                            $userDeleted = true;
+                        } else {
+                            $userSkipReason = 'Compte utilisateur non supprimé : rôles supplémentaires détectés (' . implode(', ', $nonDriverRoles) . ').';
+                            \Log::warning('Skipping user force delete due to non-driver roles', [
+                                'driver_id' => $driver->id,
+                                'user_id' => $user->id,
+                                'roles' => $roleNames,
+                            ]);
+                        }
+                    }
+                }
+
                 // 5. Suppression définitive du chauffeur
                 $deleted = $this->driverRepository->forceDelete($driver);
 
@@ -240,7 +294,48 @@ class DriverService
 
                 return $deleted;
             });
+
+            return [
+                'deleted' => (bool) $deleted,
+                'user_deleted' => $userDeleted,
+                'user_skip_reason' => $userSkipReason,
+            ];
         }
-        return false;
+        return [
+            'deleted' => false,
+            'user_deleted' => false,
+            'user_skip_reason' => null,
+        ];
+    }
+
+    private function forceDeleteUserAccount(User $user): void
+    {
+        // Dissocier un éventuel chauffeur lié (sécurité)
+        Driver::withTrashed()
+            ->where('user_id', $user->id)
+            ->update(['user_id' => null]);
+
+        // Révoquer accès véhicules
+        $user->vehicles()->detach();
+
+        // Supprimer tokens API si existants
+        if (method_exists($user, 'tokens')) {
+            $user->tokens()->delete();
+        }
+
+        // Nettoyer les pivots Spatie (roles/permissions)
+        DB::table('model_has_roles')
+            ->where('model_type', User::class)
+            ->where('model_id', $user->id)
+            ->delete();
+
+        if (Schema::hasTable('model_has_permissions')) {
+            DB::table('model_has_permissions')
+                ->where('model_type', User::class)
+                ->where('model_id', $user->id)
+                ->delete();
+        }
+
+        $user->forceDelete();
     }
 }

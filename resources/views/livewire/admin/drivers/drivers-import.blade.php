@@ -52,7 +52,8 @@
  <div>
  <h3 class="text-sm font-semibold text-gray-900">Format des dates</h3>
  <p class="text-xs text-gray-600 mt-1">
- <code class="px-1 py-0.5 bg-white border rounded text-xs">AAAA-MM-JJ</code>
+ <code class="px-1 py-0.5 bg-white border rounded text-xs">AAAA-MM-JJ</code> ou
+ <code class="px-1 py-0.5 bg-white border rounded text-xs">JJ/MM/AAAA</code>
  </p>
  </div>
  </div>
@@ -61,7 +62,7 @@
  <div class="w-8 h-8 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0">4</div>
  <div>
  <h3 class="text-sm font-semibold text-gray-900">Encodage UTF-8</h3>
- <p class="text-xs text-gray-600 mt-1">Séparateur: point-virgule (;)</p>
+ <p class="text-xs text-gray-600 mt-1">Séparateur: point-virgule (;) ou virgule (,)</p>
  </div>
  </div>
  </div>
@@ -501,6 +502,20 @@
  Nouvelle Importation
  </button>
 
+ <button
+ wire:click="downloadImportReport"
+ class="inline-flex items-center gap-2 px-6 py-2.5 bg-white border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-gray-50 transition-colors">
+ <x-iconify icon="heroicons:document-arrow-down" class="w-5 h-5 text-gray-600" />
+ Télécharger le rapport d'import
+ </button>
+
+ <button
+ wire:click="downloadCredentialsReport"
+ class="inline-flex items-center gap-2 px-6 py-2.5 bg-white border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-gray-50 transition-colors">
+ <x-iconify icon="heroicons:key" class="w-5 h-5 text-gray-600" />
+ Télécharger identifiants chauffeurs
+ </button>
+
  <a href="{{ route('admin.drivers.index') }}"
  class="inline-flex items-center gap-2 px-6 py-2.5 bg-white border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-gray-50 transition-colors">
  <x-iconify icon="heroicons:view-columns" class="w-5 h-5" />
@@ -518,8 +533,46 @@
 // Gérer le téléchargement du template
 document.addEventListener('livewire:init', () => {
  Livewire.on('download-template', (event) => {
- const csv = event.csv;
- const filename = event.filename;
+ const payload = event?.detail ?? event ?? {};
+ const data = Array.isArray(payload) ? (payload[0] ?? {}) : payload;
+ const csv = data.csv ?? (Array.isArray(payload) ? payload[0] : undefined);
+ const filename = data.filename ?? (Array.isArray(payload) ? payload[1] : undefined) ?? 'ZenFleet_Template_Import_Chauffeurs.csv';
+ if (!csv) {
+ console.error('Template CSV introuvable dans le payload', payload);
+ return;
+ }
+ const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+ const link = document.createElement('a');
+ link.href = URL.createObjectURL(blob);
+ link.download = filename;
+ link.click();
+ });
+
+ Livewire.on('download-report', (event) => {
+ const payload = event?.detail ?? event ?? {};
+ const data = Array.isArray(payload) ? (payload[0] ?? {}) : payload;
+ const csv = data.csv ?? (Array.isArray(payload) ? payload[0] : undefined);
+ const filename = data.filename ?? (Array.isArray(payload) ? payload[1] : undefined) ?? 'rapport-import-chauffeurs.csv';
+ if (!csv) {
+ console.error('Rapport d\'import introuvable dans le payload', payload);
+ return;
+ }
+ const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+ const link = document.createElement('a');
+ link.href = URL.createObjectURL(blob);
+ link.download = filename;
+ link.click();
+ });
+
+ Livewire.on('download-credentials-report', (event) => {
+ const payload = event?.detail ?? event ?? {};
+ const data = Array.isArray(payload) ? (payload[0] ?? {}) : payload;
+ const csv = data.csv ?? (Array.isArray(payload) ? payload[0] : undefined);
+ const filename = data.filename ?? (Array.isArray(payload) ? payload[1] : undefined) ?? 'credentials-chauffeurs.csv';
+ if (!csv) {
+ console.error('Rapport d\'identifiants introuvable dans le payload', payload);
+ return;
+ }
  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
  const link = document.createElement('a');
  link.href = URL.createObjectURL(blob);

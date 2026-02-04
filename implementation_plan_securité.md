@@ -119,3 +119,4 @@ Rechercher toutes les occurrences de `can('view vehicles')` etc. et les remplace
 - **[02/02/2026]** Plan enrichi (threat model, dual‑read, monitoring, checklists).
 - **[02/02/2026]** Correctif appliqué: `DriversImport.php` scoping par `organization_id` pour éviter toute mise à jour cross‑tenant.
 - **[02/03/2026]** Phase 2 démarrée: alias permissions (dual‑read) via `PermissionAliases`, Gate::before, middleware en dot‑notation, migration de permissions canoniques, policies/controllers/views alignés.
+- **[02/04/2026]** Phase 2 validée (import cross‑tenant): contraintes uniques chauffeurs scoping org (`license_number`, `employee_number`, `personal_email`) + restauration des enregistrements soft‑deleted à l'import, suppression des collisions inter‑org lors de la création/édition.

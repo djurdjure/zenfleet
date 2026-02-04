@@ -61,6 +61,13 @@
  <x-iconify icon="heroicons:plus-circle" class="w-5 h-5" />
  Nouvelle Importation
  </a>
+ @if(isset($result))
+ <a href="{{ route('admin.vehicles.import.report') }}"
+ class="inline-flex items-center gap-2 px-4 py-2.5 bg-white border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-gray-50 transition-colors shadow-sm">
+ <x-iconify icon="heroicons:document-arrow-down" class="w-5 h-5 text-gray-600" />
+ Télécharger le Rapport
+ </a>
+ @endif
  <a href="{{ route('admin.vehicles.index') }}"
  class="inline-flex items-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors shadow-sm hover:shadow-md">
  <x-iconify icon="heroicons:view-columns" class="w-5 h-5" />
@@ -299,8 +306,9 @@
  {{-- Export Erreurs --}}
  @if($errorCount > 5)
  <div class="mt-4 pt-4 border-t border-gray-200">
- <button 
- @click="exportErrors()" 
+ <button
+ type="button"
+ onclick="exportErrors()"
  class="w-full inline-flex items-center justify-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-medium rounded-lg transition-colors">
  <x-iconify icon="heroicons:arrow-down-tray" class="w-5 h-5" />
  Exporter les Erreurs (CSV)
@@ -358,13 +366,18 @@ function exportErrors() {
  const errors = @json($errorRows ?? []);
  
  let csvContent = "data:text/csv;charset=utf-8,";
- csvContent += "Ligne,Erreur,Données\n";
+ csvContent += "Ligne,Erreur,Plaque,Marque,Modèle,VIN,Données\n";
  
  errors.forEach(error => {
  const row = error.row || error.line || 'N/A';
  const errorMsg = (error.error || 'Erreur inconnue').replace(/"/g, '""');
+ const dataPayload = error.data || {};
+ const plate = (dataPayload.registration_plate || dataPayload.plaque || '').toString().replace(/"/g, '""');
+ const brand = (dataPayload.brand || '').toString().replace(/"/g, '""');
+ const model = (dataPayload.model || '').toString().replace(/"/g, '""');
+ const vin = (dataPayload.vin || '').toString().replace(/"/g, '""');
  const data = error.data ? JSON.stringify(error.data).replace(/"/g, '""') : '';
- csvContent += `"${row}","${errorMsg}","${data}"\n`;
+ csvContent += `"${row}","${errorMsg}","${plate}","${brand}","${model}","${vin}","${data}"\n`;
  });
 
  const encodedUri = encodeURI(csvContent);

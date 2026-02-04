@@ -269,8 +269,36 @@ class VehicleController extends Controller
             // Enrichissement automatique des données
             $vehicleData = $this->enrichVehicleCreationData($validatedData);
 
+            $wasRestored = false;
+
             // Transaction sécurisée
-            $vehicle = DB::transaction(function () use ($vehicleData) {
+            $vehicle = DB::transaction(function () use ($vehicleData, &$wasRestored) {
+                $existingVehicle = Vehicle::withTrashed()
+                    ->where('organization_id', $vehicleData['organization_id'])
+                    ->where(function ($query) use ($vehicleData) {
+                        $query->where('registration_plate', $vehicleData['registration_plate']);
+
+                        if (!empty($vehicleData['vin'])) {
+                            $query->orWhere('vin', $vehicleData['vin']);
+                        }
+
+                        if (!empty($vehicleData['vehicle_name'])) {
+                            $query->orWhere('vehicle_name', $vehicleData['vehicle_name']);
+                        }
+                    })
+                    ->first();
+
+                if ($existingVehicle && $existingVehicle->trashed()) {
+                    $existingVehicle->restore();
+                    $existingVehicle->fill($vehicleData);
+                    $existingVehicle->save();
+                    $wasRestored = true;
+
+                    $this->performPostCreationActions($existingVehicle);
+
+                    return $existingVehicle;
+                }
+
                 $vehicle = Vehicle::create($vehicleData);
 
                 // Actions post-création
@@ -286,9 +314,13 @@ class VehicleController extends Controller
 
             Cache::tags(['vehicles', 'analytics'])->flush();
 
+            $successMessage = $wasRestored
+                ? "Véhicule {$vehicle->registration_plate} restauré et mis à jour avec succès"
+                : "Véhicule {$vehicle->registration_plate} créé avec succès";
+
             return redirect()
                 ->route('admin.vehicles.show', $vehicle)
-                ->with('success', "Véhicule {$vehicle->registration_plate} créé avec succès")
+                ->with('success', $successMessage)
                 ->with('vehicle_created', true);
         } catch (\Illuminate\Validation\ValidationException $e) {
             return back()
@@ -1364,7 +1396,7 @@ class VehicleController extends Controller
      */
     public function showImportForm(): View|RedirectResponse
     {
-        $this->authorize('vehicles.create');
+        $this->authorize('vehicles.import');
         $this->logUserAction('vehicle.import.form_accessed');
 
         try {
@@ -1398,7 +1430,7 @@ class VehicleController extends Controller
      */
     public function handleImport(Request $request): RedirectResponse
     {
-        $this->authorize('vehicles.create');
+        $this->authorize('vehicles.import');
         $this->logUserAction('vehicle.import.started', $request);
 
         try {
@@ -1464,7 +1496,7 @@ class VehicleController extends Controller
      */
     public function showImportResults(): View|RedirectResponse
     {
-        $this->authorize('vehicles.create');
+        $this->authorize('vehicles.import');
         $this->logUserAction('vehicle.import.results_viewed');
 
         try {
@@ -1496,7 +1528,7 @@ class VehicleController extends Controller
      */
     public function downloadTemplate(): \Symfony\Component\HttpFoundation\BinaryFileResponse
     {
-        $this->authorize('vehicles.create');
+        $this->authorize('vehicles.import');
         $this->logUserAction('vehicle.import.template_downloaded');
 
         try {
@@ -1517,12 +1549,67 @@ class VehicleController extends Controller
     }
 
     /**
+     * 📥 Télécharge le rapport d'importation CSV
+     */
+    public function downloadImportReport(): \Symfony\Component\HttpFoundation\Response|RedirectResponse
+    {
+        $this->authorize('vehicles.import');
+        $this->logUserAction('vehicle.import.report_downloaded');
+
+        $result = session('vehicle_import_result');
+        if (!$result) {
+            return redirect()
+                ->route('admin.vehicles.import.results')
+                ->with('warning', 'Aucun rapport d\'importation disponible.');
+        }
+
+        $rows = [
+            ['Ligne', 'Statut', 'Plaque', 'Marque', 'Modèle', 'VIN', 'Message'],
+        ];
+
+        $reportRows = $result['report_rows'] ?? [];
+        if (!empty($reportRows)) {
+            foreach ($reportRows as $row) {
+                $rows[] = [
+                    $row['row'] ?? '',
+                    $this->getImportStatusLabel($row['status'] ?? ''),
+                    $row['registration_plate'] ?? '',
+                    $row['brand'] ?? '',
+                    $row['model'] ?? '',
+                    $row['vin'] ?? '',
+                    $row['message'] ?? '',
+                ];
+            }
+        } else {
+            foreach ($result['errors'] ?? [] as $error) {
+                $rows[] = [
+                    $error['row'] ?? '',
+                    'Erreur',
+                    '',
+                    '',
+                    '',
+                    '',
+                    $error['error'] ?? '',
+                ];
+            }
+        }
+
+        $csv = $this->buildCsvContent($rows, ';');
+        $filename = 'ZenFleet_Rapport_Import_Vehicules_' . now()->format('Ymd_His') . '.csv';
+
+        return response($csv, 200, [
+            'Content-Type' => 'text/csv; charset=UTF-8',
+            'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+        ]);
+    }
+
+    /**
      * 🧪 Prévalidation de fichier CSV sans importation - Endpoint Enterprise
      * Permet de tester la validité d'un fichier avant l'importation réelle
      */
     public function preValidateImportFile(Request $request): \Illuminate\Http\JsonResponse
     {
-        $this->authorize('vehicles.create');
+        $this->authorize('vehicles.import');
         $this->logUserAction('vehicle.import.prevalidation', $request);
 
         try {
@@ -1592,7 +1679,8 @@ class VehicleController extends Controller
             'errors' => [],
             'imported_vehicles' => [],
             'skipped_duplicates' => 0,
-            'updated_existing' => 0
+            'updated_existing' => 0,
+            'report_rows' => [],
         ];
 
         try {
@@ -1614,33 +1702,53 @@ class VehicleController extends Controller
                 throw new \Exception('Aucune donnée trouvée dans le fichier après les en-têtes');
             }
 
-            // Traitement ligne par ligne avec transaction
-            DB::transaction(function () use ($data, $options, &$result) {
-                foreach ($data as $index => $row) {
-                    $result['total_processed']++;
+            // Traitement ligne par ligne avec transaction isolée
+            foreach ($data as $index => $row) {
+                $result['total_processed']++;
 
-                    try {
-                        $processResult = $this->processVehicleRow($row, $options, $index + 1);
+                try {
+                    $processResult = DB::transaction(function () use ($row, $options, $index) {
+                        return $this->processVehicleRow($row, $options, $index + 1);
+                    });
 
-                        if ($processResult['action'] === 'imported') {
-                            $result['successful_imports']++;
-                            $result['imported_vehicles'][] = $processResult['vehicle_id'];
-                        } elseif ($processResult['action'] === 'updated') {
-                            $result['updated_existing']++;
-                            $result['imported_vehicles'][] = $processResult['vehicle_id'];
-                        } elseif ($processResult['action'] === 'skipped') {
-                            $result['skipped_duplicates']++;
-                        }
-                    } catch (\Exception $e) {
-                        $result['failed_imports']++;
-                        $result['errors'][] = [
-                            'row' => $index + 1,
-                            'data' => $row,
-                            'error' => $e->getMessage()
-                        ];
+                    if ($processResult['action'] === 'imported') {
+                        $result['successful_imports']++;
+                        $result['imported_vehicles'][] = $processResult['vehicle_id'];
+                    } elseif ($processResult['action'] === 'updated') {
+                        $result['updated_existing']++;
+                        $result['imported_vehicles'][] = $processResult['vehicle_id'];
+                    } elseif ($processResult['action'] === 'skipped') {
+                        $result['skipped_duplicates']++;
                     }
+
+                    $message = $processResult['message'] ?? match ($processResult['action']) {
+                        'imported' => 'Importé',
+                        'updated' => 'Mis à jour',
+                        'skipped' => 'Doublon ignoré',
+                        default => 'OK',
+                    };
+
+                    $result['report_rows'][] = $this->buildVehicleReportRow(
+                        $index + 1,
+                        $row,
+                        $processResult['action'],
+                        $message
+                    );
+                } catch (\Exception $e) {
+                    $result['failed_imports']++;
+                    $result['errors'][] = [
+                        'row' => $index + 1,
+                        'data' => $row,
+                        'error' => $e->getMessage()
+                    ];
+                    $result['report_rows'][] = $this->buildVehicleReportRow(
+                        $index + 1,
+                        $row,
+                        'error',
+                        $e->getMessage()
+                    );
                 }
-            });
+            }
 
             // Nettoyage du cache après importation
             Cache::tags(['vehicles', 'analytics'])->flush();
@@ -1649,6 +1757,30 @@ class VehicleController extends Controller
         }
 
         return $result;
+    }
+
+    private function buildVehicleReportRow(int $rowNumber, array $row, string $status, string $message): array
+    {
+        return [
+            'row' => $rowNumber,
+            'status' => $status,
+            'registration_plate' => $row['registration_plate'] ?? $row['plaque'] ?? '',
+            'brand' => $row['brand'] ?? '',
+            'model' => $row['model'] ?? '',
+            'vin' => $row['vin'] ?? '',
+            'message' => $message,
+        ];
+    }
+
+    private function getImportStatusLabel(string $status): string
+    {
+        return match ($status) {
+            'imported' => 'Importé',
+            'updated' => 'Mis à jour',
+            'skipped' => 'Doublon ignoré',
+            'error' => 'Erreur',
+            default => $status !== '' ? ucfirst($status) : 'OK',
+        };
     }
 
     /**
@@ -1711,6 +1843,13 @@ class VehicleController extends Controller
                 }
 
                 $row = array_map('trim', $rawRow);
+
+                // Ignorer les lignes de commentaires (# ...)
+                $firstCell = isset($row[0]) ? ltrim($row[0]) : '';
+                if ($firstCell !== '' && str_starts_with($firstCell, '#')) {
+                    $skippedLines++;
+                    continue;
+                }
 
                 if ($headers === null) {
                     // Nettoyage des en-têtes (suppression BOM et caractères invisibles)
@@ -1824,7 +1963,8 @@ class VehicleController extends Controller
         // Mais on empêche les doublons au sein de la MÊME organisation
         $organizationId = Auth::user()->organization_id;
 
-        $existingVehicle = Vehicle::where('organization_id', $organizationId)
+        $existingVehicle = Vehicle::withTrashed()
+            ->where('organization_id', $organizationId)
             ->where(function ($query) use ($vehicleData) {
                 $query->where('registration_plate', $vehicleData['registration_plate']);
 
@@ -1834,6 +1974,18 @@ class VehicleController extends Controller
                 }
             })
             ->first();
+
+        if ($existingVehicle && $existingVehicle->trashed()) {
+            $existingVehicle->restore();
+            $existingVehicle->fill($vehicleData);
+            $existingVehicle->save();
+
+            return [
+                'action' => 'updated',
+                'vehicle_id' => $existingVehicle->id,
+                'message' => 'Restauré',
+            ];
+        }
 
         if ($existingVehicle) {
             // Déterminer quel champ est en doublon pour message clair
@@ -1947,6 +2099,37 @@ class VehicleController extends Controller
         fclose($handle);
 
         return $tempFile;
+    }
+
+    private function buildCsvContent(array $rows, string $delimiter = ';'): string
+    {
+        $lines = [];
+
+        foreach ($rows as $row) {
+            $lines[] = $this->buildCsvLine($row, $delimiter);
+        }
+
+        return "\xEF\xBB\xBF" . implode("\n", $lines) . "\n";
+    }
+
+    private function buildCsvLine(array $row, string $delimiter): string
+    {
+        $escaped = array_map(function ($value) use ($delimiter) {
+            $value = (string) $value;
+            $needsQuotes = str_contains($value, $delimiter)
+                || str_contains($value, '"')
+                || str_contains($value, "\n")
+                || str_contains($value, "\r");
+
+            if ($needsQuotes) {
+                $value = str_replace('"', '""', $value);
+                $value = '"' . $value . '"';
+            }
+
+            return $value;
+        }, $row);
+
+        return implode($delimiter, $escaped);
     }
 
     private function generateExportFilename(string $format): string

@@ -211,7 +211,6 @@
                             </div>
                         </div>
                     </div>
-        </div>
         </x-form-section>
 
         {{-- PHASE 2: INFORMATIONS PROFESSIONNELLES --}}

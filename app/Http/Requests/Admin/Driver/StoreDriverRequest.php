@@ -20,6 +20,8 @@ class StoreDriverRequest extends FormRequest
      */
     public function rules(): array
     {
+        $organizationId = $this->user()->organization_id;
+
         return [
             // 🔒 SECURITY: Organization ID (ajouté automatiquement via prepareForValidation)
             'organization_id' => ['required', 'integer', 'exists:organizations,id'],
@@ -32,10 +34,25 @@ class StoreDriverRequest extends FormRequest
             'address' => ['nullable', 'string', 'max:1000'],
             'blood_type' => ['nullable', 'string', 'max:10'],
             'photo' => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif', 'max:2048'],
-            'personal_email' => ['nullable', 'string', 'email', 'max:255'],
+            'personal_email' => [
+                'nullable',
+                'string',
+                'email',
+                'max:255',
+                Rule::unique('drivers')
+                    ->where('organization_id', $organizationId)
+                    ->whereNull('deleted_at')
+            ],
 
             // Étape 2
-            'employee_number' => ['nullable', 'string', 'max:100', Rule::unique('drivers')->whereNull('deleted_at')],
+            'employee_number' => [
+                'nullable',
+                'string',
+                'max:100',
+                Rule::unique('drivers')
+                    ->where('organization_id', $organizationId)
+                    ->whereNull('deleted_at')
+            ],
             'recruitment_date' => ['nullable', 'date'],
             'contract_end_date' => ['nullable', 'date', 'after_or_equal:recruitment_date'],
             'status_id' => ['required', 'exists:driver_statuses,id'],
@@ -43,7 +60,14 @@ class StoreDriverRequest extends FormRequest
             'notes' => ['nullable', 'string', 'max:5000'],
 
             // Étape 3
-            'license_number' => ['nullable', 'string', 'max:100'],
+            'license_number' => [
+                'nullable',
+                'string',
+                'max:100',
+                Rule::unique('drivers')
+                    ->where('organization_id', $organizationId)
+                    ->whereNull('deleted_at')
+            ],
             'license_categories' => ['nullable', 'array'],
             'license_categories.*' => ['nullable', 'string', 'in:A1,A,B,BE,C1,C1E,C,CE,D,DE,F'],
             'license_issue_date' => ['nullable', 'date'],

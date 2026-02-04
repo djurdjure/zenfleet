@@ -186,6 +186,7 @@ Route::middleware(['auth', 'verified'])
                 Route::post('{user}/reset-password', [UserController::class, 'resetPassword'])->name('reset-password');
                 Route::get('{user}/impersonate', [UserController::class, 'impersonate'])->name('impersonate');
                 Route::get('export', [UserController::class, 'export'])->name('export');
+                Route::delete('{user}/force-delete', [UserController::class, 'forceDelete'])->name('force-delete');
 
                 // 🔒 GESTION DES ACCÈS VÉHICULES
                 Route::get('{user}/vehicles', \App\Livewire\Admin\Users\VehicleAccessManager::class)
@@ -239,6 +240,7 @@ Route::middleware(['auth', 'verified'])
                 Route::post('import/validate', [VehicleController::class, 'preValidateImportFile'])->name('import.validate');
                 Route::get('import-template', [VehicleController::class, 'downloadTemplate'])->name('import.template');
                 Route::get('import/results', [VehicleController::class, 'showImportResults'])->name('import.results');
+                Route::get('import/report', [VehicleController::class, 'downloadImportReport'])->name('import.report');
                 Route::get('export', [VehicleController::class, 'export'])->name('export');
 
                 // START: Tâche 1 - Routes d'Export Multiformats

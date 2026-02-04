@@ -1,6 +1,6 @@
 # Plan de Correction Expert - ZenFleet Audit Codex
 
-Date de mise a jour : 2026-01-24
+Date de mise a jour : 2026-02-04
 Base : audit_codex.md
 Contexte : Dev_environnement.md (Laravel 12 + Livewire 3 + PostgreSQL 18 + Docker)
 Statut : Phase 0 COMMITEE - Phase 1 + 1.5 PLANIFIÉE
@@ -25,9 +25,9 @@ Regle : chaque action doit avoir un identifiant, un statut, une date et une note
 
 Statuts autorises : TODO, IN_PROGRESS, DONE, BLOCKED
 
-Phase courante : Phase 1.5 (Anti-Régression)
+Phase courante : Phase 2 (RBAC & Validation Multi-tenant)
 Etat global : IN_PROGRESS
-Derniere mise a jour : 2026-01-24
+Derniere mise a jour : 2026-02-04
 
 Tableau de suivi
 
@@ -48,6 +48,7 @@ Tableau de suivi
 | P1-03 | 1 | Validation analytics scopes | TODO | | | | withoutGlobalScope deja implemente |
 | P1-04 | 1 | Tests de non-regression Phase 1 | TODO | | | | Verifier indexes + cache invalidation |
 | P1-05 | 1 | Corriger tests existants defaillants | TODO | | | | AssignmentManagementTest, etc. |
+| P2-00 | 2 | Validation import chauffeurs cross-tenant + contraintes uniques scope org | DONE | Expert | 2026-02-04 | 2026-02-04 | Import OK en org B, pas d impact org A |
 | P2-01 | 2 | Split VehicleController | TODO | | | | |
 | P2-02 | 2 | Unifier naming permissions | TODO | | | | |
 | P3-01 | 3 | Accessibilite ARIA | TODO | | | | |

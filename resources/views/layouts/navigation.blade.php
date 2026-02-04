@@ -140,10 +140,12 @@
                     <x-iconify icon="heroicons:list-bullet" class="h-4 w-4 mr-3" / />
                     Liste des chauffeurs
                 </a>
+                @can('drivers.import')
                 <a href="{{ route('admin.drivers.import.show') }}" class="flex items-center px-4 py-2 rounded-lg text-gray-500 hover:text-gray-900 hover:bg-gray-100 transition-all duration-200 {{ request()->routeIs('admin.drivers.import.*') ? 'text-blue-600 bg-blue-50 font-medium' : '' }}">
                     <x-iconify icon="heroicons:document-arrow-up" class="h-4 w-4 mr-3" / />
                     Importer chauffeurs
                 </a>
+                @endcan
             </div>
         </div>
 

@@ -4,8 +4,12 @@
 @section('content')
 <div class="py-4 px-4 mx-auto max-w-7xl lg:py-6" x-data="{
     showConfirmModal: false,
+    showForceDeleteModal: false,
     userToDelete: {},
+    userToForceDelete: {},
     deleteFormUrl: '',
+    forceDeleteFormUrl: '',
+    forceDeleteConfirm: '',
     searchQuery: '',
     selectedRole: ''
 }">
@@ -241,43 +245,69 @@
                             {{ $user->created_at->format('d/m/Y') }}
                         </td>
                         <td class="px-6 py-4 text-right">
-                                <div class="flex items-center justify-end gap-2">
-                                    @can('users.update')
-                                    <a href="{{ route('admin.users.permissions', $user) }}"
-                                        title="Gérer les Permissions"
-                                        class="p-2 rounded-full bg-gray-50 text-gray-400 hover:text-purple-600 hover:bg-purple-50 transition-all duration-200 group">
-                                        <x-iconify icon="lucide:lock" class="w-4 h-4 group-hover:scale-110 transition-transform" />
-                                    </a>
-                                    @endcan
+                            <div class="flex items-center justify-end gap-2">
+                                @can('users.update')
+                                <a href="{{ route('admin.users.permissions', $user) }}"
+                                    title="Gérer les permissions"
+                                    class="p-2 rounded-full bg-gray-50 text-gray-400 hover:text-purple-600 hover:bg-purple-50 transition-all duration-200 group">
+                                    <x-iconify icon="lucide:lock" class="w-4 h-4 group-hover:scale-110 transition-transform" />
+                                </a>
+                                @endcan
 
-                                    @can('users.update')
-                                    <a href="{{ route('admin.users.vehicles.manage', $user) }}"
-                                        title="Gérer l'accès aux véhicules"
-                                        class="p-2 rounded-full bg-gray-50 text-gray-400 hover:text-green-600 hover:bg-green-50 transition-all duration-200 group">
-                                        <x-iconify icon="lucide:car" class="w-4 h-4 group-hover:scale-110 transition-transform" />
-                                    </a>
-                                    @endcan
+                                @can('users.update')
+                                <a href="{{ route('admin.users.vehicles.manage', $user) }}"
+                                    title="Gérer l'accès aux véhicules"
+                                    class="p-2 rounded-full bg-gray-50 text-gray-400 hover:text-green-600 hover:bg-green-50 transition-all duration-200 group">
+                                    <x-iconify icon="lucide:car" class="w-4 h-4 group-hover:scale-110 transition-transform" />
+                                </a>
+                                @endcan
 
-                                    @can('users.update')
-                                    <a href="{{ route('admin.users.edit', $user) }}"
-                                        title="Modifier"
-                                        class="p-2 rounded-full bg-gray-50 text-gray-400 hover:text-amber-600 hover:bg-amber-50 transition-all duration-200 group">
-                                        <x-iconify icon="lucide:edit-3" class="w-4 h-4 group-hover:scale-110 transition-transform" />
-                                    </a>
-                                    @endcan
+                                @can('users.update')
+                                <a href="{{ route('admin.users.edit', $user) }}"
+                                    title="Modifier"
+                                    class="p-2 rounded-full bg-gray-50 text-gray-400 hover:text-amber-600 hover:bg-amber-50 transition-all duration-200 group">
+                                    <x-iconify icon="lucide:edit-3" class="w-4 h-4 group-hover:scale-110 transition-transform" />
+                                </a>
+                                @endcan
 
-                                    @can('users.delete')
-                                    @if(auth()->id() !== $user->id)
-                                    <button type="button"
-                                        @click="showConfirmModal = true; userToDelete = {{ json_encode($user->only(['id', 'name', 'email'])) }}; deleteFormUrl = '{{ route('admin.users.destroy', $user->id) }}'"
-                                        title="Supprimer"
-                                        class="p-2 rounded-full bg-gray-50 text-gray-400 hover:text-red-600 hover:bg-red-50 transition-all duration-200 group">
-                                        <x-iconify icon="lucide:trash-2" class="w-4 h-4 group-hover:scale-110 transition-transform" />
+                                @can('users.delete')
+                                @if(auth()->id() !== $user->id)
+                                <div class="relative inline-block text-left" x-data="{ open: false }">
+                                    <button
+                                        type="button"
+                                        @click="open = !open"
+                                        @click.away="open = false"
+                                        class="inline-flex items-center justify-center p-2 rounded-full bg-gray-50 text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-all duration-200"
+                                        title="Actions">
+                                        <x-iconify icon="lucide:more-vertical" class="w-5 h-5" />
                                     </button>
-                                    @endif
-                                    @endcan
+
+                                    <div
+                                        x-show="open"
+                                        x-cloak
+                                        x-transition
+                                        class="absolute right-0 z-20 mt-2 w-52 origin-top-right rounded-lg bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                                        <div class="py-1">
+                                            <button type="button"
+                                                @click="open = false; showConfirmModal = true; userToDelete = {{ json_encode($user->only(['id', 'name', 'email'])) }}; deleteFormUrl = '{{ route('admin.users.destroy', $user->id) }}'"
+                                                class="flex w-full items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                                <x-iconify icon="lucide:archive" class="w-4 h-4 text-amber-600" />
+                                                Archiver
+                                            </button>
+
+                                            <button type="button"
+                                                @click="open = false; showForceDeleteModal = true; forceDeleteConfirm = ''; userToForceDelete = {{ json_encode($user->only(['id', 'name', 'email'])) }}; forceDeleteFormUrl = '{{ route('admin.users.force-delete', $user->id) }}'"
+                                                class="flex w-full items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-red-50">
+                                                <x-iconify icon="lucide:skull" class="w-4 h-4 text-red-600" />
+                                                Supprimer définitivement
+                                            </button>
+                                        </div>
+                                    </div>
                                 </div>
-                            </td>
+                                @endif
+                                @endcan
+                            </div>
+                        </td>
                         </tr>
                     @empty
                     <tr>
@@ -316,10 +346,10 @@
                         <x-iconify icon="lucide:trash-2" class="w-6 h-6 text-red-600" />
                     </div>
                     <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
-                        <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-title">Suppression définitive</h3>
+                        <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-title">Archiver l'utilisateur</h3>
                         <div class="mt-2">
                             <p class="text-sm text-gray-500">
-                                Êtes-vous sûr de vouloir supprimer définitivement l'utilisateur
+                                Êtes-vous sûr de vouloir archiver l'utilisateur
                                 <span class="font-bold text-gray-900" x-text="userToDelete.name || userToDelete.email"></span>
                                 (<span class="font-medium" x-text="userToDelete.email"></span>) ?
                             </p>
@@ -329,12 +359,12 @@
                                         <x-iconify icon="lucide:alert-triangle" class="h-5 w-5 text-red-400" />
                                     </div>
                                     <div class="ml-3">
-                                        <h3 class="text-sm font-medium text-red-800">Attention : Action irréversible</h3>
+                                        <h3 class="text-sm font-medium text-red-800">Attention : Archivage</h3>
                                         <div class="mt-2 text-sm text-red-700">
                                             <ul role="list" class="list-disc pl-5 space-y-1">
-                                                <li>Le compte sera supprimé définitivement.</li>
-                                                <li>Les accès liés seront révoqués.</li>
-                                                <li>Cette action ne peut pas être annulée.</li>
+                                                <li>Le compte ne sera plus actif.</li>
+                                                <li>Les accès liés seront suspendus.</li>
+                                                <li>La restauration reste possible.</li>
                                             </ul>
                                         </div>
                                     </div>
@@ -347,8 +377,8 @@
                     <form :action="deleteFormUrl" method="POST" class="sm:ml-3 sm:w-auto">
                         @csrf
                         @method('DELETE')
-                        <button type="submit" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none sm:text-sm">
-                            Supprimer
+                        <button type="submit" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-amber-600 text-base font-medium text-white hover:bg-amber-700 focus:outline-none sm:text-sm">
+                            Archiver
                         </button>
                     </form>
                     <button type="button"
@@ -358,7 +388,87 @@
                     </button>
                 </div>
             </div>
+    </div>
+</div>
+
+<div x-show="showForceDeleteModal"
+    x-cloak
+    x-transition:enter="ease-out duration-300"
+    x-transition:enter-start="opacity-0"
+    x-transition:enter-end="opacity-100"
+    x-transition:leave="ease-in duration-200"
+    x-transition:leave-start="opacity-100"
+    x-transition:leave-end="opacity-0"
+    class="fixed inset-0 z-50 overflow-y-auto"
+    style="display: none;">
+    <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+        <div class="fixed inset-0 bg-gray-900/40 backdrop-blur-sm transition-opacity z-40" @click="showForceDeleteModal = false"></div>
+        <span class="hidden sm:inline-block sm:align-middle sm:h-screen">&#8203;</span>
+        <div class="relative z-50 inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full sm:p-6"
+            @click.away="showForceDeleteModal = false">
+            <div class="sm:flex sm:items-start">
+                <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
+                    <x-iconify icon="lucide:skull" class="w-6 h-6 text-red-600" />
+                </div>
+                <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+                    <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-title">Suppression définitive</h3>
+                    <div class="mt-2">
+                        <p class="text-sm text-gray-500">
+                            Vous êtes sur le point de supprimer définitivement l'utilisateur
+                            <span class="font-bold text-gray-900" x-text="userToForceDelete.name || userToForceDelete.email"></span>
+                            (<span class="font-medium" x-text="userToForceDelete.email"></span>).
+                        </p>
+                        <div class="mt-3 bg-red-50 border border-red-200 rounded-md p-3">
+                            <div class="flex">
+                                <div class="flex-shrink-0">
+                                    <x-iconify icon="lucide:alert-triangle" class="h-5 w-5 text-red-400" />
+                                </div>
+                                <div class="ml-3">
+                                    <h3 class="text-sm font-medium text-red-800">Attention : Action irréversible</h3>
+                                    <div class="mt-2 text-sm text-red-700">
+                                        <ul role="list" class="list-disc pl-5 space-y-1">
+                                            <li>Le compte sera supprimé définitivement.</li>
+                                            <li>Les accès liés seront définitivement révoqués.</li>
+                                            <li>Cette action ne peut pas être annulée.</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mt-4">
+                            <label class="block text-sm font-medium text-gray-700">
+                                Tapez <span class="font-semibold text-red-600">SUPPRIMER</span> pour confirmer
+                            </label>
+                            <input
+                                type="text"
+                                x-model="forceDeleteConfirm"
+                                placeholder="SUPPRIMER"
+                                class="mt-2 w-full rounded-md border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500 text-sm" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse">
+                <form :action="forceDeleteFormUrl" method="POST" class="sm:ml-3 sm:w-auto">
+                    @csrf
+                    @method('DELETE')
+                    <button
+                        type="submit"
+                        :disabled="forceDeleteConfirm.trim().toUpperCase() !== 'SUPPRIMER'"
+                        :class="forceDeleteConfirm.trim().toUpperCase() !== 'SUPPRIMER' ? 'bg-red-300 cursor-not-allowed' : 'bg-red-600 hover:bg-red-700'"
+                        class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 text-base font-medium text-white focus:outline-none sm:text-sm">
+                        Supprimer définitivement
+                    </button>
+                </form>
+                <button type="button"
+                    @click="showForceDeleteModal = false"
+                    class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none sm:mt-0 sm:w-auto sm:text-sm">
+                    Annuler
+                </button>
+            </div>
         </div>
     </div>
+</div>
 </div>
 @endsection

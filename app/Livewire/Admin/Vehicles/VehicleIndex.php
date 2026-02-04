@@ -58,6 +58,9 @@ class VehicleIndex extends Component
     public $showBulkDepotModal = false;
     public $showBulkStatusModal = false;
     public $showBulkArchiveModal = false;
+    public $showBulkRestoreModal = false;
+    public $showBulkForceDeleteModal = false;
+    public string $bulkForceDeleteConfirm = '';
 
     // Individual Actions States - Boolean flags + ID storage
     public ?int $restoringVehicleId = null;
@@ -93,6 +96,19 @@ class VehicleIndex extends Component
     public function getIndividualStatusVehicleProperty()
     {
         return $this->individualStatusVehicleId ? Vehicle::find($this->individualStatusVehicleId) : null;
+    }
+
+    public function getSelectedVehiclesPreviewProperty()
+    {
+        if (empty($this->selectedVehicles)) {
+            return collect();
+        }
+
+        return Vehicle::withTrashed()
+            ->whereIn('id', $this->selectedVehicles)
+            ->orderBy('registration_plate')
+            ->take(3)
+            ->get();
     }
 
     // 🔄 Query String
@@ -254,10 +270,25 @@ class VehicleIndex extends Component
         $this->resetBulkState();
     }
 
+    public function confirmBulkRestore(): void
+    {
+        if (empty($this->selectedVehicles)) {
+            $this->dispatch('toast', ['type' => 'warning', 'message' => 'Aucun véhicule sélectionné']);
+            return;
+        }
+
+        $this->showBulkRestoreModal = true;
+    }
+
     public function bulkForceDelete()
     {
         if (empty($this->selectedVehicles)) {
             $this->dispatch('toast', ['type' => 'warning', 'message' => 'Aucun véhicule sélectionné']);
+            return;
+        }
+
+        if (strtoupper(trim($this->bulkForceDeleteConfirm)) !== 'SUPPRIMER') {
+            $this->dispatch('toast', ['type' => 'error', 'message' => 'Veuillez saisir SUPPRIMER pour confirmer la suppression.']);
             return;
         }
 
@@ -275,6 +306,28 @@ class VehicleIndex extends Component
         $this->resetBulkState();
     }
 
+    public function confirmBulkForceDelete(): void
+    {
+        if (empty($this->selectedVehicles)) {
+            $this->dispatch('toast', ['type' => 'warning', 'message' => 'Aucun véhicule sélectionné']);
+            return;
+        }
+
+        $this->bulkForceDeleteConfirm = '';
+        $this->showBulkForceDeleteModal = true;
+    }
+
+    public function cancelBulkRestore(): void
+    {
+        $this->showBulkRestoreModal = false;
+    }
+
+    public function cancelBulkForceDelete(): void
+    {
+        $this->bulkForceDeleteConfirm = '';
+        $this->showBulkForceDeleteModal = false;
+    }
+
     protected function resetBulkState()
     {
         $this->selectedVehicles = [];
@@ -284,7 +337,10 @@ class VehicleIndex extends Component
         $this->showBulkDepotModal = false;
         $this->showBulkStatusModal = false;
         $this->showBulkArchiveModal = false;
+        $this->showBulkRestoreModal = false;
+        $this->showBulkForceDeleteModal = false;
         $this->showIndividualStatusModal = false;
+        $this->bulkForceDeleteConfirm = '';
     }
 
     // --- INDIVIDUAL ACTIONS ---

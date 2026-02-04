@@ -15,11 +15,20 @@ class UpdateDriverRequest extends FormRequest
     public function rules(): array
     {
         $driverId = $this->route('driver')->id;
+        $organizationId = $this->user()->organization_id;
 
         return [
             'first_name' => ['required', 'string', 'max:255'],
             'last_name' => ['required', 'string', 'max:255'],
-            'employee_number' => ['nullable', 'string', 'max:100', Rule::unique('drivers')->ignore($driverId)->whereNull('deleted_at')],
+            'employee_number' => [
+                'nullable',
+                'string',
+                'max:100',
+                Rule::unique('drivers')
+                    ->ignore($driverId)
+                    ->where('organization_id', $organizationId)
+                    ->whereNull('deleted_at')
+            ],
             'user_id' => ['nullable', 'sometimes', 'exists:users,id', Rule::unique('drivers')->ignore($driverId)->whereNull('deleted_at')],
             'status_id' => ['required', 'exists:driver_statuses,id'],
             // ... (toutes les autres règles identiques à StoreDriverRequest)
@@ -30,7 +39,15 @@ class UpdateDriverRequest extends FormRequest
             'address' => ['nullable', 'string', 'max:1000'],
             'recruitment_date' => ['nullable', 'date'],
             'contract_end_date' => ['nullable', 'date', 'after_or_equal:recruitment_date'],
-            'license_number' => ['nullable', 'string', 'max:100'],
+            'license_number' => [
+                'nullable',
+                'string',
+                'max:100',
+                Rule::unique('drivers')
+                    ->ignore($driverId)
+                    ->where('organization_id', $organizationId)
+                    ->whereNull('deleted_at')
+            ],
             'license_categories' => ['nullable', 'array'],
             'license_categories.*' => ['nullable', 'string', 'in:A1,A,B,BE,C1,C1E,C,CE,D,DE,F'],
             'license_issue_date' => ['nullable', 'date'],
@@ -39,7 +56,16 @@ class UpdateDriverRequest extends FormRequest
             'emergency_contact_name' => ['nullable', 'string', 'max:255'],
             'emergency_contact_phone' => ['nullable', 'string', 'max:50'],
             'emergency_contact_relationship' => ['nullable', 'string', 'max:100'],
-            'personal_email' => ['nullable', 'string', 'email', 'max:255'],
+            'personal_email' => [
+                'nullable',
+                'string',
+                'email',
+                'max:255',
+                Rule::unique('drivers')
+                    ->ignore($driverId)
+                    ->where('organization_id', $organizationId)
+                    ->whereNull('deleted_at')
+            ],
             'notes' => ['nullable', 'string', 'max:5000'],
             'license_verified' => ['nullable', 'boolean'],
 

@@ -352,18 +352,24 @@ class DriverController extends Controller
             }
 
             $driverName = $driver->first_name . ' ' . $driver->last_name;
-            $deleted = $this->driverService->forceDeleteDriver($driverId);
+            $result = $this->driverService->forceDeleteDriver($driverId);
 
-            if ($deleted) {
+            if (!empty($result['deleted'])) {
                 Log::warning('Driver force deleted', [
                     'driver_id' => $driver->id,
                     'driver_name' => $driverName,
                     'deleted_by' => auth()->id()
                 ]);
 
-                return redirect()
+                $redirect = redirect()
                     ->route('admin.drivers.index', ['view_deleted' => true])
                     ->with('success', "Le chauffeur {$driverName} a été supprimé définitivement.");
+
+                if (!empty($result['user_skip_reason'])) {
+                    $redirect->with('warning', $result['user_skip_reason']);
+                }
+
+                return $redirect;
             }
 
             return redirect()
