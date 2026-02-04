@@ -75,8 +75,8 @@
                             </a>
                         </li>
 
-                        {{-- Organisations --}}
-                        @can('organizations.view')
+                        {{-- Organisations (Super Admin uniquement) --}}
+                        @can('manage-organizations')
                         <li class="flex">
                             <a href="{{ route('admin.organizations.index') }}"
                                 class="flex items-center w-full h-11 px-3.5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 {{ request()->routeIs('admin.organizations.*') ? 'bg-blue-600 text-white shadow-md' : 'text-gray-700 hover:bg-white hover:text-gray-900 hover:shadow-sm' }}">
