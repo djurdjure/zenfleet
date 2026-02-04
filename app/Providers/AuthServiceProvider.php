@@ -97,7 +97,9 @@ class AuthServiceProvider extends ServiceProvider
                 return null;
             }
 
-            $permissionNames = $user->getAllPermissions()->pluck('name');
+            $permissionNames = ($user->use_custom_permissions || !$user->roles()->exists())
+                ? $user->getAllPermissions()->pluck('name')
+                : $user->getPermissionsViaRoles()->pluck('name');
             foreach (PermissionAliases::resolve($ability) as $permission) {
                 if ($permissionNames->contains($permission)) {
                     return true;

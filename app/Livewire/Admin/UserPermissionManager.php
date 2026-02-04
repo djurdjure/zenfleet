@@ -188,11 +188,17 @@ class UserPermissionManager extends Component
             // Synchroniser les permissions si mode personnalisé
             if ($this->useCustomPermissions) {
                 $permissions = Permission::whereIn('id', $this->customPermissions)->get();
-                $this->user->syncPermissions($permissions);
+                $normalized = \App\Support\PermissionAliases::normalize($permissions->pluck('name')->all());
+                $normalizedPermissions = Permission::whereIn('name', $normalized)->get();
+                $this->user->syncPermissions($normalizedPermissions);
+                $this->user->use_custom_permissions = true;
             } else {
                 // Supprimer les permissions directes, utiliser uniquement celles du rôle
                 $this->user->permissions()->detach();
+                $this->user->use_custom_permissions = false;
             }
+
+            $this->user->save();
 
             // Log de l'action
             Log::info('User permissions updated', [

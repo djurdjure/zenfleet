@@ -33,8 +33,10 @@ trait VehicleControllerExtensions
      */
     public function exportCsv()
     {
-        // Autorisation pour voir la liste des véhicules
-        $this->authorize('viewAny', Vehicle::class);
+        // Autorisation export véhicules
+        if (!Auth::user()->can('vehicles.export')) {
+            abort(403, 'Non autorisé à exporter les véhicules');
+        }
         $this->logUserAction('vehicle.export_csv_list.requested');
 
         try {
@@ -115,8 +117,8 @@ trait VehicleControllerExtensions
 
         try {
             // Vérifier les permissions
-            if (!Auth::user()->can('vehicles.view')) {
-                abort(403, 'Non autorisé à voir ce véhicule');
+            if (!Auth::user()->can('vehicles.export')) {
+                abort(403, 'Non autorisé à exporter ce véhicule');
             }
 
             // Vérifier l'appartenance à l'organisation

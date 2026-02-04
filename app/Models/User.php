@@ -16,7 +16,10 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 class User extends Authenticatable
 {
     // CORRECTION : On retire "BelongsToOrganization" et on nettoie les doublons
-    use HasApiTokens, HasFactory, Notifiable, HasRoles, SoftDeletes;
+    use HasApiTokens, HasFactory, Notifiable, HasRoles, SoftDeletes {
+        hasDirectPermission as protected spatieHasDirectPermission;
+        hasPermissionTo as protected spatieHasPermissionTo;
+    }
 
     /**
      * 🔐 OVERRIDE: Relation roles() pour gérer le multi-tenant avec organization_id
@@ -59,6 +62,7 @@ class User extends Authenticatable
         'phone',
         'password',
         'organization_id',
+        'use_custom_permissions',
     ];
 
     /**
@@ -74,6 +78,7 @@ class User extends Authenticatable
      */
     protected $casts = [
         'email_verified_at' => 'datetime',
+        'use_custom_permissions' => 'boolean',
     ];
 
     /**
@@ -116,5 +121,30 @@ class User extends Authenticatable
     public function mileageReadings(): HasMany
     {
         return $this->hasMany(VehicleMileageReading::class, 'recorded_by_id');
+    }
+
+    /**
+     * Enforce role-based permissions unless explicit custom permissions are enabled.
+     */
+    public function hasDirectPermission($permission): bool
+    {
+        if (!$this->use_custom_permissions && $this->roles()->exists()) {
+            return false;
+        }
+
+        return $this->spatieHasDirectPermission($permission);
+    }
+
+    /**
+     * Override permission checks to ignore direct permissions by default.
+     */
+    public function hasPermissionTo($permission, $guardName = null): bool
+    {
+        if (!$this->use_custom_permissions && $this->roles()->exists()) {
+            $permission = $this->filterPermission($permission, $guardName);
+            return $this->hasPermissionViaRole($permission);
+        }
+
+        return $this->spatieHasPermissionTo($permission, $guardName);
     }
 }

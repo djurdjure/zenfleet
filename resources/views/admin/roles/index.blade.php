@@ -54,6 +54,49 @@
  </div>
  </div>
 
+ @if($isSuperAdmin)
+ <form method="GET" class="mb-6 bg-white border border-gray-200 rounded-xl shadow-sm p-5">
+ <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 items-end">
+ <div>
+ <label class="block text-xs font-semibold text-gray-600 mb-2">Contexte</label>
+ <select name="context" class="w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+ onchange="this.form.submit()">
+ <option value="organization" {{ $context === 'organization' ? 'selected' : '' }}>Organisation</option>
+ <option value="global" {{ $context === 'global' ? 'selected' : '' }}>Rôles globaux</option>
+ <option value="all" {{ $context === 'all' ? 'selected' : '' }}>Toutes les organisations</option>
+ </select>
+ </div>
+
+ @if($context === 'organization')
+ <div>
+ <label class="block text-xs font-semibold text-gray-600 mb-2">Organisation</label>
+ <select name="organization_id" class="w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+ onchange="this.form.submit()">
+ @foreach($organizations as $org)
+ <option value="{{ $org->id }}" {{ (int) $selectedOrgId === (int) $org->id ? 'selected' : '' }}>
+ {{ $org->name }}{{ $org->legal_name ? ' · ' . $org->legal_name : '' }}
+ </option>
+ @endforeach
+ </select>
+ </div>
+
+ <div class="flex items-center space-x-3">
+ <label class="inline-flex items-center text-sm text-gray-700">
+ <input type="checkbox" name="include_global" value="1"
+ class="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+ onchange="this.form.submit()" {{ $includeGlobal ? 'checked' : '' }}>
+ <span class="ml-2">Inclure rôles globaux</span>
+ </label>
+ </div>
+ @endif
+
+ <div class="text-xs text-gray-500">
+ <p>Astuce : sélectionnez “Organisation” pour éviter les doublons par nom.</p>
+ </div>
+ </div>
+ </form>
+ @endif
+
  {{-- Messages de succès --}}
  @if (session('success'))
  <div class="mb-6 bg-green-50 border-l-4 border-green-500 rounded-lg p-4 shadow-sm" role="alert">
@@ -124,7 +167,10 @@
  </div>
  <div>
  <h3 class="text-xl font-bold text-white">{{ $role->name }}</h3>
- <p class="text-white/80 text-xs">ID: {{ $role->id }}</p>
+ <p class="text-white/80 text-xs">
+ ID: {{ $role->id }} •
+ {{ $role->organization_id ? 'Org #' . $role->organization_id : 'Global' }}
+ </p>
  </div>
  </div>
  </div>
@@ -133,6 +179,11 @@
  {{-- Body --}}
  <div class="p-6">
  <p class="text-sm text-gray-600 mb-4">{{ $config['description'] }}</p>
+ <div class="mb-4">
+ <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold {{ $role->organization_id ? 'bg-blue-50 text-blue-700' : 'bg-gray-100 text-gray-600' }}">
+ {{ $role->organization_id ? 'Organisation #' . $role->organization_id : 'Rôle global' }}
+ </span>
+ </div>
 
  {{-- Statistiques --}}
  <div class="bg-gray-50 rounded-lg p-4 mb-4">

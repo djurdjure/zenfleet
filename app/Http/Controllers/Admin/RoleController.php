@@ -8,38 +8,60 @@ use Illuminate\Http\Request;
 use Illuminate\View\View;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
+use App\Support\PermissionAliases;
+use App\Models\Organization;
 
 class RoleController extends Controller
 {
     /**
      * Affiche la liste des rôles.
      */
-    public function index(): View
+    public function index(Request $request): View
     {
         $user = auth()->user();
-        $organizationId = $user?->organization_id;
         $isSuperAdmin = $user?->hasRole('Super Admin');
 
-        $rolesQuery = Role::query()
-            ->when(!$isSuperAdmin, function ($query) use ($organizationId) {
-                $query->where(function ($subQuery) use ($organizationId) {
-                    $subQuery->whereNull('organization_id')
-                        ->orWhere('organization_id', $organizationId);
-                });
-            })
-            ->orderBy('name');
+        $context = $request->string('context')->toString() ?: 'organization';
+        $selectedOrgId = $request->integer('organization_id') ?: $user?->organization_id;
+        $includeGlobal = $request->boolean('include_global', false);
 
-        $roles = $rolesQuery->get();
-
-        if ($organizationId) {
-            $roles = $roles->sortByDesc(function ($role) use ($organizationId) {
-                return (int) ($role->organization_id === $organizationId);
-            });
+        if (!$isSuperAdmin) {
+            $context = 'organization';
+            $selectedOrgId = $user?->organization_id;
+            $includeGlobal = false;
         }
 
-        $roles = $roles->unique('name')->values();
+        $rolesQuery = Role::query();
 
-        return view('admin.roles.index', compact('roles'));
+        if ($context === 'global') {
+            $rolesQuery->whereNull('organization_id');
+        } elseif ($context === 'all') {
+            // no filter
+        } else {
+            if ($selectedOrgId) {
+                $rolesQuery->where('organization_id', $selectedOrgId);
+            }
+
+            if ($includeGlobal) {
+                $rolesQuery->orWhereNull('organization_id');
+            }
+        }
+
+        $rolesQuery->orderBy('name');
+
+        $roles = $rolesQuery->get();
+        $organizations = $isSuperAdmin
+            ? Organization::orderBy('name')->get(['id', 'name', 'legal_name'])
+            : collect();
+
+        return view('admin.roles.index', compact(
+            'roles',
+            'organizations',
+            'context',
+            'selectedOrgId',
+            'includeGlobal',
+            'isSuperAdmin'
+        ));
     }
 
     /**
@@ -49,6 +71,7 @@ class RoleController extends Controller
     {
         // Récupère toutes les permissions disponibles
         $allPermissions = Permission::orderBy('name')->get();
+        $allPermissions = $this->filterLegacyPermissions($allPermissions);
 
         // Grouper les permissions par Ressource (et non par action)
         $permissionsByCategory = $allPermissions->groupBy(function ($permission) {
@@ -109,7 +132,10 @@ class RoleController extends Controller
 
         // 4. Synchroniser les permissions en utilisant la collection d'objets Permission.
         // C'est la méthode la plus robuste qui élimine toute ambiguïté.
-        $role->syncPermissions($permissions);
+        $normalizedNames = PermissionAliases::normalize($permissions->pluck('name')->all());
+        $normalizedPermissions = $this->resolvePermissionsForRole($role, $normalizedNames);
+
+        $role->syncPermissions($normalizedPermissions);
 
         return redirect()->route('admin.roles.index')
             ->with('success', "Les permissions pour le rôle '{$role->name}' ont été mises à jour.");
@@ -123,5 +149,37 @@ class RoleController extends Controller
     public function permissions(): View
     {
         return view('admin.roles.permissions');
+    }
+
+    private function filterLegacyPermissions($permissions)
+    {
+        $allNames = $permissions->pluck('name');
+
+        return $permissions->filter(function ($permission) use ($allNames) {
+            if (!PermissionAliases::isLegacy($permission->name)) {
+                return true;
+            }
+
+            $canonical = PermissionAliases::canonicalFor($permission->name);
+
+            return !$canonical || !$allNames->contains($canonical);
+        })->values();
+    }
+
+    private function resolvePermissionsForRole(Role $role, array $permissionNames)
+    {
+        $guard = $role->guard_name;
+
+        $resolved = collect();
+
+        foreach ($permissionNames as $name) {
+            $permission = Permission::firstOrCreate([
+                'name' => $name,
+                'guard_name' => $guard,
+            ]);
+            $resolved->push($permission);
+        }
+
+        return $resolved;
     }
 }

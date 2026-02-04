@@ -190,6 +190,59 @@ final class PermissionAliases
         'system.view' => ['view organizations'],
     ];
 
+    private static ?array $legacyToCanonical = null;
+
+    public static function isLegacy(string $permission): bool
+    {
+        return array_key_exists($permission, self::getLegacyToCanonicalMap());
+    }
+
+    public static function canonicalFor(string $permission): ?string
+    {
+        if (isset(self::MAP[$permission])) {
+            return $permission;
+        }
+
+        $legacyMap = self::getLegacyToCanonicalMap();
+
+        return $legacyMap[$permission] ?? null;
+    }
+
+    public static function normalize(array $permissions): array
+    {
+        $normalized = [];
+
+        foreach ($permissions as $permission) {
+            $permission = trim($permission);
+            if ($permission === '') {
+                continue;
+            }
+
+            $canonical = self::canonicalFor($permission) ?? $permission;
+            $normalized[] = $canonical;
+        }
+
+        return self::unique($normalized);
+    }
+
+    private static function getLegacyToCanonicalMap(): array
+    {
+        if (self::$legacyToCanonical !== null) {
+            return self::$legacyToCanonical;
+        }
+
+        $map = [];
+        foreach (self::MAP as $canonical => $aliases) {
+            foreach ($aliases as $alias) {
+                $map[$alias] = $canonical;
+            }
+        }
+
+        self::$legacyToCanonical = $map;
+
+        return self::$legacyToCanonical;
+    }
+
     public static function resolve(string $permission): array
     {
         $permission = trim($permission);
@@ -220,21 +273,6 @@ final class PermissionAliases
         }
 
         return false;
-    }
-
-    public static function canonicalFor(string $permission): ?string
-    {
-        if (isset(self::MAP[$permission])) {
-            return $permission;
-        }
-
-        foreach (self::MAP as $canonical => $aliases) {
-            if (in_array($permission, $aliases, true)) {
-                return $canonical;
-            }
-        }
-
-        return null;
     }
 
     public static function legacyMap(): array

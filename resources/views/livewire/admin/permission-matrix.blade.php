@@ -53,7 +53,7 @@
  <option value="">-- Sélectionner un rôle --</option>
  @foreach($availableRoles as $role)
  <option value="{{ $role->id }}">
- {{ $role->name }} ({{ $role->permissions_count }} permissions)
+ {{ $role->name }} • {{ $role->organization_id ? 'Org #' . $role->organization_id : 'Global' }} ({{ $role->permissions_count }} permissions)
  </option>
  @endforeach
  </select>
@@ -76,6 +76,40 @@
  </div>
  @endif
  </div>
+
+ @if(auth()->user()->hasRole('Super Admin'))
+ {{-- Contexte Organisation --}}
+ <div class="lg:col-span-1">
+ <label class="block text-sm font-medium text-gray-700 mb-2">
+ 🧭 Contexte des rôles
+ </label>
+ <select wire:model.live="organizationContext"
+ class="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 ">
+ <option value="organization">Organisation</option>
+ <option value="global">Rôles globaux</option>
+ <option value="all">Toutes les organisations</option>
+ </select>
+ <p class="mt-2 text-xs text-gray-500">
+ Utilisez “Organisation” pour éviter les doublons par nom.
+ </p>
+ </div>
+
+ @if($organizationContext === 'organization')
+ <div class="lg:col-span-1">
+ <label class="block text-sm font-medium text-gray-700 mb-2">
+ 🏢 Organisation
+ </label>
+ <select wire:model.live="selectedOrganizationId"
+ class="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 ">
+ @foreach($availableOrganizations as $org)
+ <option value="{{ $org->id }}">
+ {{ $org->name }}{{ $org->legal_name ? ' · ' . $org->legal_name : '' }}
+ </option>
+ @endforeach
+ </select>
+ </div>
+ @endif
+ @endif
 
  {{-- Barre de Recherche --}}
  <div class="lg:col-span-1">
@@ -131,6 +165,11 @@
  </div>
 
  {{-- Options supplémentaires --}}
+ @if($organizationContext === 'all')
+ <div class="mt-4 mb-2 bg-amber-50 border border-amber-200 rounded-lg p-3 text-sm text-amber-800">
+ Mode “Toutes les organisations” : des rôles portant le même nom peuvent apparaître plusieurs fois.
+ </div>
+ @endif
  <div class="mt-4 flex items-center justify-between border-t border-gray-200 pt-4">
  <div class="flex items-center space-x-4">
  <label class="inline-flex items-center cursor-pointer">
@@ -300,6 +339,57 @@
  </div>
  </div>
  @endif
+
+ @if(auth()->user()->hasRole('Super Admin') && $selectedRole)
+ <div class="fixed bottom-8 right-8 z-40">
+ <button wire:click="confirmApplyToAllOrganizations"
+ class="px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-semibold shadow-lg transition-all">
+ 📌 Appliquer à toutes les organisations
+ </button>
+ </div>
+ @endif
+ @endif
+
+ {{-- 🔐 MODAL CONFIRMATION APPLICATION GLOBALE --}}
+ @if($showApplyAllModal && $selectedRole)
+ <div class="fixed inset-0 bg-gray-900/40 backdrop-blur-sm flex items-center justify-center z-50"
+ x-data="{ show: true }"
+ x-show="show"
+ x-transition:enter="transition ease-out duration-300"
+ x-transition:enter-start="opacity-0"
+ x-transition:enter-end="opacity-100"
+ @click.self="$wire.set('showApplyAllModal', false)">
+
+ <div class="bg-white rounded-xl shadow-2xl max-w-xl w-full mx-4 overflow-hidden"
+ @click.stop>
+ <div class="bg-gradient-to-r from-emerald-600 to-emerald-500 px-6 py-4">
+ <h3 class="text-xl font-bold text-white">Appliquer les permissions à toutes les organisations</h3>
+ </div>
+
+ <div class="p-6 space-y-4">
+ <p class="text-sm text-gray-700">
+ Vous êtes sur le point de propager les permissions du rôle
+ <span class="font-semibold text-gray-900">“{{ $selectedRole->name }}”</span>
+ à {{ $applyAllTargetCount }} organisation(s).
+ </p>
+ <div class="bg-amber-50 border border-amber-200 rounded-lg p-4 text-sm text-amber-800">
+ Cette action synchronise les permissions du rôle pour chaque organisation.
+ Les permissions manquantes seront créées automatiquement si nécessaire.
+ </div>
+ </div>
+
+ <div class="px-6 py-4 bg-gray-50 flex justify-end space-x-3">
+ <button wire:click="$set('showApplyAllModal', false)"
+ class="px-4 py-2 bg-white border border-gray-300 rounded-lg text-sm font-semibold text-gray-700 hover:bg-gray-100">
+ Annuler
+ </button>
+ <button wire:click="applyPermissionsToAllOrganizations"
+ class="px-6 py-2 bg-emerald-600 text-white rounded-lg text-sm font-semibold hover:bg-emerald-700">
+ Confirmer l’application
+ </button>
+ </div>
+ </div>
+ </div>
  @endif
 
  {{-- 📊 MODAL APERÇU --}}

@@ -6,6 +6,8 @@ use Livewire\Component;
 use Livewire\WithPagination;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
+use App\Models\Organization;
+use App\Support\PermissionAliases;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -27,7 +29,9 @@ class PermissionMatrix extends Component
     // 🎯 PROPRIÉTÉS PRINCIPALES
     public $selectedRoleId;
     public $selectedRole;
-    public $organizationContext = 'current'; // 'current', 'global', 'all'
+    public $organizationContext = 'organization'; // 'organization', 'global', 'all'
+    public $availableOrganizations = [];
+    public $selectedOrganizationId;
 
     // 🔍 FILTRES ET RECHERCHE
     public $search = '';
@@ -47,6 +51,8 @@ class PermissionMatrix extends Component
     public $showHistory = false;
     public $pendingChanges = [];
     public $confirmationModal = false;
+    public $showApplyAllModal = false;
+    public $applyAllTargetCount = 0;
 
     // 📝 AUDIT
     public $auditLogs = [];
@@ -64,6 +70,7 @@ class PermissionMatrix extends Component
             'vehicles' => ['view', 'create', 'edit', 'delete', 'restore', 'export', 'import', 'view history', 'manage maintenance', 'manage documents'],
             'drivers' => ['view', 'create', 'edit', 'delete', 'restore', 'export', 'import', 'view history', 'assign to vehicles', 'manage licenses'],
             'assignments' => ['view', 'create', 'edit', 'delete', 'end', 'extend', 'export', 'view calendar', 'assignments.view-gantt'],
+            'depots' => ['view', 'create', 'edit', 'delete', 'restore', 'export'],
             'maintenance' => ['view', 'manage plans', 'create operations', 'edit operations', 'delete operations', 'approve operations', 'export reports'],
             'repair_requests' => [
                 'view own', 'view team', 'view all',
@@ -92,6 +99,17 @@ class PermissionMatrix extends Component
         // Vérifier les permissions d'accès
         $this->authorize('manage', Role::class);
 
+        $user = Auth::user();
+
+        if ($user->hasRole('Super Admin')) {
+            $this->availableOrganizations = Organization::orderBy('name')
+                ->get(['id', 'name', 'legal_name']);
+            $this->selectedOrganizationId = $user->organization_id
+                ?? $this->availableOrganizations->first()?->id;
+        } else {
+            $this->selectedOrganizationId = $user->organization_id;
+        }
+
         // Charger les données initiales
         $this->loadAvailableRoles();
         $this->prepareResourcesAndActions();
@@ -107,27 +125,92 @@ class PermissionMatrix extends Component
     }
 
     /**
+     * 🔁 Recharger les rôles quand le contexte change.
+     */
+    public function updatedOrganizationContext(): void
+    {
+        $this->loadAvailableRoles();
+
+        if ($this->availableRoles->isNotEmpty()) {
+            if (!$this->selectedRoleId || !$this->availableRoles->contains('id', $this->selectedRoleId)) {
+                $this->selectedRoleId = $this->availableRoles->first()->id;
+                $this->loadRolePermissions();
+            }
+        } else {
+            $this->selectedRoleId = null;
+            $this->selectedRole = null;
+            $this->rolePermissions = [];
+        }
+    }
+
+    public function updatedSelectedOrganizationId(): void
+    {
+        $this->loadAvailableRoles();
+
+        if ($this->availableRoles->isNotEmpty()) {
+            $this->selectedRoleId = $this->availableRoles->first()->id;
+            $this->loadRolePermissions();
+        } else {
+            $this->selectedRoleId = null;
+            $this->selectedRole = null;
+            $this->rolePermissions = [];
+        }
+    }
+
+    /**
      * 📦 CHARGER LES RÔLES DISPONIBLES
      */
     public function loadAvailableRoles()
     {
         $query = Role::with('permissions')->withCount('permissions');
+        $currentOrgId = $this->selectedOrganizationId ?? Auth::user()->organization_id;
 
         if (Auth::user()->hasRole('Super Admin')) {
-            // Super Admin voit tous les rôles
-            $this->availableRoles = $query->get();
-        } else {
-            // Admin ne voit que les rôles de son organisation (pas Super Admin)
-            $currentOrgId = Auth::user()->organization_id;
+            if ($this->organizationContext === 'global') {
+                $query->whereNull('organization_id');
+            } elseif ($this->organizationContext === 'all') {
+                // no filter
+            } else {
+                if ($currentOrgId) {
+                    $query->where('organization_id', $currentOrgId);
+                }
+            }
 
-            $this->availableRoles = $query
-                ->where(function($q) use ($currentOrgId) {
-                    $q->where('organization_id', $currentOrgId)
-                      ->orWhereNull('organization_id');
-                })
+            $roles = $query->get();
+
+            if ($this->organizationContext !== 'all') {
+                $roles = $this->collapseRoleVariants($roles, $currentOrgId);
+            }
+
+            $this->availableRoles = $roles->sortBy('name')->values();
+        } else {
+            // Admin : ne voit que les rôles de son organisation (avec fallback global si absent)
+            $roles = $query
+                ->where('organization_id', $currentOrgId)
                 ->where('name', '!=', 'Super Admin')
                 ->get();
+
+            $this->availableRoles = $this->collapseRoleVariants($roles, $currentOrgId)
+                ->sortBy('name')
+                ->values();
         }
+    }
+
+    /**
+     * ✅ Déduplique par nom en privilégiant le rôle de l'organisation courante.
+     */
+    private function collapseRoleVariants($roles, ?int $organizationId)
+    {
+        return $roles->groupBy('name')->map(function ($group) use ($organizationId) {
+            if ($organizationId !== null) {
+                $orgRole = $group->firstWhere('organization_id', $organizationId);
+                if ($orgRole) {
+                    return $orgRole;
+                }
+            }
+
+            return $group->firstWhere('organization_id', null) ?? $group->first();
+        });
     }
 
     /**
@@ -362,9 +445,11 @@ class PermissionMatrix extends Component
         try {
             DB::beginTransaction();
 
-            // Synchroniser les permissions
+            // Synchroniser les permissions (normalisation canonical)
             $permissions = Permission::whereIn('id', $this->rolePermissions)->get();
-            $this->selectedRole->syncPermissions($permissions);
+            $normalized = PermissionAliases::normalize($permissions->pluck('name')->all());
+            $normalizedPermissions = $this->resolvePermissionsForRole($this->selectedRole, $normalized);
+            $this->selectedRole->syncPermissions($normalizedPermissions);
 
             // Audit log
             $this->logPermissionChange();
@@ -400,6 +485,86 @@ class PermissionMatrix extends Component
                 'message' => 'Erreur lors de la mise à jour: ' . $e->getMessage()
             ]);
         }
+    }
+
+    public function confirmApplyToAllOrganizations(): void
+    {
+        if (!Auth::user()->hasRole('Super Admin')) {
+            return;
+        }
+
+        if (!$this->selectedRole) {
+            $this->dispatch('notification', [
+                'type' => 'error',
+                'message' => 'Veuillez sélectionner un rôle'
+            ]);
+            return;
+        }
+
+        if ($this->selectedRole->name === 'Super Admin') {
+            $this->dispatch('notification', [
+                'type' => 'error',
+                'message' => 'La propagation du rôle Super Admin est interdite.'
+            ]);
+            return;
+        }
+
+        $this->applyAllTargetCount = Organization::count();
+        $this->showApplyAllModal = true;
+    }
+
+    public function applyPermissionsToAllOrganizations(): void
+    {
+        if (!Auth::user()->hasRole('Super Admin') || !$this->selectedRole) {
+            return;
+        }
+
+        if ($this->selectedRole->name === 'Super Admin') {
+            return;
+        }
+
+        $roleName = $this->selectedRole->name;
+        $guard = $this->selectedRole->guard_name;
+
+        $permissions = Permission::whereIn('id', $this->rolePermissions)->get();
+        $normalized = PermissionAliases::normalize($permissions->pluck('name')->all());
+
+        DB::transaction(function () use ($roleName, $guard, $normalized) {
+            $orgIds = Organization::pluck('id');
+
+            foreach ($orgIds as $orgId) {
+                $role = Role::firstOrCreate([
+                    'name' => $roleName,
+                    'guard_name' => $guard,
+                    'organization_id' => $orgId,
+                ]);
+
+                $permissionsForRole = $this->resolvePermissionsForRole($role, $normalized);
+                $role->syncPermissions($permissionsForRole);
+            }
+        });
+
+        $this->showApplyAllModal = false;
+        $this->dispatch('notification', [
+            'type' => 'success',
+            'message' => 'Permissions appliquées à toutes les organisations.'
+        ]);
+    }
+
+    private function resolvePermissionsForRole(Role $role, array $permissionNames)
+    {
+        $guard = $role->guard_name;
+        $resolved = collect();
+
+        foreach ($permissionNames as $name) {
+            $permission = Permission::firstOrCreate([
+                'name' => $name,
+                'guard_name' => $guard,
+            ]);
+            $resolved->push($permission);
+        }
+
+        return $resolved;
     }
 
     /**

@@ -679,8 +679,9 @@ class VehicleController extends Controller
      */
     public function exportPdf(): \Illuminate\Http\Response|RedirectResponse
     {
-        // Autorisation pour voir la liste des véhicules (viewAny, pas view)
-        $this->authorize('viewAny', Vehicle::class);
+        if (!Auth::user()->can('vehicles.export')) {
+            abort(403, 'Non autorisé à exporter les véhicules');
+        }
         $this->logUserAction('vehicle.export_pdf_list.requested');
 
         try {

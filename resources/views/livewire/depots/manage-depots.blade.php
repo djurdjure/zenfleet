@@ -199,9 +199,11 @@
                 </x-slot:filters>
 
                 <x-slot:actions>
+                    @can('depots.create')
                     <x-button wire:click="openCreateModal" variant="primary" class="shadow-sm hover:shadow-md transition-all">
                         <x-iconify icon="lucide:plus" class="w-5 h-5" />
                     </x-button>
+                    @endcan
                 </x-slot:actions>
 
                 <x-slot:filtersPanel>
@@ -339,6 +341,7 @@
                         </button>
 
                         <div class="flex items-center gap-2">
+                            @can('depots.update')
                             <button wire:click="openEditModal({{ $depot->id }})" class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors" title="Modifier">
                                 <x-iconify icon="lucide:pencil" class="w-4 h-4" />
                             </button>
@@ -348,6 +351,7 @@
                                 title="{{ $depot->is_active ? 'Désactiver' : 'Activer' }}">
                                 <x-iconify icon="{{ $depot->is_active ? 'lucide:power-off' : 'lucide:power' }}" class="w-4 h-4" />
                             </button>
+                            @endcan
                         </div>
                     </div>
                 </div>
@@ -360,10 +364,12 @@
                         <h3 class="mt-2 text-lg font-medium text-gray-900">Aucun dépôt trouvé</h3>
                         <p class="mt-1 text-sm text-gray-500">Commencez par créer votre premier dépôt ou essayez de modifier vos filtres.</p>
                         <div class="mt-6">
+                            @can('depots.create')
                             <x-button wire:click="openCreateModal" variant="primary">
                                 <x-iconify icon="lucide:plus" class="w-4 h-4 mr-2" />
                                 Créer un dépôt
                             </x-button>
+                            @endcan
                         </div>
                     </div>
                 </div>

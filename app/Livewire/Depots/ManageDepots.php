@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 use Livewire\Component;
 use Livewire\WithPagination;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 /**
  * ManageDepots Livewire Component
@@ -96,7 +97,7 @@ class ManageDepots extends Component
 
     public function mount()
     {
-        // Initialize component
+        $this->ensurePermission('depots.view');
     }
 
     public function updatedPerPage()
@@ -106,6 +107,7 @@ class ManageDepots extends Component
 
     public function render()
     {
+        $this->ensurePermission('depots.view');
         $depots = $this->getDepots();
         $stats = $this->getOverallStats();
 
@@ -117,6 +119,7 @@ class ManageDepots extends Component
 
     protected function getDepots()
     {
+        $this->ensurePermission('depots.view');
         $query = VehicleDepot::forOrganization(Auth::user()->organization_id)
             ->withCount('vehicles');
 
@@ -154,6 +157,7 @@ class ManageDepots extends Component
 
     protected function getOverallStats()
     {
+        $this->ensurePermission('depots.view');
         $orgId = Auth::user()->organization_id;
 
         $allDepots = VehicleDepot::forOrganization($orgId)->get();
@@ -211,6 +215,7 @@ class ManageDepots extends Component
 
     public function openCreateModal()
     {
+        $this->ensurePermission('depots.create');
         $this->resetForm();
         $this->modalMode = 'create';
         $this->showModal = true;
@@ -219,6 +224,7 @@ class ManageDepots extends Component
 
     public function openEditModal($depotId)
     {
+        $this->ensurePermission('depots.update');
         $depot = VehicleDepot::where('id', $depotId)
             ->where('organization_id', Auth::user()->organization_id)
             ->firstOrFail();
@@ -247,6 +253,7 @@ class ManageDepots extends Component
 
     public function openViewModal($depotId)
     {
+        $this->ensurePermission('depots.view');
         $depot = VehicleDepot::where('id', $depotId)
             ->where('organization_id', Auth::user()->organization_id)
             ->firstOrFail();
@@ -283,6 +290,12 @@ class ManageDepots extends Component
 
     public function save()
     {
+        if ($this->modalMode === 'create') {
+            $this->ensurePermission('depots.create');
+        } else {
+            $this->ensurePermission('depots.update');
+        }
+
         $this->validate();
 
         // Auto-generate code if empty (Enterprise-grade feature)
@@ -395,6 +408,7 @@ class ManageDepots extends Component
 
     public function delete($depotId)
     {
+        $this->ensurePermission('depots.delete');
         $depot = VehicleDepot::where('id', $depotId)
             ->where('organization_id', Auth::user()->organization_id)
             ->firstOrFail();
@@ -411,6 +425,7 @@ class ManageDepots extends Component
 
     public function toggleActive($depotId)
     {
+        $this->ensurePermission('depots.update');
         $depot = VehicleDepot::where('id', $depotId)
             ->where('organization_id', Auth::user()->organization_id)
             ->firstOrFail();
@@ -442,5 +457,14 @@ class ManageDepots extends Component
         $this->longitude = null; // Reset à null pour cohérence avec l'initialisation
         $this->description = '';
         $this->is_active = true;
+    }
+
+    private function ensurePermission(string $permission): void
+    {
+        $user = Auth::user();
+
+        if (!$user || !$user->can($permission)) {
+            throw new HttpException(403, 'Accès refusé.');
+        }
     }
 }
