@@ -26,65 +26,65 @@
         {{-- ANALYTICS CARDS --}}
         <x-page-analytics-grid columns="5">
             {{-- Total --}}
-            <div class="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-lg transition-shadow duration-300">
+            <div class="bg-blue-50 rounded-lg border border-blue-200 p-6 hover:shadow-lg transition-shadow duration-300">
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-sm font-medium text-gray-600">Total véhicules</p>
                         <p class="text-2xl font-bold text-gray-900 mt-1">{{ $analytics['total_vehicles'] }}</p>
                     </div>
-                    <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                    <div class="w-12 h-12 bg-blue-100 border border-blue-200 rounded-lg flex items-center justify-center">
                         <x-iconify icon="lucide:car" class="w-6 h-6 text-blue-600" />
                     </div>
                 </div>
             </div>
 
                 {{-- Disponibles --}}
-                <div class="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-lg transition-shadow duration-300">
+                <div class="bg-green-50 rounded-lg border border-green-200 p-6 hover:shadow-lg transition-shadow duration-300">
                     <div class="flex items-center justify-between">
                         <div>
                             <p class="text-sm font-medium text-gray-600">Disponibles</p>
                             <p class="text-2xl font-bold text-green-600 mt-1">{{ $analytics['available_vehicles'] }}</p>
                         </div>
-                        <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                        <div class="w-12 h-12 bg-green-100 border border-green-200 rounded-lg flex items-center justify-center">
                             <x-iconify icon="lucide:check-circle-2" class="w-6 h-6 text-green-600" />
                         </div>
                     </div>
                 </div>
 
                 {{-- Affectés --}}
-                <div class="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-lg transition-shadow duration-300">
+                <div class="bg-orange-50 rounded-lg border border-orange-200 p-6 hover:shadow-lg transition-shadow duration-300">
                     <div class="flex items-center justify-between">
                         <div>
                             <p class="text-sm font-medium text-gray-600">Affectés</p>
                             <p class="text-2xl font-bold text-orange-600 mt-1">{{ $analytics['assigned_vehicles'] }}</p>
                         </div>
-                        <div class="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
+                        <div class="w-12 h-12 bg-orange-100 border border-orange-200 rounded-lg flex items-center justify-center">
                             <x-iconify icon="lucide:user-check" class="w-6 h-6 text-orange-600" />
                         </div>
                     </div>
                 </div>
 
                 {{-- Maintenance --}}
-                <div class="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-lg transition-shadow duration-300">
+                <div class="bg-amber-50 rounded-lg border border-amber-200 p-6 hover:shadow-lg transition-shadow duration-300">
                     <div class="flex items-center justify-between">
                         <div>
                             <p class="text-sm font-medium text-gray-600">En maintenance</p>
                             <p class="text-2xl font-bold text-amber-600 mt-1">{{ $analytics['maintenance_vehicles'] }}</p>
                         </div>
-                        <div class="w-12 h-12 bg-amber-100 rounded-lg flex items-center justify-center">
+                        <div class="w-12 h-12 bg-amber-100 border border-amber-200 rounded-lg flex items-center justify-center">
                             <x-iconify icon="lucide:wrench" class="w-6 h-6 text-amber-600" />
                         </div>
                     </div>
                 </div>
 
                 {{-- En Panne --}}
-                <div class="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-lg transition-shadow duration-300">
+                <div class="bg-rose-50 rounded-lg border border-rose-200 p-6 hover:shadow-lg transition-shadow duration-300">
                     <div class="flex items-center justify-between">
                         <div>
                             <p class="text-sm font-medium text-gray-600">En panne</p>
                             <p class="text-2xl font-bold text-rose-600 mt-1">{{ $analytics['broken_vehicles'] }}</p>
                         </div>
-                        <div class="w-12 h-12 bg-rose-100 rounded-lg flex items-center justify-center">
+                        <div class="w-12 h-12 bg-rose-100 border border-rose-200 rounded-lg flex items-center justify-center">
                             <x-iconify icon="lucide:alert-triangle" class="w-6 h-6 text-rose-600" />
                         </div>
                     </div>
@@ -349,7 +349,7 @@
                                         </div>
                                     </td>
                                     <td class="px-3 py-2 whitespace-nowrap">
-                                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-200 shadow-sm">
                                             {{ $vehicle->vehicleType->name ?? 'N/A' }}
                                         </span>
                                     </td>

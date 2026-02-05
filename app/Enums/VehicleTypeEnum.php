@@ -167,15 +167,15 @@ enum VehicleTypeEnum: string
         $base = 'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium';
 
         $colorClasses = match($this) {
-            self::VOITURE => 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200',
-            self::CAMION => 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200',
-            self::MOTO => 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200',
-            self::ENGIN => 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200',
-            self::FOURGONNETTE => 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-200',
-            self::BUS => 'bg-pink-100 text-pink-800 dark:bg-pink-900 dark:text-pink-200',
-            self::VUL => 'bg-cyan-100 text-cyan-800 dark:bg-cyan-900 dark:text-cyan-200',
-            self::SEMI_REMORQUE => 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200',
-            self::AUTRE => 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300',
+            self::VOITURE => 'bg-blue-50 text-blue-700 border border-blue-200 dark:bg-blue-900 dark:text-blue-200 dark:border-blue-700',
+            self::CAMION => 'bg-purple-50 text-purple-700 border border-purple-200 dark:bg-purple-900 dark:text-purple-200 dark:border-purple-700',
+            self::MOTO => 'bg-green-50 text-green-700 border border-green-200 dark:bg-green-900 dark:text-green-200 dark:border-green-700',
+            self::ENGIN => 'bg-yellow-50 text-yellow-700 border border-yellow-200 dark:bg-yellow-900 dark:text-yellow-200 dark:border-yellow-700',
+            self::FOURGONNETTE => 'bg-indigo-50 text-indigo-700 border border-indigo-200 dark:bg-indigo-900 dark:text-indigo-200 dark:border-indigo-700',
+            self::BUS => 'bg-pink-50 text-pink-700 border border-pink-200 dark:bg-pink-900 dark:text-pink-200 dark:border-pink-700',
+            self::VUL => 'bg-cyan-50 text-cyan-700 border border-cyan-200 dark:bg-cyan-900 dark:text-cyan-200 dark:border-cyan-700',
+            self::SEMI_REMORQUE => 'bg-orange-50 text-orange-700 border border-orange-200 dark:bg-orange-900 dark:text-orange-200 dark:border-orange-700',
+            self::AUTRE => 'bg-gray-50 text-gray-700 border border-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600',
         };
 
         return "{$base} {$colorClasses}";

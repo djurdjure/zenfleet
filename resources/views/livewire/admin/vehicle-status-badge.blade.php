@@ -45,7 +45,7 @@
             wire:click="toggleDropdown"
             type="button"
             x-ref="trigger"
-            class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium transition-all hover:shadow-sm hover:scale-105 cursor-pointer {{ $currentEnum ? $currentEnum->badgeClasses() : 'bg-gray-100 text-gray-700' }}"
+            class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium transition-all hover:shadow-sm hover:scale-105 cursor-pointer {{ $currentEnum ? $currentEnum->badgeClasses() : 'bg-gray-50 text-gray-700 border border-gray-200' }}"
             title="Cliquer pour changer le statut">
             <span>{{ $currentEnum ? $currentEnum->label() : 'Inconnu' }}</span>
             <svg class="w-3 h-3 opacity-60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -54,7 +54,7 @@
         </button>
     @else
         {{-- Badge simple (non cliquable) - Style professionnel --}}
-        <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium {{ $currentEnum ? $currentEnum->badgeClasses() : 'bg-gray-100 text-gray-700' }}">
+        <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium {{ $currentEnum ? $currentEnum->badgeClasses() : 'bg-gray-50 text-gray-700 border border-gray-200' }}">
             {{ $currentEnum ? $currentEnum->label() : 'Inconnu' }}
         </span>
     @endif

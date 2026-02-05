@@ -60,7 +60,7 @@
             type="button"
             class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold 
                    transition-all duration-200 hover:shadow-md hover:scale-105 cursor-pointer 
-                   {{ $currentEnum ? $currentEnum->badgeClasses() : 'bg-gray-100 text-gray-700 ring-1 ring-gray-200' }}
+                   {{ $currentEnum ? $currentEnum->badgeClasses() : 'bg-gray-50 text-gray-700 border border-gray-200' }}
                    focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
             title="Cliquer pour modifier le statut">
             {{-- Icône du statut --}}
@@ -83,7 +83,7 @@
     @else
         {{-- Badge non-interactif (lecture seule) --}}
         <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold 
-                     {{ $currentEnum ? $currentEnum->badgeClasses() : 'bg-gray-100 text-gray-700 ring-1 ring-gray-200' }}">
+                     {{ $currentEnum ? $currentEnum->badgeClasses() : 'bg-gray-50 text-gray-700 border border-gray-200' }}">
             @if($currentEnum)
                 <x-iconify icon="{{ $currentEnum->icon() }}" class="w-3.5 h-3.5" />
             @else

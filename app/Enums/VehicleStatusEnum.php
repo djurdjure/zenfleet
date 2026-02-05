@@ -140,22 +140,22 @@ enum VehicleStatusEnum: string
     {
         $colorClasses = match ($this) {
             // Parking: Bleu clair professionnel - Disponible
-            self::PARKING => 'bg-blue-50 text-blue-700 ring-1 ring-blue-200',
+            self::PARKING => 'bg-blue-50 text-blue-700 border border-blue-200',
 
             // Affecté: Vert émeraude clair - Actif/opérationnel
-            self::AFFECTE => 'bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200',
+            self::AFFECTE => 'bg-emerald-50 text-emerald-700 border border-emerald-200',
 
             // En panne: Rouge rose clair - Attention requise
-            self::EN_PANNE => 'bg-rose-50 text-rose-700 ring-1 ring-rose-200',
+            self::EN_PANNE => 'bg-rose-50 text-rose-700 border border-rose-200',
 
             // En maintenance: Ambre clair - Travaux en cours
-            self::EN_MAINTENANCE => 'bg-amber-50 text-amber-700 ring-1 ring-amber-200',
+            self::EN_MAINTENANCE => 'bg-amber-50 text-amber-700 border border-amber-200',
 
             // Réformé: Gris neutre - Archivé/inactif
-            self::REFORME => 'bg-gray-100 text-gray-600 ring-1 ring-gray-200',
+            self::REFORME => 'bg-gray-50 text-gray-700 border border-gray-200',
 
             // Vendu: Gris foncé - Inactif
-            self::VENDU => 'bg-gray-100 text-gray-800 ring-1 ring-gray-300',
+            self::VENDU => 'bg-gray-50 text-gray-800 border border-gray-300',
         };
 
         return $colorClasses;

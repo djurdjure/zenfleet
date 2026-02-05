@@ -260,7 +260,7 @@ trait HasStatusBadge
     public function statusTailwindClasses(): string
     {
         $statusEnum = $this->getStatusEnum();
-        return $statusEnum ? $statusEnum->badgeClasses() : 'bg-gray-100 text-gray-800';
+        return $statusEnum ? $statusEnum->badgeClasses() : 'bg-gray-50 text-gray-700 border border-gray-200';
     }
 
     /**
@@ -269,7 +269,7 @@ trait HasStatusBadge
     public function typeTailwindClasses(): string
     {
         $typeEnum = $this->getTypeEnum();
-        return $typeEnum ? $typeEnum->badgeClasses() : 'bg-gray-100 text-gray-800';
+        return $typeEnum ? $typeEnum->badgeClasses() : 'bg-gray-50 text-gray-700 border border-gray-200';
     }
 
     // =========================================================================

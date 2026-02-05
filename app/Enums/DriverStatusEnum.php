@@ -126,11 +126,11 @@ enum DriverStatusEnum: string
         $base = 'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium';
 
         $colorClasses = match ($this) {
-            self::DISPONIBLE => 'bg-green-100 text-green-800',
-            self::EN_MISSION => 'bg-blue-100 text-blue-800',
-            self::EN_CONGE => 'bg-orange-100 text-orange-800',
-            self::EN_FORMATION => 'bg-indigo-100 text-indigo-800',
-            self::AUTRE => 'bg-gray-100 text-gray-800',
+            self::DISPONIBLE => 'bg-green-50 text-green-700 border border-green-200',
+            self::EN_MISSION => 'bg-blue-50 text-blue-700 border border-blue-200',
+            self::EN_CONGE => 'bg-orange-50 text-orange-700 border border-orange-200',
+            self::EN_FORMATION => 'bg-indigo-50 text-indigo-700 border border-indigo-200',
+            self::AUTRE => 'bg-gray-50 text-gray-700 border border-gray-200',
         };
 
         return "{$base} {$colorClasses}";
