@@ -103,6 +103,11 @@ Rechercher toutes les occurrences de `can('view vehicles')` etc. et les remplace
 - **Exports & Storage:** vérifier le scope tenant sur fichiers et liens.
  - **Jobs/Queues:** vérifier l’absence de `withoutGlobalScopes()` et vérifier l’org dans chaque job.
 
+### Reste à finaliser (Phase 3)
+- **Validation UI RBAC:** tester sauvegarde rôles/permissions par organisation après migrations.
+- **Audit legacy:** exécuter l’audit permissions et confirmer zéro legacy/orphans.
+- **Vérification exports & dépôts:** confirmer refus quand permission retirée.
+
 ## 📊 Phase 4 : Monitoring & Gouvernance
 - **Alertes:** déclencher alerte sur tentative d’accès cross‑tenant.
 - **Dashboards:** taux d’échec permissions, opérations critiques, exports.
@@ -123,3 +128,4 @@ Rechercher toutes les occurrences de `can('view vehicles')` etc. et les remplace
 - **[02/04/2026]** Phase 3 (Hardening & Logs) : fail‑closed configurable activé dans `EnterprisePermissionMiddleware` + mapping complété pour routes admin users/roles, middleware d’audit enrichi (exports GET, contexte org, route params, durée), audit appliqué à toute la zone admin.
 - **[02/04/2026]** Phase 3 (correctif validation) : permissions dépôts imposées côté Livewire (`ManageDepots`) + masquage UI des actions sans droits, guide validation mis à jour.
 - **[02/04/2026]** Phase 3 (hardening RBAC) : désactivation par défaut des permissions directes utilisateur via `use_custom_permissions`, pour empêcher les accès résiduels après modification d’un rôle.
+- **[02/04/2026]** Phase 3 (migrations) : migrations de normalisation exécutées avec succès, validation UI et audit legacy encore requis.

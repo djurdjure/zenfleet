@@ -122,6 +122,19 @@ class Kernel extends ConsoleKernel
             ->sundays()
             ->at('04:00')
             ->runInBackground();
+
+        // 🔍 Audit RBAC hebdomadaire (legacy/orphans/duplicates)
+        $schedule->command('permissions:audit')
+            ->weekly()
+            ->mondays()
+            ->at('05:30')
+            ->runInBackground()
+            ->onSuccess(function () {
+                \Log::channel('audit')->info('permissions.audit.scheduled', ['status' => 'success']);
+            })
+            ->onFailure(function () {
+                \Log::channel('audit')->warning('permissions.audit.scheduled', ['status' => 'failed']);
+            });
     }
 
     /**
