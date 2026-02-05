@@ -246,12 +246,14 @@
                 </a>
                 @endcan
 
+                @can('drivers.create')
                 {{-- Nouveau Chauffeur --}}
                 <a href="{{ route('admin.drivers.create') }}"
                     title="Nouveau Chauffeur"
                     class="inline-flex items-center gap-2 p-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all duration-200 shadow-sm hover:shadow-md">
                     <x-iconify icon="lucide:plus" class="w-5 h-5" />
                 </a>
+                @endcan
             </x-slot:actions>
 
             <x-slot:filtersPanel>
@@ -296,31 +298,79 @@
         <div class="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden relative">
 
             {{-- Bulk Actions Floating Menu --}}
-            @if(count($selectedDrivers) > 0)
-            <div class="absolute top-0 left-0 right-0 z-10 bg-blue-50 p-2 flex items-center justify-between border-b border-blue-100 animate-fade-in-down">
-                <div class="flex items-center gap-3 px-4">
-                    <span class="font-medium text-blue-900">{{ count($selectedDrivers) }} sélectionné(s)</span>
-                    <button wire:click="$set('selectedDrivers', [])" class="text-sm text-blue-600 hover:text-blue-800 underline">
-                        Annuler
-                    </button>
-                </div>
-                <div class="flex items-center gap-2 px-4">
-                    @if($visibility === 'archived')
-                    <button wire:click="confirmBulkRestore" class="inline-flex items-center gap-1 px-3 py-1.5 bg-green-600 text-white text-sm font-medium rounded hover:bg-green-700">
-                        <x-iconify icon="lucide:rotate-ccw" class="w-4 h-4" /> Restaurer
-                    </button>
-                    <button wire:click="confirmBulkForceDelete"
-                        class="inline-flex items-center gap-1 px-3 py-1.5 bg-red-600 text-white text-sm font-medium rounded hover:bg-red-700">
-                        <x-iconify icon="lucide:trash-2" class="w-4 h-4" /> Supprimer
-                    </button>
-                    @else
-                    <button wire:click="confirmBulkArchive" class="inline-flex items-center gap-1 px-3 py-1.5 bg-orange-600 text-white text-sm font-medium rounded hover:bg-orange-700">
-                        <x-iconify icon="lucide:archive" class="w-4 h-4" /> Archiver
-                    </button>
-                    @endif
+            <div x-data="{ show: @entangle('selectedDrivers').live }"
+                x-show="show.length > 0"
+                x-transition:enter="transition ease-out duration-300"
+                x-transition:enter-start="opacity-0 translate-y-4"
+                x-transition:enter-end="opacity-100 translate-y-0"
+                x-transition:leave="transition ease-in duration-200"
+                x-transition:leave-start="opacity-100 translate-y-0"
+                x-transition:leave-end="opacity-0 translate-y-4"
+                class="fixed bottom-8 left-1/2 transform -translate-x-1/2 z-50"
+                style="display: none;">
+
+                <div class="bg-white rounded-xl shadow-2xl border border-gray-200 px-6 py-4 flex items-center gap-6">
+                    {{-- Selected Count --}}
+                    <div class="flex items-center gap-2 border-r border-gray-300 pr-6">
+                        <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                            <x-iconify icon="lucide:check-circle-2" class="w-4 h-4 text-blue-600" />
+                        </div>
+                        <div>
+                            <p class="text-xs text-gray-500 font-medium">Sélectionnés</p>
+                            <p class="text-lg font-bold text-gray-900" x-text="show.length"></p>
+                        </div>
+                    </div>
+
+                    {{-- Actions --}}
+                    <div class="flex items-center gap-3">
+                        @if($visibility === 'archived')
+                        @can('drivers.restore')
+                        <button
+                            wire:click="confirmBulkRestore"
+                            class="inline-flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg transition-colors shadow-sm">
+                            <x-iconify icon="lucide:rotate-ccw" class="w-4 h-4" />
+                            <span class="hidden sm:inline">Restaurer</span>
+                        </button>
+                        @endcan
+
+                        @can('drivers.force-delete')
+                        <button
+                            wire:click="confirmBulkForceDelete"
+                            class="inline-flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-medium rounded-lg transition-colors shadow-sm">
+                            <x-iconify icon="lucide:trash-2" class="w-4 h-4" />
+                            <span class="hidden sm:inline">Supprimer Définitivement</span>
+                        </button>
+                        @endcan
+                        @else
+                        @canany(['drivers.status.update', 'drivers.update'])
+                        <button
+                            wire:click="confirmBulkStatusChange"
+                            class="inline-flex items-center gap-2 px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white font-medium rounded-lg transition-colors shadow-sm">
+                            <x-iconify icon="lucide:refresh-cw" class="w-4 h-4" />
+                            <span class="hidden sm:inline">Changer Statut</span>
+                        </button>
+                        @endcanany
+
+                        @can('drivers.delete')
+                        <button
+                            wire:click="confirmBulkArchive"
+                            class="inline-flex items-center gap-2 px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white font-medium rounded-lg transition-colors shadow-sm">
+                            <x-iconify icon="lucide:archive" class="w-4 h-4" />
+                            <span class="hidden sm:inline">Archiver</span>
+                        </button>
+                        @endcan
+                        @endif
+
+                        {{-- Clear Selection --}}
+                        <button
+                            wire:click="$set('selectedDrivers', [])"
+                            class="inline-flex items-center gap-2 px-3 py-2 bg-white hover:bg-gray-50 text-gray-700 font-medium rounded-lg transition-colors border border-gray-300 shadow-sm">
+                            <x-iconify icon="lucide:x" class="w-4 h-4" />
+                            <span class="hidden sm:inline">Annuler</span>
+                        </button>
+                    </div>
                 </div>
             </div>
-            @endif
 
             <div class="overflow-x-auto">
                 <table class="min-w-full divide-y divide-gray-200">
@@ -409,28 +459,36 @@
                             <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                 <div class="flex items-center justify-end gap-2">
                                     @if($driver->deleted_at)
+                                    @can('drivers.restore')
                                     <button wire:click="confirmRestore({{ $driver->id }})"
                                         class="p-2 rounded-full bg-gray-50 text-gray-400 hover:text-green-600 hover:bg-green-50 transition-all duration-200 group"
                                         title="Restaurer">
                                         <x-iconify icon="lucide:rotate-ccw" class="w-4 h-4 group-hover:scale-110 transition-transform" />
                                     </button>
+                                    @endcan
+                                    @can('drivers.force-delete')
                                     <button wire:click="confirmForceDelete({{ $driver->id }})"
                                         class="p-2 rounded-full bg-gray-50 text-gray-400 hover:text-red-600 hover:bg-red-50 transition-all duration-200 group"
                                         title="Supprimer définitivement">
                                         <x-iconify icon="lucide:trash-2" class="w-4 h-4 group-hover:scale-110 transition-transform" />
                                     </button>
+                                    @endcan
                                     @else
                                     {{-- Actions directes --}}
+                                    @can('drivers.view')
                                     <a href="{{ route('admin.drivers.show', $driver) }}"
                                         class="p-2 rounded-full bg-gray-50 text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition-all duration-200 group"
                                         title="Voir">
                                         <x-iconify icon="lucide:eye" class="w-4 h-4 group-hover:scale-110 transition-transform" />
                                     </a>
+                                    @endcan
+                                    @can('drivers.update')
                                     <a href="{{ route('admin.drivers.edit', $driver) }}"
                                         class="p-2 rounded-full bg-gray-50 text-gray-400 hover:text-amber-600 hover:bg-amber-50 transition-all duration-200 group"
                                         title="Modifier">
                                         <x-iconify icon="lucide:edit-3" class="w-4 h-4 group-hover:scale-110 transition-transform" />
                                     </a>
+                                    @endcan
 
                                     {{-- Dropdown Menu (3 points) --}}
                                     <div class="relative"
@@ -496,15 +554,19 @@
                                                 class="fixed z-[80] rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
                                                 style="display: none;">
                                                 <div class="py-1">
+                                                    @can('drivers.export')
                                                     <button wire:click="exportPdf({{ $driver->id }}); close()" class="group flex w-full items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
                                                         <x-iconify icon="lucide:file-text" class="mr-3 h-4 w-4 text-gray-400 group-hover:text-red-500" />
                                                         Exporter PDF
                                                     </button>
+                                                    @endcan
+                                                    @can('drivers.delete')
                                                     <div class="border-t border-gray-100 my-1"></div>
                                                     <button type="button" @click="close(); $wire.confirmArchive({{ $driver->id }})" class="group flex w-full items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
                                                         <x-iconify icon="lucide:archive" class="mr-3 h-4 w-4 text-gray-400 group-hover:text-amber-500" />
                                                         Archiver
                                                     </button>
+                                                    @endcan
                                                 </div>
                                             </div>
                                         </template>
@@ -520,10 +582,12 @@
                                     <x-iconify icon="lucide:users" class="w-16 h-16 text-gray-300 mb-4" />
                                     <h3 class="text-lg font-medium text-gray-900 mb-2">Aucun chauffeur trouvé</h3>
                                     <p class="text-sm text-gray-500 mb-4">Essayez de modifier vos filtres ou ajoutez un nouveau chauffeur.</p>
+                                    @can('drivers.create')
                                     <a href="{{ route('admin.drivers.create') }}" class="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
                                         <x-iconify icon="lucide:plus" class="w-5 h-5" />
                                         Ajouter un chauffeur
                                     </a>
+                                    @endcan
                                 </div>
                             </td>
                         </tr>
@@ -844,6 +908,52 @@
                     </button>
                     <button wire:click="cancelBulkForceDelete" type="button" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none sm:mt-0 sm:w-auto sm:text-sm">
                         Annuler
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    @endif
+
+    {{-- Bulk Status Change Modal --}}
+    @if($showBulkStatusModal)
+    <div class="fixed inset-0 z-50 overflow-y-auto" wire:key="bulk-status-modal">
+        <div class="flex items-center justify-center min-h-screen px-4">
+            <div class="fixed inset-0 bg-gray-900/40 backdrop-blur-sm transition-opacity z-40" wire:click="cancelBulkStatusChange"></div>
+
+            <div class="relative bg-white rounded-lg shadow-xl max-w-md w-full p-6 z-50">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-lg font-semibold text-gray-900 flex items-center gap-2">
+                        <x-iconify icon="lucide:refresh-cw" class="w-5 h-5 text-amber-600" />
+                        Changer le statut des chauffeurs
+                    </h3>
+                    <button wire:click="cancelBulkStatusChange" class="text-gray-400 hover:text-gray-500">
+                        <x-iconify icon="lucide:x" class="w-5 h-5" />
+                    </button>
+                </div>
+
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Sélectionner un statut</label>
+                    <select wire:model="bulkStatusId" class="block w-full border-gray-300 rounded-lg text-sm">
+                        <option value="">-- Choisir un statut --</option>
+                        @foreach($driverStatuses as $status)
+                        <option value="{{ $status->id }}">{{ $status->name }}</option>
+                        @endforeach
+                    </select>
+                    @error('bulkStatusId') <span class="text-red-500 text-xs mt-1">{{ $message }}</span> @enderror
+                </div>
+
+                <div class="flex gap-3 justify-end">
+                    <button wire:click="cancelBulkStatusChange"
+                        class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200">
+                        Annuler
+                    </button>
+                    <button wire:click="bulkChangeStatus"
+                        wire:loading.attr="disabled"
+                        wire:loading.class="opacity-50 cursor-not-allowed"
+                        class="px-4 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 inline-flex items-center gap-2">
+                        <x-iconify icon="lucide:loader-2" class="w-4 h-4 animate-spin" wire:loading wire:target="bulkChangeStatus" />
+                        Confirmer
                     </button>
                 </div>
             </div>

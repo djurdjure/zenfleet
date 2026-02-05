@@ -67,6 +67,8 @@ class DriverIndex extends Component
     public bool $showBulkArchiveModal = false;
     public bool $showBulkRestoreModal = false;
     public bool $showBulkForceDeleteModal = false;
+    public bool $showBulkStatusModal = false;
+    public ?int $bulkStatusId = null;
     public string $bulkForceDeleteConfirm = '';
 
     // 🧠 Computed Properties
@@ -178,6 +180,10 @@ class DriverIndex extends Component
 
     public function bulkArchive()
     {
+        if (!$this->ensurePermission('drivers.delete', 'Permission refusée pour archiver des chauffeurs.')) {
+            return;
+        }
+
         if (empty($this->selectedDrivers)) {
             $this->dispatch('toast', ['type' => 'warning', 'message' => 'Aucun chauffeur sélectionné']);
             return;
@@ -205,8 +211,62 @@ class DriverIndex extends Component
         $this->resetBulkState();
     }
 
+    public function confirmBulkStatusChange(): void
+    {
+        if (!$this->ensurePermission(['drivers.status.update', 'drivers.update'], 'Permission refusée pour changer le statut des chauffeurs.')) {
+            return;
+        }
+
+        if (empty($this->selectedDrivers)) {
+            $this->dispatch('toast', ['type' => 'warning', 'message' => 'Aucun chauffeur sélectionné']);
+            return;
+        }
+
+        $this->bulkStatusId = null;
+        $this->showBulkStatusModal = true;
+    }
+
+    public function bulkChangeStatus(): void
+    {
+        if (!$this->ensurePermission(['drivers.status.update', 'drivers.update'], 'Permission refusée pour changer le statut des chauffeurs.')) {
+            return;
+        }
+
+        $this->validate([
+            'bulkStatusId' => ['required', Rule::exists(DriverStatus::class, 'id')],
+            'selectedDrivers' => 'required|array|min:1',
+        ]);
+
+        $orgId = Auth::user()->organization_id;
+        $isSuperAdmin = Auth::user()->hasRole('Super Admin');
+
+        $query = Driver::whereIn('id', $this->selectedDrivers);
+        if (!$isSuperAdmin && $orgId) {
+            $query->where('organization_id', $orgId);
+        }
+
+        $count = $query->update(['status_id' => $this->bulkStatusId]);
+
+        $this->dispatch('toast', [
+            'type' => 'success',
+            'message' => $count . ' chauffeur(s) mis à jour'
+        ]);
+
+        $this->resetBulkState();
+    }
+
+    public function cancelBulkStatusChange(): void
+    {
+        $this->showBulkStatusModal = false;
+        $this->bulkStatusId = null;
+    }
+
     public function confirmBulkArchive(): void
     {
+        if (!$this->ensurePermission('drivers.delete', 'Permission refusée pour archiver des chauffeurs.')) {
+            return;
+        }
+
         if (empty($this->selectedDrivers)) {
             $this->dispatch('toast', ['type' => 'warning', 'message' => 'Aucun chauffeur sélectionné']);
             return;
@@ -217,6 +277,10 @@ class DriverIndex extends Component
 
     public function bulkRestore()
     {
+        if (!$this->ensurePermission('drivers.restore', 'Permission refusée pour restaurer des chauffeurs.')) {
+            return;
+        }
+
         if (empty($this->selectedDrivers)) {
             $this->dispatch('toast', ['type' => 'warning', 'message' => 'Aucun chauffeur sélectionné']);
             return;
@@ -235,6 +299,10 @@ class DriverIndex extends Component
 
     public function confirmBulkRestore(): void
     {
+        if (!$this->ensurePermission('drivers.restore', 'Permission refusée pour restaurer des chauffeurs.')) {
+            return;
+        }
+
         if (empty($this->selectedDrivers)) {
             $this->dispatch('toast', ['type' => 'warning', 'message' => 'Aucun chauffeur sélectionné']);
             return;
@@ -245,6 +313,10 @@ class DriverIndex extends Component
 
     public function bulkForceDelete()
     {
+        if (!$this->ensurePermission('drivers.force-delete', 'Permission refusée pour supprimer définitivement des chauffeurs.')) {
+            return;
+        }
+
         if (empty($this->selectedDrivers)) {
             $this->dispatch('toast', ['type' => 'warning', 'message' => 'Aucun chauffeur sélectionné']);
             return;
@@ -298,6 +370,8 @@ class DriverIndex extends Component
         $this->showBulkArchiveModal = false;
         $this->showBulkRestoreModal = false;
         $this->showBulkForceDeleteModal = false;
+        $this->showBulkStatusModal = false;
+        $this->bulkStatusId = null;
         $this->bulkForceDeleteConfirm = '';
     }
 
@@ -306,6 +380,10 @@ class DriverIndex extends Component
     // Archive
     public function confirmArchive(int $id)
     {
+        if (!$this->ensurePermission('drivers.delete', 'Permission refusée pour archiver un chauffeur.')) {
+            return;
+        }
+
         $this->archivingDriverId = $id;
         $this->showArchiveModal = true;
     }
@@ -323,6 +401,10 @@ class DriverIndex extends Component
 
     public function archiveDriver()
     {
+        if (!$this->ensurePermission('drivers.delete', 'Permission refusée pour archiver un chauffeur.')) {
+            return;
+        }
+
         if (!$this->archivingDriverId) return;
 
         // Utiliser withTrashed() pour éviter les erreurs si déjà supprimé (race condition)
@@ -363,6 +445,10 @@ class DriverIndex extends Component
     // Restore
     public function confirmRestore(int $id)
     {
+        if (!$this->ensurePermission('drivers.restore', 'Permission refusée pour restaurer un chauffeur.')) {
+            return;
+        }
+
         $this->restoringDriverId = $id;
         $this->showRestoreModal = true;
     }
@@ -380,6 +466,10 @@ class DriverIndex extends Component
 
     public function restoreDriver()
     {
+        if (!$this->ensurePermission('drivers.restore', 'Permission refusée pour restaurer un chauffeur.')) {
+            return;
+        }
+
         if (!$this->restoringDriverId) return;
 
         if ($this->driverService->restoreDriver($this->restoringDriverId)) {
@@ -393,6 +483,10 @@ class DriverIndex extends Component
     // Force Delete
     public function confirmForceDelete(int $id)
     {
+        if (!$this->ensurePermission('drivers.force-delete', 'Permission refusée pour supprimer définitivement un chauffeur.')) {
+            return;
+        }
+
         $this->forceDeletingDriverId = $id;
         $this->forceDeleteConfirm = '';
         $this->showForceDeleteModal = true;
@@ -413,6 +507,10 @@ class DriverIndex extends Component
 
     public function forceDeleteDriver()
     {
+        if (!$this->ensurePermission('drivers.force-delete', 'Permission refusée pour supprimer définitivement un chauffeur.')) {
+            return;
+        }
+
         if (!$this->forceDeletingDriverId) return;
 
         if (strtoupper(trim($this->forceDeleteConfirm)) !== 'SUPPRIMER') {
@@ -435,6 +533,10 @@ class DriverIndex extends Component
     // --- EXPORT PDF (MICROSERVICE) ---
     public function exportPdf(int $id)
     {
+        if (!$this->ensurePermission('drivers.export', 'Permission refusée pour exporter les chauffeurs.')) {
+            return;
+        }
+
         $driver = Driver::with(['driverStatus', 'user', 'organization', 'assignments.vehicle', 'supervisor', 'sanctions'])
             ->withTrashed()
             ->find($id);
@@ -501,6 +603,25 @@ class DriverIndex extends Component
             \Illuminate\Support\Facades\Log::error('PDF Service Exception', ['error' => $e->getMessage()]);
             $this->dispatch('toast', ['type' => 'error', 'message' => 'Service PDF indisponible']);
         }
+    }
+
+    protected function ensurePermission(array|string $ability, string $message): bool
+    {
+        $user = Auth::user();
+
+        if (!$user) {
+            $this->dispatch('toast', ['type' => 'error', 'message' => $message]);
+            return false;
+        }
+
+        foreach ((array) $ability as $perm) {
+            if ($user->can($perm)) {
+                return true;
+            }
+        }
+
+        $this->dispatch('toast', ['type' => 'error', 'message' => $message]);
+        return false;
     }
 
     // --- DATA FETCHING ---

@@ -137,6 +137,7 @@
                 @endif
 
                 {{-- Export Dropdown --}}
+                @can('vehicles.export')
                 <div class="relative" x-data="{ exportOpen: false }">
                     <button
                         @click="exportOpen = !exportOpen"
@@ -187,6 +188,7 @@
                         </div>
                     </div>
                 </div>
+                @endcan
 
                 @can('vehicles.import')
                 {{-- Import --}}
@@ -485,20 +487,24 @@
                                                         <div class="py-1">
                                                             @if($visibility === 'archived')
                                                             {{-- Restore --}}
+                                                            @can('vehicles.restore')
                                                             <button wire:click="confirmRestore({{ $vehicle->id }})"
                                                                 @click="close"
                                                                 class="flex w-full items-center px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
                                                                 <x-iconify icon="lucide:rotate-ccw" class="w-4 h-4 mr-2 text-green-600" />
                                                                 Restaurer
                                                             </button>
+                                                            @endcan
 
                                                             {{-- Force Delete --}}
+                                                            @can('vehicles.force-delete')
                                                             <button wire:click="confirmForceDelete({{ $vehicle->id }})"
                                                                 @click="close"
                                                                 class="flex w-full items-center px-3 py-2 text-sm text-gray-700 hover:bg-red-50 transition-colors">
                                                                 <x-iconify icon="lucide:trash-2" class="w-4 h-4 mr-2 text-red-600" />
                                                                 Supprimer
                                                             </button>
+                                                            @endcan
                                                             @else
                                                             {{-- Duplicate --}}
                                                             @can('vehicles.create')
@@ -519,11 +525,13 @@
 
 
                                                             {{-- Export PDF --}}
+                                                            @can('vehicles.export')
                                                             <a href="{{ route('admin.vehicles.export.single.pdf', $vehicle) }}"
                                                                 class="flex items-center px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
                                                                 <x-iconify icon="lucide:file-text" class="w-4 h-4 mr-2 text-emerald-600" />
                                                                 Exporter PDF
                                                             </a>
+                                                            @endcan
 
                                                             {{-- Archive --}}
                                                             @can('vehicles.delete')
@@ -600,6 +608,7 @@
                     <div class="flex items-center gap-3">
                         @if($visibility === 'archived')
                         {{-- Restore --}}
+                        @can('vehicles.restore')
                         <button
                             wire:click="confirmBulkRestore"
                             wire:loading.attr="disabled"
@@ -609,8 +618,10 @@
                             <x-iconify icon="lucide:loader-2" class="w-4 h-4 animate-spin" wire:loading wire:target="bulkRestore" />
                             <span class="hidden sm:inline">Restaurer</span>
                         </button>
+                        @endcan
 
                         {{-- Force Delete --}}
+                        @can('vehicles.force-delete')
                         <button
                             wire:click="confirmBulkForceDelete"
                             wire:loading.attr="disabled"
@@ -620,30 +631,37 @@
                             <x-iconify icon="lucide:loader-2" class="w-4 h-4 animate-spin" wire:loading wire:target="bulkForceDelete" />
                             <span class="hidden sm:inline">Supprimer Définitivement</span>
                         </button>
+                        @endcan
                         @else
                         {{-- Assign to Depot --}}
+                        @canany(['vehicles.update', 'vehicles.manage'])
                         <button
                             wire:click="$set('showBulkDepotModal', true)"
                             class="inline-flex items-center gap-2 px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white font-medium rounded-lg transition-colors shadow-sm">
                             <x-iconify icon="lucide:building-2" class="w-4 h-4" />
                             <span class="hidden sm:inline">Affecter Dépôt</span>
                         </button>
+                        @endcanany
 
                         {{-- Change Status --}}
+                        @canany(['vehicles.status.update', 'vehicles.update', 'vehicles.manage'])
                         <button
                             wire:click="$set('showBulkStatusModal', true)"
                             class="inline-flex items-center gap-2 px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white font-medium rounded-lg transition-colors shadow-sm">
                             <x-iconify icon="lucide:refresh-cw" class="w-4 h-4" />
                             <span class="hidden sm:inline">Changer Statut</span>
                         </button>
+                        @endcanany
 
                         {{-- Archive --}}
+                        @can('vehicles.delete')
                         <button
                             wire:click="$set('showBulkArchiveModal', true)"
                             class="inline-flex items-center gap-2 px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white font-medium rounded-lg transition-colors shadow-sm">
                             <x-iconify icon="lucide:archive" class="w-4 h-4" />
                             <span class="hidden sm:inline">Archiver</span>
                         </button>
+                        @endcan
                         @endif
 
                         {{-- Clear Selection --}}

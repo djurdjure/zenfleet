@@ -183,6 +183,16 @@ class DriverStatusBadgeUltraPro extends Component
     public function prepareStatusChange(string $newStatus)
     {
         try {
+            if (!$this->canUpdateStatus()) {
+                $this->dispatch('toast', [
+                    'type' => 'error',
+                    'title' => 'Permission refusée',
+                    'message' => 'Vous ne pouvez pas modifier le statut de ce chauffeur.',
+                    'duration' => 5000
+                ]);
+                return;
+            }
+
             // Récupérer l'enum du nouveau statut
             $this->pendingStatusEnum = DriverStatusEnum::tryFrom($newStatus);
             if (!$this->pendingStatusEnum) {
@@ -351,9 +361,14 @@ class DriverStatusBadgeUltraPro extends Component
      */
     protected function canUpdateStatus(): bool
     {
-        return auth()->user()->can('drivers.update') ||
-            auth()->user()->can('drivers.manage') ||
-            auth()->user()->hasRole(['Admin', 'Super Admin', 'Fleet Manager', 'admin', 'super-admin', 'fleet-manager']);
+        $user = auth()->user();
+
+        if (!$user) {
+            return false;
+        }
+
+        return $user->can('drivers.status.update') ||
+            $user->can('drivers.update');
     }
 
     /**

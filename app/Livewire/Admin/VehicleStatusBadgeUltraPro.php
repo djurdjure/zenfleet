@@ -197,6 +197,16 @@ class VehicleStatusBadgeUltraPro extends Component
     public function prepareStatusChange(string $newStatus)
     {
         try {
+            if (!$this->canUpdateStatus()) {
+                $this->dispatch('toast', [
+                    'type' => 'error',
+                    'title' => 'Permission refusée',
+                    'message' => 'Vous ne pouvez pas modifier le statut de ce véhicule.',
+                    'duration' => 5000
+                ]);
+                return;
+            }
+
             // Récupérer l'enum du nouveau statut
             $this->pendingStatusEnum = VehicleStatusEnum::tryFrom($newStatus);
             if (!$this->pendingStatusEnum) {
@@ -372,15 +382,14 @@ class VehicleStatusBadgeUltraPro extends Component
         /** @var \App\Models\User $user */
         $user = auth()->user();
 
-        if ($user->hasRole(['Super Admin', 'Admin'])) {
-            return true;
+        if (!$user) {
+            return false;
         }
 
         // Vérifier plusieurs permissions possibles
-        return $user->can('vehicles.update') ||
-            $user->can('vehicles.status.update') ||
-            $user->can('vehicles.manage') ||
-            $user->hasRole('fleet-manager');
+        return $user->can('vehicles.status.update') ||
+            $user->can('vehicles.update') ||
+            $user->can('vehicles.manage');
     }
 
     /**

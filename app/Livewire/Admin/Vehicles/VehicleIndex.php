@@ -194,6 +194,10 @@ class VehicleIndex extends Component
 
     public function bulkAssignDepot()
     {
+        if (!$this->ensurePermission(['vehicles.update', 'vehicles.manage'], 'Permission refusée pour affecter un dépôt.')) {
+            return;
+        }
+
         $this->validate([
             'bulkDepotId' => ['required', Rule::exists(Depot::class, 'id')],
             'selectedVehicles' => 'required|array|min:1'
@@ -216,6 +220,11 @@ class VehicleIndex extends Component
 
     public function bulkChangeStatus()
     {
+        if (!$this->canUpdateVehicleStatus()) {
+            $this->dispatch('toast', ['type' => 'error', 'message' => 'Permission refusée pour changer le statut des véhicules.']);
+            return;
+        }
+
         $this->validate([
             'bulkStatusId' => ['required', Rule::exists(VehicleStatus::class, 'id')],
             'selectedVehicles' => 'required|array|min:1'
@@ -238,6 +247,10 @@ class VehicleIndex extends Component
 
     public function bulkArchive()
     {
+        if (!$this->ensurePermission('vehicles.delete', 'Permission refusée pour archiver des véhicules.')) {
+            return;
+        }
+
         if (empty($this->selectedVehicles)) {
             $this->dispatch('toast', ['type' => 'warning', 'message' => 'Aucun véhicule sélectionné']);
             return;
@@ -255,6 +268,10 @@ class VehicleIndex extends Component
 
     public function bulkRestore()
     {
+        if (!$this->ensurePermission('vehicles.restore', 'Permission refusée pour restaurer des véhicules.')) {
+            return;
+        }
+
         if (empty($this->selectedVehicles)) {
             $this->dispatch('toast', ['type' => 'warning', 'message' => 'Aucun véhicule sélectionné']);
             return;
@@ -272,6 +289,10 @@ class VehicleIndex extends Component
 
     public function confirmBulkRestore(): void
     {
+        if (!$this->ensurePermission('vehicles.restore', 'Permission refusée pour restaurer des véhicules.')) {
+            return;
+        }
+
         if (empty($this->selectedVehicles)) {
             $this->dispatch('toast', ['type' => 'warning', 'message' => 'Aucun véhicule sélectionné']);
             return;
@@ -282,6 +303,10 @@ class VehicleIndex extends Component
 
     public function bulkForceDelete()
     {
+        if (!$this->ensurePermission('vehicles.force-delete', 'Permission refusée pour supprimer définitivement des véhicules.')) {
+            return;
+        }
+
         if (empty($this->selectedVehicles)) {
             $this->dispatch('toast', ['type' => 'warning', 'message' => 'Aucun véhicule sélectionné']);
             return;
@@ -308,6 +333,10 @@ class VehicleIndex extends Component
 
     public function confirmBulkForceDelete(): void
     {
+        if (!$this->ensurePermission('vehicles.force-delete', 'Permission refusée pour supprimer définitivement des véhicules.')) {
+            return;
+        }
+
         if (empty($this->selectedVehicles)) {
             $this->dispatch('toast', ['type' => 'warning', 'message' => 'Aucun véhicule sélectionné']);
             return;
@@ -358,6 +387,10 @@ class VehicleIndex extends Component
 
     public function confirmRestore(int $id): void
     {
+        if (!$this->ensurePermission('vehicles.restore', 'Permission refusée pour restaurer un véhicule.')) {
+            return;
+        }
+
         $this->restoringVehicleId = $id;
         $this->showRestoreModal = true;
     }
@@ -370,6 +403,10 @@ class VehicleIndex extends Component
 
     public function restoreVehicle(): void
     {
+        if (!$this->ensurePermission('vehicles.restore', 'Permission refusée pour restaurer un véhicule.')) {
+            return;
+        }
+
         if (!$this->restoringVehicleId) {
             $this->cancelRestore();
             return;
@@ -391,6 +428,10 @@ class VehicleIndex extends Component
 
     public function confirmForceDelete(int $id): void
     {
+        if (!$this->ensurePermission('vehicles.force-delete', 'Permission refusée pour supprimer définitivement un véhicule.')) {
+            return;
+        }
+
         $this->forceDeletingVehicleId = $id;
         $this->showForceDeleteModal = true;
     }
@@ -403,6 +444,10 @@ class VehicleIndex extends Component
 
     public function forceDeleteVehicle(): void
     {
+        if (!$this->ensurePermission('vehicles.force-delete', 'Permission refusée pour supprimer définitivement un véhicule.')) {
+            return;
+        }
+
         if (!$this->forceDeletingVehicleId) {
             $this->cancelForceDelete();
             return;
@@ -424,6 +469,10 @@ class VehicleIndex extends Component
 
     public function confirmArchive(int $id): void
     {
+        if (!$this->ensurePermission('vehicles.delete', 'Permission refusée pour archiver un véhicule.')) {
+            return;
+        }
+
         $this->archivingVehicleId = $id;
         $this->showArchiveModal = true;
     }
@@ -436,6 +485,10 @@ class VehicleIndex extends Component
 
     public function archiveVehicle(): void
     {
+        if (!$this->ensurePermission('vehicles.delete', 'Permission refusée pour archiver un véhicule.')) {
+            return;
+        }
+
         if (!$this->archivingVehicleId) {
             $this->cancelArchive();
             return;
@@ -472,6 +525,12 @@ class VehicleIndex extends Component
 
     public function updateIndividualStatus(): void
     {
+        if (!$this->canUpdateVehicleStatus()) {
+            $this->dispatch('toast', ['type' => 'error', 'message' => 'Permission refusée pour changer le statut du véhicule.']);
+            $this->cancelIndividualStatusChange();
+            return;
+        }
+
         $this->validate([
             'individualStatusId' => ['required', Rule::exists(VehicleStatus::class, 'id')],
         ]);
@@ -522,6 +581,11 @@ class VehicleIndex extends Component
     public function exportPdf()
     {
         try {
+            if (!$this->canExportVehicles()) {
+                $this->dispatch('toast', ['type' => 'error', 'message' => 'Permission refusée pour exporter les véhicules.']);
+                return;
+            }
+
             // Stocker les filtres en session pour le contrôleur
             session(['vehicle_export_filters' => $this->getFilters()]);
 
@@ -546,6 +610,11 @@ class VehicleIndex extends Component
     public function exportExcel()
     {
         try {
+            if (!$this->canExportVehicles()) {
+                $this->dispatch('toast', ['type' => 'error', 'message' => 'Permission refusée pour exporter les véhicules.']);
+                return;
+            }
+
             return \Maatwebsite\Excel\Facades\Excel::download(
                 new \App\Exports\VehiclesExport($this->getFilters()),
                 'vehicules_' . date('Y-m-d_H-i') . '.xlsx'
@@ -566,6 +635,11 @@ class VehicleIndex extends Component
     public function exportCsv()
     {
         try {
+            if (!$this->canExportVehicles()) {
+                $this->dispatch('toast', ['type' => 'error', 'message' => 'Permission refusée pour exporter les véhicules.']);
+                return;
+            }
+
             // Stocker les filtres en session pour le contrôleur
             session(['vehicle_export_filters' => $this->getFilters()]);
 
@@ -641,6 +715,39 @@ class VehicleIndex extends Component
 
         // Sorting
         return $query->orderBy($this->sortField, $this->sortDirection);
+    }
+
+    protected function canExportVehicles(): bool
+    {
+        $user = Auth::user();
+
+        return $user && $user->can('vehicles.export');
+    }
+
+    protected function canUpdateVehicleStatus(): bool
+    {
+        $user = Auth::user();
+
+        return $user && ($user->can('vehicles.status.update') || $user->can('vehicles.update') || $user->can('vehicles.manage'));
+    }
+
+    protected function ensurePermission(array|string $abilities, string $message): bool
+    {
+        $user = Auth::user();
+
+        if (!$user) {
+            $this->dispatch('toast', ['type' => 'error', 'message' => $message]);
+            return false;
+        }
+
+        foreach ((array) $abilities as $ability) {
+            if ($user->can($ability)) {
+                return true;
+            }
+        }
+
+        $this->dispatch('toast', ['type' => 'error', 'message' => $message]);
+        return false;
     }
 
     public function render()
