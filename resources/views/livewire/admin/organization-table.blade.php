@@ -178,11 +178,13 @@
                         <button wire:click="$set('selectedOrganizations', [])" class="text-sm text-blue-600 hover:text-blue-800 underline">Annuler</button>
                     </div>
                     <div class="flex items-center gap-2 px-4">
-                        <button wire:click="bulkDelete"
-                            onclick="confirm('Êtes-vous sûr de vouloir supprimer les organisations sélectionnées ? Cette action est irréversible.') || event.stopImmediatePropagation()"
-                            class="inline-flex items-center gap-1 px-3 py-1.5 bg-red-600 text-white text-sm font-medium rounded hover:bg-red-700">
-                            <x-iconify icon="lucide:trash-2" class="w-4 h-4" /> Supprimer
-                        </button>
+                        @can('organizations.delete')
+                            <button wire:click="bulkDelete"
+                                onclick="confirm('Êtes-vous sûr de vouloir supprimer les organisations sélectionnées ? Cette action est irréversible.') || event.stopImmediatePropagation()"
+                                class="inline-flex items-center gap-1 px-3 py-1.5 bg-red-600 text-white text-sm font-medium rounded hover:bg-red-700">
+                                <x-iconify icon="lucide:trash-2" class="w-4 h-4" /> Supprimer
+                            </button>
+                        @endcan
                     </div>
                 </div>
             @endif
@@ -271,29 +273,54 @@
                                 </div>
                             </td>
                             <td class="px-6 py-4">
-                                <button wire:click="toggleStatus({{ $org->id }})"
-                                    class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium {{ match($org->status) {
+                                @can('organizations.update')
+                                    <button wire:click="toggleStatus({{ $org->id }})"
+                                        class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium {{ match($org->status) {
+                                            'active' => 'bg-green-100 text-green-800',
+                                            'pending' => 'bg-yellow-100 text-yellow-800',
+                                            'inactive' => 'bg-gray-100 text-gray-800',
+                                            'suspended' => 'bg-red-100 text-red-800',
+                                            default => 'bg-gray-100 text-gray-800'
+                                        } }}">
+                                        <span class="w-1.5 h-1.5 rounded-full {{ match($org->status) {
+                                            'active' => 'bg-green-500',
+                                            'pending' => 'bg-yellow-500',
+                                            'inactive' => 'bg-gray-400',
+                                            'suspended' => 'bg-red-500',
+                                            default => 'bg-gray-400'
+                                        } }}"></span>
+                                        @switch($org->status)
+                                            @case('active') Actif @break
+                                            @case('pending') Attente @break
+                                            @case('inactive') Inactif @break
+                                            @case('suspended') Suspendu @break
+                                            @default {{ ucfirst($org->status) }}
+                                        @endswitch
+                                    </button>
+                                @else
+                                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium {{ match($org->status) {
                                         'active' => 'bg-green-100 text-green-800',
                                         'pending' => 'bg-yellow-100 text-yellow-800',
                                         'inactive' => 'bg-gray-100 text-gray-800',
                                         'suspended' => 'bg-red-100 text-red-800',
                                         default => 'bg-gray-100 text-gray-800'
                                     } }}">
-                                    <span class="w-1.5 h-1.5 rounded-full {{ match($org->status) {
-                                        'active' => 'bg-green-500',
-                                        'pending' => 'bg-yellow-500',
-                                        'inactive' => 'bg-gray-400',
-                                        'suspended' => 'bg-red-500',
-                                        default => 'bg-gray-400'
-                                    } }}"></span>
-                                    @switch($org->status)
-                                        @case('active') Actif @break
-                                        @case('pending') Attente @break
-                                        @case('inactive') Inactif @break
-                                        @case('suspended') Suspendu @break
-                                        @default {{ ucfirst($org->status) }}
-                                    @endswitch
-                                </button>
+                                        <span class="w-1.5 h-1.5 rounded-full {{ match($org->status) {
+                                            'active' => 'bg-green-500',
+                                            'pending' => 'bg-yellow-500',
+                                            'inactive' => 'bg-gray-400',
+                                            'suspended' => 'bg-red-500',
+                                            default => 'bg-gray-400'
+                                        } }}"></span>
+                                        @switch($org->status)
+                                            @case('active') Actif @break
+                                            @case('pending') Attente @break
+                                            @case('inactive') Inactif @break
+                                            @case('suspended') Suspendu @break
+                                            @default {{ ucfirst($org->status) }}
+                                        @endswitch
+                                    </span>
+                                @endcan
                             </td>
                             <td class="px-6 py-4 text-sm text-gray-700">{{ number_format($org->users_count) }}</td>
                             <td class="px-6 py-4 text-sm text-gray-700">{{ number_format($org->vehicles_count) }}</td>
@@ -309,17 +336,21 @@
                                         title="Voir">
                                         <x-iconify icon="lucide:eye" class="w-4 h-4 group-hover:scale-110 transition-transform" />
                                     </a>
-                                    <a href="{{ route('admin.organizations.edit', $org) }}"
-                                        class="p-2 rounded-full bg-gray-50 text-gray-400 hover:text-amber-600 hover:bg-amber-50 transition-all duration-200 group"
-                                        title="Modifier">
-                                        <x-iconify icon="lucide:edit-3" class="w-4 h-4 group-hover:scale-110 transition-transform" />
-                                    </a>
-                                    <button type="button"
-                                        wire:click="confirmDelete({{ $org->id }})"
-                                        class="p-2 rounded-full bg-gray-50 text-gray-400 hover:text-red-600 hover:bg-red-50 transition-all duration-200 group"
-                                        title="Supprimer">
-                                        <x-iconify icon="lucide:trash-2" class="w-4 h-4 group-hover:scale-110 transition-transform" />
-                                    </button>
+                                    @can('organizations.update')
+                                        <a href="{{ route('admin.organizations.edit', $org) }}"
+                                            class="p-2 rounded-full bg-gray-50 text-gray-400 hover:text-amber-600 hover:bg-amber-50 transition-all duration-200 group"
+                                            title="Modifier">
+                                            <x-iconify icon="lucide:edit-3" class="w-4 h-4 group-hover:scale-110 transition-transform" />
+                                        </a>
+                                    @endcan
+                                    @can('organizations.delete')
+                                        <button type="button"
+                                            wire:click="confirmDelete({{ $org->id }})"
+                                            class="p-2 rounded-full bg-gray-50 text-gray-400 hover:text-red-600 hover:bg-red-50 transition-all duration-200 group"
+                                            title="Supprimer">
+                                            <x-iconify icon="lucide:trash-2" class="w-4 h-4 group-hover:scale-110 transition-transform" />
+                                        </button>
+                                    @endcan
                                 </div>
                             </td>
                         </tr>

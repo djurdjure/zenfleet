@@ -125,12 +125,14 @@
                 </button>
 
                 {{-- Nouvelle Sanction --}}
-                <button
-                    onclick="openCreateSanctionModal()"
-                    class="inline-flex items-center gap-2 p-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-all duration-200 shadow-sm hover:shadow-md"
-                    title="Nouvelle Sanction">
-                    <x-iconify icon="lucide:plus" class="w-5 h-5" />
-                </button>
+                @can('create', \App\Models\DriverSanction::class)
+                    <button
+                        onclick="openCreateSanctionModal()"
+                        class="inline-flex items-center gap-2 p-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-all duration-200 shadow-sm hover:shadow-md"
+                        title="Nouvelle Sanction">
+                        <x-iconify icon="lucide:plus" class="w-5 h-5" />
+                    </button>
+                @endcan
             </div>
         </div>
 
@@ -434,35 +436,43 @@
                                                 class="fixed z-[80] rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
                                                 <div class="py-1">
                                                 {{-- Modifier --}}
-                                                <button @click="$wire.call('openEditModal', {{ $sanction->id }}); open = false"
-                                                    class="group flex w-full items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
-                                                    <x-iconify icon="heroicons:pencil-square" class="mr-3 h-4 w-4 text-gray-400 group-hover:text-amber-500" />
-                                                    Modifier
-                                                </button>
+                                                @can('update', $sanction)
+                                                    <button @click="$wire.call('openEditModal', {{ $sanction->id }}); open = false"
+                                                        class="group flex w-full items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
+                                                        <x-iconify icon="heroicons:pencil-square" class="mr-3 h-4 w-4 text-gray-400 group-hover:text-amber-500" />
+                                                        Modifier
+                                                    </button>
+                                                @endcan
 
                                                 @if($sanction->trashed())
                                                 <div class="border-t border-gray-100 my-1"></div>
                                                 {{-- Restaurer --}}
-                                                <button wire:click="confirmRestore({{ $sanction->id }}); close()"
-                                                    class="group flex w-full items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
-                                                    <x-iconify icon="heroicons:arrow-path" class="mr-3 h-4 w-4 text-gray-400 group-hover:text-green-500" />
-                                                    Restaurer
-                                                </button>
+                                                @can('restore', $sanction)
+                                                    <button wire:click="confirmRestore({{ $sanction->id }}); close()"
+                                                        class="group flex w-full items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
+                                                        <x-iconify icon="heroicons:arrow-path" class="mr-3 h-4 w-4 text-gray-400 group-hover:text-green-500" />
+                                                        Restaurer
+                                                    </button>
+                                                @endcan
 
                                                 {{-- Supprimer définitivement --}}
-                                                <button wire:click="confirmForceDelete({{ $sanction->id }}); close()"
-                                                    class="group flex w-full items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
-                                                    <x-iconify icon="heroicons:trash" class="mr-3 h-4 w-4 text-gray-400 group-hover:text-red-500" />
-                                                    Supprimer définitivement
-                                                </button>
+                                                @can('forceDelete', $sanction)
+                                                    <button wire:click="confirmForceDelete({{ $sanction->id }}); close()"
+                                                        class="group flex w-full items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
+                                                        <x-iconify icon="heroicons:trash" class="mr-3 h-4 w-4 text-gray-400 group-hover:text-red-500" />
+                                                        Supprimer définitivement
+                                                    </button>
+                                                @endcan
                                                 @else
                                                 <div class="border-t border-gray-100 my-1"></div>
                                                 {{-- Archiver --}}
-                                                <button wire:click="confirmSoftDelete({{ $sanction->id }}); close()"
-                                                    class="group flex w-full items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
-                                                    <x-iconify icon="heroicons:archive-box-arrow-down" class="mr-3 h-4 w-4 text-gray-400 group-hover:text-amber-500" />
-                                                    Archiver
-                                                </button>
+                                                @can('delete', $sanction)
+                                                    <button wire:click="confirmSoftDelete({{ $sanction->id }}); close()"
+                                                        class="group flex w-full items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
+                                                        <x-iconify icon="heroicons:archive-box-arrow-down" class="mr-3 h-4 w-4 text-gray-400 group-hover:text-amber-500" />
+                                                        Archiver
+                                                    </button>
+                                                @endcan
                                                 @endif
                                             </div>
                                         </div>

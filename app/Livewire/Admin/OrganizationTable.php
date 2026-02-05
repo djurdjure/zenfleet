@@ -11,10 +11,11 @@ use Livewire\Attributes\On;
 use Livewire\Attributes\Url;
 use Livewire\Component;
 use Livewire\WithPagination;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 class OrganizationTable extends Component
 {
-    use WithPagination;
+    use WithPagination, AuthorizesRequests;
 
     #[Url]
     public string $search = '';
@@ -53,9 +54,25 @@ class OrganizationTable extends Component
 
     public function mount($initialFilters = [])
     {
+        abort_unless(auth()->user()?->can('organizations.view'), 403, 'Accès refusé.');
+
         $this->search = $initialFilters['search'] ?? '';
         $this->status = $initialFilters['status'] ?? '';
         $this->wilaya = $initialFilters['wilaya'] ?? '';
+    }
+
+    private function ensurePermission(string $permission, string $message): bool
+    {
+        $user = auth()->user();
+        if (!$user || !$user->can($permission)) {
+            $this->dispatch('status-updated', [
+                'message' => $message,
+                'type' => 'error',
+            ]);
+            return false;
+        }
+
+        return true;
     }
 
     public function updatedSearch()
@@ -96,6 +113,10 @@ class OrganizationTable extends Component
 
     public function toggleStatus($organizationId)
     {
+        if (!$this->ensurePermission('organizations.update', 'Permission refusée pour modifier le statut.')) {
+            return;
+        }
+
         $organization = Organization::find($organizationId);
         if ($organization) {
             $newStatus = $organization->status === 'active' ? 'inactive' : 'active';
@@ -110,6 +131,10 @@ class OrganizationTable extends Component
 
     public function bulkDelete()
     {
+        if (!$this->ensurePermission('organizations.delete', 'Permission refusée pour supprimer des organisations.')) {
+            return;
+        }
+
         if (empty($this->selectedOrganizations)) {
             return;
         }
@@ -135,6 +160,10 @@ class OrganizationTable extends Component
 
     public function confirmDelete(int $organizationId): void
     {
+        if (!$this->ensurePermission('organizations.delete', 'Permission refusée pour supprimer une organisation.')) {
+            return;
+        }
+
         $this->deleteOrganizationId = $organizationId;
         $this->showDeleteModal = true;
     }
@@ -148,6 +177,11 @@ class OrganizationTable extends Component
     public function deleteOrganization(): void
     {
         if (!$this->deleteOrganizationId) {
+            return;
+        }
+
+        if (!$this->ensurePermission('organizations.delete', 'Permission refusée pour supprimer une organisation.')) {
+            $this->cancelDelete();
             return;
         }
 

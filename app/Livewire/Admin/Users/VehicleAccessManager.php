@@ -5,12 +5,14 @@ namespace App\Livewire\Admin\Users;
 use App\Models\User;
 use App\Models\Vehicle;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Livewire\Component;
 use Livewire\WithPagination;
 
 class VehicleAccessManager extends Component
 {
     use WithPagination;
+    use AuthorizesRequests;
 
     public User $user;
     public $search = '';
@@ -22,12 +24,31 @@ class VehicleAccessManager extends Component
     public function mount(User $user)
     {
         $this->user = $user;
+
+        if (!auth()->user()?->can('users.update')) {
+            abort(403, 'Accès refusé.');
+        }
+
+        if (!auth()->user()?->hasRole('Super Admin') && $this->user->organization_id !== auth()->user()?->organization_id) {
+            abort(403, 'Accès refusé.');
+        }
         
         // Si l'utilisateur est Super Admin, il a déjà accès à tout
         if ($this->user->hasRole('Super Admin')) {
             // On pourrait rediriger ou afficher un message, mais pour l'instant on laisse l'interface
             // en mode lecture seule ou informative
         }
+    }
+
+    private function ensurePermission(string $permission, string $message): bool
+    {
+        $currentUser = auth()->user();
+        if (!$currentUser || !$currentUser->can($permission)) {
+            $this->dispatch('toast', ['type' => 'error', 'message' => $message]);
+            return false;
+        }
+
+        return true;
     }
 
     public function updatedSearch()
@@ -42,6 +63,10 @@ class VehicleAccessManager extends Component
 
     public function toggleAccess($vehicleId)
     {
+        if (!$this->ensurePermission('users.update', 'Permission refusée pour modifier les accès.')) {
+            return;
+        }
+
         // 🔒 IMPORTANT: Utiliser DB direct pour bypasser le Global Scope
         // Sinon, on ne peut accorder accès qu'aux véhicules déjà accessibles (catch-22)
         $hasAccess = DB::table('user_vehicle')
@@ -75,6 +100,10 @@ class VehicleAccessManager extends Component
 
     public function grantAll()
     {
+        if (!$this->ensurePermission('users.update', 'Permission refusée pour modifier les accès.')) {
+            return;
+        }
+
         // 🔒 Récupérer tous les véhicules de l'organisation (bypass scope)
         $vehicles = Vehicle::withoutGlobalScope(\App\Models\Scopes\UserVehicleAccessScope::class)
             ->where('organization_id', $this->user->organization_id)
@@ -112,6 +141,10 @@ class VehicleAccessManager extends Component
 
     public function revokeAll()
     {
+        if (!$this->ensurePermission('users.update', 'Permission refusée pour modifier les accès.')) {
+            return;
+        }
+
         // 🔒 Utiliser DB direct pour bypasser le Global Scope
         $count = DB::table('user_vehicle')
             ->where('user_id', $this->user->id)

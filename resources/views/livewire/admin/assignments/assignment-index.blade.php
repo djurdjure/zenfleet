@@ -108,11 +108,13 @@
             </x-slot:filters>
 
             <x-slot:actions>
+                @can('create', \App\Models\Assignment::class)
                 <a href="{{ route('admin.assignments.create') }}"
                     title="Nouvelle affectation"
                     class="inline-flex items-center gap-2 p-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all duration-200 shadow-sm hover:shadow-md">
                     <x-iconify icon="lucide:plus" class="w-5 h-5" />
                 </a>
+                @endcan
             </x-slot:actions>
 
             <x-slot:filtersPanel>
@@ -326,6 +328,7 @@
                                 <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                     <div class="flex items-center justify-end gap-2">
                                         {{-- Terminer Button --}}
+                                        @can('end', $assignment)
                                         @if($assignment->canBeEnded())
                                         <button wire:click="confirmEndAssignment({{ $assignment->id }})"
                                             class="p-2 rounded-full bg-gray-50 text-gray-400 hover:text-orange-600 hover:bg-orange-50 transition-all duration-200 group"
@@ -333,13 +336,16 @@
                                             <x-iconify icon="lucide:flag-triangle-right" class="w-3.5 h-3.5 group-hover:scale-110 transition-transform" />
                                         </button>
                                         @endif
+                                        @endcan
 
                                         {{-- View Button --}}
+                                        @can('view', $assignment)
                                         <a href="{{ route('admin.assignments.show', $assignment) }}"
                                             class="p-2 rounded-full bg-gray-50 text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition-all duration-200 group"
                                             title="Voir détails">
                                             <x-iconify icon="lucide:eye" class="w-3.5 h-3.5 group-hover:scale-110 transition-transform" />
                                         </a>
+                                        @endcan
 
                                         {{-- Three-Dot Menu --}}
                                         <div class="relative inline-block text-left"
@@ -405,6 +411,7 @@
                                                     :class="direction === 'up' ? 'origin-bottom-right' : 'origin-top-right'"
                                                     class="fixed z-[80] rounded-lg shadow-lg bg-white ring-1 ring-black ring-opacity-5 divide-y divide-gray-100">
                                                     <div class="py-1">
+                                                    @can('update', $assignment)
                                                     @if($assignment->canBeEdited())
                                                     <a href="{{ route('admin.assignments.edit', $assignment) }}"
                                                         class="group flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
@@ -412,6 +419,7 @@
                                                         Modifier
                                                     </a>
                                                     @endif
+                                                    @endcan
 
                                                     @if($assignment->status === 'active')
                                                     @if($assignment->handoverForm)
@@ -440,6 +448,7 @@
                                                         Fiche de remise
                                                     </button>
 
+                                                    @can('delete', $assignment)
                                                     @if($assignment->canBeDeleted())
                                                     <div class="border-t border-gray-100 my-1"></div>
                                                     <button type="button"
@@ -449,6 +458,7 @@
                                                         Supprimer
                                                     </button>
                                                     @endif
+                                                    @endcan
                                                 </div>
                                             </div>
                                         </template>

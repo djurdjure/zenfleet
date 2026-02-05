@@ -9,6 +9,7 @@ use Livewire\Component;
 use Livewire\WithPagination;
 use Livewire\Attributes\Url;
 use Carbon\Carbon;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Log;
@@ -25,6 +26,7 @@ use Illuminate\Support\Facades\Log;
 class AssignmentIndex extends Component
 {
     use WithPagination;
+    use AuthorizesRequests;
 
     // 🔍 Filters
     #[Url(as: 'q')]
@@ -78,6 +80,8 @@ class AssignmentIndex extends Component
 
     public function mount()
     {
+        $this->authorize('viewAny', Assignment::class);
+
         // Initialize default sort if invalid
         if (!in_array($this->sort_by, ['created_at', 'start_datetime', 'status'])) {
             $this->sort_by = 'created_at';
@@ -132,7 +136,14 @@ class AssignmentIndex extends Component
     {
         $assignment = Assignment::with(['vehicle', 'driver'])->find($id);
 
-        if (!$assignment || !$assignment->canBeEnded()) {
+        if (!$assignment) {
+            $this->dispatch('toast', ['type' => 'error', 'message' => 'Affectation introuvable.']);
+            return;
+        }
+
+        $this->authorize('end', $assignment);
+
+        if (!$assignment->canBeEnded()) {
             $this->dispatch('toast', ['type' => 'error', 'message' => 'Cette affectation ne peut pas être terminée.']);
             return;
         }
@@ -171,6 +182,8 @@ class AssignmentIndex extends Component
             return;
         }
 
+        $this->authorize('end', $assignment);
+
         try {
             // ✅ MODIFIÉ: Combiner date + heure avant parsing
             $fullDateTime = "{$this->endDate} {$this->endTime}";
@@ -204,7 +217,14 @@ class AssignmentIndex extends Component
     {
         $assignment = Assignment::with(['vehicle', 'driver'])->find($id);
 
-        if (!$assignment || !$assignment->canBeDeleted()) {
+        if (!$assignment) {
+            $this->dispatch('toast', ['type' => 'error', 'message' => 'Affectation introuvable.']);
+            return;
+        }
+
+        $this->authorize('delete', $assignment);
+
+        if (!$assignment->canBeDeleted()) {
             $this->dispatch('toast', ['type' => 'error', 'message' => 'Cette affectation ne peut pas être supprimée.']);
             return;
         }
@@ -221,6 +241,8 @@ class AssignmentIndex extends Component
         $assignment = Assignment::find($this->deletingAssignmentId);
 
         if ($assignment) {
+            $this->authorize('delete', $assignment);
+
             try {
                 // Use the controller's logic logic via repository or direct model method if available
                 // Here we replicate the controller's critical checks

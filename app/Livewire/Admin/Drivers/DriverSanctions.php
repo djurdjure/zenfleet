@@ -7,6 +7,7 @@ use App\Models\DriverSanction;
 use Livewire\Component;
 use Livewire\WithPagination;
 use Livewire\WithFileUploads;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Schema;
 use Carbon\Carbon;
@@ -29,7 +30,7 @@ use Carbon\Carbon;
  */
 class DriverSanctions extends Component
 {
-    use WithPagination, WithFileUploads;
+    use WithPagination, WithFileUploads, AuthorizesRequests;
 
     // ===============================================
     // PROPRIÉTÉS PUBLIQUES
@@ -126,6 +127,7 @@ class DriverSanctions extends Component
 
     public function mount(): void
     {
+        $this->authorize('viewAny', DriverSanction::class);
         $this->sanction_date = now()->format('Y-m-d');
         $this->hasSeverityColumn = Schema::hasColumn('driver_sanctions', 'severity');
         $this->hasDurationColumn = Schema::hasColumn('driver_sanctions', 'duration_days');
@@ -186,6 +188,7 @@ class DriverSanctions extends Component
 
     public function openCreateModal(): void
     {
+        $this->authorize('create', DriverSanction::class);
         $this->resetForm();
         $this->editMode = false;
         $this->showModal = true;
@@ -195,6 +198,7 @@ class DriverSanctions extends Component
     public function openEditModal(int $id): void
     {
         $sanction = DriverSanction::findOrFail($id);
+        $this->authorize('update', $sanction);
 
         $this->sanctionId = $sanction->id;
         $this->driver_id = $sanction->driver_id;
@@ -250,6 +254,7 @@ class DriverSanctions extends Component
 
             if ($this->editMode) {
                 $sanction = DriverSanction::findOrFail($this->sanctionId);
+                $this->authorize('update', $sanction);
 
                 // Delete old attachment if new one uploaded
                 if ($this->attachment && $sanction->attachment_path) {
@@ -263,6 +268,7 @@ class DriverSanctions extends Component
                     'message' => 'Sanction modifiée avec succès'
                 ]);
             } else {
+                $this->authorize('create', DriverSanction::class);
                 DriverSanction::create($data);
 
                 $this->dispatch('notification', [
@@ -284,6 +290,7 @@ class DriverSanctions extends Component
     {
         try {
             $sanction = DriverSanction::findOrFail($id);
+            $this->authorize('delete', $sanction);
 
             // Delete attachment if exists
             if ($sanction->attachment_path) {
@@ -312,6 +319,7 @@ class DriverSanctions extends Component
     {
         $this->modalSanction = DriverSanction::with('driver')->find($id);
         if ($this->modalSanction) {
+            $this->authorize('delete', $this->modalSanction);
             $this->showArchiveModal = true;
         }
     }
@@ -325,6 +333,7 @@ class DriverSanctions extends Component
     public function executeSoftDelete(): void
     {
         if ($this->modalSanction) {
+            $this->authorize('delete', $this->modalSanction);
             $this->modalSanction->delete(); // Soft Delete standard
             $this->dispatch('notification', [
                 'type' => 'success',
@@ -340,6 +349,7 @@ class DriverSanctions extends Component
     {
         $this->modalSanction = DriverSanction::onlyTrashed()->with('driver')->find($id);
         if ($this->modalSanction) {
+            $this->authorize('restore', $this->modalSanction);
             $this->showRestoreModal = true;
         }
     }
@@ -353,6 +363,7 @@ class DriverSanctions extends Component
     public function executeRestore(): void
     {
         if ($this->modalSanction) {
+            $this->authorize('restore', $this->modalSanction);
             $this->modalSanction->restore();
             $this->dispatch('notification', [
                 'type' => 'success',
@@ -368,6 +379,7 @@ class DriverSanctions extends Component
     {
         $this->modalSanction = DriverSanction::onlyTrashed()->with('driver')->find($id);
         if ($this->modalSanction) {
+            $this->authorize('forceDelete', $this->modalSanction);
             $this->showForceDeleteModal = true;
         }
     }
@@ -382,6 +394,7 @@ class DriverSanctions extends Component
     {
         if ($this->modalSanction) {
             try {
+                $this->authorize('forceDelete', $this->modalSanction);
                 // Delete attachment if exists
                 if ($this->modalSanction->attachment_path) {
                     Storage::disk('public')->delete($this->modalSanction->attachment_path);

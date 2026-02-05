@@ -48,6 +48,7 @@
                     </select>
                 </div>
                 
+                @can('users.update')
                 <div class="mt-4 sm:mt-0 flex space-x-3">
                     <button wire:click="grantAll" wire:confirm="Êtes-vous sûr de vouloir accorder l'accès à TOUS les véhicules ?" class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-indigo-700 bg-indigo-100 hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
                         <x-iconify icon="lucide:check-circle" class="-ml-0.5 mr-2 h-4 w-4" />
@@ -58,6 +59,7 @@
                         Tout révoquer
                     </button>
                 </div>
+                @endcan
             </div>
 
             <ul role="list" class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 p-6">
@@ -105,16 +107,18 @@
                                             <span class="ml-3">Géré par affectation</span>
                                         </div>
                                     @else
-                                        <button wire:click="toggleAccess({{ $vehicle->id }})" 
-                                                class="relative -mr-px w-0 flex-1 inline-flex items-center justify-center py-4 text-sm font-medium border-t border-transparent rounded-bl-lg hover:text-gray-500 {{ $hasAccess ? 'text-red-600 hover:bg-red-50' : 'text-green-600 hover:bg-green-50' }}">
-                                            @if($hasAccess)
-                                                <x-iconify icon="lucide:user-minus" class="w-5 h-5 mr-2" />
-                                                <span class="ml-3">Révoquer</span>
-                                            @else
-                                                <x-iconify icon="lucide:user-plus" class="w-5 h-5 mr-2" />
-                                                <span class="ml-3">Accorder</span>
-                                            @endif
-                                        </button>
+                                        @can('users.update')
+                                            <button wire:click="toggleAccess({{ $vehicle->id }})" 
+                                                    class="relative -mr-px w-0 flex-1 inline-flex items-center justify-center py-4 text-sm font-medium border-t border-transparent rounded-bl-lg hover:text-gray-500 {{ $hasAccess ? 'text-red-600 hover:bg-red-50' : 'text-green-600 hover:bg-green-50' }}">
+                                                @if($hasAccess)
+                                                    <x-iconify icon="lucide:user-minus" class="w-5 h-5 mr-2" />
+                                                    <span class="ml-3">Révoquer</span>
+                                                @else
+                                                    <x-iconify icon="lucide:user-plus" class="w-5 h-5 mr-2" />
+                                                    <span class="ml-3">Accorder</span>
+                                                @endif
+                                            </button>
+                                        @endcan
                                     @endif
                                 </div>
                             </div>

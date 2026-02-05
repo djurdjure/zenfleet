@@ -6,6 +6,7 @@ use App\Models\Vehicle;
 use App\Models\VehicleMileageReading;
 use App\Models\User;
 use Illuminate\Contracts\View\View;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Livewire\Component;
 use Livewire\WithPagination;
 use Illuminate\Support\Facades\DB;
@@ -26,6 +27,7 @@ use Illuminate\Support\Facades\DB;
 class VehicleMileageHistory extends Component
 {
     use WithPagination;
+    use AuthorizesRequests;
 
     /**
      * 🚗 PROPRIÉTÉS DU VÉHICULE
@@ -128,6 +130,8 @@ class VehicleMileageHistory extends Component
         // Récupérer le véhicule avec multi-tenant scoping
         $this->vehicle = Vehicle::where('organization_id', $user->organization_id)
             ->findOrFail($vehicleId);
+
+        $this->authorize('mileageHistory', $this->vehicle);
 
         $this->vehicleId = $vehicleId;
 
@@ -318,11 +322,7 @@ class VehicleMileageHistory extends Component
      */
     public function openAddModal(): void
     {
-        // Vérifier la permission
-        if (!auth()->user()->can('mileage-readings.create')) {
-            session()->flash('error', 'Vous n\'avez pas la permission de créer des relevés kilométriques.');
-            return;
-        }
+        $this->authorize('create', VehicleMileageReading::class);
 
         $this->resetAddForm();
         $this->showAddModal = true;
@@ -354,12 +354,7 @@ class VehicleMileageHistory extends Component
      */
     public function saveReading(): void
     {
-        // Vérifier la permission
-        if (!auth()->user()->can('mileage-readings.create')) {
-            session()->flash('error', 'Vous n\'avez pas la permission de créer des relevés kilométriques.');
-            $this->closeAddModal();
-            return;
-        }
+        $this->authorize('create', VehicleMileageReading::class);
 
         // Valider les données
         $validated = $this->validate();
@@ -403,11 +398,7 @@ class VehicleMileageHistory extends Component
      */
     public function exportCsv(): void
     {
-        // Vérifier la permission
-        if (!auth()->user()->can('mileage-readings.export')) {
-            session()->flash('error', 'Vous n\'avez pas la permission d\'exporter les relevés kilométriques.');
-            return;
-        }
+        $this->authorize('export', VehicleMileageReading::class);
 
         session()->flash('info', 'Fonctionnalité d\'export CSV en cours de développement.');
     }
@@ -417,11 +408,7 @@ class VehicleMileageHistory extends Component
      */
     public function exportExcel(): void
     {
-        // Vérifier la permission
-        if (!auth()->user()->can('mileage-readings.export')) {
-            session()->flash('error', 'Vous n\'avez pas la permission d\'exporter les relevés kilométriques.');
-            return;
-        }
+        $this->authorize('export', VehicleMileageReading::class);
 
         session()->flash('info', 'Fonctionnalité d\'export Excel en cours de développement.');
     }
