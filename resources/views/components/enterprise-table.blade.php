@@ -76,7 +76,7 @@ $currentThemeClass = $themeClasses[$theme] ?? $themeClasses['gradient'];
 
  {{-- Selected Counter --}}
  <div x-show="selectedRows.length > 0" x-transition
- class="bg-indigo-100 text-indigo-800 px-3 py-1 rounded-full text-sm font-medium">
+ class="bg-indigo-50 text-indigo-700 border border-indigo-200 px-3 py-1 rounded-full text-sm font-medium">
  <span x-text="selectedRows.length"></span> sélectionné{{ selectedRows.length > 1 ? 's' : '' }}
  </div>
  </div>
@@ -460,7 +460,7 @@ function enterpriseTable(config) {
 
  if (header.type === 'badge') {
  const badgeClasses = header.badgeClasses || {};
- const className = badgeClasses[value] || 'bg-gray-100 text-gray-800';
+ const className = badgeClasses[value] || 'bg-gray-50 text-gray-700 border border-gray-200';
  return `<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${className}">${value}</span>`;
  }
 

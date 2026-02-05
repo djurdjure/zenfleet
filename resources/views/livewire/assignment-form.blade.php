@@ -42,7 +42,7 @@ Design surpassant Fleetio, Samsara et Verizon Connect:
                             <span>
                                 <strong class="font-medium">{{ $conflict['resource_label'] }}</strong>
                                 déjà affecté du {{ $conflict['period']['start'] }} au {{ $conflict['period']['end'] }}
-                                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-red-100 text-red-800 ml-1">
+                                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-red-50 text-red-700 border border-red-200 ml-1">
                                     {{ $conflict['status'] }}
                                 </span>
                             </span>
@@ -96,8 +96,8 @@ Design surpassant Fleetio, Samsara et Verizon Connect:
                             @foreach($historicalWarnings as $warning)
                                 <li class="flex items-start gap-2">
                                     <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium
-                                        {{ $warning['severity'] === 'high' ? 'bg-red-100 text-red-800' : 
-                                           ($warning['severity'] === 'medium' ? 'bg-orange-100 text-orange-800' : 'bg-yellow-100 text-yellow-800') }}">
+                                        {{ $warning['severity'] === 'high' ? 'bg-red-50 text-red-700 border border-red-200' : 
+                                           ($warning['severity'] === 'medium' ? 'bg-orange-50 text-orange-700 border border-orange-200' : 'bg-yellow-50 text-yellow-700 border border-yellow-200') }}">
                                         {{ strtoupper($warning['severity']) }}
                                     </span>
                                     <span class="flex-1">{{ $warning['message'] }}</span>

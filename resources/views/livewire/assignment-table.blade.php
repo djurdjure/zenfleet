@@ -261,7 +261,7 @@
  <div class="font-medium">{{ $assignment->end_datetime->format('d/m/Y') }}</div>
  <div class="text-gray-500">{{ $assignment->end_datetime->format('H:i') }}</div>
  @else
- <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+ <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-50 text-yellow-700 border border-yellow-200">
  Indéterminé
  </span>
  @endif

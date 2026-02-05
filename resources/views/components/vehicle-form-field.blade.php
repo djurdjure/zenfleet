@@ -31,7 +31,7 @@
 
  @if($hasError)
  <div class="flex items-center gap-1">
- <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800 animate-pulse">
+ <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-50 text-red-700 border border-red-200 animate-pulse">
  <i class="fas fa-exclamation-circle mr-1"></i>
  Erreur
  </span>

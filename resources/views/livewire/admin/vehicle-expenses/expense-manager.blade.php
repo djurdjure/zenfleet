@@ -18,49 +18,49 @@
         </div>
 
         <x-page-analytics-grid columns="4">
-            <div class="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-lg transition-shadow duration-300">
+            <div class="bg-blue-50 rounded-lg border border-blue-200 p-6 hover:shadow-lg transition-shadow duration-300">
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-sm font-medium text-gray-600">Total ce mois</p>
                         <p class="text-2xl font-bold text-gray-900 mt-1">{{ number_format($totalAmount, 2) }} DZD</p>
                     </div>
-                    <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                    <div class="w-12 h-12 bg-blue-100 border border-blue-200 rounded-lg flex items-center justify-center">
                         <x-iconify icon="solar:wallet-bold-duotone" class="w-6 h-6 text-blue-600" />
                     </div>
                 </div>
             </div>
 
-            <div class="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-lg transition-shadow duration-300">
+            <div class="bg-amber-50 rounded-lg border border-amber-200 p-6 hover:shadow-lg transition-shadow duration-300">
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-sm font-medium text-gray-600">En attente</p>
                         <p class="text-2xl font-bold text-amber-600 mt-1">{{ $pendingCount }}</p>
                     </div>
-                    <div class="w-12 h-12 bg-amber-100 rounded-lg flex items-center justify-center">
+                    <div class="w-12 h-12 bg-amber-100 border border-amber-200 rounded-lg flex items-center justify-center">
                         <x-iconify icon="solar:clock-circle-bold-duotone" class="w-6 h-6 text-amber-600" />
                     </div>
                 </div>
             </div>
 
-            <div class="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-lg transition-shadow duration-300">
+            <div class="bg-green-50 rounded-lg border border-green-200 p-6 hover:shadow-lg transition-shadow duration-300">
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-sm font-medium text-gray-600">Approuvées</p>
                         <p class="text-2xl font-bold text-green-600 mt-1">{{ $approvedCount }}</p>
                     </div>
-                    <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                    <div class="w-12 h-12 bg-green-100 border border-green-200 rounded-lg flex items-center justify-center">
                         <x-iconify icon="solar:check-circle-bold-duotone" class="w-6 h-6 text-green-600" />
                     </div>
                 </div>
             </div>
 
-            <div class="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-lg transition-shadow duration-300">
+            <div class="bg-gray-50 rounded-lg border border-gray-200 p-6 hover:shadow-lg transition-shadow duration-300">
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-sm font-medium text-gray-600">Moyenne mensuelle</p>
                         <p class="text-2xl font-bold text-gray-900 mt-1">{{ number_format($monthlyAverage, 2) }} DZD</p>
                     </div>
-                    <div class="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center">
+                    <div class="w-12 h-12 bg-gray-100 border border-gray-200 rounded-lg flex items-center justify-center">
                         <x-iconify icon="solar:chart-bold-duotone" class="w-6 h-6 text-gray-600" />
                     </div>
                 </div>
@@ -111,7 +111,7 @@
                     <x-iconify icon="lucide:filter" class="w-5 h-5 text-gray-500" />
                     <x-iconify icon="heroicons:chevron-down" class="w-4 h-4 text-gray-400 transition-transform duration-200" x-bind:class="showFilters ? 'rotate-180' : ''" />
                     @if($activeCount > 0)
-                        <span class="ml-1 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-blue-100 text-blue-800">
+                        <span class="ml-1 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-200">
                             {{ $activeCount }}
                         </span>
                     @endif
@@ -360,7 +360,7 @@
                                 </div>
                             </td>
                             <td class="px-4 py-3 whitespace-nowrap">
-                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-50 text-blue-700 border border-blue-200">
                                     {{ $categories[$expense->expense_category] ?? $expense->expense_category }}
                                 </span>
                             </td>
@@ -374,17 +374,17 @@
                             <td class="px-4 py-3 whitespace-nowrap">
                                 @switch($expense->approval_status)
                                     @case('draft')
-                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">Brouillon</span>
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-50 text-gray-700 border border-gray-200">Brouillon</span>
                                         @break
                                     @case('pending_level1')
                                     @case('pending_level2')
-                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">En attente</span>
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-50 text-yellow-700 border border-yellow-200">En attente</span>
                                         @break
                                     @case('approved')
-                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">Approuvé</span>
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-50 text-green-700 border border-green-200">Approuvé</span>
                                         @break
                                     @case('rejected')
-                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">Rejeté</span>
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-50 text-red-700 border border-red-200">Rejeté</span>
                                         @break
                                 @endswitch
                             </td>

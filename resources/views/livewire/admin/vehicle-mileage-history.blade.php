@@ -512,7 +512,7 @@
                                             <button type="button" @click="selectDay(day)" :disabled="day.disabled"
                                                 :class="{
                                                 'bg-blue-600 text-white': day.isSelected,
-                                                'bg-blue-100 text-blue-800': day.isToday && !day.isSelected,
+                                                'bg-blue-50 text-blue-700 border border-blue-200': day.isToday && !day.isSelected,
                                                 'hover:bg-gray-100': !day.disabled && !day.isSelected,
                                                 'text-gray-300 cursor-not-allowed': day.disabled,
                                                 'text-gray-700': !day.disabled && !day.isSelected
@@ -640,7 +640,7 @@
                                             <button type="button" @click="selectDay(day)" :disabled="day.disabled"
                                                 :class="{
                                                 'bg-blue-600 text-white': day.isSelected,
-                                                'bg-blue-100 text-blue-800': day.isToday && !day.isSelected,
+                                                'bg-blue-50 text-blue-700 border border-blue-200': day.isToday && !day.isSelected,
                                                 'hover:bg-gray-100': !day.disabled && !day.isSelected,
                                                 'text-gray-300 cursor-not-allowed': day.disabled,
                                                 'text-gray-700': !day.disabled && !day.isSelected
@@ -750,12 +750,12 @@
 
                                             {{-- Badge Méthode --}}
                                             @if($reading->recording_method === 'manual')
-                                            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-50 text-green-700 border border-green-200">
                                                 <x-iconify icon="lucide:hand" class="w-3 h-3" />
                                                 Manuel
                                             </span>
                                             @else
-                                            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                                            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-50 text-purple-700 border border-purple-200">
                                                 <x-iconify icon="lucide:cpu" class="w-3 h-3" />
                                                 Automatique
                                             </span>

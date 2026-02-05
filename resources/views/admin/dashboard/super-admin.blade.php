@@ -189,7 +189,7 @@
  {{ str_replace('_', ' ', $service) }}
  </span>
  <span class="px-2 py-1 text-xs font-semibold rounded-full
- {{ $status === 'healthy' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }}">
+ {{ $status === 'healthy' ? 'bg-green-50 text-green-700 border border-green-200' : 'bg-red-50 text-red-700 border border-red-200' }}">
  {{ $status === 'healthy' ? 'Opérationnel' : 'Problème' }}
  </span>
  </div>

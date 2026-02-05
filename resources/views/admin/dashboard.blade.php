@@ -299,7 +299,7 @@
  <span class="text-sm text-gray-900">{{ $activity->driver ?? 'John Doe' }}</span>
  </td>
  <td class="px-6 py-4 whitespace-nowrap">
- <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+ <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-50 text-green-700 border border-green-200">
  {{ $activity->status ?? 'Actif' }}
  </span>
  </td>
@@ -329,7 +329,7 @@
  <span class="text-sm text-gray-900">Ahmed Benali</span>
  </td>
  <td class="px-6 py-4 whitespace-nowrap">
- <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+ <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-50 text-green-700 border border-green-200">
  Complété
  </span>
  </td>
@@ -357,7 +357,7 @@
  <span class="text-sm text-gray-900">Fatima Zohra</span>
  </td>
  <td class="px-6 py-4 whitespace-nowrap">
- <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
+ <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-50 text-blue-700 border border-blue-200">
  En cours
  </span>
  </td>
@@ -385,7 +385,7 @@
  <span class="text-sm text-gray-900">Mohamed Karim</span>
  </td>
  <td class="px-6 py-4 whitespace-nowrap">
- <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-orange-100 text-orange-800">
+ <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-orange-50 text-orange-700 border border-orange-200">
  Attention
  </span>
  </td>

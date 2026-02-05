@@ -59,7 +59,7 @@
                                         <span>{{ $document->original_filename }}</span>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm">
-                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">
+                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-50 text-gray-700 border border-gray-200">
                                             {{ $document->category->name ?? 'N/A' }}
                                         </span>
                                     </td>

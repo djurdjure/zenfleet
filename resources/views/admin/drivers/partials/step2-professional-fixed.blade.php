@@ -197,15 +197,15 @@
  {{-- Badges de capacités --}}
  <div class="flex gap-2 mt-2">
  <span x-show="status.can_drive" 
- class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+ class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-50 text-green-700 border border-green-200">
  <i class="fas fa-car mr-1"></i> Conduite
  </span>
  <span x-show="status.can_assign" 
- class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+ class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-50 text-blue-700 border border-blue-200">
  <i class="fas fa-tasks mr-1"></i> Missions
  </span>
  <span x-show="!status.can_drive && !status.can_assign" 
- class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+ class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-yellow-50 text-yellow-700 border border-yellow-200">
  <i class="fas fa-exclamation-triangle mr-1"></i> Limité
  </span>
  </div>

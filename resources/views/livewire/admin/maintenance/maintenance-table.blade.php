@@ -18,49 +18,49 @@
         </div>
 
         <x-page-analytics-grid columns="4">
-            <div class="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-lg transition-shadow duration-300">
+            <div class="bg-blue-50 rounded-lg border border-blue-200 p-6 hover:shadow-lg transition-shadow duration-300">
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-sm font-medium text-gray-600">Total opérations</p>
                         <p class="text-2xl font-bold text-gray-900 mt-1">{{ $analytics['total_operations'] ?? 0 }}</p>
                     </div>
-                    <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                    <div class="w-12 h-12 bg-blue-100 border border-blue-200 rounded-lg flex items-center justify-center">
                         <x-iconify icon="lucide:wrench" class="w-6 h-6 text-blue-600" />
                     </div>
                 </div>
             </div>
 
-            <div class="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-lg transition-shadow duration-300">
+            <div class="bg-indigo-50 rounded-lg border border-indigo-200 p-6 hover:shadow-lg transition-shadow duration-300">
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-sm font-medium text-gray-600">Planifiées</p>
-                        <p class="text-2xl font-bold text-blue-600 mt-1">{{ $analytics['planned_operations'] ?? 0 }}</p>
+                        <p class="text-2xl font-bold text-indigo-600 mt-1">{{ $analytics['planned_operations'] ?? 0 }}</p>
                     </div>
-                    <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                        <x-iconify icon="lucide:calendar-clock" class="w-6 h-6 text-blue-600" />
+                    <div class="w-12 h-12 bg-indigo-100 border border-indigo-200 rounded-lg flex items-center justify-center">
+                        <x-iconify icon="lucide:calendar-clock" class="w-6 h-6 text-indigo-600" />
                     </div>
                 </div>
             </div>
 
-            <div class="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-lg transition-shadow duration-300">
+            <div class="bg-orange-50 rounded-lg border border-orange-200 p-6 hover:shadow-lg transition-shadow duration-300">
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-sm font-medium text-gray-600">En cours</p>
                         <p class="text-2xl font-bold text-orange-600 mt-1">{{ $analytics['in_progress_operations'] ?? 0 }}</p>
                     </div>
-                    <div class="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
+                    <div class="w-12 h-12 bg-orange-100 border border-orange-200 rounded-lg flex items-center justify-center">
                         <x-iconify icon="lucide:loader" class="w-6 h-6 text-orange-600" />
                     </div>
                 </div>
             </div>
 
-            <div class="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-lg transition-shadow duration-300">
+            <div class="bg-red-50 rounded-lg border border-red-200 p-6 hover:shadow-lg transition-shadow duration-300">
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-sm font-medium text-gray-600">En retard</p>
                         <p class="text-2xl font-bold text-red-600 mt-1">{{ $analytics['overdue_operations'] ?? 0 }}</p>
                     </div>
-                    <div class="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center">
+                    <div class="w-12 h-12 bg-red-100 border border-red-200 rounded-lg flex items-center justify-center">
                         <x-iconify icon="lucide:alert-circle" class="w-6 h-6 text-red-600" />
                     </div>
                 </div>
@@ -110,7 +110,7 @@
                     <x-iconify icon="lucide:filter" class="w-5 h-5 text-gray-500" />
                     <x-iconify icon="heroicons:chevron-down" class="w-4 h-4 text-gray-400 transition-transform duration-200" x-bind:class="showFilters ? 'rotate-180' : ''" />
                     @if($activeCount > 0)
-                        <span class="ml-1 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-blue-100 text-blue-800">
+                        <span class="ml-1 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-200">
                             {{ $activeCount }}
                         </span>
                     @endif

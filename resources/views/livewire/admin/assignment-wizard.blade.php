@@ -11,39 +11,39 @@
     ==================================================================== --}}
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-6">
         {{-- Card Véhicules disponibles --}}
-        <div class="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-lg transition-shadow duration-300">
+        <div class="bg-blue-50 rounded-lg border border-blue-200 p-6 hover:shadow-lg transition-shadow duration-300">
             <div class="flex items-center justify-between">
                 <div>
                     <p class="text-sm font-medium text-gray-600">Véhicules au Parking</p>
                     <p class="text-2xl font-bold text-gray-900 mt-1">{{ $analytics['total_vehicles_parking'] ?? 0 }}</p>
                 </div>
-                <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                <div class="w-12 h-12 bg-blue-100 border border-blue-200 rounded-lg flex items-center justify-center">
                     <x-iconify icon="lucide:car" class="w-6 h-6 text-blue-600" />
                 </div>
             </div>
         </div>
 
         {{-- Card Chauffeurs disponibles --}}
-        <div class="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-lg transition-shadow duration-300">
+        <div class="bg-green-50 rounded-lg border border-green-200 p-6 hover:shadow-lg transition-shadow duration-300">
             <div class="flex items-center justify-between">
                 <div>
                     <p class="text-sm font-medium text-gray-600">Chauffeurs Disponibles</p>
                     <p class="text-2xl font-bold text-green-600 mt-1">{{ $analytics['total_drivers_available'] ?? 0 }}</p>
                 </div>
-                <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                <div class="w-12 h-12 bg-green-100 border border-green-200 rounded-lg flex items-center justify-center">
                     <x-iconify icon="lucide:user-check" class="w-6 h-6 text-green-600" />
                 </div>
             </div>
         </div>
 
         {{-- Card Affectations actives --}}
-        <div class="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-lg transition-shadow duration-300">
+        <div class="bg-orange-50 rounded-lg border border-orange-200 p-6 hover:shadow-lg transition-shadow duration-300">
             <div class="flex items-center justify-between">
                 <div>
                     <p class="text-sm font-medium text-gray-600">Affectations Actives</p>
                     <p class="text-2xl font-bold text-orange-600 mt-1">{{ $analytics['active_assignments'] ?? 0 }}</p>
                 </div>
-                <div class="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
+                <div class="w-12 h-12 bg-orange-100 border border-orange-200 rounded-lg flex items-center justify-center">
                     <x-iconify icon="lucide:git-branch" class="w-6 h-6 text-orange-600" />
                 </div>
             </div>
@@ -227,7 +227,7 @@
 
                             {{-- Statut --}}
                             <div class="flex-shrink-0">
-                                <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium bg-green-50 text-green-700 border border-green-200">
                                     <x-iconify icon="lucide:check" class="w-3 h-3" />
                                     Disponible
                                 </span>
@@ -339,7 +339,7 @@
 
                             {{-- Statut --}}
                             <div class="flex-shrink-0">
-                                <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium bg-green-50 text-green-700 border border-green-200">
                                     <x-iconify icon="lucide:check" class="w-3 h-3" />
                                     Disponible
                                 </span>

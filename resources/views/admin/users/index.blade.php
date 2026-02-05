@@ -52,49 +52,49 @@
     @endif
 
     <x-page-analytics-grid columns="4">
-        <div class="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-lg transition-shadow duration-300">
+        <div class="bg-blue-50 rounded-lg border border-blue-200 p-6 hover:shadow-lg transition-shadow duration-300">
             <div class="flex items-center justify-between">
                 <div>
                     <p class="text-sm font-medium text-gray-600">Total utilisateurs</p>
                     <p class="text-2xl font-bold text-gray-900 mt-1">{{ $users->total() }}</p>
                 </div>
-                <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                <div class="w-12 h-12 bg-blue-100 border border-blue-200 rounded-lg flex items-center justify-center">
                     <x-iconify icon="lucide:users" class="w-6 h-6 text-blue-600" />
                 </div>
             </div>
         </div>
 
-        <div class="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-lg transition-shadow duration-300">
+        <div class="bg-purple-50 rounded-lg border border-purple-200 p-6 hover:shadow-lg transition-shadow duration-300">
             <div class="flex items-center justify-between">
                 <div>
                     <p class="text-sm font-medium text-gray-600">Administrateurs</p>
                     <p class="text-2xl font-bold text-purple-600 mt-1">{{ $users->filter(fn($u) => $u->hasRole('Admin') || $u->hasRole('Super Admin'))->count() }}</p>
                 </div>
-                <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+                <div class="w-12 h-12 bg-purple-100 border border-purple-200 rounded-lg flex items-center justify-center">
                     <x-iconify icon="lucide:shield" class="w-6 h-6 text-purple-600" />
                 </div>
             </div>
         </div>
 
-        <div class="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-lg transition-shadow duration-300">
+        <div class="bg-orange-50 rounded-lg border border-orange-200 p-6 hover:shadow-lg transition-shadow duration-300">
             <div class="flex items-center justify-between">
                 <div>
                     <p class="text-sm font-medium text-gray-600">Superviseurs</p>
                     <p class="text-2xl font-bold text-orange-600 mt-1">{{ $users->filter(fn($u) => $u->hasRole('Superviseur'))->count() }}</p>
                 </div>
-                <div class="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
+                <div class="w-12 h-12 bg-orange-100 border border-orange-200 rounded-lg flex items-center justify-center">
                     <x-iconify icon="lucide:user-cog" class="w-6 h-6 text-orange-600" />
                 </div>
             </div>
         </div>
 
-        <div class="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-lg transition-shadow duration-300">
+        <div class="bg-green-50 rounded-lg border border-green-200 p-6 hover:shadow-lg transition-shadow duration-300">
             <div class="flex items-center justify-between">
                 <div>
                     <p class="text-sm font-medium text-gray-600">Chauffeurs</p>
                     <p class="text-2xl font-bold text-green-600 mt-1">{{ $users->filter(fn($u) => $u->hasRole('Chauffeur'))->count() }}</p>
                 </div>
-                <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                <div class="w-12 h-12 bg-green-100 border border-green-200 rounded-lg flex items-center justify-center">
                     <x-iconify icon="lucide:id-card" class="w-6 h-6 text-green-600" />
                 </div>
             </div>
@@ -123,7 +123,7 @@
                 class="inline-flex items-center gap-2 p-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-all duration-200 shadow-sm hover:shadow-md">
                 <x-iconify icon="lucide:filter" class="w-5 h-5 text-gray-500" />
                 <x-iconify icon="heroicons:chevron-down" class="w-4 h-4 text-gray-400 transition-transform duration-200" x-bind:class="showFilters ? 'rotate-180' : ''" />
-                <span x-show="searchQuery || selectedRole" x-cloak class="ml-1 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-blue-100 text-blue-800" x-text="(searchQuery ? 1 : 0) + (selectedRole ? 1 : 0)"></span>
+                <span x-show="searchQuery || selectedRole" x-cloak class="ml-1 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-200" x-text="(searchQuery ? 1 : 0) + (selectedRole ? 1 : 0)"></span>
             </button>
         </x-slot:filters>
 
@@ -209,12 +209,12 @@
                             @endif
                         </td>
                         <td class="px-6 py-4 text-sm text-gray-700">
-                            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-gray-50 text-gray-700 border border-gray-200">
                                 <x-iconify icon="lucide:building" class="w-4 h-4 mr-2 text-gray-500" />
                                 {{ $user->organization->name ?? 'N/A' }}
                             </span>
                             @if($user->vehicles_count > 0)
-                            <span class="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                            <span class="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-50 text-blue-700 border border-blue-200">
                                 <x-iconify icon="lucide:car" class="w-3 h-3 mr-1" /> {{ $user->vehicles_count }}
                             </span>
                             @endif
@@ -224,13 +224,13 @@
                                 @forelse($user->roles as $role)
                                 @php
                                 $roleColors = [
-                                    'Super Admin' => 'bg-red-100 text-red-800 border-red-200',
-                                    'Admin' => 'bg-purple-100 text-purple-800 border-purple-200',
-                                    'Superviseur' => 'bg-orange-100 text-orange-800 border-orange-200',
-                                    'Gestionnaire Flotte' => 'bg-blue-100 text-blue-800 border-blue-200',
-                                    'Chauffeur' => 'bg-green-100 text-green-800 border-green-200',
+                                    'Super Admin' => 'bg-red-50 text-red-700 border border-red-200 border-red-200',
+                                    'Admin' => 'bg-purple-50 text-purple-700 border border-purple-200 border-purple-200',
+                                    'Superviseur' => 'bg-orange-50 text-orange-700 border border-orange-200 border-orange-200',
+                                    'Gestionnaire Flotte' => 'bg-blue-50 text-blue-700 border border-blue-200',
+                                    'Chauffeur' => 'bg-green-50 text-green-700 border border-green-200 border-green-200',
                                 ];
-                                $colorClass = $roleColors[$role->name] ?? 'bg-gray-100 text-gray-800 border-gray-200';
+                                $colorClass = $roleColors[$role->name] ?? 'bg-gray-50 text-gray-700 border border-gray-200 border-gray-200';
                                 @endphp
                                 <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full border {{ $colorClass }}">
                                     {{ $role->name }}

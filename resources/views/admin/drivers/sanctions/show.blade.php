@@ -74,11 +74,11 @@
                     <div class="flex space-x-2">
                         @php
                         $severityColor = match($sanction->severity) {
-                        'low' => 'bg-green-100 text-green-800',
-                        'medium' => 'bg-yellow-100 text-yellow-800',
-                        'high' => 'bg-orange-100 text-orange-800',
-                        'critical' => 'bg-red-100 text-red-800',
-                        default => 'bg-gray-100 text-gray-800'
+                        'low' => 'bg-green-50 text-green-700 border border-green-200',
+                        'medium' => 'bg-yellow-50 text-yellow-700 border border-yellow-200',
+                        'high' => 'bg-orange-50 text-orange-700 border border-orange-200',
+                        'critical' => 'bg-red-50 text-red-700 border border-red-200',
+                        default => 'bg-gray-50 text-gray-700 border border-gray-200'
                         };
                         $severityLabel = match($sanction->severity) {
                         'low' => 'Faible',
@@ -93,12 +93,12 @@
                         </span>
 
                         @if($sanction->isArchived())
-                        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-gray-50 text-gray-700 border border-gray-200">
                             <x-iconify icon="heroicons:archive-box" class="w-3 h-3 mr-1" />
                             Archivée
                         </span>
                         @else
-                        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-50 text-green-700 border border-green-200">
                             <x-iconify icon="heroicons:check-circle" class="w-3 h-3 mr-1" />
                             Active
                         </span>
@@ -168,7 +168,7 @@
                         <x-iconify icon="heroicons:clock" class="w-5 h-5 text-indigo-500 mr-2" />
                         <h3 class="text-lg font-semibold text-gray-900">Historique des modifications</h3>
                     </div>
-                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800">
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-50 text-indigo-700 border border-indigo-200">
                         {{ $sanction->history->count() }} {{ $sanction->history->count() > 1 ? 'événements' : 'événement' }}
                     </span>
                 </div>

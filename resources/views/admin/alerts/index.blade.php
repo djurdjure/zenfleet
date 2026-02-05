@@ -198,7 +198,7 @@
  <h4 class="font-semibold text-red-900">{{ $alert->title }}</h4>
  <p class="text-red-700 text-sm mt-1">{{ $alert->message }}</p>
  <div class="flex items-center mt-2">
- <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+ <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-50 text-red-700 border border-red-200">
  Action requise
  </span>
  </div>
@@ -234,9 +234,9 @@
  <div class="flex-1">
  <div class="flex items-center space-x-2 mb-2">
  <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
- {{ $alert->alert_priority === 'overdue' ? 'bg-red-100 text-red-800' :
- ($alert->alert_priority === 'urgent' ? 'bg-orange-100 text-orange-800' :
- 'bg-yellow-100 text-yellow-800') }}">
+ {{ $alert->alert_priority === 'overdue' ? 'bg-red-50 text-red-700 border border-red-200' :
+ ($alert->alert_priority === 'urgent' ? 'bg-orange-50 text-orange-700 border border-orange-200' :
+ 'bg-yellow-50 text-yellow-700 border border-yellow-200') }}">
  {{ ucfirst($alert->alert_priority) }}
  </span>
  <span class="text-sm text-gray-500">{{ $alert->maintenance_type }}</span>
@@ -286,9 +286,9 @@
  <div class="flex-1">
  <div class="flex items-center space-x-2 mb-2">
  <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
- {{ $alert->type === 'budget_overrun' ? 'bg-red-100 text-red-800' :
- ($alert->type === 'budget_critical' ? 'bg-orange-100 text-orange-800' :
- 'bg-yellow-100 text-yellow-800') }}">
+ {{ $alert->type === 'budget_overrun' ? 'bg-red-50 text-red-700 border border-red-200' :
+ ($alert->type === 'budget_critical' ? 'bg-orange-50 text-orange-700 border border-orange-200' :
+ 'bg-yellow-50 text-yellow-700 border border-yellow-200') }}">
  {{ $alert->type === 'budget_overrun' ? 'Dépassé' : ($alert->type === 'budget_critical' ? 'Critique' : 'Attention') }}
  </span>
  <span class="text-sm font-semibold {{ $alert->utilization_percentage > 100 ? 'text-red-600' : 'text-orange-600' }}">
@@ -358,14 +358,14 @@
  <td class="px-6 py-4 text-sm text-gray-900">{{ $repair->vehicle }}</td>
  <td class="px-6 py-4">
  <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
- {{ $repair->priority === 'urgent' ? 'bg-red-100 text-red-800' :
- ($repair->priority === 'high' ? 'bg-orange-100 text-orange-800' :
- 'bg-yellow-100 text-yellow-800') }}">
+ {{ $repair->priority === 'urgent' ? 'bg-red-50 text-red-700 border border-red-200' :
+ ($repair->priority === 'high' ? 'bg-orange-50 text-orange-700 border border-orange-200' :
+ 'bg-yellow-50 text-yellow-700 border border-yellow-200') }}">
  {{ ucfirst($repair->priority) }}
  </span>
  </td>
  <td class="px-6 py-4">
- <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+ <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-50 text-yellow-700 border border-yellow-200">
  {{ $repair->status === 'en_attente' ? 'En attente' : 'Accord initial' }}
  </span>
  </td>

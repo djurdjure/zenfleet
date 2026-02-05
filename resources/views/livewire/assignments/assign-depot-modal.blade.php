@@ -129,10 +129,10 @@
 
                                                             {{-- Badge statut --}}
                                                             <span class="px-2 py-1 text-xs rounded-full
-                                                                {{ $statusBadge['color'] === 'green' ? 'bg-green-100 text-green-800' : '' }}
-                                                                {{ $statusBadge['color'] === 'orange' ? 'bg-orange-100 text-orange-800' : '' }}
-                                                                {{ $statusBadge['color'] === 'red' ? 'bg-red-100 text-red-800' : '' }}
-                                                                {{ $statusBadge['color'] === 'gray' ? 'bg-gray-100 text-gray-800' : '' }}
+                                                                {{ $statusBadge['color'] === 'green' ? 'bg-green-50 text-green-700 border border-green-200' : '' }}
+                                                                {{ $statusBadge['color'] === 'orange' ? 'bg-orange-50 text-orange-700 border border-orange-200' : '' }}
+                                                                {{ $statusBadge['color'] === 'red' ? 'bg-red-50 text-red-700 border border-red-200' : '' }}
+                                                                {{ $statusBadge['color'] === 'gray' ? 'bg-gray-50 text-gray-700 border border-gray-200' : '' }}
                                                             ">
                                                                 {{ $statusBadge['text'] }}
                                                             </span>

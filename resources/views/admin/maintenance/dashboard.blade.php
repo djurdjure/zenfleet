@@ -540,7 +540,7 @@
  <div class="flex items-baseline space-x-2">
  <span class="text-3xl font-bold text-red-700">{{ $stats['critical_alerts'] ?? 0 }}</span>
  @if(($stats['critical_alerts'] ?? 0) > 0)
- <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800 animate-pulse">
+ <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-50 text-red-700 border border-red-200 animate-pulse">
  <span class="w-2 h-2 bg-red-500 rounded-full mr-1"></span>
  Action requise
  </span>
@@ -735,7 +735,7 @@
  <td class="px-6 py-4">
  <div class="flex items-center">
  <div class="w-3 h-3 bg-green-400 rounded-full animate-pulse mr-3"></div>
- <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+ <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-50 text-green-700 border border-green-200">
  <x-iconify icon="lucide:activity" class="w-3 h-3 mr-1" / />
  En cours
  </span>
@@ -753,12 +753,12 @@
  </div>
  </td>
  <td class="px-6 py-4">
- <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+ <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-50 text-blue-700 border border-blue-200">
  {{ $operation->maintenanceType->name ?? 'Maintenance générale' }}
  </span>
  </td>
  <td class="px-6 py-4">
- <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+ <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-50 text-green-700 border border-green-200">
  {{ ucfirst($operation->status ?? 'en_cours') }}
  </span>
  </td>
@@ -800,19 +800,19 @@
  <div class="flex items-center">
  @if($isOverdue)
  <div class="w-3 h-3 bg-red-500 rounded-full animate-pulse mr-3"></div>
- <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">
+ <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-red-50 text-red-700 border border-red-200">
  <x-iconify icon="heroicons:exclamation-triangle" class="w-3 h-3 mr-1" / />
  Critique
  </span>
  @elseif($isUrgent)
  <div class="w-3 h-3 bg-orange-500 rounded-full animate-pulse mr-3"></div>
- <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-orange-100 text-orange-800">
+ <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-orange-50 text-orange-700 border border-orange-200">
  <x-iconify icon="heroicons:clock" class="w-3 h-3 mr-1" / />
  Urgent
  </span>
  @else
  <div class="w-3 h-3 bg-blue-500 rounded-full mr-3"></div>
- <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+ <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-50 text-blue-700 border border-blue-200">
  <x-iconify icon="heroicons:calendar" class="w-3 h-3 mr-1" / />
  Planifié
  </span>
@@ -837,15 +837,15 @@
  </td>
  <td class="px-6 py-4">
  @if($isOverdue)
- <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">
+ <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-red-50 text-red-700 border border-red-200">
  En retard
  </span>
  @elseif($isUrgent)
- <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-orange-100 text-orange-800">
+ <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-orange-50 text-orange-700 border border-orange-200">
  Urgent
  </span>
  @else
- <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+ <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-50 text-blue-700 border border-blue-200">
  Planifié
  </span>
  @endif
@@ -887,7 +887,7 @@
  <td class="px-6 py-4">
  <div class="flex items-center">
  <div class="w-3 h-3 bg-green-500 rounded-full mr-3"></div>
- <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+ <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-50 text-green-700 border border-green-200">
  <x-iconify icon="heroicons:check-circle" class="w-3 h-3 mr-1" / />
  Terminé
  </span>
@@ -905,12 +905,12 @@
  </div>
  </td>
  <td class="px-6 py-4">
- <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+ <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-50 text-green-700 border border-green-200">
  {{ ['Vidange', 'Freins', 'Pneus'][$i] }}
  </span>
  </td>
  <td class="px-6 py-4">
- <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+ <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-50 text-green-700 border border-green-200">
  Terminé
  </span>
  </td>
@@ -1044,7 +1044,7 @@
  </div>
  </div>
  <div class="flex items-center space-x-2">
- <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+ <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-50 text-red-700 border border-red-200">
  {{ ucfirst($alert->priority) }}
  </span>
  <span class="text-xs text-red-600">{{ $alert->created_at->diffForHumans() }}</span>
@@ -1098,7 +1098,7 @@
  </div>
  </td>
  <td class="px-6 py-4 whitespace-nowrap">
- <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+ <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-50 text-blue-700 border border-blue-200">
  {{ $maintenance->maintenanceType->name }}
  </span>
  </td>
@@ -1117,15 +1117,15 @@
  $isUrgent = $daysRemaining !== null && $daysRemaining >= -3 && $daysRemaining <= 0;
  @endphp
  @if($isOverdue)
- <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+ <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-50 text-red-700 border border-red-200">
  En retard
  </span>
  @elseif($isUrgent)
- <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-orange-100 text-orange-800">
+ <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-orange-50 text-orange-700 border border-orange-200">
  Urgent
  </span>
  @else
- <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+ <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-50 text-green-700 border border-green-200">
  Planifié
  </span>
  @endif

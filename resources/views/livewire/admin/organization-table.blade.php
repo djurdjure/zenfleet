@@ -18,49 +18,49 @@
         </div>
 
         <x-page-analytics-grid columns="4">
-            <div class="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-lg transition-shadow duration-300">
+            <div class="bg-blue-50 rounded-lg border border-blue-200 p-6 hover:shadow-lg transition-shadow duration-300">
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-sm font-medium text-gray-600">Total organisations</p>
                         <p class="text-2xl font-bold text-gray-900 mt-1">{{ $analytics['total'] ?? 0 }}</p>
                     </div>
-                    <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                    <div class="w-12 h-12 bg-blue-100 border border-blue-200 rounded-lg flex items-center justify-center">
                         <x-iconify icon="lucide:building-2" class="w-6 h-6 text-blue-600" />
                     </div>
                 </div>
             </div>
 
-            <div class="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-lg transition-shadow duration-300">
+            <div class="bg-green-50 rounded-lg border border-green-200 p-6 hover:shadow-lg transition-shadow duration-300">
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-sm font-medium text-gray-600">Actives</p>
                         <p class="text-2xl font-bold text-green-600 mt-1">{{ $analytics['active'] ?? 0 }}</p>
                     </div>
-                    <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                    <div class="w-12 h-12 bg-green-100 border border-green-200 rounded-lg flex items-center justify-center">
                         <x-iconify icon="lucide:check-circle" class="w-6 h-6 text-green-600" />
                     </div>
                 </div>
             </div>
 
-            <div class="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-lg transition-shadow duration-300">
+            <div class="bg-purple-50 rounded-lg border border-purple-200 p-6 hover:shadow-lg transition-shadow duration-300">
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-sm font-medium text-gray-600">Utilisateurs</p>
                         <p class="text-2xl font-bold text-purple-600 mt-1">{{ $analytics['users'] ?? 0 }}</p>
                     </div>
-                    <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+                    <div class="w-12 h-12 bg-purple-100 border border-purple-200 rounded-lg flex items-center justify-center">
                         <x-iconify icon="lucide:users" class="w-6 h-6 text-purple-600" />
                     </div>
                 </div>
             </div>
 
-            <div class="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-lg transition-shadow duration-300">
+            <div class="bg-orange-50 rounded-lg border border-orange-200 p-6 hover:shadow-lg transition-shadow duration-300">
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-sm font-medium text-gray-600">Véhicules</p>
                         <p class="text-2xl font-bold text-orange-600 mt-1">{{ $analytics['vehicles'] ?? 0 }}</p>
                     </div>
-                    <div class="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
+                    <div class="w-12 h-12 bg-orange-100 border border-orange-200 rounded-lg flex items-center justify-center">
                         <x-iconify icon="lucide:car" class="w-6 h-6 text-orange-600" />
                     </div>
                 </div>
@@ -105,7 +105,7 @@
                     <x-iconify icon="lucide:filter" class="w-5 h-5 text-gray-500" />
                     <x-iconify icon="heroicons:chevron-down" class="w-4 h-4 text-gray-400 transition-transform duration-200" x-bind:class="showFilters ? 'rotate-180' : ''" />
                     @if($activeCount > 0)
-                        <span class="ml-1 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-blue-100 text-blue-800">
+                        <span class="ml-1 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-200">
                             {{ $activeCount }}
                         </span>
                     @endif
@@ -276,11 +276,11 @@
                                 @can('organizations.update')
                                     <button wire:click="toggleStatus({{ $org->id }})"
                                         class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium {{ match($org->status) {
-                                            'active' => 'bg-green-100 text-green-800',
-                                            'pending' => 'bg-yellow-100 text-yellow-800',
-                                            'inactive' => 'bg-gray-100 text-gray-800',
-                                            'suspended' => 'bg-red-100 text-red-800',
-                                            default => 'bg-gray-100 text-gray-800'
+                                            'active' => 'bg-green-50 text-green-700 border border-green-200',
+                                            'pending' => 'bg-yellow-50 text-yellow-700 border border-yellow-200',
+                                            'inactive' => 'bg-gray-50 text-gray-700 border border-gray-200',
+                                            'suspended' => 'bg-red-50 text-red-700 border border-red-200',
+                                            default => 'bg-gray-50 text-gray-700 border border-gray-200'
                                         } }}">
                                         <span class="w-1.5 h-1.5 rounded-full {{ match($org->status) {
                                             'active' => 'bg-green-500',
@@ -299,11 +299,11 @@
                                     </button>
                                 @else
                                     <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium {{ match($org->status) {
-                                        'active' => 'bg-green-100 text-green-800',
-                                        'pending' => 'bg-yellow-100 text-yellow-800',
-                                        'inactive' => 'bg-gray-100 text-gray-800',
-                                        'suspended' => 'bg-red-100 text-red-800',
-                                        default => 'bg-gray-100 text-gray-800'
+                                        'active' => 'bg-green-50 text-green-700 border border-green-200',
+                                        'pending' => 'bg-yellow-50 text-yellow-700 border border-yellow-200',
+                                        'inactive' => 'bg-gray-50 text-gray-700 border border-gray-200',
+                                        'suspended' => 'bg-red-50 text-red-700 border border-red-200',
+                                        default => 'bg-gray-50 text-gray-700 border border-gray-200'
                                     } }}">
                                         <span class="w-1.5 h-1.5 rounded-full {{ match($org->status) {
                                             'active' => 'bg-green-500',

@@ -233,7 +233,7 @@
                             {{ $permission->description ?? 'Permission: ' . $permission->name }}
                         </p>
                         <div class="mt-2">
-                            <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-indigo-100 text-indigo-800">
+                            <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-indigo-50 text-indigo-700 border border-indigo-200">
                                 {{ $permission->name }}
                             </span>
                         </div>

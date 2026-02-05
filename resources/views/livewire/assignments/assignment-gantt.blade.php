@@ -198,7 +198,7 @@
                             </div>
                             <div class="ml-2 flex-shrink-0">
                                 <span class="inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-medium
- {{ $resource['available'] ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }}">
+ {{ $resource['available'] ? 'bg-green-50 text-green-700 border border-green-200' : 'bg-red-50 text-red-700 border border-red-200' }}">
                                     {{ $resource['available'] ? 'Disponible' : 'Occupé' }}
                                 </span>
                             </div>

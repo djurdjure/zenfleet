@@ -37,7 +37,7 @@
             {{-- Indicateurs de résultats et performance --}}
             <div class="absolute inset-y-0 right-2 flex items-center gap-2">
                 @if($search)
-                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-50 text-blue-700 border border-blue-200">
                         {{ $stats['filtered'] ?? 0 }} résultat(s)
                     </span>
                 @endif
@@ -860,10 +860,10 @@
                                         }
                                         
                                         $statusConfig = [
-                                            'scheduled' => ['badge' => 'bg-purple-100 text-purple-800 border-purple-200', 'icon' => 'lucide:clock', 'label' => 'Planifiée', 'pulse' => false],
-                                            'active' => ['badge' => 'bg-green-100 text-green-800 border-green-200', 'icon' => 'lucide:play-circle', 'label' => 'Active', 'pulse' => true],
-                                            'completed' => ['badge' => 'bg-blue-100 text-blue-800 border-blue-200', 'icon' => 'lucide:check-circle-2', 'label' => 'Terminée', 'pulse' => false],
-                                            'cancelled' => ['badge' => 'bg-red-100 text-red-800 border-red-200', 'icon' => 'lucide:x-circle', 'label' => 'Annulée', 'pulse' => false],
+                                            'scheduled' => ['badge' => 'bg-purple-50 text-purple-700 border border-purple-200 border-purple-200', 'icon' => 'lucide:clock', 'label' => 'Planifiée', 'pulse' => false],
+                                            'active' => ['badge' => 'bg-green-50 text-green-700 border border-green-200 border-green-200', 'icon' => 'lucide:play-circle', 'label' => 'Active', 'pulse' => true],
+                                            'completed' => ['badge' => 'bg-blue-50 text-blue-700 border border-blue-200 border-blue-200', 'icon' => 'lucide:check-circle-2', 'label' => 'Terminée', 'pulse' => false],
+                                            'cancelled' => ['badge' => 'bg-red-50 text-red-700 border border-red-200 border-red-200', 'icon' => 'lucide:x-circle', 'label' => 'Annulée', 'pulse' => false],
                                         ];
                                         $config = $statusConfig[$status];
                                     @endphp

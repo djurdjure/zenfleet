@@ -274,7 +274,7 @@
  <p class="text-xs text-gray-600">{{ $vehicle->brand }} {{ $vehicle->model }}</p>
  </div>
  <div class="text-right">
- <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+ <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-50 text-green-700 border border-green-200">
  {{ $vehicle->vehicleStatus->name ?? 'Disponible' }}
  </span>
  <p class="text-xs text-gray-500 mt-1">{{ number_format($vehicle->current_mileage) }} km</p>

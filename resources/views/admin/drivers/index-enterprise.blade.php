@@ -359,7 +359,7 @@
  <i class="fas fa-id-badge mr-1"></i>{{ $driver->employee_number ?? 'N/A' }}
  </div>
  @if($driver->user)
- <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 mt-1">
+ <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-50 text-green-700 border border-green-200 mt-1">
  <i class="fas fa-user-check mr-1"></i>Compte actif
  </span>
  @endif
@@ -421,7 +421,7 @@
  $daysUntilExpiry = now()->diffInDays($driver->license_expiry_date, false);
  @endphp
  @if($daysUntilExpiry < 30)
- <span class="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-red-100 text-red-800">
+ <span class="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-red-50 text-red-700 border border-red-200">
  <i class="fas fa-exclamation-triangle mr-1"></i>
  Expire {{ $daysUntilExpiry > 0 ? "dans $daysUntilExpiry jours" : 'Expiré' }}
  </span>

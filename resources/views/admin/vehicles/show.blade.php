@@ -37,7 +37,7 @@
                         <x-iconify icon="ph:file-pdf" class="text-sm" /> Exporter PDF
                     </a>
                     @can('vehicles.update')
-                    <a href="{{ route('admin.vehicles.edit', $vehicle) }}" class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-gray-100 text-gray-800 rounded-lg hover:bg-gray-200 transition-colors">
+                    <a href="{{ route('admin.vehicles.edit', $vehicle) }}" class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-gray-50 text-gray-700 border border-gray-200 rounded-lg hover:bg-gray-200 transition-colors">
                         <x-iconify icon="ph:pencil-simple" class="text-sm" /> Modifier
                     </a>
                     @endcan
@@ -239,9 +239,9 @@
                                     <td class="py-2">{{ $assignment->end_datetime ? $assignment->end_datetime->format('d/m/Y') : '-' }}</td>
                                     <td class="py-2 text-center">
                                         @if(!$assignment->end_datetime)
-                                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">En cours</span>
+                                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-50 text-green-700 border border-green-200">En cours</span>
                                         @else
-                                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">Terminée</span>
+                                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gray-50 text-gray-700 border border-gray-200">Terminée</span>
                                         @endif
                                     </td>
                                 </tr>

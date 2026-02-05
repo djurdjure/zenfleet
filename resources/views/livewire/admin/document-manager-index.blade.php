@@ -27,49 +27,49 @@
             STATS GRID
         =============================================== --}}
         <x-page-analytics-grid columns="4">
-            <div class="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-lg transition-shadow duration-300">
+            <div class="bg-blue-50 rounded-lg border border-blue-200 p-6 hover:shadow-lg transition-shadow duration-300">
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-sm font-medium text-gray-600">Total Documents</p>
                         <p class="text-2xl font-bold text-gray-900 mt-1">{{ $stats['total'] }}</p>
                     </div>
-                    <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                    <div class="w-12 h-12 bg-blue-100 border border-blue-200 rounded-lg flex items-center justify-center">
                         <x-iconify icon="lucide:files" class="w-6 h-6 text-blue-600" />
                     </div>
                 </div>
             </div>
 
-            <div class="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-lg transition-shadow duration-300">
+            <div class="bg-green-50 rounded-lg border border-green-200 p-6 hover:shadow-lg transition-shadow duration-300">
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-sm font-medium text-gray-600">Validés</p>
                         <p class="text-2xl font-bold text-green-600 mt-1">{{ $stats['validated'] }}</p>
                     </div>
-                    <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                    <div class="w-12 h-12 bg-green-100 border border-green-200 rounded-lg flex items-center justify-center">
                         <x-iconify icon="lucide:check-circle" class="w-6 h-6 text-green-600" />
                     </div>
                 </div>
             </div>
 
-            <div class="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-lg transition-shadow duration-300">
+            <div class="bg-gray-50 rounded-lg border border-gray-200 p-6 hover:shadow-lg transition-shadow duration-300">
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-sm font-medium text-gray-600">Brouillons</p>
                         <p class="text-2xl font-bold text-gray-900 mt-1">{{ $stats['draft'] }}</p>
                     </div>
-                    <div class="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center">
+                    <div class="w-12 h-12 bg-gray-100 border border-gray-200 rounded-lg flex items-center justify-center">
                         <x-iconify icon="lucide:file-edit" class="w-6 h-6 text-gray-600" />
                     </div>
                 </div>
             </div>
 
-            <div class="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-lg transition-shadow duration-300">
+            <div class="bg-amber-50 rounded-lg border border-amber-200 p-6 hover:shadow-lg transition-shadow duration-300">
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-sm font-medium text-gray-600">Archivés</p>
                         <p class="text-2xl font-bold text-amber-600 mt-1">{{ $stats['archived'] }}</p>
                     </div>
-                    <div class="w-12 h-12 bg-amber-100 rounded-lg flex items-center justify-center">
+                    <div class="w-12 h-12 bg-amber-100 border border-amber-200 rounded-lg flex items-center justify-center">
                         <x-iconify icon="lucide:archive" class="w-6 h-6 text-amber-600" />
                     </div>
                 </div>
@@ -187,7 +187,7 @@
                                 </div>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
-                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-50 text-gray-700 border border-gray-200">
                                     {{ $document->category->name }}
                                 </span>
                             </td>
@@ -206,10 +206,10 @@
                             <td class="px-6 py-4 whitespace-nowrap text-center">
                                 @php
                                 $colors = [
-                                'draft' => 'bg-gray-100 text-gray-800',
-                                'validated' => 'bg-green-100 text-green-800',
-                                'archived' => 'bg-amber-100 text-amber-800',
-                                'expired' => 'bg-red-100 text-red-800',
+                                'draft' => 'bg-gray-50 text-gray-700 border border-gray-200',
+                                'validated' => 'bg-green-50 text-green-700 border border-green-200',
+                                'archived' => 'bg-amber-50 text-amber-700 border border-amber-200',
+                                'expired' => 'bg-red-50 text-red-700 border border-red-200',
                                 ];
                                 $statusLabels = [
                                 'draft' => 'Brouillon',
@@ -218,7 +218,7 @@
                                 'expired' => 'Expiré',
                                 ];
                                 @endphp
-                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $colors[$document->status] ?? 'bg-gray-100 text-gray-800' }}">
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $colors[$document->status] ?? 'bg-gray-50 text-gray-700 border border-gray-200' }}">
                                     {{ $statusLabels[$document->status] ?? ucfirst($document->status) }}
                                 </span>
                             </td>

@@ -104,52 +104,52 @@
         {{-- CARDS MÉTRIQUES ULTRA-PRO --}}
         <x-page-analytics-grid columns="4">
             {{-- Total Chauffeurs --}}
-            <div class="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-lg transition-shadow duration-300">
+            <div class="bg-blue-50 rounded-lg border border-blue-200 p-6 hover:shadow-lg transition-shadow duration-300">
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-sm font-medium text-gray-600">Total chauffeurs</p>
                         <p class="text-2xl font-bold text-gray-900 mt-1">{{ $analytics['total_drivers'] }}</p>
                     </div>
-                    <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                    <div class="w-12 h-12 bg-blue-100 border border-blue-200 rounded-lg flex items-center justify-center">
                         <x-iconify icon="lucide:users" class="w-6 h-6 text-blue-600" />
                     </div>
                 </div>
             </div>
 
             {{-- Disponibles --}}
-            <div class="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-lg transition-shadow duration-300">
+            <div class="bg-green-50 rounded-lg border border-green-200 p-6 hover:shadow-lg transition-shadow duration-300">
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-sm font-medium text-gray-600">Disponibles</p>
                         <p class="text-2xl font-bold text-green-600 mt-1">{{ $analytics['available_drivers'] }}</p>
                     </div>
-                    <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                    <div class="w-12 h-12 bg-green-100 border border-green-200 rounded-lg flex items-center justify-center">
                         <x-iconify icon="lucide:user-check" class="w-6 h-6 text-green-600" />
                     </div>
                 </div>
             </div>
 
             {{-- En Mission --}}
-            <div class="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-lg transition-shadow duration-300">
+            <div class="bg-orange-50 rounded-lg border border-orange-200 p-6 hover:shadow-lg transition-shadow duration-300">
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-sm font-medium text-gray-600">En mission</p>
                         <p class="text-2xl font-bold text-orange-600 mt-1">{{ $analytics['active_drivers'] }}</p>
                     </div>
-                    <div class="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
+                    <div class="w-12 h-12 bg-orange-100 border border-orange-200 rounded-lg flex items-center justify-center">
                         <x-iconify icon="lucide:briefcase" class="w-6 h-6 text-orange-600" />
                     </div>
                 </div>
             </div>
 
             {{-- En Repos --}}
-            <div class="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-lg transition-shadow duration-300">
+            <div class="bg-amber-50 rounded-lg border border-amber-200 p-6 hover:shadow-lg transition-shadow duration-300">
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-sm font-medium text-gray-600">En repos</p>
                         <p class="text-2xl font-bold text-amber-600 mt-1">{{ $analytics['resting_drivers'] }}</p>
                     </div>
-                    <div class="w-12 h-12 bg-amber-100 rounded-lg flex items-center justify-center">
+                    <div class="w-12 h-12 bg-amber-100 border border-amber-200 rounded-lg flex items-center justify-center">
                         <x-iconify icon="lucide:pause-circle" class="w-6 h-6 text-amber-600" />
                     </div>
                 </div>
@@ -432,13 +432,13 @@
                                 @if(!empty($driver->license_categories))
                                 <div class="flex flex-wrap gap-1 mt-1">
                                     @foreach($driver->license_categories as $cat)
-                                    <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-blue-100 text-blue-800">
+                                    <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-blue-50 text-blue-700 border border-blue-200">
                                         {{ $cat }}
                                     </span>
                                     @endforeach
                                 </div>
                                 @elseif($driver->license_category)
-                                <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-blue-100 text-blue-800">
+                                <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-blue-50 text-blue-700 border border-blue-200">
                                     {{ $driver->license_category }}
                                 </span>
                                 @endif

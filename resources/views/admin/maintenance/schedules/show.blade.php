@@ -165,12 +165,12 @@
  <div class="detail-card rounded-lg p-6">
  <h3 class="text-lg font-semibold text-gray-900 mb-4">Statut</h3>
  @if($schedule->is_active)
- <span class="badge-status bg-green-100 text-green-800">
+ <span class="badge-status bg-green-50 text-green-700 border border-green-200">
  <i class="fas fa-check-circle mr-2"></i>
  Active
  </span>
  @else
- <span class="badge-status bg-gray-100 text-gray-800">
+ <span class="badge-status bg-gray-50 text-gray-700 border border-gray-200">
  <i class="fas fa-pause-circle mr-2"></i>
  Inactive
  </span>

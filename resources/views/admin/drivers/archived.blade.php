@@ -87,7 +87,7 @@
         =============================================== --}}
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-6">
             {{-- Total Archivés --}}
-            <div class="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-lg transition-shadow duration-300">
+            <div class="bg-amber-50 rounded-lg border border-amber-200 p-6 hover:shadow-lg transition-shadow duration-300">
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-sm font-medium text-gray-600">Total archivés</p>
@@ -95,14 +95,14 @@
                             {{ $stats['total_archived'] }}
                         </p>
                     </div>
-                    <div class="w-12 h-12 bg-amber-100 rounded-lg flex items-center justify-center">
+                    <div class="w-12 h-12 bg-amber-100 border border-amber-200 rounded-lg flex items-center justify-center">
                         <x-iconify icon="lucide:archive" class="w-6 h-6 text-amber-600" />
                     </div>
                 </div>
             </div>
 
             {{-- Ce Mois --}}
-            <div class="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-lg transition-shadow duration-300">
+            <div class="bg-orange-50 rounded-lg border border-orange-200 p-6 hover:shadow-lg transition-shadow duration-300">
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-sm font-medium text-gray-600">Ce mois</p>
@@ -110,14 +110,14 @@
                             {{ $stats['archived_this_month'] }}
                         </p>
                     </div>
-                    <div class="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
+                    <div class="w-12 h-12 bg-orange-100 border border-orange-200 rounded-lg flex items-center justify-center">
                         <x-iconify icon="lucide:calendar" class="w-6 h-6 text-orange-600" />
                     </div>
                 </div>
             </div>
 
             {{-- Cette Année --}}
-            <div class="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-lg transition-shadow duration-300">
+            <div class="bg-red-50 rounded-lg border border-red-200 p-6 hover:shadow-lg transition-shadow duration-300">
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-sm font-medium text-gray-600">Cette année</p>
@@ -125,14 +125,14 @@
                             {{ $stats['archived_this_year'] }}
                         </p>
                     </div>
-                    <div class="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center">
+                    <div class="w-12 h-12 bg-red-100 border border-red-200 rounded-lg flex items-center justify-center">
                         <x-iconify icon="lucide:trending-down" class="w-6 h-6 text-red-600" />
                     </div>
                 </div>
             </div>
 
             {{-- Sélectionnés --}}
-            <div class="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-lg transition-shadow duration-300">
+            <div class="bg-purple-50 rounded-lg border border-purple-200 p-6 hover:shadow-lg transition-shadow duration-300">
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-sm font-medium text-gray-600">Sélectionnés</p>
@@ -140,14 +140,14 @@
                             0
                         </p>
                     </div>
-                    <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+                    <div class="w-12 h-12 bg-purple-100 border border-purple-200 rounded-lg flex items-center justify-center">
                         <x-iconify icon="lucide:check-square" class="w-6 h-6 text-purple-600" />
                     </div>
                 </div>
             </div>
 
             {{-- Ancienneté Moyenne --}}
-            <div class="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-lg transition-shadow duration-300">
+            <div class="bg-blue-50 rounded-lg border border-blue-200 p-6 hover:shadow-lg transition-shadow duration-300">
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-sm font-medium text-gray-600">Ancienneté moy.</p>
@@ -155,7 +155,7 @@
                             {{ number_format($stats['avg_seniority'], 1) }} ans
                         </p>
                     </div>
-                    <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                    <div class="w-12 h-12 bg-blue-100 border border-blue-200 rounded-lg flex items-center justify-center">
                         <x-iconify icon="lucide:clock" class="w-6 h-6 text-blue-600" />
                     </div>
                 </div>
@@ -197,7 +197,7 @@
                         $activeFiltersCount = count(array_filter(request()->only(['archived_from', 'archived_to', 'status_id', 'search'])));
                     @endphp
                     @if($activeFiltersCount > 0)
-                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-50 text-blue-700 border border-blue-200">
                             {{ $activeFiltersCount }}
                         </span>
                     @endif
@@ -366,7 +366,7 @@
 
                                 {{-- Matricule --}}
                                 <td class="px-6 py-4 whitespace-nowrap">
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-800">
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-50 text-amber-700 border border-amber-200">
                                         {{ $driver->employee_number ?? 'N/A' }}
                                     </span>
                                 </td>
@@ -374,11 +374,11 @@
                                 {{-- Statut --}}
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     @if($driver->driverStatus)
-                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-50 text-gray-700 border border-gray-200">
                                             {{ $driver->driverStatus->name }}
                                         </span>
                                     @else
-                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-50 text-gray-700 border border-gray-200">
                                             N/A
                                         </span>
                                     @endif

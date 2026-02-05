@@ -18,97 +18,97 @@
         </div>
 
         <x-page-analytics-grid columns="4">
-            <div class="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-lg transition-shadow duration-300">
+            <div class="bg-gray-50 rounded-lg border border-gray-200 p-6 hover:shadow-lg transition-shadow duration-300">
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-sm font-medium text-gray-600">Total</p>
                         <p class="text-2xl font-bold text-gray-900 mt-1">{{ $statistics['total'] ?? 0 }}</p>
                     </div>
-                    <div class="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center">
+                    <div class="w-12 h-12 bg-gray-100 border border-gray-200 rounded-lg flex items-center justify-center">
                         <x-iconify icon="lucide:clipboard-list" class="w-6 h-6 text-gray-600" />
                     </div>
                 </div>
             </div>
 
-            <div class="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-lg transition-shadow duration-300">
+            <div class="bg-amber-50 rounded-lg border border-amber-200 p-6 hover:shadow-lg transition-shadow duration-300">
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-sm font-medium text-amber-600">En attente</p>
                         <p class="text-2xl font-bold text-gray-900 mt-1">{{ $statistics['pending'] ?? 0 }}</p>
                     </div>
-                    <div class="w-12 h-12 bg-amber-100 rounded-lg flex items-center justify-center">
+                    <div class="w-12 h-12 bg-amber-100 border border-amber-200 rounded-lg flex items-center justify-center">
                         <x-iconify icon="lucide:clock" class="w-6 h-6 text-amber-600" />
                     </div>
                 </div>
             </div>
 
-            <div class="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-lg transition-shadow duration-300">
+            <div class="bg-green-50 rounded-lg border border-green-200 p-6 hover:shadow-lg transition-shadow duration-300">
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-sm font-medium text-green-600">Approuvées</p>
                         <p class="text-2xl font-bold text-gray-900 mt-1">{{ $statistics['approved'] ?? 0 }}</p>
                     </div>
-                    <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                    <div class="w-12 h-12 bg-green-100 border border-green-200 rounded-lg flex items-center justify-center">
                         <x-iconify icon="lucide:check-circle" class="w-6 h-6 text-green-600" />
                     </div>
                 </div>
             </div>
 
-            <div class="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-lg transition-shadow duration-300">
+            <div class="bg-red-50 rounded-lg border border-red-200 p-6 hover:shadow-lg transition-shadow duration-300">
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-sm font-medium text-red-600">Rejetées</p>
                         <p class="text-2xl font-bold text-gray-900 mt-1">{{ $statistics['rejected'] ?? 0 }}</p>
                     </div>
-                    <div class="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center">
+                    <div class="w-12 h-12 bg-red-100 border border-red-200 rounded-lg flex items-center justify-center">
                         <x-iconify icon="lucide:x-circle" class="w-6 h-6 text-red-600" />
                     </div>
                 </div>
             </div>
 
-            <div class="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-lg transition-shadow duration-300">
+            <div class="bg-red-50 rounded-lg border border-red-200 p-6 hover:shadow-lg transition-shadow duration-300">
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-sm font-medium text-red-600">Critiques</p>
                         <p class="text-2xl font-bold text-gray-900 mt-1">{{ $statistics['critical'] ?? 0 }}</p>
                     </div>
-                    <div class="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center">
+                    <div class="w-12 h-12 bg-red-100 border border-red-200 rounded-lg flex items-center justify-center">
                         <x-iconify icon="lucide:alert-triangle" class="w-6 h-6 text-red-600" />
                     </div>
                 </div>
             </div>
 
-            <div class="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-lg transition-shadow duration-300">
+            <div class="bg-orange-50 rounded-lg border border-orange-200 p-6 hover:shadow-lg transition-shadow duration-300">
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-sm font-medium text-orange-600">Urgentes</p>
                         <p class="text-2xl font-bold text-gray-900 mt-1">{{ $statistics['high'] ?? 0 }}</p>
                     </div>
-                    <div class="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
+                    <div class="w-12 h-12 bg-orange-100 border border-orange-200 rounded-lg flex items-center justify-center">
                         <x-iconify icon="lucide:zap" class="w-6 h-6 text-orange-600" />
                     </div>
                 </div>
             </div>
 
-            <div class="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-lg transition-shadow duration-300">
+            <div class="bg-blue-50 rounded-lg border border-blue-200 p-6 hover:shadow-lg transition-shadow duration-300">
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-sm font-medium text-blue-600">Aujourd'hui</p>
                         <p class="text-2xl font-bold text-gray-900 mt-1">{{ $statistics['today'] ?? 0 }}</p>
                     </div>
-                    <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                    <div class="w-12 h-12 bg-blue-100 border border-blue-200 rounded-lg flex items-center justify-center">
                         <x-iconify icon="lucide:calendar" class="w-6 h-6 text-blue-600" />
                     </div>
                 </div>
             </div>
 
-            <div class="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-lg transition-shadow duration-300">
+            <div class="bg-indigo-50 rounded-lg border border-indigo-200 p-6 hover:shadow-lg transition-shadow duration-300">
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-sm font-medium text-indigo-600">Cette semaine</p>
                         <p class="text-2xl font-bold text-gray-900 mt-1">{{ $statistics['week'] ?? 0 }}</p>
                     </div>
-                    <div class="w-12 h-12 bg-indigo-100 rounded-lg flex items-center justify-center">
+                    <div class="w-12 h-12 bg-indigo-100 border border-indigo-200 rounded-lg flex items-center justify-center">
                         <x-iconify icon="lucide:bar-chart-2" class="w-6 h-6 text-indigo-600" />
                     </div>
                 </div>
@@ -156,7 +156,7 @@
                     <x-iconify icon="lucide:filter" class="w-5 h-5 text-gray-500" />
                     <x-iconify icon="heroicons:chevron-down" class="w-4 h-4 text-gray-400 transition-transform duration-200" x-bind:class="showFilters ? 'rotate-180' : ''" />
                     @if($activeCount > 0)
-                        <span class="ml-1 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-blue-100 text-blue-800">
+                        <span class="ml-1 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-200">
                             {{ $activeCount }}
                         </span>
                     @endif
@@ -430,7 +430,7 @@
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 @if($request->category)
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">{{ $request->category->name }}</span>
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-50 text-gray-700 border border-gray-200">{{ $request->category->name }}</span>
                                 @else
                                     <span class="text-xs text-gray-500">-</span>
                                 @endif
@@ -439,11 +439,11 @@
                                 @php
                                     $urgencyConfig = $urgencyLevels[$request->urgency] ?? $urgencyLevels['normal'];
                                     $colorClass = match($urgencyConfig['color']) {
-                                        'green' => 'bg-green-100 text-green-800',
-                                        'blue' => 'bg-blue-100 text-blue-800',
-                                        'orange' => 'bg-orange-100 text-orange-800',
-                                        'red' => 'bg-red-100 text-red-800',
-                                        default => 'bg-gray-100 text-gray-800'
+                                        'green' => 'bg-green-50 text-green-700 border border-green-200',
+                                        'blue' => 'bg-blue-50 text-blue-700 border border-blue-200',
+                                        'orange' => 'bg-orange-50 text-orange-700 border border-orange-200',
+                                        'red' => 'bg-red-50 text-red-700 border border-red-200',
+                                        default => 'bg-gray-50 text-gray-700 border border-gray-200'
                                     };
                                 @endphp
                                 <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $colorClass }}">
@@ -465,12 +465,12 @@
                                 @php
                                     $statusConfig = $statuses[$request->status] ?? ['label' => 'Inconnu', 'color' => 'gray'];
                                     $statusColorClass = match($statusConfig['color']) {
-                                        'yellow' => 'bg-yellow-100 text-yellow-800',
-                                        'blue' => 'bg-blue-100 text-blue-800',
-                                        'orange' => 'bg-orange-100 text-orange-800',
-                                        'green' => 'bg-green-100 text-green-800',
-                                        'red' => 'bg-red-100 text-red-800',
-                                        default => 'bg-gray-100 text-gray-800'
+                                        'yellow' => 'bg-yellow-50 text-yellow-700 border border-yellow-200',
+                                        'blue' => 'bg-blue-50 text-blue-700 border border-blue-200',
+                                        'orange' => 'bg-orange-50 text-orange-700 border border-orange-200',
+                                        'green' => 'bg-green-50 text-green-700 border border-green-200',
+                                        'red' => 'bg-red-50 text-red-700 border border-red-200',
+                                        default => 'bg-gray-50 text-gray-700 border border-gray-200'
                                     };
                                 @endphp
                                 <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $statusColorClass }}">{{ $statusConfig['label'] }}</span>

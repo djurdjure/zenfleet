@@ -22,7 +22,7 @@
  <div>
  <div class="font-semibold text-gray-900">{{ $driver->user->name ?? 'N/A' }}</div>
  <div class="text-sm text-gray-600">{{ $driver->user->email ?? 'N/A' }}</div>
- <span class="inline-flex items-center px-2 py-1 mt-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+ <span class="inline-flex items-center px-2 py-1 mt-1 rounded-full text-xs font-medium bg-green-50 text-green-700 border border-green-200">
  <i class="fas fa-link mr-1"></i> Compte Actif
  </span>
  </div>

@@ -343,7 +343,7 @@
                     <x-iconify icon="lucide:filter" class="w-4 h-4" />
                     Filtres avancés
                     @if(request()->hasAny(['status', 'maintenance_type_id', 'provider_id', 'category', 'date_from', 'date_to']))
-                    <span class="bg-blue-100 text-blue-800 text-xs font-semibold px-2 py-0.5 rounded-full">
+                    <span class="bg-blue-50 text-blue-700 border border-blue-200 text-xs font-semibold px-2 py-0.5 rounded-full">
                         Actifs
                     </span>
                     @endif

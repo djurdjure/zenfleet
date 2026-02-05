@@ -173,7 +173,7 @@
                         {{-- Statut --}}
                         <div>
                             <label class="block text-sm font-medium text-gray-600 mb-1">Statut</label>
-                            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium {{ $depot->is_active ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800' }}">
+                            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium {{ $depot->is_active ? 'bg-green-50 text-green-700 border border-green-200' : 'bg-gray-50 text-gray-700 border border-gray-200' }}">
                                 <x-iconify icon="lucide:{{ $depot->is_active ? 'check-circle' : 'x-circle' }}" class="w-4 h-4 mr-1" />
                                 {{ $depot->is_active ? 'Actif' : 'Inactif' }}
                             </span>
@@ -366,9 +366,9 @@
                                     </td>
                                     <td class="px-4 py-3 whitespace-nowrap">
                                         <span class="inline-flex px-2 py-1 text-xs font-medium rounded-full
-                                            {{ $history->action === 'assigned' ? 'bg-green-100 text-green-800' : '' }}
-                                            {{ $history->action === 'transferred' ? 'bg-blue-100 text-blue-800' : '' }}
-                                            {{ $history->action === 'unassigned' ? 'bg-red-100 text-red-800' : '' }}">
+                                            {{ $history->action === 'assigned' ? 'bg-green-50 text-green-700 border border-green-200' : '' }}
+                                            {{ $history->action === 'transferred' ? 'bg-blue-50 text-blue-700 border border-blue-200' : '' }}
+                                            {{ $history->action === 'unassigned' ? 'bg-red-50 text-red-700 border border-red-200' : '' }}">
                                             {{ ucfirst($history->action) }}
                                         </span>
                                     </td>

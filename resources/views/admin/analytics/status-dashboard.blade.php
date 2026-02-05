@@ -194,7 +194,7 @@
                                     <span class="font-medium text-blue-600">{{ $stat['to'] }}</span>
                                 </div>
                             </div>
-                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-50 text-blue-700 border border-blue-200">
                                 {{ $stat['count'] }}
                             </span>
                         </div>
@@ -214,7 +214,7 @@
                     @forelse($topVehiclesChanges as $vehicle)
                         <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                             <div class="text-sm font-medium text-gray-900">{{ $vehicle['vehicle_name'] }}</div>
-                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-orange-100 text-orange-800">
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-orange-50 text-orange-700 border border-orange-200">
                                 {{ $vehicle['changes_count'] }} changements
                             </span>
                         </div>
@@ -264,7 +264,7 @@
                                     {{ $change['changed_at'] }}
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap">
-                                    <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium {{ $change['change_type'] === 'manual' ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800' }}">
+                                    <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium {{ $change['change_type'] === 'manual' ? 'bg-blue-50 text-blue-700 border border-blue-200' : 'bg-green-50 text-green-700 border border-green-200' }}">
                                         {{ ucfirst($change['change_type']) }}
                                     </span>
                                 </td>

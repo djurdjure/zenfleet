@@ -65,7 +65,7 @@
         <x-page-analytics-grid columns="5">
 
             {{-- 1. Total Relevés --}}
-            <div class="bg-white rounded-lg border border-gray-200 p-4 hover:shadow-lg transition-shadow duration-300">
+            <div class="bg-blue-50 rounded-lg border border-blue-200 p-4 hover:shadow-lg transition-shadow duration-300">
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-xs font-medium text-gray-600">Total relevés</p>
@@ -88,14 +88,14 @@
                             @endif
                         </p>
                     </div>
-                    <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                    <div class="w-10 h-10 bg-blue-100 border border-blue-200 rounded-lg flex items-center justify-center">
                         <x-iconify icon="lucide:gauge" class="w-5 h-5 text-blue-600" />
                     </div>
                 </div>
             </div>
 
             {{-- 2. Véhicules Suivis --}}
-            <div class="bg-white rounded-lg border border-gray-200 p-4 hover:shadow-lg transition-shadow duration-300">
+            <div class="bg-orange-50 rounded-lg border border-orange-200 p-4 hover:shadow-lg transition-shadow duration-300">
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-xs font-medium text-gray-600">Véhicules</p>
@@ -106,14 +106,14 @@
                             Actifs
                         </p>
                     </div>
-                    <div class="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center">
+                    <div class="w-10 h-10 bg-orange-100 border border-orange-200 rounded-lg flex items-center justify-center">
                         <x-iconify icon="lucide:car" class="w-5 h-5 text-orange-600" />
                     </div>
                 </div>
             </div>
 
             {{-- 3. Relevés Manuels --}}
-            <div class="bg-white rounded-lg border border-gray-200 p-4 hover:shadow-lg transition-shadow duration-300">
+            <div class="bg-green-50 rounded-lg border border-green-200 p-4 hover:shadow-lg transition-shadow duration-300">
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-xs font-medium text-gray-600">Manuels</p>
@@ -124,14 +124,14 @@
                             {{ $analytics['method_distribution']['manual_percentage'] ?? 0 }}%
                         </p>
                     </div>
-                    <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
+                    <div class="w-10 h-10 bg-green-100 border border-green-200 rounded-lg flex items-center justify-center">
                         <x-iconify icon="lucide:hand" class="w-5 h-5 text-green-600" />
                     </div>
                 </div>
             </div>
 
             {{-- 4. Relevés Automatiques --}}
-            <div class="bg-white rounded-lg border border-gray-200 p-4 hover:shadow-lg transition-shadow duration-300">
+            <div class="bg-purple-50 rounded-lg border border-purple-200 p-4 hover:shadow-lg transition-shadow duration-300">
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-xs font-medium text-gray-600">Automatiques</p>
@@ -142,14 +142,14 @@
                             {{ $analytics['method_distribution']['automatic_percentage'] ?? 0 }}%
                         </p>
                     </div>
-                    <div class="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
+                    <div class="w-10 h-10 bg-purple-100 border border-purple-200 rounded-lg flex items-center justify-center">
                         <x-iconify icon="lucide:cpu" class="w-5 h-5 text-purple-600" />
                     </div>
                 </div>
             </div>
 
             {{-- 5. KM Total Parcouru --}}
-            <div class="bg-white rounded-lg border border-gray-200 p-4 hover:shadow-lg transition-shadow duration-300">
+            <div class="bg-indigo-50 rounded-lg border border-indigo-200 p-4 hover:shadow-lg transition-shadow duration-300">
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-xs font-medium text-gray-600">KM Total</p>
@@ -164,14 +164,14 @@
                             Parcourus
                         </p>
                     </div>
-                    <div class="w-10 h-10 bg-indigo-100 rounded-lg flex items-center justify-center">
+                    <div class="w-10 h-10 bg-indigo-100 border border-indigo-200 rounded-lg flex items-center justify-center">
                         <x-iconify icon="lucide:route" class="w-5 h-5 text-indigo-600" />
                     </div>
                 </div>
             </div>
 
             {{-- 6. Moyenne Journalière --}}
-            <div class="bg-white rounded-lg border border-gray-200 p-4 hover:shadow-lg transition-shadow duration-300">
+            <div class="bg-teal-50 rounded-lg border border-teal-200 p-4 hover:shadow-lg transition-shadow duration-300">
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-xs font-medium text-gray-600">Moy./jour</p>
@@ -182,7 +182,7 @@
                             km (30j)
                         </p>
                     </div>
-                    <div class="w-10 h-10 bg-teal-100 rounded-lg flex items-center justify-center">
+                    <div class="w-10 h-10 bg-teal-100 border border-teal-200 rounded-lg flex items-center justify-center">
                         <x-iconify icon="lucide:calendar-range" class="w-5 h-5 text-teal-600" />
                     </div>
                 </div>

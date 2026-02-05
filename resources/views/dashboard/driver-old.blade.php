@@ -132,7 +132,7 @@
  <div class="text-xs text-blue-600 mt-1">Démarrée il y a 2h30</div>
  </div>
  <div class="text-right">
- <span class="px-3 py-1 bg-green-100 text-green-800 text-xs font-semibold rounded-full">
+ <span class="px-3 py-1 bg-green-50 text-green-700 border border-green-200 text-xs font-semibold rounded-full">
  En cours
  </span>
  </div>
@@ -169,7 +169,7 @@
  <div class="text-xs text-gray-500">{{ $trip['date'] ?? 'Hier 14:30' }}</div>
  </div>
  <div class="text-right">
- <span class="px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
+ <span class="px-2 py-1 text-xs font-semibold rounded-full bg-green-50 text-green-700 border border-green-200">
  Terminé
  </span>
  </div>

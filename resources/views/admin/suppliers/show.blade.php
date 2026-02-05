@@ -47,39 +47,39 @@
                         <h1 class="text-3xl font-bold text-gray-900 mb-2">{{ $supplier->company_name }}</h1>
                         <div class="flex items-center gap-3">
                             {{-- Type --}}
-                            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-gray-100 text-gray-800">
+                            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-gray-50 text-gray-700 border border-gray-200">
                                 {{ \App\Models\Supplier::TYPES[$supplier->supplier_type] ?? $supplier->supplier_type }}
                             </span>
                             
                             {{-- Statuts --}}
                             @if($supplier->is_active)
-                                <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
+                                <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-50 text-green-700 border border-green-200">
                                     <x-iconify icon="lucide:check-circle" class="w-4 h-4 mr-1" />
                                     Actif
                                 </span>
                             @else
-                                <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-gray-100 text-gray-800">
+                                <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-gray-50 text-gray-700 border border-gray-200">
                                     <x-iconify icon="lucide:x-circle" class="w-4 h-4 mr-1" />
                                     Inactif
                                 </span>
                             @endif
 
                             @if($supplier->is_preferred)
-                                <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-red-100 text-red-800">
+                                <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-red-50 text-red-700 border border-red-200">
                                     <x-iconify icon="lucide:heart" class="w-4 h-4 mr-1 fill-current" />
                                     Préféré
                                 </span>
                             @endif
 
                             @if($supplier->is_certified)
-                                <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-purple-100 text-purple-800">
+                                <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-purple-50 text-purple-700 border border-purple-200">
                                     <x-iconify icon="lucide:badge-check" class="w-4 h-4 mr-1" />
                                     Certifié
                                 </span>
                             @endif
 
                             @if($supplier->blacklisted)
-                                <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-red-100 text-red-800">
+                                <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-red-50 text-red-700 border border-red-200">
                                     <x-iconify icon="lucide:alert-triangle" class="w-4 h-4 mr-1" />
                                     Liste noire
                                 </span>
@@ -426,7 +426,7 @@
                         <div class="p-6">
                             <div class="flex flex-wrap gap-2">
                                 @foreach($supplier->specialties as $specialty)
-                                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-50 text-blue-700 border border-blue-200">
                                         {{ $specialty }}
                                     </span>
                                 @endforeach
@@ -447,7 +447,7 @@
                         <div class="p-6">
                             <div class="flex flex-wrap gap-2">
                                 @foreach($supplier->certifications as $certification)
-                                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-purple-50 text-purple-700 border border-purple-200">
                                         <x-iconify icon="lucide:badge-check" class="w-3 h-3 mr-1" />
                                         {{ $certification }}
                                     </span>
@@ -469,7 +469,7 @@
                         <div class="p-6">
                             <div class="flex flex-wrap gap-2">
                                 @foreach($supplier->service_areas as $area)
-                                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-50 text-green-700 border border-green-200">
                                         <x-iconify icon="lucide:map-pin" class="w-3 h-3 mr-1" />
                                         {{ $area }}
                                     </span>

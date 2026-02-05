@@ -80,73 +80,73 @@
             </div>
 
             <x-page-analytics-grid columns="6">
-                <div class="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-lg transition-shadow duration-300">
+                <div class="bg-blue-50 rounded-lg border border-blue-200 p-6 hover:shadow-lg transition-shadow duration-300">
                     <div class="flex items-center justify-between">
                         <div>
                             <p class="text-sm font-medium text-gray-600">Total Dépôts</p>
                             <p class="text-2xl font-bold text-gray-900 mt-1">{{ $stats['total_depots'] }}</p>
                         </div>
-                        <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                        <div class="w-12 h-12 bg-blue-100 border border-blue-200 rounded-lg flex items-center justify-center">
                             <x-iconify icon="lucide:building" class="w-6 h-6 text-blue-600" />
                         </div>
                     </div>
                 </div>
 
-                <div class="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-lg transition-shadow duration-300">
+                <div class="bg-green-50 rounded-lg border border-green-200 p-6 hover:shadow-lg transition-shadow duration-300">
                     <div class="flex items-center justify-between">
                         <div>
                             <p class="text-sm font-medium text-gray-600">Actifs</p>
                             <p class="text-2xl font-bold text-green-600 mt-1">{{ $stats['active_depots'] }}</p>
                         </div>
-                        <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                        <div class="w-12 h-12 bg-green-100 border border-green-200 rounded-lg flex items-center justify-center">
                             <x-iconify icon="lucide:activity" class="w-6 h-6 text-green-600" />
                         </div>
                     </div>
                 </div>
 
-                <div class="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-lg transition-shadow duration-300">
+                <div class="bg-indigo-50 rounded-lg border border-indigo-200 p-6 hover:shadow-lg transition-shadow duration-300">
                     <div class="flex items-center justify-between">
                         <div>
                             <p class="text-sm font-medium text-gray-600">Capacité totale</p>
                             <p class="text-2xl font-bold text-indigo-600 mt-1">{{ number_format($stats['total_capacity']) }}</p>
                         </div>
-                        <div class="w-12 h-12 bg-indigo-100 rounded-lg flex items-center justify-center">
+                        <div class="w-12 h-12 bg-indigo-100 border border-indigo-200 rounded-lg flex items-center justify-center">
                             <x-iconify icon="lucide:box" class="w-6 h-6 text-indigo-600" />
                         </div>
                     </div>
                 </div>
 
-                <div class="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-lg transition-shadow duration-300">
+                <div class="bg-orange-50 rounded-lg border border-orange-200 p-6 hover:shadow-lg transition-shadow duration-300">
                     <div class="flex items-center justify-between">
                         <div>
                             <p class="text-sm font-medium text-gray-600">Occupés</p>
                             <p class="text-2xl font-bold text-orange-600 mt-1">{{ number_format($stats['total_occupied']) }}</p>
                         </div>
-                        <div class="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
+                        <div class="w-12 h-12 bg-orange-100 border border-orange-200 rounded-lg flex items-center justify-center">
                             <x-iconify icon="lucide:truck" class="w-6 h-6 text-orange-600" />
                         </div>
                     </div>
                 </div>
 
-                <div class="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-lg transition-shadow duration-300">
+                <div class="bg-teal-50 rounded-lg border border-teal-200 p-6 hover:shadow-lg transition-shadow duration-300">
                     <div class="flex items-center justify-between">
                         <div>
                             <p class="text-sm font-medium text-gray-600">Disponibles</p>
                             <p class="text-2xl font-bold text-teal-600 mt-1">{{ number_format($stats['total_available']) }}</p>
                         </div>
-                        <div class="w-12 h-12 bg-teal-100 rounded-lg flex items-center justify-center">
+                        <div class="w-12 h-12 bg-teal-100 border border-teal-200 rounded-lg flex items-center justify-center">
                             <x-iconify icon="lucide:archive" class="w-6 h-6 text-teal-600" />
                         </div>
                     </div>
                 </div>
 
-                <div class="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-lg transition-shadow duration-300">
+                <div class="bg-purple-50 rounded-lg border border-purple-200 p-6 hover:shadow-lg transition-shadow duration-300">
                     <div class="flex items-center justify-between">
                         <div>
                             <p class="text-sm font-medium text-gray-600">Taux occupation</p>
                             <p class="text-2xl font-bold text-purple-600 mt-1">{{ $stats['average_occupancy'] }}%</p>
                         </div>
-                        <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+                        <div class="w-12 h-12 bg-purple-100 border border-purple-200 rounded-lg flex items-center justify-center">
                             <x-iconify icon="lucide:pie-chart" class="w-6 h-6 text-purple-600" />
                         </div>
                     </div>
@@ -191,7 +191,7 @@
                         <x-iconify icon="lucide:filter" class="w-5 h-5 text-gray-500" />
                         <x-iconify icon="heroicons:chevron-down" class="w-4 h-4 text-gray-400 transition-transform duration-200" x-bind:class="showFilters ? 'rotate-180' : ''" />
                         @if($activeCount > 0)
-                            <span class="ml-1 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-blue-100 text-blue-800">
+                            <span class="ml-1 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-200">
                                 {{ $activeCount }}
                             </span>
                         @endif
@@ -258,13 +258,13 @@
                                     {{ $depot->name }}
                                 </h3>
                                 @if($depot->code)
-                                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-800 mt-1">
+                                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-50 text-gray-700 border border-gray-200 mt-1">
                                     {{ $depot->code }}
                                 </span>
                                 @endif
                             </div>
                             <div class="flex flex-col items-end gap-2">
-                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $depot->is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }}">
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $depot->is_active ? 'bg-green-50 text-green-700 border border-green-200' : 'bg-red-50 text-red-700 border border-red-200' }}">
                                     {{ $depot->is_active ? 'Actif' : 'Inactif' }}
                                 </span>
                             </div>

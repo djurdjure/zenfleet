@@ -6,7 +6,7 @@
             <x-iconify icon="mdi:file-document-multiple" class="w-6 h-6 mr-2 text-blue-600" />
             Documents attachés
             @if($documents->count() > 0)
-                <span class="ml-2 px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                <span class="ml-2 px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-50 text-blue-700 border border-blue-200">
                     {{ $documents->count() }}
                 </span>
             @endif

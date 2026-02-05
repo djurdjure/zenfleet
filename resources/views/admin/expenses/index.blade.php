@@ -208,7 +208,7 @@
                         $activeFiltersCount = count(array_filter($filters ?? [], fn($v) => !empty($v)));
                         @endphp
                         @if($activeFiltersCount > 0)
-                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-50 text-blue-700 border border-blue-200">
                             {{ $activeFiltersCount }}
                         </span>
                         @endif
@@ -493,7 +493,7 @@
 
                             {{-- Type --}}
                             <td class="px-6 py-4 whitespace-nowrap">
-                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-50 text-blue-700 border border-blue-200">
                                     {{ $expense->category_label ?? 'Non défini' }}
                                 </span>
                             </td>
@@ -520,11 +520,11 @@
                                 @php
                                 $status = $expense->status_badge ?? ['color' => 'gray', 'label' => 'Inconnu'];
                                 $statusClass = match($status['color']) {
-                                    'green' => 'bg-green-100 text-green-800',
-                                    'yellow' => 'bg-yellow-100 text-yellow-800',
-                                    'red' => 'bg-red-100 text-red-800',
-                                    'blue' => 'bg-blue-100 text-blue-800',
-                                    default => 'bg-gray-100 text-gray-800'
+                                    'green' => 'bg-green-50 text-green-700 border border-green-200',
+                                    'yellow' => 'bg-yellow-50 text-yellow-700 border border-yellow-200',
+                                    'red' => 'bg-red-50 text-red-700 border border-red-200',
+                                    'blue' => 'bg-blue-50 text-blue-700 border border-blue-200',
+                                    default => 'bg-gray-50 text-gray-700 border border-gray-200'
                                 };
                                 @endphp
                                 <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $statusClass }}">

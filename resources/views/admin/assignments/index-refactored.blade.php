@@ -64,52 +64,52 @@ DESIGN PRINCIPLES:
  ===================================================================== --}}
  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
  {{-- Total Affectations --}}
- <div class="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-lg transition-shadow duration-300">
+ <div class="bg-blue-50 rounded-lg border border-blue-200 p-6 hover:shadow-lg transition-shadow duration-300">
  <div class="flex items-center justify-between">
  <div>
  <p class="text-sm font-medium text-gray-600">Total Affectations</p>
  <p class="text-2xl font-bold text-gray-900 mt-1">{{ $assignments->total() }}</p>
  </div>
- <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+ <div class="w-12 h-12 bg-blue-100 border border-blue-200 rounded-lg flex items-center justify-center">
  <x-iconify icon="lucide:calendar-check" class="w-6 h-6 text-blue-600" />
  </div>
  </div>
  </div>
 
  {{-- Actives --}}
- <div class="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-lg transition-shadow duration-300">
+ <div class="bg-green-50 rounded-lg border border-green-200 p-6 hover:shadow-lg transition-shadow duration-300">
  <div class="flex items-center justify-between">
  <div>
  <p class="text-sm font-medium text-gray-600">Affectations Actives</p>
  <p class="text-2xl font-bold text-green-600 mt-1">{{ $activeAssignments ?? 0 }}</p>
  </div>
- <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+ <div class="w-12 h-12 bg-green-100 border border-green-200 rounded-lg flex items-center justify-center">
  <x-iconify icon="lucide:check-circle" class="w-6 h-6 text-green-600" />
  </div>
  </div>
  </div>
 
  {{-- En Cours --}}
- <div class="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-lg transition-shadow duration-300">
+ <div class="bg-orange-50 rounded-lg border border-orange-200 p-6 hover:shadow-lg transition-shadow duration-300">
  <div class="flex items-center justify-between">
  <div>
  <p class="text-sm font-medium text-gray-600">En Cours</p>
  <p class="text-2xl font-bold text-orange-600 mt-1">{{ $inProgressAssignments ?? 0 }}</p>
  </div>
- <div class="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
+ <div class="w-12 h-12 bg-orange-100 border border-orange-200 rounded-lg flex items-center justify-center">
  <x-iconify icon="lucide:clock" class="w-6 h-6 text-orange-600" />
  </div>
  </div>
  </div>
 
  {{-- Planifiées --}}
- <div class="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-lg transition-shadow duration-300">
+ <div class="bg-purple-50 rounded-lg border border-purple-200 p-6 hover:shadow-lg transition-shadow duration-300">
  <div class="flex items-center justify-between">
  <div>
  <p class="text-sm font-medium text-gray-600">Planifiées</p>
  <p class="text-2xl font-bold text-purple-600 mt-1">{{ $scheduledAssignments ?? 0 }}</p>
  </div>
- <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+ <div class="w-12 h-12 bg-purple-100 border border-purple-200 rounded-lg flex items-center justify-center">
  <x-iconify icon="lucide:calendar" class="w-6 h-6 text-purple-600" />
  </div>
  </div>
@@ -327,11 +327,11 @@ DESIGN PRINCIPLES:
  <td class="px-6 py-4 whitespace-nowrap">
  @php
  $statusConfig = [
- 'scheduled' => ['badge' => 'bg-purple-100 text-purple-800', 'label' => 'Planifiée'],
- 'active' => ['badge' => 'bg-green-100 text-green-800', 'label' => 'Active'],
- 'completed' => ['badge' => 'bg-blue-100 text-blue-800', 'label' => 'Complétée'],
+ 'scheduled' => ['badge' => 'bg-purple-50 text-purple-700 border border-purple-200', 'label' => 'Planifiée'],
+ 'active' => ['badge' => 'bg-green-50 text-green-700 border border-green-200', 'label' => 'Active'],
+ 'completed' => ['badge' => 'bg-blue-50 text-blue-700 border border-blue-200', 'label' => 'Complétée'],
  ];
- $status = $statusConfig[$assignment->status] ?? ['badge' => 'bg-gray-100 text-gray-800', 'label' => $assignment->status];
+ $status = $statusConfig[$assignment->status] ?? ['badge' => 'bg-gray-50 text-gray-700 border border-gray-200', 'label' => $assignment->status];
  @endphp
  <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $status['badge'] }}">
  {{ $status['label'] }}

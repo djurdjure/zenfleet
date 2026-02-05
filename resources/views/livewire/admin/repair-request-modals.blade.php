@@ -300,10 +300,10 @@ Soyez le plus précis possible sur:
  <div class="bg-gray-50 rounded-lg p-3">
  <p class="text-xs font-medium text-gray-500 uppercase mb-1">⚡ Urgence</p>
  <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold
- @if($selectedRequest->urgency === 'critical') bg-red-100 text-red-800
- @elseif($selectedRequest->urgency === 'high') bg-orange-100 text-orange-800
- @elseif($selectedRequest->urgency === 'normal') bg-yellow-100 text-yellow-800
- @else bg-gray-100 text-gray-800 @endif">
+ @if($selectedRequest->urgency === 'critical') bg-red-50 text-red-700 border border-red-200
+ @elseif($selectedRequest->urgency === 'high') bg-orange-50 text-orange-700 border border-orange-200
+ @elseif($selectedRequest->urgency === 'normal') bg-yellow-50 text-yellow-700 border border-yellow-200
+ @else bg-gray-50 text-gray-700 border border-gray-200 @endif">
  @if($selectedRequest->urgency === 'critical') 🔴 CRITIQUE
  @elseif($selectedRequest->urgency === 'high') 🟠 HAUTE
  @elseif($selectedRequest->urgency === 'normal') 🟡 NORMALE
@@ -481,9 +481,9 @@ Soyez le plus précis possible sur:
  </span>
  <p class="text-sm text-gray-600 mt-1">
  <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium
- @if($selectedRequest->priority === 'urgente') bg-red-100 text-red-800
- @elseif($selectedRequest->priority === 'a_prevoir') bg-orange-100 text-orange-800
- @else bg-gray-100 text-gray-800 @endif">
+ @if($selectedRequest->priority === 'urgente') bg-red-50 text-red-700 border border-red-200
+ @elseif($selectedRequest->priority === 'a_prevoir') bg-orange-50 text-orange-700 border border-orange-200
+ @else bg-gray-50 text-gray-700 border border-gray-200 @endif">
  {{ $selectedRequest->priority_label }}
  </span>
  </p>

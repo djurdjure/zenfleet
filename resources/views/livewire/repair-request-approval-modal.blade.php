@@ -92,10 +92,10 @@
  <span>
  @php
  $urgencyConfig = [
- 'low' => ['bg' => 'bg-green-100 text-green-800', 'label' => 'Faible'],
- 'normal' => ['bg' => 'bg-blue-100 text-blue-800', 'label' => 'Normal'],
- 'high' => ['bg' => 'bg-orange-100 text-orange-800', 'label' => 'Élevé'],
- 'critical' => ['bg' => 'bg-red-100 text-red-800', 'label' => 'Critique'],
+ 'low' => ['bg' => 'bg-green-50 text-green-700 border border-green-200', 'label' => 'Faible'],
+ 'normal' => ['bg' => 'bg-blue-50 text-blue-700 border border-blue-200', 'label' => 'Normal'],
+ 'high' => ['bg' => 'bg-orange-50 text-orange-700 border border-orange-200', 'label' => 'Élevé'],
+ 'critical' => ['bg' => 'bg-red-50 text-red-700 border border-red-200', 'label' => 'Critique'],
  ];
  $config = $urgencyConfig[$repairRequest->urgency] ?? $urgencyConfig['normal'];
  @endphp

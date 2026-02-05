@@ -127,7 +127,7 @@
  <h4 class="text-sm font-bold text-gray-900">Phase 1: Architecture & Sécurité</h4>
  <p class="text-sm text-gray-600 mt-1">Mise en place de l'architecture enterprise et du système de permissions granulaires</p>
  <div class="mt-2">
- <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+ <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-50 text-green-700 border border-green-200">
  ✅ Terminé
  </span>
  </div>
@@ -145,7 +145,7 @@
  <h4 class="text-sm font-bold text-gray-900">Phase 2: Modules Core</h4>
  <p class="text-sm text-gray-600 mt-1">Développement des modules {{ $module }}, avec interface ultra-moderne</p>
  <div class="mt-2">
- <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+ <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-50 text-yellow-700 border border-yellow-200">
  🚧 En cours (75%)
  </span>
  </div>
@@ -163,7 +163,7 @@
  <h4 class="text-sm font-bold text-gray-900">Phase 3: Analytics & Intelligence</h4>
  <p class="text-sm text-gray-600 mt-1">Intégration d'analytics avancés et de recommandations IA</p>
  <div class="mt-2">
- <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+ <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-50 text-blue-700 border border-blue-200">
  📋 Planifié
  </span>
  </div>

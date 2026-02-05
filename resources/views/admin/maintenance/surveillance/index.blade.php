@@ -269,22 +269,22 @@
  <tr class="hover:bg-gray-50">
  <td class="px-6 py-4 whitespace-nowrap">
  @if($maintenance->urgency_level === 'critical')
- <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+ <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-50 text-red-700 border border-red-200">
  <span class="w-2 h-2 bg-red-500 rounded-full mr-1 animate-pulse"></span>
  Critique
  </span>
  @elseif($maintenance->urgency_level === 'urgent')
- <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-orange-100 text-orange-800">
+ <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-orange-50 text-orange-700 border border-orange-200">
  <span class="w-2 h-2 bg-orange-500 rounded-full mr-1"></span>
  Urgent
  </span>
  @elseif($maintenance->urgency_level === 'warning')
- <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+ <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-50 text-yellow-700 border border-yellow-200">
  <span class="w-2 h-2 bg-yellow-500 rounded-full mr-1"></span>
  Attention
  </span>
  @else
- <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+ <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-50 text-green-700 border border-green-200">
  <span class="w-2 h-2 bg-green-500 rounded-full mr-1"></span>
  Normal
  </span>
@@ -310,21 +310,21 @@
  </div>
  </td>
  <td class="px-6 py-4 whitespace-nowrap">
- <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+ <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-50 text-blue-700 border border-blue-200">
  {{ $maintenance->maintenanceType->name ?? 'Non défini' }}
  </span>
  </td>
  <td class="px-6 py-4 whitespace-nowrap">
  @if($maintenance->status === 'completed')
- <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+ <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-50 text-green-700 border border-green-200">
  Terminé
  </span>
  @elseif($maintenance->status === 'in_progress')
- <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+ <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-50 text-blue-700 border border-blue-200">
  En cours
  </span>
  @else
- <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+ <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-50 text-gray-700 border border-gray-200">
  Planifié
  </span>
  @endif

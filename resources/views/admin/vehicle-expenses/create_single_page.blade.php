@@ -210,7 +210,7 @@
                     <div>
                         <label class="block text-sm font-medium text-gray-900 mb-2 flex items-center gap-2">
                             Montant TTC
-                            <span class="inline-flex items-center px-2 py-0.5 rounded-md bg-green-100 text-green-800 text-xs font-semibold">
+                            <span class="inline-flex items-center px-2 py-0.5 rounded-md bg-green-50 text-green-700 border border-green-200 text-xs font-semibold">
                                 <x-iconify icon="lucide:coins" class="w-3 h-3 mr-1" />
                                 Dinar Algérien
                             </span>

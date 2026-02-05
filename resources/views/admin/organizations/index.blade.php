@@ -465,9 +465,9 @@ function showNotification(message, type = 'info') {
  // Create notification system
  const notification = document.createElement('div');
  notification.className = `fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg max-w-sm ${
- type === 'success' ? 'bg-green-100 text-green-800 border border-green-200' :
- type === 'error' ? 'bg-red-100 text-red-800 border border-red-200' :
- 'bg-blue-100 text-blue-800 border border-blue-200'
+ type === 'success' ? 'bg-green-50 text-green-700 border border-green-200 border border-green-200' :
+ type === 'error' ? 'bg-red-50 text-red-700 border border-red-200 border border-red-200' :
+ 'bg-blue-50 text-blue-700 border border-blue-200 border border-blue-200'
  }`;
 
  notification.innerHTML = `

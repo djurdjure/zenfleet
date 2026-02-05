@@ -121,12 +121,12 @@ Design surpassant Fleetio, Samsara et Verizon Connect:
                         <div class="mt-2">
                             @php
                             $statusConfig = [
-                                'scheduled' => ['badge' => 'bg-purple-100 text-purple-800', 'icon' => 'lucide:clock', 'label' => 'Planifiée'],
-                                'active' => ['badge' => 'bg-green-100 text-green-800', 'icon' => 'lucide:play-circle', 'label' => 'Active'],
-                                'completed' => ['badge' => 'bg-blue-100 text-blue-800', 'icon' => 'lucide:check-circle', 'label' => 'Terminée'],
-                                'cancelled' => ['badge' => 'bg-red-100 text-red-800', 'icon' => 'lucide:x-circle', 'label' => 'Annulée'],
+                                'scheduled' => ['badge' => 'bg-purple-50 text-purple-700 border border-purple-200', 'icon' => 'lucide:clock', 'label' => 'Planifiée'],
+                                'active' => ['badge' => 'bg-green-50 text-green-700 border border-green-200', 'icon' => 'lucide:play-circle', 'label' => 'Active'],
+                                'completed' => ['badge' => 'bg-blue-50 text-blue-700 border border-blue-200', 'icon' => 'lucide:check-circle', 'label' => 'Terminée'],
+                                'cancelled' => ['badge' => 'bg-red-50 text-red-700 border border-red-200', 'icon' => 'lucide:x-circle', 'label' => 'Annulée'],
                             ];
-                            $status = $statusConfig[$assignment->status] ?? ['badge' => 'bg-gray-100 text-gray-800', 'icon' => 'lucide:help-circle', 'label' => $assignment->status];
+                            $status = $statusConfig[$assignment->status] ?? ['badge' => 'bg-gray-50 text-gray-700 border border-gray-200', 'icon' => 'lucide:help-circle', 'label' => $assignment->status];
                             @endphp
                             <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-sm font-medium {{ $status['badge'] }}">
                                 <x-iconify :icon="$status['icon']" class="w-4 h-4" />
@@ -232,7 +232,7 @@ Design surpassant Fleetio, Samsara et Verizon Connect:
                                         {{ number_format($assignment->vehicle->current_mileage) }} km
                                     </span>
                                     @if($assignment->vehicle->vehicleType)
-                                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-50 text-blue-700 border border-blue-200">
                                             {{ $assignment->vehicle->vehicleType->name }}
                                         </span>
                                     @endif

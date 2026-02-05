@@ -146,13 +146,13 @@
                                         </p>
                                         <div class="flex items-center gap-3 mt-1">
                                             @if($vehicle->vehicleType)
-                                                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-800">
+                                                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-50 text-gray-700 border border-gray-200">
                                                     <i class="fas fa-tag mr-1"></i>
                                                     {{ $vehicle->vehicleType->name }}
                                                 </span>
                                             @endif
                                             @if($vehicle->depot)
-                                                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-purple-100 text-purple-800">
+                                                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-purple-50 text-purple-700 border border-purple-200">
                                                     <i class="fas fa-warehouse mr-1"></i>
                                                     {{ $vehicle->depot->name }}
                                                 </span>
@@ -163,7 +163,7 @@
                                     {{-- Statut badge --}}
                                     <div>
                                         @if($vehicle->vehicleStatus)
-                                            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-50 text-blue-700 border border-blue-200">
                                                 <i class="fas fa-parking mr-1"></i>
                                                 {{ $vehicle->vehicleStatus->name }}
                                             </span>
@@ -240,7 +240,7 @@
                                     {{-- Statut badge --}}
                                     <div>
                                         @if($driver->driverStatus)
-                                            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-50 text-green-700 border border-green-200">
                                                 <i class="fas fa-check mr-1"></i>
                                                 {{ $driver->driverStatus->name }}
                                             </span>
