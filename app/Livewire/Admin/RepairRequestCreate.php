@@ -7,6 +7,7 @@ use App\Models\Driver;
 use App\Models\RepairCategory;
 use App\Models\RepairRequest;
 use App\Models\Vehicle;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 
@@ -22,6 +23,7 @@ use Livewire\WithFileUploads;
 class RepairRequestCreate extends Component
 {
     use WithFileUploads;
+    use AuthorizesRequests;
 
     // Champs du formulaire
     public $vehicle_id;
@@ -64,6 +66,7 @@ class RepairRequestCreate extends Component
 
     public function mount()
     {
+        $this->authorize('create', RepairRequest::class);
         $user = auth()->user();
         $organizationId = $user->organization_id;
 
@@ -190,6 +193,7 @@ class RepairRequestCreate extends Component
      */
     public function submit()
     {
+        $this->authorize('create', RepairRequest::class);
         $this->validate();
 
         try {

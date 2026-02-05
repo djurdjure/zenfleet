@@ -119,16 +119,20 @@
             </x-slot:filters>
 
             <x-slot:actions>
-                <a href="{{ route('admin.vehicle-expenses.create') }}"
-                    title="Nouvelle dépense"
-                    class="inline-flex items-center gap-2 p-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all duration-200 shadow-sm hover:shadow-md">
-                    <x-iconify icon="solar:add-circle-bold" class="w-5 h-5" />
-                </a>
-                <a href="{{ route('admin.vehicle-expenses.dashboard') }}"
-                    title="Analytics"
-                    class="inline-flex items-center gap-2 p-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-all duration-200 shadow-sm hover:shadow-md">
-                    <x-iconify icon="solar:chart-2-bold" class="w-5 h-5" />
-                </a>
+                @can('expenses.create')
+                    <a href="{{ route('admin.vehicle-expenses.create') }}"
+                        title="Nouvelle dépense"
+                        class="inline-flex items-center gap-2 p-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all duration-200 shadow-sm hover:shadow-md">
+                        <x-iconify icon="solar:add-circle-bold" class="w-5 h-5" />
+                    </a>
+                @endcan
+                @canany(['expenses.analytics.view', 'expenses.dashboard.view'])
+                    <a href="{{ route('admin.vehicle-expenses.dashboard') }}"
+                        title="Analytics"
+                        class="inline-flex items-center gap-2 p-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-all duration-200 shadow-sm hover:shadow-md">
+                        <x-iconify icon="solar:chart-2-bold" class="w-5 h-5" />
+                    </a>
+                @endcanany
             </x-slot:actions>
 
             <x-slot:filtersPanel>
@@ -227,9 +231,12 @@
                         </button>
                     </div>
                     <div class="flex items-center gap-2 px-4">
-                        <button wire:click="deleteSelected" class="inline-flex items-center gap-1 px-3 py-1.5 bg-red-600 text-white text-sm font-medium rounded hover:bg-red-700">
-                            <x-iconify icon="solar:trash-bin-2-bold" class="w-4 h-4" /> Supprimer
-                        </button>
+                        @can('expenses.delete')
+                            <button wire:click="deleteSelected" class="inline-flex items-center gap-1 px-3 py-1.5 bg-red-600 text-white text-sm font-medium rounded hover:bg-red-700">
+                                <x-iconify icon="solar:trash-bin-2-bold" class="w-4 h-4" /> Supprimer
+                            </button>
+                        @endcan
+                        @can('expenses.export')
                         <div class="relative"
                              x-data="{
                                 open: false,
@@ -290,6 +297,7 @@
                                 </div>
                             </template>
                         </div>
+                        @endcan
                     </div>
                 </div>
             @endif
@@ -382,20 +390,28 @@
                             </td>
                             <td class="px-4 py-3 whitespace-nowrap">
                                 <div class="flex items-center gap-1">
-                                    <a href="{{ route('admin.vehicle-expenses.show', $expense) }}" class="p-1.5 text-gray-600 hover:bg-gray-100 rounded-lg transition" title="Voir">
-                                        <x-iconify icon="solar:eye-bold" class="w-4 h-4" />
-                                    </a>
-                                    <a href="{{ route('admin.vehicle-expenses.edit', $expense) }}" class="p-1.5 text-blue-600 hover:bg-blue-100 rounded-lg transition" title="Éditer">
-                                        <x-iconify icon="solar:pen-bold" class="w-4 h-4" />
-                                    </a>
+                                    @can('view', $expense)
+                                        <a href="{{ route('admin.vehicle-expenses.show', $expense) }}" class="p-1.5 text-gray-600 hover:bg-gray-100 rounded-lg transition" title="Voir">
+                                            <x-iconify icon="solar:eye-bold" class="w-4 h-4" />
+                                        </a>
+                                    @endcan
+                                    @can('update', $expense)
+                                        <a href="{{ route('admin.vehicle-expenses.edit', $expense) }}" class="p-1.5 text-blue-600 hover:bg-blue-100 rounded-lg transition" title="Éditer">
+                                            <x-iconify icon="solar:pen-bold" class="w-4 h-4" />
+                                        </a>
+                                    @endcan
                                     @if(in_array($expense->approval_status, ['pending_level1', 'pending_level2']))
-                                        <button wire:click="approveExpense({{ $expense->id }})" class="p-1.5 text-green-600 hover:bg-green-100 rounded-lg transition" title="Approuver">
-                                            <x-iconify icon="solar:check-circle-bold" class="w-4 h-4" />
-                                        </button>
+                                        @can('approve', $expense)
+                                            <button wire:click="approveExpense({{ $expense->id }})" class="p-1.5 text-green-600 hover:bg-green-100 rounded-lg transition" title="Approuver">
+                                                <x-iconify icon="solar:check-circle-bold" class="w-4 h-4" />
+                                            </button>
+                                        @endcan
                                     @endif
-                                    <button wire:click="confirmDelete({{ $expense->id }})" class="p-1.5 text-red-600 hover:bg-red-100 rounded-lg transition" title="Supprimer">
-                                        <x-iconify icon="solar:trash-bin-2-bold" class="w-4 h-4" />
-                                    </button>
+                                    @can('delete', $expense)
+                                        <button wire:click="confirmDelete({{ $expense->id }})" class="p-1.5 text-red-600 hover:bg-red-100 rounded-lg transition" title="Supprimer">
+                                            <x-iconify icon="solar:trash-bin-2-bold" class="w-4 h-4" />
+                                        </button>
+                                    @endcan
                                 </div>
                             </td>
                         </tr>

@@ -4,6 +4,8 @@ namespace App\Livewire\Admin\Maintenance;
 
 use Livewire\Component;
 use App\Services\Maintenance\MaintenanceService;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use App\Models\MaintenanceOperation;
 
 /**
  * 📈 COMPOSANT STATISTIQUES MAINTENANCE
@@ -14,6 +16,7 @@ use App\Services\Maintenance\MaintenanceService;
  */
 class MaintenanceStats extends Component
 {
+    use AuthorizesRequests;
     public $period = 'month'; // today, week, month, quarter, year
 
     protected $listeners = [
@@ -34,6 +37,7 @@ class MaintenanceStats extends Component
      */
     public function render(MaintenanceService $maintenanceService)
     {
+        $this->authorize('viewAny', MaintenanceOperation::class);
         $analytics = $maintenanceService->getAnalytics([
             'period' => $this->period
         ]);

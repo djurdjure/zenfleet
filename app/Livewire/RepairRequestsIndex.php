@@ -8,6 +8,7 @@ use App\Models\Vehicle;
 use App\Models\RepairCategory;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Contracts\View\View;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Livewire\Component;
 use Livewire\WithPagination;
 use Carbon\Carbon;
@@ -29,6 +30,7 @@ use Carbon\Carbon;
 class RepairRequestsIndex extends Component
 {
     use WithPagination;
+    use AuthorizesRequests;
 
     /**
      * 🔍 PROPRIÉTÉS DE RECHERCHE ET FILTRAGE
@@ -86,6 +88,7 @@ class RepairRequestsIndex extends Component
      */
     public function mount(): void
     {
+        $this->authorize('viewAny', RepairRequest::class);
         $this->loadStatistics();
         $this->loadFilterOptions();
     }
@@ -219,24 +222,33 @@ class RepairRequestsIndex extends Component
     private function applyScopesByRole($query)
     {
         $user = auth()->user();
-        
-        if ($user->hasRole('Chauffeur')) {
+
+        if ($user->can('repair-requests.view.all')) {
+            return $query;
+        }
+
+        if ($user->can('repair-requests.view.team')) {
+            if ($user->hasRole('Supervisor')) {
+                $query->where(function($q) use ($user) {
+                    $q->whereHas('driver', function ($subQ) use ($user) {
+                        $subQ->where('supervisor_id', $user->id);
+                    })->orWhere('supervisor_id', $user->id);
+                });
+            } elseif ($user->hasRole('Chef de parc') && $user->depot_id) {
+                $query->where('depot_id', $user->depot_id);
+            }
+
+            return $query;
+        }
+
+        if ($user->can('repair-requests.view.own')) {
             $query->whereHas('driver', function ($q) use ($user) {
                 $q->where('user_id', $user->id);
             });
-        } elseif ($user->hasRole('Supervisor')) {
-            $query->where(function($q) use ($user) {
-                $q->whereHas('driver', function ($subQ) use ($user) {
-                    $subQ->where('supervisor_id', $user->id);
-                })->orWhere('supervisor_id', $user->id);
-            });
-        } elseif ($user->hasRole('Chef de parc')) {
-            if ($user->depot_id) {
-                $query->where('depot_id', $user->depot_id);
-            }
+            return $query;
         }
-        
-        return $query;
+
+        return $query->whereRaw('1 = 0');
     }
 
     /**
@@ -424,6 +436,14 @@ class RepairRequestsIndex extends Component
      */
     public function exportData(string $format = 'csv'): void
     {
+        if (!auth()->user()->can('repair-requests.export')) {
+            $this->dispatch('notify', [
+                'type' => 'error',
+                'message' => 'Permission refusée pour exporter les demandes de réparation.'
+            ]);
+            return;
+        }
+
         $this->dispatch('export-repair-requests', [
             'format' => $format,
             'filters' => [
@@ -446,6 +466,22 @@ class RepairRequestsIndex extends Component
             $this->dispatch('notify', [
                 'type' => 'warning',
                 'message' => 'Veuillez sélectionner au moins une demande.'
+            ]);
+            return;
+        }
+
+        $user = auth()->user();
+        $permissionsByAction = [
+            'approve' => ['repair-requests.approve.level1', 'repair-requests.approve.level2', 'repair-requests.approve'],
+            'reject' => ['repair-requests.reject.level1', 'repair-requests.reject.level2', 'repair-requests.reject'],
+            'export' => ['repair-requests.export'],
+            'delete' => ['repair-requests.delete'],
+        ];
+        $required = $permissionsByAction[$action] ?? [];
+        if (!empty($required) && !collect($required)->some(fn($perm) => $user->can($perm))) {
+            $this->dispatch('notify', [
+                'type' => 'error',
+                'message' => 'Permission refusée pour cette action.'
             ]);
             return;
         }
@@ -474,8 +510,19 @@ class RepairRequestsIndex extends Component
         $count = 0;
         foreach ($this->selectedRequests as $requestId) {
             $request = RepairRequest::find($requestId);
-            if ($request && auth()->user()->can('approve', $request)) {
-                $request->approve(auth()->user());
+            if (!$request) {
+                continue;
+            }
+
+            $user = auth()->user();
+            $approved = false;
+            if ($request->status === RepairRequest::STATUS_PENDING_SUPERVISOR && $user->can('approveLevelOne', $request)) {
+                $approved = $request->approveBySupervisor($user, 'Approuvé en masse');
+            } elseif ($request->status === RepairRequest::STATUS_PENDING_FLEET_MANAGER && $user->can('approveLevelTwo', $request)) {
+                $approved = $request->approveByFleetManager($user, 'Approuvé en masse');
+            }
+
+            if ($approved) {
                 $count++;
             }
         }
@@ -491,10 +538,98 @@ class RepairRequestsIndex extends Component
     }
 
     /**
+     * ❌ REJET GROUPÉ
+     */
+    private function bulkReject(): void
+    {
+        $count = 0;
+        foreach ($this->selectedRequests as $requestId) {
+            $request = RepairRequest::find($requestId);
+            if (!$request) {
+                continue;
+            }
+
+            $user = auth()->user();
+            $rejected = false;
+            if ($request->status === RepairRequest::STATUS_PENDING_SUPERVISOR && $user->can('rejectLevelOne', $request)) {
+                $rejected = $request->rejectBySupervisor($user, 'Rejet en masse');
+            } elseif ($request->status === RepairRequest::STATUS_PENDING_FLEET_MANAGER && $user->can('rejectLevelTwo', $request)) {
+                $rejected = $request->rejectByFleetManager($user, 'Rejet en masse');
+            }
+
+            if ($rejected) {
+                $count++;
+            }
+        }
+
+        $this->selectedRequests = [];
+        $this->selectAll = false;
+        $this->loadStatistics();
+
+        $this->dispatch('notify', [
+            'type' => 'success',
+            'message' => "{$count} demande(s) rejetée(s) avec succès."
+        ]);
+    }
+
+    /**
+     * 📤 EXPORT GROUPÉ
+     */
+    private function bulkExport(): void
+    {
+        if (!auth()->user()->can('repair-requests.export')) {
+            $this->dispatch('notify', [
+                'type' => 'error',
+                'message' => 'Permission refusée pour exporter les demandes.'
+            ]);
+            return;
+        }
+
+        $this->dispatch('export-repair-requests', [
+            'format' => 'csv',
+            'filters' => [
+                'ids' => $this->selectedRequests,
+                'search' => $this->search,
+                'status' => $this->statusFilter,
+                'urgency' => $this->urgencyFilter,
+                'category' => $this->categoryFilter,
+                'dateFrom' => $this->dateFrom,
+                'dateTo' => $this->dateTo,
+            ]
+        ]);
+    }
+
+    /**
+     * 🗑️ SUPPRESSION GROUPÉE
+     */
+    private function bulkDelete(): void
+    {
+        $count = 0;
+        foreach ($this->selectedRequests as $requestId) {
+            $request = RepairRequest::find($requestId);
+            if ($request && auth()->user()->can('delete', $request)) {
+                $request->delete();
+                $count++;
+            }
+        }
+
+        $this->selectedRequests = [];
+        $this->selectAll = false;
+        $this->loadStatistics();
+
+        $this->dispatch('notify', [
+            'type' => 'success',
+            'message' => "{$count} demande(s) supprimée(s) avec succès."
+        ]);
+    }
+
+    /**
      * 🎨 RENDU DU COMPOSANT
      */
     public function render(): View
     {
+        $this->authorize('viewAny', RepairRequest::class);
+
         return view('livewire.repair-requests-index', [
             'repairRequests' => $this->repairRequests,
             'statuses' => $this->statuses,

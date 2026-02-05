@@ -132,6 +132,7 @@ class ExpenseForm extends Component
         if ($expenseId) {
             $this->loadExpense($expenseId);
         } else {
+            $this->authorize('create', VehicleExpense::class);
             $this->initializeNewExpense();
         }
     }
@@ -317,6 +318,15 @@ class ExpenseForm extends Component
     {
         $this->showValidation = true;
         $this->validate();
+        
+        if ($this->isEditMode) {
+            $expense = VehicleExpense::find($this->expenseId);
+            if ($expense) {
+                $this->authorize('update', $expense);
+            }
+        } else {
+            $this->authorize('create', VehicleExpense::class);
+        }
         
         DB::beginTransaction();
         try {

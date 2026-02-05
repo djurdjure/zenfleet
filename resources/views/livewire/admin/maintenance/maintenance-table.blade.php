@@ -342,12 +342,14 @@
                                         @endcan
 
                                         @if($operation->status === 'planned')
-                                            <button 
-                                                wire:click="$dispatch('start-operation', { id: {{ $operation->id }} })"
-                                                class="text-green-600 hover:text-green-900" 
-                                                title="Démarrer">
-                                                <x-iconify icon="lucide:play" class="w-5 h-5" />
-                                            </button>
+                                            @can('start', $operation)
+                                                <button 
+                                                    wire:click="$dispatch('start-operation', { id: {{ $operation->id }} })"
+                                                    class="text-green-600 hover:text-green-900" 
+                                                    title="Démarrer">
+                                                    <x-iconify icon="lucide:play" class="w-5 h-5" />
+                                                </button>
+                                            @endcan
                                         @endif
 
                                         @can('delete', $operation)
@@ -375,11 +377,13 @@
                                             @endif
                                         </p>
                                         @if(!$search && !$status && !$maintenanceTypeId)
-                                            <a href="{{ route('admin.maintenance.operations.create') }}" 
-                                               class="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm font-semibold rounded-lg hover:bg-blue-700">
-                                                <x-iconify icon="lucide:plus" class="w-4 h-4" />
-                                                Nouvelle Maintenance
-                                            </a>
+                                            @can('create', App\Models\MaintenanceOperation::class)
+                                                <a href="{{ route('admin.maintenance.operations.create') }}" 
+                                                   class="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm font-semibold rounded-lg hover:bg-blue-700">
+                                                    <x-iconify icon="lucide:plus" class="w-4 h-4" />
+                                                    Nouvelle Maintenance
+                                                </a>
+                                            @endcan
                                         @else
                                             <button wire:click="resetFilters" class="text-sm text-red-600 hover:text-red-800 flex items-center gap-1 font-medium bg-red-50 hover:bg-red-100 px-3 py-1.5 rounded-md transition-colors">
                                                 <x-iconify icon="lucide:x" class="w-4 h-4" />

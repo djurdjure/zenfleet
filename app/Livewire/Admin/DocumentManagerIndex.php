@@ -6,6 +6,7 @@ use App\Models\Document;
 use App\Models\DocumentCategory;
 use App\Services\DocumentManagerService;
 use Illuminate\Contracts\View\View;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 use Livewire\WithPagination;
@@ -28,6 +29,7 @@ class DocumentManagerIndex extends Component
 {
     use WithPagination;
     use WithFileUploads; // Added for file upload
+    use AuthorizesRequests;
 
     /**
      * Filters and Search
@@ -72,6 +74,11 @@ class DocumentManagerIndex extends Component
     protected $listeners = [
         'refresh-documents' => '$refresh',
     ];
+
+    public function mount(): void
+    {
+        $this->authorize('viewAny', Document::class);
+    }
 
     /**
      * Reset pagination when filters change
@@ -159,6 +166,7 @@ class DocumentManagerIndex extends Component
      */
     public function openUploadModal()
     {
+        $this->authorize('create', Document::class);
         $this->resetUploadForm();
         $this->showUploadModal = true;
     }
@@ -195,6 +203,7 @@ class DocumentManagerIndex extends Component
      */
     public function upload()
     {
+        $this->authorize('create', Document::class);
         // 1. Static Validation
         $rules = [
             'newFile' => ['required', 'file', 'max:10240'], // 10MB max
@@ -284,6 +293,11 @@ class DocumentManagerIndex extends Component
             $document = Document::forOrganization(auth()->user()->organization_id)
                 ->findOrFail($documentId);
 
+            if (!auth()->user()?->can('documents.download')) {
+                abort(403, 'Permission refusée pour télécharger des documents.');
+            }
+            $this->authorize('view', $document);
+
             $service = app(DocumentManagerService::class);
             return $service->download($document);
         } catch (\Exception $e) {
@@ -299,6 +313,8 @@ class DocumentManagerIndex extends Component
         try {
             $document = Document::forOrganization(auth()->user()->organization_id)
                 ->findOrFail($documentId);
+
+            $this->authorize('update', $document);
 
             $service = app(DocumentManagerService::class);
             $service->archive($document);
@@ -318,10 +334,7 @@ class DocumentManagerIndex extends Component
             $document = Document::forOrganization(auth()->user()->organization_id)
                 ->findOrFail($documentId);
 
-            if (!auth()->user()->hasAnyRole(['Super Admin', 'Admin', 'Gestionnaire Flotte'])) {
-                session()->flash('error', 'Permission refusée.');
-                return;
-            }
+            $this->authorize('delete', $document);
 
             $service = app(DocumentManagerService::class);
             $service->delete($document);

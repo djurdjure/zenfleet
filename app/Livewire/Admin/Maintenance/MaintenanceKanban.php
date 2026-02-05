@@ -5,6 +5,7 @@ namespace App\Livewire\Admin\Maintenance;
 use Livewire\Component;
 use App\Services\Maintenance\MaintenanceService;
 use App\Models\MaintenanceOperation;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 /**
  * 📋 COMPOSANT VUE KANBAN MAINTENANCE
@@ -15,6 +16,7 @@ use App\Models\MaintenanceOperation;
  */
 class MaintenanceKanban extends Component
 {
+    use AuthorizesRequests;
     protected $listeners = [
         'operationMoved' => 'moveOperation',
         'refreshKanban' => '$refresh',
@@ -26,6 +28,17 @@ class MaintenanceKanban extends Component
     public function moveOperation($operationId, $newStatus)
     {
         $operation = MaintenanceOperation::findOrFail($operationId);
+
+        // Autorisation selon le workflow
+        if ($newStatus === MaintenanceOperation::STATUS_IN_PROGRESS) {
+            $this->authorize('start', $operation);
+        } elseif ($newStatus === MaintenanceOperation::STATUS_COMPLETED) {
+            $this->authorize('complete', $operation);
+        } elseif ($newStatus === MaintenanceOperation::STATUS_CANCELLED) {
+            $this->authorize('cancel', $operation);
+        } else {
+            $this->authorize('update', $operation);
+        }
 
         // Validation du changement de statut
         if (!$this->canMoveToStatus($operation, $newStatus)) {
@@ -66,6 +79,7 @@ class MaintenanceKanban extends Component
      */
     public function render(MaintenanceService $maintenanceService)
     {
+        $this->authorize('viewAny', MaintenanceOperation::class);
         $kanbanData = $maintenanceService->getKanbanData();
 
         return view('livewire.admin.maintenance.maintenance-kanban', [

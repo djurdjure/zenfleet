@@ -13,6 +13,7 @@ use Livewire\WithPagination;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\MileageReadingsExport;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 /**
  * MileageReadingsIndex - Vue globale des relevés kilométriques
@@ -29,6 +30,7 @@ use Illuminate\Support\Facades\Log;
 class MileageReadingsIndex extends Component
 {
     use WithPagination;
+    use AuthorizesRequests;
 
     /**
      * 💼 SERVICE LAYER
@@ -66,6 +68,11 @@ class MileageReadingsIndex extends Component
     protected $listeners = [
         'refresh-readings' => '$refresh',
     ];
+
+    public function mount(): void
+    {
+        $this->authorize('viewAny', VehicleMileageReading::class);
+    }
 
     /**
      * 🔄 RESET PAGINATION QUAND FILTRES CHANGENT

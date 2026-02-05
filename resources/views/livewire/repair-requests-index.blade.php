@@ -172,6 +172,7 @@
                 </a>
                 @endcan
 
+                @can('export', App\Models\RepairRequest::class)
                 <div class="relative"
                     x-data="{
                         open: false,
@@ -240,6 +241,7 @@
                         </div>
                     </template>
                 </div>
+                @endcan
             </x-slot:actions>
 
             <x-slot:filtersPanel>
@@ -314,16 +316,16 @@
                         <button wire:click="$set('selectedRequests', [])" class="text-sm text-blue-600 hover:text-blue-800 underline">Annuler</button>
                     </div>
                     <div class="flex items-center gap-2 px-4">
-                        @can('approve', App\Models\RepairRequest::class)
+                        @canany(['repair-requests.approve.level1', 'repair-requests.approve.level2', 'repair-requests.approve'])
                         <button wire:click="applyBulkAction('approve')" class="inline-flex items-center gap-1 px-3 py-1.5 bg-green-600 text-white text-sm font-medium rounded hover:bg-green-700">
                             <x-iconify icon="lucide:check" class="w-4 h-4" /> Approuver
                         </button>
-                        @endcan
-                        @can('reject', App\Models\RepairRequest::class)
+                        @endcanany
+                        @canany(['repair-requests.reject.level1', 'repair-requests.reject.level2', 'repair-requests.reject'])
                         <button wire:click="applyBulkAction('reject')" class="inline-flex items-center gap-1 px-3 py-1.5 bg-red-600 text-white text-sm font-medium rounded hover:bg-red-700">
                             <x-iconify icon="lucide:x" class="w-4 h-4" /> Rejeter
                         </button>
-                        @endcan
+                        @endcanany
                     </div>
                 </div>
             @endif
@@ -482,23 +484,23 @@
                                         </svg>
                                     </a>
 
-                                    @can('approve', $request)
+                                    @canany(['approveLevelOne', 'approveLevelTwo'], $request)
                                     <button wire:click="$dispatch('approve-request', { requestId: {{ $request->id }} })" class="text-green-600 hover:text-green-900" title="Approuver">
                                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                                         </svg>
                                     </button>
-                                    @endcan
+                                    @endcanany
 
-                                    @can('reject', $request)
+                                    @canany(['rejectLevelOne', 'rejectLevelTwo'], $request)
                                     <button wire:click="$dispatch('reject-request', { requestId: {{ $request->id }} })" class="text-red-600 hover:text-red-900" title="Rejeter">
                                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                                         </svg>
                                     </button>
-                                    @endcan
+                                    @endcanany
 
-                                    @can('edit', $request)
+                                    @can('update', $request)
                                     <a href="{{ route('admin.repair-requests.edit', $request) }}" class="text-gray-600 hover:text-gray-900" title="Modifier">
                                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>

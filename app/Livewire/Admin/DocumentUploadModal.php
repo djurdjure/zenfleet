@@ -6,6 +6,8 @@ use App\Models\DocumentCategory;
 use App\Services\DocumentManagerService;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use App\Models\Document;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 
@@ -25,6 +27,7 @@ use Livewire\WithFileUploads;
 class DocumentUploadModal extends Component
 {
     use WithFileUploads;
+    use AuthorizesRequests;
 
     /**
      * Modal state
@@ -134,6 +137,7 @@ class DocumentUploadModal extends Component
      */
     public function openModal(?string $attachToType = null, ?int $attachToId = null)
     {
+        $this->authorize('create', Document::class);
         $this->isOpen = true;
         $this->attachToType = $attachToType;
         $this->attachToId = $attachToId;
@@ -194,6 +198,7 @@ class DocumentUploadModal extends Component
      */
     public function upload()
     {
+        $this->authorize('create', Document::class);
         // Validate form
         $this->validate();
 

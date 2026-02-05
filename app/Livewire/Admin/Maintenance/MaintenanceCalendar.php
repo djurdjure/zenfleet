@@ -5,6 +5,8 @@ namespace App\Livewire\Admin\Maintenance;
 use Livewire\Component;
 use App\Services\Maintenance\MaintenanceService;
 use Carbon\Carbon;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use App\Models\MaintenanceOperation;
 
 /**
  * 📅 COMPOSANT CALENDRIER MAINTENANCE
@@ -15,6 +17,7 @@ use Carbon\Carbon;
  */
 class MaintenanceCalendar extends Component
 {
+    use AuthorizesRequests;
     public $currentMonth;
     public $currentYear;
 
@@ -28,6 +31,7 @@ class MaintenanceCalendar extends Component
      */
     public function mount()
     {
+        $this->authorize('viewAny', MaintenanceOperation::class);
         $this->currentMonth = Carbon::now()->month;
         $this->currentYear = Carbon::now()->year;
     }
@@ -75,6 +79,7 @@ class MaintenanceCalendar extends Component
      */
     public function render(MaintenanceService $maintenanceService)
     {
+        $this->authorize('viewAny', MaintenanceOperation::class);
         $startDate = Carbon::create($this->currentYear, $this->currentMonth, 1)->startOfMonth();
         $endDate = Carbon::create($this->currentYear, $this->currentMonth, 1)->endOfMonth();
 

@@ -105,11 +105,13 @@
             </x-slot:filters>
 
             <x-slot:actions>
-                <button wire:click="openUploadModal"
-                    class="inline-flex items-center gap-2 p-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all duration-200 shadow-sm hover:shadow-md">
-                    <x-iconify icon="lucide:upload-cloud" class="w-5 h-5" />
-                    <span class="hidden sm:inline">Uploader</span>
-                </button>
+                @can('documents.create')
+                    <button wire:click="openUploadModal"
+                        class="inline-flex items-center gap-2 p-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all duration-200 shadow-sm hover:shadow-md">
+                        <x-iconify icon="lucide:upload-cloud" class="w-5 h-5" />
+                        <span class="hidden sm:inline">Uploader</span>
+                    </button>
+                @endcan
             </x-slot:actions>
 
             <x-slot:filtersPanel>
@@ -222,15 +224,19 @@
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                 <div class="flex items-center justify-end gap-2">
-                                    <button wire:click="download({{ $document->id }})" class="p-2 rounded-full text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition-colors" title="Télécharger">
-                                        <x-iconify icon="lucide:download" class="w-4 h-4" />
-                                    </button>
+                                    @can('documents.download')
+                                        <button wire:click="download({{ $document->id }})" class="p-2 rounded-full text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition-colors" title="Télécharger">
+                                            <x-iconify icon="lucide:download" class="w-4 h-4" />
+                                        </button>
+                                    @endcan
 
-                                    @if($document->status !== 'archived')
-                                    <button wire:click="archive({{ $document->id }})" class="p-2 rounded-full text-gray-400 hover:text-amber-600 hover:bg-amber-50 transition-colors" title="Archiver">
-                                        <x-iconify icon="lucide:archive" class="w-4 h-4" />
-                                    </button>
-                                    @endif
+                                    @can('documents.update')
+                                        @if($document->status !== 'archived')
+                                            <button wire:click="archive({{ $document->id }})" class="p-2 rounded-full text-gray-400 hover:text-amber-600 hover:bg-amber-50 transition-colors" title="Archiver">
+                                                <x-iconify icon="lucide:archive" class="w-4 h-4" />
+                                            </button>
+                                        @endif
+                                    @endcan
 
                                     @can('documents.delete')
                                     <button wire:click="delete({{ $document->id }})" wire:confirm="Êtes-vous sûr ?" class="p-2 rounded-full text-gray-400 hover:text-red-600 hover:bg-red-50 transition-colors" title="Supprimer">

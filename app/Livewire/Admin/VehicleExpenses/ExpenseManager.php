@@ -85,7 +85,7 @@ class ExpenseManager extends Component
 
     public function mount()
     {
-        $this->authorize('expenses.view');
+        $this->authorize('viewAny', VehicleExpense::class);
         $this->loadStatistics();
         $this->filter = request()->get('filter', $this->filter);
     }
@@ -270,6 +270,9 @@ class ExpenseManager extends Component
     public function confirmDelete($expenseId)
     {
         $this->expenseToDelete = VehicleExpense::find($expenseId);
+        if ($this->expenseToDelete) {
+            $this->authorize('delete', $this->expenseToDelete);
+        }
         $this->showDeleteModal = true;
     }
 
@@ -306,15 +309,23 @@ class ExpenseManager extends Component
         if (count($this->selectedExpenses) > 0) {
             DB::beginTransaction();
             try {
-                VehicleExpense::whereIn('id', $this->selectedExpenses)
+                $expenses = VehicleExpense::whereIn('id', $this->selectedExpenses)
                     ->where('organization_id', Auth::user()->organization_id)
-                    ->delete();
-                    
+                    ->get();
+
+                $deletedCount = 0;
+                foreach ($expenses as $expense) {
+                    if (Auth::user()->can('delete', $expense)) {
+                        $expense->delete();
+                        $deletedCount++;
+                    }
+                }
+
                 DB::commit();
                 
                 $this->dispatch('notify', [
                     'type' => 'success',
-                    'message' => count($this->selectedExpenses) . ' dépenses supprimées avec succès.'
+                    'message' => $deletedCount . ' dépenses supprimées avec succès.'
                 ]);
                 
                 $this->selectedExpenses = [];
@@ -332,6 +343,7 @@ class ExpenseManager extends Component
 
     public function exportSelected($format = 'csv')
     {
+        $this->authorize('export', VehicleExpense::class);
         $service = app(VehicleExpenseService::class);
         
         try {

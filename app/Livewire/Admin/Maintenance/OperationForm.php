@@ -16,6 +16,7 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 /**
  * Composant Livewire pour le formulaire d'opération de maintenance
@@ -24,6 +25,7 @@ use Illuminate\Validation\Rule;
 class OperationForm extends Component
 {
     use WithFileUploads;
+    use AuthorizesRequests;
 
     // Propriétés principales
     public ?int $operationId = null;
@@ -90,6 +92,7 @@ class OperationForm extends Component
         if ($this->editMode) {
             $this->loadOperation();
         } else {
+            $this->authorize('create', MaintenanceOperation::class);
             $this->scheduled_date = Carbon::today()->format('Y-m-d');
         }
     }
@@ -182,6 +185,7 @@ class OperationForm extends Component
     private function loadOperation(): void
     {
         $operation = MaintenanceOperation::with(['documents'])->findOrFail($this->operationId);
+        $this->authorize('update', $operation);
 
         $this->vehicle_id = $operation->vehicle_id;
         $this->maintenance_type_id = $operation->maintenance_type_id;
@@ -429,8 +433,10 @@ class OperationForm extends Component
 
         if ($this->editMode) {
             $operation = MaintenanceOperation::findOrFail($this->operationId);
+            $this->authorize('update', $operation);
             $operation->update($data);
         } else {
+            $this->authorize('create', MaintenanceOperation::class);
             $data['organization_id'] = auth()->user()->organization_id;
             $data['created_by'] = auth()->id();
             $operation = MaintenanceOperation::create($data);
