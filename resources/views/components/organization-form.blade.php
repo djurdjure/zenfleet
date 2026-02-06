@@ -1319,7 +1319,7 @@ document.addEventListener('DOMContentLoaded', function() {
  render: {
  option: function(data, escape) {
  return '<div class="flex items-center py-2 px-3 hover:bg-blue-50 transition-colors">' +
- '<div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mr-3">' +
+ '<div class="w-8 h-8 bg-blue-100 border border-blue-200 rounded-full flex items-center justify-center mr-3">' +
  '<i class="fas fa-industry text-blue-600 text-sm"></i>' +
  '</div>' +
  '<div class="flex-1">' +
@@ -1346,7 +1346,7 @@ document.addEventListener('DOMContentLoaded', function() {
  render: {
  option: function(data, escape) {
  return '<div class="flex items-center py-2 px-3 hover:bg-blue-50 transition-colors">' +
- '<div class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center mr-3">' +
+ '<div class="w-8 h-8 bg-green-100 border border-green-200 rounded-full flex items-center justify-center mr-3">' +
  '<i class="fas fa-map-marker-alt text-green-600 text-sm"></i>' +
  '</div>' +
  '<div class="flex-1">' +

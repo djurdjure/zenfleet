@@ -122,7 +122,7 @@
  {{-- Section : Informations Personnelles --}}
  <div>
  <div class="flex items-center mb-4">
- <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center mr-3">
+ <div class="w-10 h-10 bg-blue-100 border border-blue-300 rounded-full flex items-center justify-center mr-3">
  <i class="fas fa-user text-blue-600"></i>
  </div>
  <div>
@@ -198,7 +198,7 @@
  {{-- Section : Organisation --}}
  <div class="border-t border-gray-200 pt-8">
  <div class="flex items-center mb-4">
- <div class="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center mr-3">
+ <div class="w-10 h-10 bg-purple-100 border border-purple-300 rounded-full flex items-center justify-center mr-3">
  <i class="fas fa-building text-purple-600"></i>
  </div>
  <div>
@@ -230,7 +230,7 @@
  {{-- Section : Changer le Mot de passe --}}
  <div class="border-t border-gray-200 pt-8">
  <div class="flex items-center mb-4">
- <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center mr-3">
+ <div class="w-10 h-10 bg-green-100 border border-green-300 rounded-full flex items-center justify-center mr-3">
  <i class="fas fa-lock text-green-600"></i>
  </div>
  <div>
@@ -286,7 +286,7 @@
  {{-- Section : Rôles & Permissions --}}
  <div class="border-t border-gray-200 pt-8">
  <div class="flex items-center mb-4">
- <div class="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center mr-3">
+ <div class="w-10 h-10 bg-orange-100 border border-orange-300 rounded-full flex items-center justify-center mr-3">
  <i class="fas fa-user-shield text-orange-600"></i>
  </div>
  <div>

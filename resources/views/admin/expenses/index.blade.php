@@ -54,7 +54,7 @@
                             {{ $stats['total_count'] ?? 0 }} dépenses
                         </p>
                     </div>
-                    <div class="w-10 h-10 bg-blue-100 border border-blue-200 rounded-lg flex items-center justify-center">
+                    <div class="w-10 h-10 bg-blue-100 border border-blue-300 rounded-full flex items-center justify-center">
                         <x-iconify icon="lucide:coins" class="w-5 h-5 text-blue-600" />
                     </div>
                 </div>
@@ -77,7 +77,7 @@
                         <p class="text-xs text-green-600 mt-1">✓ À jour</p>
                         @endif
                     </div>
-                    <div class="w-10 h-10 bg-yellow-100 border border-yellow-200 rounded-lg flex items-center justify-center">
+                    <div class="w-10 h-10 bg-yellow-100 border border-yellow-300 rounded-full flex items-center justify-center">
                         <x-iconify icon="lucide:clock" class="w-5 h-5 text-yellow-600" />
                     </div>
                 </div>
@@ -93,7 +93,7 @@
                         </p>
                         <p class="text-xs text-gray-500 mt-1">Validées</p>
                     </div>
-                    <div class="w-10 h-10 bg-green-100 border border-green-200 rounded-lg flex items-center justify-center">
+                    <div class="w-10 h-10 bg-green-100 border border-green-300 rounded-full flex items-center justify-center">
                         <x-iconify icon="lucide:check-circle-2" class="w-5 h-5 text-green-600" />
                     </div>
                 </div>
@@ -109,7 +109,7 @@
                         </p>
                         <p class="text-xs text-gray-500 mt-1">Refusées</p>
                     </div>
-                    <div class="w-10 h-10 bg-red-100 border border-red-200 rounded-lg flex items-center justify-center">
+                    <div class="w-10 h-10 bg-red-100 border border-red-300 rounded-full flex items-center justify-center">
                         <x-iconify icon="lucide:x-circle" class="w-5 h-5 text-red-600" />
                     </div>
                 </div>
@@ -130,7 +130,7 @@
                         </p>
                         <p class="text-xs text-purple-700 mt-1">{{ now()->format('F Y') }}</p>
                     </div>
-                    <div class="w-10 h-10 bg-purple-200 rounded-lg flex items-center justify-center">
+                    <div class="w-10 h-10 bg-purple-200 border border-purple-300 rounded-full flex items-center justify-center">
                         <x-iconify icon="lucide:calendar" class="w-5 h-5 text-purple-700" />
                     </div>
                 </div>
@@ -146,7 +146,7 @@
                         </p>
                         <p class="text-xs text-teal-700 mt-1">Par dépense</p>
                     </div>
-                    <div class="w-10 h-10 bg-teal-200 rounded-lg flex items-center justify-center">
+                    <div class="w-10 h-10 bg-teal-200 border border-teal-300 rounded-full flex items-center justify-center">
                         <x-iconify icon="lucide:bar-chart-3" class="w-5 h-5 text-teal-700" />
                     </div>
                 </div>
@@ -162,7 +162,7 @@
                         </p>
                         <p class="text-xs text-indigo-700 mt-1">Utilisé</p>
                     </div>
-                    <div class="w-10 h-10 bg-indigo-200 rounded-lg flex items-center justify-center">
+                    <div class="w-10 h-10 bg-indigo-200 border border-indigo-300 rounded-full flex items-center justify-center">
                         <x-iconify icon="lucide:chart-pie" class="w-5 h-5 text-indigo-700" />
                     </div>
                 </div>
@@ -460,7 +460,7 @@
                             {{-- Référence --}}
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="flex items-center">
-                                    <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center mr-3">
+                                    <div class="w-10 h-10 bg-blue-100 border border-blue-300 rounded-full flex items-center justify-center mr-3">
                                         <x-iconify icon="lucide:receipt-text" class="w-5 h-5 text-blue-600" />
                                     </div>
                                     <div>
@@ -477,7 +477,7 @@
                             {{-- Véhicule --}}
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="flex items-center">
-                                    <div class="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center mr-3">
+                                    <div class="w-8 h-8 bg-gray-100 border border-gray-200 rounded-full flex items-center justify-center mr-3">
                                         <x-iconify icon="lucide:car" class="w-4 h-4 text-gray-600" />
                                     </div>
                                     <div>

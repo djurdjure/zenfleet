@@ -70,7 +70,7 @@ DESIGN PRINCIPLES:
  <p class="text-sm font-medium text-gray-600">Total Affectations</p>
  <p class="text-2xl font-bold text-gray-900 mt-1">{{ $assignments->total() }}</p>
  </div>
- <div class="w-12 h-12 bg-blue-100 border border-blue-200 rounded-lg flex items-center justify-center">
+ <div class="w-12 h-12 bg-blue-100 border border-blue-300 rounded-full flex items-center justify-center">
  <x-iconify icon="lucide:calendar-check" class="w-6 h-6 text-blue-600" />
  </div>
  </div>
@@ -83,7 +83,7 @@ DESIGN PRINCIPLES:
  <p class="text-sm font-medium text-gray-600">Affectations Actives</p>
  <p class="text-2xl font-bold text-green-600 mt-1">{{ $activeAssignments ?? 0 }}</p>
  </div>
- <div class="w-12 h-12 bg-green-100 border border-green-200 rounded-lg flex items-center justify-center">
+ <div class="w-12 h-12 bg-green-100 border border-green-300 rounded-full flex items-center justify-center">
  <x-iconify icon="lucide:check-circle" class="w-6 h-6 text-green-600" />
  </div>
  </div>
@@ -96,7 +96,7 @@ DESIGN PRINCIPLES:
  <p class="text-sm font-medium text-gray-600">En Cours</p>
  <p class="text-2xl font-bold text-orange-600 mt-1">{{ $inProgressAssignments ?? 0 }}</p>
  </div>
- <div class="w-12 h-12 bg-orange-100 border border-orange-200 rounded-lg flex items-center justify-center">
+ <div class="w-12 h-12 bg-orange-100 border border-orange-300 rounded-full flex items-center justify-center">
  <x-iconify icon="lucide:clock" class="w-6 h-6 text-orange-600" />
  </div>
  </div>
@@ -109,7 +109,7 @@ DESIGN PRINCIPLES:
  <p class="text-sm font-medium text-gray-600">Planifiées</p>
  <p class="text-2xl font-bold text-purple-600 mt-1">{{ $scheduledAssignments ?? 0 }}</p>
  </div>
- <div class="w-12 h-12 bg-purple-100 border border-purple-200 rounded-lg flex items-center justify-center">
+ <div class="w-12 h-12 bg-purple-100 border border-purple-300 rounded-full flex items-center justify-center">
  <x-iconify icon="lucide:calendar" class="w-6 h-6 text-purple-600" />
  </div>
  </div>

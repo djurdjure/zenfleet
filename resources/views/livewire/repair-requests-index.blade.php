@@ -24,7 +24,7 @@
                         <p class="text-sm font-medium text-gray-600">Total</p>
                         <p class="text-2xl font-bold text-gray-900 mt-1">{{ $statistics['total'] ?? 0 }}</p>
                     </div>
-                    <div class="w-12 h-12 bg-gray-100 border border-gray-200 rounded-lg flex items-center justify-center">
+                    <div class="w-12 h-12 bg-gray-100 border border-gray-300 rounded-full flex items-center justify-center">
                         <x-iconify icon="lucide:clipboard-list" class="w-6 h-6 text-gray-600" />
                     </div>
                 </div>
@@ -36,7 +36,7 @@
                         <p class="text-sm font-medium text-amber-600">En attente</p>
                         <p class="text-2xl font-bold text-gray-900 mt-1">{{ $statistics['pending'] ?? 0 }}</p>
                     </div>
-                    <div class="w-12 h-12 bg-amber-100 border border-amber-200 rounded-lg flex items-center justify-center">
+                    <div class="w-12 h-12 bg-amber-100 border border-amber-300 rounded-full flex items-center justify-center">
                         <x-iconify icon="lucide:clock" class="w-6 h-6 text-amber-600" />
                     </div>
                 </div>
@@ -48,7 +48,7 @@
                         <p class="text-sm font-medium text-green-600">Approuvées</p>
                         <p class="text-2xl font-bold text-gray-900 mt-1">{{ $statistics['approved'] ?? 0 }}</p>
                     </div>
-                    <div class="w-12 h-12 bg-green-100 border border-green-200 rounded-lg flex items-center justify-center">
+                    <div class="w-12 h-12 bg-green-100 border border-green-300 rounded-full flex items-center justify-center">
                         <x-iconify icon="lucide:check-circle" class="w-6 h-6 text-green-600" />
                     </div>
                 </div>
@@ -60,7 +60,7 @@
                         <p class="text-sm font-medium text-red-600">Rejetées</p>
                         <p class="text-2xl font-bold text-gray-900 mt-1">{{ $statistics['rejected'] ?? 0 }}</p>
                     </div>
-                    <div class="w-12 h-12 bg-red-100 border border-red-200 rounded-lg flex items-center justify-center">
+                    <div class="w-12 h-12 bg-red-100 border border-red-300 rounded-full flex items-center justify-center">
                         <x-iconify icon="lucide:x-circle" class="w-6 h-6 text-red-600" />
                     </div>
                 </div>
@@ -72,7 +72,7 @@
                         <p class="text-sm font-medium text-red-600">Critiques</p>
                         <p class="text-2xl font-bold text-gray-900 mt-1">{{ $statistics['critical'] ?? 0 }}</p>
                     </div>
-                    <div class="w-12 h-12 bg-red-100 border border-red-200 rounded-lg flex items-center justify-center">
+                    <div class="w-12 h-12 bg-red-100 border border-red-300 rounded-full flex items-center justify-center">
                         <x-iconify icon="lucide:alert-triangle" class="w-6 h-6 text-red-600" />
                     </div>
                 </div>
@@ -84,7 +84,7 @@
                         <p class="text-sm font-medium text-orange-600">Urgentes</p>
                         <p class="text-2xl font-bold text-gray-900 mt-1">{{ $statistics['high'] ?? 0 }}</p>
                     </div>
-                    <div class="w-12 h-12 bg-orange-100 border border-orange-200 rounded-lg flex items-center justify-center">
+                    <div class="w-12 h-12 bg-orange-100 border border-orange-300 rounded-full flex items-center justify-center">
                         <x-iconify icon="lucide:zap" class="w-6 h-6 text-orange-600" />
                     </div>
                 </div>
@@ -96,7 +96,7 @@
                         <p class="text-sm font-medium text-blue-600">Aujourd'hui</p>
                         <p class="text-2xl font-bold text-gray-900 mt-1">{{ $statistics['today'] ?? 0 }}</p>
                     </div>
-                    <div class="w-12 h-12 bg-blue-100 border border-blue-200 rounded-lg flex items-center justify-center">
+                    <div class="w-12 h-12 bg-blue-100 border border-blue-300 rounded-full flex items-center justify-center">
                         <x-iconify icon="lucide:calendar" class="w-6 h-6 text-blue-600" />
                     </div>
                 </div>
@@ -108,7 +108,7 @@
                         <p class="text-sm font-medium text-indigo-600">Cette semaine</p>
                         <p class="text-2xl font-bold text-gray-900 mt-1">{{ $statistics['week'] ?? 0 }}</p>
                     </div>
-                    <div class="w-12 h-12 bg-indigo-100 border border-indigo-200 rounded-lg flex items-center justify-center">
+                    <div class="w-12 h-12 bg-indigo-100 border border-indigo-300 rounded-full flex items-center justify-center">
                         <x-iconify icon="lucide:bar-chart-2" class="w-6 h-6 text-indigo-600" />
                     </div>
                 </div>

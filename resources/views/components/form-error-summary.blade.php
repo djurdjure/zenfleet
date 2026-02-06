@@ -2,7 +2,7 @@
  <div class="bg-red-50 border-l-4 border-red-400 p-6 rounded-lg shadow-sm mb-8 fade-in">
  <div class="flex items-start">
  <div class="flex-shrink-0">
- <div class="flex items-center justify-center w-10 h-10 bg-red-100 rounded-full">
+ <div class="flex items-center justify-center w-10 h-10 bg-red-100 border border-red-200 rounded-full">
  <i class="fas fa-exclamation-triangle text-red-500 text-lg"></i>
  </div>
  </div>

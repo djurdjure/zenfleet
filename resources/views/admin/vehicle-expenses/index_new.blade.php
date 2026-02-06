@@ -76,7 +76,7 @@
                             {{ $stats['total_count'] ?? 0 }} dépenses
                         </p>
                     </div>
-                    <div class="w-12 h-12 bg-blue-100 border border-blue-200 rounded-lg flex items-center justify-center">
+                    <div class="w-12 h-12 bg-blue-100 border border-blue-300 rounded-full flex items-center justify-center">
                         <x-iconify icon="lucide:euro" class="w-6 h-6 text-blue-600" />
                     </div>
                 </div>
@@ -102,7 +102,7 @@
                         </p>
                         @endif
                     </div>
-                    <div class="w-12 h-12 bg-purple-100 border border-purple-200 rounded-lg flex items-center justify-center">
+                    <div class="w-12 h-12 bg-purple-100 border border-purple-300 rounded-full flex items-center justify-center">
                         <x-iconify icon="lucide:calendar" class="w-6 h-6 text-purple-600" />
                     </div>
                 </div>
@@ -122,7 +122,7 @@
                         </p>
                         @endif
                     </div>
-                    <div class="w-12 h-12 bg-amber-100 border border-amber-200 rounded-lg flex items-center justify-center">
+                    <div class="w-12 h-12 bg-amber-100 border border-amber-300 rounded-full flex items-center justify-center">
                         <x-iconify icon="lucide:clock" class="w-6 h-6 text-amber-600" />
                     </div>
                 </div>
@@ -142,7 +142,7 @@
                         </p>
                         @endif
                     </div>
-                    <div class="w-12 h-12 bg-green-100 border border-green-200 rounded-lg flex items-center justify-center">
+                    <div class="w-12 h-12 bg-green-100 border border-green-300 rounded-full flex items-center justify-center">
                         <x-iconify icon="lucide:check-circle" class="w-6 h-6 text-green-600" />
                     </div>
                 </div>
@@ -163,7 +163,7 @@
                         </p>
                         <p class="text-xs text-indigo-700 mt-1">Par dépense</p>
                     </div>
-                    <div class="w-10 h-10 bg-indigo-200 rounded-lg flex items-center justify-center">
+                    <div class="w-10 h-10 bg-indigo-200 border border-indigo-300 rounded-full flex items-center justify-center">
                         <x-iconify icon="lucide:bar-chart-3" class="w-5 h-5 text-indigo-700" />
                     </div>
                 </div>
@@ -179,7 +179,7 @@
                         </p>
                         <p class="text-xs text-emerald-700 mt-1">Par véhicule/an</p>
                     </div>
-                    <div class="w-10 h-10 bg-emerald-200 rounded-lg flex items-center justify-center">
+                    <div class="w-10 h-10 bg-emerald-200 border border-emerald-300 rounded-full flex items-center justify-center">
                         <x-iconify icon="lucide:calculator" class="w-5 h-5 text-emerald-700" />
                     </div>
                 </div>
@@ -197,7 +197,7 @@
                             {{ number_format($stats['fuel_percentage'] ?? 0, 1) }}% du total
                         </p>
                     </div>
-                    <div class="w-10 h-10 bg-orange-200 rounded-lg flex items-center justify-center">
+                    <div class="w-10 h-10 bg-orange-200 border border-orange-300 rounded-full flex items-center justify-center">
                         <x-iconify icon="lucide:fuel" class="w-5 h-5 text-orange-700" />
                     </div>
                 </div>
@@ -215,7 +215,7 @@
                             {{ number_format($stats['maintenance_percentage'] ?? 0, 1) }}% du total
                         </p>
                     </div>
-                    <div class="w-10 h-10 bg-purple-200 rounded-lg flex items-center justify-center">
+                    <div class="w-10 h-10 bg-purple-200 border border-purple-300 rounded-full flex items-center justify-center">
                         <x-iconify icon="lucide:wrench" class="w-5 h-5 text-purple-700" />
                     </div>
                 </div>

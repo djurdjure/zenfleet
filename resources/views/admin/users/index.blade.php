@@ -58,7 +58,7 @@
                     <p class="text-sm font-medium text-gray-600">Total utilisateurs</p>
                     <p class="text-2xl font-bold text-gray-900 mt-1">{{ $users->total() }}</p>
                 </div>
-                <div class="w-12 h-12 bg-blue-100 border border-blue-200 rounded-lg flex items-center justify-center">
+                <div class="w-12 h-12 bg-blue-100 border border-blue-300 rounded-full flex items-center justify-center">
                     <x-iconify icon="lucide:users" class="w-6 h-6 text-blue-600" />
                 </div>
             </div>
@@ -70,7 +70,7 @@
                     <p class="text-sm font-medium text-gray-600">Administrateurs</p>
                     <p class="text-2xl font-bold text-purple-600 mt-1">{{ $users->filter(fn($u) => $u->hasRole('Admin') || $u->hasRole('Super Admin'))->count() }}</p>
                 </div>
-                <div class="w-12 h-12 bg-purple-100 border border-purple-200 rounded-lg flex items-center justify-center">
+                <div class="w-12 h-12 bg-purple-100 border border-purple-300 rounded-full flex items-center justify-center">
                     <x-iconify icon="lucide:shield" class="w-6 h-6 text-purple-600" />
                 </div>
             </div>
@@ -82,7 +82,7 @@
                     <p class="text-sm font-medium text-gray-600">Superviseurs</p>
                     <p class="text-2xl font-bold text-orange-600 mt-1">{{ $users->filter(fn($u) => $u->hasRole('Superviseur'))->count() }}</p>
                 </div>
-                <div class="w-12 h-12 bg-orange-100 border border-orange-200 rounded-lg flex items-center justify-center">
+                <div class="w-12 h-12 bg-orange-100 border border-orange-300 rounded-full flex items-center justify-center">
                     <x-iconify icon="lucide:user-cog" class="w-6 h-6 text-orange-600" />
                 </div>
             </div>
@@ -94,7 +94,7 @@
                     <p class="text-sm font-medium text-gray-600">Chauffeurs</p>
                     <p class="text-2xl font-bold text-green-600 mt-1">{{ $users->filter(fn($u) => $u->hasRole('Chauffeur'))->count() }}</p>
                 </div>
-                <div class="w-12 h-12 bg-green-100 border border-green-200 rounded-lg flex items-center justify-center">
+                <div class="w-12 h-12 bg-green-100 border border-green-300 rounded-full flex items-center justify-center">
                     <x-iconify icon="lucide:id-card" class="w-6 h-6 text-green-600" />
                 </div>
             </div>
@@ -187,7 +187,7 @@
  (selectedRole === '' || '{{ $user->roles->pluck('name')->implode(',') }}'.includes(selectedRole))">
                         <td class="px-6 py-4">
                             <div class="flex items-center">
-                                <div class="w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center font-semibold text-sm mr-3">
+                                <div class="w-10 h-10 rounded-full bg-blue-600 border border-blue-700 text-white flex items-center justify-center font-semibold text-sm mr-3">
                                     {{ strtoupper(substr($user->first_name ?? $user->name, 0, 1)) }}{{ strtoupper(substr($user->last_name ?? '', 0, 1)) }}
                                 </div>
                                 <div>

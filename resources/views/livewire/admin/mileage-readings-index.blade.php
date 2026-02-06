@@ -88,7 +88,7 @@
                             @endif
                         </p>
                     </div>
-                    <div class="w-10 h-10 bg-blue-100 border border-blue-200 rounded-lg flex items-center justify-center">
+                    <div class="w-10 h-10 bg-blue-100 border border-blue-300 rounded-full flex items-center justify-center">
                         <x-iconify icon="lucide:gauge" class="w-5 h-5 text-blue-600" />
                     </div>
                 </div>
@@ -106,7 +106,7 @@
                             Actifs
                         </p>
                     </div>
-                    <div class="w-10 h-10 bg-orange-100 border border-orange-200 rounded-lg flex items-center justify-center">
+                    <div class="w-10 h-10 bg-orange-100 border border-orange-300 rounded-full flex items-center justify-center">
                         <x-iconify icon="lucide:car" class="w-5 h-5 text-orange-600" />
                     </div>
                 </div>
@@ -124,7 +124,7 @@
                             {{ $analytics['method_distribution']['manual_percentage'] ?? 0 }}%
                         </p>
                     </div>
-                    <div class="w-10 h-10 bg-green-100 border border-green-200 rounded-lg flex items-center justify-center">
+                    <div class="w-10 h-10 bg-green-100 border border-green-300 rounded-full flex items-center justify-center">
                         <x-iconify icon="lucide:hand" class="w-5 h-5 text-green-600" />
                     </div>
                 </div>
@@ -142,7 +142,7 @@
                             {{ $analytics['method_distribution']['automatic_percentage'] ?? 0 }}%
                         </p>
                     </div>
-                    <div class="w-10 h-10 bg-purple-100 border border-purple-200 rounded-lg flex items-center justify-center">
+                    <div class="w-10 h-10 bg-purple-100 border border-purple-300 rounded-full flex items-center justify-center">
                         <x-iconify icon="lucide:cpu" class="w-5 h-5 text-purple-600" />
                     </div>
                 </div>
@@ -164,7 +164,7 @@
                             Parcourus
                         </p>
                     </div>
-                    <div class="w-10 h-10 bg-indigo-100 border border-indigo-200 rounded-lg flex items-center justify-center">
+                    <div class="w-10 h-10 bg-indigo-100 border border-indigo-300 rounded-full flex items-center justify-center">
                         <x-iconify icon="lucide:route" class="w-5 h-5 text-indigo-600" />
                     </div>
                 </div>
@@ -182,7 +182,7 @@
                             km (30j)
                         </p>
                     </div>
-                    <div class="w-10 h-10 bg-teal-100 border border-teal-200 rounded-lg flex items-center justify-center">
+                    <div class="w-10 h-10 bg-teal-100 border border-teal-300 rounded-full flex items-center justify-center">
                         <x-iconify icon="lucide:calendar-range" class="w-5 h-5 text-teal-600" />
                     </div>
                 </div>
@@ -493,7 +493,7 @@
                             {{-- Cell: Véhicule --}}
                             <td class="px-3 py-2.5 whitespace-nowrap">
                                 <div class="flex items-center">
-                                    <div class="w-8 h-8 rounded-lg bg-gray-50 border border-gray-100 flex items-center justify-center mr-2.5 group-hover:bg-white group-hover:border-blue-100 transition-colors">
+                                    <div class="w-8 h-8 rounded-full bg-gray-50 border border-gray-100 flex items-center justify-center mr-2.5 group-hover:bg-white group-hover:border-blue-100 transition-colors">
                                         <x-iconify icon="lucide:car" class="w-4 h-4 text-gray-500 group-hover:text-blue-600 transition-colors" />
                                     </div>
                                     <div class="flex flex-col">

@@ -46,7 +46,7 @@ Design surpassant Fleetio, Samsara et Verizon Connect:
                 <div class="flex items-center justify-between">
                     <div>
                         <h1 class="text-2xl font-bold text-gray-900 flex items-center gap-2.5">
-                            <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg flex items-center justify-center shadow-lg">
+                            <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center shadow-lg">
                                 <x-iconify icon="lucide:wrench" class="w-6 h-6 text-white" />
                             </div>
                             Nouvelle Opération de Maintenance

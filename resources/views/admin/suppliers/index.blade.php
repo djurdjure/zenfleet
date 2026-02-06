@@ -42,7 +42,7 @@
                         <p class="text-xs font-medium text-gray-600">Total fournisseurs</p>
                         <p class="text-xl font-bold text-gray-900 mt-1">{{ $analytics['total'] }}</p>
                     </div>
-                    <div class="w-10 h-10 bg-blue-100 border border-blue-200 rounded-lg flex items-center justify-center">
+                    <div class="w-10 h-10 bg-blue-100 border border-blue-300 rounded-full flex items-center justify-center">
                         <x-iconify icon="lucide:building-2" class="w-5 h-5 text-blue-600" />
                     </div>
                 </div>
@@ -55,7 +55,7 @@
                         <p class="text-xs font-medium text-gray-600">Actifs</p>
                         <p class="text-xl font-bold text-green-600 mt-1">{{ $analytics['active'] }}</p>
                     </div>
-                    <div class="w-10 h-10 bg-green-100 border border-green-200 rounded-lg flex items-center justify-center">
+                    <div class="w-10 h-10 bg-green-100 border border-green-300 rounded-full flex items-center justify-center">
                         <x-iconify icon="lucide:check-circle" class="w-5 h-5 text-green-600" />
                     </div>
                 </div>
@@ -68,7 +68,7 @@
                         <p class="text-xs font-medium text-gray-600">Préférés</p>
                         <p class="text-xl font-bold text-red-600 mt-1">{{ $analytics['preferred'] }}</p>
                     </div>
-                    <div class="w-10 h-10 bg-red-100 border border-red-200 rounded-lg flex items-center justify-center">
+                    <div class="w-10 h-10 bg-red-100 border border-red-300 rounded-full flex items-center justify-center">
                         <x-iconify icon="lucide:heart" class="w-5 h-5 text-red-600" />
                     </div>
                 </div>
@@ -81,7 +81,7 @@
                         <p class="text-xs font-medium text-gray-600">Certifiés</p>
                         <p class="text-xl font-bold text-purple-600 mt-1">{{ $analytics['certified'] }}</p>
                     </div>
-                    <div class="w-10 h-10 bg-purple-100 border border-purple-200 rounded-lg flex items-center justify-center">
+                    <div class="w-10 h-10 bg-purple-100 border border-purple-300 rounded-full flex items-center justify-center">
                         <x-iconify icon="lucide:badge-check" class="w-5 h-5 text-purple-600" />
                     </div>
                 </div>
@@ -93,7 +93,7 @@
             {{-- Top 5 par Rating --}}
             <div class="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg border border-blue-200 p-5">
                 <div class="flex items-center gap-2 mb-3">
-                    <div class="w-8 h-8 bg-blue-200 rounded-lg flex items-center justify-center">
+                    <div class="w-8 h-8 bg-blue-200 border border-blue-300 rounded-full flex items-center justify-center">
                         <x-iconify icon="lucide:star" class="w-4 h-4 text-blue-700" />
                     </div>
                     <h3 class="text-sm font-semibold text-blue-900">Top 5 - Rating</h3>
@@ -113,7 +113,7 @@
             {{-- Top 5 par Qualité --}}
             <div class="bg-gradient-to-br from-emerald-50 to-teal-50 rounded-lg border border-emerald-200 p-5">
                 <div class="flex items-center gap-2 mb-3">
-                    <div class="w-8 h-8 bg-emerald-200 rounded-lg flex items-center justify-center">
+                    <div class="w-8 h-8 bg-emerald-200 border border-emerald-300 rounded-full flex items-center justify-center">
                         <x-iconify icon="lucide:award" class="w-4 h-4 text-emerald-700" />
                     </div>
                     <h3 class="text-sm font-semibold text-emerald-900">Top 5 - Qualité</h3>
@@ -133,7 +133,7 @@
             {{-- Distribution Géographique --}}
             <div class="bg-gradient-to-br from-purple-50 to-pink-50 rounded-lg border border-purple-200 p-5">
                 <div class="flex items-center gap-2 mb-3">
-                    <div class="w-8 h-8 bg-purple-200 rounded-lg flex items-center justify-center">
+                    <div class="w-8 h-8 bg-purple-200 border border-purple-300 rounded-full flex items-center justify-center">
                         <x-iconify icon="lucide:map-pin" class="w-4 h-4 text-purple-700" />
                     </div>
                     <h3 class="text-sm font-semibold text-purple-900">Top 5 - Wilayas</h3>
@@ -343,7 +343,7 @@
                             {{-- Fournisseur --}}
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="flex items-center gap-3">
-                                    <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                                    <div class="w-10 h-10 bg-blue-100 border border-blue-300 rounded-full flex items-center justify-center flex-shrink-0">
                                         <x-iconify icon="lucide:building-2" class="w-5 h-5 text-blue-600" />
                                     </div>
                                     <div>

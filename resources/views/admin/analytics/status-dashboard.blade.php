@@ -96,7 +96,7 @@
                             </p>
                         @endif
                     </div>
-                    <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                    <div class="w-12 h-12 bg-blue-100 border border-blue-300 rounded-full flex items-center justify-center">
                         <i class="fas fa-exchange-alt text-xl text-blue-600"></i>
                     </div>
                 </div>
@@ -112,7 +112,7 @@
                             {{ $metrics['total_changes'] > 0 ? round(($metrics['manual_changes'] / $metrics['total_changes']) * 100, 1) : 0 }}% du total
                         </p>
                     </div>
-                    <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                    <div class="w-12 h-12 bg-green-100 border border-green-300 rounded-full flex items-center justify-center">
                         <i class="fas fa-user-edit text-xl text-green-600"></i>
                     </div>
                 </div>
@@ -128,7 +128,7 @@
                             {{ $metrics['total_changes'] > 0 ? round(($metrics['automatic_changes'] / $metrics['total_changes']) * 100, 1) : 0 }}% du total
                         </p>
                     </div>
-                    <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+                    <div class="w-12 h-12 bg-purple-100 border border-purple-300 rounded-full flex items-center justify-center">
                         <i class="fas fa-robot text-xl text-purple-600"></i>
                     </div>
                 </div>
@@ -144,7 +144,7 @@
                             {{ $metrics['unique_entities'] }} entités actives
                         </p>
                     </div>
-                    <div class="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
+                    <div class="w-12 h-12 bg-orange-100 border border-orange-300 rounded-full flex items-center justify-center">
                         <i class="fas fa-chart-bar text-xl text-orange-600"></i>
                     </div>
                 </div>

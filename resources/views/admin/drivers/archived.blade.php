@@ -95,7 +95,7 @@
                             {{ $stats['total_archived'] }}
                         </p>
                     </div>
-                    <div class="w-12 h-12 bg-amber-100 border border-amber-200 rounded-lg flex items-center justify-center">
+                    <div class="w-12 h-12 bg-amber-100 border border-amber-300 rounded-full flex items-center justify-center">
                         <x-iconify icon="lucide:archive" class="w-6 h-6 text-amber-600" />
                     </div>
                 </div>
@@ -110,7 +110,7 @@
                             {{ $stats['archived_this_month'] }}
                         </p>
                     </div>
-                    <div class="w-12 h-12 bg-orange-100 border border-orange-200 rounded-lg flex items-center justify-center">
+                    <div class="w-12 h-12 bg-orange-100 border border-orange-300 rounded-full flex items-center justify-center">
                         <x-iconify icon="lucide:calendar" class="w-6 h-6 text-orange-600" />
                     </div>
                 </div>
@@ -125,7 +125,7 @@
                             {{ $stats['archived_this_year'] }}
                         </p>
                     </div>
-                    <div class="w-12 h-12 bg-red-100 border border-red-200 rounded-lg flex items-center justify-center">
+                    <div class="w-12 h-12 bg-red-100 border border-red-300 rounded-full flex items-center justify-center">
                         <x-iconify icon="lucide:trending-down" class="w-6 h-6 text-red-600" />
                     </div>
                 </div>
@@ -140,7 +140,7 @@
                             0
                         </p>
                     </div>
-                    <div class="w-12 h-12 bg-purple-100 border border-purple-200 rounded-lg flex items-center justify-center">
+                    <div class="w-12 h-12 bg-purple-100 border border-purple-300 rounded-full flex items-center justify-center">
                         <x-iconify icon="lucide:check-square" class="w-6 h-6 text-purple-600" />
                     </div>
                 </div>
@@ -155,7 +155,7 @@
                             {{ number_format($stats['avg_seniority'], 1) }} ans
                         </p>
                     </div>
-                    <div class="w-12 h-12 bg-blue-100 border border-blue-200 rounded-lg flex items-center justify-center">
+                    <div class="w-12 h-12 bg-blue-100 border border-blue-300 rounded-full flex items-center justify-center">
                         <x-iconify icon="lucide:clock" class="w-6 h-6 text-blue-600" />
                     </div>
                 </div>

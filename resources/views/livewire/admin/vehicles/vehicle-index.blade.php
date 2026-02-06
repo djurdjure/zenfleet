@@ -32,7 +32,7 @@
                         <p class="text-sm font-medium text-gray-600">Total véhicules</p>
                         <p class="text-2xl font-bold text-gray-900 mt-1">{{ $analytics['total_vehicles'] }}</p>
                     </div>
-                    <div class="w-12 h-12 bg-blue-100 border border-blue-200 rounded-lg flex items-center justify-center">
+                    <div class="w-12 h-12 bg-blue-100 border border-blue-300 rounded-full flex items-center justify-center">
                         <x-iconify icon="lucide:car" class="w-6 h-6 text-blue-600" />
                     </div>
                 </div>
@@ -45,7 +45,7 @@
                             <p class="text-sm font-medium text-gray-600">Disponibles</p>
                             <p class="text-2xl font-bold text-green-600 mt-1">{{ $analytics['available_vehicles'] }}</p>
                         </div>
-                        <div class="w-12 h-12 bg-green-100 border border-green-200 rounded-lg flex items-center justify-center">
+                        <div class="w-12 h-12 bg-green-100 border border-green-300 rounded-full flex items-center justify-center">
                             <x-iconify icon="lucide:check-circle-2" class="w-6 h-6 text-green-600" />
                         </div>
                     </div>
@@ -58,7 +58,7 @@
                             <p class="text-sm font-medium text-gray-600">Affectés</p>
                             <p class="text-2xl font-bold text-orange-600 mt-1">{{ $analytics['assigned_vehicles'] }}</p>
                         </div>
-                        <div class="w-12 h-12 bg-orange-100 border border-orange-200 rounded-lg flex items-center justify-center">
+                        <div class="w-12 h-12 bg-orange-100 border border-orange-300 rounded-full flex items-center justify-center">
                             <x-iconify icon="lucide:user-check" class="w-6 h-6 text-orange-600" />
                         </div>
                     </div>
@@ -71,7 +71,7 @@
                             <p class="text-sm font-medium text-gray-600">En maintenance</p>
                             <p class="text-2xl font-bold text-amber-600 mt-1">{{ $analytics['maintenance_vehicles'] }}</p>
                         </div>
-                        <div class="w-12 h-12 bg-amber-100 border border-amber-200 rounded-lg flex items-center justify-center">
+                        <div class="w-12 h-12 bg-amber-100 border border-amber-300 rounded-full flex items-center justify-center">
                             <x-iconify icon="lucide:wrench" class="w-6 h-6 text-amber-600" />
                         </div>
                     </div>
@@ -84,14 +84,27 @@
                             <p class="text-sm font-medium text-gray-600">En panne</p>
                             <p class="text-2xl font-bold text-rose-600 mt-1">{{ $analytics['broken_vehicles'] }}</p>
                         </div>
-                        <div class="w-12 h-12 bg-rose-100 border border-rose-200 rounded-lg flex items-center justify-center">
+                        <div class="w-12 h-12 bg-rose-100 border border-rose-300 rounded-full flex items-center justify-center">
                             <x-iconify icon="lucide:alert-triangle" class="w-6 h-6 text-rose-600" />
                         </div>
                     </div>
                 </div>
             </x-page-analytics-grid>
-        {{-- FILTERS & ACTIONS (Unified) --}}
-        <x-page-search-bar x-data="{ showFilters: false }">
+        {{-- FILTERS & ACTIONS (Pro) --}}
+        @php
+            $activeFiltersCount = collect([
+                $search,
+                $status_id,
+                $depot_id,
+                $fuel_type_id,
+                $brand,
+                $acquisition_date_from,
+                $acquisition_date_to,
+                $mileage_min,
+                $mileage_max,
+            ])->filter(fn ($value) => $value !== null && $value !== '')->count();
+        @endphp
+        <x-page-search-bar x-data="{ showFilters: false }" class="bg-white/90 backdrop-blur rounded-xl border border-gray-200 p-3 shadow-sm">
             <x-slot:search>
                 <div class="relative">
                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -103,7 +116,7 @@
                         placeholder="Rechercher par immatriculation, marque, modèle..."
                         wire:loading.attr="aria-busy"
                         wire:target="search"
-                        class="pl-10 pr-4 py-2.5 block w-full bg-white border border-gray-300 rounded-lg shadow-sm hover:border-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm">
+                        class="pl-10 pr-4 h-10 block w-full bg-white border border-gray-300 rounded-lg shadow-sm hover:border-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm">
                     <div wire:loading.delay wire:target="search" class="absolute inset-y-0 right-0 pr-3 flex items-center">
                         <x-iconify icon="lucide:loader-2" class="w-4 h-4 text-blue-500 animate-spin" />
                     </div>
@@ -115,9 +128,14 @@
                     @click="showFilters = !showFilters"
                     type="button"
                     title="Filtres"
-                    class="inline-flex items-center gap-2 p-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-all duration-200 shadow-sm hover:shadow-md">
+                    class="inline-flex items-center gap-2 h-10 px-3 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-all duration-200 shadow-sm hover:shadow-md {{ $activeFiltersCount ? 'bg-blue-50 border-blue-200 text-blue-700' : '' }}">
                     <x-iconify icon="lucide:filter" class="w-5 h-5 text-gray-500" />
                     <x-iconify icon="heroicons:chevron-down" class="w-4 h-4 text-gray-400 transition-transform duration-200" x-bind:class="showFilters ? 'rotate-180' : ''" />
+                    @if($activeFiltersCount)
+                        <span class="ml-1 inline-flex items-center px-1.5 py-0.5 rounded-full text-[11px] font-semibold bg-blue-100 text-blue-700 border border-blue-200">
+                            {{ $activeFiltersCount }}
+                        </span>
+                    @endif
                 </button>
             </x-slot:filters>
 
@@ -125,13 +143,13 @@
                 @if($visibility === 'archived')
                 <button wire:click="$set('visibility', 'active')"
                     title="Voir Actifs"
-                    class="inline-flex items-center gap-2 p-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-all duration-200 shadow-sm hover:shadow-md">
+                    class="inline-flex items-center justify-center h-10 w-10 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-all duration-200 shadow-sm hover:shadow-md">
                     <x-iconify icon="lucide:list" class="w-5 h-5" />
                 </button>
                 @else
                 <button wire:click="$set('visibility', 'archived')"
                     title="Voir Archives"
-                    class="inline-flex items-center gap-2 p-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-all duration-200 shadow-sm hover:shadow-md">
+                    class="inline-flex items-center justify-center h-10 w-10 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-all duration-200 shadow-sm hover:shadow-md">
                     <x-iconify icon="lucide:archive" class="w-5 h-5 text-amber-600" />
                 </button>
                 @endif
@@ -144,7 +162,7 @@
                         @click.away="exportOpen = false"
                         type="button"
                         title="Exporter"
-                        class="inline-flex items-center gap-2 p-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-all duration-200 shadow-sm hover:shadow-md">
+                        class="inline-flex items-center justify-center h-10 px-3 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-all duration-200 shadow-sm hover:shadow-md">
                         <x-iconify icon="lucide:download" class="w-5 h-5 text-gray-500" />
                         <x-iconify icon="heroicons:chevron-down" class="w-4 h-4 text-gray-400" />
                     </button>
@@ -194,7 +212,7 @@
                 {{-- Import --}}
                 <a href="{{ route('admin.vehicles.import.show') }}"
                     title="Importer"
-                    class="inline-flex items-center gap-2 p-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-all duration-200 shadow-sm hover:shadow-md">
+                    class="inline-flex items-center justify-center h-10 w-10 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-all duration-200 shadow-sm hover:shadow-md">
                     <x-iconify icon="lucide:upload" class="w-5 h-5" />
                 </a>
                 @endcan
@@ -203,17 +221,17 @@
                 {{-- Nouveau Véhicule --}}
                 <a href="{{ route('admin.vehicles.create') }}"
                     title="Nouveau Véhicule"
-                    class="inline-flex items-center gap-2 p-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all duration-200 shadow-sm hover:shadow-md">
+                    class="inline-flex items-center justify-center h-10 w-10 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all duration-200 shadow-sm hover:shadow-md">
                     <x-iconify icon="lucide:plus" class="w-5 h-5" />
                 </a>
                 @endcan
             </x-slot:actions>
 
             <x-slot:filtersPanel>
-                <x-page-filters-panel columns="4">
+                <x-page-filters-panel columns="4" class="bg-white/95 border border-gray-200 p-4 rounded-xl shadow-sm">
                     {{-- Depot --}}
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Dépôt</label>
+                        <label class="block text-xs font-semibold text-gray-700 mb-1">Dépôt</label>
                         <x-slim-select wire:model.live="depot_id" name="depot_id" placeholder="Tous les dépôts">
                             <option value="" data-placeholder="true">Tous les dépôts</option>
                             @foreach($depots as $depot)
@@ -224,7 +242,7 @@
 
                     {{-- Status --}}
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Statut</label>
+                        <label class="block text-xs font-semibold text-gray-700 mb-1">Statut</label>
                         <x-slim-select wire:model.live="status_id" name="status_id" placeholder="Tous les statuts">
                             <option value="" data-placeholder="true">Tous les statuts</option>
                             @foreach($vehicleStatuses as $status)
@@ -235,7 +253,7 @@
 
                     {{-- Brand --}}
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Marque</label>
+                        <label class="block text-xs font-semibold text-gray-700 mb-1">Marque</label>
                         <x-slim-select wire:model.live="brand" name="brand" placeholder="Toutes les marques">
                             <option value="" data-placeholder="true">Toutes les marques</option>
                             @foreach($brands as $brand)
@@ -246,47 +264,55 @@
 
                     {{-- Fuel Type --}}
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Type de carburant</label>
+                        <label class="block text-xs font-semibold text-gray-700 mb-1">Type de carburant</label>
                         <x-slim-select wire:model.live="fuel_type_id" name="fuel_type_id" placeholder="Tous les carburants">
                             <option value="" data-placeholder="true">Tous les carburants</option>
-                            @foreach($fuelTypes as $key => $label)
-                            <option value="{{ $key }}">{{ $label }}</option>
+                            @foreach($fuelTypes as $fuelType)
+                            <option value="{{ $fuelType->id }}">{{ $fuelType->name }}</option>
                             @endforeach
                         </x-slim-select>
                     </div>
 
                     {{-- Acquisition Date Range --}}
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Date d'acquisition (de)</label>
-                        <x-datepicker
-                            wire:model.live="acquisition_date_from"
-                            name="acquisition_date_from"
-                            placeholder="JJ/MM/AAAA" />
-                    </div>
-
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Date d'acquisition (à)</label>
-                        <x-datepicker
-                            wire:model.live="acquisition_date_to"
-                            name="acquisition_date_to"
-                            placeholder="JJ/MM/AAAA" />
+                    <div class="md:col-span-2">
+                        <label class="block text-xs font-semibold text-gray-700 mb-1">Date d'acquisition</label>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-[11px] text-gray-500 mb-1">Du</label>
+                                <x-datepicker
+                                    wire:model.live="acquisition_date_from"
+                                    name="acquisition_date_from"
+                                    placeholder="JJ/MM/AAAA" />
+                            </div>
+                            <div>
+                                <label class="block text-[11px] text-gray-500 mb-1">Au</label>
+                                <x-datepicker
+                                    wire:model.live="acquisition_date_to"
+                                    name="acquisition_date_to"
+                                    placeholder="JJ/MM/AAAA" />
+                            </div>
+                        </div>
                     </div>
 
                     {{-- Mileage Range --}}
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Kilométrage min</label>
-                        <x-input
-                            wire:model.live.debounce.500ms="mileage_min"
-                            type="number"
-                            placeholder="0" />
-                    </div>
-
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Kilométrage max</label>
-                        <x-input
-                            wire:model.live.debounce.500ms="mileage_max"
-                            type="number"
-                            placeholder="999999" />
+                    <div class="md:col-span-2">
+                        <label class="block text-xs font-semibold text-gray-700 mb-1">Kilométrage</label>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-[11px] text-gray-500 mb-1">Min</label>
+                                <x-input
+                                    wire:model.live.debounce.500ms="mileage_min"
+                                    type="number"
+                                    placeholder="0" />
+                            </div>
+                            <div>
+                                <label class="block text-[11px] text-gray-500 mb-1">Max</label>
+                                <x-input
+                                    wire:model.live.debounce.500ms="mileage_max"
+                                    type="number"
+                                    placeholder="999999" />
+                            </div>
+                        </div>
                     </div>
 
                     <x-slot:reset>
@@ -556,7 +582,7 @@
                                 <tr>
                                     <td colspan="8" class="px-6 py-12 text-center">
                                         <div class="flex flex-col items-center justify-center">
-                                            <div class="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mb-3">
+                                            <div class="w-12 h-12 bg-gray-100 border border-gray-200 rounded-full flex items-center justify-center mb-3">
                                                 <x-iconify icon="lucide:search-x" class="w-6 h-6 text-gray-400" />
                                             </div>
                                             <h3 class="text-sm font-medium text-gray-900">Aucun véhicule trouvé</h3>
@@ -595,7 +621,7 @@
                 <div class="bg-white rounded-xl shadow-2xl border border-gray-200 px-6 py-4 flex items-center gap-6">
                     {{-- Selected Count --}}
                     <div class="flex items-center gap-2 border-r border-gray-300 pr-6">
-                        <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                        <div class="w-8 h-8 bg-blue-100 border border-blue-200 rounded-full flex items-center justify-center">
                             <x-iconify icon="lucide:check-circle-2" class="w-4 h-4 text-blue-600" />
                         </div>
                         <div>

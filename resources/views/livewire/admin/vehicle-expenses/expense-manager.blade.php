@@ -24,7 +24,7 @@
                         <p class="text-sm font-medium text-gray-600">Total ce mois</p>
                         <p class="text-2xl font-bold text-gray-900 mt-1">{{ number_format($totalAmount, 2) }} DZD</p>
                     </div>
-                    <div class="w-12 h-12 bg-blue-100 border border-blue-200 rounded-lg flex items-center justify-center">
+                    <div class="w-12 h-12 bg-blue-100 border border-blue-300 rounded-full flex items-center justify-center">
                         <x-iconify icon="solar:wallet-bold-duotone" class="w-6 h-6 text-blue-600" />
                     </div>
                 </div>
@@ -36,7 +36,7 @@
                         <p class="text-sm font-medium text-gray-600">En attente</p>
                         <p class="text-2xl font-bold text-amber-600 mt-1">{{ $pendingCount }}</p>
                     </div>
-                    <div class="w-12 h-12 bg-amber-100 border border-amber-200 rounded-lg flex items-center justify-center">
+                    <div class="w-12 h-12 bg-amber-100 border border-amber-300 rounded-full flex items-center justify-center">
                         <x-iconify icon="solar:clock-circle-bold-duotone" class="w-6 h-6 text-amber-600" />
                     </div>
                 </div>
@@ -48,7 +48,7 @@
                         <p class="text-sm font-medium text-gray-600">Approuvées</p>
                         <p class="text-2xl font-bold text-green-600 mt-1">{{ $approvedCount }}</p>
                     </div>
-                    <div class="w-12 h-12 bg-green-100 border border-green-200 rounded-lg flex items-center justify-center">
+                    <div class="w-12 h-12 bg-green-100 border border-green-300 rounded-full flex items-center justify-center">
                         <x-iconify icon="solar:check-circle-bold-duotone" class="w-6 h-6 text-green-600" />
                     </div>
                 </div>
@@ -60,7 +60,7 @@
                         <p class="text-sm font-medium text-gray-600">Moyenne mensuelle</p>
                         <p class="text-2xl font-bold text-gray-900 mt-1">{{ number_format($monthlyAverage, 2) }} DZD</p>
                     </div>
-                    <div class="w-12 h-12 bg-gray-100 border border-gray-200 rounded-lg flex items-center justify-center">
+                    <div class="w-12 h-12 bg-gray-100 border border-gray-300 rounded-full flex items-center justify-center">
                         <x-iconify icon="solar:chart-bold-duotone" class="w-6 h-6 text-gray-600" />
                     </div>
                 </div>
@@ -437,7 +437,7 @@
         @if($showDeleteModal)
             <x-modal wire:model="showDeleteModal" maxWidth="md">
                 <div class="p-6">
-                    <div class="flex items-center justify-center w-12 h-12 mx-auto mb-4 bg-red-100 rounded-full">
+                    <div class="flex items-center justify-center w-12 h-12 mx-auto mb-4 bg-red-100 border border-red-200 rounded-full">
                         <x-iconify icon="solar:trash-bin-2-bold" class="w-6 h-6 text-red-600" />
                     </div>
                     <h3 class="text-lg font-medium text-center text-gray-900 mb-2">Confirmer la suppression</h3>

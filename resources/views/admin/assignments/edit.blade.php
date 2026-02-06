@@ -64,7 +64,7 @@ DESIGN PRINCIPLES:
  {{-- Chauffeur --}}
  <x-card padding="p-6" margin="mb-0">
  <div class="flex items-center gap-4">
- <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
+ <div class="w-12 h-12 bg-blue-100 border border-blue-300 rounded-full flex items-center justify-center flex-shrink-0">
  <x-iconify icon="lucide:user" class="w-6 h-6 text-blue-600" />
  </div>
  <div class="flex-1">
@@ -82,7 +82,7 @@ DESIGN PRINCIPLES:
  {{-- Véhicule --}}
  <x-card padding="p-6" margin="mb-0">
  <div class="flex items-center gap-4">
- <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0">
+ <div class="w-12 h-12 bg-green-100 border border-green-300 rounded-full flex items-center justify-center flex-shrink-0">
  <x-iconify icon="lucide:car" class="w-6 h-6 text-green-600" />
  </div>
  <div class="flex-1">
@@ -100,7 +100,7 @@ DESIGN PRINCIPLES:
  {{-- Dates --}}
  <x-card padding="p-6" margin="mb-0">
  <div class="flex items-center gap-4">
- <div class="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center flex-shrink-0">
+ <div class="w-12 h-12 bg-orange-100 border border-orange-300 rounded-full flex items-center justify-center flex-shrink-0">
  <x-iconify icon="lucide:calendar-check" class="w-6 h-6 text-orange-600" />
  </div>
  <div class="flex-1">
@@ -118,7 +118,7 @@ DESIGN PRINCIPLES:
  {{-- Statut --}}
  <x-card padding="p-6" margin="mb-0">
  <div class="flex items-center gap-4">
- <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center flex-shrink-0">
+ <div class="w-12 h-12 bg-purple-100 border border-purple-300 rounded-full flex items-center justify-center flex-shrink-0">
  <x-iconify icon="lucide:info" class="w-6 h-6 text-purple-600" />
  </div>
  <div class="flex-1">

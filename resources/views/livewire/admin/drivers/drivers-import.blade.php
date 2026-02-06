@@ -30,7 +30,7 @@
 
  <div class="space-y-4">
  <div class="flex items-start gap-3 p-4 bg-gray-50 rounded-lg">
- <div class="w-8 h-8 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0">1</div>
+ <div class="w-8 h-8 bg-blue-100 border border-blue-200 text-blue-600 rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0">1</div>
  <div>
  <h3 class="text-sm font-semibold text-gray-900">Téléchargez le modèle</h3>
  <p class="text-xs text-gray-600 mt-1">Format CSV avec les colonnes requises</p>
@@ -38,7 +38,7 @@
  </div>
 
  <div class="flex items-start gap-3 p-4 bg-gray-50 rounded-lg">
- <div class="w-8 h-8 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0">2</div>
+ <div class="w-8 h-8 bg-blue-100 border border-blue-200 text-blue-600 rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0">2</div>
  <div>
  <h3 class="text-sm font-semibold text-gray-900">Remplissez vos données</h3>
  <p class="text-xs text-gray-600 mt-1">
@@ -48,7 +48,7 @@
  </div>
 
  <div class="flex items-start gap-3 p-4 bg-gray-50 rounded-lg">
- <div class="w-8 h-8 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0">3</div>
+ <div class="w-8 h-8 bg-blue-100 border border-blue-200 text-blue-600 rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0">3</div>
  <div>
  <h3 class="text-sm font-semibold text-gray-900">Format des dates</h3>
  <p class="text-xs text-gray-600 mt-1">
@@ -59,7 +59,7 @@
  </div>
 
  <div class="flex items-start gap-3 p-4 bg-gray-50 rounded-lg">
- <div class="w-8 h-8 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0">4</div>
+ <div class="w-8 h-8 bg-blue-100 border border-blue-200 text-blue-600 rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0">4</div>
  <div>
  <h3 class="text-sm font-semibold text-gray-900">Encodage UTF-8</h3>
  <p class="text-xs text-gray-600 mt-1">Séparateur: point-virgule (;) ou virgule (,)</p>
@@ -289,7 +289,7 @@
  <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
  <x-card>
  <div class="flex items-center gap-4">
- <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+ <div class="w-12 h-12 bg-blue-100 border border-blue-300 rounded-full flex items-center justify-center">
  <x-iconify icon="heroicons:document-text" class="w-6 h-6 text-blue-600" />
  </div>
  <div>
@@ -301,7 +301,7 @@
 
  <x-card>
  <div class="flex items-center gap-4">
- <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+ <div class="w-12 h-12 bg-green-100 border border-green-300 rounded-full flex items-center justify-center">
  <x-iconify icon="heroicons:check-circle" class="w-6 h-6 text-green-600" />
  </div>
  <div>
@@ -313,7 +313,7 @@
 
  <x-card>
  <div class="flex items-center gap-4">
- <div class="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center">
+ <div class="w-12 h-12 bg-red-100 border border-red-300 rounded-full flex items-center justify-center">
  <x-iconify icon="heroicons:exclamation-triangle" class="w-6 h-6 text-red-600" />
  </div>
  <div>
@@ -417,7 +417,7 @@
  <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
  <x-card>
  <div class="flex items-center gap-4">
- <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+ <div class="w-12 h-12 bg-green-100 border border-green-300 rounded-full flex items-center justify-center">
  <x-iconify icon="heroicons:check-circle" class="w-6 h-6 text-green-600" />
  </div>
  <div>
@@ -429,7 +429,7 @@
 
  <x-card>
  <div class="flex items-center gap-4">
- <div class="w-12 h-12 bg-amber-100 rounded-lg flex items-center justify-center">
+ <div class="w-12 h-12 bg-amber-100 border border-amber-300 rounded-full flex items-center justify-center">
  <x-iconify icon="heroicons:arrow-path" class="w-6 h-6 text-amber-600" />
  </div>
  <div>
@@ -441,7 +441,7 @@
 
  <x-card>
  <div class="flex items-center gap-4">
- <div class="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center">
+ <div class="w-12 h-12 bg-gray-100 border border-gray-300 rounded-full flex items-center justify-center">
  <x-iconify icon="heroicons:forward" class="w-6 h-6 text-gray-600" />
  </div>
  <div>
@@ -453,7 +453,7 @@
 
  <x-card>
  <div class="flex items-center gap-4">
- <div class="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center">
+ <div class="w-12 h-12 bg-red-100 border border-red-300 rounded-full flex items-center justify-center">
  <x-iconify icon="heroicons:exclamation-triangle" class="w-6 h-6 text-red-600" />
  </div>
  <div>

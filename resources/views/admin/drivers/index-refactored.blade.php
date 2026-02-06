@@ -85,7 +85,7 @@
  {{ $analytics['total_drivers'] ?? ($drivers->total() ?? 0) }}
  </p>
  </div>
- <div class="w-12 h-12 bg-blue-100 border border-blue-200 rounded-lg flex items-center justify-center">
+ <div class="w-12 h-12 bg-blue-100 border border-blue-300 rounded-full flex items-center justify-center">
  <x-iconify icon="heroicons:users" class="w-6 h-6 text-blue-600" />
  </div>
  </div>
@@ -100,7 +100,7 @@
  {{ $analytics['available_drivers'] ?? 0 }}
  </p>
  </div>
- <div class="w-12 h-12 bg-green-100 border border-green-200 rounded-lg flex items-center justify-center">
+ <div class="w-12 h-12 bg-green-100 border border-green-300 rounded-full flex items-center justify-center">
  <x-iconify icon="heroicons:check-circle" class="w-6 h-6 text-green-600" />
  </div>
  </div>
@@ -115,7 +115,7 @@
  {{ $analytics['on_mission_drivers'] ?? 0 }}
  </p>
  </div>
- <div class="w-12 h-12 bg-orange-100 border border-orange-200 rounded-lg flex items-center justify-center">
+ <div class="w-12 h-12 bg-orange-100 border border-orange-300 rounded-full flex items-center justify-center">
  <x-iconify icon="heroicons:truck" class="w-6 h-6 text-orange-600" />
  </div>
  </div>
@@ -130,7 +130,7 @@
  {{ $analytics['resting_drivers'] ?? 0 }}
  </p>
  </div>
- <div class="w-12 h-12 bg-red-100 border border-red-200 rounded-lg flex items-center justify-center">
+ <div class="w-12 h-12 bg-red-100 border border-red-300 rounded-full flex items-center justify-center">
  <x-iconify icon="heroicons:moon" class="w-6 h-6 text-red-600" />
  </div>
  </div>
@@ -151,7 +151,7 @@
  </p>
  <p class="text-xs text-blue-700 mt-1">Moyenne de l'équipe</p>
  </div>
- <div class="w-10 h-10 bg-blue-200 rounded-lg flex items-center justify-center">
+ <div class="w-10 h-10 bg-blue-200 border border-blue-300 rounded-full flex items-center justify-center">
  <x-iconify icon="heroicons:calendar" class="w-5 h-5 text-blue-700" />
  </div>
  </div>
@@ -167,7 +167,7 @@
  </p>
  <p class="text-xs text-purple-700 mt-1">Permis à jour</p>
  </div>
- <div class="w-10 h-10 bg-purple-200 rounded-lg flex items-center justify-center">
+ <div class="w-10 h-10 bg-purple-200 border border-purple-300 rounded-full flex items-center justify-center">
  <x-iconify icon="heroicons:identification" class="w-5 h-5 text-purple-700" />
  </div>
  </div>
@@ -183,7 +183,7 @@
  </p>
  <p class="text-xs text-emerald-700 mt-1">Expérience moyenne</p>
  </div>
- <div class="w-10 h-10 bg-emerald-200 rounded-lg flex items-center justify-center">
+ <div class="w-10 h-10 bg-emerald-200 border border-emerald-300 rounded-full flex items-center justify-center">
  <x-iconify icon="heroicons:star" class="w-5 h-5 text-emerald-700" />
  </div>
  </div>

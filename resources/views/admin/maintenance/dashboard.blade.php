@@ -384,7 +384,7 @@
  <div class="group">
  <div class="bg-gradient-to-br from-blue-50 to-indigo-100 rounded-lg p-4 border-2 border-transparent group-hover:border-blue-300 transition-all duration-300 group-hover:shadow-lg">
  <div class="flex items-center mb-3">
- <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+ <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
  <i class="fas fa-cogs text-white"></i>
  </div>
  <h4 class="text-sm font-semibold text-gray-900 ml-3">Types de Maintenance</h4>
@@ -404,7 +404,7 @@
  <div class="group">
  <div class="bg-gradient-to-br from-green-50 to-emerald-100 rounded-lg p-4 border-2 border-transparent group-hover:border-green-300 transition-all duration-300 group-hover:shadow-lg">
  <div class="flex items-center mb-3">
- <div class="w-10 h-10 bg-gradient-to-br from-green-500 to-emerald-600 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+ <div class="w-10 h-10 bg-gradient-to-br from-green-500 to-emerald-600 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
  <i class="fas fa-calendar-alt text-white"></i>
  </div>
  <h4 class="text-sm font-semibold text-gray-900 ml-3">Planifications</h4>
@@ -424,7 +424,7 @@
  <div class="group">
  <div class="bg-gradient-to-br from-purple-50 to-violet-100 rounded-lg p-4 border-2 border-transparent group-hover:border-purple-300 transition-all duration-300 group-hover:shadow-lg">
  <div class="flex items-center mb-3">
- <div class="w-10 h-10 bg-gradient-to-br from-purple-500 to-violet-600 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+ <div class="w-10 h-10 bg-gradient-to-br from-purple-500 to-violet-600 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
  <i class="fas fa-wrench text-white"></i>
  </div>
  <h4 class="text-sm font-semibold text-gray-900 ml-3">Opérations</h4>
@@ -444,7 +444,7 @@
  <div class="group">
  <div class="bg-gradient-to-br from-orange-50 to-red-100 rounded-lg p-4 border-2 border-transparent group-hover:border-orange-300 transition-all duration-300 group-hover:shadow-lg">
  <div class="flex items-center mb-3">
- <div class="w-10 h-10 bg-gradient-to-br from-orange-500 to-red-600 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+ <div class="w-10 h-10 bg-gradient-to-br from-orange-500 to-red-600 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
  <i class="fas fa-bell text-white"></i>
  </div>
  <h4 class="text-sm font-semibold text-gray-900 ml-3">Alertes & Rapports</h4>
@@ -467,7 +467,7 @@
  <div class="group">
  <div class="bg-gradient-to-br from-teal-50 to-cyan-100 rounded-lg p-4 border-2 border-transparent group-hover:border-teal-300 transition-all duration-300 group-hover:shadow-lg">
  <div class="flex items-center mb-3">
- <div class="w-10 h-10 bg-gradient-to-br from-teal-500 to-cyan-600 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+ <div class="w-10 h-10 bg-gradient-to-br from-teal-500 to-cyan-600 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
  <i class="fas fa-building text-white"></i>
  </div>
  <h4 class="text-sm font-semibold text-gray-900 ml-3">Fournisseurs</h4>
@@ -486,7 +486,7 @@
  <div class="group">
  <div class="bg-gradient-to-br from-gray-50 to-slate-100 rounded-lg p-4 border-2 border-transparent group-hover:border-gray-300 transition-all duration-300 group-hover:shadow-lg">
  <div class="flex items-center mb-3">
- <div class="w-10 h-10 bg-gradient-to-br from-gray-500 to-slate-600 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+ <div class="w-10 h-10 bg-gradient-to-br from-gray-500 to-slate-600 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
  <i class="fas fa-cog text-white"></i>
  </div>
  <h4 class="text-sm font-semibold text-gray-900 ml-3">Configuration</h4>
@@ -505,7 +505,7 @@
  <div class="group">
  <div class="bg-gradient-to-br from-amber-50 to-yellow-100 rounded-lg p-4 border-2 border-transparent group-hover:border-amber-300 transition-all duration-300 group-hover:shadow-lg">
  <div class="flex items-center mb-3">
- <div class="w-10 h-10 bg-gradient-to-br from-amber-500 to-yellow-600 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+ <div class="w-10 h-10 bg-gradient-to-br from-amber-500 to-yellow-600 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
  <i class="fas fa-question-circle text-white"></i>
  </div>
  <h4 class="text-sm font-semibold text-gray-900 ml-3">Support</h4>
@@ -743,7 +743,7 @@
  </td>
  <td class="px-6 py-4">
  <div class="flex items-center">
- <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center mr-3">
+ <div class="w-10 h-10 bg-blue-100 border border-blue-300 rounded-full flex items-center justify-center mr-3">
  <x-iconify icon="lucide:car" class="w-5 h-5 text-blue-600" / />
  </div>
  <div>
@@ -821,7 +821,7 @@
  </td>
  <td class="px-6 py-4">
  <div class="flex items-center">
- <div class="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center mr-3">
+ <div class="w-10 h-10 bg-gray-100 border border-gray-300 rounded-full flex items-center justify-center mr-3">
  <x-iconify icon="lucide:car" class="w-5 h-5 text-gray-600" / />
  </div>
  <div>
@@ -895,7 +895,7 @@
  </td>
  <td class="px-6 py-4">
  <div class="flex items-center">
- <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center mr-3">
+ <div class="w-10 h-10 bg-green-100 border border-green-300 rounded-full flex items-center justify-center mr-3">
  <x-iconify icon="lucide:car" class="w-5 h-5 text-green-600" / />
  </div>
  <div>
@@ -950,7 +950,7 @@
  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
  <a href="{{ route('admin.maintenance.alerts.index') }}" class="action-button group flex items-center p-4 bg-red-50 hover:bg-red-100 rounded-lg border-2 border-red-200 transition-all duration-200">
  <div class="flex-shrink-0">
- <div class="w-10 h-10 bg-red-500 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform">
+ <div class="w-10 h-10 bg-red-500 border border-red-600 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
  <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
  <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
  </svg>
@@ -964,7 +964,7 @@
 
  <a href="{{ route('admin.maintenance.schedules.index') }}" class="action-button group flex items-center p-4 bg-blue-50 hover:bg-blue-100 rounded-lg border-2 border-blue-200 transition-all duration-200">
  <div class="flex-shrink-0">
- <div class="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform">
+ <div class="w-10 h-10 bg-blue-500 border border-blue-600 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
  <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
  <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"></path>
  </svg>
@@ -978,7 +978,7 @@
 
  <a href="{{ route('admin.maintenance.operations.index') }}" class="action-button group flex items-center p-4 bg-green-50 hover:bg-green-100 rounded-lg border-2 border-green-200 transition-all duration-200">
  <div class="flex-shrink-0">
- <div class="w-10 h-10 bg-green-500 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform">
+ <div class="w-10 h-10 bg-green-500 border border-green-600 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
  <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
  <path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd"></path>
  </svg>
@@ -992,7 +992,7 @@
 
  <a href="{{ route('admin.maintenance.reports.index') }}" class="action-button group flex items-center p-4 bg-purple-50 hover:bg-purple-100 rounded-lg border-2 border-purple-200 transition-all duration-200">
  <div class="flex-shrink-0">
- <div class="w-10 h-10 bg-purple-500 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform">
+ <div class="w-10 h-10 bg-purple-500 border border-purple-600 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
  <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
  <path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zM8 7a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zM14 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z"></path>
  </svg>
@@ -1030,7 +1030,7 @@
  <div class="flex items-center justify-between">
  <div class="flex items-center">
  <div class="flex-shrink-0">
- <div class="w-8 h-8 bg-red-500 rounded-lg flex items-center justify-center">
+ <div class="w-8 h-8 bg-red-500 border border-red-600 rounded-full flex items-center justify-center">
  <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
  <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
  </svg>

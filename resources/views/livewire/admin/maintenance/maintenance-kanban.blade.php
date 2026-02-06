@@ -33,7 +33,7 @@
                         
                         {{-- Vehicle Info --}}
                         <div class="flex items-center gap-2 mb-3">
-                            <div class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                            <div class="w-8 h-8 bg-blue-100 border border-blue-200 rounded-full flex items-center justify-center flex-shrink-0">
                                 <x-iconify icon="lucide:car" class="w-4 h-4 text-blue-600" />
                             </div>
                             <div class="flex-1 min-w-0">

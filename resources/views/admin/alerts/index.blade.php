@@ -60,7 +60,7 @@
                         <p class="text-sm font-medium text-gray-600">Critiques</p>
                         <p class="text-2xl font-bold text-red-600 mt-1">{{ $stats['critical_count'] }}</p>
                     </div>
-                    <div class="w-12 h-12 bg-red-100 border border-red-200 rounded-lg flex items-center justify-center">
+                    <div class="w-12 h-12 bg-red-100 border border-red-300 rounded-full flex items-center justify-center">
                         <x-iconify icon="heroicons:exclamation-triangle" class="w-6 h-6 text-red-600" />
                     </div>
                 </div>
@@ -72,7 +72,7 @@
                         <p class="text-sm font-medium text-gray-600">Maintenance</p>
                         <p class="text-2xl font-bold text-indigo-600 mt-1">{{ $stats['maintenance_count'] }}</p>
                     </div>
-                    <div class="w-12 h-12 bg-indigo-100 border border-indigo-200 rounded-lg flex items-center justify-center">
+                    <div class="w-12 h-12 bg-indigo-100 border border-indigo-300 rounded-full flex items-center justify-center">
                         <x-iconify icon="heroicons:wrench" class="w-6 h-6 text-indigo-600" />
                     </div>
                 </div>
@@ -84,7 +84,7 @@
                         <p class="text-sm font-medium text-gray-600">Budget</p>
                         <p class="text-2xl font-bold text-emerald-600 mt-1">{{ $stats['budget_overruns'] }}</p>
                     </div>
-                    <div class="w-12 h-12 bg-emerald-100 border border-emerald-200 rounded-lg flex items-center justify-center">
+                    <div class="w-12 h-12 bg-emerald-100 border border-emerald-300 rounded-full flex items-center justify-center">
                         <x-iconify icon="lucide:wallet" class="w-6 h-6 text-emerald-600" />
                     </div>
                 </div>
@@ -96,7 +96,7 @@
                         <p class="text-sm font-medium text-gray-600">Réparations</p>
                         <p class="text-2xl font-bold text-orange-600 mt-1">{{ $stats['pending_repairs'] }}</p>
                     </div>
-                    <div class="w-12 h-12 bg-orange-100 border border-orange-200 rounded-lg flex items-center justify-center">
+                    <div class="w-12 h-12 bg-orange-100 border border-orange-300 rounded-full flex items-center justify-center">
                         <x-iconify icon="lucide:wrench" class="w-6 h-6 text-orange-600" />
                     </div>
                 </div>
@@ -108,7 +108,7 @@
                         <p class="text-sm font-medium text-gray-600">En retard</p>
                         <p class="text-2xl font-bold text-yellow-700 mt-1">{{ $stats['overdue_maintenance'] }}</p>
                     </div>
-                    <div class="w-12 h-12 bg-yellow-100 border border-yellow-200 rounded-lg flex items-center justify-center">
+                    <div class="w-12 h-12 bg-yellow-100 border border-yellow-300 rounded-full flex items-center justify-center">
                         <x-iconify icon="heroicons:clock" class="w-6 h-6 text-yellow-700" />
                     </div>
                 </div>
@@ -120,7 +120,7 @@
                         <p class="text-sm font-medium text-gray-600">Total alertes</p>
                         <p class="text-2xl font-bold text-blue-700 mt-1">{{ $stats['total_alerts'] }}</p>
                     </div>
-                    <div class="w-12 h-12 bg-blue-100 border border-blue-200 rounded-lg flex items-center justify-center">
+                    <div class="w-12 h-12 bg-blue-100 border border-blue-300 rounded-full flex items-center justify-center">
                         <x-iconify icon="heroicons:bell-alert" class="w-6 h-6 text-blue-700" />
                     </div>
                 </div>
@@ -193,7 +193,7 @@
                 @foreach($alertCoverage as $item)
                     <div class="bg-gray-50 rounded-lg border border-gray-200 p-4">
                         <div class="flex items-start gap-3">
-                            <div class="w-10 h-10 bg-white border border-gray-200 rounded-lg flex items-center justify-center">
+                            <div class="w-10 h-10 bg-white border border-gray-300 rounded-full flex items-center justify-center">
                                 <x-iconify icon="{{ $item['icon'] }}" class="w-5 h-5 text-gray-700" />
                             </div>
                             <div>

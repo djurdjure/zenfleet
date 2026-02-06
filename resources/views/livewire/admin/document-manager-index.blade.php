@@ -33,7 +33,7 @@
                         <p class="text-sm font-medium text-gray-600">Total Documents</p>
                         <p class="text-2xl font-bold text-gray-900 mt-1">{{ $stats['total'] }}</p>
                     </div>
-                    <div class="w-12 h-12 bg-blue-100 border border-blue-200 rounded-lg flex items-center justify-center">
+                    <div class="w-12 h-12 bg-blue-100 border border-blue-300 rounded-full flex items-center justify-center">
                         <x-iconify icon="lucide:files" class="w-6 h-6 text-blue-600" />
                     </div>
                 </div>
@@ -45,7 +45,7 @@
                         <p class="text-sm font-medium text-gray-600">Validés</p>
                         <p class="text-2xl font-bold text-green-600 mt-1">{{ $stats['validated'] }}</p>
                     </div>
-                    <div class="w-12 h-12 bg-green-100 border border-green-200 rounded-lg flex items-center justify-center">
+                    <div class="w-12 h-12 bg-green-100 border border-green-300 rounded-full flex items-center justify-center">
                         <x-iconify icon="lucide:check-circle" class="w-6 h-6 text-green-600" />
                     </div>
                 </div>
@@ -57,7 +57,7 @@
                         <p class="text-sm font-medium text-gray-600">Brouillons</p>
                         <p class="text-2xl font-bold text-gray-900 mt-1">{{ $stats['draft'] }}</p>
                     </div>
-                    <div class="w-12 h-12 bg-gray-100 border border-gray-200 rounded-lg flex items-center justify-center">
+                    <div class="w-12 h-12 bg-gray-100 border border-gray-300 rounded-full flex items-center justify-center">
                         <x-iconify icon="lucide:file-edit" class="w-6 h-6 text-gray-600" />
                     </div>
                 </div>
@@ -69,7 +69,7 @@
                         <p class="text-sm font-medium text-gray-600">Archivés</p>
                         <p class="text-2xl font-bold text-amber-600 mt-1">{{ $stats['archived'] }}</p>
                     </div>
-                    <div class="w-12 h-12 bg-amber-100 border border-amber-200 rounded-lg flex items-center justify-center">
+                    <div class="w-12 h-12 bg-amber-100 border border-amber-300 rounded-full flex items-center justify-center">
                         <x-iconify icon="lucide:archive" class="w-6 h-6 text-amber-600" />
                     </div>
                 </div>

@@ -156,7 +156,7 @@
                         <div class="space-y-3">
                             {{-- Vehicle --}}
                             <div class="flex items-center gap-3">
-                                <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                                <div class="w-10 h-10 bg-blue-100 border border-blue-300 rounded-full flex items-center justify-center">
                                     <x-iconify icon="lucide:car" class="w-5 h-5 text-blue-600" />
                                 </div>
                                 <div>
@@ -180,7 +180,7 @@
 
                             {{-- Date --}}
                             <div class="flex items-center gap-3">
-                                <div class="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center">
+                                <div class="w-10 h-10 bg-gray-100 border border-gray-300 rounded-full flex items-center justify-center">
                                     <x-iconify icon="lucide:calendar" class="w-5 h-5 text-gray-600" />
                                 </div>
                                 <div>
@@ -191,7 +191,7 @@
 
                             {{-- Provider --}}
                             <div class="flex items-center gap-3" x-show="selectedEvent.extendedProps.provider">
-                                <div class="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
+                                <div class="w-10 h-10 bg-purple-100 border border-purple-300 rounded-full flex items-center justify-center">
                                     <x-iconify icon="lucide:building" class="w-5 h-5 text-purple-600" />
                                 </div>
                                 <div>
@@ -202,7 +202,7 @@
 
                             {{-- Cost --}}
                             <div class="flex items-center gap-3" x-show="selectedEvent.extendedProps.cost">
-                                <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
+                                <div class="w-10 h-10 bg-green-100 border border-green-300 rounded-full flex items-center justify-center">
                                     <x-iconify icon="lucide:banknote" class="w-5 h-5 text-green-600" />
                                 </div>
                                 <div>

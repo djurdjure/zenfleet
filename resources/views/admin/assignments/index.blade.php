@@ -74,7 +74,7 @@ DESIGN PRINCIPLES:
                         <p class="text-sm font-medium text-gray-600">Total Affectations</p>
                         <p class="text-2xl font-bold text-gray-900 mt-1">{{ $assignments->total() }}</p>
                     </div>
-                    <div class="w-12 h-12 bg-blue-100 border border-blue-200 rounded-lg flex items-center justify-center">
+                    <div class="w-12 h-12 bg-blue-100 border border-blue-300 rounded-full flex items-center justify-center">
                         <x-iconify icon="lucide:calendar-check" class="w-6 h-6 text-blue-600" />
                     </div>
                 </div>
@@ -87,7 +87,7 @@ DESIGN PRINCIPLES:
                         <p class="text-sm font-medium text-gray-600">Affectations Actives</p>
                         <p class="text-2xl font-bold text-green-600 mt-1">{{ $activeAssignments ?? 0 }}</p>
                     </div>
-                    <div class="w-12 h-12 bg-green-100 border border-green-200 rounded-lg flex items-center justify-center">
+                    <div class="w-12 h-12 bg-green-100 border border-green-300 rounded-full flex items-center justify-center">
                         <x-iconify icon="lucide:check-circle" class="w-6 h-6 text-green-600" />
                     </div>
                 </div>
@@ -100,7 +100,7 @@ DESIGN PRINCIPLES:
                         <p class="text-sm font-medium text-gray-600">En Cours</p>
                         <p class="text-2xl font-bold text-orange-600 mt-1">{{ $inProgressAssignments ?? 0 }}</p>
                     </div>
-                    <div class="w-12 h-12 bg-orange-100 border border-orange-200 rounded-lg flex items-center justify-center">
+                    <div class="w-12 h-12 bg-orange-100 border border-orange-300 rounded-full flex items-center justify-center">
                         <x-iconify icon="lucide:clock" class="w-6 h-6 text-orange-600" />
                     </div>
                 </div>
@@ -113,7 +113,7 @@ DESIGN PRINCIPLES:
                         <p class="text-sm font-medium text-gray-600">Planifiées</p>
                         <p class="text-2xl font-bold text-purple-600 mt-1">{{ $scheduledAssignments ?? 0 }}</p>
                     </div>
-                    <div class="w-12 h-12 bg-purple-100 border border-purple-200 rounded-lg flex items-center justify-center">
+                    <div class="w-12 h-12 bg-purple-100 border border-purple-300 rounded-full flex items-center justify-center">
                         <x-iconify icon="lucide:calendar" class="w-6 h-6 text-purple-600" />
                     </div>
                 </div>
@@ -619,7 +619,7 @@ DESIGN PRINCIPLES:
                             {{-- Assignment Details --}}
                             <div class="mt-4 bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg p-4">
                                 <div class="flex items-center gap-3 mb-3">
-                                    <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                                    <div class="w-10 h-10 bg-blue-100 border border-blue-300 rounded-full flex items-center justify-center">
                                         <svg class="h-6 w-6 text-blue-600" fill="currentColor" viewBox="0 0 24 24">
                                             <path d="M18.92 6.01C18.72 5.42 18.16 5 17.5 5h-11c-.66 0-1.22.42-1.42 1.01L3 12v8c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h12v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-8l-2.08-5.99z"/>
                                         </svg>
@@ -896,7 +896,7 @@ DESIGN PRINCIPLES:
                             </p>
                             <div class="mt-4 bg-red-50 border border-red-200 rounded-lg p-4">
                                 <div class="flex items-center gap-3">
-                                    <div class="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center">
+                                    <div class="w-10 h-10 bg-red-100 border border-red-300 rounded-full flex items-center justify-center">
                                         <svg class="h-6 w-6 text-red-600" fill="currentColor" viewBox="0 0 24 24">
                                             <path d="M18.92 6.01C18.72 5.42 18.16 5 17.5 5h-11c-.66 0-1.22.42-1.42 1.01L3 12v8c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h12v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-8l-2.08-5.99z"/>
                                         </svg>

@@ -120,7 +120,7 @@
  <div class="space-y-4">
  <div class="flex items-center p-4 bg-gray-50 rounded-lg">
  <div class="flex-shrink-0">
- <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+ <div class="w-10 h-10 bg-blue-100 border border-blue-200 rounded-full flex items-center justify-center">
  <i class="fas fa-plus text-blue-600"></i>
  </div>
  </div>
@@ -134,7 +134,7 @@
  
  <div class="flex items-center p-4 bg-gray-50 rounded-lg">
  <div class="flex-shrink-0">
- <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+ <div class="w-10 h-10 bg-green-100 border border-green-200 rounded-full flex items-center justify-center">
  <i class="fas fa-user text-green-600"></i>
  </div>
  </div>
@@ -148,7 +148,7 @@
 
  <div class="flex items-center p-4 bg-gray-50 rounded-lg">
  <div class="flex-shrink-0">
- <div class="w-10 h-10 bg-yellow-100 rounded-full flex items-center justify-center">
+ <div class="w-10 h-10 bg-yellow-100 border border-yellow-200 rounded-full flex items-center justify-center">
  <i class="fas fa-car text-yellow-600"></i>
  </div>
  </div>

@@ -34,7 +34,7 @@ function archiveDriver(driverId, driverName, employeeNumber) {
                             </p>
                             <div class="mt-4 bg-blue-50 border border-blue-200 rounded-lg p-4">
                                 <div class="flex items-center gap-3">
-                                    <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                                    <div class="w-10 h-10 bg-blue-100 border border-blue-300 rounded-full flex items-center justify-center">
                                         <svg class="h-6 w-6 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
                                             <path d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" />
                                         </svg>

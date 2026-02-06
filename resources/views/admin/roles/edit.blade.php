@@ -172,7 +172,7 @@
  <div class="bg-gradient-to-r from-{{ $catConfig['color'] }}-50 to-{{ $catConfig['color'] }}-100 px-6 py-4 border-b border-{{ $catConfig['color'] }}-200">
  <div class="flex items-center justify-between">
  <div class="flex items-center space-x-3">
- <div class="w-10 h-10 bg-{{ $catConfig['color'] }}-500 rounded-lg flex items-center justify-center">
+ <div class="w-10 h-10 bg-{{ $catConfig['color'] }}-500 rounded-full flex items-center justify-center">
  <i class="fas {{ $catConfig['icon'] }} text-white"></i>
  </div>
  <div>

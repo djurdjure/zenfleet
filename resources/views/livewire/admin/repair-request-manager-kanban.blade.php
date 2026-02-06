@@ -99,7 +99,7 @@
  <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">Total</p>
  <p class="text-2xl font-bold text-gray-900 mt-1">{{ $stats['total'] }}</p>
  </div>
- <div class="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center">
+ <div class="w-12 h-12 bg-gray-100 border border-gray-200 rounded-full flex items-center justify-center">
  <svg class="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
  </svg>
@@ -114,7 +114,7 @@
  <p class="text-xs font-medium text-yellow-700 uppercase tracking-wide">En attente</p>
  <p class="text-2xl font-bold text-yellow-900 mt-1">{{ $stats['pending'] }}</p>
  </div>
- <div class="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center">
+ <div class="w-12 h-12 bg-yellow-100 border border-yellow-200 rounded-full flex items-center justify-center">
  <svg class="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
  </svg>
@@ -129,7 +129,7 @@
  <p class="text-xs font-medium text-red-700 uppercase tracking-wide">Urgentes</p>
  <p class="text-2xl font-bold text-red-900 mt-1">{{ $stats['urgent'] }}</p>
  </div>
- <div class="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center animate-pulse">
+ <div class="w-12 h-12 bg-red-100 border border-red-200 rounded-full flex items-center justify-center animate-pulse">
  <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-1.964-1.333-2.732 0L3.732 16c-.77 1.333.192 3 1.732 3z"></path>
  </svg>
@@ -144,7 +144,7 @@
  <p class="text-xs font-medium text-green-700 uppercase tracking-wide">Approuvées</p>
  <p class="text-2xl font-bold text-green-900 mt-1">{{ $stats['approved'] }}</p>
  </div>
- <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
+ <div class="w-12 h-12 bg-green-100 border border-green-200 rounded-full flex items-center justify-center">
  <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
  </svg>
@@ -159,7 +159,7 @@
  <p class="text-xs font-medium text-gray-600 uppercase tracking-wide">Rejetées</p>
  <p class="text-2xl font-bold text-gray-900 mt-1">{{ $stats['rejected'] }}</p>
  </div>
- <div class="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center">
+ <div class="w-12 h-12 bg-gray-100 border border-gray-200 rounded-full flex items-center justify-center">
  <svg class="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
  </svg>
@@ -175,7 +175,7 @@
  <p class="text-lg font-bold text-blue-900 mt-1">{{ number_format($stats['avg_estimated_cost'], 0, ',', ' ') }}</p>
  <p class="text-xs text-blue-600">DA</p>
  </div>
- <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
+ <div class="w-12 h-12 bg-blue-100 border border-blue-200 rounded-full flex items-center justify-center">
  <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
  </svg>
@@ -195,7 +195,7 @@
  <div class="px-4 py-3 bg-gradient-to-r from-yellow-50 to-yellow-100 rounded-t-lg">
  <div class="flex items-center justify-between">
  <div class="flex items-center gap-2">
- <div class="w-8 h-8 bg-yellow-400 rounded-full flex items-center justify-center">
+ <div class="w-8 h-8 bg-yellow-400 border border-yellow-500 rounded-full flex items-center justify-center">
  <span class="text-white font-bold text-sm">1</span>
  </div>
  <h3 class="font-bold text-gray-900 text-sm">En Attente Superviseur</h3>
@@ -213,7 +213,7 @@
  {{-- Header avec plaque et urgence --}}
  <div class="flex items-start justify-between">
  <div class="flex items-center gap-2">
- <div class="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center">
+ <div class="w-10 h-10 bg-gray-100 border border-gray-300 rounded-full flex items-center justify-center">
  <svg class="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2"></path>
  </svg>
@@ -274,7 +274,7 @@
  <div class="px-4 py-3 bg-gradient-to-r from-blue-50 to-blue-100 rounded-t-lg">
  <div class="flex items-center justify-between">
  <div class="flex items-center gap-2">
- <div class="w-8 h-8 bg-blue-400 rounded-full flex items-center justify-center">
+ <div class="w-8 h-8 bg-blue-400 border border-blue-500 rounded-full flex items-center justify-center">
  <span class="text-white font-bold text-sm">2</span>
  </div>
  <h3 class="font-bold text-gray-900 text-sm">Approuvé Superviseur</h3>
@@ -291,7 +291,7 @@
  <div class="space-y-3">
  <div class="flex items-start justify-between">
  <div class="flex items-center gap-2">
- <div class="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center">
+ <div class="w-10 h-10 bg-gray-100 border border-gray-300 rounded-full flex items-center justify-center">
  <svg class="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2"></path>
  </svg>
@@ -332,7 +332,7 @@
  <div class="px-4 py-3 bg-gradient-to-r from-purple-50 to-purple-100 rounded-t-lg">
  <div class="flex items-center justify-between">
  <div class="flex items-center gap-2">
- <div class="w-8 h-8 bg-purple-400 rounded-full flex items-center justify-center">
+ <div class="w-8 h-8 bg-purple-400 border border-purple-500 rounded-full flex items-center justify-center">
  <span class="text-white font-bold text-sm">3</span>
  </div>
  <h3 class="font-bold text-gray-900 text-sm">En Attente Gestionnaire</h3>
@@ -349,7 +349,7 @@
  <div class="space-y-3">
  <div class="flex items-start justify-between">
  <div class="flex items-center gap-2">
- <div class="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center">
+ <div class="w-10 h-10 bg-gray-100 border border-gray-300 rounded-full flex items-center justify-center">
  <svg class="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2"></path>
  </svg>
@@ -402,7 +402,7 @@
  <div class="px-4 py-3 bg-gradient-to-r from-green-50 to-green-100 rounded-t-lg">
  <div class="flex items-center justify-between">
  <div class="flex items-center gap-2">
- <div class="w-8 h-8 bg-green-400 rounded-full flex items-center justify-center">
+ <div class="w-8 h-8 bg-green-400 border border-green-500 rounded-full flex items-center justify-center">
  <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path>
  </svg>
@@ -421,7 +421,7 @@
  <div class="space-y-3">
  <div class="flex items-start justify-between">
  <div class="flex items-center gap-2">
- <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
+ <div class="w-10 h-10 bg-green-100 border border-green-300 rounded-full flex items-center justify-center">
  <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
  </svg>
@@ -470,7 +470,7 @@
  <div class="px-4 py-3 bg-gradient-to-r from-red-50 to-red-100 rounded-t-lg">
  <div class="flex items-center justify-between">
  <div class="flex items-center gap-2">
- <div class="w-8 h-8 bg-red-400 rounded-full flex items-center justify-center">
+ <div class="w-8 h-8 bg-red-400 border border-red-500 rounded-full flex items-center justify-center">
  <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12"></path>
  </svg>
@@ -489,7 +489,7 @@
  <div class="space-y-3">
  <div class="flex items-start justify-between">
  <div class="flex items-center gap-2">
- <div class="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center">
+ <div class="w-10 h-10 bg-red-100 border border-red-300 rounded-full flex items-center justify-center">
  <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
  </svg>

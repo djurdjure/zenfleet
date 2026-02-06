@@ -63,7 +63,7 @@
                         <p class="text-sm font-medium text-gray-600">Total Sanctions</p>
                         <p class="text-2xl font-bold text-gray-900 mt-1">{{ $this->sanctions->total() }}</p>
                     </div>
-                    <div class="w-12 h-12 bg-gray-100 border border-gray-200 rounded-lg flex items-center justify-center">
+                    <div class="w-12 h-12 bg-gray-100 border border-gray-300 rounded-full flex items-center justify-center">
                         <x-iconify icon="heroicons:scale" class="w-6 h-6 text-gray-600" />
                     </div>
                 </div>
@@ -78,7 +78,7 @@
                             {{ \App\Models\DriverSanction::whereNull('archived_at')->count() }}
                         </p>
                     </div>
-                    <div class="w-12 h-12 bg-red-100 border border-red-200 rounded-lg flex items-center justify-center">
+                    <div class="w-12 h-12 bg-red-100 border border-red-300 rounded-full flex items-center justify-center">
                         <x-iconify icon="heroicons:exclamation-circle" class="w-6 h-6 text-red-600" />
                     </div>
                 </div>
@@ -93,7 +93,7 @@
                             {{ \App\Models\DriverSanction::whereNotNull('archived_at')->count() }}
                         </p>
                     </div>
-                    <div class="w-12 h-12 bg-gray-100 border border-gray-200 rounded-lg flex items-center justify-center">
+                    <div class="w-12 h-12 bg-gray-100 border border-gray-300 rounded-full flex items-center justify-center">
                         <x-iconify icon="heroicons:archive-box" class="w-6 h-6 text-gray-500" />
                     </div>
                 </div>
@@ -108,7 +108,7 @@
                             {{ \App\Models\DriverSanction::whereBetween('sanction_date', [now()->startOfWeek(), now()->endOfWeek()])->count() }}
                         </p>
                     </div>
-                    <div class="w-12 h-12 bg-blue-100 border border-blue-200 rounded-lg flex items-center justify-center">
+                    <div class="w-12 h-12 bg-blue-100 border border-blue-300 rounded-full flex items-center justify-center">
                         <x-iconify icon="heroicons:calendar" class="w-6 h-6 text-blue-600" />
                     </div>
                 </div>

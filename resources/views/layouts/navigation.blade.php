@@ -58,7 +58,7 @@
         {{-- Dashboard Principal --}}
         <a href="{{ route('dashboard') }}"
             class="nav-item flex items-center px-4 py-3 rounded-xl text-gray-600 hover:text-gray-900 hover:bg-gray-100 transition-all duration-300 group {{ request()->routeIs('dashboard') ? 'bg-blue-50 text-blue-700 border border-blue-100' : '' }}">
-            <div class="flex items-center justify-center w-10 h-10 rounded-lg {{ request()->routeIs('dashboard') ? 'bg-blue-600 text-white' : 'bg-gray-100 group-hover:bg-gray-200 text-gray-500' }} transition-all duration-300">
+            <div class="flex items-center justify-center w-10 h-10 rounded-full {{ request()->routeIs('dashboard') ? 'bg-blue-600 border border-blue-700 text-white' : 'bg-gray-100 group-hover:bg-gray-200 text-gray-500' }} transition-all duration-300">
                 <x-iconify icon="heroicons:squares-2x2" class="h-5 w-5" / />
             </div>
             <span class="ml-3 font-medium">Tableau de Bord</span>
@@ -74,7 +74,7 @@
 
         <a href="{{ route('admin.alerts.index') }}"
             class="nav-item flex items-center px-4 py-3 rounded-xl text-gray-600 hover:text-gray-900 hover:bg-red-50 transition-all duration-300 group {{ request()->routeIs('admin.alerts.*') ? 'bg-red-50 text-red-700 border border-red-100' : '' }}">
-            <div class="flex items-center justify-center w-10 h-10 rounded-lg {{ request()->routeIs('admin.alerts.*') ? 'bg-red-600 text-white' : 'bg-gray-100 group-hover:bg-gray-200 text-gray-500' }} transition-all duration-300 relative">
+            <div class="flex items-center justify-center w-10 h-10 rounded-full {{ request()->routeIs('admin.alerts.*') ? 'bg-red-600 border border-red-700 text-white' : 'bg-gray-100 group-hover:bg-gray-200 text-gray-500' }} transition-all duration-300 relative">
                 <x-iconify icon="heroicons:exclamation-triangle" class="h-5 w-5" / />
                 @if(auth()->user()->unreadNotifications->where('type', 'like', '%Alert%')->count() > 0)
                 <span class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center animate-pulse">
@@ -97,7 +97,7 @@
         <div class="nav-item" x-data="{ expanded: {{ request()->routeIs('admin.vehicles.*', 'admin.assignments.*', 'admin.planning.*') ? 'true' : 'false' }} }">
             <button @click="expanded = !expanded"
                 class="w-full flex items-center px-4 py-3 rounded-xl text-gray-600 hover:text-gray-900 hover:bg-gray-100 transition-all duration-300 group">
-                <div class="flex items-center justify-center w-10 h-10 rounded-lg bg-gray-100 group-hover:bg-gray-200 text-gray-500 transition-all duration-300">
+                <div class="flex items-center justify-center w-10 h-10 rounded-full bg-gray-100 border border-gray-300 group-hover:bg-gray-200 text-gray-500 transition-all duration-300">
                     <x-iconify icon="heroicons:truck" class="h-5 w-5" / />
                 </div>
                 <div class="ml-3 flex-1 text-left">
@@ -126,7 +126,7 @@
         <div class="nav-item" x-data="{ expanded: {{ request()->routeIs('admin.drivers.*') ? 'true' : 'false' }} }">
             <button @click="expanded = !expanded"
                 class="w-full flex items-center px-4 py-3 rounded-xl text-gray-600 hover:text-gray-900 hover:bg-gray-100 transition-all duration-300 group">
-                <div class="flex items-center justify-center w-10 h-10 rounded-lg bg-gray-100 group-hover:bg-gray-200 text-gray-500 transition-all duration-300">
+                <div class="flex items-center justify-center w-10 h-10 rounded-full bg-gray-100 border border-gray-300 group-hover:bg-gray-200 text-gray-500 transition-all duration-300">
                     <x-iconify icon="heroicons:users" class="h-5 w-5" / />
                 </div>
                 <div class="ml-3 flex-1 text-left">
@@ -153,7 +153,7 @@
         {{-- Fournisseurs Enterprise --}}
         <a href="{{ route('admin.suppliers-enterprise.index') }}"
             class="nav-item flex items-center px-4 py-3 rounded-xl text-gray-600 hover:text-gray-900 hover:bg-teal-50 transition-all duration-300 group {{ request()->routeIs('admin.suppliers-enterprise.*') ? 'bg-teal-50 text-teal-700 border border-teal-100' : '' }}">
-            <div class="flex items-center justify-center w-10 h-10 rounded-lg {{ request()->routeIs('admin.suppliers-enterprise.*') ? 'bg-teal-600 text-white' : 'bg-gray-100 group-hover:bg-gray-200 text-gray-500' }} transition-all duration-300">
+            <div class="flex items-center justify-center w-10 h-10 rounded-full {{ request()->routeIs('admin.suppliers-enterprise.*') ? 'bg-teal-600 border border-teal-700 text-white' : 'bg-gray-100 group-hover:bg-gray-200 text-gray-500' }} transition-all duration-300">
                 <x-iconify icon="heroicons:building-office" class="h-5 w-5" / />
             </div>
             <div class="ml-3 flex-1">
@@ -169,7 +169,7 @@
         <div class="nav-item" x-data="{ expanded: {{ request()->routeIs('admin.vehicle-expenses.*', 'admin.expense-groups.*') ? 'true' : 'false' }} }">
             <button @click="expanded = !expanded"
                 class="w-full flex items-center px-4 py-3 rounded-xl text-gray-600 hover:text-gray-900 hover:bg-emerald-50 transition-all duration-300 group {{ request()->routeIs('admin.vehicle-expenses.*', 'admin.expense-groups.*') ? 'bg-emerald-50 text-emerald-700 border border-emerald-100' : '' }}">
-                <div class="flex items-center justify-center w-10 h-10 rounded-lg {{ request()->routeIs('admin.vehicle-expenses.*', 'admin.expense-groups.*') ? 'bg-emerald-600 text-white' : 'bg-gray-100 group-hover:bg-gray-200 text-gray-500' }} transition-all duration-300 relative">
+                <div class="flex items-center justify-center w-10 h-10 rounded-full {{ request()->routeIs('admin.vehicle-expenses.*', 'admin.expense-groups.*') ? 'bg-emerald-600 border border-emerald-700 text-white' : 'bg-gray-100 group-hover:bg-gray-200 text-gray-500' }} transition-all duration-300 relative">
                     <x-iconify icon="tabler:moneybag" class="h-5 w-5" />
                     @if(auth()->user()->unreadNotifications->where('type', 'like', '%Expense%')->count() > 0)
                     <span class="absolute -top-2 -right-2 bg-emerald-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center animate-pulse">
@@ -252,7 +252,7 @@
         <div class="nav-item" x-data="{ expanded: {{ request()->routeIs('admin.maintenance.*') ? 'true' : 'false' }} }">
             <button @click="expanded = !expanded"
                 class="w-full flex items-center px-4 py-3 rounded-xl text-gray-600 hover:text-gray-900 hover:bg-indigo-50 transition-all duration-300 group {{ request()->routeIs('admin.maintenance.*') ? 'bg-indigo-50 text-indigo-700 border border-indigo-100' : '' }}">
-                <div class="flex items-center justify-center w-10 h-10 rounded-lg {{ request()->routeIs('admin.maintenance.*') ? 'bg-indigo-600 text-white' : 'bg-gray-100 group-hover:bg-gray-200 text-gray-500' }} transition-all duration-300 relative">
+                <div class="flex items-center justify-center w-10 h-10 rounded-full {{ request()->routeIs('admin.maintenance.*') ? 'bg-indigo-600 border border-indigo-700 text-white' : 'bg-gray-100 group-hover:bg-gray-200 text-gray-500' }} transition-all duration-300 relative">
                     <x-iconify icon="heroicons:cog-6-tooth" class="h-5 w-5" / />
                     @if(auth()->user()->unreadNotifications->where('type', 'like', '%Maintenance%')->count() > 0)
                     <span class="absolute -top-2 -right-2 bg-indigo-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
@@ -295,7 +295,7 @@
         <div class="nav-item" x-data="{ expanded: {{ request()->routeIs('admin.documents.*', 'admin.document-categories.*') ? 'true' : 'false' }} }">
             <button @click="expanded = !expanded"
                 class="w-full flex items-center px-4 py-3 rounded-xl text-gray-600 hover:text-gray-900 hover:bg-gray-100 transition-all duration-300 group">
-                <div class="flex items-center justify-center w-10 h-10 rounded-lg bg-gray-100 group-hover:bg-gray-200 text-gray-500 transition-all duration-300">
+                <div class="flex items-center justify-center w-10 h-10 rounded-full bg-gray-100 border border-gray-300 group-hover:bg-gray-200 text-gray-500 transition-all duration-300">
                     <x-iconify icon="heroicons:folder-open" class="h-5 w-5" / />
                 </div>
                 <div class="ml-3 flex-1 text-left">
@@ -321,7 +321,7 @@
         <div class="nav-item" x-data="{ expanded: {{ request()->routeIs('admin.organizations.*', 'admin.users.*', 'admin.roles.*') ? 'true' : 'false' }} }">
             <button @click="expanded = !expanded"
                 class="w-full flex items-center px-4 py-3 rounded-xl text-gray-600 hover:text-gray-900 hover:bg-rose-50 transition-all duration-300 group {{ request()->routeIs('admin.organizations.*', 'admin.users.*', 'admin.roles.*') ? 'bg-rose-50 text-rose-700 border border-rose-100' : '' }}">
-                <div class="flex items-center justify-center w-10 h-10 rounded-lg {{ request()->routeIs('admin.organizations.*', 'admin.users.*', 'admin.roles.*') ? 'bg-rose-600 text-white' : 'bg-gray-100 group-hover:bg-gray-200 text-gray-500' }} transition-all duration-300">
+                <div class="flex items-center justify-center w-10 h-10 rounded-full {{ request()->routeIs('admin.organizations.*', 'admin.users.*', 'admin.roles.*') ? 'bg-rose-600 border border-rose-700 text-white' : 'bg-gray-100 group-hover:bg-gray-200 text-gray-500' }} transition-all duration-300">
                     <x-iconify icon="heroicons:shield-check" class="h-5 w-5" / />
                 </div>
                 <div class="ml-3 flex-1 text-left">
@@ -440,7 +440,7 @@
                     <div class="space-y-1">
                         <a href="{{ route('profile.edit') }}"
                             class="flex items-center w-full px-4 py-3 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-all duration-200 group">
-                            <div class="flex items-center justify-center w-8 h-8 rounded-lg bg-gray-100 group-hover:bg-blue-50 transition-all duration-200 mr-3">
+                            <div class="flex items-center justify-center w-8 h-8 rounded-full bg-gray-100 border border-gray-200 group-hover:bg-blue-50 transition-all duration-200 mr-3">
                                 <x-iconify icon="heroicons:user" class="h-4 w-4 text-gray-500 group-hover:text-blue-600" / />
                             </div>
                             <div class="flex-1">
@@ -451,7 +451,7 @@
 
                         <a href="{{ route('admin.notifications.index') }}"
                             class="flex items-center w-full px-4 py-3 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-all duration-200 group">
-                            <div class="flex items-center justify-center w-8 h-8 rounded-lg bg-gray-100 group-hover:bg-yellow-50 transition-all duration-200 mr-3 relative">
+                            <div class="flex items-center justify-center w-8 h-8 rounded-full bg-gray-100 border border-gray-200 group-hover:bg-yellow-50 transition-all duration-200 mr-3 relative">
                                 <x-iconify icon="heroicons:bell" class="h-4 w-4 text-gray-500 group-hover:text-yellow-600" / />
                                 @if(auth()->user()->unreadNotifications->count() > 0)
                                 <span class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center">
@@ -471,7 +471,7 @@
                             @csrf
                             <button type="submit"
                                 class="flex items-center w-full px-4 py-3 text-sm text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all duration-200 group">
-                                <div class="flex items-center justify-center w-8 h-8 rounded-lg bg-gray-100 group-hover:bg-red-50 transition-all duration-200 mr-3">
+                                <div class="flex items-center justify-center w-8 h-8 rounded-full bg-gray-100 border border-gray-200 group-hover:bg-red-50 transition-all duration-200 mr-3">
                                     <x-iconify icon="heroicons:arrow-right-on-rectangle" class="h-4 w-4 text-gray-500 group-hover:text-red-500" / />
                                 </div>
                                 <div class="flex-1 text-left">

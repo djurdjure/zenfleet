@@ -374,7 +374,7 @@
  <!-- Super Admin -->
  <div class="flex items-center justify-between p-2 bg-white/70 rounded-lg">
  <div class="flex items-center gap-2">
- <div class="w-8 h-8 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-lg flex items-center justify-center">
+ <div class="w-8 h-8 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-full flex items-center justify-center">
  <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
  <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z" />
  <path fill-rule="evenodd" d="M4 5a2 2 0 012-2 1 1 0 000 2H6a2 2 0 100 4h2a2 2 0 100 4h2a1 1 0 100 2 2 2 0 01-2 2H4a2 2 0 01-2-2V7a2 2 0 012-2z" clip-rule="evenodd" />
@@ -395,7 +395,7 @@
  <!-- Admin -->
  <div class="flex items-center justify-between p-2 bg-white/70 rounded-lg">
  <div class="flex items-center gap-2">
- <div class="w-8 h-8 bg-gradient-to-br from-green-500 to-emerald-600 rounded-lg flex items-center justify-center">
+ <div class="w-8 h-8 bg-gradient-to-br from-green-500 to-emerald-600 rounded-full flex items-center justify-center">
  <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
  <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" />
  </svg>

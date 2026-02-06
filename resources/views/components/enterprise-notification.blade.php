@@ -229,7 +229,7 @@ $notificationId = 'notification-' . Str::random(8);
  <button
  type="button"
  @click="dismiss()"
- class="inline-flex items-center justify-center w-8 h-8 rounded-lg {{ $config['textColors'] }}/60 hover:{{ $config['textColors'] }} hover:bg-white/50 transition-all duration-200 hover:scale-110"
+ class="inline-flex items-center justify-center w-8 h-8 rounded-full {{ $config['textColors'] }}/60 hover:{{ $config['textColors'] }} hover:bg-white/50 transition-all duration-200 hover:scale-110"
  aria-label="Fermer la notification"
  >
  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

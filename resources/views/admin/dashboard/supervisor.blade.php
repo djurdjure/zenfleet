@@ -35,7 +35,7 @@
  <div class="max-w-7xl mx-auto mb-8">
  <div class="bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-3xl p-6">
  <div class="flex items-center gap-4">
- <div class="w-10 h-10 bg-amber-500 rounded-full flex items-center justify-center">
+ <div class="w-10 h-10 bg-amber-500 border border-amber-600 rounded-full flex items-center justify-center">
  <i class="fas fa-exclamation-triangle text-white"></i>
  </div>
  <div>

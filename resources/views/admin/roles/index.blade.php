@@ -115,44 +115,50 @@
  'Super Admin' => [
  'gradient' => 'from-red-500 to-red-600',
  'icon' => 'fa-crown',
- 'iconBg' => 'bg-red-100',
- 'iconColor' => 'text-red-600',
+    'iconBg' => 'bg-red-100',
+    'iconBorder' => 'border-red-300',
+    'iconColor' => 'text-red-600',
  'description' => 'Accès total et illimité à toutes les fonctionnalités'
  ],
  'Admin' => [
  'gradient' => 'from-purple-500 to-purple-600',
  'icon' => 'fa-user-shield',
- 'iconBg' => 'bg-purple-100',
- 'iconColor' => 'text-purple-600',
+    'iconBg' => 'bg-purple-100',
+    'iconBorder' => 'border-purple-300',
+    'iconColor' => 'text-purple-600',
  'description' => 'Gestion complète de son organisation'
  ],
  'Superviseur' => [
  'gradient' => 'from-orange-500 to-orange-600',
  'icon' => 'fa-user-tie',
- 'iconBg' => 'bg-orange-100',
- 'iconColor' => 'text-orange-600',
+    'iconBg' => 'bg-orange-100',
+    'iconBorder' => 'border-orange-300',
+    'iconColor' => 'text-orange-600',
  'description' => 'Supervision des opérations et du personnel'
  ],
  'Gestionnaire Flotte' => [
  'gradient' => 'from-blue-500 to-blue-600',
  'icon' => 'fa-car',
- 'iconBg' => 'bg-blue-100',
- 'iconColor' => 'text-blue-600',
+    'iconBg' => 'bg-blue-100',
+    'iconBorder' => 'border-blue-300',
+    'iconColor' => 'text-blue-600',
  'description' => 'Gestion des véhicules et affectations'
  ],
  'Chauffeur' => [
  'gradient' => 'from-green-500 to-green-600',
  'icon' => 'fa-id-card',
- 'iconBg' => 'bg-green-100',
- 'iconColor' => 'text-green-600',
+    'iconBg' => 'bg-green-100',
+    'iconBorder' => 'border-green-300',
+    'iconColor' => 'text-green-600',
  'description' => 'Accès limité aux missions assignées'
  ],
  ];
  $config = $roleConfig[$role->name] ?? [
  'gradient' => 'from-gray-500 to-gray-600',
  'icon' => 'fa-user',
- 'iconBg' => 'bg-gray-100',
- 'iconColor' => 'text-gray-600',
+    'iconBg' => 'bg-gray-100',
+    'iconBorder' => 'border-gray-300',
+    'iconColor' => 'text-gray-600',
  'description' => 'Rôle personnalisé'
  ];
  @endphp
@@ -162,7 +168,7 @@
  <div class="bg-gradient-to-r {{ $config['gradient'] }} px-6 py-5">
  <div class="flex items-center justify-between">
  <div class="flex items-center space-x-3">
- <div class="w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center">
+ <div class="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
  <i class="fas {{ $config['icon'] }} text-2xl text-white"></i>
  </div>
  <div>
@@ -192,7 +198,7 @@
  <p class="text-xs text-gray-500 uppercase tracking-wide font-semibold">Permissions</p>
  <p class="text-2xl font-bold text-gray-900 mt-1">{{ $role->permissions->count() }}</p>
  </div>
- <div class="w-12 h-12 {{ $config['iconBg'] }} rounded-lg flex items-center justify-center">
+ <div class="w-12 h-12 {{ $config['iconBg'] }} {{ $config['iconBorder'] }} border rounded-full flex items-center justify-center">
  <i class="fas fa-key text-xl {{ $config['iconColor'] }}"></i>
  </div>
  </div>

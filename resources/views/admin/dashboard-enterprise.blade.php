@@ -298,7 +298,7 @@
  {{-- Actions Rapides --}}
  <div class="zenfleet-form-enterprise">
  <div class="flex items-center mb-4">
- <div class="w-8 h-8 bg-gradient-to-br from-purple-500 to-purple-600 rounded-lg flex items-center justify-center mr-3">
+ <div class="w-8 h-8 bg-gradient-to-br from-purple-500 to-purple-600 rounded-full flex items-center justify-center mr-3">
  <i class="fas fa-bolt text-white text-sm"></i>
  </div>
  <h4 class="text-lg font-bold text-gray-900">Actions Rapides</h4>
@@ -330,7 +330,7 @@
  {{-- Alertes et Notifications --}}
  <div class="zenfleet-form-enterprise">
  <div class="flex items-center mb-4">
- <div class="w-8 h-8 bg-gradient-to-br from-red-500 to-red-600 rounded-lg flex items-center justify-center mr-3">
+ <div class="w-8 h-8 bg-gradient-to-br from-red-500 to-red-600 rounded-full flex items-center justify-center mr-3">
  <i class="fas fa-bell text-white text-sm"></i>
  </div>
  <h4 class="text-lg font-bold text-gray-900">Alertes Importantes</h4>
@@ -361,7 +361,7 @@
  {{-- Météo du Jour --}}
  <div class="zenfleet-form-enterprise">
  <div class="flex items-center mb-4">
- <div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center mr-3">
+ <div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center mr-3">
  <i class="fas fa-cloud-sun text-white text-sm"></i>
  </div>
  <h4 class="text-lg font-bold text-gray-900">Conditions Météo</h4>
@@ -385,7 +385,7 @@
  {{-- Taux d'Utilisation --}}
  <div class="zenfleet-form-enterprise">
  <div class="flex items-center mb-4">
- <div class="w-8 h-8 bg-gradient-to-br from-green-500 to-green-600 rounded-lg flex items-center justify-center mr-3">
+ <div class="w-8 h-8 bg-gradient-to-br from-green-500 to-green-600 rounded-full flex items-center justify-center mr-3">
  <i class="fas fa-percentage text-white text-sm"></i>
  </div>
  <h4 class="text-lg font-bold text-gray-900">Taux d'Utilisation</h4>

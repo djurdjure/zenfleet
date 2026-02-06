@@ -444,7 +444,7 @@
                     <div class="space-y-3">
                         @foreach($recentActivity as $activity)
                         <div class="flex items-start gap-3 p-3 bg-gray-50 rounded-lg">
-                            <div class="flex-shrink-0 w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                            <div class="flex-shrink-0 w-8 h-8 bg-blue-100 border border-blue-200 rounded-full flex items-center justify-center">
                                 <x-iconify :icon="'heroicons:' . ($activity['icon'] ?? 'circle')" class="w-4 h-4 text-blue-600" />
                             </div>
                             <div class="flex-1 min-w-0">

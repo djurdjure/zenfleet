@@ -132,7 +132,7 @@
                 <div class="flex items-center justify-between">
                     <div class="flex-1">
                         <div class="flex items-center gap-2 mb-2">
-                            <div class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
+                            <div class="w-8 h-8 bg-blue-100 border border-blue-200 rounded-full flex items-center justify-center">
                                 <x-iconify icon="heroicons:calendar-days" class="w-5 h-5 text-blue-600" />
                             </div>
                             <p class="text-xs font-semibold text-blue-600 uppercase tracking-wide">Ancienneté moyenne</p>
@@ -153,7 +153,7 @@
                 <div class="flex items-center justify-between">
                     <div class="flex-1">
                         <div class="flex items-center gap-2 mb-2">
-                            <div class="w-8 h-8 bg-emerald-100 rounded-lg flex items-center justify-center">
+                            <div class="w-8 h-8 bg-emerald-100 border border-emerald-200 rounded-full flex items-center justify-center">
                                 <x-iconify icon="heroicons:chart-pie" class="w-5 h-5 text-emerald-600" />
                             </div>
                             <p class="text-xs font-semibold text-emerald-600 uppercase tracking-wide">Disponibilité</p>
@@ -174,7 +174,7 @@
                 <div class="flex items-center justify-between">
                     <div class="flex-1">
                         <div class="flex items-center gap-2 mb-2">
-                            <div class="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center">
+                            <div class="w-8 h-8 bg-purple-100 border border-purple-200 rounded-full flex items-center justify-center">
                                 <x-iconify icon="heroicons:identification" class="w-5 h-5 text-purple-600" />
                             </div>
                             <p class="text-xs font-semibold text-purple-600 uppercase tracking-wide">Permis valides</p>
@@ -437,7 +437,7 @@
                     @endphp
                     @if($vehicle)
                     <div class="flex items-center gap-2">
-                        <div class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
+                        <div class="w-8 h-8 bg-blue-100 border border-blue-200 rounded-full flex items-center justify-center">
                             <x-iconify icon="heroicons:truck" class="w-4 h-4 text-blue-600" />
                         </div>
                         <div>
@@ -601,7 +601,7 @@
                             </p>
                             <div id="driverInfo" class="bg-blue-50 border border-blue-200 rounded-xl p-4">
                                 <div class="flex items-center gap-3">
-                                    <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
+                                    <div class="w-12 h-12 bg-blue-100 border border-blue-200 rounded-full flex items-center justify-center flex-shrink-0">
                                         <x-iconify icon="heroicons:user" class="h-7 w-7 text-blue-600" />
                                     </div>
                                     <div class="flex-1 min-w-0">

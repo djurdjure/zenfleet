@@ -66,7 +66,7 @@
                             <p class="text-sm font-medium text-gray-600">Total Archivés</p>
                             <p class="text-3xl font-bold text-amber-600">{{ $stats['total_archived'] }}</p>
                         </div>
-                        <div class="w-12 h-12 bg-amber-100 rounded-xl flex items-center justify-center">
+                        <div class="w-12 h-12 bg-amber-100 border border-amber-200 rounded-xl flex items-center justify-center">
                             <i class="fas fa-archive text-amber-600 text-xl"></i>
                         </div>
                     </div>
@@ -78,7 +78,7 @@
                             <p class="text-sm font-medium text-gray-600">Ce Mois</p>
                             <p class="text-3xl font-bold text-orange-600">{{ $stats['archived_this_month'] }}</p>
                         </div>
-                        <div class="w-12 h-12 bg-orange-100 rounded-xl flex items-center justify-center">
+                        <div class="w-12 h-12 bg-orange-100 border border-orange-200 rounded-xl flex items-center justify-center">
                             <i class="fas fa-calendar-alt text-orange-600 text-xl"></i>
                         </div>
                     </div>
@@ -90,7 +90,7 @@
                             <p class="text-sm font-medium text-gray-600">Cette Année</p>
                             <p class="text-3xl font-bold text-red-600">{{ $stats['archived_this_year'] }}</p>
                         </div>
-                        <div class="w-12 h-12 bg-red-100 rounded-xl flex items-center justify-center">
+                        <div class="w-12 h-12 bg-red-100 border border-red-200 rounded-xl flex items-center justify-center">
                             <i class="fas fa-chart-line text-red-600 text-xl"></i>
                         </div>
                     </div>

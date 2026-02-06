@@ -213,7 +213,7 @@
                     {{-- Titre avec animation --}}
                     <div>
                         <h3 class="text-lg font-bold text-gray-900 flex items-center gap-2">
-                            <div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg flex items-center justify-center shadow-md">
+                            <div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center shadow-md">
                                 <x-iconify icon="lucide:settings-2" class="w-5 h-5 text-white" />
                             </div>
                             Filtres avancés nouvelle génération
@@ -413,7 +413,7 @@
                                 <button wire:click="selectVehicle({{ $vehicle['id'] }})"
                                         class="w-full px-4 py-3 text-left hover:bg-blue-50 transition-colors flex items-center gap-3 border-b border-gray-100 last:border-0">
                                     <div class="flex-shrink-0">
-                                        <div class="w-10 h-10 bg-gradient-to-br from-blue-100 to-indigo-100 rounded-lg flex items-center justify-center">
+                                        <div class="w-10 h-10 bg-gradient-to-br from-blue-100 to-indigo-100 rounded-full flex items-center justify-center">
                                             <x-iconify icon="lucide:car" class="w-5 h-5 text-blue-600" />
                                         </div>
                                     </div>
@@ -768,7 +768,7 @@
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     <div class="flex items-center gap-3">
                                         <div class="flex-shrink-0">
-                                            <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-100 to-indigo-100 flex items-center justify-center shadow-sm group-hover:shadow-md transition-shadow">
+                                            <div class="w-10 h-10 rounded-full bg-gradient-to-br from-blue-100 to-indigo-100 flex items-center justify-center shadow-sm group-hover:shadow-md transition-shadow">
                                                 <x-iconify icon="lucide:car" class="w-5 h-5 text-blue-600" />
                                             </div>
                                         </div>
@@ -1093,7 +1093,7 @@
                     <div class="bg-gradient-to-br from-gray-50 to-blue-50 rounded-xl p-4 mb-6 border border-gray-200">
                         <div class="grid grid-cols-2 gap-4">
                             <div class="flex items-center gap-3">
-                                <div class="flex-shrink-0 w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                                <div class="flex-shrink-0 w-10 h-10 bg-blue-100 border border-blue-300 rounded-full flex items-center justify-center">
                                     <x-iconify icon="lucide:car" class="w-5 h-5 text-blue-600" />
                                 </div>
                                 <div>
@@ -1102,7 +1102,7 @@
                                 </div>
                             </div>
                             <div class="flex items-center gap-3">
-                                <div class="flex-shrink-0 w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
+                                <div class="flex-shrink-0 w-10 h-10 bg-green-100 border border-green-300 rounded-full flex items-center justify-center">
                                     <x-iconify icon="lucide:user" class="w-5 h-5 text-green-600" />
                                 </div>
                                 <div>

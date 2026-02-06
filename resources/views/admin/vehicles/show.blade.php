@@ -276,7 +276,7 @@
                         </h2>
                         @if($vehicle->currentAssignment)
                         <div class="flex items-center gap-3">
-                            <div class="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center font-bold text-gray-600">
+                            <div class="w-10 h-10 rounded-full bg-gray-200 border border-gray-300 flex items-center justify-center font-bold text-gray-600">
                                 {{ substr($vehicle->currentAssignment->driver->user->name ?? '?', 0, 1) }}
                             </div>
                             <div>

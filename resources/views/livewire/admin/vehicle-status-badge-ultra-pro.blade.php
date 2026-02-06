@@ -158,7 +158,7 @@
                         </button>
                     @empty
                         <div class="px-4 py-8 text-center">
-                            <div class="w-10 h-10 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-2">
+                            <div class="w-10 h-10 bg-gray-50 border border-gray-200 rounded-full flex items-center justify-center mx-auto mb-2">
                                 <x-iconify icon="lucide:lock" class="w-5 h-5 text-gray-400" />
                             </div>
                             <p class="text-sm text-gray-500 font-medium">Aucune transition possible</p>

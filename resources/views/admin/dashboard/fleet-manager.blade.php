@@ -96,7 +96,7 @@
  <div class="max-w-7xl mx-auto mb-8">
  <div class="bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-3xl p-6">
  <div class="flex items-center gap-4">
- <div class="w-10 h-10 bg-amber-500 rounded-full flex items-center justify-center">
+ <div class="w-10 h-10 bg-amber-500 border border-amber-600 rounded-full flex items-center justify-center">
  <i class="fas fa-exclamation-triangle text-white"></i>
  </div>
  <div>
@@ -197,7 +197,7 @@
  @if(isset($upcomingMaintenance) && $upcomingMaintenance->count() > 0)
  @foreach($upcomingMaintenance->take(5) as $maintenance)
  <div class="flex items-center gap-4 py-3 border-b border-gray-50 last:border-0">
- <div class="w-8 h-8 bg-yellow-100 rounded-full flex items-center justify-center">
+ <div class="w-8 h-8 bg-yellow-100 border border-yellow-200 rounded-full flex items-center justify-center">
  <i class="fas fa-wrench text-yellow-600 text-xs"></i>
  </div>
  <div class="flex-1">
@@ -224,42 +224,42 @@
  <h2 class="text-xl font-bold text-gray-900 mb-6">Actions Gestionnaire Flotte</h2>
  <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4">
  <a href="{{ route('admin.vehicles.index') }}" class="flex flex-col items-center gap-3 p-4 bg-blue-50 hover:bg-blue-100 rounded-xl transition-colors">
- <div class="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center">
+ <div class="w-10 h-10 bg-blue-500 border border-blue-600 rounded-full flex items-center justify-center">
  <i class="fas fa-car text-white"></i>
  </div>
  <span class="text-sm font-medium text-gray-700">Véhicules</span>
  </a>
 
  <a href="{{ route('admin.drivers.index') }}" class="flex flex-col items-center gap-3 p-4 bg-green-50 hover:bg-green-100 rounded-xl transition-colors">
- <div class="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center">
+ <div class="w-10 h-10 bg-green-500 border border-green-600 rounded-full flex items-center justify-center">
  <i class="fas fa-user-tie text-white"></i>
  </div>
  <span class="text-sm font-medium text-gray-700">Chauffeurs</span>
  </a>
 
  <a href="{{ route('admin.assignments.index') }}" class="flex flex-col items-center gap-3 p-4 bg-orange-50 hover:bg-orange-100 rounded-xl transition-colors">
- <div class="w-10 h-10 bg-orange-500 rounded-full flex items-center justify-center">
+ <div class="w-10 h-10 bg-orange-500 border border-orange-600 rounded-full flex items-center justify-center">
  <i class="fas fa-clipboard-check text-white"></i>
  </div>
  <span class="text-sm font-medium text-gray-700">Affectations</span>
  </a>
 
  <a href="{{ route('admin.maintenance.dashboard') }}" class="flex flex-col items-center gap-3 p-4 bg-yellow-50 hover:bg-yellow-100 rounded-xl transition-colors">
- <div class="w-10 h-10 bg-yellow-500 rounded-full flex items-center justify-center">
+ <div class="w-10 h-10 bg-yellow-500 border border-yellow-600 rounded-full flex items-center justify-center">
  <i class="fas fa-wrench text-white"></i>
  </div>
  <span class="text-sm font-medium text-gray-700">Maintenance</span>
  </a>
 
  <a href="{{ route('admin.planning.index') }}" class="flex flex-col items-center gap-3 p-4 bg-purple-50 hover:bg-purple-100 rounded-xl transition-colors">
- <div class="w-10 h-10 bg-purple-500 rounded-full flex items-center justify-center">
+ <div class="w-10 h-10 bg-purple-500 border border-purple-600 rounded-full flex items-center justify-center">
  <i class="fas fa-calendar-alt text-white"></i>
  </div>
  <span class="text-sm font-medium text-gray-700">Planning</span>
  </a>
 
  <a href="{{ route('admin.reports.index') }}" class="flex flex-col items-center gap-3 p-4 bg-indigo-50 hover:bg-indigo-100 rounded-xl transition-colors">
- <div class="w-10 h-10 bg-indigo-500 rounded-full flex items-center justify-center">
+ <div class="w-10 h-10 bg-indigo-500 border border-indigo-600 rounded-full flex items-center justify-center">
  <i class="fas fa-chart-bar text-white"></i>
  </div>
  <span class="text-sm font-medium text-gray-700">Rapports</span>

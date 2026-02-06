@@ -94,7 +94,7 @@
                             Ce mois: {{ $analytics['monthly_operations'] ?? 0 }}
                         </p>
                     </div>
-                    <div class="w-10 h-10 bg-blue-100 border border-blue-200 rounded-lg flex items-center justify-center">
+                    <div class="w-10 h-10 bg-blue-100 border border-blue-300 rounded-full flex items-center justify-center">
                         <x-iconify icon="lucide:wrench" class="w-5 h-5 text-blue-600" />
                     </div>
                 </div>
@@ -112,7 +112,7 @@
                             Prochains 7j: {{ $analytics['upcoming_count'] ?? 0 }}
                         </p>
                     </div>
-                    <div class="w-10 h-10 bg-blue-100 border border-blue-200 rounded-lg flex items-center justify-center">
+                    <div class="w-10 h-10 bg-blue-100 border border-blue-300 rounded-full flex items-center justify-center">
                         <x-iconify icon="lucide:calendar-clock" class="w-5 h-5 text-blue-600" />
                     </div>
                 </div>
@@ -130,7 +130,7 @@
                             Véhicules: {{ $analytics['vehicles_in_maintenance'] ?? 0 }}
                         </p>
                     </div>
-                    <div class="w-10 h-10 bg-orange-100 border border-orange-200 rounded-lg flex items-center justify-center">
+                    <div class="w-10 h-10 bg-orange-100 border border-orange-300 rounded-full flex items-center justify-center">
                         <x-iconify icon="lucide:loader" class="w-5 h-5 text-orange-600" />
                     </div>
                 </div>
@@ -149,7 +149,7 @@
                             Nécessitent attention
                         </p>
                     </div>
-                    <div class="w-10 h-10 bg-red-100 border border-red-200 rounded-lg flex items-center justify-center">
+                    <div class="w-10 h-10 bg-red-100 border border-red-300 rounded-full flex items-center justify-center">
                         <x-iconify icon="lucide:alert-circle" class="w-5 h-5 text-red-600" />
                     </div>
                 </div>
@@ -167,7 +167,7 @@
                             Taux: {{ number_format(($analytics['completed_operations'] ?? 0) / max($analytics['total_operations'] ?? 1, 1) * 100, 1) }}%
                         </p>
                     </div>
-                    <div class="w-10 h-10 bg-green-100 border border-green-200 rounded-lg flex items-center justify-center">
+                    <div class="w-10 h-10 bg-green-100 border border-green-300 rounded-full flex items-center justify-center">
                         <x-iconify icon="lucide:check-circle-2" class="w-5 h-5 text-green-600" />
                     </div>
                 </div>
@@ -185,7 +185,7 @@
                             Moyen: {{ number_format($analytics['avg_cost'] ?? 0, 0, ',', ' ') }} DA
                         </p>
                     </div>
-                    <div class="w-10 h-10 bg-purple-100 border border-purple-200 rounded-lg flex items-center justify-center">
+                    <div class="w-10 h-10 bg-purple-100 border border-purple-300 rounded-full flex items-center justify-center">
                         <x-iconify icon="lucide:banknote" class="w-5 h-5 text-purple-600" />
                     </div>
                 </div>
@@ -203,7 +203,7 @@
                             Total: {{ number_format($analytics['total_duration_hours'] ?? 0, 1) }}h
                         </p>
                     </div>
-                    <div class="w-10 h-10 bg-indigo-100 border border-indigo-200 rounded-lg flex items-center justify-center">
+                    <div class="w-10 h-10 bg-indigo-100 border border-indigo-300 rounded-full flex items-center justify-center">
                         <x-iconify icon="lucide:clock" class="w-5 h-5 text-indigo-600" />
                     </div>
                 </div>
@@ -221,7 +221,7 @@
                             Taux: {{ number_format(($analytics['cancelled_operations'] ?? 0) / max($analytics['total_operations'] ?? 1, 1) * 100, 1) }}%
                         </p>
                     </div>
-                    <div class="w-10 h-10 bg-gray-100 border border-gray-200 rounded-lg flex items-center justify-center">
+                    <div class="w-10 h-10 bg-gray-100 border border-gray-300 rounded-full flex items-center justify-center">
                         <x-iconify icon="lucide:x-circle" class="w-5 h-5 text-gray-500" />
                     </div>
                 </div>
@@ -239,7 +239,7 @@
                         <p class="text-xs font-semibold text-red-600 uppercase tracking-wide">Véhicules à surveiller</p>
                         <p class="text-sm text-red-700 mt-0.5">Plus de maintenances</p>
                     </div>
-                    <div class="w-10 h-10 bg-red-200 rounded-lg flex items-center justify-center">
+                    <div class="w-10 h-10 bg-red-200 border border-red-300 rounded-full flex items-center justify-center">
                         <x-iconify icon="lucide:trending-up" class="w-5 h-5 text-red-700" />
                     </div>
                 </div>
@@ -264,7 +264,7 @@
                         <p class="text-xs font-semibold text-blue-600 uppercase tracking-wide">Types fréquents</p>
                         <p class="text-sm text-blue-700 mt-0.5">Maintenances courantes</p>
                     </div>
-                    <div class="w-10 h-10 bg-blue-200 rounded-lg flex items-center justify-center">
+                    <div class="w-10 h-10 bg-blue-200 border border-blue-300 rounded-full flex items-center justify-center">
                         <x-iconify icon="lucide:bar-chart" class="w-5 h-5 text-blue-700" />
                     </div>
                 </div>
@@ -289,7 +289,7 @@
                         <p class="text-xs font-semibold text-yellow-600 uppercase tracking-wide">Alertes & Prédictions</p>
                         <p class="text-sm text-yellow-700 mt-0.5">Maintenances à venir</p>
                     </div>
-                    <div class="w-10 h-10 bg-yellow-200 rounded-lg flex items-center justify-center">
+                    <div class="w-10 h-10 bg-yellow-200 border border-yellow-300 rounded-full flex items-center justify-center">
                         <x-iconify icon="lucide:bell" class="w-5 h-5 text-yellow-700" />
                     </div>
                 </div>
@@ -572,7 +572,7 @@
                             {{-- Véhicule --}}
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="flex items-center">
-                                    <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                                    <div class="w-10 h-10 bg-blue-100 border border-blue-300 rounded-full flex items-center justify-center flex-shrink-0">
                                         <x-iconify icon="lucide:car" class="w-5 h-5 text-blue-600" />
                                     </div>
                                     <div class="ml-3">

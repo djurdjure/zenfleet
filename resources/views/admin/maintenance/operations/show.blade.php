@@ -89,7 +89,7 @@
                     <div class="space-y-4">
                         {{-- Planifiée --}}
                         <div class="flex items-start gap-3">
-                            <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
+                            <div class="w-8 h-8 rounded-full bg-blue-100 border border-blue-200 flex items-center justify-center flex-shrink-0">
                                 <x-iconify icon="lucide:calendar" class="w-4 h-4 text-blue-600" />
                             </div>
                             <div class="flex-1">
@@ -103,7 +103,7 @@
                         {{-- En cours --}}
                         @if(in_array($operation->status, ['in_progress', 'completed']))
                             <div class="flex items-start gap-3">
-                                <div class="w-8 h-8 rounded-full bg-orange-100 flex items-center justify-center flex-shrink-0">
+                                <div class="w-8 h-8 rounded-full bg-orange-100 border border-orange-200 flex items-center justify-center flex-shrink-0">
                                     <x-iconify icon="lucide:play" class="w-4 h-4 text-orange-600" />
                                 </div>
                                 <div class="flex-1">
@@ -118,7 +118,7 @@
                         {{-- Terminée --}}
                         @if($operation->status === 'completed')
                             <div class="flex items-start gap-3">
-                                <div class="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
+                                <div class="w-8 h-8 rounded-full bg-green-100 border border-green-200 flex items-center justify-center flex-shrink-0">
                                     <x-iconify icon="lucide:check" class="w-4 h-4 text-green-600" />
                                 </div>
                                 <div class="flex-1">
@@ -210,7 +210,7 @@
                             @foreach($operation->documents as $document)
                                 <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors duration-200">
                                     <div class="flex items-center gap-3">
-                                        <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                                        <div class="w-10 h-10 bg-blue-100 border border-blue-300 rounded-full flex items-center justify-center">
                                             <x-iconify icon="lucide:file" class="w-5 h-5 text-blue-600" />
                                         </div>
                                         <div>
@@ -240,7 +240,7 @@
                     </h3>
                     
                     <div class="flex items-center gap-3 mb-4">
-                        <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                        <div class="w-12 h-12 bg-blue-100 border border-blue-300 rounded-full flex items-center justify-center flex-shrink-0">
                             <x-iconify icon="lucide:car" class="w-6 h-6 text-blue-600" />
                         </div>
                         <div>

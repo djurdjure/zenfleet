@@ -101,7 +101,7 @@
  <p class="text-sm font-medium text-gray-600">Total Traité</p>
  <p class="text-2xl font-bold text-gray-900 mt-1">{{ number_format($totalRecords) }}</p>
  </div>
- <div class="w-12 h-12 bg-blue-100 border border-blue-200 rounded-lg flex items-center justify-center">
+ <div class="w-12 h-12 bg-blue-100 border border-blue-300 rounded-full flex items-center justify-center">
  <x-iconify icon="heroicons:document-text" class="w-6 h-6 text-blue-600" />
  </div>
  </div>
@@ -114,7 +114,7 @@
  <p class="text-sm font-medium text-gray-600">Importés</p>
  <p class="text-2xl font-bold text-green-600 mt-1">{{ number_format($successCount) }}</p>
  </div>
- <div class="w-12 h-12 bg-green-100 border border-green-200 rounded-lg flex items-center justify-center">
+ <div class="w-12 h-12 bg-green-100 border border-green-300 rounded-full flex items-center justify-center">
  <x-iconify icon="heroicons:check-circle" class="w-6 h-6 text-green-600" />
  </div>
  </div>
@@ -127,7 +127,7 @@
  <p class="text-sm font-medium text-gray-600">Mis à Jour</p>
  <p class="text-2xl font-bold text-amber-600 mt-1">{{ number_format($updateCount) }}</p>
  </div>
- <div class="w-12 h-12 bg-amber-100 border border-amber-200 rounded-lg flex items-center justify-center">
+ <div class="w-12 h-12 bg-amber-100 border border-amber-300 rounded-full flex items-center justify-center">
  <x-iconify icon="heroicons:arrow-path" class="w-6 h-6 text-amber-600" />
  </div>
  </div>
@@ -140,7 +140,7 @@
  <p class="text-sm font-medium text-gray-600">Erreurs</p>
  <p class="text-2xl font-bold text-red-600 mt-1">{{ number_format($errorCount) }}</p>
  </div>
- <div class="w-12 h-12 bg-red-100 border border-red-200 rounded-lg flex items-center justify-center">
+ <div class="w-12 h-12 bg-red-100 border border-red-300 rounded-full flex items-center justify-center">
  <x-iconify icon="heroicons:exclamation-triangle" class="w-6 h-6 text-red-600" />
  </div>
  </div>
@@ -233,7 +233,7 @@
  @foreach($recentlyImported as $vehicle)
  <div class="flex items-center justify-between p-4 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors">
  <div class="flex items-center gap-3">
- <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
+ <div class="w-10 h-10 bg-green-100 border border-green-300 rounded-full flex items-center justify-center">
  <x-iconify icon="heroicons:truck" class="w-5 h-5 text-green-600" />
  </div>
  <div>

@@ -75,7 +75,7 @@
                         <p class="text-xs font-medium text-gray-600 uppercase">Total</p>
                         <p class="text-2xl font-bold text-gray-900 mt-1">{{ $schedules->total() }}</p>
                     </div>
-                    <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                    <div class="w-12 h-12 bg-blue-100 border border-blue-300 rounded-full flex items-center justify-center">
                         <x-iconify icon="lucide:repeat" class="w-6 h-6 text-blue-600" />
                     </div>
                 </div>
@@ -89,7 +89,7 @@
                             {{ $schedules->where('is_active', true)->count() }}
                         </p>
                     </div>
-                    <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                    <div class="w-12 h-12 bg-green-100 border border-green-300 rounded-full flex items-center justify-center">
                         <x-iconify icon="lucide:check-circle" class="w-6 h-6 text-green-600" />
                     </div>
                 </div>
@@ -103,7 +103,7 @@
                             {{ $schedules->where('is_active', false)->count() }}
                         </p>
                     </div>
-                    <div class="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center">
+                    <div class="w-12 h-12 bg-gray-100 border border-gray-300 rounded-full flex items-center justify-center">
                         <x-iconify icon="lucide:pause-circle" class="w-6 h-6 text-gray-600" />
                     </div>
                 </div>
@@ -117,7 +117,7 @@
                             {{ $schedules->unique('vehicle_id')->count() }}
                         </p>
                     </div>
-                    <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+                    <div class="w-12 h-12 bg-purple-100 border border-purple-300 rounded-full flex items-center justify-center">
                         <x-iconify icon="lucide:car" class="w-6 h-6 text-purple-600" />
                     </div>
                 </div>
@@ -152,7 +152,7 @@
                             <tr class="hover:bg-gray-50 transition-colors duration-150">
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     <div class="flex items-center gap-3">
-                                        <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                                        <div class="w-10 h-10 bg-blue-100 border border-blue-300 rounded-full flex items-center justify-center">
                                             <x-iconify icon="lucide:car" class="w-5 h-5 text-blue-600" />
                                         </div>
                                         <div>

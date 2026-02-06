@@ -32,7 +32,7 @@
  <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
  <div class="bg-white/70 backdrop-blur-sm rounded-xl p-4 border border-white/20">
  <div class="flex items-center space-x-3">
- <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
+ <div class="w-10 h-10 bg-green-100 border border-green-300 rounded-full flex items-center justify-center">
  <i class="fas fa-car text-green-600"></i>
  </div>
  <div>
@@ -44,7 +44,7 @@
 
  <div class="bg-white/70 backdrop-blur-sm rounded-xl p-4 border border-white/20">
  <div class="flex items-center space-x-3">
- <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+ <div class="w-10 h-10 bg-blue-100 border border-blue-300 rounded-full flex items-center justify-center">
  <i class="fas fa-user-tie text-blue-600"></i>
  </div>
  <div>
@@ -56,7 +56,7 @@
 
  <div class="bg-white/70 backdrop-blur-sm rounded-xl p-4 border border-white/20">
  <div class="flex items-center space-x-3">
- <div class="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
+ <div class="w-10 h-10 bg-purple-100 border border-purple-300 rounded-full flex items-center justify-center">
  <i class="fas fa-shield-alt text-purple-600"></i>
  </div>
  <div>

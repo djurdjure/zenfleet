@@ -146,7 +146,7 @@ Design surpassant Fleetio, Samsara et Verizon Connect:
                             {{ $assignment->formatted_duration }}
                         </p>
                     </div>
-                    <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                    <div class="w-10 h-10 bg-blue-100 border border-blue-300 rounded-full flex items-center justify-center">
                         <x-iconify icon="lucide:timer" class="w-5 h-5 text-blue-600" />
                     </div>
                 </div>
@@ -167,7 +167,7 @@ Design surpassant Fleetio, Samsara et Verizon Connect:
                             @endif
                         </p>
                     </div>
-                    <div class="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
+                    <div class="w-10 h-10 bg-purple-100 border border-purple-300 rounded-full flex items-center justify-center">
                         <x-iconify icon="lucide:gauge" class="w-5 h-5 text-purple-600" />
                     </div>
                 </div>
@@ -182,7 +182,7 @@ Design surpassant Fleetio, Samsara et Verizon Connect:
                             {{ $assignment->is_ongoing ? 'En cours' : ($assignment->is_scheduled ? 'Planifiée' : 'Terminée') }}
                         </p>
                     </div>
-                    <div class="w-10 h-10 bg-emerald-100 rounded-lg flex items-center justify-center">
+                    <div class="w-10 h-10 bg-emerald-100 border border-emerald-300 rounded-full flex items-center justify-center">
                         <x-iconify icon="lucide:calendar" class="w-5 h-5 text-emerald-600" />
                     </div>
                 </div>
@@ -309,7 +309,7 @@ Design surpassant Fleetio, Samsara et Verizon Connect:
                                 <div class="absolute -left-3 top-0 bottom-0 w-1 bg-gradient-to-b from-green-500 to-green-600 rounded-full"></div>
                                 <div class="pl-4">
                                     <div class="flex items-center gap-2 mb-2">
-                                        <div class="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
+                                        <div class="w-8 h-8 bg-green-100 border border-green-200 rounded-full flex items-center justify-center">
                                             <x-iconify icon="lucide:play-circle" class="w-4 h-4 text-green-600" />
                                         </div>
                                         <h3 class="text-sm font-medium text-gray-500 uppercase">Début</h3>
@@ -338,7 +338,7 @@ Design surpassant Fleetio, Samsara et Verizon Connect:
                                 @endif
                                 <div class="pl-4">
                                     <div class="flex items-center gap-2 mb-2">
-                                        <div class="w-8 h-8 {{ $assignment->end_datetime ? 'bg-orange-100' : 'bg-gray-100' }} rounded-lg flex items-center justify-center">
+                                        <div class="w-8 h-8 {{ $assignment->end_datetime ? 'bg-orange-100 border border-orange-200' : 'bg-gray-100' }} rounded-full flex items-center justify-center">
                                             <x-iconify icon="lucide:flag-triangle-right" class="w-4 h-4 {{ $assignment->end_datetime ? 'text-orange-600' : 'text-gray-400' }}" />
                                         </div>
                                         <h3 class="text-sm font-medium text-gray-500 uppercase">Fin</h3>

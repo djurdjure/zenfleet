@@ -110,7 +110,7 @@
                         <p class="text-sm font-medium text-gray-600">Total chauffeurs</p>
                         <p class="text-2xl font-bold text-gray-900 mt-1">{{ $analytics['total_drivers'] }}</p>
                     </div>
-                    <div class="w-12 h-12 bg-blue-100 border border-blue-200 rounded-lg flex items-center justify-center">
+                    <div class="w-12 h-12 bg-blue-100 border border-blue-300 rounded-full flex items-center justify-center">
                         <x-iconify icon="lucide:users" class="w-6 h-6 text-blue-600" />
                     </div>
                 </div>
@@ -123,7 +123,7 @@
                         <p class="text-sm font-medium text-gray-600">Disponibles</p>
                         <p class="text-2xl font-bold text-green-600 mt-1">{{ $analytics['available_drivers'] }}</p>
                     </div>
-                    <div class="w-12 h-12 bg-green-100 border border-green-200 rounded-lg flex items-center justify-center">
+                    <div class="w-12 h-12 bg-green-100 border border-green-300 rounded-full flex items-center justify-center">
                         <x-iconify icon="lucide:user-check" class="w-6 h-6 text-green-600" />
                     </div>
                 </div>
@@ -136,7 +136,7 @@
                         <p class="text-sm font-medium text-gray-600">En mission</p>
                         <p class="text-2xl font-bold text-orange-600 mt-1">{{ $analytics['active_drivers'] }}</p>
                     </div>
-                    <div class="w-12 h-12 bg-orange-100 border border-orange-200 rounded-lg flex items-center justify-center">
+                    <div class="w-12 h-12 bg-orange-100 border border-orange-300 rounded-full flex items-center justify-center">
                         <x-iconify icon="lucide:briefcase" class="w-6 h-6 text-orange-600" />
                     </div>
                 </div>
@@ -149,7 +149,7 @@
                         <p class="text-sm font-medium text-gray-600">En repos</p>
                         <p class="text-2xl font-bold text-amber-600 mt-1">{{ $analytics['resting_drivers'] }}</p>
                     </div>
-                    <div class="w-12 h-12 bg-amber-100 border border-amber-200 rounded-lg flex items-center justify-center">
+                    <div class="w-12 h-12 bg-amber-100 border border-amber-300 rounded-full flex items-center justify-center">
                         <x-iconify icon="lucide:pause-circle" class="w-6 h-6 text-amber-600" />
                     </div>
                 </div>
@@ -312,7 +312,7 @@
                 <div class="bg-white rounded-xl shadow-2xl border border-gray-200 px-6 py-4 flex items-center gap-6">
                     {{-- Selected Count --}}
                     <div class="flex items-center gap-2 border-r border-gray-300 pr-6">
-                        <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                        <div class="w-8 h-8 bg-blue-100 border border-blue-200 rounded-full flex items-center justify-center">
                             <x-iconify icon="lucide:check-circle-2" class="w-4 h-4 text-blue-600" />
                         </div>
                         <div>

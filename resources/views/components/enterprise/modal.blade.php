@@ -107,7 +107,7 @@ $variantIcons = [
                         {{-- Icon du modal --}}
                         @if($icon)
                         <div class="flex-shrink-0">
-                            <div class="w-10 h-10 rounded-xl flex items-center justify-center {{ $variantIcons[$variant] ?? 'bg-gray-100 text-gray-600' }}">
+                            <div class="w-10 h-10 rounded-xl flex items-center justify-center {{ $variantIcons[$variant] ?? 'bg-gray-100 border border-gray-200 text-gray-600' }}">
                                 {!! $icon !!}
                             </div>
                         </div>

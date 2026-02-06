@@ -49,7 +49,7 @@
                             {{ $analytics['total_drivers'] ?? 0 }}
                         </p>
                     </div>
-                    <div class="w-12 h-12 bg-blue-100 border border-blue-200 rounded-lg flex items-center justify-center">
+                    <div class="w-12 h-12 bg-blue-100 border border-blue-300 rounded-full flex items-center justify-center">
                         <x-iconify icon="lucide:users" class="w-6 h-6 text-blue-600" />
                     </div>
                 </div>
@@ -64,7 +64,7 @@
                             {{ $analytics['available_drivers'] ?? 0 }}
                         </p>
                     </div>
-                    <div class="w-12 h-12 bg-green-100 border border-green-200 rounded-lg flex items-center justify-center">
+                    <div class="w-12 h-12 bg-green-100 border border-green-300 rounded-full flex items-center justify-center">
                         <x-iconify icon="lucide:user-check" class="w-6 h-6 text-green-600" />
                     </div>
                 </div>
@@ -79,7 +79,7 @@
                             {{ $analytics['active_drivers'] ?? 0 }}
                         </p>
                     </div>
-                    <div class="w-12 h-12 bg-orange-100 border border-orange-200 rounded-lg flex items-center justify-center">
+                    <div class="w-12 h-12 bg-orange-100 border border-orange-300 rounded-full flex items-center justify-center">
                         <x-iconify icon="lucide:briefcase" class="w-6 h-6 text-orange-600" />
                     </div>
                 </div>
@@ -94,7 +94,7 @@
                             {{ $analytics['resting_drivers'] ?? 0 }}
                         </p>
                     </div>
-                    <div class="w-12 h-12 bg-amber-100 border border-amber-200 rounded-lg flex items-center justify-center">
+                    <div class="w-12 h-12 bg-amber-100 border border-amber-300 rounded-full flex items-center justify-center">
                         <x-iconify icon="lucide:pause-circle" class="w-6 h-6 text-amber-600" />
                     </div>
                 </div>
@@ -115,7 +115,7 @@
                         </p>
                         <p class="text-xs text-blue-700 mt-1">Expérience moyenne</p>
                     </div>
-                    <div class="w-10 h-10 bg-blue-200 rounded-lg flex items-center justify-center">
+                    <div class="w-10 h-10 bg-blue-200 border border-blue-300 rounded-full flex items-center justify-center">
                         <x-iconify icon="lucide:user" class="w-5 h-5 text-blue-700" />
                     </div>
                 </div>
@@ -131,7 +131,7 @@
                         </p>
                         <p class="text-xs text-emerald-700 mt-1">{{ number_format($analytics['valid_licenses_percent'] ?? 0, 1) }}% de la flotte</p>
                     </div>
-                    <div class="w-10 h-10 bg-emerald-200 rounded-lg flex items-center justify-center">
+                    <div class="w-10 h-10 bg-emerald-200 border border-emerald-300 rounded-full flex items-center justify-center">
                         <x-iconify icon="lucide:badge-check" class="w-5 h-5 text-emerald-700" />
                     </div>
                 </div>
@@ -147,7 +147,7 @@
                         </p>
                         <p class="text-xs text-purple-700 mt-1">Dans l'entreprise</p>
                     </div>
-                    <div class="w-10 h-10 bg-purple-200 rounded-lg flex items-center justify-center">
+                    <div class="w-10 h-10 bg-purple-200 border border-purple-300 rounded-full flex items-center justify-center">
                         <x-iconify icon="lucide:award" class="w-5 h-5 text-purple-700" />
                     </div>
                 </div>
@@ -579,7 +579,7 @@
                             </p>
                             <div class="mt-4 bg-blue-50 border border-blue-200 rounded-lg p-4">
                                 <div class="flex items-center gap-3">
-                                    <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                                    <div class="w-10 h-10 bg-blue-100 border border-blue-300 rounded-full flex items-center justify-center">
                                         <svg class="h-6 w-6 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
                                             <path d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" />
                                         </svg>
@@ -679,7 +679,7 @@
                             </p>
                             <div class="mt-4 bg-green-50 border border-green-200 rounded-lg p-4">
                                 <div class="flex items-center gap-3">
-                                    <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
+                                    <div class="w-10 h-10 bg-green-100 border border-green-300 rounded-full flex items-center justify-center">
                                         <svg class="h-6 w-6 text-green-600" fill="currentColor" viewBox="0 0 20 20">
                                             <path d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" />
                                         </svg>
@@ -771,7 +771,7 @@
                             </p>
                             <div class="mt-4 bg-red-50 border border-red-200 rounded-lg p-4">
                                 <div class="flex items-center gap-3">
-                                    <div class="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center">
+                                    <div class="w-10 h-10 bg-red-100 border border-red-300 rounded-full flex items-center justify-center">
                                         <svg class="h-6 w-6 text-red-600" fill="currentColor" viewBox="0 0 20 20">
                                             <path d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" />
                                         </svg>

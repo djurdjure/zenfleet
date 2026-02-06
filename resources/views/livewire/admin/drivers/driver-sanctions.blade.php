@@ -15,7 +15,7 @@
         {{-- Total Sanctions --}}
         <div class="bg-red-50 rounded-lg border border-red-200 p-6 hover:shadow-md transition-shadow">
             <div class="flex items-center gap-4">
-                <div class="w-12 h-12 bg-red-100 border border-red-200 rounded-lg flex items-center justify-center">
+                <div class="w-12 h-12 bg-red-100 border border-red-300 rounded-full flex items-center justify-center">
                     <x-iconify icon="heroicons:exclamation-triangle" class="w-6 h-6 text-red-600" />
                 </div>
                 <div class="flex-1">
@@ -28,7 +28,7 @@
         {{-- Actives --}}
         <div class="bg-amber-50 rounded-lg border border-amber-200 p-6 hover:shadow-md transition-shadow">
             <div class="flex items-center gap-4">
-                <div class="w-12 h-12 bg-amber-100 border border-amber-200 rounded-lg flex items-center justify-center">
+                <div class="w-12 h-12 bg-amber-100 border border-amber-300 rounded-full flex items-center justify-center">
                     <x-iconify icon="heroicons:shield-exclamation" class="w-6 h-6 text-amber-600" />
                 </div>
                 <div class="flex-1">
@@ -41,7 +41,7 @@
         {{-- Ce Mois --}}
         <div class="bg-blue-50 rounded-lg border border-blue-200 p-6 hover:shadow-md transition-shadow">
             <div class="flex items-center gap-4">
-                <div class="w-12 h-12 bg-blue-100 border border-blue-200 rounded-lg flex items-center justify-center">
+                <div class="w-12 h-12 bg-blue-100 border border-blue-300 rounded-full flex items-center justify-center">
                     <x-iconify icon="heroicons:calendar" class="w-6 h-6 text-blue-600" />
                 </div>
                 <div class="flex-1">
@@ -54,7 +54,7 @@
         {{-- Critiques --}}
         <div class="bg-purple-50 rounded-lg border border-purple-200 p-6 hover:shadow-md transition-shadow">
             <div class="flex items-center gap-4">
-                <div class="w-12 h-12 bg-purple-100 border border-purple-200 rounded-lg flex items-center justify-center">
+                <div class="w-12 h-12 bg-purple-100 border border-purple-300 rounded-full flex items-center justify-center">
                     <x-iconify icon="heroicons:signal" class="w-6 h-6 text-purple-600" />
                 </div>
                 <div class="flex-1">
@@ -291,7 +291,7 @@
                                 </div>
                                 @else
                                 <div class="flex items-center gap-3">
-                                    <div class="w-10 h-10 bg-gray-300 rounded-full flex items-center justify-center text-gray-600 font-semibold text-sm">
+                                    <div class="w-10 h-10 bg-gray-300 border border-gray-400 rounded-full flex items-center justify-center text-gray-600 font-semibold text-sm">
                                         <x-iconify icon="heroicons:user" class="w-5 h-5" />
                                     </div>
                                     <div>

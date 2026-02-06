@@ -24,7 +24,7 @@
                         <p class="text-sm font-medium text-gray-600">Total organisations</p>
                         <p class="text-2xl font-bold text-gray-900 mt-1">{{ $analytics['total'] ?? 0 }}</p>
                     </div>
-                    <div class="w-12 h-12 bg-blue-100 border border-blue-200 rounded-lg flex items-center justify-center">
+                    <div class="w-12 h-12 bg-blue-100 border border-blue-300 rounded-full flex items-center justify-center">
                         <x-iconify icon="lucide:building-2" class="w-6 h-6 text-blue-600" />
                     </div>
                 </div>
@@ -36,7 +36,7 @@
                         <p class="text-sm font-medium text-gray-600">Actives</p>
                         <p class="text-2xl font-bold text-green-600 mt-1">{{ $analytics['active'] ?? 0 }}</p>
                     </div>
-                    <div class="w-12 h-12 bg-green-100 border border-green-200 rounded-lg flex items-center justify-center">
+                    <div class="w-12 h-12 bg-green-100 border border-green-300 rounded-full flex items-center justify-center">
                         <x-iconify icon="lucide:check-circle" class="w-6 h-6 text-green-600" />
                     </div>
                 </div>
@@ -48,7 +48,7 @@
                         <p class="text-sm font-medium text-gray-600">Utilisateurs</p>
                         <p class="text-2xl font-bold text-purple-600 mt-1">{{ $analytics['users'] ?? 0 }}</p>
                     </div>
-                    <div class="w-12 h-12 bg-purple-100 border border-purple-200 rounded-lg flex items-center justify-center">
+                    <div class="w-12 h-12 bg-purple-100 border border-purple-300 rounded-full flex items-center justify-center">
                         <x-iconify icon="lucide:users" class="w-6 h-6 text-purple-600" />
                     </div>
                 </div>
@@ -60,7 +60,7 @@
                         <p class="text-sm font-medium text-gray-600">Véhicules</p>
                         <p class="text-2xl font-bold text-orange-600 mt-1">{{ $analytics['vehicles'] ?? 0 }}</p>
                     </div>
-                    <div class="w-12 h-12 bg-orange-100 border border-orange-200 rounded-lg flex items-center justify-center">
+                    <div class="w-12 h-12 bg-orange-100 border border-orange-300 rounded-full flex items-center justify-center">
                         <x-iconify icon="lucide:car" class="w-6 h-6 text-orange-600" />
                     </div>
                 </div>
@@ -258,7 +258,7 @@
                                     @if($org->logo_path)
                                         <img src="{{ Storage::url($org->logo_path) }}" alt="{{ $org->name }}" class="w-10 h-10 rounded-lg object-cover border border-gray-200">
                                     @else
-                                        <div class="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center text-white font-bold text-sm">
+                                        <div class="w-10 h-10 bg-blue-600 border border-blue-700 rounded-full flex items-center justify-center text-white font-bold text-sm">
                                             {{ strtoupper(substr($org->name, 0, 1)) }}
                                         </div>
                                     @endif

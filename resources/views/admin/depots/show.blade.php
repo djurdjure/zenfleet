@@ -402,7 +402,7 @@
     <div class="flex min-h-full items-center justify-center p-4">
         <div class="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
             <div class="flex items-center mb-4">
-                <div class="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mr-4">
+                <div class="w-12 h-12 bg-red-100 border border-red-200 rounded-full flex items-center justify-center mr-4">
                     <x-iconify icon="lucide:alert-triangle" class="w-6 h-6 text-red-600" />
                 </div>
                 <div>

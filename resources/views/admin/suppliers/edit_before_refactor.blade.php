@@ -37,7 +37,7 @@
 
             {{-- Titre --}}
             <div class="flex items-center gap-4">
-                <div class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
+                <div class="w-12 h-12 bg-blue-100 border border-blue-200 rounded-xl flex items-center justify-center">
                     <x-iconify icon="lucide:building-2" class="w-6 h-6 text-blue-600" />
                 </div>
                 <div>

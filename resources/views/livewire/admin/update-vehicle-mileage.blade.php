@@ -173,7 +173,7 @@
                             @if($vehicleData)
                             <div class="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg border-2 border-blue-200 p-5">
                                 <div class="flex items-start gap-4">
-                                    <div class="w-12 h-12 bg-blue-600 rounded-lg flex items-center justify-center flex-shrink-0">
+                                    <div class="w-12 h-12 bg-blue-600 border border-blue-700 rounded-full flex items-center justify-center flex-shrink-0">
                                         <x-iconify icon="heroicons:truck" class="w-7 h-7 text-white" />
                                     </div>
                                     <div class="flex-1 min-w-0">
@@ -361,7 +361,7 @@
                     <div class="p-4 space-y-3">
                         @foreach($recentReadings as $reading)
                         <div class="flex items-start gap-3 pb-3 border-b border-gray-100 last:border-0 last:pb-0">
-                            <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                            <div class="w-10 h-10 bg-blue-100 border border-blue-300 rounded-full flex items-center justify-center flex-shrink-0">
                                 <x-iconify icon="heroicons:gauge" class="w-5 h-5 text-blue-600" />
                             </div>
                             <div class="flex-1 min-w-0">

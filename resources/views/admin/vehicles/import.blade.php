@@ -91,7 +91,7 @@
  <div class="space-y-4">
  {{-- Step 1 --}}
  <div class="flex items-start gap-3 p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
- <div class="flex-shrink-0 w-8 h-8 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-sm font-bold">
+ <div class="flex-shrink-0 w-8 h-8 bg-blue-100 border border-blue-200 text-blue-600 rounded-full flex items-center justify-center text-sm font-bold">
  1
  </div>
  <div>
@@ -102,7 +102,7 @@
 
  {{-- Step 2 --}}
  <div class="flex items-start gap-3 p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
- <div class="flex-shrink-0 w-8 h-8 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-sm font-bold">
+ <div class="flex-shrink-0 w-8 h-8 bg-blue-100 border border-blue-200 text-blue-600 rounded-full flex items-center justify-center text-sm font-bold">
  2
  </div>
  <div>
@@ -115,7 +115,7 @@
 
  {{-- Step 3 --}}
  <div class="flex items-start gap-3 p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
- <div class="flex-shrink-0 w-8 h-8 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-sm font-bold">
+ <div class="flex-shrink-0 w-8 h-8 bg-blue-100 border border-blue-200 text-blue-600 rounded-full flex items-center justify-center text-sm font-bold">
  3
  </div>
  <div>
@@ -128,7 +128,7 @@
 
  {{-- Step 4 --}}
  <div class="flex items-start gap-3 p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
- <div class="flex-shrink-0 w-8 h-8 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-sm font-bold">
+ <div class="flex-shrink-0 w-8 h-8 bg-blue-100 border border-blue-200 text-blue-600 rounded-full flex items-center justify-center text-sm font-bold">
  4
  </div>
  <div>

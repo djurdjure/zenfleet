@@ -123,7 +123,7 @@
                                 Ce mois: {{ $stats['monthly_count'] ?? 0 }}
                             </p>
                         </div>
-                        <div class="w-10 h-10 bg-blue-100 border border-blue-200 rounded-lg flex items-center justify-center">
+                        <div class="w-10 h-10 bg-blue-100 border border-blue-300 rounded-full flex items-center justify-center">
                             <x-iconify icon="lucide:gauge" class="w-5 h-5 text-blue-600" />
                         </div>
                     </div>
@@ -141,7 +141,7 @@
                                 Depuis: {{ $stats['first_reading_date'] ?? '-' }}
                             </p>
                         </div>
-                        <div class="w-10 h-10 bg-green-100 border border-green-200 rounded-lg flex items-center justify-center">
+                        <div class="w-10 h-10 bg-green-100 border border-green-300 rounded-full flex items-center justify-center">
                             <x-iconify icon="lucide:route" class="w-5 h-5 text-green-600" />
                         </div>
                     </div>
@@ -159,7 +159,7 @@
                                 Basé sur 30 jours
                             </p>
                         </div>
-                        <div class="w-10 h-10 bg-purple-100 border border-purple-200 rounded-lg flex items-center justify-center">
+                        <div class="w-10 h-10 bg-purple-100 border border-purple-300 rounded-full flex items-center justify-center">
                             <x-iconify icon="lucide:trending-up" class="w-5 h-5 text-purple-600" />
                         </div>
                     </div>
@@ -177,7 +177,7 @@
                                 {{ $stats['last_reading']?->format('d/m/Y H:i') ?? '-' }}
                             </p>
                         </div>
-                        <div class="w-10 h-10 bg-orange-100 border border-orange-200 rounded-lg flex items-center justify-center">
+                        <div class="w-10 h-10 bg-orange-100 border border-orange-300 rounded-full flex items-center justify-center">
                             <x-iconify icon="lucide:clock" class="w-5 h-5 text-orange-600" />
                         </div>
                     </div>
@@ -195,7 +195,7 @@
                                 {{ number_format($stats['manual_percentage'] ?? 0, 1) }}% du total
                             </p>
                         </div>
-                        <div class="w-10 h-10 bg-indigo-100 border border-indigo-200 rounded-lg flex items-center justify-center">
+                        <div class="w-10 h-10 bg-indigo-100 border border-indigo-300 rounded-full flex items-center justify-center">
                             <x-iconify icon="lucide:hand" class="w-5 h-5 text-indigo-600" />
                         </div>
                     </div>
@@ -213,7 +213,7 @@
                                 {{ number_format($stats['automatic_percentage'] ?? 0, 1) }}% du total
                             </p>
                         </div>
-                        <div class="w-10 h-10 bg-teal-100 border border-teal-200 rounded-lg flex items-center justify-center">
+                        <div class="w-10 h-10 bg-teal-100 border border-teal-300 rounded-full flex items-center justify-center">
                             <x-iconify icon="lucide:cpu" class="w-5 h-5 text-teal-600" />
                         </div>
                     </div>
@@ -232,7 +232,7 @@
                                 {{ $vehicle->registration_plate }}
                             </p>
                         </div>
-                        <div class="w-10 h-10 bg-blue-100 border border-blue-200 rounded-lg flex items-center justify-center">
+                        <div class="w-10 h-10 bg-blue-100 border border-blue-300 rounded-full flex items-center justify-center">
                             <x-iconify icon="lucide:gauge-circle" class="w-5 h-5 text-blue-600" />
                         </div>
                     </div>
@@ -256,7 +256,7 @@
                                 @endif
                             </p>
                         </div>
-                        <div class="w-10 h-10 bg-amber-100 border border-amber-200 rounded-lg flex items-center justify-center">
+                        <div class="w-10 h-10 bg-amber-100 border border-amber-300 rounded-full flex items-center justify-center">
                             <x-iconify icon="lucide:calendar-range" class="w-5 h-5 text-amber-600" />
                         </div>
                     </div>

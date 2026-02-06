@@ -194,7 +194,7 @@
         <div class="form-section p-6" id="step-1">
             <div class="flex items-center mb-6">
                 <div class="flex-shrink-0">
-                    <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg flex items-center justify-center">
+                    <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center">
                         <i class="fas fa-car text-white"></i>
                     </div>
                 </div>
@@ -285,7 +285,7 @@
         <div class="form-section p-6" id="step-2">
             <div class="flex items-center mb-6">
                 <div class="flex-shrink-0">
-                    <div class="w-10 h-10 bg-gradient-to-br from-green-500 to-emerald-600 rounded-lg flex items-center justify-center">
+                    <div class="w-10 h-10 bg-gradient-to-br from-green-500 to-emerald-600 rounded-full flex items-center justify-center">
                         <i class="fas fa-clock text-white"></i>
                     </div>
                 </div>
@@ -364,7 +364,7 @@
         <div class="form-section p-6" id="step-3">
             <div class="flex items-center mb-6">
                 <div class="flex-shrink-0">
-                    <div class="w-10 h-10 bg-gradient-to-br from-purple-500 to-pink-600 rounded-lg flex items-center justify-center">
+                    <div class="w-10 h-10 bg-gradient-to-br from-purple-500 to-pink-600 rounded-full flex items-center justify-center">
                         <i class="fas fa-calendar-check text-white"></i>
                     </div>
                 </div>
@@ -427,7 +427,7 @@
         <div class="form-section p-6" id="step-4">
             <div class="flex items-center mb-6">
                 <div class="flex-shrink-0">
-                    <div class="w-10 h-10 bg-gradient-to-br from-orange-500 to-red-600 rounded-lg flex items-center justify-center">
+                    <div class="w-10 h-10 bg-gradient-to-br from-orange-500 to-red-600 rounded-full flex items-center justify-center">
                         <i class="fas fa-cogs text-white"></i>
                     </div>
                 </div>
