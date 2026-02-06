@@ -201,6 +201,10 @@ class OrganizationController extends Controller
 
             $organization = Organization::create($validated);
 
+            // Provision default roles for the new organization
+            app(\App\Services\OrganizationRoleProvisioner::class)
+                ->ensureRolesForOrganization($organization);
+
             return redirect()
                 ->route('admin.organizations.index')
                 ->with('success', 'Organisation créée avec succès.');
