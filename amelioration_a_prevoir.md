@@ -7,6 +7,7 @@
 
 ## Permissions & Rôles
 - Refactoriser la page des permissions en matrice “CRUD” par rôle (cases à cocher Voir/Créer/Modifier/Supprimer) pour une gestion plus claire et rapide.
+- Supprimer définitivement la logique “dual-read” (PermissionAliases + compatibilité legacy) après validation complète, et refactoriser le middleware pour n’accepter que les permissions canoniques.
 
 ## UX & Gouvernance des Données
 - Ajouter un menu “Corbeille” global pour retrouver tous les éléments archivés (chauffeurs, véhicules, fournisseurs, etc.) avec options de restauration ou suppression définitive, traçabilité et filtres par module.
