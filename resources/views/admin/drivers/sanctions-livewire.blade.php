@@ -4,7 +4,7 @@
 
 @section('content')
 <section class="bg-gray-50 min-h-screen">
-    <div class="py-6 px-4 mx-auto max-w-7xl lg:py-12">
+    <div class="py-4 px-4 mx-auto max-w-7xl lg:py-6">
         
         {{-- Breadcrumb --}}
         <nav class="flex items-center gap-2 text-sm text-gray-600 mb-6">
@@ -18,14 +18,12 @@
         </nav>
 
         {{-- Header --}}
-        <div class="mb-8">
-            <h1 class="text-3xl font-bold text-gray-900 flex items-center gap-4">
-                <div class="w-16 h-16 bg-gradient-to-br from-red-500 to-orange-600 rounded-2xl flex items-center justify-center shadow-lg">
-                    <x-iconify icon="heroicons:exclamation-triangle" class="w-8 h-8 text-white" />
-                </div>
+        <div class="mb-4">
+            <h1 class="text-2xl font-bold text-gray-900 flex items-center gap-2.5">
+                <x-iconify icon="heroicons:exclamation-triangle" class="w-6 h-6 text-red-600" />
                 Sanctions des Chauffeurs
             </h1>
-            <p class="text-gray-600 mt-2 ml-20">
+            <p class="text-sm text-gray-600 ml-8.5">
                 Gérez l'historique des sanctions de votre équipe
             </p>
         </div>

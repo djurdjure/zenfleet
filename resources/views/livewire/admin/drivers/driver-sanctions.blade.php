@@ -10,12 +10,12 @@
     {{-- ===============================================
  STATISTIQUES - Style Véhicules
  =============================================== --}}
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+    <x-page-analytics-grid columns="4">
 
         {{-- Total Sanctions --}}
-        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow">
+        <div class="bg-red-50 rounded-lg border border-red-200 p-6 hover:shadow-md transition-shadow">
             <div class="flex items-center gap-4">
-                <div class="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center">
+                <div class="w-12 h-12 bg-red-100 border border-red-200 rounded-lg flex items-center justify-center">
                     <x-iconify icon="heroicons:exclamation-triangle" class="w-6 h-6 text-red-600" />
                 </div>
                 <div class="flex-1">
@@ -26,9 +26,9 @@
         </div>
 
         {{-- Actives --}}
-        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow">
+        <div class="bg-amber-50 rounded-lg border border-amber-200 p-6 hover:shadow-md transition-shadow">
             <div class="flex items-center gap-4">
-                <div class="w-12 h-12 bg-amber-100 rounded-lg flex items-center justify-center">
+                <div class="w-12 h-12 bg-amber-100 border border-amber-200 rounded-lg flex items-center justify-center">
                     <x-iconify icon="heroicons:shield-exclamation" class="w-6 h-6 text-amber-600" />
                 </div>
                 <div class="flex-1">
@@ -39,9 +39,9 @@
         </div>
 
         {{-- Ce Mois --}}
-        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow">
+        <div class="bg-blue-50 rounded-lg border border-blue-200 p-6 hover:shadow-md transition-shadow">
             <div class="flex items-center gap-4">
-                <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                <div class="w-12 h-12 bg-blue-100 border border-blue-200 rounded-lg flex items-center justify-center">
                     <x-iconify icon="heroicons:calendar" class="w-6 h-6 text-blue-600" />
                 </div>
                 <div class="flex-1">
@@ -52,9 +52,9 @@
         </div>
 
         {{-- Critiques --}}
-        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow">
+        <div class="bg-purple-50 rounded-lg border border-purple-200 p-6 hover:shadow-md transition-shadow">
             <div class="flex items-center gap-4">
-                <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+                <div class="w-12 h-12 bg-purple-100 border border-purple-200 rounded-lg flex items-center justify-center">
                     <x-iconify icon="heroicons:signal" class="w-6 h-6 text-purple-600" />
                 </div>
                 <div class="flex-1">
@@ -64,7 +64,7 @@
             </div>
         </div>
 
-    </div>
+    </x-page-analytics-grid>
 
     {{-- ===============================================
  RECHERCHE ET FILTRES - Style Véhicules
