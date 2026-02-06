@@ -76,17 +76,6 @@
  background: #555;
  }
  
- /* Dark mode scrollbar */
- .dark .overflow-x-auto::-webkit-scrollbar-track {
- background: #374151;
- }
  
- .dark .overflow-x-auto::-webkit-scrollbar-thumb {
- background: #6B7280;
- }
- 
- .dark .overflow-x-auto::-webkit-scrollbar-thumb:hover {
- background: #9CA3AF;
- }
 </style>
 @endpush

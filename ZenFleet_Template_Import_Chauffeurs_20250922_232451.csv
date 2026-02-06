@@ -1,0 +1,15 @@
+# INSTRUCTIONS DÉTAILLÉES #;# Remplissez les colonnes ci-dessous #;# Séparateur recommandé: point-virgule (;) #;# Dates acceptées: AAAA-MM-JJ ou JJ/MM/AAAA #;# Champs obligatoires: nom, prenom, numero_permis #;# Les lignes de commentaires (#) sont ignorées #;# Statuts acceptés: Disponible, En formation, Suspendu, Inactif, En mission, En congé #;# Catégories permis: A1, A, B, BE, C1, C1E, C, CE, D, DE, F #;# Groupes sanguins: A+, A-, B+, B-, AB+, AB-, O+, O- #;;;;;;;;;
+# Nom de famille (obligatoire) #;# Prénom(s) (obligatoire) #;# Date naissance (AAAA-MM-JJ) #;# Matricule employé unique #;# Statut actuel du chauffeur #;# Date de recrutement #;# Date fin contrat (vide si CDI) #;# Numéro de téléphone #;# Email personnel #;# Adresse complète #;# Numéro permis de conduire (obligatoire) #;# Catégories permis (B,C,D...) #;# Date délivrance permis #;# Date expiration permis #;# Autorité de délivrance #;# Nom contact urgence #;# Téléphone contact urgence #;# Groupe sanguin (A+, B-, O+...) #
+nom;prenom;date_naissance;matricule;statut;date_recrutement;date_fin_contrat;telephone;email_personnel;adresse;numero_permis;categorie_permis;date_delivrance_permis;date_expiration_permis;autorite_delivrance;contact_urgence_nom;contact_urgence_telephone;groupe_sanguin
+Benali;Ahmed;1985-03-15;EMP-2024-001;Disponible;2024-01-15;2026-12-31;0550123456;ahmed.benali@email.dz;"25 Rue Didouche Mourad, 16000 Alger";P-DZ-2020-001234;B,C;2020-06-15;2030-06-14;Wilaya d'Alger;Benali Fatima;0661234567;O+
+Kaddour;Amina;1990-07-22;EMP-2024-002;En formation;2024-02-01;;0770987654;amina.kaddour@gmail.com;"18 Boulevard Mohamed V, 31000 Oran";P-DZ-2021-005678;B;2021-09-10;2031-09-09;Wilaya d'Oran;Kaddour Mohamed;0552987654;A+
+Slimani;Youcef;1982-11-08;EMP-2024-003;Disponible;2024-01-20;2025-12-31;0665555444;y.slimani@outlook.com;"42 Rue Larbi Ben M'hidi, 25000 Constantine";P-DZ-2019-009876;B,C,D;2019-04-20;2029-04-19;Wilaya de Constantine;Slimani Aicha;0771555444;B-
+
+# INFORMATIONS IMPORTANTES #
+# 1. Encodage: UTF-8 #
+# 2. Séparateur: point-virgule (;) ou virgule (,) #
+# 3. Taille max: 10 MB #
+# 4. Extensions: .csv, .xlsx, .xls #
+# 5. Les lignes de commentaires sont ignorées #
+
+# Généré le: 03/02/2026 12:02:00 #

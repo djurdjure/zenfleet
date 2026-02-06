@@ -759,18 +759,6 @@ Note: Le CSS SlimSelect de base est déjà chargé via CDN dans layouts/admin/ca
     color: #dc2626;                              /* red-600 */
 }
 
-/* 🎨 STYLES POUR DARK MODE (optionnel - pour futur support dark mode) */
-@media (prefers-color-scheme: dark) {
-    /* Variables dark mode désactivées par défaut - à activer si besoin */
-    /*
-    :root {
-        --ss-bg-color: #1f2937;
-        --ss-font-color: #f9fafb;
-        --ss-border-color: #4b5563;
-    }
-    */
-}
-
 /* 📱 RESPONSIVE - Adaptation mobile */
 @media (max-width: 640px) {
     .ss-content {
