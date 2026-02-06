@@ -119,6 +119,11 @@ Rechercher toutes les occurrences de `can('view vehicles')` etc. et les remplace
 - **Journalisation sécurité:** traces en canal `audit` pour chaque contrôle.
 - **Commandes dédiées:** `security:health-check` et `roles:ensure-organizations`.
 
+## 🧩 Phase 6 : Assurance Continue & Verrouillages
+- **Provisionnement automatique des rôles:** observer `Organization` pour garantir des rôles à toute création (UI, seeder, script).
+- **Mode strict CI/CD:** `security:health-check --strict` échoue si anomalies détectées.
+- **Proof of compliance:** critères “zéro legacy/orphan/duplicate” requis avant déploiement.
+
 ## ✅ Checklist de sécurité avant release
 - Backup DB effectué.
 - Cache permissions invalidé.
@@ -136,3 +141,4 @@ Rechercher toutes les occurrences de `can('view vehicles')` etc. et les remplace
 - **[02/04/2026]** Phase 3 (hardening RBAC) : désactivation par défaut des permissions directes utilisateur via `use_custom_permissions`, pour empêcher les accès résiduels après modification d’un rôle.
 - **[02/04/2026]** Phase 3 (migrations) : migrations de normalisation exécutées avec succès, validation UI et audit legacy encore requis.
 - **[02/06/2026]** Phase 5 : health‑check RBAC automatisé + provisioning des rôles par organisation (commande `security:health-check`, provisioner, tâche planifiée).
+- **[02/06/2026]** Phase 6 : observer `Organization` pour auto‑provision des rôles + mode strict `security:health-check --strict`.

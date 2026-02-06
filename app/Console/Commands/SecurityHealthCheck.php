@@ -16,7 +16,8 @@ class SecurityHealthCheck extends Command
 {
     protected $signature = 'security:health-check
         {--fix-missing-roles : Auto-provision missing organization roles}
-        {--organization_id= : Check a single organization}';
+        {--organization_id= : Check a single organization}
+        {--strict : Exit with failure if any metric is non-zero}';
 
     protected $description = 'Enterprise security health check (RBAC, legacy permissions, tenant role coverage).';
 
@@ -33,14 +34,16 @@ class SecurityHealthCheck extends Command
         $missingRolesByOrg = $this->detectMissingRoles($organizationId);
         $missingRolesCount = $missingRolesByOrg->count();
 
-        $this->table(['Metric', 'Count'], [
+        $metrics = [
             ['Legacy permissions', $legacyPermissions],
             ['Duplicate permissions', $duplicatePermissions],
             ['Orphan role permissions', $orphanRolePermissions],
             ['Orphan user permissions', $orphanUserPermissions],
             ['Orphan user roles', $orphanUserRoles],
             ['Organizations missing roles', $missingRolesCount],
-        ]);
+        ];
+
+        $this->table(['Metric', 'Count'], $metrics);
 
         if ($missingRolesCount > 0) {
             $this->warn('Organizations with missing roles: ' . $missingRolesByOrg->keys()->implode(', '));
@@ -74,6 +77,13 @@ class SecurityHealthCheck extends Command
             'orphan_user_roles' => $orphanUserRoles,
             'organizations_missing_roles' => $missingRolesByOrg->keys()->values()->all(),
         ]);
+
+        $hasIssues = collect($metrics)->contains(fn ($row) => (int) $row[1] > 0);
+
+        if ($this->option('strict') && $hasIssues) {
+            $this->error('Security health check failed in strict mode.');
+            return self::FAILURE;
+        }
 
         return self::SUCCESS;
     }
