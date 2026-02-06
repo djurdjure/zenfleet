@@ -62,7 +62,7 @@
         {{-- ===============================================
             CARDS STATISTIQUES ENTERPRISE
         ===============================================        {{-- CARDS STATISTIQUES ENTERPRISE --}}
-        <x-page-analytics-grid columns="5">
+        <x-page-analytics-grid columns="6">
 
             {{-- 1. Total Relevés --}}
             <div class="bg-blue-50 rounded-lg border border-blue-200 p-4 hover:shadow-lg transition-shadow duration-300">

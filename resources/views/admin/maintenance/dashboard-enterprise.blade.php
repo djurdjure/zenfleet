@@ -23,7 +23,7 @@
  <!-- Statistiques Principales -->
  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
  @if(isset($stats))
- <div class="bg-white rounded-xl shadow-lg p-6 border-l-4 border-blue-500">
+ <div class="bg-blue-50 rounded-xl shadow-lg p-6 border border-blue-200 border-l-4 border-blue-500">
  <div class="flex items-center">
  <div class="p-3 rounded-full bg-blue-100 text-blue-600">
  🚨
@@ -35,7 +35,7 @@
  </div>
  </div>
 
- <div class="bg-white rounded-xl shadow-lg p-6 border-l-4 border-red-500">
+ <div class="bg-red-50 rounded-xl shadow-lg p-6 border border-red-200 border-l-4 border-red-500">
  <div class="flex items-center">
  <div class="p-3 rounded-full bg-red-100 text-red-600">
  ⚠️
@@ -47,7 +47,7 @@
  </div>
  </div>
 
- <div class="bg-white rounded-xl shadow-lg p-6 border-l-4 border-green-500">
+ <div class="bg-green-50 rounded-xl shadow-lg p-6 border border-green-200 border-l-4 border-green-500">
  <div class="flex items-center">
  <div class="p-3 rounded-full bg-green-100 text-green-600">
  🔧
@@ -59,7 +59,7 @@
  </div>
  </div>
 
- <div class="bg-white rounded-xl shadow-lg p-6 border-l-4 border-purple-500">
+ <div class="bg-purple-50 rounded-xl shadow-lg p-6 border border-purple-200 border-l-4 border-purple-500">
  <div class="flex items-center">
  <div class="p-3 rounded-full bg-purple-100 text-purple-600">
  💰

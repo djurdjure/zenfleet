@@ -112,7 +112,7 @@
         =============================================== --}}
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
                 {{-- 1. Total Relevés --}}
-                <div class="bg-white rounded-lg border border-gray-200 p-4 hover:shadow-lg transition-shadow duration-300">
+                <div class="bg-blue-50 rounded-lg border border-blue-200 p-4 hover:shadow-lg transition-shadow duration-300">
                     <div class="flex items-center justify-between">
                         <div>
                             <p class="text-xs font-medium text-gray-600">Total relevés</p>
@@ -123,14 +123,14 @@
                                 Ce mois: {{ $stats['monthly_count'] ?? 0 }}
                             </p>
                         </div>
-                        <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                        <div class="w-10 h-10 bg-blue-100 border border-blue-200 rounded-lg flex items-center justify-center">
                             <x-iconify icon="lucide:gauge" class="w-5 h-5 text-blue-600" />
                         </div>
                     </div>
                 </div>
 
                 {{-- 2. Distance Parcourue --}}
-                <div class="bg-white rounded-lg border border-gray-200 p-4 hover:shadow-lg transition-shadow duration-300">
+                <div class="bg-green-50 rounded-lg border border-green-200 p-4 hover:shadow-lg transition-shadow duration-300">
                     <div class="flex items-center justify-between">
                         <div>
                             <p class="text-xs font-medium text-gray-600">Distance parcourue</p>
@@ -141,14 +141,14 @@
                                 Depuis: {{ $stats['first_reading_date'] ?? '-' }}
                             </p>
                         </div>
-                        <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
+                        <div class="w-10 h-10 bg-green-100 border border-green-200 rounded-lg flex items-center justify-center">
                             <x-iconify icon="lucide:route" class="w-5 h-5 text-green-600" />
                         </div>
                     </div>
                 </div>
 
                 {{-- 3. Moyenne Journalière --}}
-                <div class="bg-white rounded-lg border border-gray-200 p-4 hover:shadow-lg transition-shadow duration-300">
+                <div class="bg-purple-50 rounded-lg border border-purple-200 p-4 hover:shadow-lg transition-shadow duration-300">
                     <div class="flex items-center justify-between">
                         <div>
                             <p class="text-xs font-medium text-gray-600">Moy. journalière</p>
@@ -159,14 +159,14 @@
                                 Basé sur 30 jours
                             </p>
                         </div>
-                        <div class="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
+                        <div class="w-10 h-10 bg-purple-100 border border-purple-200 rounded-lg flex items-center justify-center">
                             <x-iconify icon="lucide:trending-up" class="w-5 h-5 text-purple-600" />
                         </div>
                     </div>
                 </div>
 
                 {{-- 4. Dernière Mise à Jour --}}
-                <div class="bg-white rounded-lg border border-gray-200 p-4 hover:shadow-lg transition-shadow duration-300">
+                <div class="bg-orange-50 rounded-lg border border-orange-200 p-4 hover:shadow-lg transition-shadow duration-300">
                     <div class="flex items-center justify-between">
                         <div>
                             <p class="text-xs font-medium text-gray-600">Dernier relevé</p>
@@ -177,14 +177,14 @@
                                 {{ $stats['last_reading']?->format('d/m/Y H:i') ?? '-' }}
                             </p>
                         </div>
-                        <div class="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center">
+                        <div class="w-10 h-10 bg-orange-100 border border-orange-200 rounded-lg flex items-center justify-center">
                             <x-iconify icon="lucide:clock" class="w-5 h-5 text-orange-600" />
                         </div>
                     </div>
                 </div>
 
                 {{-- 5. Relevés Manuels --}}
-                <div class="bg-white rounded-lg border border-gray-200 p-4 hover:shadow-lg transition-shadow duration-300">
+                <div class="bg-indigo-50 rounded-lg border border-indigo-200 p-4 hover:shadow-lg transition-shadow duration-300">
                     <div class="flex items-center justify-between">
                         <div>
                             <p class="text-xs font-medium text-gray-600">Manuels</p>
@@ -195,14 +195,14 @@
                                 {{ number_format($stats['manual_percentage'] ?? 0, 1) }}% du total
                             </p>
                         </div>
-                        <div class="w-10 h-10 bg-indigo-100 rounded-lg flex items-center justify-center">
+                        <div class="w-10 h-10 bg-indigo-100 border border-indigo-200 rounded-lg flex items-center justify-center">
                             <x-iconify icon="lucide:hand" class="w-5 h-5 text-indigo-600" />
                         </div>
                     </div>
                 </div>
 
                 {{-- 6. Relevés Automatiques --}}
-                <div class="bg-white rounded-lg border border-gray-200 p-4 hover:shadow-lg transition-shadow duration-300">
+                <div class="bg-teal-50 rounded-lg border border-teal-200 p-4 hover:shadow-lg transition-shadow duration-300">
                     <div class="flex items-center justify-between">
                         <div>
                             <p class="text-xs font-medium text-gray-600">Automatiques</p>
@@ -213,14 +213,14 @@
                                 {{ number_format($stats['automatic_percentage'] ?? 0, 1) }}% du total
                             </p>
                         </div>
-                        <div class="w-10 h-10 bg-teal-100 rounded-lg flex items-center justify-center">
+                        <div class="w-10 h-10 bg-teal-100 border border-teal-200 rounded-lg flex items-center justify-center">
                             <x-iconify icon="lucide:cpu" class="w-5 h-5 text-teal-600" />
                         </div>
                     </div>
                 </div>
 
                 {{-- 7. Kilométrage Actuel --}}
-                <div class="bg-white rounded-lg border border-gray-200 p-4 hover:shadow-lg transition-shadow duration-300">
+                <div class="bg-blue-50 rounded-lg border border-blue-200 p-4 hover:shadow-lg transition-shadow duration-300">
                     <div class="flex items-center justify-between">
                         <div>
                             <p class="text-xs font-medium text-gray-600">KM Actuel</p>
@@ -232,14 +232,14 @@
                                 {{ $vehicle->registration_plate }}
                             </p>
                         </div>
-                        <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                        <div class="w-10 h-10 bg-blue-100 border border-blue-200 rounded-lg flex items-center justify-center">
                             <x-iconify icon="lucide:gauge-circle" class="w-5 h-5 text-blue-600" />
                         </div>
                     </div>
                 </div>
 
                 {{-- 8. Tendance 7 Jours --}}
-                <div class="bg-white rounded-lg border border-gray-200 p-4 hover:shadow-lg transition-shadow duration-300">
+                <div class="bg-amber-50 rounded-lg border border-amber-200 p-4 hover:shadow-lg transition-shadow duration-300">
                     <div class="flex items-center justify-between">
                         <div>
                             <p class="text-xs font-medium text-gray-600">7 derniers jours</p>
@@ -256,7 +256,7 @@
                                 @endif
                             </p>
                         </div>
-                        <div class="w-10 h-10 bg-amber-100 rounded-lg flex items-center justify-center">
+                        <div class="w-10 h-10 bg-amber-100 border border-amber-200 rounded-lg flex items-center justify-center">
                             <x-iconify icon="lucide:calendar-range" class="w-5 h-5 text-amber-600" />
                         </div>
                     </div>

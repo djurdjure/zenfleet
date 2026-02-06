@@ -36,52 +36,52 @@
         {{-- CARDS MÉTRIQUES ULTRA-PRO --}}
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
             {{-- Total Fournisseurs --}}
-            <div class="bg-white rounded-lg border border-gray-200 p-4 hover:shadow-lg transition-shadow duration-300">
+            <div class="bg-blue-50 rounded-lg border border-blue-200 p-4 hover:shadow-lg transition-shadow duration-300">
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-xs font-medium text-gray-600">Total fournisseurs</p>
                         <p class="text-xl font-bold text-gray-900 mt-1">{{ $analytics['total'] }}</p>
                     </div>
-                    <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                    <div class="w-10 h-10 bg-blue-100 border border-blue-200 rounded-lg flex items-center justify-center">
                         <x-iconify icon="lucide:building-2" class="w-5 h-5 text-blue-600" />
                     </div>
                 </div>
             </div>
 
             {{-- Actifs --}}
-            <div class="bg-white rounded-lg border border-gray-200 p-4 hover:shadow-lg transition-shadow duration-300">
+            <div class="bg-green-50 rounded-lg border border-green-200 p-4 hover:shadow-lg transition-shadow duration-300">
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-xs font-medium text-gray-600">Actifs</p>
                         <p class="text-xl font-bold text-green-600 mt-1">{{ $analytics['active'] }}</p>
                     </div>
-                    <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
+                    <div class="w-10 h-10 bg-green-100 border border-green-200 rounded-lg flex items-center justify-center">
                         <x-iconify icon="lucide:check-circle" class="w-5 h-5 text-green-600" />
                     </div>
                 </div>
             </div>
 
             {{-- Préférés --}}
-            <div class="bg-white rounded-lg border border-gray-200 p-4 hover:shadow-lg transition-shadow duration-300">
+            <div class="bg-red-50 rounded-lg border border-red-200 p-4 hover:shadow-lg transition-shadow duration-300">
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-xs font-medium text-gray-600">Préférés</p>
                         <p class="text-xl font-bold text-red-600 mt-1">{{ $analytics['preferred'] }}</p>
                     </div>
-                    <div class="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center">
+                    <div class="w-10 h-10 bg-red-100 border border-red-200 rounded-lg flex items-center justify-center">
                         <x-iconify icon="lucide:heart" class="w-5 h-5 text-red-600" />
                     </div>
                 </div>
             </div>
 
             {{-- Certifiés --}}
-            <div class="bg-white rounded-lg border border-gray-200 p-4 hover:shadow-lg transition-shadow duration-300">
+            <div class="bg-purple-50 rounded-lg border border-purple-200 p-4 hover:shadow-lg transition-shadow duration-300">
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-xs font-medium text-gray-600">Certifiés</p>
                         <p class="text-xl font-bold text-purple-600 mt-1">{{ $analytics['certified'] }}</p>
                     </div>
-                    <div class="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
+                    <div class="w-10 h-10 bg-purple-100 border border-purple-200 rounded-lg flex items-center justify-center">
                         <x-iconify icon="lucide:badge-check" class="w-5 h-5 text-purple-600" />
                     </div>
                 </div>

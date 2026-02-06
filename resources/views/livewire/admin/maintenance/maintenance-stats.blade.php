@@ -33,7 +33,7 @@
     {{-- Cards Métriques --}}
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4" wire:loading.class="opacity-50">
         {{-- Total Opérations --}}
-        <div class="bg-white rounded-lg border border-gray-200 p-4 hover:shadow-lg transition-shadow duration-300">
+        <div class="bg-blue-50 rounded-lg border border-blue-200 p-4 hover:shadow-lg transition-shadow duration-300">
             <div class="flex items-center justify-between">
                 <div>
                     <p class="text-xs font-medium text-gray-600">Total opérations</p>
@@ -41,14 +41,14 @@
                         {{ $analytics['total_operations'] ?? 0 }}
                     </p>
                 </div>
-                <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                <div class="w-10 h-10 bg-blue-100 border border-blue-200 rounded-lg flex items-center justify-center">
                     <x-iconify icon="lucide:wrench" class="w-5 h-5 text-blue-600" />
                 </div>
             </div>
         </div>
 
         {{-- Planifiées --}}
-        <div class="bg-white rounded-lg border border-gray-200 p-4 hover:shadow-lg transition-shadow duration-300">
+        <div class="bg-blue-50 rounded-lg border border-blue-200 p-4 hover:shadow-lg transition-shadow duration-300">
             <div class="flex items-center justify-between">
                 <div>
                     <p class="text-xs font-medium text-gray-600">Planifiées</p>
@@ -56,14 +56,14 @@
                         {{ $analytics['planned_operations'] ?? 0 }}
                     </p>
                 </div>
-                <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                <div class="w-10 h-10 bg-blue-100 border border-blue-200 rounded-lg flex items-center justify-center">
                     <x-iconify icon="lucide:calendar-clock" class="w-5 h-5 text-blue-600" />
                 </div>
             </div>
         </div>
 
         {{-- En Cours --}}
-        <div class="bg-white rounded-lg border border-gray-200 p-4 hover:shadow-lg transition-shadow duration-300">
+        <div class="bg-orange-50 rounded-lg border border-orange-200 p-4 hover:shadow-lg transition-shadow duration-300">
             <div class="flex items-center justify-between">
                 <div>
                     <p class="text-xs font-medium text-gray-600">En cours</p>
@@ -74,14 +74,14 @@
                         Véhicules: {{ $analytics['vehicles_in_maintenance'] ?? 0 }}
                     </p>
                 </div>
-                <div class="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center">
+                <div class="w-10 h-10 bg-orange-100 border border-orange-200 rounded-lg flex items-center justify-center">
                     <x-iconify icon="lucide:loader" class="w-5 h-5 text-orange-600" />
                 </div>
             </div>
         </div>
 
         {{-- En Retard --}}
-        <div class="bg-white rounded-lg border border-gray-200 p-4 hover:shadow-lg transition-shadow duration-300">
+        <div class="bg-red-50 rounded-lg border border-red-200 p-4 hover:shadow-lg transition-shadow duration-300">
             <div class="flex items-center justify-between">
                 <div>
                     <p class="text-xs font-medium text-gray-600">En retard</p>
@@ -95,14 +95,14 @@
                         </p>
                     @endif
                 </div>
-                <div class="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center">
+                <div class="w-10 h-10 bg-red-100 border border-red-200 rounded-lg flex items-center justify-center">
                     <x-iconify icon="lucide:alert-circle" class="w-5 h-5 text-red-600" />
                 </div>
             </div>
         </div>
 
         {{-- Complétées --}}
-        <div class="bg-white rounded-lg border border-gray-200 p-4 hover:shadow-lg transition-shadow duration-300">
+        <div class="bg-green-50 rounded-lg border border-green-200 p-4 hover:shadow-lg transition-shadow duration-300">
             <div class="flex items-center justify-between">
                 <div>
                     <p class="text-xs font-medium text-gray-600">Complétées</p>
@@ -113,14 +113,14 @@
                         Taux: {{ number_format(($analytics['completed_operations'] ?? 0) / max($analytics['total_operations'] ?? 1, 1) * 100, 1) }}%
                     </p>
                 </div>
-                <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
+                <div class="w-10 h-10 bg-green-100 border border-green-200 rounded-lg flex items-center justify-center">
                     <x-iconify icon="lucide:check-circle-2" class="w-5 h-5 text-green-600" />
                 </div>
             </div>
         </div>
 
         {{-- Coût Total --}}
-        <div class="bg-white rounded-lg border border-gray-200 p-4 hover:shadow-lg transition-shadow duration-300">
+        <div class="bg-purple-50 rounded-lg border border-purple-200 p-4 hover:shadow-lg transition-shadow duration-300">
             <div class="flex items-center justify-between">
                 <div>
                     <p class="text-xs font-medium text-gray-600">Coût total</p>
@@ -131,14 +131,14 @@
                         Moyen: {{ number_format($analytics['avg_cost'] ?? 0, 0, ',', ' ') }} DA
                     </p>
                 </div>
-                <div class="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
+                <div class="w-10 h-10 bg-purple-100 border border-purple-200 rounded-lg flex items-center justify-center">
                     <x-iconify icon="lucide:banknote" class="w-5 h-5 text-purple-600" />
                 </div>
             </div>
         </div>
 
         {{-- Durée Moyenne --}}
-        <div class="bg-white rounded-lg border border-gray-200 p-4 hover:shadow-lg transition-shadow duration-300">
+        <div class="bg-indigo-50 rounded-lg border border-indigo-200 p-4 hover:shadow-lg transition-shadow duration-300">
             <div class="flex items-center justify-between">
                 <div>
                     <p class="text-xs font-medium text-gray-600">Durée moyenne</p>
@@ -149,14 +149,14 @@
                         Total: {{ number_format($analytics['total_duration_hours'] ?? 0, 1) }}h
                     </p>
                 </div>
-                <div class="w-10 h-10 bg-indigo-100 rounded-lg flex items-center justify-center">
+                <div class="w-10 h-10 bg-indigo-100 border border-indigo-200 rounded-lg flex items-center justify-center">
                     <x-iconify icon="lucide:clock" class="w-5 h-5 text-indigo-600" />
                 </div>
             </div>
         </div>
 
         {{-- Annulées --}}
-        <div class="bg-white rounded-lg border border-gray-200 p-4 hover:shadow-lg transition-shadow duration-300">
+        <div class="bg-gray-50 rounded-lg border border-gray-200 p-4 hover:shadow-lg transition-shadow duration-300">
             <div class="flex items-center justify-between">
                 <div>
                     <p class="text-xs font-medium text-gray-600">Annulées</p>
@@ -167,7 +167,7 @@
                         Taux: {{ number_format(($analytics['cancelled_operations'] ?? 0) / max($analytics['total_operations'] ?? 1, 1) * 100, 1) }}%
                     </p>
                 </div>
-                <div class="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center">
+                <div class="w-10 h-10 bg-gray-100 border border-gray-200 rounded-lg flex items-center justify-center">
                     <x-iconify icon="lucide:x-circle" class="w-5 h-5 text-gray-500" />
                 </div>
             </div>

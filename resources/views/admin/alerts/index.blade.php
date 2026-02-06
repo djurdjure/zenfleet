@@ -66,7 +66,7 @@
 
  {{-- Statistiques détaillées --}}
  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-6">
- <div class="bg-white rounded-xl shadow-lg p-6 border-l-4 border-red-500 hover:shadow-xl transition-shadow">
+ <div class="bg-red-50 rounded-xl shadow-lg p-6 border border-red-200 border-l-4 border-red-500 hover:shadow-xl transition-shadow">
  <div class="flex items-center">
  <div class="p-3 bg-red-100 rounded-full">
  <x-iconify icon="heroicons:exclamation-triangle" class="h-6 w-6 text-red-600" / />
@@ -78,7 +78,7 @@
  </div>
  </div>
 
- <div class="bg-white rounded-xl shadow-lg p-6 border-l-4 border-indigo-500 hover:shadow-xl transition-shadow">
+ <div class="bg-indigo-50 rounded-xl shadow-lg p-6 border border-indigo-200 border-l-4 border-indigo-500 hover:shadow-xl transition-shadow">
  <div class="flex items-center">
  <div class="p-3 bg-indigo-100 rounded-full">
  <x-iconify icon="heroicons:wrench" class="h-6 w-6 text-indigo-600" / />
@@ -90,7 +90,7 @@
  </div>
  </div>
 
- <div class="bg-white rounded-xl shadow-lg p-6 border-l-4 border-emerald-500 hover:shadow-xl transition-shadow">
+ <div class="bg-emerald-50 rounded-xl shadow-lg p-6 border border-emerald-200 border-l-4 border-emerald-500 hover:shadow-xl transition-shadow">
  <div class="flex items-center">
  <div class="p-3 bg-emerald-100 rounded-full">
  <x-iconify icon="lucide:wallet" class="h-6 w-6 text-emerald-600" / />
@@ -102,7 +102,7 @@
  </div>
  </div>
 
- <div class="bg-white rounded-xl shadow-lg p-6 border-l-4 border-orange-500 hover:shadow-xl transition-shadow">
+ <div class="bg-orange-50 rounded-xl shadow-lg p-6 border border-orange-200 border-l-4 border-orange-500 hover:shadow-xl transition-shadow">
  <div class="flex items-center">
  <div class="p-3 bg-orange-100 rounded-full">
  <x-iconify icon="lucide:wrench" class="h-6 w-6 text-orange-600" / />
@@ -114,7 +114,7 @@
  </div>
  </div>
 
- <div class="bg-white rounded-xl shadow-lg p-6 border-l-4 border-yellow-500 hover:shadow-xl transition-shadow">
+ <div class="bg-yellow-50 rounded-xl shadow-lg p-6 border border-yellow-200 border-l-4 border-yellow-500 hover:shadow-xl transition-shadow">
  <div class="flex items-center">
  <div class="p-3 bg-yellow-100 rounded-full">
  <x-iconify icon="heroicons:clock" class="h-6 w-6 text-yellow-600" / />
@@ -126,7 +126,7 @@
  </div>
  </div>
 
- <div class="bg-white rounded-xl shadow-lg p-6 border-l-4 border-blue-500 hover:shadow-xl transition-shadow">
+ <div class="bg-blue-50 rounded-xl shadow-lg p-6 border border-blue-200 border-l-4 border-blue-500 hover:shadow-xl transition-shadow">
  <div class="flex items-center">
  <div class="p-3 bg-blue-100 rounded-full">
  <x-iconify icon="heroicons:arrow-trending-up" class="h-6 w-6 text-blue-600" / />

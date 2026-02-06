@@ -43,7 +43,7 @@
         =============================================== --}}
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
             {{-- Total Dépenses --}}
-            <div class="bg-white rounded-lg border border-gray-200 p-4 hover:shadow-lg transition-shadow duration-300">
+            <div class="bg-blue-50 rounded-lg border border-blue-200 p-4 hover:shadow-lg transition-shadow duration-300">
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-xs font-medium text-gray-600">Total dépenses</p>
@@ -54,14 +54,14 @@
                             {{ $stats['total_count'] ?? 0 }} dépenses
                         </p>
                     </div>
-                    <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                    <div class="w-10 h-10 bg-blue-100 border border-blue-200 rounded-lg flex items-center justify-center">
                         <x-iconify icon="lucide:coins" class="w-5 h-5 text-blue-600" />
                     </div>
                 </div>
             </div>
 
             {{-- En Attente --}}
-            <div class="bg-white rounded-lg border border-gray-200 p-4 hover:shadow-lg transition-shadow duration-300">
+            <div class="bg-yellow-50 rounded-lg border border-yellow-200 p-4 hover:shadow-lg transition-shadow duration-300">
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-xs font-medium text-gray-600">En attente</p>
@@ -77,14 +77,14 @@
                         <p class="text-xs text-green-600 mt-1">✓ À jour</p>
                         @endif
                     </div>
-                    <div class="w-10 h-10 bg-yellow-100 rounded-lg flex items-center justify-center">
+                    <div class="w-10 h-10 bg-yellow-100 border border-yellow-200 rounded-lg flex items-center justify-center">
                         <x-iconify icon="lucide:clock" class="w-5 h-5 text-yellow-600" />
                     </div>
                 </div>
             </div>
 
             {{-- Approuvées --}}
-            <div class="bg-white rounded-lg border border-gray-200 p-4 hover:shadow-lg transition-shadow duration-300">
+            <div class="bg-green-50 rounded-lg border border-green-200 p-4 hover:shadow-lg transition-shadow duration-300">
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-xs font-medium text-gray-600">Approuvées</p>
@@ -93,14 +93,14 @@
                         </p>
                         <p class="text-xs text-gray-500 mt-1">Validées</p>
                     </div>
-                    <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
+                    <div class="w-10 h-10 bg-green-100 border border-green-200 rounded-lg flex items-center justify-center">
                         <x-iconify icon="lucide:check-circle-2" class="w-5 h-5 text-green-600" />
                     </div>
                 </div>
             </div>
 
             {{-- Rejetées --}}
-            <div class="bg-white rounded-lg border border-gray-200 p-4 hover:shadow-lg transition-shadow duration-300">
+            <div class="bg-red-50 rounded-lg border border-red-200 p-4 hover:shadow-lg transition-shadow duration-300">
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-xs font-medium text-gray-600">Rejetées</p>
@@ -109,7 +109,7 @@
                         </p>
                         <p class="text-xs text-gray-500 mt-1">Refusées</p>
                     </div>
-                    <div class="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center">
+                    <div class="w-10 h-10 bg-red-100 border border-red-200 rounded-lg flex items-center justify-center">
                         <x-iconify icon="lucide:x-circle" class="w-5 h-5 text-red-600" />
                     </div>
                 </div>
