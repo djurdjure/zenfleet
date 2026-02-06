@@ -135,6 +135,19 @@ class Kernel extends ConsoleKernel
             ->onFailure(function () {
                 \Log::channel('audit')->warning('permissions.audit.scheduled', ['status' => 'failed']);
             });
+
+        // 🛡️ Security health check (roles coverage + RBAC drift)
+        $schedule->command('security:health-check')
+            ->weekly()
+            ->mondays()
+            ->at('05:40')
+            ->runInBackground()
+            ->onSuccess(function () {
+                \Log::channel('audit')->info('security.health_check.scheduled', ['status' => 'success']);
+            })
+            ->onFailure(function () {
+                \Log::channel('audit')->warning('security.health_check.scheduled', ['status' => 'failed']);
+            });
     }
 
     /**

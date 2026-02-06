@@ -113,6 +113,12 @@ Rechercher toutes les occurrences de `can('view vehicles')` etc. et les remplace
 - **Dashboards:** taux d’échec permissions, opérations critiques, exports.
 - **Revue périodique:** audit permissions trimestriel.
 
+## 🧭 Phase 5 : Gouvernance Active & Auto‑remédiation
+- **Health check RBAC:** contrôle hebdomadaire (legacy, doublons, orphelins).
+- **Couverture des rôles par organisation:** détection des orgs sans rôles + auto‑provisionnement sécurisé.
+- **Journalisation sécurité:** traces en canal `audit` pour chaque contrôle.
+- **Commandes dédiées:** `security:health-check` et `roles:ensure-organizations`.
+
 ## ✅ Checklist de sécurité avant release
 - Backup DB effectué.
 - Cache permissions invalidé.
@@ -129,3 +135,4 @@ Rechercher toutes les occurrences de `can('view vehicles')` etc. et les remplace
 - **[02/04/2026]** Phase 3 (correctif validation) : permissions dépôts imposées côté Livewire (`ManageDepots`) + masquage UI des actions sans droits, guide validation mis à jour.
 - **[02/04/2026]** Phase 3 (hardening RBAC) : désactivation par défaut des permissions directes utilisateur via `use_custom_permissions`, pour empêcher les accès résiduels après modification d’un rôle.
 - **[02/04/2026]** Phase 3 (migrations) : migrations de normalisation exécutées avec succès, validation UI et audit legacy encore requis.
+- **[02/06/2026]** Phase 5 : health‑check RBAC automatisé + provisioning des rôles par organisation (commande `security:health-check`, provisioner, tâche planifiée).
