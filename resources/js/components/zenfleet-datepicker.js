@@ -28,6 +28,73 @@ export function zenfleetDatepickerData() {
         picker: null,
         value: null, // Deprecated: use serverDate instead, kept for compatibility
         instance: null, // Flowbite instance
+        skipChangeEvent: false,
+        skipBlurSync: false,
+
+        bindPickerGuard(pickerEl) {
+            if (!pickerEl || pickerEl._zenfleetGuardBound) return;
+
+            const markInteraction = () => {
+                this.skipBlurSync = true;
+                window.setTimeout(() => {
+                    this.skipBlurSync = false;
+                }, 0);
+            };
+
+            pickerEl.addEventListener('mousedown', markInteraction, { capture: true });
+            pickerEl.addEventListener('touchstart', markInteraction, { capture: true, passive: true });
+            pickerEl._zenfleetGuardBound = true;
+        },
+
+        formatDisplayDate(date) {
+            const day = String(date.getDate()).padStart(2, '0');
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const year = date.getFullYear();
+            return `${day}/${month}/${year}`;
+        },
+
+        formatServerDate(date) {
+            const day = String(date.getDate()).padStart(2, '0');
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const year = date.getFullYear();
+            return `${year}-${month}-${day}`;
+        },
+
+        buildDate(year, month, day) {
+            if (month < 1 || month > 12 || day < 1 || day > 31) return null;
+            const date = new Date(year, month - 1, day);
+            if (
+                date.getFullYear() !== year ||
+                date.getMonth() !== month - 1 ||
+                date.getDate() !== day
+            ) {
+                return null;
+            }
+            return date;
+        },
+
+        parseInputDate(value) {
+            const input = String(value || '').trim();
+            if (!input) return null;
+
+            const frMatch = input.match(/^(\d{1,2})[\/.\-](\d{1,2})[\/.\-](\d{4})$/);
+            if (frMatch) {
+                const day = Number(frMatch[1]);
+                const month = Number(frMatch[2]);
+                const year = Number(frMatch[3]);
+                return this.buildDate(year, month, day);
+            }
+
+            const isoMatch = input.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+            if (isoMatch) {
+                const year = Number(isoMatch[1]);
+                const month = Number(isoMatch[2]);
+                const day = Number(isoMatch[3]);
+                return this.buildDate(year, month, day);
+            }
+
+            return null;
+        },
 
         /**
          * Initialize the datepicker component
@@ -114,31 +181,33 @@ export function zenfleetDatepickerData() {
                 minDate: minDate,
                 maxDate: maxDate,
                 // Ensure the picker respects our manually set value
-                defaultViewDate: this.displayValue || new Date(),
+                defaultViewDate: this.parseInputDate(this.displayValue) || new Date(),
             });
 
             // 🚫 FORCE LIGHT MODE: Remove 'dark' class from the generated picker
             // Flowbite Datepicker appends the picker to the body or container
             // We need to find it and strip the class
-            if (this.instance && this.instance.pickerElement) {
-                this.instance.pickerElement.classList.remove('dark');
+            const pickerEl = this.instance?.picker?.element;
+            if (pickerEl) {
+                pickerEl.classList.remove('dark');
                 // Also force a specific light class if needed by our CSS
-                this.instance.pickerElement.classList.add('light-mode-forced');
+                pickerEl.classList.add('light-mode-forced');
+                this.bindPickerGuard(pickerEl);
             }
 
             // Handle Date Selection Event
             el.addEventListener('changeDate', (e) => {
+                if (this.skipChangeEvent) {
+                    this.skipChangeEvent = false;
+                    return;
+                }
                 // Flowbite event detail usually contains the date object
                 const d = e.detail.date;
 
                 if (d && !isNaN(d.getTime())) {
-                    // Convert to YYYY-MM-DD for server/Livewire
-                    const year = d.getFullYear();
-                    const month = String(d.getMonth() + 1).padStart(2, '0');
-                    const day = String(d.getDate()).padStart(2, '0');
-                    const serverDate = `${year}-${month}-${day}`;
+                    const serverDate = this.formatServerDate(d);
 
-                    this.displayValue = this.instance.getDate('dd/mm/yyyy');
+                    this.displayValue = this.formatDisplayDate(d);
                     this.serverDate = serverDate;
                     this.value = serverDate; // Keep for backward compatibility
 
@@ -155,6 +224,9 @@ export function zenfleetDatepickerData() {
 
             // Handle manual input changes (blur) to validate strict format
             el.addEventListener('blur', () => {
+                if (this.skipBlurSync) {
+                    return;
+                }
                 const val = el.value;
                 if (!val) {
                     this.serverDate = null;
@@ -163,20 +235,28 @@ export function zenfleetDatepickerData() {
                     return;
                 }
 
-                // If the user typed something valid, Flowbite usually handles it,
-                // but we should sync just in case
-                const date = this.instance.getDate();
-                if (date) {
-                    const year = date.getFullYear();
-                    const month = String(date.getMonth() + 1).padStart(2, '0');
-                    const day = String(date.getDate()).padStart(2, '0');
-                    const serverDate = `${year}-${month}-${day}`;
+                const parsed = this.parseInputDate(val);
+                if (!parsed) {
+                    this.serverDate = null;
+                    this.value = null; // Keep for backward compatibility
+                    this.$dispatch('input', null);
+                    return;
+                }
 
-                    if (this.serverDate !== serverDate) {
-                        this.serverDate = serverDate;
-                        this.value = serverDate; // Keep for backward compatibility
-                        this.$dispatch('input', serverDate);
-                    }
+                const serverDate = this.formatServerDate(parsed);
+                if (this.serverDate !== serverDate) {
+                    this.displayValue = this.formatDisplayDate(parsed);
+                    this.serverDate = serverDate;
+                    this.value = serverDate; // Keep for backward compatibility
+                    this.$dispatch('input', serverDate);
+                }
+
+                if (this.instance) {
+                    this.skipChangeEvent = true;
+                    this.instance.setDate(parsed, { autohide: false });
+                    setTimeout(() => {
+                        this.skipChangeEvent = false;
+                    }, 0);
                 }
             });
 

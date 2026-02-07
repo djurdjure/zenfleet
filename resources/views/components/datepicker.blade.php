@@ -95,7 +95,7 @@ $inputClasses .= $error ? ' border-red-500' : ' border-gray-300';
             @if($disabled) disabled @endif
             @if($required) required @endif
             autocomplete="off"
-            readonly>
+            spellcheck="false">
 
         {{-- Hidden Input (Server receives this in Y-m-d format) --}}
         <input

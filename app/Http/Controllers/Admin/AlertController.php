@@ -95,10 +95,15 @@ class AlertController extends Controller
         // Alertes de budget dépassé - ENTERPRISE: Vérification existence table
         try {
             if (DB::getSchemaBuilder()->hasTable('expense_budgets')) {
-                $budgetOverruns = DB::table('expense_budgets')
-                    ->where('organization_id', $organizationId)
+                $budgetQuery = ExpenseBudget::query()
+                    ->where('organization_id', $organizationId);
+
+                if (DB::getSchemaBuilder()->hasColumn('expense_budgets', 'is_active')) {
+                    $budgetQuery->where('is_active', true);
+                }
+
+                $budgetOverruns = $budgetQuery
                     ->whereRaw('spent_amount > budgeted_amount')
-                    ->where('status', 'active')
                     ->count();
 
                 if ($budgetOverruns > 0) {
@@ -261,33 +266,56 @@ class AlertController extends Controller
                 return collect([]);
             }
 
-            return DB::table('expense_budgets')
-                ->where('organization_id', $organizationId)
-                ->where('status', 'active')
-                ->whereRaw('(spent_amount / budgeted_amount) * 100 >= warning_threshold')
-                ->select([
-                    'id',
-                    'scope_type',
-                    'scope_description',
-                    'budgeted_amount',
-                    'spent_amount',
-                    'warning_threshold',
-                    'critical_threshold',
-                    DB::raw('(spent_amount / budgeted_amount) * 100 as utilization_percentage'),
-                    DB::raw("CASE
-                        WHEN spent_amount > budgeted_amount THEN 'budget_overrun'
-                        WHEN (spent_amount / budgeted_amount) * 100 >= critical_threshold THEN 'budget_critical'
-                        ELSE 'budget_warning'
-                    END as type"),
-                    DB::raw("CASE
-                        WHEN spent_amount > budgeted_amount THEN 'urgent'
-                        WHEN (spent_amount / budgeted_amount) * 100 >= critical_threshold THEN 'high'
-                        ELSE 'medium'
-                    END as priority"),
-                    'created_at'
-                ])
-                ->orderByRaw("CASE priority WHEN 'urgent' THEN 1 WHEN 'high' THEN 2 ELSE 3 END")
+            $budgetQuery = ExpenseBudget::query()
+                ->where('organization_id', $organizationId);
+
+            if (DB::getSchemaBuilder()->hasColumn('expense_budgets', 'is_active')) {
+                $budgetQuery->where('is_active', true);
+            }
+
+            $budgets = $budgetQuery
+                ->whereRaw('(spent_amount / NULLIF(budgeted_amount, 0)) * 100 >= warning_threshold')
+                ->with(['vehicle'])
                 ->get();
+
+            return $budgets
+                ->map(function (ExpenseBudget $budget) {
+                    $utilization = $budget->utilization_percentage;
+                    $isOverBudget = $budget->isOverBudget();
+                    $isCritical = $utilization >= $budget->critical_threshold;
+
+                    $type = $isOverBudget
+                        ? 'budget_overrun'
+                        : ($isCritical ? 'budget_critical' : 'budget_warning');
+
+                    $priority = $isOverBudget
+                        ? 'urgent'
+                        : ($isCritical ? 'high' : 'medium');
+
+                    $scopeType = $budget->isVehicleScope()
+                        ? 'vehicle'
+                        : ($budget->isCategoryScope() ? 'category' : 'global');
+
+                    return (object)[
+                        'id' => $budget->id,
+                        'scope_type' => $scopeType,
+                        'scope_description' => $budget->scope_description,
+                        'budgeted_amount' => $budget->budgeted_amount,
+                        'spent_amount' => $budget->spent_amount,
+                        'warning_threshold' => $budget->warning_threshold,
+                        'critical_threshold' => $budget->critical_threshold,
+                        'utilization_percentage' => $utilization,
+                        'type' => $type,
+                        'priority' => $priority,
+                        'created_at' => $budget->created_at,
+                    ];
+                })
+                ->sortBy(function ($alert) {
+                    return $alert->priority === 'urgent'
+                        ? 1
+                        : ($alert->priority === 'high' ? 2 : 3);
+                })
+                ->values();
         } catch (\Exception $e) {
             \Log::warning('Error fetching budget alerts', ['error' => $e->getMessage()]);
             return collect([]);
