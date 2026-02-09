@@ -245,6 +245,7 @@ function setupZenFleetChartsLifecycle() {
     window.ZenFleetCharts = zenFleetChartsManager;
 
     let rafId = null;
+    let observer = null;
     const scheduleRefresh = () => {
         if (rafId !== null) {
             cancelAnimationFrame(rafId);
@@ -256,13 +257,56 @@ function setupZenFleetChartsLifecycle() {
         });
     };
 
+    const containsChartNode = (node) => {
+        if (!(node instanceof Element)) {
+            return false;
+        }
+
+        return node.matches(CHART_SELECTOR) || Boolean(node.querySelector(CHART_SELECTOR));
+    };
+
+    const initDomObserver = () => {
+        if (observer || !document.body) {
+            return;
+        }
+
+        observer = new MutationObserver((mutations) => {
+            const shouldRefresh = mutations.some((mutation) => {
+                if (containsChartNode(mutation.target)) {
+                    return true;
+                }
+
+                return (
+                    Array.from(mutation.addedNodes).some(containsChartNode) ||
+                    Array.from(mutation.removedNodes).some(containsChartNode)
+                );
+            });
+
+            if (shouldRefresh) {
+                scheduleRefresh();
+            }
+        });
+
+        observer.observe(document.body, {
+            childList: true,
+            subtree: true,
+        });
+    };
+
     if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', scheduleRefresh, { once: true });
+        document.addEventListener('DOMContentLoaded', () => {
+            initDomObserver();
+            scheduleRefresh();
+        }, { once: true });
     } else {
+        initDomObserver();
         scheduleRefresh();
     }
 
-    document.addEventListener('livewire:initialized', scheduleRefresh);
+    document.addEventListener('livewire:initialized', () => {
+        initDomObserver();
+        scheduleRefresh();
+    });
     document.addEventListener('livewire:navigated', scheduleRefresh);
     document.addEventListener('dashboard:data-updated', scheduleRefresh);
 
@@ -270,4 +314,3 @@ function setupZenFleetChartsLifecycle() {
 }
 
 export { zenFleetChartsManager, setupZenFleetChartsLifecycle };
-

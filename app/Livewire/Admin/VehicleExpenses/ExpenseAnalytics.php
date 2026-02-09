@@ -136,6 +136,9 @@ class ExpenseAnalytics extends Component
             if ($this->showAdvancedMetrics) {
                 $this->loadAdvancedMetrics($service, $filters);
             }
+
+            // Keep frontend chart widgets in sync after every Livewire refresh.
+            $this->dispatch('dashboard:data-updated');
             
         } catch (\Exception $e) {
             $this->dispatch('notify', [
