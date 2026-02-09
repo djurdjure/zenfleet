@@ -207,16 +207,15 @@
  </select>
  </div>
  <div class="chart-container">
- <div
+ <x-charts.widget
  id="fleetChart"
- data-zenfleet-chart
- data-chart-id="fleet-dashboard-utilization"
- data-chart-type="area"
- data-chart-height="300"
- data-chart-aria-label="Evolution hebdomadaire des vehicules actifs"
- data-chart-labels='@json(["Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"])'
- data-chart-series='@json([["name" => "Véhicules actifs", "data" => [18, 22, 20, 24, 23, 19, 21]]])'
- data-chart-options='@json([
+ chart-id="fleet-dashboard-utilization"
+ type="area"
+ :height="300"
+ aria-label="Evolution hebdomadaire des vehicules actifs"
+ :labels='["Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"]'
+ :series='[["name" => "Véhicules actifs", "data" => [18, 22, 20, 24, 23, 19, 21]]]'
+ :options='[
     "stroke" => ["width" => 3, "curve" => "smooth"],
     "fill" => [
         "type" => "gradient",
@@ -229,8 +228,8 @@
     "markers" => ["size" => 4],
     "legend" => ["show" => false],
     "yaxis" => ["min" => 0]
- ])'
- ></div>
+ ]'
+ />
  </div>
  </div>
 

@@ -78,43 +78,41 @@
  <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
  <div class="bg-white rounded-xl shadow-lg p-6">
  <h3 class="text-lg font-semibold text-gray-800 mb-4">📊 Répartition des Alertes</h3>
- <div
+ <x-charts.widget
  id="alertsChart"
  class="h-64"
- data-zenfleet-chart
- data-chart-id="maintenance-enterprise-alerts"
- data-chart-type="donut"
- data-chart-height="260"
- data-chart-aria-label="Repartition des alertes de maintenance par priorite"
- data-chart-labels='@json(array_keys($chartData["alerts_by_priority"] ?? []))'
- data-chart-series='@json(array_values($chartData["alerts_by_priority"] ?? []))'
- data-chart-options='@json([
+ chart-id="maintenance-enterprise-alerts"
+ type="donut"
+ :height="260"
+ aria-label="Repartition des alertes de maintenance par priorite"
+ :labels='array_keys($chartData["alerts_by_priority"] ?? [])'
+ :series='array_values($chartData["alerts_by_priority"] ?? [])'
+ :options='[
     "colors" => ["#ef4444", "#f59e0b", "#10b981", "#3b82f6"],
     "legend" => ["position" => "bottom"]
- ])'
- ></div>
+ ]'
+ />
  </div>
 
  <div class="bg-white rounded-xl shadow-lg p-6">
  <h3 class="text-lg font-semibold text-gray-800 mb-4">💰 Évolution des Coûts</h3>
- <div
+ <x-charts.widget
  id="costsChart"
  class="h-64"
- data-zenfleet-chart
- data-chart-id="maintenance-enterprise-costs"
- data-chart-type="line"
- data-chart-height="260"
- data-chart-aria-label="Evolution mensuelle des couts de maintenance"
- data-chart-labels='@json(array_column($chartData["cost_evolution"] ?? [], "month"))'
- data-chart-series='@json([[
+ chart-id="maintenance-enterprise-costs"
+ type="line"
+ :height="260"
+ aria-label="Evolution mensuelle des couts de maintenance"
+ :labels='array_column($chartData["cost_evolution"] ?? [], "month")'
+ :series='[[
     "name" => "Coûts (€)",
     "data" => array_column($chartData["cost_evolution"] ?? [], "cost")
- ]])'
- data-chart-options='@json([
+ ]]'
+ :options='[
     "stroke" => ["curve" => "smooth", "width" => 3],
     "yaxis" => ["min" => 0]
- ])'
- ></div>
+ ]'
+ />
  </div>
  </div>
  @endif

@@ -161,19 +161,18 @@
                     <i class="fas fa-chart-area text-blue-600 mr-2"></i>
                     Changements quotidiens
                 </h3>
-                <div
+                <x-charts.widget
                     id="dailyChangesChart"
-                    data-zenfleet-chart
-                    data-chart-id="status-daily-changes"
-                    data-chart-type="area"
-                    data-chart-height="300"
-                    data-chart-aria-label="Evolution quotidienne des changements de statuts"
-                    data-chart-labels='@json(collect($dailyChanges)->pluck("date")->values())'
-                    data-chart-series='@json([[
+                    chart-id="status-daily-changes"
+                    type="area"
+                    :height="300"
+                    aria-label="Evolution quotidienne des changements de statuts"
+                    :labels='collect($dailyChanges)->pluck("date")->values()'
+                    :series='[[
                         "name" => "Changements",
                         "data" => collect($dailyChanges)->pluck("count")->values()
-                    ]])'
-                    data-chart-options='@json([
+                    ]]'
+                    :options='[
                         "stroke" => ["curve" => "smooth", "width" => 2],
                         "fill" => [
                             "type" => "gradient",
@@ -186,8 +185,8 @@
                         "xaxis" => ["labels" => ["rotate" => -45]],
                         "colors" => ["#3b82f6"],
                         "legend" => ["show" => false]
-                    ])'
-                ></div>
+                    ]'
+                />
             </div>
 
             {{-- Distribution actuelle des statuts --}}
@@ -196,20 +195,19 @@
                     <i class="fas fa-chart-pie text-green-600 mr-2"></i>
                     Distribution actuelle
                 </h3>
-                <div
+                <x-charts.widget
                     id="statusDistributionChart"
-                    data-zenfleet-chart
-                    data-chart-id="status-distribution"
-                    data-chart-type="donut"
-                    data-chart-height="300"
-                    data-chart-aria-label="Distribution actuelle des statuts"
-                    data-chart-labels='@json(collect($statusDistribution)->pluck("status")->values())'
-                    data-chart-series='@json(collect($statusDistribution)->pluck("count")->values())'
-                    data-chart-options='@json([
+                    chart-id="status-distribution"
+                    type="donut"
+                    :height="300"
+                    aria-label="Distribution actuelle des statuts"
+                    :labels='collect($statusDistribution)->pluck("status")->values()'
+                    :series='collect($statusDistribution)->pluck("count")->values()'
+                    :options='[
                         "colors" => ["#10b981", "#3b82f6", "#f59e0b", "#ef4444", "#8b5cf6"],
                         "legend" => ["position" => "bottom"]
-                    ])'
-                ></div>
+                    ]'
+                />
             </div>
         </div>
 
