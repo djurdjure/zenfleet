@@ -181,14 +181,20 @@
  <select name="organization_id"
  id="organization_id"
  required
+ @if(auth()->user()->hasRole('Super Admin'))
+ onchange="if(this.value){ window.location='{{ route('admin.users.create') }}?organization_id=' + this.value; }"
+ @endif
  class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all">
  <option value="">-- Choisir une organisation --</option>
  @foreach($organizations as $org)
- <option value="{{ $org->id }}" @selected(old('organization_id') == $org->id)>
+ <option value="{{ $org->id }}" @selected(old('organization_id', $selectedOrganizationId ?? null) == $org->id)>
  {{ $org->name }}
  </option>
  @endforeach
  </select>
+ @if(auth()->user()->hasRole('Super Admin'))
+ <p class="mt-1 text-xs text-gray-500">Le changement d'organisation recharge automatiquement la liste des rôles disponibles.</p>
+ @endif
  @error('organization_id')
  <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
  @enderror

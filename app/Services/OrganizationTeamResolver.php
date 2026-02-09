@@ -53,7 +53,6 @@ class OrganizationTeamResolver implements PermissionsTeamResolver
             ->where('model_has_roles.model_type', get_class($user))
             ->where('roles.name', 'Super Admin')
             ->whereNull('roles.organization_id') // Super Admin est global
-            ->whereNull('model_has_roles.organization_id') // Assignation aussi globale
             ->exists();
 
         // Super Admin n'a pas de scoping (retourne null)

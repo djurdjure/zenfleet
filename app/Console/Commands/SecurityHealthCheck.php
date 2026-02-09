@@ -165,9 +165,13 @@ class SecurityHealthCheck extends Command
 
     private function resolveTemplateRoleNames(): Collection
     {
-        $globalRoles = Role::whereNull('organization_id')->pluck('name');
+        $globalRoles = Role::whereNull('organization_id')
+            ->pluck('name')
+            ->reject(fn (string $name) => $name === 'Super Admin')
+            ->values();
+
         if ($globalRoles->isNotEmpty()) {
-            return $globalRoles->values();
+            return $globalRoles;
         }
 
         $templateOrg = Role::whereNotNull('organization_id')
@@ -177,7 +181,10 @@ class SecurityHealthCheck extends Command
             ->first();
 
         if ($templateOrg) {
-            return Role::where('organization_id', $templateOrg->organization_id)->pluck('name')->values();
+            return Role::where('organization_id', $templateOrg->organization_id)
+                ->pluck('name')
+                ->reject(fn (string $name) => $name === 'Super Admin')
+                ->values();
         }
 
         return collect();

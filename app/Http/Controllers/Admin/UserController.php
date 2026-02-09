@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Validation\Rules;
 use Illuminate\View\View;
 use Spatie\Permission\Models\Role;
+use App\Services\OrganizationRoleProvisioner;
 
 class UserController extends Controller
 {
@@ -39,9 +40,6 @@ class UserController extends Controller
     {
         $this->authorize('users.create');
 
-        // 🛡️ SÉCURITÉ: Filtrer les rôles selon les permissions
-        $roles = $this->getAssignableRoles();
-        
         $user = auth()->user();
         if ($user->hasRole('Super Admin')) {
             $organizations = Organization::withoutGlobalScope('organization')->orderBy('name')->get();
@@ -49,7 +47,18 @@ class UserController extends Controller
             $organizations = Organization::where('id', $user->organization_id)->get();
         }
 
-        return view('admin.users.create', compact('roles', 'organizations'));
+        $selectedOrganizationId = (int) (request()->query('organization_id')
+            ?: old('organization_id')
+            ?: ($user->hasRole('Super Admin') ? ($organizations->first()->id ?? 0) : $user->organization_id));
+
+        if ($selectedOrganizationId > 0) {
+            $this->ensureRolesForTargetOrganization($selectedOrganizationId);
+        }
+
+        // 🛡️ SÉCURITÉ: Filtrer les rôles selon l'organisation cible
+        $roles = $this->getAssignableRoles($selectedOrganizationId > 0 ? $selectedOrganizationId : null);
+
+        return view('admin.users.create', compact('roles', 'organizations', 'selectedOrganizationId'));
     }
 
     public function store(Request $request): RedirectResponse
@@ -60,6 +69,10 @@ class UserController extends Controller
         $organizationId = $user->hasRole('Super Admin') ? $request->input('organization_id') : $user->organization_id;
         $request->merge(['organization_id' => $organizationId]);
 
+        if ($organizationId) {
+            $this->ensureRolesForTargetOrganization((int) $organizationId);
+        }
+
         // 🛡️ SÉCURITÉ: Validation des rôles avec contrôle d'escalation
         $validated = $request->validate([
             'first_name' => ['required', 'string', 'max:255'],
@@ -67,8 +80,8 @@ class UserController extends Controller
             'email' => ['required', 'string', 'email', 'max:255', 'unique:'.User::class],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
             'organization_id' => ['required', 'exists:organizations,id'],
-            'roles' => ['sometimes', 'array', function ($attribute, $value, $fail) {
-                if (!$this->canAssignRoles($value)) {
+            'roles' => ['sometimes', 'array', function ($attribute, $value, $fail) use ($organizationId) {
+                if (!$this->canAssignRoles($value, null, (int) $organizationId)) {
                     $fail('Vous n\'êtes pas autorisé à assigner un ou plusieurs de ces rôles.');
                 }
             }],
@@ -104,7 +117,7 @@ class UserController extends Controller
         $this->authorize('users.update');
 
         // 🛡️ SÉCURITÉ: Filtrer les rôles selon les permissions
-        $roles = $this->getAssignableRoles();
+        $roles = $this->getAssignableRoles((int) $user->organization_id);
         
         $loggedInUser = auth()->user();
         if ($loggedInUser->hasRole('Super Admin')) {
@@ -145,8 +158,8 @@ class UserController extends Controller
             'last_name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email,'.$user->id],
             'organization_id' => ['required', 'exists:organizations,id'],
-            'roles' => ['sometimes', 'array', function ($attribute, $value, $fail) use ($user) {
-                if (!$this->canAssignRoles($value, $user)) {
+            'roles' => ['sometimes', 'array', function ($attribute, $value, $fail) use ($user, $request) {
+                if (!$this->canAssignRoles($value, $user, (int) $request->input('organization_id'))) {
                     $fail('Vous n\'êtes pas autorisé à assigner un ou plusieurs de ces rôles.');
                 }
             }],
@@ -279,41 +292,74 @@ class UserController extends Controller
     /**
      * 🛡️ SÉCURITÉ: Obtenir les rôles que l'utilisateur connecté peut assigner
      */
-    private function getAssignableRoles()
+    private function getAssignableRoles(?int $organizationId = null)
     {
         $user = auth()->user();
-        
+
         if ($user->hasRole('Super Admin')) {
-            // Super Admin peut assigner tous les rôles
-            return Role::all();
-        } else {
-            // Admin ne peut pas assigner le rôle Super Admin
-            return Role::where('name', '!=', 'Super Admin')->get();
+            // Scope strict: l'organisation cible + rôle global Super Admin (si présent)
+            $query = Role::query();
+
+            if ($organizationId) {
+                $query->where(function ($q) use ($organizationId) {
+                    $q->where('organization_id', $organizationId)
+                        ->orWhere(function ($globalQ) {
+                            $globalQ->whereNull('organization_id')
+                                ->where('name', 'Super Admin');
+                        });
+                });
+            } else {
+                $query->whereNull('organization_id');
+            }
+
+            return $query->orderBy('name')->get()->unique('name')->values();
         }
+
+        // Admin/Gestionnaire: uniquement les rôles de son organisation, sans Super Admin
+        return Role::where('organization_id', $user->organization_id)
+            ->where('name', '!=', 'Super Admin')
+            ->orderBy('name')
+            ->get()
+            ->unique('name')
+            ->values();
     }
 
     /**
      * 🛡️ SÉCURITÉ: Vérifier si l'utilisateur peut assigner les rôles demandés
      */
-    private function canAssignRoles(array $roleIds, User $targetUser = null): bool
+    private function canAssignRoles(array $roleIds, User $targetUser = null, ?int $targetOrganizationId = null): bool
     {
         $user = auth()->user();
-        
+
+        if ($targetOrganizationId && !$user->hasRole('Super Admin') && (int) $targetOrganizationId !== (int) $user->organization_id) {
+            return false;
+        }
+
         // Récupérer les rôles par leurs IDs
         $roles = Role::whereIn('id', $roleIds)->get();
-        
+        if ($roles->count() !== count($roleIds)) {
+            return false;
+        }
+
         foreach ($roles as $role) {
             // Règle 1: Seul Super Admin peut assigner le rôle Super Admin
             if ($role->name === 'Super Admin' && !$user->hasRole('Super Admin')) {
                 return false;
             }
-            
+
             // Règle 2: Empêcher l'auto-promotion (si on modifie un utilisateur existant)
             if ($targetUser && $user->id === $targetUser->id && $role->name === 'Super Admin') {
                 return false;
             }
+
+            // Règle 3: Interdire les rôles d'une autre organisation pour les rôles non-globaux
+            if ($role->name !== 'Super Admin' && $targetOrganizationId && $role->organization_id !== null) {
+                if ((int) $role->organization_id !== (int) $targetOrganizationId) {
+                    return false;
+                }
+            }
         }
-        
+
         return true;
     }
 
@@ -325,7 +371,7 @@ class UserController extends Controller
     private function secureRoleAssignment(User $user, array $roleIds): void
     {
         // Double vérification avant assignation
-        if (!empty($roleIds) && !$this->canAssignRoles($roleIds, $user)) {
+        if (!empty($roleIds) && !$this->canAssignRoles($roleIds, $user, (int) $user->organization_id)) {
             throw new AuthorizationException('Permission insuffisante pour assigner ces rôles');
         }
 
@@ -343,15 +389,24 @@ class UserController extends Controller
             return;
         }
 
-        // Récupérer les rôles à assigner
-        $rolesToSync = Role::whereIn('id', $roleIds)->get();
+        // Récupérer les rôles à assigner puis les normaliser par nom
+        // pour éviter les erreurs de scope (ID d'une autre organisation)
+        $selectedRoles = Role::whereIn('id', $roleIds)->get()->unique('name');
+        $rolesToAssign = collect();
+
+        foreach ($selectedRoles as $selectedRole) {
+            $resolvedRole = $this->resolveRoleForOrganization($selectedRole->name, (int) $user->organization_id);
+            if ($resolvedRole) {
+                $rolesToAssign->push($resolvedRole);
+            }
+        }
 
         // ASSIGNATION MANUELLE avec organization_id correct
         // On ne peut pas utiliser syncRoles() car il ne gère pas bien organization_id
-        foreach ($rolesToSync as $role) {
-            // Déterminer l'organization_id pour cette assignation
-            // Super Admin est global (NULL), les autres sont scoped
-            $organizationId = ($role->name === 'Super Admin') ? null : $user->organization_id;
+        foreach ($rolesToAssign as $role) {
+            // organization_id est requis dans model_has_roles.
+            // Même pour un rôle global (ex: Super Admin), on garde le contexte org utilisateur.
+            $organizationId = $user->organization_id;
 
             DB::table('model_has_roles')->insert([
                 'role_id' => $role->id,
@@ -366,6 +421,37 @@ class UserController extends Controller
 
         // Recharger les relations
         $user->load('roles');
+    }
+
+    /**
+     * Résout le rôle applicable à l'organisation cible.
+     */
+    private function resolveRoleForOrganization(string $roleName, int $organizationId): ?Role
+    {
+        if ($roleName === 'Super Admin') {
+            return Role::where('name', 'Super Admin')
+                ->whereNull('organization_id')
+                ->first()
+                ?? Role::where('name', 'Super Admin')->first();
+        }
+
+        return Role::where('name', $roleName)
+            ->where('organization_id', $organizationId)
+            ->first()
+            ?? Role::where('name', $roleName)->whereNull('organization_id')->first();
+    }
+
+    /**
+     * S'assure que les rôles de base existent pour l'organisation cible.
+     */
+    private function ensureRolesForTargetOrganization(int $organizationId): void
+    {
+        $organization = Organization::withoutGlobalScope('organization')->find($organizationId);
+        if (!$organization) {
+            return;
+        }
+
+        app(OrganizationRoleProvisioner::class)->ensureRolesForOrganization($organization);
     }
 
     /**
