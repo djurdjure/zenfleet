@@ -27,6 +27,7 @@ import ZenFleetSelect, { zenfleetSelectDirective, zenfleetSelectData } from './c
 
 // Import ZenFleet Datepicker (Enterprise-grade Flowbite Datepicker wrapper)
 import { zenfleetDatepickerData } from './components/zenfleet-datepicker';
+import { setupZenFleetChartsLifecycle } from './charts/zenfleet-charts';
 
 // ✅ OPTIMISATION: Configuration des objets globaux de manière sécurisée
 const initializeGlobals = () => {
@@ -45,6 +46,7 @@ const initializeGlobals = () => {
 
 // Expose globals immediately
 initializeGlobals();
+setupZenFleetChartsLifecycle();
 
 // ✅ FONCTION D'ENREGISTREMENT UNIVERSELLE
 // Permet d'enregistrer les composants sur n'importe quelle instance Alpine (Importée ou Livewire)

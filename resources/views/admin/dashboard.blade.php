@@ -207,7 +207,30 @@
  </select>
  </div>
  <div class="chart-container">
- <canvas id="fleetChart"></canvas>
+ <div
+ id="fleetChart"
+ data-zenfleet-chart
+ data-chart-id="fleet-dashboard-utilization"
+ data-chart-type="area"
+ data-chart-height="300"
+ data-chart-aria-label="Evolution hebdomadaire des vehicules actifs"
+ data-chart-labels='@json(["Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"])'
+ data-chart-series='@json([["name" => "Véhicules actifs", "data" => [18, 22, 20, 24, 23, 19, 21]]])'
+ data-chart-options='@json([
+    "stroke" => ["width" => 3, "curve" => "smooth"],
+    "fill" => [
+        "type" => "gradient",
+        "gradient" => [
+            "shadeIntensity" => 1,
+            "opacityFrom" => 0.45,
+            "opacityTo" => 0.05
+        ]
+    ],
+    "markers" => ["size" => 4],
+    "legend" => ["show" => false],
+    "yaxis" => ["min" => 0]
+ ])'
+ ></div>
  </div>
  </div>
 
@@ -402,88 +425,8 @@
 @endsection
 
 @push('scripts')
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
- // Graphique d'utilisation de la flotte
- const ctx = document.getElementById('fleetChart').getContext('2d');
- const gradient = ctx.createLinearGradient(0, 0, 0, 300);
- gradient.addColorStop(0, 'rgba(59, 130, 246, 0.5)');
- gradient.addColorStop(1, 'rgba(59, 130, 246, 0)');
-
- new Chart(ctx, {
- type: 'line',
- data: {
- labels: ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'],
- datasets: [{
- label: 'Véhicules actifs',
- data: [18, 22, 20, 24, 23, 19, 21],
- backgroundColor: gradient,
- borderColor: '#3b82f6',
- borderWidth: 3,
- fill: true,
- tension: 0.4,
- pointRadius: 5,
- pointBackgroundColor: '#fff',
- pointBorderColor: '#3b82f6',
- pointBorderWidth: 2,
- pointHoverRadius: 7,
- pointHoverBackgroundColor: '#3b82f6',
- pointHoverBorderColor: '#fff',
- pointHoverBorderWidth: 2
- }]
- },
- options: {
- responsive: true,
- maintainAspectRatio: false,
- plugins: {
- legend: {
- display: false
- },
- tooltip: {
- backgroundColor: 'rgba(0, 0, 0, 0.8)',
- padding: 12,
- titleColor: '#fff',
- bodyColor: '#fff',
- borderColor: '#3b82f6',
- borderWidth: 1,
- displayColors: false,
- callbacks: {
- label: function(context) {
- return context.parsed.y + ' véhicules';
- }
- }
- }
- },
- scales: {
- y: {
- beginAtZero: true,
- grid: {
- color: 'rgba(0, 0, 0, 0.05)',
- drawBorder: false
- },
- ticks: {
- color: '#6b7280',
- font: {
- size: 12
- }
- }
- },
- x: {
- grid: {
- display: false
- },
- ticks: {
- color: '#6b7280',
- font: {
- size: 12
- }
- }
- }
- }
- }
- });
-
  // Animation des nombres
  const animateValue = (element, start, end, duration) => {
  let startTimestamp = null;
