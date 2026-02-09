@@ -88,7 +88,7 @@ class ExpenseController extends Controller
 
         // 🚗 Données pour les filtres
         $vehicles = Vehicle::where('organization_id', $organizationId)
-            ->where('status', 'active')
+            ->active()
             ->select('id', 'registration_plate', 'brand', 'model')
             ->orderBy('registration_plate')
             ->get();
@@ -98,7 +98,7 @@ class ExpenseController extends Controller
 
         // 💰 Budgets actifs
         $budgets = ExpenseBudget::where('organization_id', $organizationId)
-            ->where('status', 'active')
+            ->active()
             ->get();
 
         return view('admin.expenses.index', compact(
@@ -119,13 +119,13 @@ class ExpenseController extends Controller
         $organizationId = auth()->user()->organization_id;
 
         $vehicles = Vehicle::where('organization_id', $organizationId)
-            ->where('status', 'active')
+            ->active()
             ->select('id', 'registration_plate', 'brand', 'model', 'current_mileage')
             ->orderBy('registration_plate')
             ->get();
 
         $drivers = Driver::where('organization_id', $organizationId)
-            ->where('status', 'active')
+            ->active()
             ->select('id', 'first_name', 'last_name', 'employee_number')
             ->orderBy('first_name')
             ->get();
@@ -275,13 +275,13 @@ class ExpenseController extends Controller
         }
 
         $vehicles = Vehicle::where('organization_id', $organizationId)
-            ->where('status', 'active')
+            ->active()
             ->select('id', 'registration_plate', 'brand', 'model', 'current_mileage')
             ->orderBy('registration_plate')
             ->get();
 
         $drivers = Driver::where('organization_id', $organizationId)
-            ->where('status', 'active')
+            ->active()
             ->select('id', 'first_name', 'last_name', 'employee_number')
             ->orderBy('first_name')
             ->get();

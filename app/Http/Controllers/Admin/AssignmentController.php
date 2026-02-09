@@ -714,7 +714,7 @@ class AssignmentController extends Controller
 
             // Calcul du taux d'utilisation (véhicules affectés / total véhicules)
             $totalVehicles = Vehicle::where('organization_id', $organizationId)
-                ->where('status', 'active')
+                ->active()
                 ->count();
 
             $assignedVehicles = Assignment::where('organization_id', $organizationId)
@@ -794,13 +794,13 @@ class AssignmentController extends Controller
         $this->authorize('assignments.view');
 
         $vehicles = Vehicle::where('organization_id', auth()->user()->organization_id)
-            ->where('status', 'active')
+            ->active()
             ->whereDoesntHave('assignments', function ($query) {
                 // Véhicules sans affectation en cours
                 $query->whereNull('end_datetime')
                     ->where('start_datetime', '<=', now());
             })
-            ->select('id', 'registration_plate', 'brand', 'model', 'current_mileage', 'status')
+            ->select('id', 'registration_plate', 'brand', 'model', 'current_mileage', 'status_id')
             ->orderBy('registration_plate')
             ->get();
 

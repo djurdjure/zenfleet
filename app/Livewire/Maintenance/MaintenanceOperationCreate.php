@@ -132,7 +132,10 @@ class MaintenanceOperationCreate extends Component
 
         // ✅ VÉHICULES: Charger avec kilométrage actuel
         $this->vehicleOptions = Vehicle::select('id', 'registration_plate', 'brand', 'model', 'current_mileage')
-            ->where('status', '!=', 'decommissioned')
+            ->whereDoesntHave('vehicleStatus', function ($query) {
+                $query->whereIn('slug', ['reforme', 'decommissioned', 'archived', 'sold', 'vendu'])
+                    ->orWhereIn('name', ['Réformé', 'Decommissioned', 'Archived', 'Sold', 'Vendu']);
+            })
             ->orderBy('registration_plate')
             ->get()
             ->map(function ($vehicle) {

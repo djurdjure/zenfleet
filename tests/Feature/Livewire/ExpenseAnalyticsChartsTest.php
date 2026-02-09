@@ -8,6 +8,7 @@ use App\Models\User;
 use App\Services\ExpenseAnalyticsService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 class ExpenseAnalyticsChartsTest extends TestCase
@@ -28,7 +29,7 @@ class ExpenseAnalyticsChartsTest extends TestCase
         $this->app->instance(ExpenseAnalyticsService::class, $this->fakeAnalyticsService());
     }
 
-    /** @test */
+    #[Test]
     public function it_dispatches_dashboard_refresh_event_after_loading_analytics(): void
     {
         Livewire::test(ExpenseAnalytics::class)
@@ -36,7 +37,7 @@ class ExpenseAnalyticsChartsTest extends TestCase
             ->assertDispatched('dashboard:data-updated');
     }
 
-    /** @test */
+    #[Test]
     public function it_renders_unified_chart_widgets_for_all_view_modes(): void
     {
         Livewire::test(ExpenseAnalytics::class)

@@ -12,6 +12,7 @@ use Livewire\Component;
 use Livewire\WithFileUploads;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Validation\Rule;
 
@@ -140,14 +141,15 @@ class ExpenseForm extends Component
     private function loadFormData()
     {
         $orgId = Auth::user()->organization_id;
+        $plateColumn = Schema::hasColumn('vehicles', 'license_plate') ? 'license_plate' : 'registration_plate';
         
         $this->vehicles = Vehicle::where('organization_id', $orgId)
-            ->where('status', 'active')
-            ->orderBy('license_plate')
+            ->active()
+            ->orderBy($plateColumn)
             ->get();
             
         $this->drivers = Driver::where('organization_id', $orgId)
-            ->where('status', 'active')
+            ->active($orgId)
             ->orderBy('last_name')
             ->get();
             

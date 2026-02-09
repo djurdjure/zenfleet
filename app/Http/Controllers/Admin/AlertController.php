@@ -100,6 +100,8 @@ class AlertController extends Controller
 
                 if (DB::getSchemaBuilder()->hasColumn('expense_budgets', 'is_active')) {
                     $budgetQuery->where('is_active', true);
+                } elseif (DB::getSchemaBuilder()->hasColumn('expense_budgets', 'status')) {
+                    $budgetQuery->where('status', 'active');
                 }
 
                 $budgetOverruns = $budgetQuery
@@ -167,7 +169,7 @@ class AlertController extends Controller
             if (DB::getSchemaBuilder()->hasColumn('vehicles', 'insurance_expiry_date')) {
                 $expiredInsurance = Vehicle::where('organization_id', $organizationId)
                     ->where('insurance_expiry_date', '<', now())
-                    ->where('status', 'active')
+                    ->active()
                     ->count();
 
                 if ($expiredInsurance > 0) {
@@ -191,7 +193,7 @@ class AlertController extends Controller
             if (DB::getSchemaBuilder()->hasColumn('vehicles', 'technical_inspection_date')) {
                 $expiredInspection = Vehicle::where('organization_id', $organizationId)
                     ->where('technical_inspection_date', '<', now())
-                    ->where('status', 'active')
+                    ->active()
                     ->count();
 
                 if ($expiredInspection > 0) {
@@ -271,6 +273,8 @@ class AlertController extends Controller
 
             if (DB::getSchemaBuilder()->hasColumn('expense_budgets', 'is_active')) {
                 $budgetQuery->where('is_active', true);
+            } elseif (DB::getSchemaBuilder()->hasColumn('expense_budgets', 'status')) {
+                $budgetQuery->where('status', 'active');
             }
 
             $budgets = $budgetQuery

@@ -9,10 +9,14 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Schema;
 
 class ExpenseBudget extends Model
 {
     use HasFactory, SoftDeletes, BelongsToOrganization;
+
+    private static ?bool $hasScopeTypeColumn = null;
+    private static ?bool $hasScopeDescriptionColumn = null;
 
     public const PERIOD_MONTHLY = 'monthly';
     public const PERIOD_QUARTERLY = 'quarterly';
@@ -30,6 +34,8 @@ class ExpenseBudget extends Model
         'spent_amount',
         'warning_threshold',
         'critical_threshold',
+        'scope_type',
+        'scope_description',
         'description',
         'approval_workflow',
         'is_active'
@@ -339,10 +345,34 @@ class ExpenseBudget extends Model
 
     public function getScopeDescriptionAttribute(): string
     {
+        return $this->resolveScopeDescription();
+    }
+
+    public function getScopeTypeAttribute($value): string
+    {
+        return $value ?: $this->resolveScopeType();
+    }
+
+    public function resolveScopeType(): string
+    {
+        if ($this->isVehicleScope()) {
+            return 'vehicle';
+        }
+
+        if ($this->isCategoryScope()) {
+            return 'category';
+        }
+
+        return 'global';
+    }
+
+    public function resolveScopeDescription(): string
+    {
         $scope = [];
 
         if ($this->vehicle_id) {
-            $scope[] = "Véhicule: {$this->vehicle->registration_plate}";
+            $vehiclePlate = $this->vehicle?->registration_plate ?? "#{$this->vehicle_id}";
+            $scope[] = "Véhicule: {$vehiclePlate}";
         } else {
             $scope[] = "Tous véhicules";
         }
@@ -410,8 +440,38 @@ class ExpenseBudget extends Model
     {
         parent::boot();
 
+        static::saving(function (self $budget) {
+            if (self::hasScopeTypeColumn()) {
+                $budget->setAttribute('scope_type', $budget->resolveScopeType());
+            }
+
+            if (self::hasScopeDescriptionColumn()) {
+                $budget->setAttribute('scope_description', $budget->resolveScopeDescription());
+            }
+        });
+
         static::created(function ($budget) {
             $budget->recalculateSpentAmount();
         });
+    }
+
+    private static function hasScopeTypeColumn(): bool
+    {
+        if (self::$hasScopeTypeColumn === null) {
+            self::$hasScopeTypeColumn = Schema::hasTable('expense_budgets')
+                && Schema::hasColumn('expense_budgets', 'scope_type');
+        }
+
+        return self::$hasScopeTypeColumn;
+    }
+
+    private static function hasScopeDescriptionColumn(): bool
+    {
+        if (self::$hasScopeDescriptionColumn === null) {
+            self::$hasScopeDescriptionColumn = Schema::hasTable('expense_budgets')
+                && Schema::hasColumn('expense_budgets', 'scope_description');
+        }
+
+        return self::$hasScopeDescriptionColumn;
     }
 }
