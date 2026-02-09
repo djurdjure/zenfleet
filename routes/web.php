@@ -607,13 +607,13 @@ Route::middleware(['auth', 'verified', 'audit.log'])
 
             // 📋 Gestion des Types de Maintenance
             Route::prefix('types')->name('types.')->group(function () {
-                Route::get('/', [\App\Http\Controllers\Admin\Maintenance\MaintenanceTypeController::class, 'index'])->name('index');
-                Route::get('/create', [\App\Http\Controllers\Admin\Maintenance\MaintenanceTypeController::class, 'create'])->name('create');
-                Route::post('/', [\App\Http\Controllers\Admin\Maintenance\MaintenanceTypeController::class, 'store'])->name('store');
-                Route::get('/{maintenanceType}', [\App\Http\Controllers\Admin\Maintenance\MaintenanceTypeController::class, 'show'])->name('show');
-                Route::get('/{maintenanceType}/edit', [\App\Http\Controllers\Admin\Maintenance\MaintenanceTypeController::class, 'edit'])->name('edit');
-                Route::put('/{maintenanceType}', [\App\Http\Controllers\Admin\Maintenance\MaintenanceTypeController::class, 'update'])->name('update');
-                Route::delete('/{maintenanceType}', [\App\Http\Controllers\Admin\Maintenance\MaintenanceTypeController::class, 'destroy'])->name('destroy');
+                Route::get('/', [\App\Http\Controllers\Admin\MaintenanceTypeController::class, 'index'])->name('index');
+                Route::get('/create', [\App\Http\Controllers\Admin\MaintenanceTypeController::class, 'create'])->name('create');
+                Route::post('/', [\App\Http\Controllers\Admin\MaintenanceTypeController::class, 'store'])->name('store');
+                Route::get('/{maintenanceType}', [\App\Http\Controllers\Admin\MaintenanceTypeController::class, 'show'])->name('show');
+                Route::get('/{maintenanceType}/edit', [\App\Http\Controllers\Admin\MaintenanceTypeController::class, 'edit'])->name('edit');
+                Route::put('/{maintenanceType}', [\App\Http\Controllers\Admin\MaintenanceTypeController::class, 'update'])->name('update');
+                Route::delete('/{maintenanceType}', [\App\Http\Controllers\Admin\MaintenanceTypeController::class, 'destroy'])->name('destroy');
             });
 
             // 🏢 Gestion des Fournisseurs de Maintenance

@@ -2,10 +2,9 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\Maintenance\MaintenanceOperationController;
-use App\Http\Controllers\Admin\Maintenance\MaintenanceDashboardController;
 use App\Http\Controllers\Admin\Maintenance\MaintenanceScheduleController;
-use App\Http\Controllers\Admin\Maintenance\MaintenanceAlertController;
-use App\Http\Controllers\Admin\Maintenance\MaintenanceReportController;
+use App\Http\Controllers\Admin\MaintenanceAlertController;
+use App\Http\Controllers\Admin\MaintenanceReportController;
 
 /*
 |--------------------------------------------------------------------------
@@ -154,12 +153,12 @@ Route::prefix('admin/maintenance')->name('admin.maintenance.')->middleware(['aut
     |--------------------------------------------------------------------------
     */
     Route::prefix('types')->name('types.')->group(function () {
-        Route::get('/', [\App\Http\Controllers\Admin\Maintenance\MaintenanceTypeController::class, 'index'])->name('index');
-        Route::get('/create', [\App\Http\Controllers\Admin\Maintenance\MaintenanceTypeController::class, 'create'])->name('create');
-        Route::post('/', [\App\Http\Controllers\Admin\Maintenance\MaintenanceTypeController::class, 'store'])->name('store');
-        Route::get('/{type}/edit', [\App\Http\Controllers\Admin\Maintenance\MaintenanceTypeController::class, 'edit'])->name('edit');
-        Route::put('/{type}', [\App\Http\Controllers\Admin\Maintenance\MaintenanceTypeController::class, 'update'])->name('update');
-        Route::delete('/{type}', [\App\Http\Controllers\Admin\Maintenance\MaintenanceTypeController::class, 'destroy'])->name('destroy');
+        Route::get('/', [\App\Http\Controllers\Admin\MaintenanceTypeController::class, 'index'])->name('index');
+        Route::get('/create', [\App\Http\Controllers\Admin\MaintenanceTypeController::class, 'create'])->name('create');
+        Route::post('/', [\App\Http\Controllers\Admin\MaintenanceTypeController::class, 'store'])->name('store');
+        Route::get('/{type}/edit', [\App\Http\Controllers\Admin\MaintenanceTypeController::class, 'edit'])->name('edit');
+        Route::put('/{type}', [\App\Http\Controllers\Admin\MaintenanceTypeController::class, 'update'])->name('update');
+        Route::delete('/{type}', [\App\Http\Controllers\Admin\MaintenanceTypeController::class, 'destroy'])->name('destroy');
     });
 
     /*
@@ -168,11 +167,11 @@ Route::prefix('admin/maintenance')->name('admin.maintenance.')->middleware(['aut
     |--------------------------------------------------------------------------
     */
     Route::prefix('providers')->name('providers.')->group(function () {
-        Route::get('/', [\App\Http\Controllers\Admin\Maintenance\MaintenanceProviderController::class, 'index'])->name('index');
-        Route::get('/create', [\App\Http\Controllers\Admin\Maintenance\MaintenanceProviderController::class, 'create'])->name('create');
-        Route::post('/', [\App\Http\Controllers\Admin\Maintenance\MaintenanceProviderController::class, 'store'])->name('store');
-        Route::get('/{provider}/edit', [\App\Http\Controllers\Admin\Maintenance\MaintenanceProviderController::class, 'edit'])->name('edit');
-        Route::put('/{provider}', [\App\Http\Controllers\Admin\Maintenance\MaintenanceProviderController::class, 'update'])->name('update');
-        Route::delete('/{provider}', [\App\Http\Controllers\Admin\Maintenance\MaintenanceProviderController::class, 'destroy'])->name('destroy');
+        Route::get('/', [\App\Http\Controllers\Admin\MaintenanceProviderController::class, 'index'])->name('index');
+        Route::get('/create', [\App\Http\Controllers\Admin\MaintenanceProviderController::class, 'create'])->name('create');
+        Route::post('/', [\App\Http\Controllers\Admin\MaintenanceProviderController::class, 'store'])->name('store');
+        Route::get('/{provider}/edit', [\App\Http\Controllers\Admin\MaintenanceProviderController::class, 'edit'])->name('edit');
+        Route::put('/{provider}', [\App\Http\Controllers\Admin\MaintenanceProviderController::class, 'update'])->name('update');
+        Route::delete('/{provider}', [\App\Http\Controllers\Admin\MaintenanceProviderController::class, 'destroy'])->name('destroy');
     });
 });
