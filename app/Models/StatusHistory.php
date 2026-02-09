@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\Concerns\BelongsToOrganization;
+use App\Support\Analytics\AnalyticsCacheVersion;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
@@ -41,6 +42,21 @@ use Carbon\Carbon;
 class StatusHistory extends Model
 {
     use HasFactory, BelongsToOrganization;
+
+    protected static function booted(): void
+    {
+        static::created(function (StatusHistory $history): void {
+            AnalyticsCacheVersion::bump('status', $history->organization_id);
+        });
+
+        static::updated(function (StatusHistory $history): void {
+            AnalyticsCacheVersion::bump('status', $history->organization_id);
+        });
+
+        static::deleted(function (StatusHistory $history): void {
+            AnalyticsCacheVersion::bump('status', $history->organization_id);
+        });
+    }
 
     /**
      * The table associated with the model.

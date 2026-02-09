@@ -207,28 +207,40 @@
  </select>
  </div>
  <div class="chart-container">
+ @php
+ $fleetChartPayload = [
+    'meta' => [
+        'source' => 'admin.dashboard.fleet-utilization',
+        'period' => 'last_7_days',
+        'filters' => ['scope' => 'fleet'],
+    ],
+    'chart' => [
+        'id' => 'fleet-dashboard-utilization',
+        'type' => 'area',
+        'height' => 300,
+        'ariaLabel' => 'Evolution hebdomadaire des vehicules actifs',
+    ],
+    'labels' => ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'],
+    'series' => [['name' => 'Véhicules actifs', 'data' => [18, 22, 20, 24, 23, 19, 21]]],
+    'options' => [
+        'stroke' => ['width' => 3, 'curve' => 'smooth'],
+        'fill' => [
+            'type' => 'gradient',
+            'gradient' => [
+                'shadeIntensity' => 1,
+                'opacityFrom' => 0.45,
+                'opacityTo' => 0.05
+            ]
+        ],
+        'markers' => ['size' => 4],
+        'legend' => ['show' => false],
+        'yaxis' => ['min' => 0],
+    ],
+ ];
+ @endphp
  <x-charts.widget
  id="fleetChart"
- chart-id="fleet-dashboard-utilization"
- type="area"
- :height="300"
- aria-label="Evolution hebdomadaire des vehicules actifs"
- :labels='["Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"]'
- :series='[["name" => "Véhicules actifs", "data" => [18, 22, 20, 24, 23, 19, 21]]]'
- :options='[
-    "stroke" => ["width" => 3, "curve" => "smooth"],
-    "fill" => [
-        "type" => "gradient",
-        "gradient" => [
-            "shadeIntensity" => 1,
-            "opacityFrom" => 0.45,
-            "opacityTo" => 0.05
-        ]
-    ],
-    "markers" => ["size" => 4],
-    "legend" => ["show" => false],
-    "yaxis" => ["min" => 0]
- ]'
+ :payload="$fleetChartPayload"
  />
  </div>
  </div>

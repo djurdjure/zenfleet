@@ -6,6 +6,7 @@ use App\Models\VehicleExpense;
 use App\Models\Vehicle;
 use App\Models\ExpenseGroup;
 use App\Models\User;
+use App\Support\Analytics\AnalyticsCacheVersion;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
@@ -150,10 +151,11 @@ class ExpenseAnalyticsService
             : 'guest';
 
         return sprintf(
-            'expense_analytics:%s:org:%d:role:%s:%s',
+            'expense_analytics:%s:org:%d:role:%s:v:%d:%s',
             $scope,
             $organizationId,
             $role,
+            AnalyticsCacheVersion::current('expenses', $organizationId),
             md5(json_encode($context))
         );
     }

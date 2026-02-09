@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Support\Analytics\AnalyticsCacheVersion;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -103,6 +104,20 @@ class MaintenanceOperation extends Model
             if ($operation->isDirty('status') && $operation->status === self::STATUS_COMPLETED) {
                 $operation->handleCompletion();
             }
+
+            AnalyticsCacheVersion::bump('maintenance', $operation->organization_id);
+        });
+
+        static::created(function ($operation) {
+            AnalyticsCacheVersion::bump('maintenance', $operation->organization_id);
+        });
+
+        static::deleted(function ($operation) {
+            AnalyticsCacheVersion::bump('maintenance', $operation->organization_id);
+        });
+
+        static::restored(function ($operation) {
+            AnalyticsCacheVersion::bump('maintenance', $operation->organization_id);
         });
     }
 

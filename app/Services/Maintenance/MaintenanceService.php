@@ -2,6 +2,7 @@
 
 namespace App\Services\Maintenance;
 
+use App\Support\Analytics\AnalyticsCacheVersion;
 use App\Models\MaintenanceOperation;
 use App\Models\Vehicle;
 use App\Models\MaintenanceType;
@@ -188,9 +189,10 @@ class MaintenanceService
         ksort($normalizedFilters);
 
         return sprintf(
-            'maintenance_analytics:org:%d:role:%s:%s',
+            'maintenance_analytics:org:%d:role:%s:v:%d:%s',
             $organizationId,
             $role,
+            AnalyticsCacheVersion::current('maintenance', $organizationId),
             md5(json_encode($normalizedFilters))
         );
     }

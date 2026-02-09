@@ -7,10 +7,12 @@ use App\Models\Organization;
 use App\Models\StatusHistory;
 use App\Models\Vehicle;
 use App\Models\Driver;
+use App\Support\Analytics\AnalyticsCacheVersion;
 use App\Support\Analytics\ChartPayloadFactory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 
 /**
@@ -56,7 +58,7 @@ class StatusAnalyticsController extends Controller
         $chartPayloads = $this->buildChartPayloads($dailyChanges, $statusDistribution, $entityType, $startDate, $endDate);
 
         // Historique récent
-        $recentChanges = $this->getRecentChanges($entityType, 20);
+        $recentChanges = $this->getRecentChanges($entityType, 20, $startDate, $endDate);
 
         return view('admin.analytics.status-dashboard', compact(
             'metrics',
@@ -233,15 +235,24 @@ class StatusAnalyticsController extends Controller
     /**
      * Récupère les changements récents
      */
-    protected function getRecentChanges(string $entityType, int $limit = 20): array
+    protected function getRecentChanges(
+        string $entityType,
+        int $limit = 20,
+        ?Carbon $startDate = null,
+        ?Carbon $endDate = null
+    ): array
     {
         $entityClass = $entityType === 'vehicle' ? Vehicle::class : Driver::class;
 
-        $changes = StatusHistory::where('statusable_type', $entityClass)
+        $query = StatusHistory::where('statusable_type', $entityClass)
             ->with(['statusable', 'changedBy'])
-            ->orderByDesc('changed_at')
-            ->limit($limit)
-            ->get();
+            ->orderByDesc('changed_at');
+
+        if ($startDate !== null && $endDate !== null) {
+            $query->whereBetween('changed_at', [$startDate, $endDate]);
+        }
+
+        $changes = $query->limit($limit)->get();
 
         return $changes->map(function ($change) use ($entityType) {
             $entity = $change->statusable;
@@ -350,9 +361,10 @@ class StatusAnalyticsController extends Controller
 
         $organizationId = auth()->user()->organization_id ?? null;
         $cacheKey = sprintf(
-            'status_analytics_daily:%s:%s:%s:%s',
+            'status_analytics_daily:%s:%s:v:%d:%s:%s',
             $organizationId ?? 'global',
             $entityType,
+            AnalyticsCacheVersion::current('status', $organizationId),
             $startDate->format('Ymd'),
             $endDate->format('Ymd')
         );
@@ -397,6 +409,80 @@ class StatusAnalyticsController extends Controller
             'success' => true,
             'payload' => $payload,
         ]);
+    }
+
+    /**
+     * Export CSV des analytics de statuts.
+     */
+    public function exportCsv(Request $request)
+    {
+        $validated = $request->validate([
+            'entity_type' => ['nullable', 'in:vehicle,driver'],
+            'start_date' => ['nullable', 'date'],
+            'end_date' => ['nullable', 'date', 'after_or_equal:start_date'],
+        ]);
+
+        $entityType = $validated['entity_type'] ?? 'vehicle';
+        $startDate = isset($validated['start_date']) ? Carbon::parse($validated['start_date']) : now()->subDays(30);
+        $endDate = isset($validated['end_date']) ? Carbon::parse($validated['end_date']) : now();
+
+        $rows = $this->getRecentChanges($entityType, 500, $startDate, $endDate);
+        $fileName = sprintf('status-analytics-%s-%s.csv', $entityType, now()->format('Ymd_His'));
+
+        return response()->streamDownload(function () use ($rows): void {
+            $handle = fopen('php://output', 'w');
+
+            fputcsv($handle, ['entity_name', 'from_status', 'to_status', 'reason', 'changed_by', 'changed_at', 'change_type']);
+
+            foreach ($rows as $row) {
+                fputcsv($handle, [
+                    $row['entity_name'],
+                    $row['from_status'],
+                    $row['to_status'],
+                    $row['reason'],
+                    $row['changed_by'],
+                    $row['changed_at'],
+                    $row['change_type'],
+                ]);
+            }
+
+            fclose($handle);
+        }, $fileName, [
+            'Content-Type' => 'text/csv; charset=UTF-8',
+        ]);
+    }
+
+    /**
+     * Export PDF synthétique des analytics de statuts.
+     */
+    public function exportPdf(Request $request)
+    {
+        $validated = $request->validate([
+            'entity_type' => ['nullable', 'in:vehicle,driver'],
+            'start_date' => ['nullable', 'date'],
+            'end_date' => ['nullable', 'date', 'after_or_equal:start_date'],
+        ]);
+
+        $entityType = $validated['entity_type'] ?? 'vehicle';
+        $startDate = isset($validated['start_date']) ? Carbon::parse($validated['start_date']) : now()->subDays(30);
+        $endDate = isset($validated['end_date']) ? Carbon::parse($validated['end_date']) : now();
+
+        $metrics = $this->calculateMetrics($startDate, $endDate, $entityType);
+        $transitionStats = $this->getTransitionStats($startDate, $endDate, $entityType);
+        $statusDistribution = $this->getCurrentStatusDistribution($entityType);
+        $recentChanges = $this->getRecentChanges($entityType, 50, $startDate, $endDate);
+
+        $pdf = Pdf::loadView('admin.analytics.exports.status-report', [
+            'entityType' => $entityType,
+            'startDate' => $startDate,
+            'endDate' => $endDate,
+            'metrics' => $metrics,
+            'transitionStats' => $transitionStats,
+            'statusDistribution' => $statusDistribution,
+            'recentChanges' => $recentChanges,
+        ])->setPaper('a4', 'portrait');
+
+        return $pdf->download(sprintf('status-analytics-%s-%s.pdf', $entityType, now()->format('Ymd_His')));
     }
 
     /**

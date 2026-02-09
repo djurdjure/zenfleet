@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\Concerns\BelongsToOrganization;
+use App\Support\Analytics\AnalyticsCacheVersion;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -623,16 +624,23 @@ class VehicleExpense extends Model
 
         static::created(function ($expense) {
             $expense->updateBudgetImpact();
+            AnalyticsCacheVersion::bump('expenses', $expense->organization_id);
         });
 
         static::updated(function ($expense) {
             if ($expense->wasChanged(['amount_ht', 'tva_rate', 'expense_category'])) {
                 $expense->updateBudgetImpact();
             }
+            AnalyticsCacheVersion::bump('expenses', $expense->organization_id);
         });
 
         static::deleted(function ($expense) {
             $expense->updateBudgetImpact();
+            AnalyticsCacheVersion::bump('expenses', $expense->organization_id);
+        });
+
+        static::restored(function ($expense) {
+            AnalyticsCacheVersion::bump('expenses', $expense->organization_id);
         });
     }
 }

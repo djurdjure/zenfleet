@@ -78,40 +78,64 @@
  <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
  <div class="bg-white rounded-xl shadow-lg p-6">
  <h3 class="text-lg font-semibold text-gray-800 mb-4">📊 Répartition des Alertes</h3>
+ @php
+ $alertsChartPayload = [
+    'meta' => [
+        'source' => 'maintenance.dashboard.alerts',
+        'period' => 'current',
+        'filters' => ['module' => 'maintenance'],
+    ],
+    'chart' => [
+        'id' => 'maintenance-enterprise-alerts',
+        'type' => 'donut',
+        'height' => 260,
+        'ariaLabel' => 'Repartition des alertes de maintenance par priorite',
+    ],
+    'labels' => array_keys($chartData['alerts_by_priority'] ?? []),
+    'series' => array_values($chartData['alerts_by_priority'] ?? []),
+    'options' => [
+        'colors' => ['#ef4444', '#f59e0b', '#10b981', '#3b82f6'],
+        'legend' => ['position' => 'bottom'],
+    ],
+ ];
+ @endphp
  <x-charts.widget
  id="alertsChart"
  class="h-64"
- chart-id="maintenance-enterprise-alerts"
- type="donut"
- :height="260"
- aria-label="Repartition des alertes de maintenance par priorite"
- :labels='array_keys($chartData["alerts_by_priority"] ?? [])'
- :series='array_values($chartData["alerts_by_priority"] ?? [])'
- :options='[
-    "colors" => ["#ef4444", "#f59e0b", "#10b981", "#3b82f6"],
-    "legend" => ["position" => "bottom"]
- ]'
+ :payload="$alertsChartPayload"
  />
  </div>
 
  <div class="bg-white rounded-xl shadow-lg p-6">
  <h3 class="text-lg font-semibold text-gray-800 mb-4">💰 Évolution des Coûts</h3>
+ @php
+ $costsChartPayload = [
+    'meta' => [
+        'source' => 'maintenance.dashboard.cost-evolution',
+        'period' => 'last_6_months',
+        'filters' => ['module' => 'maintenance'],
+    ],
+    'chart' => [
+        'id' => 'maintenance-enterprise-costs',
+        'type' => 'line',
+        'height' => 260,
+        'ariaLabel' => 'Evolution mensuelle des couts de maintenance',
+    ],
+    'labels' => array_column($chartData['cost_evolution'] ?? [], 'month'),
+    'series' => [[
+        'name' => 'Coûts (€)',
+        'data' => array_column($chartData['cost_evolution'] ?? [], 'cost'),
+    ]],
+    'options' => [
+        'stroke' => ['curve' => 'smooth', 'width' => 3],
+        'yaxis' => ['min' => 0],
+    ],
+ ];
+ @endphp
  <x-charts.widget
  id="costsChart"
  class="h-64"
- chart-id="maintenance-enterprise-costs"
- type="line"
- :height="260"
- aria-label="Evolution mensuelle des couts de maintenance"
- :labels='array_column($chartData["cost_evolution"] ?? [], "month")'
- :series='[[
-    "name" => "Coûts (€)",
-    "data" => array_column($chartData["cost_evolution"] ?? [], "cost")
- ]]'
- :options='[
-    "stroke" => ["curve" => "smooth", "width" => 3],
-    "yaxis" => ["min" => 0]
- ]'
+ :payload="$costsChartPayload"
  />
  </div>
  </div>
