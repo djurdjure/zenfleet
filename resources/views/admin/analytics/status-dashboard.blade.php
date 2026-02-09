@@ -163,29 +163,7 @@
                 </h3>
                 <x-charts.widget
                     id="dailyChangesChart"
-                    chart-id="status-daily-changes"
-                    type="area"
-                    :height="300"
-                    aria-label="Evolution quotidienne des changements de statuts"
-                    :labels='collect($dailyChanges)->pluck("date")->values()'
-                    :series='[[
-                        "name" => "Changements",
-                        "data" => collect($dailyChanges)->pluck("count")->values()
-                    ]]'
-                    :options='[
-                        "stroke" => ["curve" => "smooth", "width" => 2],
-                        "fill" => [
-                            "type" => "gradient",
-                            "gradient" => [
-                                "shadeIntensity" => 1,
-                                "opacityFrom" => 0.7,
-                                "opacityTo" => 0.3
-                            ]
-                        ],
-                        "xaxis" => ["labels" => ["rotate" => -45]],
-                        "colors" => ["#3b82f6"],
-                        "legend" => ["show" => false]
-                    ]'
+                    :payload="$chartPayloads['daily_changes']"
                 />
             </div>
 
@@ -197,16 +175,7 @@
                 </h3>
                 <x-charts.widget
                     id="statusDistributionChart"
-                    chart-id="status-distribution"
-                    type="donut"
-                    :height="300"
-                    aria-label="Distribution actuelle des statuts"
-                    :labels='collect($statusDistribution)->pluck("status")->values()'
-                    :series='collect($statusDistribution)->pluck("count")->values()'
-                    :options='[
-                        "colors" => ["#10b981", "#3b82f6", "#f59e0b", "#ef4444", "#8b5cf6"],
-                        "legend" => ["position" => "bottom"]
-                    ]'
+                    :payload="$chartPayloads['status_distribution']"
                 />
             </div>
         </div>

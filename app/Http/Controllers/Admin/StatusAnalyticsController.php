@@ -3,11 +3,14 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Organization;
 use App\Models\StatusHistory;
 use App\Models\Vehicle;
 use App\Models\Driver;
+use App\Support\Analytics\ChartPayloadFactory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Cache;
 use Carbon\Carbon;
 
 /**
@@ -50,6 +53,7 @@ class StatusAnalyticsController extends Controller
         $dailyChanges = $this->getDailyChanges($startDate, $endDate, $entityType);
         $statusDistribution = $this->getCurrentStatusDistribution($entityType);
         $topVehiclesChanges = $this->getTopVehiclesWithMostChanges($startDate, $endDate, 10);
+        $chartPayloads = $this->buildChartPayloads($dailyChanges, $statusDistribution, $entityType, $startDate, $endDate);
 
         // Historique récent
         $recentChanges = $this->getRecentChanges($entityType, 20);
@@ -60,6 +64,7 @@ class StatusAnalyticsController extends Controller
             'dailyChanges',
             'statusDistribution',
             'topVehiclesChanges',
+            'chartPayloads',
             'recentChanges',
             'startDate',
             'endDate',
@@ -326,5 +331,148 @@ class StatusAnalyticsController extends Controller
             'previous_count' => $previousCount,
             'growth' => $growth,
         ];
+    }
+
+    /**
+     * API JSON pour alimenter le chart quotidien en mode AJAX.
+     */
+    public function getDailyStatsApi(Request $request)
+    {
+        $validated = $request->validate([
+            'entity_type' => ['nullable', 'in:vehicle,driver'],
+            'start_date' => ['nullable', 'date'],
+            'end_date' => ['nullable', 'date', 'after_or_equal:start_date'],
+        ]);
+
+        $entityType = $validated['entity_type'] ?? 'vehicle';
+        $startDate = isset($validated['start_date']) ? Carbon::parse($validated['start_date']) : now()->subDays(30);
+        $endDate = isset($validated['end_date']) ? Carbon::parse($validated['end_date']) : now();
+
+        $organizationId = auth()->user()->organization_id ?? null;
+        $cacheKey = sprintf(
+            'status_analytics_daily:%s:%s:%s:%s',
+            $organizationId ?? 'global',
+            $entityType,
+            $startDate->format('Ymd'),
+            $endDate->format('Ymd')
+        );
+
+        $payload = Cache::remember($cacheKey, config('analytics.cache.ttl.realtime', 300), function () use ($entityType, $startDate, $endDate, $organizationId) {
+            $dailyChanges = $this->getDailyChanges($startDate, $endDate, $entityType);
+
+            return ChartPayloadFactory::make(
+                chartId: 'status-daily-changes-api',
+                type: 'area',
+                labels: collect($dailyChanges)->pluck('date')->values()->all(),
+                series: [[
+                    'name' => 'Changements',
+                    'data' => collect($dailyChanges)->pluck('count')->values()->all(),
+                ]],
+                options: [
+                    'stroke' => ['curve' => 'smooth', 'width' => 2],
+                    'fill' => [
+                        'type' => 'gradient',
+                        'gradient' => [
+                            'shadeIntensity' => 1,
+                            'opacityFrom' => 0.7,
+                            'opacityTo' => 0.3,
+                        ],
+                    ],
+                    'legend' => ['show' => false],
+                ],
+                meta: [
+                    'source' => 'status.analytics.api.daily',
+                    'tenant_id' => $organizationId,
+                    'period' => $startDate->format('Y-m-d') . '|' . $endDate->format('Y-m-d'),
+                    'filters' => ['entity_type' => $entityType],
+                    'timezone' => $this->resolveTimezone(),
+                    'currency' => $this->resolveCurrency($organizationId),
+                ],
+                height: 300,
+                ariaLabel: 'Evolution quotidienne des changements de statuts'
+            );
+        });
+
+        return response()->json([
+            'success' => true,
+            'payload' => $payload,
+        ]);
+    }
+
+    /**
+     * Build normalized payload contract for dashboard charts.
+     */
+    protected function buildChartPayloads(array $dailyChanges, array $statusDistribution, string $entityType, Carbon $startDate, Carbon $endDate): array
+    {
+        $organizationId = auth()->user()->organization_id ?? null;
+        $period = $startDate->format('Y-m-d') . '|' . $endDate->format('Y-m-d');
+        $meta = [
+            'source' => 'status.analytics.dashboard',
+            'tenant_id' => $organizationId,
+            'period' => $period,
+            'filters' => ['entity_type' => $entityType],
+            'timezone' => $this->resolveTimezone(),
+            'currency' => $this->resolveCurrency($organizationId),
+        ];
+
+        return [
+            'daily_changes' => ChartPayloadFactory::make(
+                chartId: 'status-daily-changes',
+                type: 'area',
+                labels: collect($dailyChanges)->pluck('date')->values()->all(),
+                series: [[
+                    'name' => 'Changements',
+                    'data' => collect($dailyChanges)->pluck('count')->values()->all(),
+                ]],
+                options: [
+                    'stroke' => ['curve' => 'smooth', 'width' => 2],
+                    'fill' => [
+                        'type' => 'gradient',
+                        'gradient' => [
+                            'shadeIntensity' => 1,
+                            'opacityFrom' => 0.7,
+                            'opacityTo' => 0.3,
+                        ],
+                    ],
+                    'xaxis' => ['labels' => ['rotate' => -45]],
+                    'colors' => ['#3b82f6'],
+                    'legend' => ['show' => false],
+                ],
+                meta: $meta,
+                height: 300,
+                ariaLabel: 'Evolution quotidienne des changements de statuts'
+            ),
+            'status_distribution' => ChartPayloadFactory::make(
+                chartId: 'status-distribution',
+                type: 'donut',
+                labels: collect($statusDistribution)->pluck('status')->values()->all(),
+                series: collect($statusDistribution)->pluck('count')->values()->all(),
+                options: [
+                    'colors' => ['#10b981', '#3b82f6', '#f59e0b', '#ef4444', '#8b5cf6'],
+                    'legend' => ['position' => 'bottom'],
+                ],
+                meta: $meta,
+                height: 300,
+                ariaLabel: 'Distribution actuelle des statuts'
+            ),
+        ];
+    }
+
+    protected function resolveTimezone(): string
+    {
+        return auth()->user()->timezone
+            ?? config('app.timezone');
+    }
+
+    protected function resolveCurrency(?int $organizationId): string
+    {
+        if (!$organizationId) {
+            return config('algeria.currency.code', 'DZD');
+        }
+
+        $organization = Organization::query()->find($organizationId);
+
+        return $organization?->currency
+            ?? config('algeria.currency.code', 'DZD');
     }
 }

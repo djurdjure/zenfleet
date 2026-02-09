@@ -8,6 +8,8 @@ use App\Models\ExpenseGroup;
 use App\Models\User;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 use Carbon\CarbonPeriod;
 
@@ -28,58 +30,66 @@ class ExpenseAnalyticsService
      */
     public function getDashboardStats(int $organizationId): array
     {
-        $currentMonth = now()->startOfMonth();
-        $lastMonth = now()->subMonth()->startOfMonth();
-        $currentYear = now()->startOfYear();
-        
-        // Statistiques du mois en cours
-        $currentMonthExpenses = VehicleExpense::where('organization_id', $organizationId)
-            ->whereBetween('expense_date', [$currentMonth, now()])
-            ->get();
-        
-        // Statistiques du mois précédent pour comparaison
-        $lastMonthExpenses = VehicleExpense::where('organization_id', $organizationId)
-            ->whereBetween('expense_date', [$lastMonth, $currentMonth->copy()->subDay()])
-            ->get();
-        
-        // Statistiques de l'année
-        $yearExpenses = VehicleExpense::where('organization_id', $organizationId)
-            ->whereBetween('expense_date', [$currentYear, now()])
-            ->get();
+        return $this->rememberAnalytics(
+            scope: 'dashboard_stats',
+            organizationId: $organizationId,
+            context: ['month' => now()->format('Y-m')],
+            ttl: config('analytics.cache.ttl.realtime', 300),
+            callback: function () use ($organizationId): array {
+                $currentMonth = now()->startOfMonth();
+                $lastMonth = now()->subMonth()->startOfMonth();
+                $currentYear = now()->startOfYear();
 
-        return [
-            'current_month' => [
-                'total' => $currentMonthExpenses->sum('total_ttc'),
-                'count' => $currentMonthExpenses->count(),
-                'average' => $currentMonthExpenses->avg('total_ttc') ?? 0,
-                'by_category' => $this->groupByCategory($currentMonthExpenses),
-            ],
-            'last_month' => [
-                'total' => $lastMonthExpenses->sum('total_ttc'),
-                'count' => $lastMonthExpenses->count(),
-                'average' => $lastMonthExpenses->avg('total_ttc') ?? 0,
-            ],
-            'year_to_date' => [
-                'total' => $yearExpenses->sum('total_ttc'),
-                'count' => $yearExpenses->count(),
-                'average' => $yearExpenses->avg('total_ttc') ?? 0,
-                'months' => $this->getMonthlyTrend($organizationId, now()->year),
-            ],
-            'growth' => [
-                'amount' => $currentMonthExpenses->sum('total_ttc') - $lastMonthExpenses->sum('total_ttc'),
-                'percentage' => $this->calculateGrowth(
-                    $currentMonthExpenses->sum('total_ttc'),
-                    $lastMonthExpenses->sum('total_ttc')
-                ),
-            ],
-            'pending_approvals' => VehicleExpense::where('organization_id', $organizationId)
-                ->whereIn('approval_status', ['pending_level1', 'pending_level2'])
-                ->count(),
-            'unpaid_expenses' => VehicleExpense::where('organization_id', $organizationId)
-                ->where('approval_status', 'approved')
-                ->where('payment_status', '!=', 'paid')
-                ->sum('total_ttc'),
-        ];
+                // Statistiques du mois en cours
+                $currentMonthExpenses = VehicleExpense::where('organization_id', $organizationId)
+                    ->whereBetween('expense_date', [$currentMonth, now()])
+                    ->get();
+
+                // Statistiques du mois précédent pour comparaison
+                $lastMonthExpenses = VehicleExpense::where('organization_id', $organizationId)
+                    ->whereBetween('expense_date', [$lastMonth, $currentMonth->copy()->subDay()])
+                    ->get();
+
+                // Statistiques de l'année
+                $yearExpenses = VehicleExpense::where('organization_id', $organizationId)
+                    ->whereBetween('expense_date', [$currentYear, now()])
+                    ->get();
+
+                return [
+                    'current_month' => [
+                        'total' => $currentMonthExpenses->sum('total_ttc'),
+                        'count' => $currentMonthExpenses->count(),
+                        'average' => $currentMonthExpenses->avg('total_ttc') ?? 0,
+                        'by_category' => $this->groupByCategory($currentMonthExpenses),
+                    ],
+                    'last_month' => [
+                        'total' => $lastMonthExpenses->sum('total_ttc'),
+                        'count' => $lastMonthExpenses->count(),
+                        'average' => $lastMonthExpenses->avg('total_ttc') ?? 0,
+                    ],
+                    'year_to_date' => [
+                        'total' => $yearExpenses->sum('total_ttc'),
+                        'count' => $yearExpenses->count(),
+                        'average' => $yearExpenses->avg('total_ttc') ?? 0,
+                        'months' => $this->getMonthlyTrend($organizationId, now()->year),
+                    ],
+                    'growth' => [
+                        'amount' => $currentMonthExpenses->sum('total_ttc') - $lastMonthExpenses->sum('total_ttc'),
+                        'percentage' => $this->calculateGrowth(
+                            $currentMonthExpenses->sum('total_ttc'),
+                            $lastMonthExpenses->sum('total_ttc')
+                        ),
+                    ],
+                    'pending_approvals' => VehicleExpense::where('organization_id', $organizationId)
+                        ->whereIn('approval_status', ['pending_level1', 'pending_level2'])
+                        ->count(),
+                    'unpaid_expenses' => VehicleExpense::where('organization_id', $organizationId)
+                        ->where('approval_status', 'approved')
+                        ->where('payment_status', '!=', 'paid')
+                        ->sum('total_ttc'),
+                ];
+            }
+        );
     }
 
     /**
@@ -92,22 +102,60 @@ class ExpenseAnalyticsService
      */
     public function getComprehensiveAnalytics(int $organizationId, string $period, int $year): array
     {
-        $analytics = [
-            'period' => $period,
-            'year' => $year,
-            'tco' => $this->calculateTCO($organizationId, $year),
-            'budget_analysis' => $this->analyzeBudgets($organizationId, $year),
-            'category_breakdown' => $this->getCategoryBreakdown($organizationId, $period, $year),
-            'vehicle_costs' => $this->getVehicleCosts($organizationId, $period, $year),
-            'supplier_analysis' => $this->getSupplierAnalysis($organizationId, $year),
-            'driver_performance' => $this->getDriverPerformance($organizationId, $year),
-            'trends' => $this->getTrends($organizationId, $year),
-            'predictions' => $this->getPredictions($organizationId),
-            'efficiency_metrics' => $this->getEfficiencyMetrics($organizationId, $year),
-            'compliance_score' => $this->getComplianceScore($organizationId),
-        ];
+        return $this->rememberAnalytics(
+            scope: 'comprehensive',
+            organizationId: $organizationId,
+            context: ['period' => $period, 'year' => $year],
+            ttl: config('analytics.cache.ttl.historical', 1800),
+            callback: function () use ($organizationId, $period, $year): array {
+                return [
+                    'meta' => [
+                        'organization_id' => $organizationId,
+                        'period' => $period,
+                        'year' => $year,
+                        'generated_at' => now()->toIso8601String(),
+                        'timezone' => Auth::user()?->timezone ?? config('app.timezone'),
+                        'currency' => config('algeria.currency.code', 'DZD'),
+                    ],
+                    'period' => $period,
+                    'year' => $year,
+                    'tco' => $this->calculateTCO($organizationId, $year),
+                    'budget_analysis' => $this->analyzeBudgets($organizationId, $year),
+                    'category_breakdown' => $this->getCategoryBreakdown($organizationId, $period, $year),
+                    'vehicle_costs' => $this->getVehicleCosts($organizationId, $period, $year),
+                    'supplier_analysis' => $this->getSupplierAnalysis($organizationId, $year),
+                    'driver_performance' => $this->getDriverPerformance($organizationId, $year),
+                    'trends' => $this->getTrends($organizationId, $year),
+                    'predictions' => $this->getPredictions($organizationId),
+                    'efficiency_metrics' => $this->getEfficiencyMetrics($organizationId, $year),
+                    'compliance_score' => $this->getComplianceScore($organizationId),
+                ];
+            }
+        );
+    }
 
-        return $analytics;
+    protected function rememberAnalytics(string $scope, int $organizationId, array $context, int $ttl, \Closure $callback): array
+    {
+        $key = $this->buildCacheKey($scope, $organizationId, $context);
+
+        return Cache::remember($key, $ttl, $callback);
+    }
+
+    protected function buildCacheKey(string $scope, int $organizationId, array $context): string
+    {
+        ksort($context);
+
+        $role = Auth::check()
+            ? (Auth::user()->getRoleNames()->first() ?? 'user')
+            : 'guest';
+
+        return sprintf(
+            'expense_analytics:%s:org:%d:role:%s:%s',
+            $scope,
+            $organizationId,
+            $role,
+            md5(json_encode($context))
+        );
     }
 
     /**

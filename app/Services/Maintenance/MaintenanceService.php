@@ -10,6 +10,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 
 /**
@@ -117,9 +118,9 @@ class MaintenanceService
      */
     public function getAnalytics(array $filters = []): array
     {
-        $cacheKey = 'maintenance_analytics_' . auth()->user()->organization_id . '_' . md5(json_encode($filters));
-        
-        return Cache::remember($cacheKey, 300, function() use ($filters) {
+        $cacheKey = $this->buildAnalyticsCacheKey($filters);
+
+        return Cache::remember($cacheKey, config('analytics.cache.ttl.realtime', 300), function() use ($filters) {
             $query = MaintenanceOperation::query();
 
             // Appliquer filtre de période si fourni
@@ -174,6 +175,24 @@ class MaintenanceService
                     ->count(),
             ];
         });
+    }
+
+    protected function buildAnalyticsCacheKey(array $filters): string
+    {
+        $organizationId = Auth::user()->organization_id ?? 0;
+        $role = Auth::check()
+            ? (Auth::user()->getRoleNames()->first() ?? 'user')
+            : 'guest';
+
+        $normalizedFilters = $filters;
+        ksort($normalizedFilters);
+
+        return sprintf(
+            'maintenance_analytics:org:%d:role:%s:%s',
+            $organizationId,
+            $role,
+            md5(json_encode($normalizedFilters))
+        );
     }
 
     /**
