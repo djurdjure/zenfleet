@@ -1,6 +1,8 @@
+@extends('layouts.admin.catalyst')
+@section('title', $title ?? 'Planning Gantt des Affectations')
+@section('content')
+
 {{-- 📈 Vue Gantt des Affectations - Interface Admin Enterprise --}}
-<x-admin-layout>
- <x-slot name="header">
  <div class="flex justify-between items-center">
  <div>
  <h2 class="font-semibold text-xl text-gray-800 leading-tight">
@@ -33,7 +35,6 @@
  @endcan
  </div>
  </div>
- </x-slot>
 
  {{-- Breadcrumbs --}}
  @if(isset($breadcrumbs))
@@ -262,4 +263,4 @@
  }
  </style>
  @endpush
-</x-admin-layout>
+@endsection

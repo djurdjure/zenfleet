@@ -19,7 +19,6 @@ import './bootstrap';
 // Import des librairies tierces avec optimisation
 import Alpine from 'alpinejs';
 import Sortable from 'sortablejs';
-import ApexCharts from 'apexcharts';
 import flatpickr from "flatpickr";
 
 // Import ZenFleet SlimSelect (nouveau remplacement de TomSelect)
@@ -34,7 +33,6 @@ const initializeGlobals = () => {
     window.Alpine = Alpine;
     window.ZenFleetSelect = ZenFleetSelect;
     window.Sortable = Sortable;
-    window.ApexCharts = ApexCharts;
     window.flatpickr = flatpickr;
 
     // ✅ RESTORE: Global ZenFleet object
@@ -224,9 +222,6 @@ const registerAlpineComponents = (alpineInstance) => {
 
             // Sortable avec sauvegarde d'état
             this.initializeSortable();
-
-            // ApexCharts avec thème ZenFleet
-            this.initializeCharts();
         },
 
         // Configuration ZenFleetSelect (SlimSelect ultra-optimisé)
@@ -295,34 +290,6 @@ const registerAlpineComponents = (alpineInstance) => {
                         }
                     }
                 });
-            });
-        },
-
-        // Initialisation des graphiques
-        initializeCharts() {
-            document.querySelectorAll('.chart-container[data-chart-type]').forEach(container => {
-                if (container.chart) return;
-
-                const chartType = container.getAttribute('data-chart-type');
-                const chartData = JSON.parse(container.getAttribute('data-chart-data') || '{}');
-
-                // Configuration par défaut ZenFleet
-                const defaultOptions = {
-                    theme: {
-                        mode: 'light',
-                        palette: 'palette1',
-                    },
-                    colors: ['#0ea5e9', '#22c55e', '#f59e0b', '#ef4444', '#06b6d4'],
-                    chart: {
-                        fontFamily: 'Inter, sans-serif',
-                        toolbar: { show: false },
-                        background: 'transparent',
-                    },
-                };
-
-                const chart = new ApexCharts(container, { ...defaultOptions, ...chartData });
-                chart.render();
-                container.chart = chart;
             });
         },
 
