@@ -281,14 +281,33 @@
                         <div class="p-6">
                             <h3 class="mb-4 text-lg font-semibold">Répartition par catégorie</h3>
                             <div class="h-64">
+                                @php
+                                    $categoryPiePayload = [
+                                        'meta' => [
+                                            'source' => 'expense.analytics.dashboard.category-breakdown',
+                                            'period' => $period,
+                                            'filters' => [
+                                                'start_date' => $startDate,
+                                                'end_date' => $endDate,
+                                                'vehicle_id' => $vehicle_id ?: null,
+                                                'category' => $category ?: null,
+                                                'expense_group_id' => $expense_group_id ?: null,
+                                            ],
+                                        ],
+                                        'chart' => [
+                                            'id' => 'expense-category-pie',
+                                            'type' => 'donut',
+                                            'height' => 260,
+                                            'ariaLabel' => 'Repartition des depenses par categorie',
+                                        ],
+                                        'labels' => $pieChartData['labels'] ?? [],
+                                        'series' => $pieChartData['datasets'][0]['data'] ?? [],
+                                        'options' => [],
+                                    ];
+                                @endphp
                                 <x-charts.widget
                                     id="categoryPieChart"
-                                    chart-id="expense-category-pie"
-                                    type="donut"
-                                    :height="260"
-                                    aria-label="Repartition des depenses par categorie"
-                                    :labels='$pieChartData["labels"] ?? []'
-                                    :series='$pieChartData["datasets"][0]["data"] ?? []'
+                                    :payload="$categoryPiePayload"
                                     wire-ignore
                                 />
                             </div>
@@ -301,14 +320,39 @@
                         <div class="p-6">
                             <h3 class="mb-4 text-lg font-semibold">Évolution mensuelle</h3>
                             <div class="h-64">
+                                @php
+                                    $monthlyTrendPayload = [
+                                        'meta' => [
+                                            'source' => 'expense.analytics.dashboard.monthly-trend',
+                                            'period' => $period,
+                                            'filters' => [
+                                                'start_date' => $startDate,
+                                                'end_date' => $endDate,
+                                                'vehicle_id' => $vehicle_id ?: null,
+                                                'category' => $category ?: null,
+                                                'expense_group_id' => $expense_group_id ?: null,
+                                            ],
+                                        ],
+                                        'chart' => [
+                                            'id' => 'expense-monthly-trend',
+                                            'type' => 'line',
+                                            'height' => 260,
+                                            'ariaLabel' => 'Evolution mensuelle des depenses',
+                                        ],
+                                        'labels' => $chartLabels ?? [],
+                                        'series' => collect($chartData['datasets'] ?? [])
+                                            ->map(fn ($dataset) => [
+                                                'name' => $dataset['label'] ?? 'Serie',
+                                                'data' => $dataset['data'] ?? [],
+                                            ])
+                                            ->values()
+                                            ->all(),
+                                        'options' => [],
+                                    ];
+                                @endphp
                                 <x-charts.widget
                                     id="monthlyTrendChart"
-                                    chart-id="expense-monthly-trend"
-                                    type="line"
-                                    :height="260"
-                                    aria-label="Evolution mensuelle des depenses"
-                                    :labels='$chartLabels ?? []'
-                                    :series='collect($chartData["datasets"] ?? [])->map(fn ($dataset) => ["name" => $dataset["label"] ?? "Serie", "data" => $dataset["data"] ?? []])->values()'
+                                    :payload="$monthlyTrendPayload"
                                     wire-ignore
                                 />
                             </div>
@@ -365,18 +409,39 @@
                         <div class="p-6">
                             <h3 class="mb-4 text-lg font-semibold">TCO par véhicule</h3>
                             <div class="h-96">
+                                @php
+                                    $tcoPayload = [
+                                        'meta' => [
+                                            'source' => 'expense.analytics.tco.by-vehicle',
+                                            'period' => $period,
+                                            'filters' => [
+                                                'start_date' => $startDate,
+                                                'end_date' => $endDate,
+                                                'vehicle_id' => $vehicle_id ?: null,
+                                                'category' => $category ?: null,
+                                                'expense_group_id' => $expense_group_id ?: null,
+                                            ],
+                                        ],
+                                        'chart' => [
+                                            'id' => 'expense-tco-vehicles',
+                                            'type' => 'bar',
+                                            'height' => 360,
+                                            'ariaLabel' => 'TCO par vehicule',
+                                        ],
+                                        'labels' => $chartLabels ?? [],
+                                        'series' => [[
+                                            'name' => 'TCO (DZD)',
+                                            'data' => array_values($chartData ?? []),
+                                        ]],
+                                        'options' => [
+                                            'plotOptions' => ['bar' => ['borderRadius' => 6, 'columnWidth' => '48%']],
+                                            'yaxis' => ['min' => 0],
+                                        ],
+                                    ];
+                                @endphp
                                 <x-charts.widget
                                     id="tcoChart"
-                                    chart-id="expense-tco-vehicles"
-                                    type="bar"
-                                    :height="360"
-                                    aria-label="TCO par vehicule"
-                                    :labels='$chartLabels ?? []'
-                                    :series='[["name" => "TCO (DZD)", "data" => array_values($chartData ?? [])]]'
-                                    :options='[
-                                        "plotOptions" => ["bar" => ["borderRadius" => 6, "columnWidth" => "48%"]],
-                                        "yaxis" => ["min" => 0]
-                                    ]'
+                                    :payload="$tcoPayload"
                                     wire-ignore
                                 />
                             </div>
@@ -393,21 +458,45 @@
                         <div class="p-6">
                             <h3 class="mb-4 text-lg font-semibold">Tendances des dépenses</h3>
                             <div class="h-96">
+                                @php
+                                    $trendsPayload = [
+                                        'meta' => [
+                                            'source' => 'expense.analytics.trends.monthly',
+                                            'period' => $period,
+                                            'filters' => [
+                                                'start_date' => $startDate,
+                                                'end_date' => $endDate,
+                                                'vehicle_id' => $vehicle_id ?: null,
+                                                'category' => $category ?: null,
+                                                'expense_group_id' => $expense_group_id ?: null,
+                                            ],
+                                        ],
+                                        'chart' => [
+                                            'id' => 'expense-trends-monthly',
+                                            'type' => 'line',
+                                            'height' => 360,
+                                            'ariaLabel' => 'Tendances mensuelles des depenses',
+                                        ],
+                                        'labels' => collect($trends['monthly']['periods'] ?? [])->pluck('label')->values()->all(),
+                                        'series' => [
+                                            [
+                                                'name' => 'Montant (DZD)',
+                                                'data' => collect($trends['monthly']['periods'] ?? [])->pluck('total_amount')->values()->all(),
+                                            ],
+                                            [
+                                                'name' => 'Nombre de depenses',
+                                                'data' => collect($trends['monthly']['periods'] ?? [])->pluck('expense_count')->values()->all(),
+                                            ],
+                                        ],
+                                        'options' => [
+                                            'stroke' => ['curve' => 'smooth', 'width' => 3],
+                                            'yaxis' => ['min' => 0],
+                                        ],
+                                    ];
+                                @endphp
                                 <x-charts.widget
                                     id="trendsChart"
-                                    chart-id="expense-trends-monthly"
-                                    type="line"
-                                    :height="360"
-                                    aria-label="Tendances mensuelles des depenses"
-                                    :labels='collect($trends["monthly"]["periods"] ?? [])->pluck("label")->values()'
-                                    :series='[
-                                        ["name" => "Montant (DZD)", "data" => collect($trends["monthly"]["periods"] ?? [])->pluck("total_amount")->values()],
-                                        ["name" => "Nombre de dépenses", "data" => collect($trends["monthly"]["periods"] ?? [])->pluck("expense_count")->values()]
-                                    ]'
-                                    :options='[
-                                        "stroke" => ["curve" => "smooth", "width" => 3],
-                                        "yaxis" => ["min" => 0]
-                                    ]'
+                                    :payload="$trendsPayload"
                                     wire-ignore
                                 />
                             </div>
@@ -464,14 +553,33 @@
                             <div class="p-6">
                                 <h3 class="mb-4 text-lg font-semibold">Répartition par fournisseur</h3>
                                 <div class="h-64">
+                                    @php
+                                        $supplierPayload = [
+                                            'meta' => [
+                                                'source' => 'expense.analytics.suppliers.distribution',
+                                                'period' => $period,
+                                                'filters' => [
+                                                    'start_date' => $startDate,
+                                                    'end_date' => $endDate,
+                                                    'vehicle_id' => $vehicle_id ?: null,
+                                                    'category' => $category ?: null,
+                                                    'expense_group_id' => $expense_group_id ?: null,
+                                                ],
+                                            ],
+                                            'chart' => [
+                                                'id' => 'expense-suppliers-distribution',
+                                                'type' => 'donut',
+                                                'height' => 260,
+                                                'ariaLabel' => 'Repartition des depenses par fournisseur',
+                                            ],
+                                            'labels' => collect($supplierAnalysis['top_suppliers'] ?? [])->pluck('name')->values()->all(),
+                                            'series' => collect($supplierAnalysis['top_suppliers'] ?? [])->pluck('total_amount')->map(fn ($v) => (float) $v)->values()->all(),
+                                            'options' => [],
+                                        ];
+                                    @endphp
                                     <x-charts.widget
                                         id="supplierChart"
-                                        chart-id="expense-suppliers-distribution"
-                                        type="donut"
-                                        :height="260"
-                                        aria-label="Repartition des depenses par fournisseur"
-                                        :labels='collect($supplierAnalysis["top_suppliers"] ?? [])->pluck("name")->values()'
-                                        :series='collect($supplierAnalysis["top_suppliers"] ?? [])->pluck("total_amount")->map(fn ($v) => (float) $v)->values()'
+                                        :payload="$supplierPayload"
                                         wire-ignore
                                     />
                                 </div>
@@ -505,21 +613,45 @@
                             <div class="p-6">
                                 <h3 class="mb-4 text-lg font-semibold">Utilisation des budgets par groupe</h3>
                                 <div class="h-80">
+                                    @php
+                                        $budgetPayload = [
+                                            'meta' => [
+                                                'source' => 'expense.analytics.budgets.usage',
+                                                'period' => $period,
+                                                'filters' => [
+                                                    'start_date' => $startDate,
+                                                    'end_date' => $endDate,
+                                                    'vehicle_id' => $vehicle_id ?: null,
+                                                    'category' => $category ?: null,
+                                                    'expense_group_id' => $expense_group_id ?: null,
+                                                ],
+                                            ],
+                                            'chart' => [
+                                                'id' => 'expense-budgets-usage',
+                                                'type' => 'bar',
+                                                'height' => 300,
+                                                'ariaLabel' => 'Utilisation des budgets par groupe',
+                                            ],
+                                            'labels' => collect($budgetAnalysis['groups'] ?? [])->pluck('name')->values()->all(),
+                                            'series' => [
+                                                [
+                                                    'name' => 'Alloue',
+                                                    'data' => collect($budgetAnalysis['groups'] ?? [])->pluck('budget_allocated')->values()->all(),
+                                                ],
+                                                [
+                                                    'name' => 'Utilise',
+                                                    'data' => collect($budgetAnalysis['groups'] ?? [])->pluck('budget_used')->values()->all(),
+                                                ],
+                                            ],
+                                            'options' => [
+                                                'plotOptions' => ['bar' => ['borderRadius' => 6, 'columnWidth' => '55%']],
+                                                'yaxis' => ['min' => 0],
+                                            ],
+                                        ];
+                                    @endphp
                                     <x-charts.widget
                                         id="budgetUsageChart"
-                                        chart-id="expense-budgets-usage"
-                                        type="bar"
-                                        :height="300"
-                                        aria-label="Utilisation des budgets par groupe"
-                                        :labels='collect($budgetAnalysis["groups"] ?? [])->pluck("name")->values()'
-                                        :series='[
-                                            ["name" => "Alloué", "data" => collect($budgetAnalysis["groups"] ?? [])->pluck("budget_allocated")->values()],
-                                            ["name" => "Utilisé", "data" => collect($budgetAnalysis["groups"] ?? [])->pluck("budget_used")->values()]
-                                        ]'
-                                        :options='[
-                                            "plotOptions" => ["bar" => ["borderRadius" => 6, "columnWidth" => "55%"]],
-                                            "yaxis" => ["min" => 0]
-                                        ]'
+                                        :payload="$budgetPayload"
                                         wire-ignore
                                     />
                                 </div>
