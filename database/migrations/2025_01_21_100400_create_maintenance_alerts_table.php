@@ -11,22 +11,41 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('maintenance_alerts', function (Blueprint $table) {
+        if (Schema::hasTable('maintenance_alerts')) {
+            return;
+        }
+
+        $hasVehiclesTable = Schema::hasTable('vehicles');
+        $hasSchedulesTable = Schema::hasTable('maintenance_schedules');
+
+        Schema::create('maintenance_alerts', function (Blueprint $table) use ($hasVehiclesTable, $hasSchedulesTable) {
             $table->id();
             $table->foreignId('organization_id')
                   ->constrained('organizations')
                   ->onDelete('cascade')
                   ->index('idx_maintenance_alerts_org');
 
-            $table->foreignId('vehicle_id')
-                  ->constrained('vehicles')
-                  ->onDelete('cascade')
-                  ->index('idx_maintenance_alerts_vehicle');
+            if ($hasVehiclesTable) {
+                $table->foreignId('vehicle_id')
+                      ->constrained('vehicles')
+                      ->onDelete('cascade')
+                      ->index('idx_maintenance_alerts_vehicle');
+            } else {
+                // Bootstrap-safe path: FK is added later once vehicles exists.
+                $table->foreignId('vehicle_id')
+                      ->index('idx_maintenance_alerts_vehicle');
+            }
 
-            $table->foreignId('maintenance_schedule_id')
-                  ->constrained('maintenance_schedules')
-                  ->onDelete('cascade')
-                  ->index('idx_maintenance_alerts_schedule');
+            if ($hasSchedulesTable) {
+                $table->foreignId('maintenance_schedule_id')
+                      ->constrained('maintenance_schedules')
+                      ->onDelete('cascade')
+                      ->index('idx_maintenance_alerts_schedule');
+            } else {
+                // Bootstrap-safe path: FK is added later once maintenance_schedules exists.
+                $table->foreignId('maintenance_schedule_id')
+                      ->index('idx_maintenance_alerts_schedule');
+            }
 
             $table->enum('alert_type', ['km_based', 'time_based', 'overdue'])
                   ->index('idx_maintenance_alerts_type');

@@ -11,23 +11,29 @@ return new class extends Migration
      */
     public function up(): void
     {
-        // Skip si la table vehicles n'existe pas encore
-        if (!Schema::hasTable('vehicles')) {
-            echo "⚠️  Table vehicles n'existe pas encore, skip maintenance_schedules\n";
+        if (Schema::hasTable('maintenance_schedules')) {
             return;
         }
 
-        Schema::create('maintenance_schedules', function (Blueprint $table) {
+        $hasVehiclesTable = Schema::hasTable('vehicles');
+
+        Schema::create('maintenance_schedules', function (Blueprint $table) use ($hasVehiclesTable) {
             $table->id();
             $table->foreignId('organization_id')
                   ->constrained('organizations')
                   ->onDelete('cascade')
                   ->index('idx_maintenance_schedules_org');
 
-            $table->foreignId('vehicle_id')
-                  ->constrained('vehicles')
-                  ->onDelete('cascade')
-                  ->index('idx_maintenance_schedules_vehicle');
+            if ($hasVehiclesTable) {
+                $table->foreignId('vehicle_id')
+                      ->constrained('vehicles')
+                      ->onDelete('cascade')
+                      ->index('idx_maintenance_schedules_vehicle');
+            } else {
+                // Bootstrap-safe path: FK is added later once vehicles exists.
+                $table->foreignId('vehicle_id')
+                      ->index('idx_maintenance_schedules_vehicle');
+            }
 
             $table->foreignId('maintenance_type_id')
                   ->constrained('maintenance_types')

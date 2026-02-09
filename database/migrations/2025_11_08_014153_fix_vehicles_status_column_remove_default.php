@@ -73,7 +73,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        if (!Schema::hasTable('vehicles')) {
+        if (!Schema::hasTable('vehicles') || !Schema::hasColumn('vehicles', 'status')) {
             return;
         }
 
@@ -93,7 +93,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        if (!Schema::hasTable('vehicles')) {
+        if (!Schema::hasTable('vehicles') || !Schema::hasColumn('vehicles', 'status')) {
             return;
         }
 

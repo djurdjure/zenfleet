@@ -2,27 +2,60 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
     public function up()
     {
+        if (Schema::hasTable('repair_requests')) {
+            return;
+        }
+
         $driver = DB::getDriverName();
+        $hasVehiclesTable = Schema::hasTable('vehicles');
 
         // Créer les ENUMs requis pour PostgreSQL
         if ($driver === 'pgsql') {
-            DB::statement("CREATE TYPE repair_priority_enum AS ENUM ('urgente', 'a_prevoir', 'non_urgente')");
-            DB::statement("CREATE TYPE repair_status_enum AS ENUM ('en_attente', 'accord_initial', 'accordee', 'refusee', 'en_cours', 'terminee', 'annulee')");
-            DB::statement("CREATE TYPE supervisor_decision_enum AS ENUM ('accepte', 'refuse')");
-            DB::statement("CREATE TYPE manager_decision_enum AS ENUM ('valide', 'refuse')");
+            DB::statement("DO $$ BEGIN
+                IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'repair_priority_enum') THEN
+                    CREATE TYPE repair_priority_enum AS ENUM ('urgente', 'a_prevoir', 'non_urgente');
+                END IF;
+            END $$");
+
+            DB::statement("DO $$ BEGIN
+                IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'repair_status_enum') THEN
+                    CREATE TYPE repair_status_enum AS ENUM ('en_attente', 'accord_initial', 'accordee', 'refusee', 'en_cours', 'terminee', 'annulee');
+                END IF;
+            END $$");
+
+            DB::statement("DO $$ BEGIN
+                IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'supervisor_decision_enum') THEN
+                    CREATE TYPE supervisor_decision_enum AS ENUM ('accepte', 'refuse');
+                END IF;
+            END $$");
+
+            DB::statement("DO $$ BEGIN
+                IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'manager_decision_enum') THEN
+                    CREATE TYPE manager_decision_enum AS ENUM ('valide', 'refuse');
+                END IF;
+            END $$");
         }
 
-        Schema::create('repair_requests', function (Blueprint $table) {
+        Schema::create('repair_requests', function (Blueprint $table) use ($hasVehiclesTable) {
             $table->id();
             $table->unsignedBigInteger('organization_id');
-            $table->unsignedBigInteger('vehicle_id');
             $table->unsignedBigInteger('requested_by'); // driver_id
+
+            if ($hasVehiclesTable) {
+                $table->foreignId('vehicle_id')
+                    ->constrained('vehicles')
+                    ->onDelete('cascade');
+            } else {
+                // Bootstrap-safe path: FK is added later once vehicles exists.
+                $table->unsignedBigInteger('vehicle_id');
+            }
 
             // Classification de la demande
             $table->enum('priority', ['urgente', 'a_prevoir', 'non_urgente'])->default('non_urgente');
@@ -73,7 +106,6 @@ return new class extends Migration
 
             // Contraintes foreign key
             $table->foreign('organization_id')->references('id')->on('organizations')->onDelete('cascade');
-            $table->foreign('vehicle_id')->references('id')->on('vehicles')->onDelete('cascade');
             $table->foreign('requested_by')->references('id')->on('users')->onDelete('cascade');
             $table->foreign('supervisor_id')->references('id')->on('users')->onDelete('set null');
             $table->foreign('manager_id')->references('id')->on('users')->onDelete('set null');

@@ -2,19 +2,29 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
     public function up()
     {
-        $driver = DB::getDriverName();
-
-        if ($driver === 'pgsql') {
-            DB::statement("CREATE TYPE budget_period_enum AS ENUM ('monthly', 'quarterly', 'yearly')");
+        if (Schema::hasTable('expense_budgets')) {
+            return;
         }
 
-        Schema::create('expense_budgets', function (Blueprint $table) use ($driver) {
+        $driver = DB::getDriverName();
+        $hasVehiclesTable = Schema::hasTable('vehicles');
+
+        if ($driver === 'pgsql') {
+            DB::statement("DO $$ BEGIN
+                IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'budget_period_enum') THEN
+                    CREATE TYPE budget_period_enum AS ENUM ('monthly', 'quarterly', 'yearly');
+                END IF;
+            END $$");
+        }
+
+        Schema::create('expense_budgets', function (Blueprint $table) use ($driver, $hasVehiclesTable) {
             $table->id();
             $table->unsignedBigInteger('organization_id');
 
@@ -59,7 +69,9 @@ return new class extends Migration
 
             // Contraintes
             $table->foreign('organization_id')->references('id')->on('organizations')->onDelete('cascade');
-            $table->foreign('vehicle_id')->references('id')->on('vehicles')->onDelete('cascade');
+            if ($hasVehiclesTable) {
+                $table->foreign('vehicle_id')->references('id')->on('vehicles')->onDelete('cascade');
+            }
 
             // Contrainte unicité
             $table->unique([

@@ -9,6 +9,7 @@ use App\Models\Vehicle;
 use App\Models\ExpenseGroup;
 use Livewire\Component;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Schema;
 use Carbon\Carbon;
 
 class ExpenseAnalytics extends Component
@@ -80,9 +81,11 @@ class ExpenseAnalytics extends Component
 
     public function render()
     {
+        $plateColumn = Schema::hasColumn('vehicles', 'license_plate') ? 'license_plate' : 'registration_plate';
+
         $vehicles = Vehicle::where('organization_id', Auth::user()->organization_id)
-            ->where('status', 'active')
-            ->orderBy('license_plate')
+            ->active()
+            ->orderBy($plateColumn)
             ->get();
             
         $expenseGroups = ExpenseGroup::where('organization_id', Auth::user()->organization_id)

@@ -2,13 +2,23 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
     public function up()
     {
+        if (Schema::hasTable('vehicle_expenses')) {
+            return;
+        }
+
         $driver = DB::getDriverName();
+        $hasOrganizationsTable = Schema::hasTable('organizations');
+        $hasVehiclesTable = Schema::hasTable('vehicles');
+        $hasSuppliersTable = Schema::hasTable('suppliers');
+        $hasRepairRequestsTable = Schema::hasTable('repair_requests');
+        $hasUsersTable = Schema::hasTable('users');
 
         // Créer l'ENUM pour les catégories de dépenses (PostgreSQL uniquement)
         if ($driver === 'pgsql') {
@@ -26,7 +36,13 @@ return new class extends Migration
             ");
         }
 
-        Schema::create('vehicle_expenses', function (Blueprint $table) {
+        Schema::create('vehicle_expenses', function (Blueprint $table) use (
+            $hasOrganizationsTable,
+            $hasVehiclesTable,
+            $hasSuppliersTable,
+            $hasRepairRequestsTable,
+            $hasUsersTable
+        ) {
             $table->id();
             $table->unsignedBigInteger('organization_id');
             $table->unsignedBigInteger('vehicle_id');
@@ -129,14 +145,29 @@ return new class extends Migration
             $table->index(['is_recurring', 'next_due_date']);
 
             // Contraintes foreign key
-            $table->foreign('organization_id')->references('id')->on('organizations')->onDelete('cascade');
-            $table->foreign('vehicle_id')->references('id')->on('vehicles')->onDelete('cascade');
-            $table->foreign('supplier_id')->references('id')->on('suppliers')->onDelete('set null');
-            $table->foreign('driver_id')->references('id')->on('users')->onDelete('set null');
-            $table->foreign('repair_request_id')->references('id')->on('repair_requests')->onDelete('set null');
-            $table->foreign('recorded_by')->references('id')->on('users')->onDelete('cascade');
-            $table->foreign('approved_by')->references('id')->on('users')->onDelete('set null');
-            $table->foreign('audited_by')->references('id')->on('users')->onDelete('set null');
+            if ($hasOrganizationsTable) {
+                $table->foreign('organization_id')->references('id')->on('organizations')->onDelete('cascade');
+            }
+
+            if ($hasVehiclesTable) {
+                $table->foreign('vehicle_id')->references('id')->on('vehicles')->onDelete('cascade');
+            }
+
+            if ($hasSuppliersTable) {
+                $table->foreign('supplier_id')->references('id')->on('suppliers')->onDelete('set null');
+            }
+
+            if ($hasUsersTable) {
+                $table->foreign('driver_id')->references('id')->on('users')->onDelete('set null');
+                $table->foreign('recorded_by')->references('id')->on('users')->onDelete('cascade');
+                $table->foreign('approved_by')->references('id')->on('users')->onDelete('set null');
+                $table->foreign('audited_by')->references('id')->on('users')->onDelete('set null');
+            }
+
+            if ($hasRepairRequestsTable) {
+                $table->foreign('repair_request_id')->references('id')->on('repair_requests')->onDelete('set null');
+            }
+
             $table->foreign('parent_expense_id')->references('id')->on('vehicle_expenses')->onDelete('cascade');
         });
 

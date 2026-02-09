@@ -8,7 +8,16 @@ return new class extends Migration
 {
     public function up(): void
     {
-        if (!Schema::hasTable('drivers') || !Schema::hasColumn('drivers', 'organization_id')) {
+        if (
+            !Schema::hasTable('drivers') ||
+            !Schema::hasColumn('drivers', 'organization_id') ||
+            !Schema::hasColumn('drivers', 'deleted_at')
+        ) {
+            return;
+        }
+
+        // PostgreSQL-first migration: this relies on partial unique indexes.
+        if (Schema::getConnection()->getDriverName() !== 'pgsql') {
             return;
         }
 
@@ -33,7 +42,7 @@ return new class extends Migration
 
     public function down(): void
     {
-        if (!Schema::hasTable('drivers')) {
+        if (!Schema::hasTable('drivers') || Schema::getConnection()->getDriverName() !== 'pgsql') {
             return;
         }
 

@@ -11,17 +11,29 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('maintenance_operations', function (Blueprint $table) {
+        if (Schema::hasTable('maintenance_operations')) {
+            return;
+        }
+
+        $hasVehiclesTable = Schema::hasTable('vehicles');
+
+        Schema::create('maintenance_operations', function (Blueprint $table) use ($hasVehiclesTable) {
             $table->id();
             $table->foreignId('organization_id')
                   ->constrained('organizations')
                   ->onDelete('cascade')
                   ->index('idx_maintenance_operations_org');
 
-            $table->foreignId('vehicle_id')
-                  ->constrained('vehicles')
-                  ->onDelete('cascade')
-                  ->index('idx_maintenance_operations_vehicle');
+            if ($hasVehiclesTable) {
+                $table->foreignId('vehicle_id')
+                      ->constrained('vehicles')
+                      ->onDelete('cascade')
+                      ->index('idx_maintenance_operations_vehicle');
+            } else {
+                // Legacy-safe bootstrap: add FK in a later migration once vehicles exists.
+                $table->foreignId('vehicle_id')
+                      ->index('idx_maintenance_operations_vehicle');
+            }
 
             $table->foreignId('maintenance_type_id')
                   ->constrained('maintenance_types')
