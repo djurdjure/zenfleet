@@ -12,7 +12,10 @@
 ])
 
 @php
-$component = new \App\View\Components\Input($type, $name, $label, $placeholder, $error, $helpText, $icon, $required, $disabled, $value);
+$baseKey = preg_replace('/\[\]$/', '', $name);
+$errorLookupKey = trim(preg_replace('/\[(.*?)\]/', '.$1', $baseKey), '.');
+$resolvedError = $error ?: ((isset($errors) && $errorLookupKey !== '') ? ($errors->first($errorLookupKey) ?: $errors->first($errorLookupKey . '.0')) : null);
+$component = new \App\View\Components\Input($type, $name, $label, $placeholder, $resolvedError, $helpText, $icon, $required, $disabled, $value);
 $classes = $component->getClasses();
 $inputId = $component->getId();
 @endphp
@@ -40,18 +43,19 @@ $inputId = $component->getId();
             id="{{ $inputId }}"
             class="{{ $classes }} {{ $icon ? 'pl-10' : '' }}"
             placeholder="{{ $placeholder }}"
-            value="{{ old($name, $value) }}"
+            value="{{ old($errorLookupKey !== '' ? $errorLookupKey : $name, $value) }}"
+            aria-invalid="{{ $resolvedError ? 'true' : 'false' }}"
             @if($required) required @endif
             @if($disabled) disabled @endif
             {{-- ⚠️ VALIDATION TEMPS RÉEL: Bordure rouge vif SEULEMENT si champ touché ET invalide --}}
-            x-bind:class="(typeof fieldErrors !== 'undefined' && fieldErrors && fieldErrors['{{ $name }}'] && typeof touchedFields !== 'undefined' && touchedFields && touchedFields['{{ $name }}']) ? '!border-red-500 !focus:ring-2 !focus:ring-red-500 !focus:border-red-500 !bg-red-50' : ''"
+            x-bind:class="(typeof fieldErrors !== 'undefined' && fieldErrors && fieldErrors['{{ $errorLookupKey !== '' ? $errorLookupKey : $name }}'] && typeof touchedFields !== 'undefined' && touchedFields && touchedFields['{{ $errorLookupKey !== '' ? $errorLookupKey : $name }}']) ? '!border-red-500 !focus:ring-2 !focus:ring-red-500 !focus:border-red-500 !bg-red-50' : ''"
             {{ $attributes->except(['class']) }} />
     </div>
 
-    @if($error)
+    @if($resolvedError)
     <p class="mt-2 text-sm text-red-600 flex items-start font-medium">
         <x-iconify icon="lucide:circle-alert" class="w-4 h-4 mr-1.5 mt-0.5 flex-shrink-0" />
-        <span>{{ $error }}</span>
+        <span>{{ $resolvedError }}</span>
     </p>
     @elseif($helpText)
     <p class="mt-2 text-sm text-gray-600">
@@ -60,7 +64,7 @@ $inputId = $component->getId();
     @endif
 
     {{-- ⚠️ Erreur dynamique Alpine.js - SEULEMENT si champ touché ET invalide --}}
-    <p x-show="typeof fieldErrors !== 'undefined' && fieldErrors && fieldErrors['{{ $name }}'] && typeof touchedFields !== 'undefined' && touchedFields && touchedFields['{{ $name }}']"
+    <p x-show="typeof fieldErrors !== 'undefined' && fieldErrors && fieldErrors['{{ $errorLookupKey !== '' ? $errorLookupKey : $name }}'] && typeof touchedFields !== 'undefined' && touchedFields && touchedFields['{{ $errorLookupKey !== '' ? $errorLookupKey : $name }}']"
         x-transition:enter="transition ease-out duration-200"
         x-transition:enter-start="opacity-0 transform -translate-y-1"
         x-transition:enter-end="opacity-100 transform translate-y-0"

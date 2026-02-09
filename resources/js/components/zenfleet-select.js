@@ -58,8 +58,13 @@ class ZenFleetSelect {
         this.options = this.mergeOptions(options);
         this.slimInstance = null;
         this.livewireComponent = null;
+        this.livewireComponentId = null;
+        this.livewireUnwatch = null;
         this.fallbackInput = null;
         this.observers = [];
+        this.isRefreshing = false;
+        this.refreshScheduled = null;
+        this.isDestroyed = false;
         this.performanceMetrics = {
             initTime: 0,
             searchTime: 0,
@@ -122,6 +127,10 @@ class ZenFleetSelect {
         const startTime = performance.now();
 
         try {
+            if (!this.element.isConnected) {
+                return;
+            }
+
             // Detection du champ fallback (hidden input)
             const inputName = this.element.name.replace('[]', '');
             const prevEl = this.element.previousElementSibling;
@@ -202,6 +211,9 @@ class ZenFleetSelect {
         const events = {
             // Événement après changement
             afterChange: (newVal) => {
+                if (this.isRefreshing || this.isDestroyed || !this.element.isConnected) {
+                    return;
+                }
                 this.log('debug', 'Value changed', { newValue: newVal });
 
                 // Enterprise Fix: Sync immediately on change
@@ -387,6 +399,7 @@ class ZenFleetSelect {
         }
 
         const wireId = livewireEl.getAttribute('wire:id');
+        this.livewireComponentId = wireId;
         this.livewireComponent = window.Livewire?.find?.(wireId);
 
         if (!this.livewireComponent) {
@@ -396,7 +409,16 @@ class ZenFleetSelect {
 
         // Listener pour updates Livewire → SlimSelect
         try {
-            this.livewireComponent.$watch(this.options.livewireProperty, (value) => {
+            this.livewireUnwatch = this.livewireComponent.$watch(this.options.livewireProperty, (value) => {
+                if (this.isDestroyed || !this.element.isConnected) {
+                    return;
+                }
+
+                const currentWireId = this.element.closest('[wire\\:id]')?.getAttribute('wire:id');
+                if (!currentWireId || currentWireId !== this.livewireComponentId) {
+                    return;
+                }
+
                 if (this.slimInstance && value !== undefined) {
                     // Éviter boucles infinies
                     const currentValue = this.slimInstance.getSelected();
@@ -407,7 +429,9 @@ class ZenFleetSelect {
                     }
                 }
             });
-
+            if (typeof this.livewireUnwatch !== 'function') {
+                this.livewireUnwatch = null;
+            }
             this.log('info', 'Livewire sync enabled', {
                 property: this.options.livewireProperty,
                 wireId
@@ -422,14 +446,65 @@ class ZenFleetSelect {
      * Synchronisation SlimSelect → Livewire
      */
     syncToLivewire(value) {
-        if (!this.livewireComponent) return;
+        if (!this.livewireComponent || this.isDestroyed) return;
 
         try {
-            this.livewireComponent.set(this.options.livewireProperty, value);
+            if (!this.element.isConnected) {
+                this.log('debug', 'Skipped Livewire sync (element detached)');
+                return;
+            }
+
+            const currentWireId = this.element.closest('[wire\\:id]')?.getAttribute('wire:id');
+            if (!currentWireId || currentWireId !== this.livewireComponentId) {
+                this.log('debug', 'Skipped Livewire sync (component not found)');
+                return;
+            }
+
+            const activeLivewireComponent = window.Livewire?.find?.(this.livewireComponentId);
+            if (!activeLivewireComponent) {
+                this.log('debug', 'Skipped Livewire sync (component disposed)');
+                return;
+            }
+            this.livewireComponent = activeLivewireComponent;
+
+            const normalized = this.normalizeValueForLivewire(value);
+            this.livewireComponent.set(this.options.livewireProperty, normalized);
             this.log('debug', 'SlimSelect → Livewire sync', { value });
         } catch (error) {
             this.logError('Livewire sync failed', error);
         }
+    }
+
+    normalizeValueForLivewire(value) {
+        const isMultiple = this.element.hasAttribute('multiple');
+
+        if (isMultiple) {
+            if (Array.isArray(value)) {
+                return value
+                    .map(item => (item && typeof item === 'object' && 'value' in item) ? item.value : item)
+                    .filter(item => item !== undefined && item !== null);
+            }
+
+            if (value && typeof value === 'object' && 'value' in value) {
+                return [value.value];
+            }
+
+            return value == null ? [] : [value];
+        }
+
+        if (Array.isArray(value)) {
+            const first = value[0];
+            if (first && typeof first === 'object' && 'value' in first) {
+                return first.value;
+            }
+            return first ?? null;
+        }
+
+        if (value && typeof value === 'object' && 'value' in value) {
+            return value.value;
+        }
+
+        return value ?? null;
     }
 
     /**
@@ -456,21 +531,31 @@ class ZenFleetSelect {
      * Setup observers pour dynamic content updates
      */
     setupObservers() {
+        const allowObserver = this.element.getAttribute('data-zenfleet-observer') === 'true';
+        if (this.element.closest('[wire\\:id]') && !allowObserver) {
+            this.log('debug', 'Observer skipped for Livewire-managed select');
+            return;
+        }
+
         // Observer pour détection de changements dans les options du select original
         const observer = new MutationObserver((mutations) => {
+            if (this.isRefreshing || this.refreshScheduled) {
+                return;
+            }
             mutations.forEach((mutation) => {
-                if (mutation.type === 'childList' || mutation.type === 'attributes') {
-                    this.log('debug', 'Select options changed, refreshing SlimSelect');
-                    this.refresh();
+                if (mutation.type === 'childList') {
+                    this.log('debug', 'Select options changed, scheduling refresh');
+                    this.refreshScheduled = requestAnimationFrame(() => {
+                        this.refreshScheduled = null;
+                        this.refresh();
+                    });
                 }
             });
         });
 
         observer.observe(this.element, {
             childList: true,
-            subtree: true,
-            attributes: true,
-            attributeFilter: ['disabled', 'selected']
+            subtree: false
         });
 
         this.observers.push(observer);
@@ -480,13 +565,18 @@ class ZenFleetSelect {
      * Refresh des données
      */
     refresh() {
-        if (!this.slimInstance) return;
+        if (!this.slimInstance || this.isDestroyed || !this.element.isConnected) return;
 
         try {
+            this.isRefreshing = true;
             const data = this.prepareData();
             this.slimInstance.setData(data);
             this.log('debug', 'Data refreshed', { optionsCount: data.length });
+            queueMicrotask(() => {
+                this.isRefreshing = false;
+            });
         } catch (error) {
+            this.isRefreshing = false;
             this.logError('Refresh failed', error);
         }
     }
@@ -577,6 +667,13 @@ class ZenFleetSelect {
      * Destruction propre (memory leak prevention)
      */
     destroy() {
+        this.isDestroyed = true;
+
+        if (this.refreshScheduled) {
+            cancelAnimationFrame(this.refreshScheduled);
+            this.refreshScheduled = null;
+        }
+
         this.log('info', 'Destroying instance', {
             element: this.element.id || this.element.name,
             metrics: this.performanceMetrics
@@ -597,7 +694,16 @@ class ZenFleetSelect {
         }
 
         // Cleanup
+        if (this.livewireUnwatch) {
+            try {
+                this.livewireUnwatch();
+            } catch (error) {
+                this.logError('Livewire unwatch failed', error);
+            }
+        }
+        this.livewireUnwatch = null;
         this.livewireComponent = null;
+        this.livewireComponentId = null;
         this.element.classList.remove('zenfleet-select-open');
 
         // Remove error messages

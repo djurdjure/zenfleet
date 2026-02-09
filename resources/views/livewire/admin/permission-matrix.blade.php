@@ -1,25 +1,44 @@
-<div class="min-h-screen bg-gray-50 ">
- <div class="px-4 sm:px-6 lg:px-8 py-8">
+<div class="min-h-screen bg-gray-50">
+ <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10">
+@php
+ $buttonNeutral = 'inline-flex items-center justify-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900/20 transition-colors';
+ $buttonPrimary = 'inline-flex items-center justify-center gap-2 rounded-xl border border-blue-600 bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500/30 transition-colors';
+@endphp
 
  {{-- 🎯 EN-TÊTE AVEC CONTRÔLES --}}
  <div class="mb-8">
- <div class="flex items-center justify-between">
+ <div class="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
  <div>
- <h1 class="text-4xl font-bold text-gray-900 flex items-center">
- <svg class="w-10 h-10 mr-3 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+<p class="text-xs font-semibold uppercase tracking-[0.25em] text-gray-500">Security & Governance</p>
+<h1 class="mt-3 text-3xl font-semibold text-gray-900 flex items-center gap-3">
+<span class="inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-gray-700 text-white">
+ <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
  </svg>
- Matrice des Permissions
+ </span>
+ Matrice des permissions
  </h1>
- <p class="mt-2 text-sm text-gray-600 ">
- Configuration avancée des rôles et permissions - Architecture enterprise-grade
+<p class="mt-2 text-sm text-gray-600">
+ Orchestration unifiée des rôles, permissions et politiques de sécurité multi-tenant.
  </p>
+ <div class="mt-4 flex flex-wrap gap-2 text-xs">
+<span class="rounded-full bg-gray-700 text-white px-3 py-1">RBAC Enterprise</span>
+<span class="rounded-full bg-gray-100 text-gray-600 px-3 py-1">Audit actif</span>
+<span class="rounded-full bg-gray-100 text-gray-600 px-3 py-1">Sync Livewire</span>
+ </div>
  </div>
 
- <div class="flex items-center space-x-3">
+ <div class="flex items-center gap-3">
+ {{-- Mode compact --}}
+ <button wire:click="toggleCompactMode"
+ class="{{ $compactMode ? $buttonPrimary : $buttonNeutral }}">
+ <x-iconify icon="lucide:layout-grid" class="h-4 w-4" />
+ {{ $compactMode ? 'Mode compact actif' : 'Mode compact' }}
+ </button>
+
  {{-- Bouton Historique --}}
  <button wire:click="$toggle('showHistory')"
- class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 :bg-gray-700">
+class="{{ $buttonNeutral }}">
  <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
  </svg>
@@ -28,7 +47,7 @@
 
  {{-- Bouton Preview --}}
  <button wire:click="$toggle('showPreview')"
- class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 :bg-gray-700">
+class="{{ $buttonNeutral }}">
  <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
@@ -39,8 +58,33 @@
  </div>
  </div>
 
+ @if($selectedRole)
+ <div class="mb-6 grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
+ <div class="rounded-2xl border border-gray-200 bg-white px-4 py-4 shadow-sm">
+ <p class="text-xs font-semibold uppercase tracking-wide text-gray-500">Couverture globale</p>
+ <p class="mt-2 text-2xl font-semibold text-gray-900">{{ $quickInsights['coverage'] }}%</p>
+ <p class="text-xs text-gray-500">{{ $quickInsights['assigned_count'] }} / {{ $quickInsights['total_permissions'] }} permissions</p>
+ </div>
+ <div class="rounded-2xl border border-gray-200 bg-white px-4 py-4 shadow-sm">
+ <p class="text-xs font-semibold uppercase tracking-wide text-gray-500">Vue filtrée</p>
+ <p class="mt-2 text-2xl font-semibold text-gray-900">{{ $quickInsights['filtered_assigned'] }} / {{ $quickInsights['filtered_count'] }}</p>
+ <p class="text-xs text-gray-500">Permissions visibles et actives</p>
+ </div>
+ <div class="rounded-2xl border border-gray-200 bg-white px-4 py-4 shadow-sm">
+ <p class="text-xs font-semibold uppercase tracking-wide text-gray-500">Risque élevé</p>
+ <p class="mt-2 text-2xl font-semibold {{ $quickInsights['risky_count'] > 0 ? 'text-amber-700' : 'text-emerald-700' }}">{{ $quickInsights['risky_count'] }}</p>
+ <p class="text-xs text-gray-500">Actions sensibles attribuées</p>
+ </div>
+ <div class="rounded-2xl border border-gray-200 bg-white px-4 py-4 shadow-sm">
+ <p class="text-xs font-semibold uppercase tracking-wide text-gray-500">Anomalies</p>
+ <p class="mt-2 text-2xl font-semibold {{ $quickInsights['anomaly_count'] > 0 ? 'text-red-700' : 'text-emerald-700' }}">{{ $quickInsights['anomaly_count'] }}</p>
+ <p class="text-xs text-gray-500">Doublons canoniques détectés</p>
+ </div>
+ </div>
+ @endif
+
  {{-- 🎛️ PANNEAU DE CONTRÔLE --}}
- <div class="bg-white rounded-lg shadow-lg p-6 mb-8">
+<div class="bg-white/90 backdrop-blur rounded-2xl border border-gray-200 shadow-sm p-6 mb-8">
  <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
 
  {{-- Sélecteur de Rôle --}}
@@ -49,7 +93,7 @@
  🎭 Rôle à configurer
  </label>
  <select wire:model.live="selectedRoleId"
- class="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 ">
+class="block w-full rounded-xl border-gray-200 shadow-sm focus:border-gray-400 focus:ring-gray-200">
  <option value="">-- Sélectionner un rôle --</option>
  @foreach($availableRoles as $role)
  <option value="{{ $role->id }}">
@@ -84,7 +128,7 @@
  🧭 Contexte des rôles
  </label>
  <select wire:model.live="organizationContext"
- class="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 ">
+class="block w-full rounded-xl border-gray-200 shadow-sm focus:border-gray-400 focus:ring-gray-200">
  <option value="organization">Organisation</option>
  <option value="global">Rôles globaux</option>
  <option value="all">Toutes les organisations</option>
@@ -100,7 +144,7 @@
  🏢 Organisation
  </label>
  <select wire:model.live="selectedOrganizationId"
- class="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 ">
+class="block w-full rounded-xl border-gray-200 shadow-sm focus:border-gray-400 focus:ring-gray-200">
  @foreach($availableOrganizations as $org)
  <option value="{{ $org->id }}">
  {{ $org->name }}{{ $org->legal_name ? ' · ' . $org->legal_name : '' }}
@@ -122,7 +166,7 @@
  placeholder="Rechercher une permission..."
  wire:loading.attr="aria-busy"
  wire:target="search"
- class="pl-10 pr-4 py-2.5 block w-full bg-white border border-gray-300 rounded-lg shadow-sm hover:border-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm">
+ class="pl-10 pr-4 py-2.5 block w-full bg-white border border-gray-200 rounded-xl shadow-sm hover:border-gray-300 focus:ring-2 focus:ring-gray-200 focus:border-gray-400 text-sm">
  <div wire:loading.delay wire:target="search" class="absolute inset-y-0 right-0 pr-3 flex items-center">
  <x-iconify icon="lucide:loader-2" class="w-4 h-4 text-blue-500 animate-spin" />
  </div>
@@ -140,7 +184,7 @@
  📦 Filtrer par ressource
  </label>
  <select wire:model.live="filterByResource"
- class="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 ">
+ class="block w-full rounded-xl border-gray-200 shadow-sm focus:border-gray-400 focus:ring-gray-200">
  <option value="">Toutes les ressources</option>
  @foreach($resources as $resource)
  <option value="{{ $resource }}">{{ $this->formatResourceName($resource) }}</option>
@@ -154,7 +198,7 @@
  ⚡ Filtrer par action
  </label>
  <select wire:model.live="filterByAction"
- class="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 ">
+ class="block w-full rounded-xl border-gray-200 shadow-sm focus:border-gray-400 focus:ring-gray-200">
  <option value="">Toutes les actions</option>
  @foreach($actions as $action)
  <option value="{{ $action }}">{{ $this->formatActionName($action) }}</option>
@@ -208,52 +252,68 @@
  </div>
  @else
  {{-- Matrice par ressource --}}
- <div class="space-y-6">
+ <div class="{{ $compactMode ? 'space-y-4' : 'space-y-6' }}">
  @forelse($groupedPermissions as $resource => $permissions)
- <div class="bg-white rounded-lg shadow-lg overflow-hidden"
- x-data="{ expanded: true }">
+ @php
+  $assignedCount = $permissions->whereIn('id', $rolePermissions)->count();
+  $totalCount = $permissions->count();
+  $coverage = $totalCount > 0 ? (int) round(($assignedCount / $totalCount) * 100) : 0;
+ @endphp
+
+ <div class="rounded-2xl border border-gray-200 bg-white shadow-sm overflow-hidden"
+ wire:key="resource-card-{{ $resource }}">
 
  {{-- En-tête de la ressource --}}
- <div class="bg-gradient-to-r from-blue-600 to-blue-500 px-6 py-4">
- <div class="flex items-center justify-between">
- <div class="flex items-center space-x-3">
- <button @click="expanded = !expanded"
- class="text-white hover:text-blue-100 transition-transform"
- :class="{ 'rotate-180': !expanded }">
- <svg class="w-6 h-6 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+ <div class="{{ $compactMode ? 'bg-[#e3e7ee] border-b border-[#d5dbe5] px-4 py-3' : 'bg-[#e3e7ee] border-b border-[#d5dbe5] px-6 py-4' }}">
+ <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+ <div class="flex items-center gap-4">
+ <span class="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-gray-300 bg-white text-gray-700">
+ <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
  </svg>
- </button>
-
- <h3 class="text-xl font-bold text-white flex items-center">
- {{ $this->formatResourceName($resource) }}
- <span class="ml-3 px-3 py-1 bg-white/20 rounded-full text-sm">
- {{ $permissions->whereIn('id', $rolePermissions)->count() }} / {{ $permissions->count() }}
  </span>
+
+ <div>
+ <p class="text-[11px] uppercase tracking-[0.2em] text-gray-500">Ressource</p>
+ <h3 class="{{ $compactMode ? 'text-base font-semibold text-gray-900' : 'text-lg font-semibold text-gray-900' }}">
+ {{ $this->formatResourceName($resource) }}
  </h3>
  </div>
+ </div>
 
- <div class="flex items-center space-x-2">
+ <div class="flex flex-wrap items-center gap-4 text-gray-800">
+ <div class="flex items-center gap-3 rounded-xl border border-gray-200 bg-white px-3 py-2">
+ <div>
+ <p class="text-xs text-gray-500">Assignées</p>
+ <p class="text-lg font-semibold text-gray-900">{{ $assignedCount }} / {{ $totalCount }}</p>
+ </div>
+ <div class="h-8 w-px bg-gray-200"></div>
+ <div>
+ <p class="text-xs text-gray-500">Couverture</p>
+ <p class="text-lg font-semibold text-gray-900">{{ $coverage }}%</p>
+ </div>
+ </div>
+
+ <div class="flex items-center gap-2">
  <button wire:click="selectAllForResource('{{ $resource }}')"
- class="px-4 py-2 bg-white/20 hover:bg-white/30 text-white rounded-md text-sm font-medium transition-colors">
- ✅ Tout sélectionner
+ class="inline-flex items-center gap-2 rounded-xl border border-blue-200 bg-blue-50 px-3 py-2 text-xs font-semibold uppercase tracking-wide text-blue-700 hover:bg-blue-100 transition-colors">
+ <span class="inline-flex h-2 w-2 rounded-full bg-blue-400"></span>
+ Tout sélectionner
  </button>
  <button wire:click="deselectAllForResource('{{ $resource }}')"
- class="px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-md text-sm font-medium transition-colors">
- ❌ Tout désélectionner
+ class="inline-flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-3 py-2 text-xs font-semibold uppercase tracking-wide text-gray-600 hover:bg-gray-50 transition-colors">
+ <span class="inline-flex h-2 w-2 rounded-full bg-gray-400"></span>
+ Tout désélectionner
  </button>
+ </div>
  </div>
  </div>
  </div>
 
  {{-- Grille des permissions --}}
- <div x-show="expanded"
- x-transition:enter="transition ease-out duration-200"
- x-transition:enter-start="opacity-0 transform scale-95"
- x-transition:enter-end="opacity-100 transform scale-100"
- class="p-6">
+ <div class="{{ $compactMode ? 'bg-gray-50/80 p-4' : 'bg-gray-50/70 p-6' }}">
 
- <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+ <div class="grid {{ $compactMode ? 'grid-cols-1 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3' : 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4' }}">
  @foreach($permissions as $permission)
  @php
  $isAssigned = in_array($permission['id'], $rolePermissions);
@@ -261,29 +321,36 @@
 
  <div wire:key="permission-{{ $permission['id'] }}"
  class="relative group">
- <label class="flex items-center p-4 border-2 rounded-lg cursor-pointer transition-all
+ <label class="flex items-start gap-3 {{ $compactMode ? 'p-3 rounded-xl' : 'p-4 rounded-2xl' }} border cursor-pointer transition-all shadow-sm hover:shadow-md
  {{ $isAssigned
- ? 'border-green-500 bg-green-50 /20'
- : 'border-gray-200 bg-white hover:border-blue-300 hover:bg-blue-50 :bg-blue-900/10' }}">
+ ? 'border-blue-200 bg-blue-50/70'
+ : 'border-gray-200 bg-white hover:border-gray-300 hover:bg-gray-50/70' }}">
 
  <input type="checkbox"
  wire:click="togglePermission({{ $permission['id'] }})"
  {{ $isAssigned ? 'checked' : '' }}
- class="h-5 w-5 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+ class="mt-1 h-5 w-5 text-gray-900 focus:ring-gray-200 border-gray-300 rounded-lg">
 
- <div class="ml-3 flex-1">
- <p class="text-sm font-semibold {{ $isAssigned ? 'text-green-900 ' : 'text-gray-900 ' }}">
+ <div class="flex-1">
+ <p class="{{ $compactMode ? 'text-xs' : 'text-sm' }} font-semibold {{ $isAssigned ? 'text-blue-900' : 'text-gray-900' }}">
+ {{ $permission['display_name'] }}
+ </p>
+ <div class="{{ $compactMode ? 'mt-1' : 'mt-2' }} flex flex-wrap items-center gap-2 text-[11px] text-gray-500">
+ <span class="inline-flex items-center rounded-full bg-white px-2 py-0.5 text-gray-600 border border-gray-200">
+ {{ $permission['display_resource'] }}
+ </span>
+ <span class="inline-flex items-center rounded-full bg-white px-2 py-0.5 text-gray-600 border border-gray-200">
  {{ $permission['display_action'] }}
- </p>
- <p class="text-xs text-gray-500 mt-0.5">
- {{ $permission['name'] }}
- </p>
+ </span>
+ </div>
  </div>
 
  @if($isAssigned)
- <svg class="w-5 h-5 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+ <span class="ml-auto inline-flex h-8 w-8 items-center justify-center rounded-full bg-blue-500/10 text-blue-600">
+ <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
  </svg>
+ </span>
  @endif
  </label>
  </div>
@@ -308,12 +375,7 @@
 
  {{-- 💾 BARRE D'ACTIONS FLOTTANTE --}}
  @if($hasPendingChanges)
- <div class="fixed bottom-8 left-1/2 transform -translate-x-1/2 z-50"
- x-data="{ show: true }"
- x-show="show"
- x-transition:enter="transition ease-out duration-300"
- x-transition:enter-start="opacity-0 transform translate-y-4"
- x-transition:enter-end="opacity-100 transform translate-y-0">
+ <div class="fixed bottom-8 left-1/2 transform -translate-x-1/2 z-50">
 
  <div class="bg-gradient-to-r from-blue-600 to-blue-500 rounded-lg shadow-2xl p-6 flex items-center space-x-6">
  <div class="flex items-center text-white">
@@ -328,11 +390,11 @@
 
  <div class="flex items-center space-x-3">
  <button wire:click="cancel"
- class="px-6 py-3 bg-white/20 hover:bg-white/30 text-white rounded-lg font-semibold transition-colors">
+ class="inline-flex items-center justify-center rounded-xl border border-white/40 bg-white/20 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-white/30">
  ❌ Annuler
  </button>
  <button wire:click="save"
- class="px-8 py-3 bg-white text-blue-600 hover:bg-blue-50 rounded-lg font-bold shadow-lg transition-all transform hover:scale-105">
+ class="inline-flex items-center justify-center rounded-xl border border-white bg-white px-6 py-2.5 text-sm font-semibold text-blue-700 shadow-lg transition-colors hover:bg-blue-50">
  ✅ Enregistrer
  </button>
  </div>
@@ -343,7 +405,7 @@
  @if(auth()->user()->hasRole('Super Admin') && $selectedRole)
  <div class="fixed bottom-8 right-8 z-40">
  <button wire:click="confirmApplyToAllOrganizations"
- class="px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-semibold shadow-lg transition-all">
+ class="{{ $buttonPrimary }} shadow-lg">
  📌 Appliquer à toutes les organisations
  </button>
  </div>
@@ -353,16 +415,11 @@
  {{-- 🔐 MODAL CONFIRMATION APPLICATION GLOBALE --}}
  @if($showApplyAllModal && $selectedRole)
  <div class="fixed inset-0 bg-gray-900/40 backdrop-blur-sm flex items-center justify-center z-50"
- x-data="{ show: true }"
- x-show="show"
- x-transition:enter="transition ease-out duration-300"
- x-transition:enter-start="opacity-0"
- x-transition:enter-end="opacity-100"
- @click.self="$wire.set('showApplyAllModal', false)">
+ wire:click.self="$set('showApplyAllModal', false)">
 
  <div class="bg-white rounded-xl shadow-2xl max-w-xl w-full mx-4 overflow-hidden"
  @click.stop>
- <div class="bg-gradient-to-r from-emerald-600 to-emerald-500 px-6 py-4">
+ <div class="bg-gradient-to-r from-blue-600 to-blue-500 px-6 py-4">
  <h3 class="text-xl font-bold text-white">Appliquer les permissions à toutes les organisations</h3>
  </div>
 
@@ -380,11 +437,11 @@
 
  <div class="px-6 py-4 bg-gray-50 flex justify-end space-x-3">
  <button wire:click="$set('showApplyAllModal', false)"
- class="px-4 py-2 bg-white border border-gray-300 rounded-lg text-sm font-semibold text-gray-700 hover:bg-gray-100">
+ class="{{ $buttonNeutral }}">
  Annuler
  </button>
  <button wire:click="applyPermissionsToAllOrganizations"
- class="px-6 py-2 bg-emerald-600 text-white rounded-lg text-sm font-semibold hover:bg-emerald-700">
+ class="{{ $buttonPrimary }}">
  Confirmer l’application
  </button>
  </div>
@@ -395,12 +452,7 @@
  {{-- 📊 MODAL APERÇU --}}
  @if($showPreview && $selectedRole)
  <div class="fixed inset-0 bg-gray-900/40 backdrop-blur-sm flex items-center justify-center z-50"
- x-data="{ show: true }"
- x-show="show"
- x-transition:enter="transition ease-out duration-300"
- x-transition:enter-start="opacity-0"
- x-transition:enter-end="opacity-100"
- @click.self="$wire.set('showPreview', false)">
+ wire:click.self="$set('showPreview', false)">
 
  <div class="bg-white rounded-lg shadow-2xl max-w-4xl w-full mx-4 max-h-[80vh] overflow-hidden"
  @click.stop>
@@ -428,10 +480,10 @@
  </svg>
  <div class="flex-1">
  <p class="text-xs font-semibold text-green-900 ">
- {{ $perm['display_resource'] }}
+ {{ $perm['display_name'] ?? ($perm['display_action'] . ' ' . $perm['display_resource']) }}
  </p>
  <p class="text-xs text-green-700 ">
- {{ $perm['display_action'] }}
+ {{ $perm['display_resource'] }} • {{ $perm['display_action'] }}
  </p>
  </div>
  </div>
@@ -451,31 +503,4 @@
 
  </div>
 
- {{-- 🔔 Notifications Toast --}}
- <div x-data="{ notifications: [] }"
- @notification.window="
- const notification = $event.detail;
- notifications.push({ ...notification, id: Date.now() });
- setTimeout(() => notifications.shift(), 5000);
- "
- class="fixed top-4 right-4 z-50 space-y-2">
- <template x-for="notification in notifications" :key="notification.id">
- <div x-show="true"
- x-transition:enter="transition ease-out duration-300"
- x-transition:enter-start="opacity-0 transform translate-x-8"
- x-transition:enter-end="opacity-100 transform translate-x-0"
- x-transition:leave="transition ease-in duration-200"
- x-transition:leave-start="opacity-100"
- x-transition:leave-end="opacity-0"
- class="bg-white rounded-lg shadow-lg p-4 max-w-sm"
- :class="{
- 'border-l-4 border-green-500': notification.type === 'success',
- 'border-l-4 border-blue-500': notification.type === 'info',
- 'border-l-4 border-yellow-500': notification.type === 'warning',
- 'border-l-4 border-red-500': notification.type === 'error'
- }">
- <p class="text-sm font-medium text-gray-900 " x-text="notification.message"></p>
- </div>
- </template>
- </div>
 </div>

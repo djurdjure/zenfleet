@@ -3,9 +3,8 @@
 namespace App\Jobs;
 
 use App\Models\Assignment;
-use App\Models\Driver;
-use App\Models\Vehicle;
 use App\Events\AssignmentActivated;
+use App\Services\AssignmentPresenceService;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -52,13 +51,11 @@ class ProcessScheduledAssignments implements ShouldQueue, ShouldBeUnique
                 // 1. Mettre à jour le statut de l'affectation
                 $assignment->update(['status' => Assignment::STATUS_ACTIVE]);
 
-                // 2. Mettre à jour le statut du véhicule
-                $this->updateVehicleStatus($assignment->vehicle, $assignment->driver_id);
+                // 2. Synchroniser la présence (source de vérité = assignments)
+                $presence = app(AssignmentPresenceService::class);
+                $presence->syncForAssignment($assignment, now());
 
-                // 3. Mettre à jour le statut du chauffeur
-                $this->updateDriverStatus($assignment->driver, $assignment->vehicle_id);
-
-                // 4. Déclencher l'événement
+                // 3. Déclencher l'événement
                 event(new AssignmentActivated($assignment, 'automatic', null, [
                     'reason' => 'scheduled_start_reached',
                     'processed_by' => 'ProcessScheduledAssignments'
@@ -69,45 +66,5 @@ class ProcessScheduledAssignments implements ShouldQueue, ShouldBeUnique
         }
 
         Log::info('[ProcessScheduledAssignments] Synchronisation terminée', ['activated_count' => $count]);
-    }
-
-    /**
-     * Met à jour le statut du véhicule à "assigned" (En mission).
-     */
-    private function updateVehicleStatus(Vehicle $vehicle, int $driverId): void
-    {
-        $statusSync = app(\App\Services\ResourceStatusSynchronizer::class);
-        $assignedStatusId = $statusSync->resolveVehicleStatusIdForAssigned($vehicle->organization_id);
-
-        $update = [
-            'is_available' => false,
-            'assignment_status' => 'assigned',
-            'current_driver_id' => $driverId, // Lien direct pour cohérence immédiate
-        ];
-        if ($assignedStatusId) {
-            $update['status_id'] = $assignedStatusId;
-        }
-
-        $vehicle->update($update);
-    }
-
-    /**
-     * Met à jour le statut du chauffeur à "assigned" (En mission).
-     */
-    private function updateDriverStatus(Driver $driver, int $vehicleId): void
-    {
-        $statusSync = app(\App\Services\ResourceStatusSynchronizer::class);
-        $assignedStatusId = $statusSync->resolveDriverStatusIdForAssigned($driver->organization_id);
-
-        $update = [
-            'is_available' => false,
-            'assignment_status' => 'assigned',
-            'current_vehicle_id' => $vehicleId, // Lien direct pour cohérence immédiate
-        ];
-        if ($assignedStatusId) {
-            $update['status_id'] = $assignedStatusId;
-        }
-
-        $driver->update($update);
     }
 }

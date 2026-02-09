@@ -13,7 +13,15 @@
 ])
 
 @php
+$baseKey = preg_replace('/\[\]$/', '', $name);
+$lookupKey = trim(preg_replace('/\[(.*?)\]/', '.$1', $baseKey), '.');
+$resolvedError = $error ?: ((isset($errors) && $lookupKey !== '') ? ($errors->first($lookupKey) ?: $errors->first($lookupKey . '.0')) : null);
+$htmlName = $multiple && !str_ends_with($name, '[]') ? $name . '[]' : $name;
 $selectId = 'slimselect-' . $name . '-' . uniqid();
+$selectedValues = old($lookupKey !== '' ? $lookupKey : $name, $selected);
+if (!is_array($selectedValues)) {
+    $selectedValues = ($selectedValues === null || $selectedValues === '') ? [] : [$selectedValues];
+}
 @endphp
 
 <div wire:ignore
@@ -42,7 +50,7 @@ $selectId = 'slimselect-' . $name . '-' . uniqid();
         }
     }"
     x-init="initSelect()"
-    {{ $attributes->merge(['class' => '']) }}>
+    {{ $attributes->merge(['class' => $resolvedError ? 'slimselect-error' : '']) }}>
 
     @if($label)
     <label for="{{ $selectId }}" class="block mb-2 text-sm font-medium text-gray-900">
@@ -55,9 +63,11 @@ $selectId = 'slimselect-' . $name . '-' . uniqid();
 
     <select
         x-ref="select"
-        name="{{ $name }}"
+        name="{{ $htmlName }}"
         id="{{ $selectId }}"
         class="slimselect-field w-full"
+        aria-invalid="{{ $resolvedError ? 'true' : 'false' }}"
+        @if($required) required @endif
         @if($disabled) disabled @endif
         @if($multiple) multiple @endif
         {{ $attributes->except(['class']) }}>
@@ -71,19 +81,24 @@ $selectId = 'slimselect-' . $name . '-' . uniqid();
         @endif
 
         @foreach($options as $value => $optionLabel)
+        @php
+        $isSelected = $multiple
+            ? in_array((string) $value, array_map('strval', $selectedValues), true)
+            : ((string) old($lookupKey !== '' ? $lookupKey : $name, $selected) === (string) $value);
+        @endphp
         <option
             value="{{ $value }}"
-            {{ (is_array($selected) ? in_array($value, $selected) : old($name, $selected) == $value) ? 'selected' : '' }}>
+            {{ $isSelected ? 'selected' : '' }}>
             {{ $optionLabel }}
         </option>
         @endforeach
         @endif
     </select>
 
-    @if($error)
+    @if($resolvedError)
     <p class="mt-2 text-sm text-red-600 flex items-start">
         <x-iconify icon="lucide:circle-alert" class="w-4 h-4 mr-1.5 mt-0.5 flex-shrink-0" />
-        <span>{{ $error }}</span>
+        <span>{{ $resolvedError }}</span>
     </p>
     @elseif($helpText)
     <p class="mt-2 text-sm text-gray-500">

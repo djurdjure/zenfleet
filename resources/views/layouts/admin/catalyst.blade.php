@@ -294,6 +294,7 @@
 
             <main class="py-10">
                 <div class="px-4 sm:px-6 lg:px-8">
+                    <x-form-error-summary />
                     @yield('content')
                 </div>
             </main>
@@ -475,6 +476,7 @@
  ==================================================================== --}}
     <div x-data="toastManager()"
         @toast.window="showToast($event.detail)"
+        @notification.window="showToast(Array.isArray($event.detail) ? ($event.detail[0] || {}) : $event.detail)"
         class="fixed top-4 right-4 z-50 space-y-2"
         style="pointer-events: none;">
         <template x-for="(toast, index) in toasts" :key="toast.id">
@@ -553,8 +555,7 @@
                     </div>
                 </div>
             </div>
-    </div>
-    </template>
+        </template>
     </div>
 
     <script>

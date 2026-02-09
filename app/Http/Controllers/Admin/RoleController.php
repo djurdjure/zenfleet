@@ -69,48 +69,9 @@ class RoleController extends Controller
      */
     public function edit(Role $role): View
     {
-        // Récupère toutes les permissions disponibles
-        $allPermissions = Permission::orderBy('name')->get();
-        $allPermissions = $this->filterLegacyPermissions($allPermissions);
-
-        // Grouper les permissions par Ressource (et non par action)
-        $permissionsByCategory = $allPermissions->groupBy(function ($permission) {
-            $name = $permission->name;
-            if (str_contains($name, 'organization')) return 'organizations';
-            if (str_contains($name, 'user')) return 'users';
-            if (str_contains($name, 'role')) return 'roles';
-            if (str_contains($name, 'vehicle')) return 'vehicles';
-            if (str_contains($name, 'driver') && !str_contains($name, 'sanction')) return 'drivers';
-            if (str_contains($name, 'assignment')) return 'assignments';
-            if (str_contains($name, 'maintenance')) return 'maintenance';
-            if (str_contains($name, 'repair')) return 'repairs';
-            if (str_contains($name, 'mileage')) return 'mileage';
-            if (str_contains($name, 'supplier')) return 'suppliers';
-            if (str_contains($name, 'expense')) return 'expenses';
-            if (str_contains($name, 'document')) return 'documents';
-            if (str_contains($name, 'alert')) return 'alerts';
-            if (str_contains($name, 'audit')) return 'audit';
-            if (str_contains($name, 'sanction')) return 'sanctions';
-            if (str_contains($name, 'depot')) return 'depots';
-            if (str_contains($name, 'report') || str_contains($name, 'analytics')) return 'reports';
-            
-            return 'autres';
-        });
-
-        // Ordre des catégories pour affichage logique
-        $categoryOrder = [
-            'organizations', 'users', 'roles', 
-            'vehicles', 'drivers', 'assignments', 'depots',
-            'maintenance', 'repairs', 'mileage', 
-            'suppliers', 'expenses', 'documents', 
-            'alerts', 'sanctions', 'reports', 'audit', 'autres'
-        ];
-        
-        $orderedCategories = collect($categoryOrder)->mapWithKeys(function ($category) use ($permissionsByCategory) {
-            return [$category => $permissionsByCategory->get($category, collect())];
-        })->filter(fn($perms) => $perms->isNotEmpty());
-
-        return view('admin.roles.edit', compact('role', 'allPermissions', 'orderedCategories'));
+        return view('admin.roles.permissions', [
+            'roleId' => $role->id,
+        ]);
     }
 
     /**
@@ -149,21 +110,6 @@ class RoleController extends Controller
     public function permissions(): View
     {
         return view('admin.roles.permissions');
-    }
-
-    private function filterLegacyPermissions($permissions)
-    {
-        $allNames = $permissions->pluck('name');
-
-        return $permissions->filter(function ($permission) use ($allNames) {
-            if (!PermissionAliases::isLegacy($permission->name)) {
-                return true;
-            }
-
-            $canonical = PermissionAliases::canonicalFor($permission->name);
-
-            return !$canonical || !$allNames->contains($canonical);
-        })->values();
     }
 
     private function resolvePermissionsForRole(Role $role, array $permissionNames)

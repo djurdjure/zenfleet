@@ -238,66 +238,29 @@ class HealZombieAssignments extends Command
                     "🧟 Affectation zombie corrigée automatiquement par heal-zombies command."
             ]);
 
-            // 2. Libérer le véhicule si nécessaire
-            if ($zombie->vehicle) {
-                $vehicle = $zombie->vehicle;
+            // 2. Synchroniser la présence des ressources
+            $vehicleBefore = $zombie->vehicle?->is_available;
+            $driverBefore = $zombie->driver?->is_available;
 
-                // Vérifier qu'aucune autre affectation active n'existe
-                $hasOtherActiveAssignment = Assignment::where('vehicle_id', $vehicle->id)
-                    ->where('id', '!=', $zombie->id)
-                    ->whereIn('status', [Assignment::STATUS_ACTIVE, Assignment::STATUS_SCHEDULED])
-                    ->where(function ($q) {
-                        $q->whereNull('end_datetime')
-                          ->orWhere('end_datetime', '>', now());
-                    })
-                    ->exists();
+            $presence = app(\App\Services\AssignmentPresenceService::class);
+            $presence->syncForAssignment($zombie, now(), $zombie->end_datetime ?? now());
 
-                if (!$hasOtherActiveAssignment) {
-                    $vehicle->update([
-                        'is_available' => true,
-                        'current_driver_id' => null,
-                        'assignment_status' => 'available',
-                        'last_assignment_end' => $zombie->end_datetime
-                    ]);
-
-                    $resourcesReleased++;
-
-                    Log::info('[HealZombieAssignments] 🚗 Véhicule libéré', [
-                        'vehicle_id' => $vehicle->id,
-                        'registration' => $vehicle->registration_plate
-                    ]);
-                }
+            $vehicleFresh = $zombie->vehicle?->fresh();
+            if ($vehicleFresh && !$vehicleBefore && $vehicleFresh->is_available && $vehicleFresh->assignment_status === 'available') {
+                $resourcesReleased++;
+                Log::info('[HealZombieAssignments] 🚗 Véhicule libéré', [
+                    'vehicle_id' => $vehicleFresh->id,
+                    'registration' => $vehicleFresh->registration_plate
+                ]);
             }
 
-            // 3. Libérer le chauffeur si nécessaire
-            if ($zombie->driver) {
-                $driver = $zombie->driver;
-
-                // Vérifier qu'aucune autre affectation active n'existe
-                $hasOtherActiveAssignment = Assignment::where('driver_id', $driver->id)
-                    ->where('id', '!=', $zombie->id)
-                    ->whereIn('status', [Assignment::STATUS_ACTIVE, Assignment::STATUS_SCHEDULED])
-                    ->where(function ($q) {
-                        $q->whereNull('end_datetime')
-                          ->orWhere('end_datetime', '>', now());
-                    })
-                    ->exists();
-
-                if (!$hasOtherActiveAssignment) {
-                    $driver->update([
-                        'is_available' => true,
-                        'current_vehicle_id' => null,
-                        'assignment_status' => 'available',
-                        'last_assignment_end' => $zombie->end_datetime
-                    ]);
-
-                    $resourcesReleased++;
-
-                    Log::info('[HealZombieAssignments] 👤 Chauffeur libéré', [
-                        'driver_id' => $driver->id,
-                        'name' => $driver->full_name
-                    ]);
-                }
+            $driverFresh = $zombie->driver?->fresh();
+            if ($driverFresh && !$driverBefore && $driverFresh->is_available && $driverFresh->assignment_status === 'available') {
+                $resourcesReleased++;
+                Log::info('[HealZombieAssignments] 👤 Chauffeur libéré', [
+                    'driver_id' => $driverFresh->id,
+                    'name' => $driverFresh->full_name
+                ]);
             }
 
             Log::info('[HealZombieAssignments] ✅ Zombie corrigé', [

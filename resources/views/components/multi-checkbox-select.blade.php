@@ -11,10 +11,13 @@
 ])
 
 @php
+$baseKey = preg_replace('/\[\]$/', '', $name);
+$lookupKey = trim(preg_replace('/\[(.*?)\]/', '.$1', $baseKey), '.');
+$resolvedError = $error ?: ((isset($errors) && $lookupKey !== '') ? ($errors->first($lookupKey) ?: $errors->first($lookupKey . '.0')) : null);
 $fieldId = 'multi-select-' . $name . '-' . uniqid();
 
 // Logique de pré-sélection : Priorité à old() > $selected
-$oldValues = old($name);
+$oldValues = old($lookupKey !== '' ? $lookupKey : $name);
 
 if (!is_null($oldValues)) {
 // Si des valeurs 'old' existent (retour de validation), on les utilise
@@ -72,8 +75,9 @@ $optionKeys = array_keys($options);
         @click="open = !open"
         :aria-expanded="open"
         aria-haspopup="true"
-        class="w-full bg-gray-50 border border-gray-300 text-gray-900 rounded-lg shadow-sm px-4 py-2.5 text-left cursor-default focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition duration-150 ease-in-out"
-        :class="{ 'border-red-500 focus:ring-red-500 focus:border-red-500': '{{ $error }}' }">
+        class="w-full bg-gray-50 border text-gray-900 rounded-lg shadow-sm px-4 py-2.5 text-left cursor-default focus:outline-none focus:ring-2 sm:text-sm transition duration-150 ease-in-out {{ $resolvedError ? 'border-red-500 bg-red-50 focus:ring-red-500 focus:border-red-500' : 'border-gray-300 focus:ring-blue-500 focus:border-blue-500' }}"
+        x-bind:class="(typeof fieldErrors !== 'undefined' && fieldErrors && fieldErrors['{{ $lookupKey !== '' ? $lookupKey : $name }}']) ? 'border-red-500 bg-red-50 focus:ring-red-500 focus:border-red-500' : ''"
+        aria-invalid="{{ $resolvedError ? 'true' : 'false' }}">
         <span x-text="selectedLabels" class="block truncate" :class="{ 'text-gray-500': selected.length === 0 }"></span>
         <span class="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
             <svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
@@ -128,10 +132,10 @@ $optionKeys = array_keys($options);
     La soumission est maintenant gérée par les checkboxes cachées avec name="{{ $name }}[]", 
     ce qui assure que le serveur reçoit un tableau comme requis par la validation. -->
 
-    @if($error)
+    @if($resolvedError)
     <p class="mt-2 text-sm text-red-600 flex items-start">
         <x-iconify icon="lucide:circle-alert" class="w-4 h-4 mr-1.5 mt-0.5 flex-shrink-0" />
-        <span>{{ $error }}</span>
+        <span>{{ $resolvedError }}</span>
     </p>
     @elseif($helpText)
     <p class="mt-2 text-sm text-gray-500">
@@ -140,13 +144,13 @@ $optionKeys = array_keys($options);
     @endif
 
     {{-- Erreur dynamique Alpine.js --}}
-    <p x-show="fieldErrors && fieldErrors['{{ $name }}'] && touchedFields && touchedFields['{{ $name }}']"
+    <p x-show="fieldErrors && fieldErrors['{{ $lookupKey !== '' ? $lookupKey : $name }}'] && touchedFields && touchedFields['{{ $lookupKey !== '' ? $lookupKey : $name }}']"
         x-transition:enter="transition ease-out duration-200"
         x-transition:enter-start="opacity-0 transform -translate-y-1"
         x-transition:enter-end="opacity-100 transform translate-y-0"
         class="mt-2 text-sm text-red-600 flex items-start font-medium"
         style="display: none;">
         <x-iconify icon="lucide:circle-alert" class="w-4 h-4 mr-1.5 mt-0.5 flex-shrink-0" />
-        <span x-text="fieldErrors['{{ $name }}']"></span>
+        <span x-text="fieldErrors['{{ $lookupKey !== '' ? $lookupKey : $name }}']"></span>
     </p>
 </div>

@@ -14,33 +14,36 @@
 ])
 
 @php
+$baseKey = preg_replace('/\[\]$/', '', $name);
+$lookupKey = trim(preg_replace('/\[(.*?)\]/', '.$1', $baseKey), '.');
+$resolvedError = $error ?: ((isset($errors) && $lookupKey !== '') ? ($errors->first($lookupKey) ?: $errors->first($lookupKey . '.0')) : null);
 // Générer un ID unique pour le composant
 $inputId = 'datepicker-' . uniqid();
 
 // Définir la valeur par défaut
-if (!$value && $defaultToday && !old($name)) {
+if (!$value && $defaultToday && !old($lookupKey !== '' ? $lookupKey : $name)) {
 $value = date('d/m/Y'); // Format français par défaut
 }
 
 // Classes conditionnelles pour erreur (fond rouge clair et bordure)
-$inputClasses = $error
+$inputClasses = $resolvedError
 ? 'datepicker-input !bg-red-50 border-2 border-red-500 text-gray-900 text-sm rounded-xl focus:ring-2 focus:ring-red-500 focus:border-red-500 block w-full pl-11 p-3 transition-all duration-200 placeholder-red-400'
 : 'datepicker-input !bg-white border border-gray-200 text-gray-900 text-sm rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 hover:border-gray-300 block w-full pl-11 p-3 transition-all duration-200';
 
 // Classes pour l'icône
-$iconClasses = $error
+$iconClasses = $resolvedError
 ? 'text-red-500 animate-pulse'
 : 'text-gray-400 group-hover:text-blue-600 transition-colors duration-200';
 
 // Classes pour le conteneur
-$containerClasses = $error
+$containerClasses = $resolvedError
 ? 'relative group error-state'
 : 'relative group';
 @endphp
 
 <div {{ $attributes->merge(['class' => '']) }}>
     @if($label)
-    <label for="{{ $inputId }}" class="block mb-2 text-sm font-semibold {{ $error ? 'text-red-700' : 'text-gray-700' }}">
+    <label for="{{ $inputId }}" class="block mb-2 text-sm font-semibold {{ $resolvedError ? 'text-red-700' : 'text-gray-700' }}">
         {{ $label }}
         @if($required)
         <span class="text-red-500 ml-0.5">*</span>
@@ -61,7 +64,8 @@ $containerClasses = $error
             id="{{ $inputId }}"
             class="{{ $inputClasses }}"
             placeholder="{{ $placeholder }}"
-            value="{{ old($name, $value) }}"
+            value="{{ old($lookupKey !== '' ? $lookupKey : $name, $value) }}"
+            aria-invalid="{{ $resolvedError ? 'true' : 'false' }}"
             @if($required) required @endif
             @if($disabled) disabled @endif
             @if($minDate) data-min-date="{{ $minDate }}" @endif
@@ -89,11 +93,11 @@ $containerClasses = $error
     </div>
 
     {{-- Messages d'erreur ou d'aide --}}
-    @if($error)
+    @if($resolvedError)
     <div class="mt-2 flex items-start animate-fadeIn">
         <x-iconify icon="lucide:alert-circle" class="w-4 h-4 text-red-600 mr-1.5 mt-0.5 flex-shrink-0" />
         <div>
-            <p class="text-sm text-red-600 font-medium">{{ $error }}</p>
+            <p class="text-sm text-red-600 font-medium">{{ $resolvedError }}</p>
             <p class="text-xs text-red-500 mt-0.5">Format attendu: JJ/MM/AAAA</p>
         </div>
     </div>

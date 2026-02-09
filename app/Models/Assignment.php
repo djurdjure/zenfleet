@@ -524,7 +524,7 @@ class Assignment extends Model
      * 1. Transaction ACID garantie avec rollback automatique
      * 2. Vérification intelligente des autres affectations actives
      * 3. Libération conditionnelle des ressources (évite les conflits multi-affectations)
-     * 4. Synchronisation automatique des status_id
+     * 4. Synchronisation automatique de la présence (assignment_status/is_available)
      * 5. Gestion complète des événements et audit trail
      * 6. Support avancé du kilométrage et des notes
      * 7. Détection et prévention des zombies

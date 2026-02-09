@@ -12,8 +12,11 @@
 ])
 
 @php
+$baseKey = preg_replace('/\[\]$/', '', $name);
+$lookupKey = trim(preg_replace('/\[(.*?)\]/', '.$1', $baseKey), '.');
+$resolvedError = $error ?: ((isset($errors) && $lookupKey !== '') ? ($errors->first($lookupKey) ?: $errors->first($lookupKey . '.0')) : null);
 $inputId = 'datepicker-' . uniqid();
-$rawValue = old($name, $value);
+$rawValue = old($lookupKey !== '' ? $lookupKey : $name, $value);
 
 // Convert server value to display format (d/m/Y) for Flowbite
 $displayValue = '';
@@ -56,7 +59,7 @@ $maxDateFormatted = $maxDateObj ? $maxDateObj->format('d/m/Y') : '';
 
 // Input classes following Flowbite pattern
 $inputClasses = 'block w-full !pl-10 p-2.5 bg-gray-50 border-2 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 transition-all duration-200';
-$inputClasses .= $error ? ' border-red-500' : ' border-gray-300';
+$inputClasses .= $resolvedError ? ' border-red-500' : ' border-gray-300';
 @endphp
 
 <div
@@ -79,7 +82,7 @@ $inputClasses .= $error ? ' border-red-500' : ' border-gray-300';
     <div class="relative">
         {{-- Calendar Icon --}}
         <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-            <svg class="w-5 h-5 {{ $error ? 'text-red-500' : 'text-gray-400' }}" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+            <svg class="w-5 h-5 {{ $resolvedError ? 'text-red-500' : 'text-gray-400' }}" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
                 <path d="M20 4a2 2 0 0 0-2-2h-2V1a1 1 0 0 0-2 0v1h-3V1a1 1 0 0 0-2 0v1H6V1a1 1 0 0 0-2 0v1H2a2 2 0 0 0-2 2v2h20V4ZM0 18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8H0v10Zm5-8h10a1 1 0 0 1 0 2H5a1 1 0 0 1 0-2Z" />
             </svg>
         </div>
@@ -92,6 +95,7 @@ $inputClasses .= $error ? ' border-red-500' : ' border-gray-300';
             class="{{ $inputClasses }}"
             placeholder="{{ $placeholder }}"
             x-model="displayValue"
+            aria-invalid="{{ $resolvedError ? 'true' : 'false' }}"
             @if($disabled) disabled @endif
             @if($required) required @endif
             autocomplete="off"
@@ -105,12 +109,12 @@ $inputClasses .= $error ? ' border-red-500' : ' border-gray-300';
             value="{{ $rawValue }}">
     </div>
 
-    @if($error)
+    @if($resolvedError)
     <p class="mt-2 text-sm text-red-600 flex items-center gap-1">
         <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
             <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
         </svg>
-        {{ $error }}
+        {{ $resolvedError }}
     </p>
     @elseif($helpText)
     <p class="mt-1 text-xs text-gray-500">{{ $helpText }}</p>

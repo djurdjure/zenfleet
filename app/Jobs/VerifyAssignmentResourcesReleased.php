@@ -3,7 +3,7 @@
 namespace App\Jobs;
 
 use App\Models\Assignment;
-use App\Services\ResourceStatusSynchronizer;
+use App\Services\AssignmentPresenceService;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -56,7 +56,7 @@ class VerifyAssignmentResourcesReleased implements ShouldQueue
     /**
      * Exécuter le job
      */
-    public function handle(ResourceStatusSynchronizer $sync): void
+    public function handle(AssignmentPresenceService $presence): void
     {
         Log::info('[VerifyRelease] 🔍 Vérification synchronisation post-terminaison', [
             'assignment_id' => $this->assignmentId,
@@ -83,6 +83,9 @@ class VerifyAssignmentResourcesReleased implements ShouldQueue
             return;
         }
 
+        // Synchroniser la présence (self-healing non destructif)
+        $presence->syncForAssignment($assignment, now(), $assignment->end_datetime ?? now());
+
         $issues = [];
 
         // ============================================
@@ -99,28 +102,20 @@ class VerifyAssignmentResourcesReleased implements ShouldQueue
 
             if (!$hasOtherAssignment) {
                 // Pas d'autre affectation, le véhicule DEVRAIT être disponible
-
-                // Vérifier status_id
-                $expectedStatusId = $sync->resolveVehicleStatusIdForAvailable($assignment->organization_id);
-
-                if ($expectedStatusId && $vehicle->status_id !== $expectedStatusId && $vehicle->is_available && $vehicle->assignment_status === 'available') {
-                    // Incohérence détectée : ressource marquée disponible mais status_id incorrect
-                    Log::warning('[VerifyRelease] 🔧 Véhicule status_id incohérent - correction en cours', [
+                if (!$vehicle->is_available || $vehicle->assignment_status !== 'available' || $vehicle->current_driver_id) {
+                    Log::warning('[VerifyRelease] 🔧 Véhicule présence incohérente - correction en cours', [
                         'vehicle_id' => $vehicle->id,
                         'registration_plate' => $vehicle->registration_plate,
-                        'current_status_id' => $vehicle->status_id,
-                        'expected_status_id' => $expectedStatusId,
                         'is_available' => $vehicle->is_available,
-                        'assignment_status' => $vehicle->assignment_status
+                        'assignment_status' => $vehicle->assignment_status,
+                        'current_driver_id' => $vehicle->current_driver_id
                     ]);
 
-                    // Corriger avec le synchroniseur
-                    $sync->syncVehicleStatus($vehicle);
-                    $issues[] = 'vehicle_status_id_fixed';
+                    $presence->syncVehicle($vehicle->id, now(), $assignment->end_datetime ?? now());
+                    $issues[] = 'vehicle_presence_fixed';
 
-                    Log::info('[VerifyRelease] ✅ Véhicule status_id corrigé', [
-                        'vehicle_id' => $vehicle->id,
-                        'new_status_id' => $vehicle->fresh()->status_id
+                    Log::info('[VerifyRelease] ✅ Véhicule présence corrigée', [
+                        'vehicle_id' => $vehicle->id
                     ]);
                 }
             }
@@ -140,28 +135,20 @@ class VerifyAssignmentResourcesReleased implements ShouldQueue
 
             if (!$hasOtherAssignment) {
                 // Pas d'autre affectation, le chauffeur DEVRAIT être disponible
-
-                // Vérifier status_id
-                $expectedStatusId = $sync->resolveDriverStatusIdForAvailable($assignment->organization_id);
-
-                if ($expectedStatusId && $driver->status_id !== $expectedStatusId && $driver->is_available && $driver->assignment_status === 'available') {
-                    // Incohérence détectée : ressource marquée disponible mais status_id incorrect
-                    Log::warning('[VerifyRelease] 🔧 Chauffeur status_id incohérent - correction en cours', [
+                if (!$driver->is_available || $driver->assignment_status !== 'available' || $driver->current_vehicle_id) {
+                    Log::warning('[VerifyRelease] 🔧 Chauffeur présence incohérente - correction en cours', [
                         'driver_id' => $driver->id,
                         'full_name' => $driver->full_name,
-                        'current_status_id' => $driver->status_id,
-                        'expected_status_id' => $expectedStatusId,
                         'is_available' => $driver->is_available,
-                        'assignment_status' => $driver->assignment_status
+                        'assignment_status' => $driver->assignment_status,
+                        'current_vehicle_id' => $driver->current_vehicle_id
                     ]);
 
-                    // Corriger avec le synchroniseur
-                    $sync->syncDriverStatus($driver);
-                    $issues[] = 'driver_status_id_fixed';
+                    $presence->syncDriver($driver->id, now(), $assignment->end_datetime ?? now());
+                    $issues[] = 'driver_presence_fixed';
 
-                    Log::info('[VerifyRelease] ✅ Chauffeur status_id corrigé', [
-                        'driver_id' => $driver->id,
-                        'new_status_id' => $driver->fresh()->status_id
+                    Log::info('[VerifyRelease] ✅ Chauffeur présence corrigée', [
+                        'driver_id' => $driver->id
                     ]);
                 }
             }

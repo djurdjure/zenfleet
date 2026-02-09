@@ -182,8 +182,9 @@ class ProcessExpiredAssignmentsEnhanced implements ShouldQueue, ShouldBeUnique
             $this->totalExpired++;
 
             // 2. Libérer les ressources si nécessaire (Utilisation du Trait ManagesResourceStatus)
-            $this->releaseResource($assignment->vehicle);
-            $this->releaseResource($assignment->driver);
+            $endTime = $assignment->end_datetime ?? now();
+            $this->releaseResource($assignment->vehicle, now(), $endTime);
+            $this->releaseResource($assignment->driver, now(), $endTime);
             $this->totalReleased++;
 
             // 3. Déclencher l'événement pour notifications et autres listeners

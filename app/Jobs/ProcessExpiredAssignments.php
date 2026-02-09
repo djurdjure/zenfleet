@@ -3,11 +3,10 @@
 namespace App\Jobs;
 
 use App\Models\Assignment;
-use App\Models\Vehicle;
-use App\Models\Driver;
 use App\Events\AssignmentEnded;
 use App\Events\VehicleStatusChanged;
 use App\Events\DriverStatusChanged;
+use App\Services\AssignmentPresenceService;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -180,34 +179,31 @@ class ProcessExpiredAssignments implements ShouldQueue
                     "Affectation terminée automatiquement à la date de fin planifiée."
             ]);
 
-            // 2. Libérer le véhicule
+            // 2. Synchroniser la présence (source de vérité = assignments)
+            $presence = app(AssignmentPresenceService::class);
+            $presence->syncForAssignment($assignment, now(), $assignment->end_datetime ?? now());
+
+            // 3. Événements de disponibilité si aucune autre affectation active
             if ($assignment->vehicle) {
-                $vehicle = $assignment->vehicle;
-                
-                // Vérifier qu'aucune autre affectation active n'existe pour ce véhicule
+                $vehicle = $assignment->vehicle->fresh();
                 $hasOtherActiveAssignment = Assignment::where('vehicle_id', $vehicle->id)
                     ->where('id', '!=', $assignment->id)
+                    ->where(function ($q) {
+                        $q->whereNull('status')->orWhere('status', '!=', Assignment::STATUS_CANCELLED);
+                    })
+                    ->where('start_datetime', '<=', now())
                     ->where(function ($q) {
                         $q->whereNull('end_datetime')
                           ->orWhere('end_datetime', '>', now());
                     })
-                    ->where('start_datetime', '<=', now())
                     ->whereNull('ended_at')
                     ->exists();
 
                 if (!$hasOtherActiveAssignment) {
-                    $vehicle->update([
-                        'is_available' => true,
-                        'current_driver_id' => null,
-                        'assignment_status' => 'available',
-                        'last_assignment_end' => $assignment->end_datetime
-                    ]);
-
                     Log::info("🚗 Véhicule #{$vehicle->id} libéré automatiquement", [
                         'registration' => $vehicle->registration_plate
                     ]);
 
-                    // Événement de changement de statut véhicule
                     event(new VehicleStatusChanged($vehicle, 'available', [
                         'reason' => 'assignment_expired',
                         'assignment_id' => $assignment->id
@@ -215,34 +211,26 @@ class ProcessExpiredAssignments implements ShouldQueue
                 }
             }
 
-            // 3. Libérer le chauffeur
             if ($assignment->driver) {
-                $driver = $assignment->driver;
-                
-                // Vérifier qu'aucune autre affectation active n'existe pour ce chauffeur
+                $driver = $assignment->driver->fresh();
                 $hasOtherActiveAssignment = Assignment::where('driver_id', $driver->id)
                     ->where('id', '!=', $assignment->id)
+                    ->where(function ($q) {
+                        $q->whereNull('status')->orWhere('status', '!=', Assignment::STATUS_CANCELLED);
+                    })
+                    ->where('start_datetime', '<=', now())
                     ->where(function ($q) {
                         $q->whereNull('end_datetime')
                           ->orWhere('end_datetime', '>', now());
                     })
-                    ->where('start_datetime', '<=', now())
                     ->whereNull('ended_at')
                     ->exists();
 
                 if (!$hasOtherActiveAssignment) {
-                    $driver->update([
-                        'is_available' => true,
-                        'current_vehicle_id' => null,
-                        'assignment_status' => 'available',
-                        'last_assignment_end' => $assignment->end_datetime
-                    ]);
-
                     Log::info("👤 Chauffeur #{$driver->id} libéré automatiquement", [
                         'name' => $driver->full_name
                     ]);
 
-                    // Événement de changement de statut chauffeur
                     event(new DriverStatusChanged($driver, 'available', [
                         'reason' => 'assignment_expired',
                         'assignment_id' => $assignment->id

@@ -49,6 +49,7 @@ class PermissionMatrix extends Component
     // 🎨 UI STATE
     public $showPreview = false;
     public $showHistory = false;
+    public $compactMode = false;
     public $pendingChanges = [];
     public $confirmationModal = false;
     public $showApplyAllModal = false;
@@ -94,18 +95,30 @@ class PermissionMatrix extends Component
     /**
      * 🚀 INITIALISATION
      */
-    public function mount()
+    public function mount(?int $roleId = null)
     {
         // Vérifier les permissions d'accès
         $this->authorize('manage', Role::class);
 
         $user = Auth::user();
+        $requestedRole = $roleId ? Role::find($roleId) : null;
 
         if ($user->hasRole('Super Admin')) {
             $this->availableOrganizations = Organization::orderBy('name')
                 ->get(['id', 'name', 'legal_name']);
-            $this->selectedOrganizationId = $user->organization_id
-                ?? $this->availableOrganizations->first()?->id;
+            if ($requestedRole) {
+                if ($requestedRole->organization_id === null) {
+                    $this->organizationContext = 'global';
+                    $this->selectedOrganizationId = $user->organization_id
+                        ?? $this->availableOrganizations->first()?->id;
+                } else {
+                    $this->organizationContext = 'organization';
+                    $this->selectedOrganizationId = $requestedRole->organization_id;
+                }
+            } else {
+                $this->selectedOrganizationId = $user->organization_id
+                    ?? $this->availableOrganizations->first()?->id;
+            }
         } else {
             $this->selectedOrganizationId = $user->organization_id;
         }
@@ -115,8 +128,13 @@ class PermissionMatrix extends Component
         $this->prepareResourcesAndActions();
 
         // Sélectionner le premier rôle par défaut
-        if ($this->availableRoles->isNotEmpty()) {
+        if ($requestedRole && $this->availableRoles->contains('id', $requestedRole->id)) {
+            $this->selectedRoleId = $requestedRole->id;
+        } elseif ($this->availableRoles->isNotEmpty()) {
             $this->selectedRoleId = $this->availableRoles->first()->id;
+        }
+
+        if ($this->selectedRoleId) {
             $this->loadRolePermissions();
         }
 
@@ -127,8 +145,10 @@ class PermissionMatrix extends Component
     /**
      * 🔁 Recharger les rôles quand le contexte change.
      */
-    public function updatedOrganizationContext(): void
+    public function updatedOrganizationContext($value = null): void
     {
+        $normalized = $this->normalizeSelectValue($value ?? $this->organizationContext);
+        $this->organizationContext = $normalized ?: 'organization';
         $this->loadAvailableRoles();
 
         if ($this->availableRoles->isNotEmpty()) {
@@ -143,8 +163,9 @@ class PermissionMatrix extends Component
         }
     }
 
-    public function updatedSelectedOrganizationId(): void
+    public function updatedSelectedOrganizationId($value = null): void
     {
+        $this->selectedOrganizationId = $this->normalizeSelectId($value ?? $this->selectedOrganizationId);
         $this->loadAvailableRoles();
 
         if ($this->availableRoles->isNotEmpty()) {
@@ -218,51 +239,258 @@ class PermissionMatrix extends Component
      */
     public function prepareResourcesAndActions()
     {
-        $resourceActionsMap = $this->getResourceActionsMap();
-
-        // Extraire les ressources uniques
-        $this->resources = array_keys($resourceActionsMap);
-        sort($this->resources);
-
-        // Extraire toutes les actions uniques
-        $allActions = [];
-        foreach ($resourceActionsMap as $actions) {
-            $allActions = array_merge($allActions, $actions);
-        }
-        $this->actions = array_unique($allActions);
-        sort($this->actions);
-
-        // Construire la matrice permissions
-        $this->buildPermissionsMatrix($resourceActionsMap);
+        $this->buildPermissionsMatrixFromPermissions();
     }
 
     /**
      * 🏗️ CONSTRUIRE LA MATRICE DES PERMISSIONS
      */
-    private function buildPermissionsMatrix(array $resourceActionsMap)
+    private function buildPermissionsMatrixFromPermissions(): void
     {
-        $allPermissions = Permission::all()->keyBy('name');
-
         $this->permissionsMatrix = [];
+        $permissions = Permission::query()->orderBy('name')->get();
+        $permissions = $this->filterLegacyPermissions($permissions);
 
-        foreach ($resourceActionsMap as $resource => $actions) {
-            foreach ($actions as $action) {
-                $permissionName = "{$action} {$resource}";
+        foreach ($permissions as $permission) {
+            $meta = $this->describePermission($permission->name);
 
-                if ($allPermissions->has($permissionName)) {
-                    $permission = $allPermissions->get($permissionName);
+            $this->permissionsMatrix[] = [
+                'id' => $permission->id,
+                'name' => $permission->name,
+                'resource' => $meta['resource'],
+                'action' => $meta['action'],
+                'display_resource' => $meta['display_resource'],
+                'display_action' => $meta['display_action'],
+                'display_name' => $meta['display_name'],
+            ];
+        }
 
-                    $this->permissionsMatrix[] = [
-                        'id' => $permission->id,
-                        'name' => $permissionName,
-                        'resource' => $resource,
-                        'action' => $action,
-                        'display_resource' => $this->formatResourceName($resource),
-                        'display_action' => $this->formatActionName($action),
-                    ];
-                }
+        $this->resources = collect($this->permissionsMatrix)
+            ->pluck('resource')
+            ->filter()
+            ->unique()
+            ->sort()
+            ->values()
+            ->all();
+
+        $this->actions = collect($this->permissionsMatrix)
+            ->pluck('action')
+            ->filter()
+            ->unique()
+            ->sort()
+            ->values()
+            ->all();
+    }
+
+    private function filterLegacyPermissions($permissions)
+    {
+        $allNames = $permissions->pluck('name');
+
+        return $permissions->filter(function ($permission) use ($allNames) {
+            if (!PermissionAliases::isLegacy($permission->name)) {
+                return true;
+            }
+
+            $canonical = PermissionAliases::canonicalFor($permission->name);
+
+            return !$canonical || !$allNames->contains($canonical);
+        })->values();
+    }
+
+    private function describePermission(string $permissionName): array
+    {
+        $canonical = PermissionAliases::canonicalFor($permissionName) ?? $permissionName;
+        $canonical = trim($canonical);
+
+        $overrides = $this->permissionPresentationOverrides();
+        if (isset($overrides[$canonical])) {
+            $resource = $this->normalizeResourceKey($overrides[$canonical]['resource'] ?? '');
+            $action = $this->normalizeActionKey($overrides[$canonical]['action'] ?? '');
+            $displayName = $overrides[$canonical]['label'] ?? null;
+
+            $displayResource = $this->formatResourceName($resource);
+            $displayAction = $this->formatActionName($action);
+
+            return [
+                'resource' => $resource,
+                'action' => $action,
+                'display_resource' => $displayResource,
+                'display_action' => $displayAction,
+                'display_name' => $displayName ?: $this->formatPermissionLabel($action, $resource),
+            ];
+        }
+
+        if (str_contains($canonical, '.')) {
+            $segments = explode('.', $canonical);
+            $resourceRaw = array_shift($segments);
+            $actionRaw = implode(' ', $segments);
+        } else {
+            [$actionRaw, $resourceRaw] = $this->splitActionResource($canonical);
+        }
+
+        $resource = $this->normalizeResourceKey($resourceRaw);
+        $action = $this->normalizeActionKey($actionRaw);
+        if ($action === '') {
+            $action = 'manage';
+        }
+
+        $displayResource = $this->formatResourceName($resource);
+        $displayAction = $this->formatActionName($action);
+        $displayName = $this->formatPermissionLabel($action, $resource);
+
+        return [
+            'resource' => $resource,
+            'action' => $action,
+            'display_resource' => $displayResource,
+            'display_action' => $displayAction,
+            'display_name' => $displayName,
+        ];
+    }
+
+    private function splitActionResource(string $permission): array
+    {
+        $value = strtolower(trim($permission));
+        if ($value === '') {
+            return ['', ''];
+        }
+
+        $multiWordActions = [
+            'manage organization settings',
+            'manage organization subscription',
+            'view organization statistics',
+            'view statistics',
+            'view history',
+            'view calendar',
+            'view logs',
+            'export logs',
+            'reset passwords',
+            'mark as read',
+            'approve level 2',
+            'approve level 1',
+            'view all',
+            'view team',
+            'view own',
+            'update own',
+            'assign to vehicles',
+            'manage settings',
+            'manage subscription',
+            'manage organizations',
+            'manage organization',
+        ];
+
+        foreach ($multiWordActions as $action) {
+            if (str_starts_with($value, $action . ' ')) {
+                $resource = trim(substr($value, strlen($action)));
+                return [$action, $resource];
+            }
+            if ($value === $action) {
+                return [$action, ''];
             }
         }
+
+        $parts = preg_split('/\s+/', $value, 2);
+        $action = $parts[0] ?? $value;
+        $resource = $parts[1] ?? '';
+
+        return [$action, $resource];
+    }
+
+    private function normalizeResourceKey(string $resource): string
+    {
+        $resource = trim(strtolower($resource));
+        if ($resource === '') {
+            return 'misc';
+        }
+
+        $resource = str_replace('-', '_', $resource);
+
+        $resourceMap = [
+            'organization' => 'organizations',
+            'organizations' => 'organizations',
+            'organization settings' => 'organizations',
+            'organization subscription' => 'organizations',
+            'organization statistics' => 'organizations',
+            'organizations statistics' => 'organizations',
+            'user' => 'users',
+            'users' => 'users',
+            'role' => 'roles',
+            'roles' => 'roles',
+            'vehicle' => 'vehicles',
+            'vehicles' => 'vehicles',
+            'driver' => 'drivers',
+            'drivers' => 'drivers',
+            'assignment' => 'assignments',
+            'assignments' => 'assignments',
+            'depot' => 'depots',
+            'depots' => 'depots',
+            'maintenance operation' => 'maintenance',
+            'maintenance operations' => 'maintenance',
+            'maintenance' => 'maintenance',
+            'repair request' => 'repair_requests',
+            'repair requests' => 'repair_requests',
+            'mileage reading' => 'mileage_readings',
+            'mileage readings' => 'mileage_readings',
+            'supplier' => 'suppliers',
+            'suppliers' => 'suppliers',
+            'expense' => 'expenses',
+            'expenses' => 'expenses',
+            'document' => 'documents',
+            'documents' => 'documents',
+            'alert' => 'alerts',
+            'alerts' => 'alerts',
+            'audit' => 'audit',
+            'system' => 'organizations',
+        ];
+
+        if (isset($resourceMap[$resource])) {
+            return $resourceMap[$resource];
+        }
+
+        if (str_contains($resource, 'organization')) {
+            return 'organizations';
+        }
+
+        return str_replace(' ', '_', $resource);
+    }
+
+    private function normalizeActionKey(string $action): string
+    {
+        $action = trim(strtolower($action));
+        $action = str_replace(['_', '-'], ' ', $action);
+        $action = preg_replace('/\s+/', ' ', $action);
+
+        return $action;
+    }
+
+    private function permissionPresentationOverrides(): array
+    {
+        return [
+            'manage organization settings' => [
+                'resource' => 'organizations',
+                'action' => 'manage settings',
+                'label' => 'Gérer paramètres organisation',
+            ],
+            'manage organization subscription' => [
+                'resource' => 'organizations',
+                'action' => 'manage subscription',
+                'label' => 'Gérer abonnement organisation',
+            ],
+            'view organization statistics' => [
+                'resource' => 'organizations',
+                'action' => 'view statistics',
+                'label' => 'Voir statistiques organisation',
+            ],
+            'manage organizations' => [
+                'resource' => 'organizations',
+                'action' => 'manage',
+                'label' => 'Gérer organisations',
+            ],
+            'system.manage_organizations' => [
+                'resource' => 'organizations',
+                'action' => 'manage',
+                'label' => 'Administrer organisations (système)',
+            ],
+        ];
     }
 
     /**
@@ -270,12 +498,20 @@ class PermissionMatrix extends Component
      */
     public function loadRolePermissions()
     {
-        if (!$this->selectedRoleId) {
+        $roleId = $this->normalizeSelectId($this->selectedRoleId);
+        $this->selectedRoleId = $roleId;
+
+        if (!$roleId) {
+            $this->selectedRole = null;
             $this->rolePermissions = [];
             return;
         }
 
-        $this->selectedRole = Role::with('permissions')->find($this->selectedRoleId);
+        $this->selectedRole = Role::with('permissions')->find($roleId);
+
+        if ($this->selectedRole instanceof \Illuminate\Support\Collection) {
+            $this->selectedRole = $this->selectedRole->first();
+        }
 
         if ($this->selectedRole) {
             $this->rolePermissions = $this->selectedRole->permissions->pluck('id')->toArray();
@@ -581,6 +817,11 @@ class PermissionMatrix extends Component
         ]);
     }
 
+    public function toggleCompactMode(): void
+    {
+        $this->compactMode = !$this->compactMode;
+    }
+
     /**
      * 📜 LOGGER LES CHANGEMENTS
      */
@@ -642,9 +883,37 @@ class PermissionMatrix extends Component
             'analytics' => 'Analytics',
             'alerts' => 'Alertes',
             'audit' => 'Audit',
+            'misc' => 'Divers',
         ];
 
         return $translations[$resource] ?? ucfirst(str_replace('_', ' ', $resource));
+    }
+
+    /**
+     * 🏷️ NOM SINGULIER D'UNE RESSOURCE
+     */
+    private function formatResourceLabel(string $resource): string
+    {
+        $labels = [
+            'organizations' => 'organisation',
+            'users' => 'utilisateur',
+            'roles' => 'rôle',
+            'vehicles' => 'véhicule',
+            'drivers' => 'chauffeur',
+            'assignments' => 'affectation',
+            'depots' => 'dépôt',
+            'maintenance' => 'maintenance',
+            'repair_requests' => 'demande de réparation',
+            'mileage_readings' => 'relevé kilométrique',
+            'suppliers' => 'fournisseur',
+            'expenses' => 'dépense',
+            'documents' => 'document',
+            'analytics' => 'analytics',
+            'alerts' => 'alerte',
+            'audit' => 'audit',
+        ];
+
+        return $labels[$resource] ?? str_replace('_', ' ', rtrim($resource, 's'));
     }
 
     /**
@@ -659,12 +928,15 @@ class PermissionMatrix extends Component
             'view all' => 'Voir (Tous)',
             'create' => 'Créer',
             'edit' => 'Modifier',
+            'update' => 'Modifier',
             'update own' => 'Modifier (Propres)',
             'delete' => 'Supprimer',
             'restore' => 'Restaurer',
             'export' => 'Exporter',
             'import' => 'Importer',
             'manage' => 'Gérer',
+            'manage subscription' => 'Gérer abonnement',
+            'manage organizations' => 'Gérer organisations',
             'approve' => 'Approuver',
             'approve level 1' => 'Approuver (N1)',
             'approve level 2' => 'Approuver (N2)',
@@ -695,6 +967,10 @@ class PermissionMatrix extends Component
             'reset passwords' => 'Réinitialiser MDP',
             'impersonate' => 'Impersonate',
             'manage settings' => 'Gérer paramètres',
+            'manage organization settings' => 'Gérer paramètres organisation',
+            'organizations.create' => 'Créer organisation',
+            'organizations.edit' => 'Modifier organisation',
+            'organizations.delete' => 'Supprimer organisation',
             'manage maintenance' => 'Gérer maintenance',
             'manage documents' => 'Gérer documents',
             'download' => 'Télécharger',
@@ -707,10 +983,29 @@ class PermissionMatrix extends Component
     }
 
     /**
+     * 🏷️ LIBELLÉ COMPLET D'UNE PERMISSION
+     */
+    private function formatPermissionLabel(string $action, string $resource): string
+    {
+        if ($resource === 'organizations') {
+            return match ($action) {
+                'create' => 'Créer organisation',
+                'edit' => 'Modifier organisation',
+                'delete' => 'Supprimer organisation',
+                'manage settings' => 'Gérer paramètres organisation',
+                default => $this->formatActionName($action) . ' organisation',
+            };
+        }
+
+        return $this->formatActionName($action) . ' ' . $this->formatResourceLabel($resource);
+    }
+
+    /**
      * 🔄 WHEN SELECTED ROLE CHANGES
      */
-    public function updatedSelectedRoleId()
+    public function updatedSelectedRoleId($value = null)
     {
+        $this->selectedRoleId = $this->normalizeSelectId($value ?? $this->selectedRoleId);
         $this->loadRolePermissions();
     }
 
@@ -729,24 +1024,34 @@ class PermissionMatrix extends Component
     {
         // Appliquer les filtres
         $filteredMatrix = collect($this->permissionsMatrix);
+        $filterByResource = $this->normalizeSelectValue($this->filterByResource);
+        $filterByAction = $this->normalizeSelectValue($this->filterByAction);
+
+        if ($filterByResource !== $this->filterByResource) {
+            $this->filterByResource = $filterByResource ?? '';
+        }
+        if ($filterByAction !== $this->filterByAction) {
+            $this->filterByAction = $filterByAction ?? '';
+        }
 
         // Filtre par recherche
         if ($this->search) {
             $filteredMatrix = $filteredMatrix->filter(function ($perm) {
                 return str_contains(strtolower($perm['name']), strtolower($this->search)) ||
                        str_contains(strtolower($perm['display_resource']), strtolower($this->search)) ||
-                       str_contains(strtolower($perm['display_action']), strtolower($this->search));
+                       str_contains(strtolower($perm['display_action']), strtolower($this->search)) ||
+                       str_contains(strtolower($perm['display_name']), strtolower($this->search));
             });
         }
 
         // Filtre par ressource
-        if ($this->filterByResource) {
-            $filteredMatrix = $filteredMatrix->where('resource', $this->filterByResource);
+        if ($filterByResource) {
+            $filteredMatrix = $filteredMatrix->where('resource', $filterByResource);
         }
 
         // Filtre par action
-        if ($this->filterByAction) {
-            $filteredMatrix = $filteredMatrix->where('action', $this->filterByAction);
+        if ($filterByAction) {
+            $filteredMatrix = $filteredMatrix->where('action', $filterByAction);
         }
 
         // Filtre "uniquement assignées"
@@ -758,10 +1063,109 @@ class PermissionMatrix extends Component
 
         // Regrouper par ressource
         $groupedPermissions = $filteredMatrix->groupBy('resource');
+        $quickInsights = $this->buildQuickInsights($filteredMatrix);
 
         return view('livewire.admin.permission-matrix', [
             'groupedPermissions' => $groupedPermissions,
             'hasPendingChanges' => count($this->pendingChanges) > 0,
+            'quickInsights' => $quickInsights,
         ]);
+    }
+
+    private function buildQuickInsights($filteredMatrix): array
+    {
+        $totalPermissions = count($this->permissionsMatrix);
+        $assignedCount = count($this->rolePermissions);
+        $coverage = $totalPermissions > 0
+            ? (int) round(($assignedCount / $totalPermissions) * 100)
+            : 0;
+
+        $filteredIds = $filteredMatrix->pluck('id')->all();
+        $filteredAssigned = count(array_intersect($filteredIds, $this->rolePermissions));
+
+        $riskyKeywords = [
+            'delete',
+            'force-delete',
+            'force delete',
+            'impersonate',
+            'bypass',
+            'approve level 2',
+            'manage organizations',
+            'manage settings',
+            'system.manage',
+        ];
+
+        $assignedPermissions = collect($this->permissionsMatrix)
+            ->whereIn('id', $this->rolePermissions);
+
+        $riskyCount = $assignedPermissions->filter(function ($permission) use ($riskyKeywords) {
+            $haystack = strtolower(($permission['name'] ?? '') . ' ' . ($permission['action'] ?? ''));
+
+            foreach ($riskyKeywords as $keyword) {
+                if (str_contains($haystack, $keyword)) {
+                    return true;
+                }
+            }
+
+            return false;
+        })->count();
+
+        $canonicalNames = collect($this->permissionsMatrix)
+            ->map(fn($permission) => PermissionAliases::canonicalFor($permission['name']) ?? $permission['name']);
+        $anomalyCount = $canonicalNames->count() - $canonicalNames->unique()->count();
+
+        return [
+            'assigned_count' => $assignedCount,
+            'total_permissions' => $totalPermissions,
+            'coverage' => $coverage,
+            'filtered_count' => $filteredMatrix->count(),
+            'filtered_assigned' => $filteredAssigned,
+            'risky_count' => $riskyCount,
+            'anomaly_count' => max(0, $anomalyCount),
+        ];
+    }
+
+    private function normalizeSelectValue($value): ?string
+    {
+        if (is_array($value)) {
+            if ($value === []) {
+                return null;
+            }
+
+            $value = array_key_exists('value', $value)
+                ? $value['value']
+                : ($value[0] ?? null);
+        }
+
+        if (is_object($value)) {
+            if (isset($value->value)) {
+                $value = $value->value;
+            } elseif (method_exists($value, '__toString')) {
+                $value = (string) $value;
+            } else {
+                return null;
+            }
+        }
+
+        if (is_string($value)) {
+            $value = trim($value);
+            return $value === '' ? null : $value;
+        }
+
+        if (is_numeric($value)) {
+            return (string) $value;
+        }
+
+        return null;
+    }
+
+    private function normalizeSelectId($value): ?int
+    {
+        $normalized = $this->normalizeSelectValue($value);
+        if ($normalized === null || !is_numeric($normalized)) {
+            return null;
+        }
+
+        return (int) $normalized;
     }
 }

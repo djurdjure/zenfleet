@@ -8,8 +8,7 @@ use App\Models\Vehicle;
 use App\Repositories\Interfaces\AssignmentRepositoryInterface;
 use Carbon\Carbon;
 use Illuminate\Pagination\LengthAwarePaginator;
-use App\Models\VehicleStatus;
-use App\Models\DriverStatus;  
+use App\Services\AssignmentPresenceService;
 
 class AssignmentService
 {
@@ -51,21 +50,17 @@ class AssignmentService
    
     public function endAssignment(Assignment $assignment, int $endMileage, string $endDateTime): bool
     {
-        // On récupère le statut "Parking" pour le véhicule
-        $parkingStatusId = VehicleStatus::where('name', 'Parking')->firstOrFail()->id;
-        $assignment->vehicle->update([
-            'status_id' => $parkingStatusId,
-            'current_mileage' => $endMileage,
-        ]);
-
-        // On remet le statut du chauffeur à "Disponible"
-        $availableStatusId = DriverStatus::where('name', 'Disponible')->firstOrFail()->id;
-        $assignment->driver->update(['status_id' => $availableStatusId]);
-
-        // On met à jour l'affectation elle-même
-        return $this->assignmentRepository->update($assignment, [
+        // Mettre à jour l'affectation elle-même
+        $updated = $this->assignmentRepository->update($assignment, [
             'end_datetime' => $endDateTime,
             'end_mileage' => $endMileage,
         ]);
+
+        if ($updated) {
+            $presence = app(AssignmentPresenceService::class);
+            $presence->syncForAssignment($assignment->fresh(), now(), Carbon::parse($endDateTime));
+        }
+
+        return $updated;
     }
 }

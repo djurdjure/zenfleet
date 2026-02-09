@@ -11,7 +11,10 @@
 ])
 
 @php
- $component = new \App\View\Components\Textarea($name, $label, $placeholder, $error, $helpText, $required, $disabled, $value, $rows);
+ $baseKey = preg_replace('/\[\]$/', '', $name);
+ $lookupKey = trim(preg_replace('/\[(.*?)\]/', '.$1', $baseKey), '.');
+ $resolvedError = $error ?: ((isset($errors) && $lookupKey !== '') ? ($errors->first($lookupKey) ?: $errors->first($lookupKey . '.0')) : null);
+ $component = new \App\View\Components\Textarea($name, $label, $placeholder, $resolvedError, $helpText, $required, $disabled, $value, $rows);
  $classes = $component->getClasses();
  $textareaId = $component->getId();
 @endphp
@@ -32,15 +35,16 @@
  rows="{{ $rows }}"
  class="{{ $classes }}"
  placeholder="{{ $placeholder }}"
+ aria-invalid="{{ $resolvedError ? 'true' : 'false' }}"
  @if($required) required @endif
  @if($disabled) disabled @endif
  {{ $attributes->except(['class']) }}
- >{{ old($name, $value) }}</textarea>
+ >{{ old($lookupKey !== '' ? $lookupKey : $name, $value) }}</textarea>
 
- @if($error)
+ @if($resolvedError)
  <p class="mt-2 text-sm text-red-600 flex items-start font-medium">
  <x-iconify icon="lucide:circle-alert" class="w-4 h-4 mr-1.5 mt-0.5 flex-shrink-0" />
- <span>{{ $error }}</span>
+ <span>{{ $resolvedError }}</span>
  </p>
  @elseif($helpText)
  <p class="mt-2 text-sm text-gray-600">

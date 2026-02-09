@@ -2,26 +2,26 @@
 
 namespace App\Console\Commands;
 
-use App\Services\ResourceStatusSynchronizer;
+use App\Models\Assignment;
+use App\Models\Driver;
+use App\Models\Vehicle;
+use App\Services\AssignmentPresenceService;
+use Carbon\Carbon;
 use Illuminate\Console\Command;
 
 /**
- * 🔧 COMMANDE ARTISAN : DÉTECTION ET CORRECTION DES ZOMBIES
+ * 🔧 COMMANDE ARTISAN : DÉTECTION ET CORRECTION DES ZOMBIES DE PRÉSENCE
  *
- * Cette commande utilise le service ResourceStatusSynchronizer pour détecter
- * et corriger automatiquement toutes les incohérences de statuts.
+ * Cette commande détecte et corrige les incohérences de présence
+ * (is_available, assignment_status, current_*_id) à partir des affectations.
  *
  * UTILISATION :
  * php artisan resources:heal-statuses                    # Correction réelle
  * php artisan resources:heal-statuses --dry-run          # Simulation (aucune modification)
- * php artisan resources:heal-statuses --verbose          # Avec détails
+ * php artisan resources:heal-statuses --details          # Avec détails
  *
- * PLANIFICATION :
- * Cette commande peut être planifiée dans app/Console/Kernel.php :
- * $schedule->command('resources:heal-statuses')->hourly();
- *
- * @version 1.0.0
- * @date 2025-11-14
+ * @version 2.0.0
+ * @date 2026-02-07
  */
 class HealResourceStatusesCommand extends Command
 {
@@ -35,14 +35,14 @@ class HealResourceStatusesCommand extends Command
     /**
      * The console command description.
      */
-    protected $description = 'Détecte et corrige les incohérences de statuts des ressources (véhicules et chauffeurs)';
+    protected $description = 'Détecte et corrige les incohérences de présence des ressources (véhicules et chauffeurs)';
 
     /**
      * Execute the console command.
      */
-    public function handle(ResourceStatusSynchronizer $synchronizer): int
+    public function handle(AssignmentPresenceService $presence): int
     {
-        $this->info('🔍 Détection des incohérences de statuts...');
+        $this->info('🔍 Détection des incohérences de présence...');
         $this->newLine();
 
         $dryRun = $this->option('dry-run');
@@ -53,131 +53,127 @@ class HealResourceStatusesCommand extends Command
             $this->newLine();
         }
 
-        // Exécuter le healing
-        if ($dryRun) {
-            // Mode simulation : compter sans corriger
-            $vehicleStats = $this->simulateVehicleHealing();
-            $driverStats = $this->simulateDriverHealing();
+        $now = now();
+        $vehicleStats = $this->countVehiclePresenceMismatches($now);
+        $driverStats = $this->countDriverPresenceMismatches($now);
+
+        if (!$dryRun) {
+            $presence->syncAll();
+            $vehicleStatsAfter = $this->countVehiclePresenceMismatches(now());
+            $driverStatsAfter = $this->countDriverPresenceMismatches(now());
         } else {
-            // Mode réel : détecter et corriger
-            $vehicleStats = $synchronizer->healAllVehicleZombies();
-            $driverStats = $synchronizer->healAllDriverZombies();
+            $vehicleStatsAfter = $vehicleStats;
+            $driverStatsAfter = $driverStats;
         }
 
-        // Afficher les résultats
-        $this->displayResults($vehicleStats, $driverStats, $verbose);
-
-        // Message final
-        $this->newLine();
-        $totalHealed = ($vehicleStats['zombies_healed'] ?? 0) + ($driverStats['zombies_healed'] ?? 0);
-
-        if ($totalHealed === 0) {
-            $this->info('✅ Aucune incohérence détectée. Le système est parfaitement cohérent !');
-        } else {
-            if ($dryRun) {
-                $this->warn("⚠️ {$totalHealed} zombie(s) détecté(s) en mode simulation");
-                $this->info('💡 Exécutez sans --dry-run pour appliquer les corrections');
-            } else {
-                $this->info("✅ {$totalHealed} zombie(s) corrigé(s) avec succès !");
-            }
-        }
+        $this->displayResults($vehicleStats, $driverStats, $vehicleStatsAfter, $driverStatsAfter, $verbose, $dryRun);
 
         return self::SUCCESS;
     }
 
-    /**
-     * Simule le healing des véhicules (mode dry-run)
-     */
-    private function simulateVehicleHealing(): array
+    private function countVehiclePresenceMismatches(Carbon $now): array
     {
-        $zombiesAvailable = \App\Models\Vehicle::where('is_available', true)
-            ->where('assignment_status', 'available')
-            ->where('status_id', '!=', 8)
+        $activeVehicleIds = Assignment::query()
+            ->select('vehicle_id')
+            ->whereNotNull('vehicle_id')
             ->whereNull('deleted_at')
-            ->get();
+            ->where(function ($q) {
+                $q->whereNull('status')->orWhere('status', '!=', Assignment::STATUS_CANCELLED);
+            })
+            ->where('start_datetime', '<=', $now)
+            ->where(function ($q) use ($now) {
+                $q->whereNull('end_datetime')
+                    ->orWhere('end_datetime', '>', $now);
+            })
+            ->groupBy('vehicle_id');
 
-        $zombiesAssigned = \App\Models\Vehicle::where('is_available', false)
-            ->where('assignment_status', 'assigned')
-            ->where('status_id', '!=', 9)
-            ->whereNull('deleted_at')
-            ->get();
+        $assignedMismatch = Vehicle::query()
+            ->whereIn('id', $activeVehicleIds)
+            ->where(function ($q) {
+                $q->where('is_available', true)
+                    ->orWhere('assignment_status', '!=', 'assigned')
+                    ->orWhereNull('current_driver_id');
+            })
+            ->count();
+
+        $availableMismatch = Vehicle::query()
+            ->whereNotIn('id', $activeVehicleIds)
+            ->where(function ($q) {
+                $q->where('is_available', false)
+                    ->orWhere('assignment_status', '!=', 'available')
+                    ->orWhereNotNull('current_driver_id');
+            })
+            ->count();
 
         return [
-            'type' => 'vehicles',
-            'zombies_found' => $zombiesAvailable->count() + $zombiesAssigned->count(),
-            'zombies_healed' => $zombiesAvailable->count() + $zombiesAssigned->count(), // En dry-run, on considère qu'ils seraient guéris
-            'details' => [
-                'available_with_wrong_status' => $zombiesAvailable->count(),
-                'assigned_with_wrong_status' => $zombiesAssigned->count(),
-            ]
+            'assigned_mismatch' => $assignedMismatch,
+            'available_mismatch' => $availableMismatch,
         ];
     }
 
-    /**
-     * Simule le healing des chauffeurs (mode dry-run)
-     */
-    private function simulateDriverHealing(): array
+    private function countDriverPresenceMismatches(Carbon $now): array
     {
-        $zombiesAvailable = \App\Models\Driver::where('is_available', true)
-            ->where('assignment_status', 'available')
-            ->where('status_id', '!=', 7)
+        $activeDriverIds = Assignment::query()
+            ->select('driver_id')
+            ->whereNotNull('driver_id')
             ->whereNull('deleted_at')
-            ->get();
+            ->where(function ($q) {
+                $q->whereNull('status')->orWhere('status', '!=', Assignment::STATUS_CANCELLED);
+            })
+            ->where('start_datetime', '<=', $now)
+            ->where(function ($q) use ($now) {
+                $q->whereNull('end_datetime')
+                    ->orWhere('end_datetime', '>', $now);
+            })
+            ->groupBy('driver_id');
 
-        $zombiesAssigned = \App\Models\Driver::where('is_available', false)
-            ->where('assignment_status', 'assigned')
-            ->where('status_id', '!=', 8)
-            ->whereNull('deleted_at')
-            ->get();
+        $assignedMismatch = Driver::query()
+            ->whereIn('id', $activeDriverIds)
+            ->where(function ($q) {
+                $q->where('is_available', true)
+                    ->orWhere('assignment_status', '!=', 'assigned')
+                    ->orWhereNull('current_vehicle_id');
+            })
+            ->count();
+
+        $availableMismatch = Driver::query()
+            ->whereNotIn('id', $activeDriverIds)
+            ->where(function ($q) {
+                $q->where('is_available', false)
+                    ->orWhere('assignment_status', '!=', 'available')
+                    ->orWhereNotNull('current_vehicle_id');
+            })
+            ->count();
 
         return [
-            'type' => 'drivers',
-            'zombies_found' => $zombiesAvailable->count() + $zombiesAssigned->count(),
-            'zombies_healed' => $zombiesAvailable->count() + $zombiesAssigned->count(),
-            'details' => [
-                'available_with_wrong_status' => $zombiesAvailable->count(),
-                'assigned_with_wrong_status' => $zombiesAssigned->count(),
-            ]
+            'assigned_mismatch' => $assignedMismatch,
+            'available_mismatch' => $availableMismatch,
         ];
     }
 
     /**
      * Affiche les résultats de la détection/correction
      */
-    private function displayResults(array $vehicleStats, array $driverStats, bool $verbose): void
+    private function displayResults(array $vehicleBefore, array $driverBefore, array $vehicleAfter, array $driverAfter, bool $verbose, bool $dryRun): void
     {
-        // Résumé véhicules
-        $this->info('1️⃣ Véhicules zombies :');
-        $this->line("   Détectés : {$vehicleStats['zombies_found']}");
-        $this->line("   Corrigés : {$vehicleStats['zombies_healed']}");
-
-        if ($verbose && isset($vehicleStats['details'])) {
-            $this->line("      - Disponibles avec mauvais status_id : {$vehicleStats['details']['available_with_wrong_status']}");
-            $this->line("      - Affectés avec mauvais status_id : {$vehicleStats['details']['assigned_with_wrong_status']}");
-        }
+        $this->info('1️⃣ Véhicules :');
+        $this->line("   Détectés (doivent être affectés) : {$vehicleBefore['assigned_mismatch']}");
+        $this->line("   Détectés (doivent être disponibles) : {$vehicleBefore['available_mismatch']}");
 
         $this->newLine();
 
-        // Résumé chauffeurs
-        $this->info('2️⃣ Chauffeurs zombies :');
-        $this->line("   Détectés : {$driverStats['zombies_found']}");
-        $this->line("   Corrigés : {$driverStats['zombies_healed']}");
-
-        if ($verbose && isset($driverStats['details'])) {
-            $this->line("      - Disponibles avec mauvais status_id : {$driverStats['details']['available_with_wrong_status']}");
-            $this->line("      - Affectés avec mauvais status_id : {$driverStats['details']['assigned_with_wrong_status']}");
-        }
+        $this->info('2️⃣ Chauffeurs :');
+        $this->line("   Détectés (doivent être affectés) : {$driverBefore['assigned_mismatch']}");
+        $this->line("   Détectés (doivent être disponibles) : {$driverBefore['available_mismatch']}");
 
         $this->newLine();
 
-        // Tableau récapitulatif
-        $this->table(
-            ['Type', 'Détectés', 'Corrigés'],
-            [
-                ['Véhicules', $vehicleStats['zombies_found'], $vehicleStats['zombies_healed']],
-                ['Chauffeurs', $driverStats['zombies_found'], $driverStats['zombies_healed']],
-                ['TOTAL', $vehicleStats['zombies_found'] + $driverStats['zombies_found'], $vehicleStats['zombies_healed'] + $driverStats['zombies_healed']],
-            ]
-        );
+        if (!$dryRun) {
+            $this->info('✅ Résultats après correction :');
+            $this->line("   Véhicules restants : " . ($vehicleAfter['assigned_mismatch'] + $vehicleAfter['available_mismatch']));
+            $this->line("   Chauffeurs restants : " . ($driverAfter['assigned_mismatch'] + $driverAfter['available_mismatch']));
+        } elseif ($verbose) {
+            $this->line('ℹ️ Mode simulation : aucun changement appliqué.');
+        }
     }
 }

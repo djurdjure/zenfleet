@@ -10,7 +10,10 @@
 ])
 
 @php
- $component = new \App\View\Components\Select($name, $label, $error, $helpText, $required, $disabled, $options, $selected);
+ $baseKey = preg_replace('/\[\]$/', '', $name);
+ $lookupKey = trim(preg_replace('/\[(.*?)\]/', '.$1', $baseKey), '.');
+ $resolvedError = $error ?: ((isset($errors) && $lookupKey !== '') ? ($errors->first($lookupKey) ?: $errors->first($lookupKey . '.0')) : null);
+ $component = new \App\View\Components\Select($name, $label, $resolvedError, $helpText, $required, $disabled, $options, $selected);
  $classes = $component->getClasses();
  $selectId = $component->getId();
 @endphp
@@ -29,6 +32,7 @@
  name="{{ $name }}"
  id="{{ $selectId }}"
  class="{{ $classes }}"
+ aria-invalid="{{ $resolvedError ? 'true' : 'false' }}"
  @if($required) required @endif
  @if($disabled) disabled @endif
  {{ $attributes->except(['class']) }}
@@ -44,17 +48,17 @@
  @endif
 
  @foreach($options as $value => $label)
- <option value="{{ $value }}" {{ old($name, $selected) == $value ? 'selected' : '' }}>
+ <option value="{{ $value }}" {{ old($lookupKey !== '' ? $lookupKey : $name, $selected) == $value ? 'selected' : '' }}>
  {{ $label }}
  </option>
  @endforeach
  @endif
  </select>
 
- @if($error)
+ @if($resolvedError)
  <p class="mt-2 text-sm text-red-600 flex items-start">
  <x-iconify icon="heroicons:exclamation-circle" class="w-4 h-4 mr-1 mt-0.5 flex-shrink-0" />
- <span>{{ $error }}</span>
+ <span>{{ $resolvedError }}</span>
  </p>
  @elseif($helpText)
  <p class="mt-2 text-sm text-gray-500">

@@ -6,7 +6,7 @@ use App\Models\Assignment;
 use App\Models\Driver;
 use App\Models\Vehicle;
 use App\Notifications\AssignmentSyncAnomalyDetected;
-use App\Traits\ManagesResourceStatus;
+use App\Services\AssignmentPresenceService;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -50,8 +50,6 @@ use Carbon\Carbon;
  */
 class SyncAssignmentStatuses extends Command
 {
-    use ManagesResourceStatus;
-
     protected $signature = 'assignments:sync
                             {--dry-run : Simulation sans modification}
                             {--force : Force sans confirmation}
@@ -194,50 +192,36 @@ class SyncAssignmentStatuses extends Command
         }
 
         $vehicles = Vehicle::whereNull('deleted_at')->get();
+        $now = now();
+        $presence = app(AssignmentPresenceService::class);
 
         foreach ($vehicles as $vehicle) {
-            $hasActiveAssignment = Assignment::where('vehicle_id', $vehicle->id)
-                ->whereNull('deleted_at')
-                ->whereIn('status', [Assignment::STATUS_ACTIVE, Assignment::STATUS_SCHEDULED])
-                ->exists();
+            $activeAssignment = $this->findActiveAssignmentForVehicle($vehicle->id, $now);
+            $shouldBeAvailable = $activeAssignment === null;
 
-            $shouldBeAvailable = !$hasActiveAssignment;
-            $currentlyAvailable = $vehicle->is_available;
-            $currentStatus = $vehicle->assignment_status;
+            $needsSync = $shouldBeAvailable
+                ? (!$vehicle->is_available || $vehicle->assignment_status !== 'available' || $vehicle->current_driver_id)
+                : ($vehicle->is_available || $vehicle->assignment_status !== 'assigned' || $vehicle->current_driver_id !== $activeAssignment->driver_id);
 
-            if ($shouldBeAvailable !== $currentlyAvailable ||
-                ($shouldBeAvailable && $currentStatus !== 'available') ||
-                (!$shouldBeAvailable && $currentStatus === 'available')) {
-
+            if ($needsSync) {
                 if (!$silent) {
                     $this->line(sprintf(
                         '  → Véhicule #%d (%s) : %s → %s',
                         $vehicle->id,
                         $vehicle->registration_plate,
-                        $currentlyAvailable ? 'disponible' : 'occupé',
+                        $vehicle->is_available ? 'disponible' : 'occupé',
                         $shouldBeAvailable ? 'disponible' : 'occupé'
                     ));
                 }
 
                 if (!$dryRun) {
-                    if ($shouldBeAvailable) {
-                        // Utiliser la logique de libération intelligente du Trait
-                        $this->releaseResource($vehicle);
-                        $this->vehiclesFreed++;
-                    } else {
-                        // Récupérer le chauffeur de l'affectation active
-                        $activeAssignment = Assignment::where('vehicle_id', $vehicle->id)
-                            ->whereNull('deleted_at')
-                            ->whereIn('status', [Assignment::STATUS_ACTIVE, Assignment::STATUS_SCHEDULED])
-                            ->first();
+                    $presence->syncVehicle($vehicle->id, $now);
+                }
 
-                        if ($activeAssignment) {
-                            $vehicle->current_driver_id = $activeAssignment->driver_id;
-                        }
-                        $this->vehiclesLocked++;
-                    }
-
-                    $vehicle->save();
+                if ($shouldBeAvailable) {
+                    $this->vehiclesFreed++;
+                } else {
+                    $this->vehiclesLocked++;
                 }
 
                 $this->inconsistenciesFixed++;
@@ -269,55 +253,36 @@ class SyncAssignmentStatuses extends Command
         }
 
         $drivers = Driver::whereNull('deleted_at')->get();
+        $now = now();
+        $presence = app(AssignmentPresenceService::class);
 
         foreach ($drivers as $driver) {
-            $hasActiveAssignment = Assignment::where('driver_id', $driver->id)
-                ->whereNull('deleted_at')
-                ->whereIn('status', [Assignment::STATUS_ACTIVE, Assignment::STATUS_SCHEDULED])
-                ->exists();
+            $activeAssignment = $this->findActiveAssignmentForDriver($driver->id, $now);
+            $shouldBeAvailable = $activeAssignment === null;
 
-            $shouldBeAvailable = !$hasActiveAssignment;
-            $currentlyAvailable = $driver->is_available;
-            $currentStatus = $driver->assignment_status;
+            $needsSync = $shouldBeAvailable
+                ? (!$driver->is_available || $driver->assignment_status !== 'available' || $driver->current_vehicle_id)
+                : ($driver->is_available || $driver->assignment_status !== 'assigned' || $driver->current_vehicle_id !== $activeAssignment->vehicle_id);
 
-            if ($shouldBeAvailable !== $currentlyAvailable ||
-                ($shouldBeAvailable && $currentStatus !== 'available') ||
-                (!$shouldBeAvailable && $currentStatus === 'available')) {
-
+            if ($needsSync) {
                 if (!$silent) {
                     $this->line(sprintf(
                         '  → Chauffeur #%d (%s) : %s → %s',
                         $driver->id,
                         $driver->full_name,
-                        $currentlyAvailable ? 'disponible' : 'occupé',
+                        $driver->is_available ? 'disponible' : 'occupé',
                         $shouldBeAvailable ? 'disponible' : 'occupé'
                     ));
                 }
 
                 if (!$dryRun) {
-                    if ($shouldBeAvailable) {
-                        // Utiliser la logique de libération intelligente du Trait
-                        $this->releaseResource($driver);
-                        $this->driversFreed++;
-                    } else {
-                        // Récupérer le véhicule de l'affectation active
-                        $activeAssignment = Assignment::where('driver_id', $driver->id)
-                            ->whereNull('deleted_at')
-                            ->whereIn('status', [Assignment::STATUS_ACTIVE, Assignment::STATUS_SCHEDULED])
-                            ->first();
+                    $presence->syncDriver($driver->id, $now);
+                }
 
-                        if ($activeAssignment) {
-                            $driver->current_vehicle_id = $activeAssignment->vehicle_id;
-                        }
-                        // Mettre le statut métier "En mission"
-                        $enMissionStatusId = \DB::table('driver_statuses')
-                            ->where('name', 'En mission')
-                            ->value('id') ?? 8;
-                        $driver->status_id = $enMissionStatusId;
-                        $this->driversLocked++;
-                    }
-
-                    $driver->save();
+                if ($shouldBeAvailable) {
+                    $this->driversFreed++;
+                } else {
+                    $this->driversLocked++;
                 }
 
                 $this->inconsistenciesFixed++;
@@ -361,6 +326,40 @@ class SyncAssignmentStatuses extends Command
 
         // Active (commencée et pas encore terminée)
         return Assignment::STATUS_ACTIVE;
+    }
+
+    private function findActiveAssignmentForVehicle(int $vehicleId, Carbon $now): ?Assignment
+    {
+        return Assignment::where('vehicle_id', $vehicleId)
+            ->whereNull('deleted_at')
+            ->where(function ($q) {
+                $q->whereNull('status')->orWhere('status', '!=', Assignment::STATUS_CANCELLED);
+            })
+            ->where('start_datetime', '<=', $now)
+            ->where(function ($q) use ($now) {
+                $q->whereNull('end_datetime')
+                    ->orWhere('end_datetime', '>', $now);
+            })
+            ->orderByDesc('start_datetime')
+            ->orderByDesc('id')
+            ->first();
+    }
+
+    private function findActiveAssignmentForDriver(int $driverId, Carbon $now): ?Assignment
+    {
+        return Assignment::where('driver_id', $driverId)
+            ->whereNull('deleted_at')
+            ->where(function ($q) {
+                $q->whereNull('status')->orWhere('status', '!=', Assignment::STATUS_CANCELLED);
+            })
+            ->where('start_datetime', '<=', $now)
+            ->where(function ($q) use ($now) {
+                $q->whereNull('end_datetime')
+                    ->orWhere('end_datetime', '>', $now);
+            })
+            ->orderByDesc('start_datetime')
+            ->orderByDesc('id')
+            ->first();
     }
 
     /**

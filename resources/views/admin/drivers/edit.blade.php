@@ -63,18 +63,6 @@
             </p>
         </div>
 
-        {{-- Affichage des erreurs globales --}}
-        @if ($errors->any())
-        <x-alert type="error" title="Erreurs de validation" dismissible class="mb-6">
-            Veuillez corriger les erreurs suivantes avant de soumettre le formulaire :
-            <ul class="mt-2 ml-5 list-disc text-sm">
-                @foreach ($errors->all() as $error)
-                <li>{{ $error }}</li>
-                @endforeach
-            </ul>
-        </x-alert>
-        @endif
-
         {{-- ====================================================================
  FORMULAIRE SINGLE-PAGE AVEC VALIDATION ALPINE.JS
  ==================================================================== --}}
@@ -332,8 +320,8 @@
                     format="d/m/Y"
                     :error="$errors->first('license_expiry_date')"
                     placeholder="Choisir une date"
-                    :minDate="date('Y-m-d')"
-                    required />
+                    required
+                    helpText="Calculée automatiquement à 10 ans - 1 jour (modifiable si nécessaire)" />
 
                 <x-input
                     name="license_authority"

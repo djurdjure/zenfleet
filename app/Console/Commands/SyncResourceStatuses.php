@@ -3,17 +3,18 @@
 namespace App\Console\Commands;
 
 use App\Jobs\SyncResourceStatusesJob;
-use App\Models\Vehicle;
+use App\Models\Assignment;
 use App\Models\Driver;
-use App\Models\VehicleStatus;
-use App\Models\DriverStatus;
+use App\Models\Vehicle;
+use App\Services\AssignmentPresenceService;
+use Carbon\Carbon;
 use Illuminate\Console\Command;
 
 /**
  * 🔧 COMMANDE DE SYNCHRONISATION ENTERPRISE-GRADE
  *
- * Synchronise les status_id avec les champs is_available pour garantir
- * la cohérence totale entre les deux systèmes de gestion des statuts.
+ * Synchronise la présence des ressources (is_available, assignment_status, current_*_id)
+ * à partir des affectations comme source de vérité.
  *
  * Utilisation:
  * - php artisan assignments:sync-resource-status        (Mode diagnostic)
@@ -21,7 +22,7 @@ use Illuminate\Console\Command;
  * - php artisan assignments:sync-resource-status --force (Exécution réelle)
  * - php artisan assignments:sync-resource-status --queue (Via queue)
  *
- * @version 1.0.0-Enterprise
+ * @version 2.0.0-Enterprise
  * @author ZenFleet Team
  */
 class SyncResourceStatuses extends Command
@@ -41,7 +42,7 @@ class SyncResourceStatuses extends Command
      *
      * @var string
      */
-    protected $description = '🔄 Synchronise les status_id avec is_available pour garantir la cohérence des statuts';
+    protected $description = '🔄 Synchronise la présence des ressources avec les affectations';
 
     /**
      * Execute the console command.
@@ -49,7 +50,7 @@ class SyncResourceStatuses extends Command
     public function handle()
     {
         $this->info('╔══════════════════════════════════════════════════════════════╗');
-        $this->info('║  🚀 ZENFLEET - SYNCHRONISATION DES STATUTS DE RESSOURCES   ║');
+        $this->info('║  🚀 ZENFLEET - SYNCHRONISATION PRÉSENCE RESSOURCES         ║');
         $this->info('╚══════════════════════════════════════════════════════════════╝');
         $this->newLine();
 
@@ -95,219 +96,131 @@ class SyncResourceStatuses extends Command
         $this->info('📊 ANALYSE DE L\'ÉTAT ACTUEL');
         $this->info('═══════════════════════════════════════');
 
-        // Récupérer les statuts
-        $parkingStatus = VehicleStatus::where('name', 'Parking')->first();
-        $affectedStatus = VehicleStatus::where('name', 'Affecté')->first();
-        $availableDriverStatus = DriverStatus::where('slug', 'disponible')
-            ->orWhere('name', 'ILIKE', '%disponible%')
-            ->first();
+        $now = now();
+        $vehicleStats = $this->countVehiclePresenceMismatches($now);
+        $driverStats = $this->countDriverPresenceMismatches($now);
 
-        // Analyser les véhicules
-        $vehiclesAvailableButWrongStatus = Vehicle::where('is_available', true)
-            ->where('assignment_status', 'available')
-            ->whereNull('current_driver_id')
-            ->when($parkingStatus, fn($q) => $q->where('status_id', '!=', $parkingStatus->id))
-            ->count();
+        $this->line('Véhicules :');
+        $this->line("  - Incohérences (devraient être affectés) : {$vehicleStats['assigned_mismatch']}");
+        $this->line("  - Incohérences (devraient être disponibles) : {$vehicleStats['available_mismatch']}");
 
-        $vehiclesAssignedButWrongStatus = Vehicle::where('is_available', false)
-            ->where('assignment_status', 'assigned')
-            ->whereNotNull('current_driver_id')
-            ->when($affectedStatus, fn($q) => $q->where('status_id', '!=', $affectedStatus->id))
-            ->count();
+        $this->newLine();
 
-        // Analyser les chauffeurs
-        $driversAvailableButWrongStatus = Driver::where('is_available', true)
-            ->where('assignment_status', 'available')
-            ->whereNull('current_vehicle_id')
-            ->when($availableDriverStatus, fn($q) => $q->where('status_id', '!=', $availableDriverStatus->id))
-            ->count();
-
-        $driversAssignedButWrongStatus = Driver::where('is_available', false)
-            ->where('assignment_status', 'assigned')
-            ->whereNotNull('current_vehicle_id')
-            ->count();
-
-        // Afficher les résultats
-        $this->table(
-            ['Ressource', 'État', 'Incohérences'],
-            [
-                ['Véhicules', 'Disponibles (is_available=true)', $vehiclesAvailableButWrongStatus],
-                ['Véhicules', 'Affectés (is_available=false)', $vehiclesAssignedButWrongStatus],
-                ['Chauffeurs', 'Disponibles (is_available=true)', $driversAvailableButWrongStatus],
-                ['Chauffeurs', 'En mission (is_available=false)', $driversAssignedButWrongStatus],
-            ]
-        );
-
-        $totalInconsistencies = $vehiclesAvailableButWrongStatus + $vehiclesAssignedButWrongStatus +
-                               $driversAvailableButWrongStatus + $driversAssignedButWrongStatus;
-
-        if ($totalInconsistencies === 0) {
-            $this->info('✅ Aucune incohérence détectée ! Tous les statuts sont synchronisés.');
-        } else {
-            $this->warn("⚠️  Total d'incohérences à corriger: {$totalInconsistencies}");
-        }
+        $this->line('Chauffeurs :');
+        $this->line("  - Incohérences (devraient être affectés) : {$driverStats['assigned_mismatch']}");
+        $this->line("  - Incohérences (devraient être disponibles) : {$driverStats['available_mismatch']}");
     }
 
     /**
-     * Simule la synchronisation sans appliquer les changements
+     * Simulation de synchronisation
      */
     private function simulateSynchronization(): void
     {
-        $this->newLine();
-        $this->info('🔍 SIMULATION DES CHANGEMENTS');
-        $this->info('═══════════════════════════════════════');
+        $now = now();
+        $vehicleStats = $this->countVehiclePresenceMismatches($now);
+        $driverStats = $this->countDriverPresenceMismatches($now);
 
-        $parkingStatus = VehicleStatus::where('name', 'Parking')->first();
-        $availableDriverStatus = DriverStatus::where('slug', 'disponible')
-            ->orWhere('name', 'ILIKE', '%disponible%')
-            ->first();
+        $total = $vehicleStats['assigned_mismatch'] + $vehicleStats['available_mismatch']
+            + $driverStats['assigned_mismatch'] + $driverStats['available_mismatch'];
 
-        // Véhicules à modifier
-        $vehiclesToFix = Vehicle::where('is_available', true)
-            ->where('assignment_status', 'available')
-            ->whereNull('current_driver_id')
-            ->when($parkingStatus, fn($q) => $q->where('status_id', '!=', $parkingStatus->id))
-            ->with('vehicleStatus')
-            ->limit(10)
-            ->get();
-
-        if ($vehiclesToFix->count() > 0) {
-            $this->info("\n📦 Véhicules qui seraient mis à jour:");
-            foreach ($vehiclesToFix as $vehicle) {
-                $this->line(sprintf(
-                    "  • %s: %s → Parking",
-                    $vehicle->registration_plate,
-                    $vehicle->vehicleStatus->name ?? 'N/A'
-                ));
-            }
-            if ($vehiclesToFix->count() === 10) {
-                $this->line('  ... et plus');
-            }
+        if ($total === 0) {
+            $this->info('✅ Aucune incohérence détectée.');
+            return;
         }
 
-        // Chauffeurs à modifier
-        $driversToFix = Driver::where('is_available', true)
-            ->where('assignment_status', 'available')
-            ->whereNull('current_vehicle_id')
-            ->when($availableDriverStatus, fn($q) => $q->where('status_id', '!=', $availableDriverStatus->id))
-            ->with('driverStatus')
-            ->limit(10)
-            ->get();
-
-        if ($driversToFix->count() > 0) {
-            $this->info("\n👤 Chauffeurs qui seraient mis à jour:");
-            foreach ($driversToFix as $driver) {
-                $this->line(sprintf(
-                    "  • %s: %s → Disponible",
-                    $driver->full_name,
-                    $driver->driverStatus->name ?? 'N/A'
-                ));
-            }
-            if ($driversToFix->count() === 10) {
-                $this->line('  ... et plus');
-            }
-        }
-
-        $this->newLine();
-        $this->info('💡 Relancez avec --force pour appliquer ces changements');
+        $this->warn("⚠️  {$total} incohérence(s) détectée(s). Exécutez sans --dry pour corriger.");
     }
 
     /**
-     * Exécute la synchronisation réelle
+     * Exécuter la synchronisation réelle
      */
     private function executeSynchronization(): void
     {
-        $this->newLine();
-        $this->info('⚙️  EXÉCUTION DE LA SYNCHRONISATION');
-        $this->info('═══════════════════════════════════════');
+        $presence = app(AssignmentPresenceService::class);
+        $result = $presence->syncAll();
 
-        $progressBar = $this->output->createProgressBar(4);
-        $progressBar->setFormat('verbose');
+        $this->info('✅ Synchronisation terminée');
+        $this->line("  - Véhicules synchronisés : {$result['vehicles_synced']}");
+        $this->line("  - Chauffeurs synchronisés : {$result['drivers_synced']}");
+    }
 
-        // Étape 1: Véhicules disponibles
-        $progressBar->setMessage('Synchronisation des véhicules disponibles...');
-        $progressBar->advance();
+    private function countVehiclePresenceMismatches(Carbon $now): array
+    {
+        $activeVehicleIds = Assignment::query()
+            ->select('vehicle_id')
+            ->whereNotNull('vehicle_id')
+            ->whereNull('deleted_at')
+            ->where(function ($q) {
+                $q->whereNull('status')->orWhere('status', '!=', Assignment::STATUS_CANCELLED);
+            })
+            ->where('start_datetime', '<=', $now)
+            ->where(function ($q) use ($now) {
+                $q->whereNull('end_datetime')
+                    ->orWhere('end_datetime', '>', $now);
+            })
+            ->groupBy('vehicle_id');
 
-        $parkingStatus = VehicleStatus::where('name', 'Parking')->first();
-        $countVehiclesAvailable = 0;
+        $assignedMismatch = Vehicle::query()
+            ->whereIn('id', $activeVehicleIds)
+            ->where(function ($q) {
+                $q->where('is_available', true)
+                    ->orWhere('assignment_status', '!=', 'assigned')
+                    ->orWhereNull('current_driver_id');
+            })
+            ->count();
 
-        if ($parkingStatus) {
-            $countVehiclesAvailable = Vehicle::where('is_available', true)
-                ->where('assignment_status', 'available')
-                ->whereNull('current_driver_id')
-                ->where('status_id', '!=', $parkingStatus->id)
-                ->update(['status_id' => $parkingStatus->id]);
-        }
+        $availableMismatch = Vehicle::query()
+            ->whereNotIn('id', $activeVehicleIds)
+            ->where(function ($q) {
+                $q->where('is_available', false)
+                    ->orWhere('assignment_status', '!=', 'available')
+                    ->orWhereNotNull('current_driver_id');
+            })
+            ->count();
 
-        // Étape 2: Véhicules affectés
-        $progressBar->setMessage('Synchronisation des véhicules affectés...');
-        $progressBar->advance();
+        return [
+            'assigned_mismatch' => $assignedMismatch,
+            'available_mismatch' => $availableMismatch,
+        ];
+    }
 
-        $affectedStatus = VehicleStatus::where('name', 'Affecté')->first();
-        $countVehiclesAssigned = 0;
+    private function countDriverPresenceMismatches(Carbon $now): array
+    {
+        $activeDriverIds = Assignment::query()
+            ->select('driver_id')
+            ->whereNotNull('driver_id')
+            ->whereNull('deleted_at')
+            ->where(function ($q) {
+                $q->whereNull('status')->orWhere('status', '!=', Assignment::STATUS_CANCELLED);
+            })
+            ->where('start_datetime', '<=', $now)
+            ->where(function ($q) use ($now) {
+                $q->whereNull('end_datetime')
+                    ->orWhere('end_datetime', '>', $now);
+            })
+            ->groupBy('driver_id');
 
-        if ($affectedStatus) {
-            $countVehiclesAssigned = Vehicle::where('is_available', false)
-                ->where('assignment_status', 'assigned')
-                ->whereNotNull('current_driver_id')
-                ->where('status_id', '!=', $affectedStatus->id)
-                ->update(['status_id' => $affectedStatus->id]);
-        }
+        $assignedMismatch = Driver::query()
+            ->whereIn('id', $activeDriverIds)
+            ->where(function ($q) {
+                $q->where('is_available', true)
+                    ->orWhere('assignment_status', '!=', 'assigned')
+                    ->orWhereNull('current_vehicle_id');
+            })
+            ->count();
 
-        // Étape 3: Chauffeurs disponibles
-        $progressBar->setMessage('Synchronisation des chauffeurs disponibles...');
-        $progressBar->advance();
+        $availableMismatch = Driver::query()
+            ->whereNotIn('id', $activeDriverIds)
+            ->where(function ($q) {
+                $q->where('is_available', false)
+                    ->orWhere('assignment_status', '!=', 'available')
+                    ->orWhereNotNull('current_vehicle_id');
+            })
+            ->count();
 
-        $availableDriverStatus = DriverStatus::where('slug', 'disponible')
-            ->orWhere('name', 'ILIKE', '%disponible%')
-            ->first();
-        $countDriversAvailable = 0;
-
-        if ($availableDriverStatus) {
-            $countDriversAvailable = Driver::where('is_available', true)
-                ->where('assignment_status', 'available')
-                ->whereNull('current_vehicle_id')
-                ->where('status_id', '!=', $availableDriverStatus->id)
-                ->update(['status_id' => $availableDriverStatus->id]);
-        }
-
-        // Étape 4: Chauffeurs en mission
-        $progressBar->setMessage('Synchronisation des chauffeurs en mission...');
-        $progressBar->advance();
-
-        $onMissionStatus = DriverStatus::where('slug', 'en-mission')
-            ->orWhere('name', 'ILIKE', '%mission%')
-            ->first();
-        $countDriversAssigned = 0;
-
-        if ($onMissionStatus) {
-            $countDriversAssigned = Driver::where('is_available', false)
-                ->where('assignment_status', 'assigned')
-                ->whereNotNull('current_vehicle_id')
-                ->where('status_id', '!=', $onMissionStatus->id)
-                ->update(['status_id' => $onMissionStatus->id]);
-        }
-
-        $progressBar->finish();
-        $this->newLine(2);
-
-        // Résumé
-        $this->info('✅ SYNCHRONISATION TERMINÉE AVEC SUCCÈS !');
-        $this->newLine();
-
-        $this->table(
-            ['Type', 'Nombre de mises à jour'],
-            [
-                ['Véhicules disponibles', $countVehiclesAvailable],
-                ['Véhicules affectés', $countVehiclesAssigned],
-                ['Chauffeurs disponibles', $countDriversAvailable],
-                ['Chauffeurs en mission', $countDriversAssigned],
-                ['─────────────────────', '─────────────────'],
-                ['TOTAL', $countVehiclesAvailable + $countVehiclesAssigned + $countDriversAvailable + $countDriversAssigned],
-            ]
-        );
-
-        $this->newLine();
-        $this->info('📝 Les logs détaillés sont disponibles dans storage/logs/laravel.log');
+        return [
+            'assigned_mismatch' => $assignedMismatch,
+            'available_mismatch' => $availableMismatch,
+        ];
     }
 }

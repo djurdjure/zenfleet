@@ -1,2 +1,2 @@
 @props(['field'])
-{{ isset($errors) && $errors->has($field) ? 'border-red-300' : '' }}
+{{ isset($errors) && $errors->has($field) ? 'zenfleet-invalid' : '' }}

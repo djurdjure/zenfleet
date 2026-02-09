@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Admin\Driver;
 
+use Carbon\Carbon;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -71,5 +72,51 @@ class UpdateDriverRequest extends FormRequest
 
 
         ];
+    }
+
+    protected function prepareForValidation(): void
+    {
+        $payload = [];
+
+        $issueDate = $this->normalizeDateInput($this->input('license_issue_date'));
+        $expiryDate = $this->normalizeDateInput($this->input('license_expiry_date'));
+
+        if ($issueDate) {
+            $payload['license_issue_date'] = $issueDate->format('Y-m-d');
+
+            // Business rule: expiry = issue date + 10 years - 1 day unless user explicitly set another value.
+            if (!$expiryDate) {
+                $payload['license_expiry_date'] = $issueDate->copy()->addYears(10)->subDay()->format('Y-m-d');
+            }
+        }
+
+        if ($expiryDate) {
+            $payload['license_expiry_date'] = $expiryDate->format('Y-m-d');
+        }
+
+        if (!empty($payload)) {
+            $this->merge($payload);
+        }
+    }
+
+    private function normalizeDateInput(mixed $value): ?Carbon
+    {
+        if (!$value) {
+            return null;
+        }
+
+        try {
+            if (is_string($value) && preg_match('/^\d{4}-\d{2}-\d{2}$/', $value)) {
+                return Carbon::createFromFormat('Y-m-d', $value)->startOfDay();
+            }
+
+            if (is_string($value) && preg_match('/^\d{1,2}\/\d{1,2}\/\d{4}$/', $value)) {
+                return Carbon::createFromFormat('d/m/Y', $value)->startOfDay();
+            }
+
+            return Carbon::parse((string) $value)->startOfDay();
+        } catch (\Throwable) {
+            return null;
+        }
     }
 }

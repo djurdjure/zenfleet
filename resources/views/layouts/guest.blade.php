@@ -16,6 +16,9 @@
     <!-- Font Awesome Pro -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
+    <!-- Iconify (utilisé par les composants partagés) -->
+    <script src="https://code.iconify.design/3/3.1.0/iconify.min.js"></script>
+
     <!-- Production Assets -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
@@ -62,6 +65,7 @@
 
             <!-- Login Card -->
             <div class="relative glass-morphism rounded-3xl p-8 sm:p-10 shadow-2xl">
+                <x-form-error-summary />
                 {{ $slot }}
             </div>
         </div>

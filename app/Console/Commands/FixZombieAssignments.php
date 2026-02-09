@@ -323,66 +323,26 @@ class FixZombieAssignments extends Command
                     break;
 
                 case 'vehicle_not_released':
-                    if (!$this->hasOtherActiveAssignment('vehicle', $zombie)) {
-                        DB::table('vehicles')
-                            ->where('id', $zombie->vehicle_id)
-                            ->update([
-                                'is_available' => true,
-                                'current_driver_id' => null,
-                                'assignment_status' => 'available',
-                                'last_assignment_end' => $zombie->end_datetime ?? now(),
-                                'updated_at' => now()
-                            ]);
-                        $this->line("  ✅ Véhicule libéré");
-                        $fixed = true;
+                    $presence = app(\App\Services\AssignmentPresenceService::class);
+                    $presence->syncVehicle($zombie->vehicle_id, now(), $zombie->end_datetime ?? now());
+                    $this->line("  ✅ Véhicule présence synchronisée");
+                    $fixed = true;
 
-                        // CORRECTION #2: Synchroniser status_id immédiatement après libération
-                        if (class_exists('\\App\\Services\\ResourceStatusSynchronizer')) {
-                            try {
-                                $sync = app('\\App\\Services\\ResourceStatusSynchronizer');
-                                $sync->syncVehicleStatus($zombie->vehicle->fresh());
-                                $this->line("  ✅ status_id véhicule synchronisé");
-                            } catch (\Exception $e) {
-                                $this->error("  ⚠️ Erreur synchronisation status_id véhicule: " . $e->getMessage());
-                            }
-                        }
-
-                        // Déclencher l'événement pour notifications
-                        event(new \App\Events\VehicleStatusChanged($zombie->vehicle, 'available'));
-                    } else {
-                        $this->line("  ⚠️ Véhicule a d'autres affectations actives - non libéré");
+                    $vehicleFresh = $zombie->vehicle?->fresh();
+                    if ($vehicleFresh && $vehicleFresh->is_available && $vehicleFresh->assignment_status === 'available') {
+                        event(new \App\Events\VehicleStatusChanged($vehicleFresh, 'available'));
                     }
                     break;
 
                 case 'driver_not_released':
-                    if (!$this->hasOtherActiveAssignment('driver', $zombie)) {
-                        DB::table('drivers')
-                            ->where('id', $zombie->driver_id)
-                            ->update([
-                                'is_available' => true,
-                                'current_vehicle_id' => null,
-                                'assignment_status' => 'available',
-                                'last_assignment_end' => $zombie->end_datetime ?? now(),
-                                'updated_at' => now()
-                            ]);
-                        $this->line("  ✅ Chauffeur libéré");
-                        $fixed = true;
+                    $presence = app(\App\Services\AssignmentPresenceService::class);
+                    $presence->syncDriver($zombie->driver_id, now(), $zombie->end_datetime ?? now());
+                    $this->line("  ✅ Chauffeur présence synchronisée");
+                    $fixed = true;
 
-                        // CORRECTION #2: Synchroniser status_id immédiatement après libération
-                        if (class_exists('\\App\\Services\\ResourceStatusSynchronizer')) {
-                            try {
-                                $sync = app('\\App\\Services\\ResourceStatusSynchronizer');
-                                $sync->syncDriverStatus($zombie->driver->fresh());
-                                $this->line("  ✅ status_id chauffeur synchronisé");
-                            } catch (\Exception $e) {
-                                $this->error("  ⚠️ Erreur synchronisation status_id chauffeur: " . $e->getMessage());
-                            }
-                        }
-
-                        // Déclencher l'événement pour notifications
-                        event(new \App\Events\DriverStatusChanged($zombie->driver, 'available'));
-                    } else {
-                        $this->line("  ⚠️ Chauffeur a d'autres affectations actives - non libéré");
+                    $driverFresh = $zombie->driver?->fresh();
+                    if ($driverFresh && $driverFresh->is_available && $driverFresh->assignment_status === 'available') {
+                        event(new \App\Events\DriverStatusChanged($driverFresh, 'available'));
                     }
                     break;
             }
