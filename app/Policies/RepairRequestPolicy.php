@@ -97,7 +97,7 @@ class RepairRequestPolicy
         }
 
         // Admin can update any
-        if ($user->hasRole('Admin')) {
+        if ($this->isAdminRole($user)) {
             return true;
         }
 
@@ -130,12 +130,12 @@ class RepairRequestPolicy
         }
 
         // Supervisor can approve their team's requests
-        if ($user->hasRole('Supervisor')) {
+        if ($this->isSupervisorRole($user)) {
             return $this->isTeamRequest($user, $repairRequest);
         }
 
         // Admin and Fleet Manager can also approve level 1
-        return $user->hasRole(['Admin', 'Fleet Manager']);
+        return $this->isAdminRole($user) || $this->isFleetManagerRole($user);
     }
 
     /**
@@ -168,7 +168,7 @@ class RepairRequestPolicy
         }
 
         // Only Fleet Manager and Admin
-        return $user->hasRole(['Admin', 'Fleet Manager']);
+        return $this->isAdminRole($user) || $this->isFleetManagerRole($user);
     }
 
     /**
@@ -196,7 +196,7 @@ class RepairRequestPolicy
         }
 
         // Admin can delete any
-        if ($user->hasRole('Admin')) {
+        if ($this->isAdminRole($user)) {
             return true;
         }
 
@@ -219,7 +219,7 @@ class RepairRequestPolicy
         }
 
         // Only Admin can force delete
-        return $user->hasRole('Admin') && $user->can('repair-requests.force-delete');
+        return $this->isAdminRole($user) && $user->can('repair-requests.force-delete');
     }
 
     /**
@@ -233,7 +233,7 @@ class RepairRequestPolicy
         }
 
         // Only Admin can restore
-        return $user->hasRole('Admin') && $user->can('repair-requests.restore');
+        return $this->isAdminRole($user) && $user->can('repair-requests.restore');
     }
 
     /**
@@ -269,6 +269,31 @@ class RepairRequestPolicy
     public function export(User $user): bool
     {
         return $user->can('repair-requests.export')
-            || $user->hasRole(['Admin', 'Fleet Manager']);
+            || $this->isAdminRole($user)
+            || $this->isFleetManagerRole($user);
+    }
+
+    /**
+     * Role alias helper: Supervisor in FR/EN naming.
+     */
+    protected function isSupervisorRole(User $user): bool
+    {
+        return $user->hasAnyRole(['Supervisor', 'Superviseur']);
+    }
+
+    /**
+     * Role alias helper: Fleet Manager in FR/EN naming.
+     */
+    protected function isFleetManagerRole(User $user): bool
+    {
+        return $user->hasAnyRole(['Fleet Manager', 'Gestionnaire Flotte', 'Chef de parc']);
+    }
+
+    /**
+     * Role alias helper: Admin role.
+     */
+    protected function isAdminRole(User $user): bool
+    {
+        return $user->hasRole('Admin');
     }
 }

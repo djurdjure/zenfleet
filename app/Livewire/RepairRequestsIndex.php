@@ -44,6 +44,8 @@ class RepairRequestsIndex extends Component
     public string $dateFrom = '';
     public string $dateTo = '';
     public bool $showFilters = false;
+    public $vehicleOptions = [];
+    public $driverOptions = [];
     
     /**
      * 📊 PROPRIÉTÉS DE TRI ET AFFICHAGE
@@ -228,14 +230,17 @@ class RepairRequestsIndex extends Component
         }
 
         if ($user->can('repair-requests.view.team')) {
-            if ($user->hasRole('Supervisor')) {
+            if ($this->isSupervisorRole($user)) {
                 $query->where(function($q) use ($user) {
                     $q->whereHas('driver', function ($subQ) use ($user) {
                         $subQ->where('supervisor_id', $user->id);
                     })->orWhere('supervisor_id', $user->id);
                 });
-            } elseif ($user->hasRole('Chef de parc') && $user->depot_id) {
-                $query->where('depot_id', $user->depot_id);
+            } elseif ($this->isFleetManagerRole($user) && $user->depot_id) {
+                // Scope team by vehicle depot instead of a non-existent repair_requests.depot_id column.
+                $query->whereHas('vehicle', function ($subQ) use ($user) {
+                    $subQ->where('depot_id', $user->depot_id);
+                });
             }
 
             return $query;
@@ -418,7 +423,7 @@ class RepairRequestsIndex extends Component
         $query = Vehicle::where('organization_id', $user->organization_id)
             ->active(); // REFACTORED: utilisation du Query Scope
 
-        if ($user->hasRole('Chauffeur')) {
+        if ($this->isDriverRole($user)) {
             $query->whereHas('assignments', function($q) use ($user) {
                 $q->where('driver_id', function($subQ) use ($user) {
                     $subQ->select('id')
@@ -621,6 +626,30 @@ class RepairRequestsIndex extends Component
             'type' => 'success',
             'message' => "{$count} demande(s) supprimée(s) avec succès."
         ]);
+    }
+
+    /**
+     * Role alias helper: Driver in FR/EN naming.
+     */
+    private function isDriverRole($user): bool
+    {
+        return $user->hasAnyRole(['Chauffeur', 'Driver']);
+    }
+
+    /**
+     * Role alias helper: Supervisor in FR/EN naming.
+     */
+    private function isSupervisorRole($user): bool
+    {
+        return $user->hasAnyRole(['Supervisor', 'Superviseur']);
+    }
+
+    /**
+     * Role alias helper: Fleet manager in FR/EN naming.
+     */
+    private function isFleetManagerRole($user): bool
+    {
+        return $user->hasAnyRole(['Fleet Manager', 'Gestionnaire Flotte', 'Chef de parc']);
     }
 
     /**
