@@ -38,7 +38,7 @@ class DashboardController extends Controller
         $this->cacheService = $cacheService;
         
         // Middleware conditionnel pour certaines méthodes
-        $this->middleware('role:Super Admin|Admin|Gestionnaire Flotte|Supervisor')
+        $this->middleware('role:Super Admin|Admin|Gestionnaire Flotte|Supervisor|Superviseur')
             ->only(['systemMetrics', 'systemHealth', 'auditLogs']);
     }
 
@@ -103,7 +103,7 @@ class DashboardController extends Controller
      */
     private function generateDashboardData(User $user): array
     {
-        $role = $user->getRoleNames()->first() ?? 'User';
+        $role = $this->resolveDashboardRole($user);
         $cacheKey = "dashboard_v2_{$role}_{$user->id}";
         
         return Cache::remember($cacheKey, 300, function () use ($user, $role) {
@@ -112,7 +112,7 @@ class DashboardController extends Controller
                     'Super Admin' => $this->renderSuperAdminDashboard($user),
                     'Admin' => $this->renderAdminDashboard($user),
                     'Gestionnaire Flotte' => $this->renderFleetManagerDashboard($user),
-                    'Supervisor' => $this->renderSupervisorDashboard($user),
+                    'Superviseur' => $this->renderSupervisorDashboard($user),
                     default => $this->renderDriverDashboard($user)
                 };
             } catch (\Exception $e) {
@@ -131,14 +131,14 @@ class DashboardController extends Controller
      */
     private function renderDashboardView(User $user, array $data): View
     {
-        $role = $user->getRoleNames()->first() ?? 'User';
+        $role = $this->resolveDashboardRole($user);
         
         try {
             $viewMap = [
                 'Super Admin' => 'admin.dashboard.super-admin',
                 'Admin' => 'admin.dashboard.admin',
                 'Gestionnaire Flotte' => 'admin.dashboard.fleet-manager',
-                'Supervisor' => 'admin.dashboard.supervisor',
+                'Superviseur' => 'admin.dashboard.supervisor',
                 'User' => 'dashboard.driver',
                 'Driver' => 'dashboard.driver',
             ];
@@ -351,7 +351,7 @@ class DashboardController extends Controller
                 'error' => $e->getMessage()
             ]);
             
-            return $this->getFallbackDashboardData($user, 'Supervisor');
+            return $this->getFallbackDashboardData($user, 'Superviseur');
         }
     }
 
@@ -362,7 +362,7 @@ class DashboardController extends Controller
     {
         try {
             // Pour les admins, on affiche un dashboard simplifié plutôt qu'un dashboard chauffeur
-            if ($user->is_super_admin || $user->hasRole(['Super Admin', 'Admin'])) {
+            if ($user->is_super_admin || $user->hasAnyRole(['Super Admin', 'Admin'])) {
                 return [
                     'user' => $user,
                     'stats' => [
@@ -487,13 +487,30 @@ class DashboardController extends Controller
                 'Super Admin' => 'super-admin',
                 'Admin' => 'admin',
                 'Gestionnaire Flotte' => 'fleet-manager',
-                'Supervisor' => 'supervisor',
+                'Superviseur' => 'supervisor',
                 default => 'driver'
             },
             'error' => 'Données partiellement indisponibles - Mode dégradé activé',
             'fallbackMode' => true,
             'timestamp' => now()->toISOString()
         ];
+    }
+
+    /**
+     * Résout le rôle de dashboard en gérant les alias historiques.
+     */
+    private function resolveDashboardRole(User $user): string
+    {
+        $roles = $user->getRoleNames();
+
+        return match (true) {
+            $roles->contains('Super Admin') => 'Super Admin',
+            $roles->contains('Admin') => 'Admin',
+            $roles->contains('Gestionnaire Flotte') => 'Gestionnaire Flotte',
+            $roles->contains('Superviseur'), $roles->contains('Supervisor') => 'Superviseur',
+            $roles->contains('Driver'), $roles->contains('Chauffeur') => 'Driver',
+            default => 'User',
+        };
     }
 
     // ============================================================

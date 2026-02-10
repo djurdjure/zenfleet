@@ -141,6 +141,12 @@ class UpdateVehicleMileage extends Component
     
     public function mount(?int $vehicleId = null): void
     {
+        abort_unless(
+            $this->canRecordMileage(),
+            403,
+            'This action is unauthorized.'
+        );
+
         // Initialiser la date et l'heure à maintenant
         $this->recordedDate = now()->format('Y-m-d');
         $this->recordedTime = now()->format('H:i');
@@ -148,11 +154,17 @@ class UpdateVehicleMileage extends Component
         $user = auth()->user();
         
         // Mode fixe pour les chauffeurs avec véhicule assigné
-        if ($user->hasRole('Chauffeur') && $user->driver_id) {
-            $assignment = DB::table('vehicle_assignments')
-                ->where('driver_id', $user->driver_id)
+        if ($user->hasAnyRole(['Chauffeur', 'Driver']) && $user->driver) {
+            $assignment = DB::table('assignments')
+                ->where('driver_id', $user->driver->id)
                 ->where('organization_id', $user->organization_id)
-                ->whereNull('end_date')
+                ->where('status', 'active')
+                ->whereNull('deleted_at')
+                ->where(function ($query) {
+                    $query->whereNull('end_datetime')
+                        ->orWhere('end_datetime', '>=', now());
+                })
+                ->orderByDesc('start_datetime')
                 ->first();
                 
             if ($assignment) {
@@ -173,22 +185,9 @@ class UpdateVehicleMileage extends Component
     
     private function loadVehicle(int $vehicleId): void
     {
-        $user = auth()->user();
-        
-        $query = Vehicle::with(['category', 'depot'])
-            ->where('organization_id', $user->organization_id)
-            ->where('id', $vehicleId);
-            
-        // Appliquer les restrictions selon le rôle
-        if ($user->hasRole('Chauffeur')) {
-            $query->whereHas('currentAssignments', function ($q) use ($user) {
-                $q->where('driver_id', $user->driver_id);
-            });
-        } elseif ($user->hasAnyRole(['Supervisor', 'Chef de Parc']) && $user->depot_id) {
-            $query->where('depot_id', $user->depot_id);
-        }
-        
-        $vehicle = $query->first();
+        $vehicle = $this->buildAccessibleVehiclesQuery()
+            ->where('id', $vehicleId)
+            ->first();
         
         if ($vehicle) {
             $this->vehicleData = [
@@ -196,12 +195,12 @@ class UpdateVehicleMileage extends Component
                 'registration_plate' => $vehicle->registration_plate,
                 'brand' => $vehicle->brand,
                 'model' => $vehicle->model,
-                'year' => $vehicle->year,
+                'year' => $vehicle->manufacturing_year,
                 'current_mileage' => $vehicle->current_mileage,
                 'category_name' => $vehicle->category?->name,
                 'depot_name' => $vehicle->depot?->name,
-                'fuel_type' => $vehicle->fuel_type,
-                'status' => $vehicle->status,
+                'fuel_type' => $vehicle->fuelType?->name,
+                'status' => $vehicle->vehicleStatus?->name,
                 'color' => $vehicle->color,
             ];
             
@@ -274,6 +273,10 @@ class UpdateVehicleMileage extends Component
      */
     public function save()
     {
+        if (!$this->canRecordMileage()) {
+            abort(403, 'This action is unauthorized.');
+        }
+
         // Validation
         $this->validate();
 
@@ -288,7 +291,8 @@ class UpdateVehicleMileage extends Component
 
             // ✅ VALIDATION ENTERPRISE V2.0: Recharger le véhicule avec LOCK
             // pour obtenir les données les plus récentes et éviter les race conditions
-            $vehicle = Vehicle::where('id', $this->vehicleData['id'])
+            $vehicle = $this->buildAccessibleVehiclesQuery()
+                ->where('id', $this->vehicleData['id'])
                 ->lockForUpdate()
                 ->first();
 
@@ -323,7 +327,7 @@ class UpdateVehicleMileage extends Component
                 'recorded_at' => $recordedAt,
                 'recording_method' => 'manual',
                 'notes' => $this->notes ?: null,
-                'recorded_by' => auth()->id(),
+                'recorded_by_id' => auth()->id(),
                 'organization_id' => auth()->user()->organization_id,
             ]);
 
@@ -412,15 +416,7 @@ class UpdateVehicleMileage extends Component
             return collect([]);
         }
 
-        $user = auth()->user();
-
-        $query = Vehicle::where('organization_id', $user->organization_id)
-            // ✅ SUPPRESSION du scope active() qui filtrait sur status_id=1 (inexistant)
-            ->where('is_archived', false) // Uniquement non archivés
-            ->with(['category', 'depot', 'vehicleStatus']);
-
-        // ✅ CORRECTION V6.0: Retrait des filtres de permissions restrictifs
-        // Tous les utilisateurs peuvent voir tous les véhicules de l'organisation
+        $query = $this->buildAccessibleVehiclesQuery();
 
         // Recherche
         if ($this->vehicleSearch) {
@@ -433,6 +429,30 @@ class UpdateVehicleMileage extends Component
         }
 
         return $query->orderBy('registration_plate')->get();
+    }
+
+    /**
+     * Base query: véhicules autorisés pour l'utilisateur connecté.
+     */
+    private function buildAccessibleVehiclesQuery()
+    {
+        $user = auth()->user();
+
+        return Vehicle::query()
+            ->where('organization_id', $user->organization_id)
+            ->where('is_archived', false)
+            ->with(['category', 'depot', 'vehicleStatus', 'fuelType']);
+    }
+
+    private function canRecordMileage(): bool
+    {
+        $user = auth()->user();
+
+        return (bool) $user?->canAny([
+            'mileage-readings.create',
+            'mileage-readings.update.own',
+            'mileage-readings.update.any',
+        ]);
     }
     
     /**

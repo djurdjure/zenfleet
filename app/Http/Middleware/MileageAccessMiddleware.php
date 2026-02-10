@@ -28,22 +28,31 @@ class MileageAccessMiddleware
         }
 
         // Super Admin et Admin ont toujours accès complet
-        if ($user->hasRole(['Super Admin', 'Admin'])) {
+        if ($user->hasAnyRole(['Super Admin', 'Admin'])) {
             return $next($request);
         }
 
         // Gestionnaire Flotte avec permission complète
-        if ($user->hasRole('Gestionnaire Flotte') && $user->can('mileage-readings.view.all')) {
+        if ($user->hasAnyRole(['Gestionnaire Flotte', 'Fleet Manager', 'Chef de parc']) && $user->can('mileage-readings.view.all')) {
             return $next($request);
         }
 
         // Superviseur avec accès équipe
-        if ($user->hasRole('Superviseur') && $user->can('mileage-readings.view.team')) {
+        if ($user->hasAnyRole(['Superviseur', 'Supervisor']) && $user->can('mileage-readings.view.team')) {
             return $next($request);
         }
 
         // Chauffeur ou autre rôle avec accès limité
         if ($user->can('mileage-readings.view.own')) {
+            return $next($request);
+        }
+
+        // Accès au module pour saisie/mise à jour même sans permission de consultation globale
+        if ($user->canAny([
+            'mileage-readings.create',
+            'mileage-readings.update.own',
+            'mileage-readings.update.any',
+        ])) {
             return $next($request);
         }
 
