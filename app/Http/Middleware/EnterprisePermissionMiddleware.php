@@ -475,14 +475,11 @@ class EnterprisePermissionMiddleware
             ], 403);
         }
 
-        // Redirection avec message d'erreur contextualisé
+        // Réponse 403 explicite pour les requêtes web:
+        // évite les redirections ambiguës en cas de refus d'accès.
         $errorMessage = $this->getContextualErrorMessage($permission);
 
-        return redirect()
-            ->back()
-            ->with('error', $errorMessage)
-            ->with('error_type', 'permission_denied')
-            ->with('required_permission', $permission);
+        return response($errorMessage, 403);
     }
 
     /**

@@ -4,6 +4,7 @@ namespace App\Policies;
 
 use App\Models\User;
 use App\Models\Vehicle;
+use App\Models\Assignment;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
 class VehiclePolicy
@@ -134,10 +135,19 @@ class VehiclePolicy
 
         // Chauffeur: uniquement son véhicule assigné
         if ($user->can('mileage-readings.view.own')) {
-            if ($user->driver_id) {
+            if ($user->driver) {
+                $referenceTime = now();
+
                 // Vérifier si le véhicule est assigné à ce chauffeur
-                return $vehicle->currentAssignments()
-                    ->where('driver_id', $user->driver_id)
+                return $vehicle->assignments()
+                    ->where('driver_id', $user->driver->id)
+                    ->where('status', '!=', Assignment::STATUS_CANCELLED)
+                    ->where('start_datetime', '<=', $referenceTime)
+                    ->whereNull('deleted_at')
+                    ->where(function ($query) use ($referenceTime) {
+                        $query->whereNull('end_datetime')
+                            ->orWhere('end_datetime', '>=', $referenceTime);
+                    })
                     ->exists();
             }
         }

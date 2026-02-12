@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreVehicleMileageReadingRequest;
 use App\Http\Requests\UpdateVehicleMileageReadingRequest;
+use App\Models\Vehicle;
 use App\Models\VehicleMileageReading;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -56,10 +57,12 @@ class VehicleMileageReadingController extends Controller
         $this->authorize('viewAny', VehicleMileageReading::class);
 
         $user = auth()->user();
+        $accessibleVehicleIds = $this->getAccessibleVehicleIds($user->organization_id);
 
         // Base query with organization isolation
         $query = VehicleMileageReading::query()
             ->where('organization_id', $user->organization_id)
+            ->whereIn('vehicle_id', $accessibleVehicleIds)
             ->with(['vehicle', 'recordedBy', 'organization']);
 
         // Apply permission-based scoping
@@ -71,6 +74,8 @@ class VehicleMileageReadingController extends Controller
             $query->whereHas('vehicle', function ($q) use ($user) {
                 if ($user->depot_id) {
                     $q->where('depot_id', $user->depot_id);
+                } else {
+                    $q->whereRaw('1 = 0');
                 }
             });
         } else {
@@ -331,5 +336,14 @@ class VehicleMileageReadingController extends Controller
                 'error' => $e->getMessage(),
             ], 500);
         }
+    }
+
+    private function getAccessibleVehicleIds(int $organizationId): array
+    {
+        return Vehicle::query()
+            ->where('organization_id', $organizationId)
+            ->pluck('id')
+            ->map(fn ($id) => (int) $id)
+            ->all();
     }
 }

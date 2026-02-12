@@ -4,7 +4,7 @@
     🎯 AMÉLIORATIONS V3.0 (21/11/2025):
     - SlimSelect pour sélection de véhicule (style identique aux affectations)
     - Flatpickr via x-datepicker pour date (déjà présent, amélioré)
-    - SlimSelect pour sélection d'heure (options par 15min)
+    - Champ heure natif (prérempli + modifiable)
     - CSS enterprise-grade cohérent avec le module affectations
     - Initialisation Livewire hooks robuste avec gestion d'erreurs
     - Support complet Livewire + wire:ignore pour éviter conflits
@@ -14,7 +14,7 @@
     - Structure section > container > cards
     - Icônes Heroicons
     - Composants <x-button>, <x-datepicker>, <x-input>
-    - SlimSelect avec recherche et highlighting
+    - SlimSelect avec recherche pour la sélection véhicule
     - Couleurs et espacements standardisés
     - Responsive mobile/tablet/desktop
 
@@ -139,11 +139,6 @@
                                             <span class="text-sm text-blue-700">
                                                 {{ $vehicleData['brand'] }} {{ $vehicleData['model'] }}
                                             </span>
-                                            @if($vehicleData['manufacturing_year'])
-                                                <span class="px-2 py-0.5 bg-blue-200 text-blue-800 text-xs rounded-full">
-                                                    {{ $vehicleData['manufacturing_year'] }}
-                                                </span>
-                                            @endif
                                         </div>
                                         
                                         <div class="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
@@ -188,6 +183,7 @@
                                 <x-datepicker
                                     name="date"
                                     wire:model.live="date"
+                                    :value="$date"
                                     label="Date de la lecture"
                                     :maxDate="date('Y-m-d')"
                                     :minDate="date('Y-m-d', strtotime('-30 days'))"
@@ -197,7 +193,7 @@
                                     required
                                 />
                             </div>
-                            {{-- Heure - SLIMSELECT ENTERPRISE --}}
+                            {{-- Heure - Champ natif prérempli et modifiable --}}
                             <div>
                                 <label for="time" class="block text-sm font-medium text-gray-700 mb-2">
                                     <div class="flex items-center gap-2">
@@ -206,29 +202,22 @@
                                         <span class="text-red-500">*</span>
                                     </div>
                                 </label>
-                                <div wire:ignore id="time-select-wrapper">
-                                    <select
-                                        id="time"
-                                        name="time"
-                                        class="slimselect-time w-full"
-                                        required>
-                                        <option data-placeholder="true" value=""></option>
-                                        @for($hour = 0; $hour < 24; $hour++)
-                                            @foreach(['00', '30'] as $minute)
-                                                @php $timeValue = sprintf('%02d:%s', $hour, $minute); @endphp
-                                                <option value="{{ $timeValue }}" @selected($time == $timeValue)>
-                                                    {{ $timeValue }}
-                                                </option>
-                                            @endforeach
-                                        @endfor
-                                    </select>
-                                </div>
+                                <input
+                                    type="time"
+                                    id="time"
+                                    name="time"
+                                    wire:model.live="time"
+                                    step="60"
+                                    required
+                                    class="block w-full px-3 py-2.5 bg-white border rounded-lg shadow-sm text-sm text-gray-900 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 {{ $errors->has('time') ? 'border-red-500 bg-red-50' : 'border-gray-300' }}"
+                                />
                                 @error('time')
                                     <p class="mt-2 text-sm text-red-600 flex items-center gap-1">
                                         <x-iconify icon="heroicons:exclamation-circle" class="w-4 h-4" />
                                         {{ $message }}
                                     </p>
                                 @enderror
+                                <p class="mt-1.5 text-xs text-gray-500">Préchargée à l'heure actuelle, modifiable.</p>
                             </div>
                         </div>
 
@@ -495,39 +484,6 @@ function initMileageSlimSelects() {
         }
     }
 
-    // 🕐 Heure select
-    const timeEl = document.getElementById('time');
-    if (timeEl && !timeEl.slim) {
-        try {
-            const timeSlimSelect = new SlimSelect({
-                select: timeEl,
-                settings: {
-                    showSearch: true,
-                    searchHighlight: false,
-                    closeOnSelect: true,
-                    allowDeselect: false,
-                    placeholderText: 'Sélectionner l\'heure',
-                    searchPlaceholder: 'Rechercher...',
-                },
-                events: {
-                    afterChange: (newVal) => {
-                        const value = newVal[0]?.value || '';
-                        console.log('🕐 Heure sélectionnée:', value);
-
-                        @this.set('time', value);
-
-                        if (value) {
-                            document.getElementById('time-select-wrapper')?.classList.remove('slimselect-error');
-                        }
-                    }
-                }
-            });
-            timeEl.slim = timeSlimSelect; // Stocker pour éviter réinitialisation
-            console.log('✅ Heure SlimSelect initialisée');
-        } catch (error) {
-            console.error('❌ Erreur init heure SlimSelect:', error);
-        }
-    }
 }
 </script>
 @endpush

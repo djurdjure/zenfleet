@@ -485,7 +485,7 @@
                                     </a>
 
                                     @canany(['approveLevelOne', 'approveLevelTwo'], $request)
-                                    <button wire:click="$dispatch('approve-request', { requestId: {{ $request->id }} })" class="text-green-600 hover:text-green-900" title="Approuver">
+                                    <button wire:click="openApproveModal({{ $request->id }})" class="text-green-600 hover:text-green-900" title="Approuver">
                                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                                         </svg>
@@ -493,7 +493,7 @@
                                     @endcanany
 
                                     @canany(['rejectLevelOne', 'rejectLevelTwo'], $request)
-                                    <button wire:click="$dispatch('reject-request', { requestId: {{ $request->id }} })" class="text-red-600 hover:text-red-900" title="Rejeter">
+                                    <button wire:click="openRejectModal({{ $request->id }})" class="text-red-600 hover:text-red-900" title="Rejeter">
                                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                                         </svg>
@@ -501,11 +501,13 @@
                                     @endcanany
 
                                     @can('update', $request)
+                                    @if(\Illuminate\Support\Facades\Route::has('admin.repair-requests.edit'))
                                     <a href="{{ route('admin.repair-requests.edit', $request) }}" class="text-gray-600 hover:text-gray-900" title="Modifier">
                                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
                                         </svg>
                                     </a>
+                                    @endif
                                     @endcan
                                 </div>
                             </td>
@@ -541,4 +543,58 @@
             </div>
         </div>
     </div>
+
+    <x-modal wire:model="showDecisionModal" :title="$decisionAction === 'approve' ? 'Approuver la demande' : 'Rejeter la demande'" maxWidth="2xl">
+        @if($decisionRequest)
+        <div class="space-y-4">
+            <div class="rounded-lg border border-gray-200 bg-gray-50 px-4 py-3">
+                <div class="text-sm font-semibold text-gray-900">
+                    {{ $decisionRequest->vehicle?->registration_plate ?? 'N/A' }} - {{ $decisionRequest->title }}
+                </div>
+                <div class="text-xs text-gray-600 mt-1">
+                    Statut: {{ $statuses[$decisionRequest->status]['label'] ?? $decisionRequest->status }}
+                </div>
+            </div>
+
+            <div>
+                <label for="decision-comment" class="block text-sm font-medium text-gray-700 mb-2">
+                    @if($decisionAction === 'approve')
+                    Commentaire (optionnel)
+                    @else
+                    Motif du rejet <span class="text-red-600">*</span>
+                    @endif
+                </label>
+                <textarea
+                    id="decision-comment"
+                    wire:model.defer="decisionComment"
+                    rows="4"
+                    class="w-full rounded-lg border-gray-300 focus:ring-blue-500 focus:border-blue-500"
+                    placeholder="{{ $decisionAction === 'approve' ? 'Ajouter un commentaire...' : 'Décrire le motif du rejet...' }}"></textarea>
+                @error('decisionComment')
+                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                @enderror
+            </div>
+
+            <div class="flex justify-end gap-3 pt-2">
+                <button
+                    type="button"
+                    wire:click="closeDecisionModal"
+                    class="inline-flex items-center px-4 py-2 rounded-lg border border-gray-300 text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">
+                    Annuler
+                </button>
+                <button
+                    type="button"
+                    wire:click="submitDecision"
+                    wire:loading.attr="disabled"
+                    class="inline-flex items-center px-4 py-2 rounded-lg text-sm font-medium text-white {{ $decisionAction === 'approve' ? 'bg-green-600 hover:bg-green-700' : 'bg-red-600 hover:bg-red-700' }}">
+                    @if($decisionAction === 'approve')
+                    Confirmer l'approbation
+                    @else
+                    Confirmer le rejet
+                    @endif
+                </button>
+            </div>
+        </div>
+        @endif
+    </x-modal>
 </div>

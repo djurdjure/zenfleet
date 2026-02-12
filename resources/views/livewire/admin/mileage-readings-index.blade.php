@@ -285,13 +285,13 @@
                 @endcan
 
                 {{-- Bouton Nouveau Relevé (Icon-only) --}}
-                @can('mileage-readings.create')
+                @canany(['mileage-readings.create', 'mileage-readings.update.own', 'mileage-readings.update.any'])
                 <a href="{{ route('admin.mileage-readings.update') }}"
                     title="Nouveau relevé"
                     class="inline-flex items-center gap-2 p-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg shadow-sm hover:shadow transition-all">
                     <x-iconify icon="lucide:plus" class="w-5 h-5" />
                 </a>
-                @endcan
+                @endcanany
             </x-slot:actions>
 
             <x-slot:filtersPanel>
@@ -498,10 +498,14 @@
                                     </div>
                                     <div class="flex flex-col">
                                         <div class="text-sm font-bold text-gray-900 leading-tight">
-                                            {{ $reading->vehicle->registration_plate }}
+                                            {{ $reading->vehicle?->registration_plate ?? 'Véhicule indisponible' }}
                                         </div>
                                         <div class="text-[11px] text-gray-500 uppercase tracking-wide">
+                                            @if($reading->vehicle)
                                             {{ $reading->vehicle->brand }} {{ $reading->vehicle->model }}
+                                            @else
+                                            Relation véhicule indisponible
+                                            @endif
                                         </div>
                                     </div>
                                 </div>
@@ -603,11 +607,17 @@
                             {{-- Cell: Actions --}}
                             <td class="px-3 py-2.5 whitespace-nowrap text-right">
                                 <div class="flex items-center justify-end gap-2">
+                                    @if($reading->vehicle)
                                     <a href="{{ route('admin.vehicles.mileage-history', $reading->vehicle_id) }}"
                                         class="p-2 rounded-full bg-gray-50 text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition-all duration-200 group"
                                         title="Voir historique">
                                         <x-iconify icon="lucide:history" class="w-3.5 h-3.5 group-hover:scale-110 transition-transform" />
                                     </a>
+                                    @else
+                                    <span class="p-2 rounded-full bg-gray-50 text-gray-300 cursor-not-allowed" title="Historique indisponible">
+                                        <x-iconify icon="lucide:history" class="w-3.5 h-3.5" />
+                                    </span>
+                                    @endif
                                     @canany(['mileage-readings.update.any', 'mileage-readings.update.own'])
                                     <button wire:click="editReading({{ $reading->id }})"
                                         class="p-2 rounded-full bg-gray-50 text-gray-400 hover:text-amber-600 hover:bg-amber-50 transition-all duration-200 group"
@@ -648,13 +658,13 @@
                                         Effacer les filtres
                                     </button>
                                     @else
-                                    @can('mileage-readings.create')
+                                    @canany(['mileage-readings.create', 'mileage-readings.update.own', 'mileage-readings.update.any'])
                                     <a href="{{ route('admin.mileage-readings.update') }}"
                                         class="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg shadow-sm transition-colors">
                                         <x-iconify icon="lucide:plus" class="w-4 h-4" />
                                         Créer le premier relevé
                                     </a>
-                                    @endcan
+                                    @endcanany
                                     @endif
                                 </div>
                             </td>

@@ -36,7 +36,9 @@ class MaintenanceService
             'maintenanceType:id,name,category',
             'provider:id,company_name,contact_phone',
             'creator:id,name'
-        ]);
+        ])
+            // Respecte les scopes d'accès véhicule pour éviter des relations nulles en vue.
+            ->whereHas('vehicle');
 
         // Filtre par recherche (immatriculation, type, fournisseur)
         if (!empty($filters['search'])) {
@@ -122,12 +124,7 @@ class MaintenanceService
         $cacheKey = $this->buildAnalyticsCacheKey($filters);
 
         return Cache::remember($cacheKey, config('analytics.cache.ttl.realtime', 300), function() use ($filters) {
-            $query = MaintenanceOperation::query();
-
-            // Appliquer filtre de période si fourni
-            if (!empty($filters['period'])) {
-                $this->applyPeriodFilter($query, $filters['period']);
-            }
+            $query = $this->buildScopedAnalyticsQuery($filters);
 
             $baseQuery = clone $query;
 
@@ -180,18 +177,24 @@ class MaintenanceService
 
     protected function buildAnalyticsCacheKey(array $filters): string
     {
-        $organizationId = Auth::user()->organization_id ?? 0;
-        $role = Auth::check()
-            ? (Auth::user()->getRoleNames()->first() ?? 'user')
+        $user = Auth::user();
+        $organizationId = $user?->organization_id ?? 0;
+        $userId = $user?->id ?? 0;
+        $roleSignature = $user
+            ? $user->getRoleNames()->sort()->values()->implode('|')
             : 'guest';
+        $roleHash = md5($roleSignature !== '' ? $roleSignature : 'guest');
+        $accessSignature = $this->buildVehicleAccessSignature();
 
         $normalizedFilters = $filters;
         ksort($normalizedFilters);
 
         return sprintf(
-            'maintenance_analytics:org:%d:role:%s:v:%d:%s',
+            'maintenance_analytics:org:%d:user:%d:roles:%s:access:%s:v:%d:%s',
             $organizationId,
-            $role,
+            $userId,
+            $roleHash,
+            $accessSignature,
             AnalyticsCacheVersion::current('maintenance', $organizationId),
             md5(json_encode($normalizedFilters))
         );
@@ -369,6 +372,7 @@ class MaintenanceService
                 'maintenanceType:id,name,category',
                 'provider:id,company_name'
             ])
+            ->whereHas('vehicle')
             ->where('status', $status)
             ->orderBy('scheduled_date', 'asc')
             ->limit(50)
@@ -394,6 +398,7 @@ class MaintenanceService
             'vehicle:id,registration_plate,brand,model',
             'maintenanceType:id,name,category'
         ])
+        ->whereHas('vehicle')
         ->whereBetween('scheduled_date', [$startDate, $endDate])
         ->whereIn('status', [MaintenanceOperation::STATUS_PLANNED, MaintenanceOperation::STATUS_IN_PROGRESS])
         ->get()
@@ -454,7 +459,8 @@ class MaintenanceService
 
     private function getTopMaintenanceVehicles(int $limit, array $filters): Collection
     {
-        return MaintenanceOperation::select('vehicle_id', DB::raw('COUNT(*) as count'), DB::raw('SUM(total_cost) as total_cost'))
+        return $this->buildScopedAnalyticsQuery($filters)
+            ->select('vehicle_id', DB::raw('COUNT(*) as count'), DB::raw('SUM(total_cost) as total_cost'))
             ->with('vehicle:id,registration_plate,brand,model')
             ->groupBy('vehicle_id')
             ->orderByDesc('count')
@@ -464,8 +470,10 @@ class MaintenanceService
 
     private function getTopMaintenanceTypes(int $limit, array $filters): Collection
     {
-        return MaintenanceOperation::select('maintenance_type_id', DB::raw('COUNT(*) as count'), DB::raw('SUM(total_cost) as total_cost'))
+        return $this->buildScopedAnalyticsQuery($filters)
+            ->select('maintenance_type_id', DB::raw('COUNT(*) as count'), DB::raw('SUM(total_cost) as total_cost'))
             ->with('maintenanceType:id,name,category')
+            ->whereHas('maintenanceType')
             ->groupBy('maintenance_type_id')
             ->orderByDesc('count')
             ->limit($limit)
@@ -474,12 +482,81 @@ class MaintenanceService
 
     private function getStatusDistribution(array $filters): Collection
     {
-        return MaintenanceOperation::select('status', DB::raw('COUNT(*) as count'))
+        return $this->buildScopedAnalyticsQuery($filters)
+            ->select('status', DB::raw('COUNT(*) as count'))
             ->groupBy('status')
             ->get()
             ->mapWithKeys(function($item) {
                 return [$item->status => $item->count];
             });
+    }
+
+    /**
+     * Construit la requête analytics strictement limitée aux véhicules accessibles.
+     */
+    private function buildScopedAnalyticsQuery(array $filters = []): \Illuminate\Database\Eloquent\Builder
+    {
+        $query = MaintenanceOperation::query()
+            ->whereHas('vehicle');
+
+        if (!empty($filters['period'])) {
+            $this->applyPeriodFilter($query, $filters['period']);
+        }
+
+        return $query;
+    }
+
+    /**
+     * Empreinte d'accès véhicule pour éviter toute fuite de cache inter-utilisateurs
+     * et refléter immédiatement les changements d'accès (pivot user_vehicle).
+     */
+    private function buildVehicleAccessSignature(): string
+    {
+        $user = Auth::user();
+
+        if (!$user) {
+            return 'guest';
+        }
+
+        // Les profils globaux voient tout dans leur scope organisationnel.
+        if ($user->hasAnyRole(['Super Admin', 'Admin'])) {
+            return 'all-vehicles';
+        }
+
+        $manualAccess = DB::table('user_vehicle')
+            ->where('user_id', $user->id)
+            ->selectRaw("COUNT(*) as total, md5(COALESCE(string_agg(vehicle_id::text, ',' ORDER BY vehicle_id), '')) as digest")
+            ->first();
+
+        $driverAccess = (object) ['total' => 0, 'digest' => md5('')];
+
+        if ($user->driver) {
+            $driverAccess = DB::table('assignments')
+                ->where('driver_id', $user->driver->id)
+                ->where('status', 'active')
+                ->whereNull('deleted_at')
+                ->where(function ($query) {
+                    $query->whereNull('end_datetime')
+                        ->orWhere('end_datetime', '>=', now());
+                })
+                ->selectRaw("COUNT(*) as total, md5(COALESCE(string_agg(vehicle_id::text, ',' ORDER BY vehicle_id), '')) as digest")
+                ->first();
+        }
+
+        $manualTotal = (int) ($manualAccess->total ?? 0);
+        $manualDigest = (string) ($manualAccess->digest ?? md5(''));
+        $driverTotal = (int) ($driverAccess->total ?? 0);
+        $driverDigest = (string) ($driverAccess->digest ?? md5(''));
+
+        return sha1(implode('|', [
+            $user->id,
+            $user->organization_id,
+            $manualTotal,
+            $manualDigest,
+            $driverTotal,
+            $driverDigest,
+            optional($user->updated_at)?->timestamp ?? 0,
+        ]));
     }
 
     private function createMaintenanceStartedAlert(MaintenanceOperation $operation): void

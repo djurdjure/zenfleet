@@ -118,17 +118,16 @@ class RepairRequestsTable extends Component
             'supervisor',
             'fleetManager',
             'category',
-            'depot',
         ])
             ->where('organization_id', $user->organization_id);
 
         // 🔐 FILTRAGE PAR RÔLE
-        if ($user->hasRole('Chauffeur')) {
+        if ($user->isDriverOnly()) {
             // Driver: own requests only
             $query->whereHas('driver', function ($q) use ($user) {
                 $q->where('user_id', $user->id);
             });
-        } elseif ($user->hasRole('Supervisor')) {
+        } elseif ($user->hasAnyRole(['Supervisor', 'Superviseur'])) {
             // Supervisor: team requests only
             $query->whereHas('driver', function ($q) use ($user) {
                 $q->where('supervisor_id', $user->id);
@@ -147,7 +146,7 @@ class RepairRequestsTable extends Component
                         $q->where('name', 'ilike', $search);
                     })
                     ->orWhereHas('vehicle', function ($q) use ($search) {
-                        $q->where('license_plate', 'ilike', $search)
+                        $q->where('registration_plate', 'ilike', $search)
                             ->orWhere('vehicle_name', 'ilike', $search);
                     });
             });

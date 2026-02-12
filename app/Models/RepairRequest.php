@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Schema;
 
 /**
  * RepairRequest Model - Main model for repair workflow
@@ -100,10 +101,18 @@ class RepairRequest extends Model
         'status',
         'title',
         'description',
+        'location_description',
         'urgency',
         'estimated_cost',
+        'actual_cost',
         'current_mileage',
         'current_location',
+        'assigned_supplier_id',
+        'work_started_at',
+        'work_completed_at',
+        'work_photos',
+        'completion_notes',
+        'final_rating',
         'supervisor_id',
         'supervisor_status',
         'supervisor_comment',
@@ -131,16 +140,23 @@ class RepairRequest extends Model
         'organization_id' => 'integer',
         'vehicle_id' => 'integer',
         'driver_id' => 'integer',
+        'requested_by' => 'integer',
         'category_id' => 'integer',
+        'assigned_supplier_id' => 'integer',
         'supervisor_id' => 'integer',
         'fleet_manager_id' => 'integer',
         'rejected_by' => 'integer',
         'final_approved_by' => 'integer',
         'maintenance_operation_id' => 'integer',
         'estimated_cost' => 'decimal:2',
+        'actual_cost' => 'decimal:2',
+        'final_rating' => 'decimal:2',
         'current_mileage' => 'integer',
         'photos' => 'array',
         'attachments' => 'array',
+        'work_photos' => 'array',
+        'work_started_at' => 'datetime',
+        'work_completed_at' => 'datetime',
         'supervisor_approved_at' => 'datetime',
         'fleet_manager_approved_at' => 'datetime',
         'rejected_at' => 'datetime',
@@ -256,7 +272,9 @@ class RepairRequest extends Model
      */
     public function requester(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'driver_id');
+        $foreignKey = $this->columnExists('requested_by') ? 'requested_by' : 'driver_id';
+
+        return $this->belongsTo(User::class, $foreignKey);
     }
 
     /**
@@ -266,7 +284,9 @@ class RepairRequest extends Model
      */
     public function assignedSupplier(): BelongsTo
     {
-        return $this->belongsTo(Supplier::class, 'supplier_id');
+        $foreignKey = $this->columnExists('assigned_supplier_id') ? 'assigned_supplier_id' : 'supplier_id';
+
+        return $this->belongsTo(Supplier::class, $foreignKey);
     }
 
     /**
@@ -425,6 +445,210 @@ class RepairRequest extends Model
     }
 
     /**
+     * Check if request can be cancelled (only while still pending).
+     */
+    public function isCancellable(): bool
+    {
+        return $this->isPending();
+    }
+
+    // ──────────────────────────────────────────────────────────
+    // Authorization guards
+    // ──────────────────────────────────────────────────────────
+
+    /**
+     * Determine whether the given user may approve at the supervisor level.
+     *
+     * Rules:
+     *  - Request must be in STATUS_PENDING_SUPERVISOR
+     *  - User must belong to the same organization
+     *  - User must hold a supervisor-level role
+     */
+    public function canBeApprovedBy(User $user): bool
+    {
+        if ($this->status !== self::STATUS_PENDING_SUPERVISOR) {
+            return false;
+        }
+
+        if ($this->organization_id !== $user->organization_id) {
+            return false;
+        }
+
+        return $this->userCanAnyPermission($user, [
+            'repair-requests.approve.level1',
+            'approve repair requests level 1',
+        ]) || $user->hasAnyRole(['Superviseur', 'Supervisor', 'Admin', 'Super Admin', 'Fleet Manager', 'Gestionnaire Flotte']);
+    }
+
+    /**
+     * Determine whether the given user may validate at the fleet-manager level.
+     *
+     * Rules:
+     *  - Request must be in STATUS_PENDING_FLEET_MANAGER
+     *  - User must belong to the same organization
+     *  - User must hold a fleet-manager-level role
+     */
+    public function canBeValidatedBy(User $user): bool
+    {
+        if ($this->status !== self::STATUS_PENDING_FLEET_MANAGER) {
+            return false;
+        }
+
+        if ($this->organization_id !== $user->organization_id) {
+            return false;
+        }
+
+        return $this->userCanAnyPermission($user, [
+            'repair-requests.approve.level2',
+            'approve repair requests level 2',
+        ]) || $user->hasAnyRole(['Admin', 'Super Admin', 'Fleet Manager', 'Gestionnaire Flotte']);
+    }
+
+    // ──────────────────────────────────────────────────────────
+    // Post-workflow lifecycle methods
+    // ──────────────────────────────────────────────────────────
+
+    /**
+     * Assign an approved request to a supplier.
+     *
+     * @throws \LogicException If the request is not in an assignable state.
+     */
+    public function assignToSupplier(int $supplierId): bool
+    {
+        if (! $this->isApproved()) {
+            throw new \LogicException("Impossible d'assigner un fournisseur : la demande n'est pas approuvée (statut actuel : {$this->status}).");
+        }
+
+        $supplierForeignKey = $this->columnExists('assigned_supplier_id') ? 'assigned_supplier_id' : 'supplier_id';
+        $this->{$supplierForeignKey} = $supplierId;
+
+        if ($this->save()) {
+            $this->logHistory('supplier_assigned', $this->status, $this->status, null, "Fournisseur #{$supplierId} assigné");
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Mark approved work as started (creates an associated maintenance operation placeholder).
+     *
+     * @throws \LogicException If the request is not in a startable state.
+     */
+    public function startWork(): bool
+    {
+        if (! $this->isApproved()) {
+            throw new \LogicException("Impossible de démarrer les travaux : la demande n'est pas approuvée (statut actuel : {$this->status}).");
+        }
+
+        if ($this->columnExists('work_started_at') && $this->work_started_at === null) {
+            $this->work_started_at = now();
+            $this->save();
+        }
+
+        $this->logHistory('work_started', $this->status, $this->status);
+        return true;
+    }
+
+    /**
+     * Mark work as completed with cost details and optional photos.
+     *
+     * @throws \LogicException If the request is not in an approved state.
+     */
+    public function completeWork(
+        float $actualCost,
+        ?string $notes = null,
+        ?array $workPhotos = null,
+        ?float $rating = null,
+    ): bool {
+        if (! $this->isApproved()) {
+            throw new \LogicException("Impossible de compléter les travaux : la demande n'est pas approuvée.");
+        }
+
+        $updates = [];
+
+        if ($this->columnExists('actual_cost')) {
+            $updates['actual_cost'] = $actualCost;
+        }
+        if ($this->columnExists('completion_notes')) {
+            $updates['completion_notes'] = $notes;
+        }
+        if ($this->columnExists('work_photos')) {
+            $updates['work_photos'] = $workPhotos;
+        }
+        if ($this->columnExists('final_rating')) {
+            $updates['final_rating'] = $rating;
+        }
+        if ($this->columnExists('work_completed_at')) {
+            $updates['work_completed_at'] = now();
+        }
+
+        if (! empty($updates)) {
+            $this->fill($updates)->save();
+        }
+
+        $this->logHistory(
+            'work_completed',
+            $this->status,
+            $this->status,
+            null,
+            "Coût réel : {$actualCost} DA" . ($notes ? " — {$notes}" : ''),
+        );
+
+        return true;
+    }
+
+    /**
+     * Cancel a pending request.
+     *
+     * @throws \LogicException If the request is not in a cancellable state.
+     */
+    public function cancel(): bool
+    {
+        if (! $this->isCancellable()) {
+            throw new \LogicException("Impossible d'annuler : la demande n'est plus en attente (statut actuel : {$this->status}).");
+        }
+
+        $fromStatus = $this->status;
+        $this->status = self::STATUS_REJECTED_SUPERVISOR;
+        $this->rejection_reason = 'Annulée par le demandeur';
+        $this->rejected_at = now();
+
+        if ($this->save()) {
+            $this->logHistory('cancelled', $fromStatus, self::STATUS_REJECTED_SUPERVISOR, null, 'Annulée par le demandeur');
+            return true;
+        }
+
+        return false;
+    }
+
+    // ──────────────────────────────────────────────────────────
+    // Backward-compatibility accessors
+    // ──────────────────────────────────────────────────────────
+
+    /**
+     * Legacy accessor — maps old `priority_label` to the modern `urgency_label`.
+     *
+     * Ensures views still referencing `$request->priority_label` do not break.
+     */
+    public function getPriorityLabelAttribute(): string
+    {
+        return $this->urgency_label;
+    }
+
+    /**
+     * Legacy accessor — maps old `priority` reads to modern `urgency`.
+     *
+     * Only used when the attribute is accessed through the legacy name,
+     * e.g.  `$request->priority`. Will not interfere with Eloquent
+     * because `priority` is NOT in the $fillable/$casts arrays.
+     */
+    public function getPriorityAttribute(): ?string
+    {
+        return $this->urgency;
+    }
+
+    /**
      * Approve by supervisor
      */
     public function approveBySupervisor(User $supervisor, ?string $comment = null): bool
@@ -518,6 +742,35 @@ class RepairRequest extends Model
             'to_status' => $toStatus,
             'comment' => $comment,
         ]);
+    }
+
+    /**
+     * Backward compatibility for mixed permission namespaces in old/new seeders.
+     */
+    protected function userCanAnyPermission(User $user, array $permissions): bool
+    {
+        foreach ($permissions as $permission) {
+            if ($user->can($permission)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Runtime schema guard for environments still mixing old/new repair schemas.
+     */
+    protected function columnExists(string $column): bool
+    {
+        static $cache = [];
+        $key = $this->getTable() . '.' . $column;
+
+        if (! array_key_exists($key, $cache)) {
+            $cache[$key] = Schema::hasColumn($this->getTable(), $column);
+        }
+
+        return $cache[$key];
     }
 
     /**

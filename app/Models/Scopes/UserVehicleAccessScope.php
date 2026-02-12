@@ -2,6 +2,7 @@
 
 namespace App\Models\Scopes;
 
+use App\Models\Assignment;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Scope;
@@ -41,8 +42,32 @@ class UserVehicleAccessScope implements Scope
             $builder->where('organization_id', $user->organization_id);
             return;
         }
+
+        // Chauffeur pur: accès strict au(x) véhicule(s) affecté(s) actif(s) uniquement.
+        if ($user->isDriverOnly()) {
+            if (! $user->driver) {
+                $builder->whereRaw('1 = 0');
+                return;
+            }
+
+            $referenceTime = now();
+
+            $builder
+                ->where('organization_id', $user->organization_id)
+                ->whereHas('assignments', function ($q) use ($user, $referenceTime) {
+                    $q->where('driver_id', $user->driver->id)
+                        ->where('status', '!=', Assignment::STATUS_CANCELLED)
+                        ->where('start_datetime', '<=', $referenceTime)
+                        ->where(function ($dateQuery) use ($referenceTime) {
+                            $dateQuery->whereNull('end_datetime')
+                                ->orWhere('end_datetime', '>=', $referenceTime);
+                        });
+                });
+
+            return;
+        }
         
-        // Pour les autres utilisateurs (chauffeurs et utilisateurs normaux)
+        // Pour les autres utilisateurs (rôles mixtes et utilisateurs non admin)
         $builder->where(function($query) use ($user) {
             // 1. Véhicules accessibles via la table pivot (accès manuel)
             $query->whereHas('users', function($q) use ($user) {
@@ -53,7 +78,8 @@ class UserVehicleAccessScope implements Scope
             if ($user->driver) {
                 $query->orWhereHas('assignments', function($q) use ($user) {
                     $q->where('driver_id', $user->driver->id)
-                      ->where('status', 'active')
+                      ->where('status', '!=', Assignment::STATUS_CANCELLED)
+                      ->where('start_datetime', '<=', now())
                       ->where(function ($dateQuery) {
                           $dateQuery->whereNull('end_datetime')
                               ->orWhere('end_datetime', '>=', now());

@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\RepairRequest;
 
+use App\Models\Assignment;
 use App\Models\Driver;
 use App\Models\Organization;
 use App\Models\RepairRequest;
@@ -81,6 +82,15 @@ class CreateRepairRequestTest extends TestCase
 
         $this->vehicle = Vehicle::factory()->create([
             'organization_id' => $this->organization->id,
+        ]);
+
+        Assignment::factory()->create([
+            'organization_id' => $this->organization->id,
+            'vehicle_id' => $this->vehicle->id,
+            'driver_id' => $this->driver->id,
+            'start_datetime' => now()->subHour(),
+            'end_datetime' => null,
+            'status' => Assignment::STATUS_ACTIVE,
         ]);
 
         Storage::fake('public');

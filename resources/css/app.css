@@ -1,0 +1,72 @@
+@import "tailwindcss";
+@import 'flatpickr/dist/flatpickr.min.css';
+@import 'slim-select/styles';
+
+@theme {
+    /* ZenFleet Colors */
+    --color-zenfleet-primary: #0ea5e9;
+    --color-zenfleet-secondary: #1e293b;
+    --color-zenfleet-success: #22c55e;
+    --color-zenfleet-warning: #f59e0b;
+    --color-zenfleet-danger: #ef4444;
+    --color-zenfleet-info: #06b6d4;
+
+    /* Spacing */
+    --spacing-sidebar: 280px;
+    --spacing-sidebar-collapsed: 80px;
+    --spacing-header: 70px;
+    --spacing-content: 1200px;
+
+    /* Breakpoints */
+    --breakpoint-sm: 640px;
+    --breakpoint-md: 768px;
+    --breakpoint-lg: 1024px;
+    --breakpoint-xl: 1280px;
+    --breakpoint-2xl: 1536px;
+
+    /* Actions */
+    --shadow-zenfleet: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    --shadow-zenfleet-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+@layer base {
+    :root {
+        color-scheme: light;
+        /* 🚫 Force Light Mode */
+    }
+
+    body {
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        background-color: rgb(249 250 251);
+        color: rgb(17 24 39);
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+    }
+}
+
+@layer components {
+    .zenfleet-card {
+        background-color: white;
+        border-radius: 0.75rem;
+        box-shadow: var(--shadow-zenfleet);
+        border: 1px solid rgb(229 231 235);
+        overflow: hidden;
+        transition: all 300ms;
+    }
+
+    .zenfleet-card:hover {
+        box-shadow: var(--shadow-zenfleet-lg);
+    }
+
+    .zenfleet-invalid {
+        border-color: var(--color-zenfleet-danger) !important;
+        background-color: #fef2f2 !important;
+        box-shadow: 0 0 0 1px rgba(239, 68, 68, 0.25) !important;
+    }
+
+    .zenfleet-invalid:focus {
+        outline: none;
+        --tw-ring-color: var(--color-zenfleet-danger) !important;
+        --tw-ring-shadow: 0 0 0 3px rgba(239, 68, 68, 0.2) !important;
+    }
+}

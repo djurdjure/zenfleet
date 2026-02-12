@@ -69,7 +69,7 @@ class VehicleExpensePolicy
         }
 
         // Les chauffeurs ne peuvent voir que leurs propres dépenses
-        if ($user->hasRole('Chauffeur')) {
+        if ($user->isDriverOnly()) {
             return $expense->driver_id === $user->id || 
                    $expense->requester_id === $user->id ||
                    $expense->recorded_by === $user->id;

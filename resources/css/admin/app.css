@@ -1,0 +1,550 @@
+/* Custom fonts */
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap');
+
+/* Vendors */
+@import './flatpickr.css';
+
+.animate-shake {
+    animation: shake 0.5s ease-in-out;
+}
+@import './slim-select.css';
+
+@theme {
+    --breakpoint-sm: 640px;
+    --breakpoint-md: 768px;
+    --breakpoint-lg: 1024px;
+    --breakpoint-xl: 1280px;
+    --breakpoint-2xl: 1536px;
+}
+
+/* Base styles */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Global styles */
+html {
+    font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+    color: rgb(17 24 39);
+    background-color: rgb(249 250 251);
+}
+
+/* Scrollbar personnalisé */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background-color: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: rgb(209 213 219);
+    border-radius: 9999px;
+    transition: background-color 0.2s;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background-color: rgb(156 163 175);
+}
+
+/* Forms */
+[type='text'],
+[type='email'],
+[type='url'],
+[type='password'],
+[type='number'],
+[type='date'],
+[type='datetime-local'],
+[type='month'],
+[type='search'],
+[type='tel'],
+[type='time'],
+[type='week'],
+[multiple],
+textarea,
+select {
+    border-color: rgb(209 213 219);
+    border-radius: 0.5rem;
+    box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+}
+
+[type='text']:focus,
+[type='email']:focus,
+[type='url']:focus,
+[type='password']:focus,
+[type='number']:focus,
+[type='date']:focus,
+[type='datetime-local']:focus,
+[type='month']:focus,
+[type='search']:focus,
+[type='tel']:focus,
+[type='time']:focus,
+[type='week']:focus,
+[multiple]:focus,
+textarea:focus,
+select:focus {
+    border-color: rgb(59 130 246);
+    --tw-ring-color: rgb(59 130 246);
+    outline: none;
+}
+
+/* Transitions */
+.transition-all {
+    transition-property: all;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 200ms;
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.animate-fade-in {
+    animation: fadeIn 0.3s ease-out forwards;
+}
+
+/* Loading States */
+.loading-skeleton {
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    background-color: rgb(229 231 235);
+    border-radius: 0.25rem;
+}
+
+/* Card Hover Effects */
+.hover-card {
+    transition: all 300ms;
+}
+
+.hover-card:hover {
+    box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+    transform: translateY(-0.25rem);
+}
+
+/* Status Badges */
+.badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.125rem 0.625rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    line-height: 1rem;
+    font-weight: 500;
+}
+
+.badge-success {
+    background-color: rgb(220 252 231);
+    color: rgb(22 101 52);
+}
+
+.badge-warning {
+    background-color: rgb(254 249 195);
+    color: rgb(133 77 14);
+}
+
+.badge-danger {
+    background-color: rgb(254 226 226);
+    color: rgb(153 27 27);
+}
+
+.badge-info {
+    background-color: rgb(219 234 254);
+    color: rgb(30 64 175);
+}
+
+.badge-gray {
+    background-color: rgb(243 244 246);
+    color: rgb(31 41 55);
+}
+
+/* Custom Utilities */
+.text-xxs {
+    font-size: 0.65rem;
+    line-height: 0.9rem;
+}
+
+.bg-glass {
+    background-color: rgb(255 255 255 / 0.9);
+    backdrop-filter: blur(4px);
+}
+
+/* ========================================
+   🎨 ZENFLEET SLIMSELECT ENTERPRISE THEME
+   ======================================== */
+
+/* 🎯 CRITICAL: Override SlimSelect Native CSS Variables */
+.ss-main,
+.ss-content {
+    /* Primary color - ZenFleet blue-500 for selected options */
+    --ss-primary-color: #3b82f6 !important;
+
+    /* Background colors - Match x-input gray-50 */
+    --ss-bg-color: #f9fafb !important;
+    --ss-content-bg-color: #ffffff !important;
+
+    /* Border colors - Match x-input gray-300 */
+    --ss-border-color: #d1d5db !important;
+
+    /* Text colors */
+    --ss-font-color: #111827 !important;
+    --ss-font-placeholder-color: #9ca3af !important;
+
+    /* Border radius - Match x-input rounded-lg */
+    --ss-border-radius: 0.5rem !important;
+
+    /* Spacing */
+    --ss-spacing-l: 12px !important;
+    --ss-spacing-m: 8px !important;
+    --ss-spacing-s: 4px !important;
+}
+
+/* Additional ZenFleet-specific variables */
+:root {
+    --ss-main-height: 42px;
+    --ss-focus-color: #3b82f6;
+    --ss-error-color: #dc2626;
+    --ss-hover-border-color: #9ca3af;
+}
+
+/* ✅ Main Container - Force gray-50 background */
+body .ss-main,
+html body .ss-main,
+.ss-main {
+    background-color: #f9fafb !important;
+    border: 1px solid #d1d5db !important;
+    color: #111827 !important;
+    border-radius: 0.5rem !important;
+    padding: 0 !important;
+    min-height: 42px !important;
+    transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out !important;
+    box-shadow: none !important;
+}
+
+/* Hover state */
+body .ss-main:hover:not(:focus-within) {
+    border-color: #9ca3af !important;
+}
+
+/* Focus state - Blue ring */
+body .ss-main:focus-within {
+    border-color: #3b82f6 !important;
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.3) !important;
+    background-color: #ffffff !important;
+    outline: none !important;
+}
+
+/* Selected value styling */
+body .ss-main .ss-values .ss-single {
+    padding: 10px 12px !important;
+    font-size: 0.875rem !important;
+    line-height: 1.25rem !important;
+    font-weight: 400 !important;
+    color: #111827 !important;
+    background-color: transparent !important;
+}
+
+/* Placeholder styling */
+body .ss-main .ss-values .ss-placeholder {
+    padding: 10px 12px !important;
+    font-size: 0.875rem !important;
+    color: #9ca3af !important;
+}
+
+/* Dropdown content container */
+body .ss-content {
+    background-color: #ffffff !important;
+    margin-top: 4px !important;
+    border: 1px solid #e5e7eb !important;
+    border-radius: 0.5rem !important;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1) !important;
+    z-index: 9999 !important;
+}
+
+/* Search field in dropdown */
+body .ss-content .ss-search {
+    background-color: #f9fafb !important;
+    border-bottom: 1px solid #e5e7eb !important;
+    padding: 8px !important;
+}
+
+body .ss-content .ss-search input {
+    font-size: 0.875rem !important;
+    padding: 10px 12px !important;
+    border-radius: 6px !important;
+    background-color: #ffffff !important;
+    border: 1px solid #d1d5db !important;
+}
+
+body .ss-content .ss-search input:focus {
+    border-color: #3b82f6 !important;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1) !important;
+}
+
+/* Options list */
+body .ss-content .ss-list .ss-option {
+    font-size: 0.875rem !important;
+    padding: 10px 12px !important;
+    color: #111827 !important;
+    transition: background-color 0.15s ease !important;
+}
+
+/* Option hover */
+body .ss-content .ss-list .ss-option:hover {
+    background-color: #eff6ff !important;
+    border-color: transparent !important;
+    color: #111827 !important;
+}
+
+/* ✅ CRITICAL: Selected option - ZenFleet blue-500 */
+body .ss-content .ss-list .ss-option.ss-highlighted,
+body .ss-content .ss-list .ss-option:not(.ss-disabled).ss-selected {
+    background-color: #3b82f6 !important;
+    color: #ffffff !important;
+}
+
+/* Selected option checkmark */
+body .ss-content .ss-list .ss-option:not(.ss-disabled).ss-selected::after {
+    content: '✓' !important;
+    margin-left: auto !important;
+    font-weight: 600 !important;
+    color: #ffffff !important;
+}
+
+/* Hide placeholder option in dropdown */
+body .ss-content .ss-list .ss-option[data-placeholder="true"] {
+    display: none !important;
+}
+
+/* Dropdown arrow */
+body .ss-main .ss-arrow path {
+    stroke-width: 1.5 !important;
+    stroke: #6b7280 !important;
+}
+
+/* Error state validation */
+.slimselect-error .ss-main {
+    border-color: #dc2626 !important;
+    box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1) !important;
+    background-color: #fef2f2 !important;
+}
+
+/* Animation */
+body .ss-content.ss-open-below,
+body .ss-content.ss-open-above {
+    animation: zenfleetSlideIn 0.2s ease-out !important;
+}
+
+@keyframes zenfleetSlideIn {
+    from {
+        opacity: 0;
+        transform: scaleY(0.95) translateY(-4px);
+    }
+
+    to {
+        opacity: 1;
+        transform: scaleY(1) translateY(0);
+    }
+}
+
+/* Responsive Mobile */
+@media (max-width: 640px) {
+    .ss-content .ss-list .ss-option {
+        padding: 12px !important;
+        min-height: 44px !important;
+    }
+}
+
+/* ========================================
+   🚫 FORCE FLATPICKR / DATEPICKER LIGHT MODE
+   ======================================== */
+.flatpickr-calendar,
+.datepicker {
+    /* Force Light Theme */
+    background-color: #ffffff !important;
+    background: #ffffff !important;
+    color: #1f2937 !important;
+    border: 1px solid #e5e7eb !important;
+    border-radius: 0.9rem !important;
+    box-shadow: 0 12px 32px -16px rgba(15, 23, 42, 0.35), 0 4px 10px -4px rgba(15, 23, 42, 0.12) !important;
+}
+
+/* Header */
+.flatpickr-months,
+.datepicker-header {
+    background-color: #ffffff !important;
+    color: #1f2937 !important;
+    fill: #1f2937 !important;
+}
+
+.flatpickr-month,
+.datepicker-title,
+.datepicker-switch,
+.prev-btn,
+.next-btn {
+    color: #1f2937 !important;
+    fill: #1f2937 !important;
+}
+
+/* Weekdays */
+.flatpickr-weekdays,
+.datepicker-grid .dow {
+    background-color: #f9fafb !important;
+    color: #4b5563 !important;
+}
+
+/* Days */
+.flatpickr-day,
+.datepicker-cell {
+    color: #1f2937 !important;
+    background-color: #ffffff !important;
+    border-color: transparent !important;
+}
+
+/* Hover */
+.flatpickr-day:hover,
+.datepicker-cell:hover:not(.disabled) {
+    background-color: #f3f4f6 !important;
+    color: #1f2937 !important;
+}
+
+/* Selected */
+.flatpickr-day.selected,
+.datepicker-cell.selected,
+.datepicker-cell.active,
+.datepicker-cell.focused {
+    background-color: #3b82f6 !important;
+    color: #ffffff !important;
+    border-color: #3b82f6 !important;
+}
+
+/* Today */
+.flatpickr-day.today,
+.datepicker-cell.today {
+    background-color: #eff6ff !important;
+    color: #3b82f6 !important;
+    border-color: #3b82f6 !important;
+    font-weight: 600 !important;
+}
+
+/* ========================================
+   📊 ANALYTICS CARDS GRID RESPONSIVE
+   ======================================== */
+.analytics-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+@media (max-width: 1023px) {
+    .analytics-cards-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+    }
+}
+
+@media (max-width: 767px) {
+    .analytics-cards-grid {
+        grid-template-columns: 1fr !important;
+    }
+}
+
+/* ========================================
+   📄 PAGINATION FOOTER RESPONSIVE
+   ======================================== */
+.pagination-footer {
+    margin-top: 1rem;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+}
+
+@media (max-width: 639px) {
+    .pagination-footer {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+    }
+}
+
+/* ========================================
+   📋 PAGE LIST LAYOUTS - ENTERPRISE UTILITIES
+   ======================================== */
+
+/* Analytics Grid - Auto-responsive with proper spacing */
+.analytics-cards-grid {
+    display: grid;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    grid-template-columns: 1fr;
+}
+
+@media (min-width: 768px) {
+    .analytics-cards-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (min-width: 1024px) {
+    .analytics-cards-grid {
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    }
+}
+
+/* Prevent analytics cards from being too narrow or too wide */
+.analytics-cards-grid>* {
+    min-width: 180px;
+    max-width: 100%;
+}
+
+/* Filter Grid - Fixed responsive columns */
+.filters-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1rem;
+}
+
+@media (min-width: 768px) {
+    .filters-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (min-width: 1024px) {
+    .filters-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+/* Search Actions Bar - Responsive Fallback */
+.search-actions-bar {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    align-items: flex-start;
+}
+
+@media (min-width: 1024px) {
+    .search-actions-bar {
+        flex-direction: row;
+        align-items: center;
+    }
+}

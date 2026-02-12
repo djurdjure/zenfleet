@@ -5,7 +5,9 @@ namespace App\Livewire;
 use App\Models\RepairRequest;
 use App\Models\Driver;
 use App\Models\Vehicle;
+use App\Models\Assignment;
 use App\Models\RepairCategory;
+use App\Services\RepairRequestService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Contracts\View\View;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
@@ -55,6 +57,14 @@ class RepairRequestsIndex extends Component
     public int $perPage = 20;
     public array $selectedRequests = [];
     public bool $selectAll = false;
+
+    /**
+     * 🎯 DECISION WORKFLOW MODAL
+     */
+    public bool $showDecisionModal = false;
+    public ?int $decisionRequestId = null;
+    public string $decisionAction = 'approve';
+    public string $decisionComment = '';
     
     /**
      * 📈 PROPRIÉTÉS STATISTIQUES
@@ -215,6 +225,99 @@ class RepairRequestsIndex extends Component
             $this->selectedRequests = $this->repairRequests->pluck('id')->toArray();
         } else {
             $this->selectedRequests = [];
+        }
+    }
+
+    /**
+     * Ouvrir le modal de décision en mode approbation.
+     */
+    public function openApproveModal(int $requestId): void
+    {
+        $this->openDecisionModal($requestId, 'approve');
+    }
+
+    /**
+     * Ouvrir le modal de décision en mode rejet.
+     */
+    public function openRejectModal(int $requestId): void
+    {
+        $this->openDecisionModal($requestId, 'reject');
+    }
+
+    /**
+     * Fermer et réinitialiser le modal de décision.
+     */
+    public function closeDecisionModal(): void
+    {
+        $this->showDecisionModal = false;
+        $this->decisionRequestId = null;
+        $this->decisionAction = 'approve';
+        $this->decisionComment = '';
+        $this->resetErrorBag('decisionComment');
+    }
+
+    /**
+     * Soumettre une décision d'approbation/rejet selon le niveau courant.
+     */
+    public function submitDecision(): void
+    {
+        $repairRequest = $this->resolveDecisionRequest();
+        if (! $repairRequest) {
+            $this->dispatch('notify', [
+                'type' => 'error',
+                'message' => 'Demande introuvable ou non accessible.'
+            ]);
+            $this->closeDecisionModal();
+            return;
+        }
+
+        $user = auth()->user();
+        $service = app(RepairRequestService::class);
+        $comment = trim($this->decisionComment);
+
+        if ($this->decisionAction === 'reject' && $comment === '') {
+            $this->addError('decisionComment', 'La raison du rejet est obligatoire.');
+            return;
+        }
+
+        try {
+            $action = $this->decisionAction;
+
+            if ($repairRequest->status === RepairRequest::STATUS_PENDING_SUPERVISOR) {
+                if ($action === 'approve') {
+                    $this->authorize('approveLevelOne', $repairRequest);
+                    $service->approveBySupervisor($repairRequest, $user, $comment ?: null);
+                } else {
+                    $this->authorize('rejectLevelOne', $repairRequest);
+                    $service->rejectBySupervisor($repairRequest, $user, $comment);
+                }
+            } elseif ($repairRequest->status === RepairRequest::STATUS_PENDING_FLEET_MANAGER) {
+                if ($action === 'approve') {
+                    $this->authorize('approveLevelTwo', $repairRequest);
+                    $service->approveByFleetManager($repairRequest, $user, $comment ?: null);
+                } else {
+                    $this->authorize('rejectLevelTwo', $repairRequest);
+                    $service->rejectByFleetManager($repairRequest, $user, $comment);
+                }
+            } else {
+                throw new \RuntimeException('Cette demande n\'est plus en attente de validation.');
+            }
+
+            $this->closeDecisionModal();
+            $this->loadStatistics();
+
+            $this->dispatch('notify', [
+                'type' => 'success',
+                'message' => $action === 'approve'
+                    ? 'Décision enregistrée: demande approuvée.'
+                    : 'Décision enregistrée: demande rejetée.'
+            ]);
+        } catch (\Throwable $e) {
+            report($e);
+            $this->dispatch('notify', [
+                'type' => 'error',
+                'message' => 'Impossible d\'enregistrer la décision: ' . $e->getMessage()
+            ]);
         }
     }
 
@@ -424,12 +527,24 @@ class RepairRequestsIndex extends Component
             ->active(); // REFACTORED: utilisation du Query Scope
 
         if ($this->isDriverRole($user)) {
-            $query->whereHas('assignments', function($q) use ($user) {
-                $q->where('driver_id', function($subQ) use ($user) {
-                    $subQ->select('id')
-                        ->from('drivers')
-                        ->where('user_id', $user->id);
-                })->where('is_active', true);
+            $driverId = Driver::query()
+                ->where('organization_id', $user->organization_id)
+                ->where('user_id', $user->id)
+                ->value('id');
+
+            if (! $driverId) {
+                return collect();
+            }
+
+            $referenceTime = now();
+            $query->whereHas('assignments', function($q) use ($driverId, $referenceTime) {
+                $q->where('driver_id', $driverId)
+                    ->where('status', '!=', Assignment::STATUS_CANCELLED)
+                    ->where('start_datetime', '<=', $referenceTime)
+                    ->where(function ($dateQuery) use ($referenceTime) {
+                        $dateQuery->whereNull('end_datetime')
+                            ->orWhere('end_datetime', '>=', $referenceTime);
+                    });
             });
         }
 
@@ -513,18 +628,22 @@ class RepairRequestsIndex extends Component
     private function bulkApprove(): void
     {
         $count = 0;
+        $service = app(RepairRequestService::class);
+        $user = auth()->user();
+
         foreach ($this->selectedRequests as $requestId) {
             $request = RepairRequest::find($requestId);
             if (!$request) {
                 continue;
             }
 
-            $user = auth()->user();
             $approved = false;
             if ($request->status === RepairRequest::STATUS_PENDING_SUPERVISOR && $user->can('approveLevelOne', $request)) {
-                $approved = $request->approveBySupervisor($user, 'Approuvé en masse');
+                $service->approveBySupervisor($request, $user, 'Approuvé en masse');
+                $approved = true;
             } elseif ($request->status === RepairRequest::STATUS_PENDING_FLEET_MANAGER && $user->can('approveLevelTwo', $request)) {
-                $approved = $request->approveByFleetManager($user, 'Approuvé en masse');
+                $service->approveByFleetManager($request, $user, 'Approuvé en masse');
+                $approved = true;
             }
 
             if ($approved) {
@@ -548,18 +667,22 @@ class RepairRequestsIndex extends Component
     private function bulkReject(): void
     {
         $count = 0;
+        $service = app(RepairRequestService::class);
+        $user = auth()->user();
+
         foreach ($this->selectedRequests as $requestId) {
             $request = RepairRequest::find($requestId);
             if (!$request) {
                 continue;
             }
 
-            $user = auth()->user();
             $rejected = false;
             if ($request->status === RepairRequest::STATUS_PENDING_SUPERVISOR && $user->can('rejectLevelOne', $request)) {
-                $rejected = $request->rejectBySupervisor($user, 'Rejet en masse');
+                $service->rejectBySupervisor($request, $user, 'Rejet en masse');
+                $rejected = true;
             } elseif ($request->status === RepairRequest::STATUS_PENDING_FLEET_MANAGER && $user->can('rejectLevelTwo', $request)) {
-                $rejected = $request->rejectByFleetManager($user, 'Rejet en masse');
+                $service->rejectByFleetManager($request, $user, 'Rejet en masse');
+                $rejected = true;
             }
 
             if ($rejected) {
@@ -633,7 +756,7 @@ class RepairRequestsIndex extends Component
      */
     private function isDriverRole($user): bool
     {
-        return $user->hasAnyRole(['Chauffeur', 'Driver']);
+        return $user->isDriverOnly();
     }
 
     /**
@@ -653,6 +776,81 @@ class RepairRequestsIndex extends Component
     }
 
     /**
+     * Rafraîchit la vue après création.
+     */
+    public function handleRequestCreated(): void
+    {
+        $this->resetPage();
+        $this->loadStatistics();
+    }
+
+    /**
+     * Rafraîchit la vue après mise à jour.
+     */
+    public function handleRequestUpdated(): void
+    {
+        $this->resetPage();
+        $this->loadStatistics();
+    }
+
+    /**
+     * Rafraîchit la vue après suppression.
+     */
+    public function handleRequestDeleted(): void
+    {
+        $this->resetPage();
+        $this->loadStatistics();
+    }
+
+    /**
+     * Initialise le modal de décision.
+     */
+    private function openDecisionModal(int $requestId, string $action): void
+    {
+        $repairRequest = $this->resolveDecisionRequest($requestId);
+        if (! $repairRequest) {
+            $this->dispatch('notify', [
+                'type' => 'error',
+                'message' => 'Demande introuvable ou non accessible.'
+            ]);
+            return;
+        }
+
+        $this->decisionRequestId = $requestId;
+        $this->decisionAction = $action;
+        $this->decisionComment = '';
+        $this->showDecisionModal = true;
+    }
+
+    /**
+     * Charge la demande de décision en respectant l'isolation org/role.
+     */
+    private function resolveDecisionRequest(?int $requestId = null): ?RepairRequest
+    {
+        $user = auth()->user();
+        $id = $requestId ?? $this->decisionRequestId;
+        if (! $id) {
+            return null;
+        }
+
+        $query = RepairRequest::query()
+            ->where('organization_id', $user->organization_id)
+            ->whereKey($id);
+
+        $query = $this->applyScopesByRole($query);
+
+        return $query->first();
+    }
+
+    /**
+     * Expose la demande courante du modal à la vue.
+     */
+    public function getDecisionRequestProperty(): ?RepairRequest
+    {
+        return $this->resolveDecisionRequest();
+    }
+
+    /**
      * 🎨 RENDU DU COMPOSANT
      */
     public function render(): View
@@ -665,6 +863,7 @@ class RepairRequestsIndex extends Component
             'urgencyLevels' => $this->urgencyLevels,
             'categories' => $this->categories,
             'vehicles' => $this->vehicles,
+            'decisionRequest' => $this->decisionRequest,
             'statistics' => $this->statistics,
         ]);
     }

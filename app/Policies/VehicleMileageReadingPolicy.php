@@ -155,7 +155,7 @@ class VehicleMileageReadingPolicy
         }
 
         // Drivers can only delete their own readings
-        if ($user->hasRole('Chauffeur')) {
+        if ($user->isDriverOnly()) {
             return $reading->recorded_by_id === $user->id;
         }
 

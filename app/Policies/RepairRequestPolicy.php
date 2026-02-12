@@ -40,9 +40,14 @@ class RepairRequestPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->can('repair-requests.view.all')
-            || $user->can('repair-requests.view.team')
-            || $user->can('repair-requests.view.own');
+        return $this->canAnyPermission($user, [
+            'repair-requests.view.all',
+            'repair-requests.view.team',
+            'repair-requests.view.own',
+            'view all repair requests',
+            'view team repair requests',
+            'view own repair requests',
+        ]);
     }
 
     /**
@@ -56,18 +61,18 @@ class RepairRequestPolicy
         }
 
         // Admin and Fleet Manager can view all in their org
-        if ($user->can('repair-requests.view.all')) {
+        if ($this->canAnyPermission($user, ['repair-requests.view.all', 'view all repair requests'])) {
             return true;
         }
 
         // Supervisor can view team requests (their supervised drivers)
-        if ($user->can('repair-requests.view.team')) {
+        if ($this->canAnyPermission($user, ['repair-requests.view.team', 'view team repair requests'])) {
             return $this->isTeamRequest($user, $repairRequest);
         }
 
         // Driver can view their own requests
-        if ($user->can('repair-requests.view.own')) {
-            return $repairRequest->driver->user_id === $user->id;
+        if ($this->canAnyPermission($user, ['repair-requests.view.own', 'view own repair requests'])) {
+            return $repairRequest->driver?->user_id === $user->id;
         }
 
         return false;
@@ -78,7 +83,10 @@ class RepairRequestPolicy
      */
     public function create(User $user): bool
     {
-        return $user->can('repair-requests.create');
+        return $this->canAnyPermission($user, [
+            'repair-requests.create',
+            'create repair requests',
+        ]);
     }
 
     /**
@@ -102,7 +110,7 @@ class RepairRequestPolicy
         }
 
         // Driver can update own pending requests
-        if ($repairRequest->driver->user_id === $user->id) {
+        if ($repairRequest->driver?->user_id === $user->id) {
             return $repairRequest->status === RepairRequest::STATUS_PENDING_SUPERVISOR;
         }
 
@@ -125,7 +133,10 @@ class RepairRequestPolicy
         }
 
         // Must have permission
-        if (!$user->can('repair-requests.approve.level1')) {
+        if (! $this->canAnyPermission($user, [
+            'repair-requests.approve.level1',
+            'approve repair requests level 1',
+        ])) {
             return false;
         }
 
@@ -163,7 +174,10 @@ class RepairRequestPolicy
         }
 
         // Must have permission
-        if (!$user->can('repair-requests.approve.level2')) {
+        if (! $this->canAnyPermission($user, [
+            'repair-requests.approve.level2',
+            'approve repair requests level 2',
+        ])) {
             return false;
         }
 
@@ -191,7 +205,10 @@ class RepairRequestPolicy
         }
 
         // Must have delete permission
-        if (!$user->can('repair-requests.delete')) {
+        if (! $this->canAnyPermission($user, [
+            'repair-requests.delete',
+            'delete repair requests',
+        ])) {
             return false;
         }
 
@@ -201,7 +218,7 @@ class RepairRequestPolicy
         }
 
         // Driver can delete own pending requests
-        if ($repairRequest->driver->user_id === $user->id) {
+        if ($repairRequest->driver?->user_id === $user->id) {
             return $repairRequest->status === RepairRequest::STATUS_PENDING_SUPERVISOR;
         }
 
@@ -219,7 +236,10 @@ class RepairRequestPolicy
         }
 
         // Only Admin can force delete
-        return $this->isAdminRole($user) && $user->can('repair-requests.force-delete');
+        return $this->isAdminRole($user) && $this->canAnyPermission($user, [
+            'repair-requests.force-delete',
+            'force delete repair requests',
+        ]);
     }
 
     /**
@@ -233,7 +253,10 @@ class RepairRequestPolicy
         }
 
         // Only Admin can restore
-        return $this->isAdminRole($user) && $user->can('repair-requests.restore');
+        return $this->isAdminRole($user) && $this->canAnyPermission($user, [
+            'repair-requests.restore',
+            'restore repair requests',
+        ]);
     }
 
     /**
@@ -242,7 +265,7 @@ class RepairRequestPolicy
     protected function isTeamRequest(User $user, RepairRequest $repairRequest): bool
     {
         // Check if the driver's supervisor is this user
-        return $repairRequest->driver->supervisor_id === $user->id;
+        return $repairRequest->driver?->supervisor_id === $user->id;
     }
 
     /**
@@ -268,7 +291,10 @@ class RepairRequestPolicy
      */
     public function export(User $user): bool
     {
-        return $user->can('repair-requests.export')
+        return $this->canAnyPermission($user, [
+            'repair-requests.export',
+            'export repair requests',
+        ])
             || $this->isAdminRole($user)
             || $this->isFleetManagerRole($user);
     }
@@ -294,6 +320,20 @@ class RepairRequestPolicy
      */
     protected function isAdminRole(User $user): bool
     {
-        return $user->hasRole('Admin');
+        return $user->hasAnyRole(['Admin', 'Super Admin']);
+    }
+
+    /**
+     * Permission compatibility helper (legacy + normalized names).
+     */
+    protected function canAnyPermission(User $user, array $permissions): bool
+    {
+        foreach ($permissions as $permission) {
+            if ($user->can($permission)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

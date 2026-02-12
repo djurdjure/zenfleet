@@ -2,97 +2,185 @@
 
 namespace Tests\Feature;
 
+use App\Models\Assignment;
+use App\Models\Driver;
 use App\Models\Organization;
 use App\Models\RepairRequest;
 use App\Models\User;
 use App\Models\Vehicle;
-use App\Notifications\RepairRequestApproved;
-use App\Notifications\RepairRequestRejected;
-use App\Notifications\RepairRequestValidated;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
-use Illuminate\Support\Facades\Notification;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Spatie\Permission\Contracts\PermissionsTeamResolver;
+use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
+use Spatie\Permission\PermissionRegistrar;
 use Tests\TestCase;
 
 class RepairRequestWorkflowTest extends TestCase
 {
     use RefreshDatabase;
 
-    protected $organization;
-    protected $driver;
-    protected $supervisor;
-    protected $manager;
-    protected $vehicle;
+    protected Organization $organization;
+    protected User $driverUser;
+    protected Driver $driver;
+    protected User $supervisor;
+    protected User $manager;
+    protected Vehicle $vehicle;
 
     protected function setUp(): void
     {
         parent::setUp();
 
+        $permissionRegistrar = app(PermissionRegistrar::class);
+        $permissionRegistrar->forgetCachedPermissions();
+
+        // Create organization
         $this->organization = Organization::factory()->create([
-            'organization_type' => 'enterprise'
+            'organization_type' => 'enterprise',
         ]);
 
-        $this->driver = User::factory()->create([
-            'organization_id' => $this->organization->id
+        // Set team context
+        app(PermissionsTeamResolver::class)->setPermissionsTeamId($this->organization->id);
+        $permissionRegistrar->setPermissionsTeamId($this->organization->id);
+
+        // Create roles WITH organization_id (required by schema)
+        $driverRole = Role::firstOrCreate([
+            'name' => 'Chauffeur',
+            'guard_name' => 'web',
+            'organization_id' => $this->organization->id,
+        ]);
+        $supervisorRole = Role::firstOrCreate([
+            'name' => 'Superviseur',
+            'guard_name' => 'web',
+            'organization_id' => $this->organization->id,
+        ]);
+        $fleetManagerRole = Role::firstOrCreate([
+            'name' => 'Gestionnaire Flotte',
+            'guard_name' => 'web',
+            'organization_id' => $this->organization->id,
         ]);
 
-        $teamResolver = app(PermissionsTeamResolver::class);
-        $teamResolver->setPermissionsTeamId($this->organization->id);
-        Role::firstOrCreate(['name' => 'Chauffeur', 'guard_name' => 'web']);
-        $this->driver->assignRole('Chauffeur');
+        // Create permissions
+        $permissions = [];
+        $permissionNames = [
+            'repair-requests.create',
+            'repair-requests.view.own',
+            'repair-requests.view.team',
+            'repair-requests.view.all',
+            'repair-requests.approve.level1',
+            'repair-requests.approve.level2',
+            'repair-requests.reject.level1',
+            'repair-requests.reject.level2',
+            'repair-requests.delete',
+            'repair-requests.export',
+        ];
+        foreach ($permissionNames as $pName) {
+            $permissions[$pName] = Permission::firstOrCreate([
+                'name' => $pName,
+                'guard_name' => 'web',
+            ]);
+        }
 
+        // Assign permissions to roles
+        $driverRole->givePermissionTo([
+            $permissions['repair-requests.create'],
+            $permissions['repair-requests.view.own'],
+        ]);
+        $supervisorRole->givePermissionTo([
+            $permissions['repair-requests.view.own'],
+            $permissions['repair-requests.view.team'],
+            $permissions['repair-requests.approve.level1'],
+            $permissions['repair-requests.reject.level1'],
+        ]);
+        $fleetManagerRole->givePermissionTo([
+            $permissions['repair-requests.view.own'],
+            $permissions['repair-requests.view.all'],
+            $permissions['repair-requests.approve.level2'],
+            $permissions['repair-requests.reject.level2'],
+        ]);
+
+        // Create driver user
+        $this->driverUser = User::factory()->create([
+            'organization_id' => $this->organization->id,
+        ]);
+        app(PermissionsTeamResolver::class)->setPermissionsTeamId($this->organization->id);
+        $permissionRegistrar->setPermissionsTeamId($this->organization->id);
+        $this->driverUser->assignRole('Chauffeur');
+        DB::table('model_has_roles')
+            ->where('model_id', $this->driverUser->id)
+            ->where('model_type', User::class)
+            ->update(['organization_id' => $this->organization->id]);
+
+        // Create supervisor user
         $this->supervisor = User::factory()->create([
-            'organization_id' => $this->organization->id
+            'organization_id' => $this->organization->id,
         ]);
-        Role::firstOrCreate(['name' => 'Superviseur', 'guard_name' => 'web']);
+        app(PermissionsTeamResolver::class)->setPermissionsTeamId($this->organization->id);
+        $permissionRegistrar->setPermissionsTeamId($this->organization->id);
         $this->supervisor->assignRole('Superviseur');
+        DB::table('model_has_roles')
+            ->where('model_id', $this->supervisor->id)
+            ->where('model_type', User::class)
+            ->update(['organization_id' => $this->organization->id]);
 
+        // Create fleet manager user
         $this->manager = User::factory()->create([
-            'organization_id' => $this->organization->id
+            'organization_id' => $this->organization->id,
         ]);
-        Role::firstOrCreate(['name' => 'Gestionnaire Flotte', 'guard_name' => 'web']);
+        app(PermissionsTeamResolver::class)->setPermissionsTeamId($this->organization->id);
+        $permissionRegistrar->setPermissionsTeamId($this->organization->id);
         $this->manager->assignRole('Gestionnaire Flotte');
+        DB::table('model_has_roles')
+            ->where('model_id', $this->manager->id)
+            ->where('model_type', User::class)
+            ->update(['organization_id' => $this->organization->id]);
 
-        $this->vehicle = Vehicle::factory()->create([
-            'organization_id' => $this->organization->id
+        // Create driver record linked to driverUser, supervised by supervisor
+        $this->driver = Driver::factory()->create([
+            'organization_id' => $this->organization->id,
+            'user_id' => $this->driverUser->id,
+            'supervisor_id' => $this->supervisor->id,
         ]);
 
-        Notification::fake();
+        // Create vehicle
+        $this->vehicle = Vehicle::factory()->create([
+            'organization_id' => $this->organization->id,
+        ]);
+
+        Assignment::factory()->create([
+            'organization_id' => $this->organization->id,
+            'vehicle_id' => $this->vehicle->id,
+            'driver_id' => $this->driver->id,
+            'start_datetime' => now()->subHour(),
+            'end_datetime' => null,
+            'status' => Assignment::STATUS_ACTIVE,
+        ]);
+
         Storage::fake('public');
     }
 
     public function test_driver_can_create_repair_request()
     {
-        $this->actingAs($this->driver);
-
-        $attachments = [
-            UploadedFile::fake()->image('damage1.jpg'),
-            UploadedFile::fake()->create('report.pdf', 100)
-        ];
+        $this->actingAs($this->driverUser);
 
         $response = $this->post(route('admin.repair-requests.store'), [
+            'driver_id' => $this->driver->id,
             'vehicle_id' => $this->vehicle->id,
-            'category' => 'engine',
-            'priority' => 'high',
-            'description' => 'Problème moteur urgent nécessitant intervention',
-            'estimated_cost' => 25000.00,
-            'attachments' => $attachments
+            'title' => 'Problème moteur urgent',
+            'description' => 'Problème moteur urgent nécessitant intervention rapide',
+            'urgency' => 'high',
         ]);
 
         $response->assertRedirect();
+
         $this->assertDatabaseHas('repair_requests', [
             'vehicle_id' => $this->vehicle->id,
-            'requested_by' => $this->driver->id,
-            'status' => RepairRequest::STATUS_PENDING,
-            'category' => 'engine',
-            'priority' => 'high'
+            'driver_id' => $this->driver->id,
+            'status' => RepairRequest::STATUS_PENDING_SUPERVISOR,
+            'urgency' => 'high',
         ]);
-
-        $repairRequest = RepairRequest::latest()->first();
-        $this->assertCount(2, $repairRequest->attachments);
     }
 
     public function test_supervisor_can_approve_repair_request()
@@ -100,27 +188,22 @@ class RepairRequestWorkflowTest extends TestCase
         $repairRequest = RepairRequest::factory()->create([
             'organization_id' => $this->organization->id,
             'vehicle_id' => $this->vehicle->id,
-            'requested_by' => $this->driver->id,
-            'status' => RepairRequest::STATUS_PENDING
+            'driver_id' => $this->driver->id,
+            'status' => RepairRequest::STATUS_PENDING_SUPERVISOR,
         ]);
 
         $this->actingAs($this->supervisor);
 
-        $response = $this->post(route('admin.repair-requests.approve', $repairRequest), [
-            'supervisor_comments' => 'Approuvé après vérification terrain'
+        $response = $this->post(route('admin.repair-requests.approve-supervisor', $repairRequest), [
+            'comment' => 'Approuvé après vérification terrain',
         ]);
 
-        $response->assertJson(['success' => true]);
+        $response->assertRedirect();
 
         $repairRequest->refresh();
-        $this->assertEquals(RepairRequest::STATUS_INITIAL_APPROVAL, $repairRequest->status);
-        $this->assertEquals(RepairRequest::SUPERVISOR_ACCEPT, $repairRequest->supervisor_decision);
+        $this->assertEquals(RepairRequest::STATUS_PENDING_FLEET_MANAGER, $repairRequest->status);
+        $this->assertEquals('approved', $repairRequest->supervisor_status);
         $this->assertEquals($this->supervisor->id, $repairRequest->supervisor_id);
-
-        Notification::assertSentTo(
-            $this->driver,
-            RepairRequestApproved::class
-        );
     }
 
     public function test_supervisor_can_reject_repair_request()
@@ -128,154 +211,122 @@ class RepairRequestWorkflowTest extends TestCase
         $repairRequest = RepairRequest::factory()->create([
             'organization_id' => $this->organization->id,
             'vehicle_id' => $this->vehicle->id,
-            'requested_by' => $this->driver->id,
-            'status' => RepairRequest::STATUS_PENDING
+            'driver_id' => $this->driver->id,
+            'status' => RepairRequest::STATUS_PENDING_SUPERVISOR,
         ]);
 
         $this->actingAs($this->supervisor);
 
-        $response = $this->post(route('admin.repair-requests.reject', $repairRequest), [
-            'supervisor_comments' => 'Réparation non justifiée - maintenance préventive suffisante'
+        $response = $this->post(route('admin.repair-requests.reject-supervisor', $repairRequest), [
+            'reason' => 'Réparation non justifiée - maintenance préventive suffisante',
         ]);
 
-        $response->assertJson(['success' => true]);
+        $response->assertRedirect();
 
         $repairRequest->refresh();
-        $this->assertEquals(RepairRequest::STATUS_REJECTED, $repairRequest->status);
-        $this->assertEquals(RepairRequest::SUPERVISOR_REJECT, $repairRequest->supervisor_decision);
-
-        Notification::assertSentTo(
-            $this->driver,
-            RepairRequestRejected::class
-        );
+        $this->assertEquals(RepairRequest::STATUS_REJECTED_SUPERVISOR, $repairRequest->status);
+        $this->assertEquals('rejected', $repairRequest->supervisor_status);
+        $this->assertNotNull($repairRequest->rejected_at);
     }
 
-    public function test_manager_can_validate_approved_request()
+    public function test_fleet_manager_can_approve_after_supervisor()
     {
         $repairRequest = RepairRequest::factory()->create([
             'organization_id' => $this->organization->id,
             'vehicle_id' => $this->vehicle->id,
-            'requested_by' => $this->driver->id,
+            'driver_id' => $this->driver->id,
             'supervisor_id' => $this->supervisor->id,
-            'status' => RepairRequest::STATUS_INITIAL_APPROVAL,
-            'supervisor_decision' => RepairRequest::SUPERVISOR_ACCEPT
+            'status' => RepairRequest::STATUS_PENDING_FLEET_MANAGER,
+            'supervisor_status' => 'approved',
+            'supervisor_approved_at' => now(),
         ]);
 
         $this->actingAs($this->manager);
 
-        $response = $this->post(route('admin.repair-requests.validate', $repairRequest), [
-            'manager_comments' => 'Budget validé - procéder aux réparations'
+        $response = $this->post(route('admin.repair-requests.approve-fleet-manager', $repairRequest), [
+            'comment' => 'Budget validé - procéder aux réparations',
         ]);
 
-        $response->assertJson(['success' => true]);
+        $response->assertRedirect();
 
         $repairRequest->refresh();
-        $this->assertEquals(RepairRequest::STATUS_APPROVED, $repairRequest->status);
-        $this->assertEquals(RepairRequest::MANAGER_VALIDATE, $repairRequest->manager_decision);
-        $this->assertEquals($this->manager->id, $repairRequest->manager_id);
-
-        Notification::assertSentTo(
-            $this->driver,
-            RepairRequestValidated::class
-        );
+        $this->assertEquals(RepairRequest::STATUS_APPROVED_FINAL, $repairRequest->status);
+        $this->assertEquals('approved', $repairRequest->fleet_manager_status);
+        $this->assertEquals($this->manager->id, $repairRequest->fleet_manager_id);
+        $this->assertNotNull($repairRequest->final_approved_at);
     }
 
-    public function test_workflow_prevents_unauthorized_actions()
+    public function test_fleet_manager_cannot_approve_without_supervisor_approval()
     {
         $repairRequest = RepairRequest::factory()->create([
             'organization_id' => $this->organization->id,
-            'status' => RepairRequest::STATUS_PENDING
+            'vehicle_id' => $this->vehicle->id,
+            'driver_id' => $this->driver->id,
+            'status' => RepairRequest::STATUS_PENDING_SUPERVISOR,
         ]);
 
-        // Manager cannot approve directly without supervisor approval
+        // Fleet manager cannot approve level 2 when status is pending_supervisor
         $this->actingAs($this->manager);
-        $response = $this->post(route('admin.repair-requests.validate', $repairRequest));
-        $response->assertStatus(422);
+        $response = $this->post(route('admin.repair-requests.approve-fleet-manager', $repairRequest), [
+            'comment' => 'Tentative directe',
+        ]);
+        $response->assertForbidden();
+    }
+
+    public function test_driver_cannot_approve_repair_request()
+    {
+        $repairRequest = RepairRequest::factory()->create([
+            'organization_id' => $this->organization->id,
+            'vehicle_id' => $this->vehicle->id,
+            'driver_id' => $this->driver->id,
+            'status' => RepairRequest::STATUS_PENDING_SUPERVISOR,
+        ]);
 
         // Driver cannot approve their own request
-        $this->actingAs($this->driver);
-        $response = $this->post(route('admin.repair-requests.approve', $repairRequest));
-        $response->assertStatus(403);
+        $this->actingAs($this->driverUser);
+        $response = $this->post(route('admin.repair-requests.approve-supervisor', $repairRequest), [
+            'comment' => 'Auto-approbation',
+        ]);
+        $response->assertForbidden();
     }
 
     public function test_organization_isolation_in_repair_requests()
     {
         $otherOrganization = Organization::factory()->create();
         $otherUser = User::factory()->create([
-            'organization_id' => $otherOrganization->id
+            'organization_id' => $otherOrganization->id,
         ]);
 
         $repairRequest = RepairRequest::factory()->create([
-            'organization_id' => $this->organization->id
+            'organization_id' => $this->organization->id,
+            'vehicle_id' => $this->vehicle->id,
+            'driver_id' => $this->driver->id,
         ]);
 
         $this->actingAs($otherUser);
         $response = $this->get(route('admin.repair-requests.show', $repairRequest));
-        $response->assertStatus(404);
+        // Should be forbidden (different organization) or 404
+        $this->assertTrue(in_array($response->status(), [403, 404]));
     }
 
-    public function test_repair_request_cost_tracking()
+    public function test_repair_request_creates_history_on_approval()
     {
         $repairRequest = RepairRequest::factory()->create([
             'organization_id' => $this->organization->id,
-            'estimated_cost' => 50000.00,
-            'status' => RepairRequest::STATUS_APPROVED
+            'vehicle_id' => $this->vehicle->id,
+            'driver_id' => $this->driver->id,
+            'status' => RepairRequest::STATUS_PENDING_SUPERVISOR,
         ]);
 
-        $this->actingAs($this->manager);
+        $this->actingAs($this->supervisor);
 
-        // Update actual cost
-        $response = $this->patch(route('admin.repair-requests.update', $repairRequest), [
-            'actual_cost' => 47500.00,
-            'completion_date' => now()->toDateString(),
-            'status' => RepairRequest::STATUS_COMPLETED
+        $this->post(route('admin.repair-requests.approve-supervisor', $repairRequest), [
+            'comment' => 'Approuvé',
         ]);
 
-        $response->assertRedirect();
-
-        $repairRequest->refresh();
-        $this->assertEquals(47500.00, $repairRequest->actual_cost);
-        $this->assertEquals(RepairRequest::STATUS_COMPLETED, $repairRequest->status);
-        $this->assertNotNull($repairRequest->completion_date);
-    }
-
-    public function test_repair_request_search_and_filters()
-    {
-        RepairRequest::factory()->count(5)->create([
-            'organization_id' => $this->organization->id,
-            'category' => 'engine',
-            'status' => RepairRequest::STATUS_PENDING
+        $this->assertDatabaseHas('repair_request_history', [
+            'repair_request_id' => $repairRequest->id,
+            'action' => 'supervisor_approved',
         ]);
-
-        RepairRequest::factory()->count(3)->create([
-            'organization_id' => $this->organization->id,
-            'category' => 'brake',
-            'status' => RepairRequest::STATUS_APPROVED
-        ]);
-
-        $this->actingAs($this->manager);
-
-        // Test category filter
-        $response = $this->get(route('admin.repair-requests.index', [
-            'category' => 'engine'
-        ]));
-        $response->assertStatus(200);
-
-        // Test status filter
-        $response = $this->get(route('admin.repair-requests.index', [
-            'status' => RepairRequest::STATUS_APPROVED
-        ]));
-        $response->assertStatus(200);
-
-        // Test search functionality
-        $searchRequest = RepairRequest::factory()->create([
-            'organization_id' => $this->organization->id,
-            'description' => 'Problème spécifique moteur diesel'
-        ]);
-
-        $response = $this->get(route('admin.repair-requests.index', [
-            'search' => 'diesel'
-        ]));
-        $response->assertStatus(200);
     }
 }

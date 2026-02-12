@@ -166,7 +166,9 @@ class MileageReadingsIndex extends Component
                 'vehicle',
                 'recordedBy',
             ])
-            ->where('organization_id', $user->organization_id);
+            ->where('organization_id', $user->organization_id)
+            // Exclure les relevés dont le véhicule est masqué par les scopes d'accès.
+            ->whereHas('vehicle');
 
         // 🔐 PERMISSION-BASED SCOPING
         if ($user->can('mileage-readings.view.all')) {
@@ -287,6 +289,7 @@ class MileageReadingsIndex extends Component
 
         // IDs des utilisateurs/chauffeurs ayant enregistré au moins un relevé
         $authorIds = VehicleMileageReading::where('organization_id', $user->organization_id)
+            ->whereHas('vehicle')
             ->whereNotNull('recorded_by_id')
             ->distinct()
             ->pluck('recorded_by_id');
@@ -357,6 +360,7 @@ class MileageReadingsIndex extends Component
     {
         // Vérifier que le relevé existe et appartient à l'organisation
         $reading = VehicleMileageReading::where('organization_id', auth()->user()->organization_id)
+            ->whereHas('vehicle')
             ->findOrFail($id);
 
         // Vérifier les permissions
@@ -385,6 +389,7 @@ class MileageReadingsIndex extends Component
         try {
             // Récupérer le relevé
             $reading = VehicleMileageReading::where('organization_id', auth()->user()->organization_id)
+                ->whereHas('vehicle')
                 ->findOrFail($this->deleteId);
 
             // Vérifier les permissions

@@ -2,7 +2,7 @@
                         {{-- Dashboard --}}
                         <li class="flex">
                             @php
-                            $dashboardRoute = auth()->user()->hasAnyRole(['Super Admin', 'Admin', 'Gestionnaire Flotte', 'Supervisor'])
+                            $dashboardRoute = auth()->user()->hasAnyRole(['Super Admin', 'Admin', 'Gestionnaire Flotte', 'Supervisor', 'Superviseur'])
                             ? route('admin.dashboard')
                             : route('driver.dashboard');
                             $isDashboardActive = request()->routeIs('admin.dashboard', 'driver.dashboard', 'dashboard');
@@ -130,8 +130,8 @@
                         @endcan
 
                         {{-- Demandes de Réparation - Chauffeurs uniquement (menu séparé) --}}
-                        @hasrole('Chauffeur')
-                        @can('repair-requests.view.own')
+                        @hasanyrole('Chauffeur|Driver')
+                        @canany(['repair-requests.view.own', 'repair-requests.create'])
                         <li class="flex">
                             <a href="{{ route('driver.repair-requests.index') }}"
                                 class="flex items-center w-full h-11 px-3.5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 {{ request()->routeIs('driver.repair-requests.*') ? 'bg-blue-600 text-white shadow-md' : 'text-gray-700 hover:bg-white hover:text-gray-900 hover:shadow-sm' }}">
@@ -139,8 +139,8 @@
                                 <span class="flex-1">Mes Demandes</span>
                             </a>
                         </li>
-                        @endcan
-                        @endhasrole
+                        @endcanany
+                        @endhasanyrole
 
                         {{-- Kilométrage avec sous-menus - Accessible à tous les rôles avec permission --}}
                         @canany(['mileage-readings.view.own', 'mileage-readings.view.team', 'mileage-readings.view.all'])
@@ -167,7 +167,7 @@
                                         {{-- Historique --}}
                                         <li>
                                             @php
-                                            $mileageIndexRoute = auth()->user()->hasAnyRole(['Super Admin', 'Admin', 'Gestionnaire Flotte', 'Supervisor'])
+                                            $mileageIndexRoute = auth()->user()->hasAnyRole(['Super Admin', 'Admin', 'Gestionnaire Flotte', 'Supervisor', 'Superviseur'])
                                             ? route('admin.mileage-readings.index')
                                             : route('admin.mileage-readings.index');
                                             $isMileageIndexActive = request()->routeIs('admin.mileage-readings.index');
@@ -179,7 +179,7 @@
                                             </a>
                                         </li>
                                         {{-- Mettre à jour --}}
-                                        @can('mileage-readings.create')
+                                        @canany(['mileage-readings.create', 'mileage-readings.update.own', 'mileage-readings.update.any'])
                                         <li>
                                             @php
                                             $mileageUpdateRoute = auth()->user()->hasRole('Chauffeur')
@@ -193,7 +193,7 @@
                                                 Mettre à jour
                                             </a>
                                         </li>
-                                        @endcan
+                                        @endcanany
                                     </ul>
                                 </div>
                             </div>

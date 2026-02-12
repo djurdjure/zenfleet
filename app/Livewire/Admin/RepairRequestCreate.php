@@ -7,6 +7,7 @@ use App\Models\Driver;
 use App\Models\RepairCategory;
 use App\Models\RepairRequest;
 use App\Models\Vehicle;
+use App\Services\RepairRequestService;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Livewire\Component;
 use Livewire\WithFileUploads;
@@ -41,6 +42,11 @@ class RepairRequestCreate extends Component
     public $drivers = [];
     public $categories = [];
 
+    // Contexte de sécurité chauffeur pur
+    public bool $isDriverScoped = false;
+    public ?int $lockedDriverId = null;
+    public ?int $lockedVehicleId = null;
+
     // État
     public $loading = false;
 
@@ -70,30 +76,33 @@ class RepairRequestCreate extends Component
         $user = auth()->user();
         $organizationId = $user->organization_id;
 
-        // Charger les véhicules actifs uniquement
-        // CORRECTION ENTERPRISE: Utilisation du scope active() (status_id = 1)
-        $this->vehicles = Vehicle::where('organization_id', $organizationId)
-            ->active() // Scope: filtre status_id = 1 (Actif)
-            ->whereNull('deleted_at')
-            ->orderBy('registration_plate')
-            ->get(['id', 'registration_plate', 'brand', 'model', 'current_mileage'])
-            ->values()
-            ->toArray();
+        $this->isDriverScoped = $user->isDriverOnly();
 
-        // Charger les chauffeurs
-        $this->drivers = Driver::with('user')
-            ->where('organization_id', $organizationId)
-            ->whereNull('deleted_at')
-            ->get()
-            ->map(function ($driver) {
-                return [
-                    'id' => $driver->id,
-                    'name' => $driver->user->name ?? 'N/A',
-                    'license_number' => $driver->license_number ?? '',
-                ];
-            })
-            ->values()
-            ->toArray();
+        if ($this->isDriverScoped) {
+            $this->initializeDriverScopedForm($organizationId, (int) $user->id);
+        } else {
+            $this->vehicles = Vehicle::where('organization_id', $organizationId)
+                ->active()
+                ->whereNull('deleted_at')
+                ->orderBy('registration_plate')
+                ->get(['id', 'registration_plate', 'brand', 'model', 'current_mileage'])
+                ->values()
+                ->toArray();
+
+            $this->drivers = Driver::with('user')
+                ->where('organization_id', $organizationId)
+                ->whereNull('deleted_at')
+                ->get()
+                ->map(function ($driver) {
+                    return [
+                        'id' => $driver->id,
+                        'name' => $driver->user->name ?? 'N/A',
+                        'license_number' => $driver->license_number ?? '',
+                    ];
+                })
+                ->values()
+                ->toArray();
+        }
 
         // Charger les catégories
         $this->categories = RepairCategory::where('organization_id', $organizationId)
@@ -105,12 +114,71 @@ class RepairRequestCreate extends Component
             ->toArray();
     }
 
+    private function initializeDriverScopedForm(int $organizationId, int $userId): void
+    {
+        $driver = Driver::with('user')
+            ->where('organization_id', $organizationId)
+            ->where('user_id', $userId)
+            ->whereNull('deleted_at')
+            ->first();
+
+        if (! $driver) {
+            $this->drivers = [];
+            $this->vehicles = [];
+            return;
+        }
+
+        $this->lockedDriverId = (int) $driver->id;
+        $this->driver_id = $this->lockedDriverId;
+        $this->drivers = [[
+            'id' => $driver->id,
+            'name' => $driver->user->name ?? 'N/A',
+            'license_number' => $driver->license_number ?? '',
+        ]];
+
+        $referenceTime = now();
+        $assignment = Assignment::query()
+            ->where('organization_id', $organizationId)
+            ->where('driver_id', $driver->id)
+            ->where('status', '!=', Assignment::STATUS_CANCELLED)
+            ->where('start_datetime', '<=', $referenceTime)
+            ->where(function ($query) use ($referenceTime) {
+                $query->whereNull('end_datetime')
+                    ->orWhere('end_datetime', '>=', $referenceTime);
+            })
+            ->with(['vehicle:id,organization_id,registration_plate,brand,model,current_mileage'])
+            ->orderByDesc('start_datetime')
+            ->first();
+
+        if (! $assignment || ! $assignment->vehicle) {
+            $this->vehicles = [];
+            return;
+        }
+
+        $vehicle = $assignment->vehicle;
+        $this->lockedVehicleId = (int) $vehicle->id;
+        $this->vehicle_id = $this->lockedVehicleId;
+        $this->current_mileage = $vehicle->current_mileage;
+        $this->vehicles = [[
+            'id' => $vehicle->id,
+            'registration_plate' => $vehicle->registration_plate,
+            'brand' => $vehicle->brand,
+            'model' => $vehicle->model,
+            'current_mileage' => $vehicle->current_mileage,
+        ]];
+    }
+
     /**
      * Appelé automatiquement quand vehicle_id change (Livewire 3)
      * Charge le chauffeur assigné et le kilométrage
      */
     public function updatedVehicleId($value)
     {
+        if ($this->isDriverScoped) {
+            $this->vehicle_id = $this->lockedVehicleId;
+            return;
+        }
+
         if (empty($value)) {
             $this->driver_id = null;
             $this->current_mileage = null;
@@ -151,6 +219,11 @@ class RepairRequestCreate extends Component
      */
     public function updatedDriverId($value)
     {
+        if ($this->isDriverScoped) {
+            $this->driver_id = $this->lockedDriverId;
+            return;
+        }
+
         if (empty($value)) {
             // Ne pas effacer vehicle_id si c'est juste un changement manuel
             return;
@@ -194,10 +267,24 @@ class RepairRequestCreate extends Component
     public function submit()
     {
         $this->authorize('create', RepairRequest::class);
+
+        if ($this->isDriverScoped) {
+            $this->driver_id = $this->lockedDriverId;
+            $this->vehicle_id = $this->lockedVehicleId;
+        }
+
+        if ($this->isDriverScoped && (! $this->driver_id || ! $this->vehicle_id)) {
+            $this->addError(
+                'form',
+                'Aucun vehicule actif ne vous est affecte. Contactez votre superviseur pour finaliser l\'affectation.'
+            );
+            return;
+        }
+
         $this->validate();
 
         try {
-            $data = [
+            $repairRequest = app(RepairRequestService::class)->createRequest([
                 'vehicle_id' => $this->vehicle_id,
                 'driver_id' => $this->driver_id,
                 'title' => $this->title,
@@ -205,28 +292,20 @@ class RepairRequestCreate extends Component
                 'category_id' => $this->category_id,
                 'urgency' => $this->urgency,
                 'current_mileage' => $this->current_mileage,
+                'location_description' => null,
                 'estimated_cost' => $this->estimated_cost,
                 'organization_id' => auth()->user()->organization_id,
-                'status' => RepairRequest::STATUS_PENDING_SUPERVISOR,
-            ];
-
-            // Créer la demande
-            $repairRequest = RepairRequest::create($data);
-
-            // Gérer les pièces jointes si présentes
-            if (!empty($this->attachments)) {
-                foreach ($this->attachments as $attachment) {
-                    $path = $attachment->store('repair-requests', 'public');
-                    // Vous pouvez créer un modèle Attachment si nécessaire
-                    // ou stocker dans une table pivot
-                }
-            }
+                'requested_by' => auth()->id(),
+                'attachments' => $this->attachments,
+            ]);
 
             session()->flash('success', 'Demande de réparation créée avec succès.');
 
             return redirect()->route('admin.repair-requests.show', $repairRequest);
         } catch (\Exception $e) {
-            session()->flash('error', 'Erreur lors de la création: ' . $e->getMessage());
+            report($e);
+            $this->addError('form', 'Échec de création: ' . $e->getMessage());
+            session()->flash('error', 'Échec de création: ' . $e->getMessage());
         }
     }
 

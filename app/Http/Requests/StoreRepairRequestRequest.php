@@ -2,6 +2,8 @@
 
 namespace App\Http\Requests;
 
+use App\Models\Assignment;
+use App\Models\Driver;
 use App\Models\RepairRequest;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
@@ -24,7 +26,17 @@ class StoreRepairRequestRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return $this->user()->can('repair-requests.create');
+        $user = $this->user();
+
+        if (! $user) {
+            return false;
+        }
+
+        // Backward compatibility: support both legacy and normalized permission names.
+        return $user->canAny([
+            'repair-requests.create',
+            'create repair requests',
+        ]);
     }
 
     /**
@@ -42,6 +54,34 @@ class StoreRepairRequestRequest extends FormRequest
                 Rule::exists('drivers', 'id')
                     ->where('organization_id', $this->user()->organization_id)
                     ->whereNull('deleted_at'),
+                function (string $attribute, mixed $value, \Closure $fail) {
+                    // Driver users can only create requests for their own driver profile.
+                    // Admin/supervisor scopes keep cross-driver create capabilities.
+                    if ($this->user()->canAny([
+                        'repair-requests.view.all',
+                        'repair-requests.view.team',
+                        'view all repair requests',
+                        'view team repair requests',
+                    ]) || $this->user()->hasAnyRole([
+                        'Super Admin',
+                        'Admin',
+                        'Gestionnaire Flotte',
+                        'Fleet Manager',
+                        'Supervisor',
+                        'Superviseur',
+                    ])) {
+                        return;
+                    }
+
+                    $ownDriverId = Driver::query()
+                        ->where('organization_id', $this->user()->organization_id)
+                        ->where('user_id', $this->user()->id)
+                        ->value('id');
+
+                    if ((int) $value !== (int) $ownDriverId) {
+                        $fail('Vous ne pouvez créer une demande que pour votre propre profil chauffeur.');
+                    }
+                },
             ],
             'vehicle_id' => [
                 'required',
@@ -49,6 +89,39 @@ class StoreRepairRequestRequest extends FormRequest
                 Rule::exists('vehicles', 'id')
                     ->where('organization_id', $this->user()->organization_id)
                     ->whereNull('deleted_at'),
+                function (string $attribute, mixed $value, \Closure $fail) {
+                    $user = $this->user();
+                    if (! $user->isDriverOnly()) {
+                        return;
+                    }
+
+                    $ownDriverId = Driver::query()
+                        ->where('organization_id', $user->organization_id)
+                        ->where('user_id', $user->id)
+                        ->value('id');
+
+                    if (! $ownDriverId) {
+                        $fail('Votre profil chauffeur est introuvable.');
+                        return;
+                    }
+
+                    $referenceTime = now();
+                    $isAssignedVehicle = Assignment::query()
+                        ->where('organization_id', $user->organization_id)
+                        ->where('driver_id', $ownDriverId)
+                        ->where('vehicle_id', (int) $value)
+                        ->where('status', '!=', Assignment::STATUS_CANCELLED)
+                        ->where('start_datetime', '<=', $referenceTime)
+                        ->where(function ($query) use ($referenceTime) {
+                            $query->whereNull('end_datetime')
+                                ->orWhere('end_datetime', '>=', $referenceTime);
+                        })
+                        ->exists();
+
+                    if (! $isAssignedVehicle) {
+                        $fail('Vous ne pouvez creer une demande que pour votre vehicule actuellement affecte.');
+                    }
+                },
             ],
 
             // 📝 INFORMATIONS DE BASE

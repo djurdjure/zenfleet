@@ -43,6 +43,16 @@ class StoreVehicleMileageReadingRequest extends FormRequest
                 Rule::exists('vehicles', 'id')
                     ->where('organization_id', $this->user()->organization_id)
                     ->whereNull('deleted_at'),
+                function ($attribute, $value, $fail) {
+                    $isAccessible = Vehicle::query()
+                        ->where('organization_id', $this->user()->organization_id)
+                        ->where('id', $value)
+                        ->exists();
+
+                    if (!$isAccessible) {
+                        $fail('Vous n\'avez pas accès au véhicule sélectionné.');
+                    }
+                },
             ],
 
             // 📊 KILOMÉTRAGE (Required)

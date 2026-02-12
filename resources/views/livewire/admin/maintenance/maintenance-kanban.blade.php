@@ -38,10 +38,14 @@
                             </div>
                             <div class="flex-1 min-w-0">
                                 <div class="text-sm font-semibold text-gray-900 truncate">
-                                    {{ $operation->vehicle->registration_plate }}
+                                    {{ $operation->vehicle?->registration_plate ?? 'Véhicule indisponible' }}
                                 </div>
                                 <div class="text-xs text-gray-500 truncate">
+                                    @if($operation->vehicle)
                                     {{ $operation->vehicle->brand }} {{ $operation->vehicle->model }}
+                                    @else
+                                    Relation véhicule indisponible
+                                    @endif
                                 </div>
                             </div>
                         </div>
@@ -64,7 +68,7 @@
                         @if($operation->provider)
                             <div class="flex items-center gap-1 text-xs text-gray-500 mb-2">
                                 <x-iconify icon="lucide:building" class="w-3 h-3" />
-                                <span class="truncate">{{ $operation->provider->name }}</span>
+                                <span class="truncate">{{ $operation->provider->company_name ?? $operation->provider->name ?? 'Prestataire' }}</span>
                             </div>
                         @endif
 

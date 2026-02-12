@@ -18,6 +18,31 @@ class RepairRequestController extends Controller
      */
     public function index()
     {
-        return view('driver.repair-requests.index');
+        $user = auth()->user();
+
+        abort_unless($user, 403, 'This action is unauthorized.');
+
+        // Canonical workflow entrypoint.
+        // - If user can list own/team/all requests: go to unified index.
+        // - If user can only create: go directly to create page.
+        if ($user->canAny([
+            'repair-requests.view.own',
+            'repair-requests.view.team',
+            'repair-requests.view.all',
+            'view own repair requests',
+            'view team repair requests',
+            'view all repair requests',
+        ])) {
+            return redirect()->route('admin.repair-requests.index');
+        }
+
+        if ($user->canAny([
+            'repair-requests.create',
+            'create repair requests',
+        ])) {
+            return redirect()->route('admin.repair-requests.create');
+        }
+
+        abort(403, 'This action is unauthorized.');
     }
 }

@@ -1,11 +1,22 @@
 @props([
-'name',
+'name' => null,
 'title' => null,
 'maxWidth' => 'lg',
 'closeable' => true,
 ])
 
 @php
+$name = $name ?? null;
+$title = $title ?? null;
+$maxWidth = $maxWidth ?? 'lg';
+$closeable = $closeable ?? true;
+
+$wireModel = $attributes->get('wire:model')
+    ?? $attributes->get('wire:model.live')
+    ?? $attributes->get('wire:model.defer');
+
+$resolvedName = $name ?: ($wireModel ?: 'modal-'.\Illuminate\Support\Str::random(12));
+
 $maxWidthClasses = match($maxWidth) {
 'sm' => 'max-w-sm',
 'md' => 'max-w-md',
@@ -33,8 +44,8 @@ default => 'max-w-lg',
 
 <div
     x-data="{ 
-    show: false,
-    modalName: '{{ $name }}',
+    show: @if($wireModel) $wire.entangle('{{ $wireModel }}') @else false @endif,
+    modalName: '{{ $resolvedName }}',
     init() {
         this.$watch('show', value => {
             if (value) {

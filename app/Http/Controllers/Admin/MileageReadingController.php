@@ -93,6 +93,18 @@ class MileageReadingController extends Controller
      */
     public function update(?int $vehicle = null)
     {
+        $user = auth()->user();
+
+        abort_unless(
+            $user && $user->canAny([
+                'mileage-readings.create',
+                'mileage-readings.update.own',
+                'mileage-readings.update.any',
+            ]),
+            403,
+            'This action is unauthorized.'
+        );
+
         return view('admin.mileage-readings.update', [
             'vehicleId' => $vehicle
         ]);

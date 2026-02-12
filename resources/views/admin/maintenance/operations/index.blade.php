@@ -247,7 +247,7 @@
                 <ul class="space-y-2">
                     @foreach($analytics['top_vehicles']->take(5) as $item)
                     <li class="flex items-center justify-between text-sm">
-                        <span class="text-red-900 font-medium truncate">{{ $item->vehicle->registration_plate }}</span>
+                        <span class="text-red-900 font-medium truncate">{{ $item->vehicle?->registration_plate ?? 'Véhicule indisponible' }}</span>
                         <span class="text-red-700 font-bold">{{ $item->count }}</span>
                     </li>
                     @endforeach
@@ -576,8 +576,14 @@
                                         <x-iconify icon="lucide:car" class="w-5 h-5 text-blue-600" />
                                     </div>
                                     <div class="ml-3">
-                                        <div class="text-sm font-semibold text-gray-900">{{ $operation->vehicle->registration_plate }}</div>
-                                        <div class="text-xs text-gray-500">{{ $operation->vehicle->brand }} {{ $operation->vehicle->model }}</div>
+                                        <div class="text-sm font-semibold text-gray-900">{{ $operation->vehicle?->registration_plate ?? 'Véhicule indisponible' }}</div>
+                                        <div class="text-xs text-gray-500">
+                                            @if($operation->vehicle)
+                                            {{ $operation->vehicle->brand }} {{ $operation->vehicle->model }}
+                                            @else
+                                            Relation véhicule indisponible
+                                            @endif
+                                        </div>
                                     </div>
                                 </div>
                             </td>

@@ -6,6 +6,7 @@ use App\Models\VehicleMileageReading;
 use App\Models\Vehicle;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 
 /**
@@ -47,49 +48,56 @@ class MileageReadingService
      */
     public function getAnalytics(int $organizationId): array
     {
-        $cacheKey = "mileage_analytics_{$organizationId}";
+        $vehicleIds = $this->getAccessibleVehicleIds($organizationId);
+        $cacheKey = $this->buildAnalyticsCacheKey($organizationId, $vehicleIds);
 
-        return Cache::remember($cacheKey, 300, function () use ($organizationId) {
+        return Cache::remember($cacheKey, 300, function () use ($organizationId, $vehicleIds) {
             $now = now();
             $last7Days = $now->copy()->subDays(7);
             $last30Days = $now->copy()->subDays(30);
 
+            if (empty($vehicleIds)) {
+                return $this->emptyAnalyticsPayload($now);
+            }
+
+            $baseQuery = $this->scopedReadingsQuery($organizationId, $vehicleIds);
+
             // Total des relevés
-            $totalReadings = VehicleMileageReading::forOrganization($organizationId)->count();
-            $manualCount = VehicleMileageReading::forOrganization($organizationId)->manualOnly()->count();
-            $automaticCount = VehicleMileageReading::forOrganization($organizationId)->automaticOnly()->count();
+            $totalReadings = (clone $baseQuery)->count();
+            $manualCount = (clone $baseQuery)->manualOnly()->count();
+            $automaticCount = (clone $baseQuery)->automaticOnly()->count();
 
             // Véhicules suivis
-            $vehiclesTracked = VehicleMileageReading::forOrganization($organizationId)
+            $vehiclesTracked = (clone $baseQuery)
                 ->distinct('vehicle_id')
                 ->count('vehicle_id');
 
             // Dernier relevé
-            $lastReading = VehicleMileageReading::forOrganization($organizationId)
+            $lastReading = (clone $baseQuery)
                 ->latest('recorded_at')
                 ->first();
 
             // Relevés des 7 derniers jours
-            $readingsLast7Days = VehicleMileageReading::forOrganization($organizationId)
+            $readingsLast7Days = (clone $baseQuery)
                 ->where('recorded_at', '>=', $last7Days)
                 ->count();
 
             // Relevés des 30 derniers jours
-            $readingsLast30Days = VehicleMileageReading::forOrganization($organizationId)
+            $readingsLast30Days = (clone $baseQuery)
                 ->where('recorded_at', '>=', $last30Days)
                 ->count();
 
             // Kilométrage total parcouru (somme des différences)
-            $totalMileageCovered = $this->calculateTotalMileageCovered($organizationId);
+            $totalMileageCovered = $this->calculateTotalMileageCovered($organizationId, $vehicleIds);
 
             // Moyenne kilométrique journalière
-            $avgDailyMileage = $this->calculateAverageDailyMileage($organizationId, $last30Days, $now);
+            $avgDailyMileage = $this->calculateAverageDailyMileage($organizationId, $vehicleIds, $last30Days, $now);
 
             // Top 5 véhicules par kilométrage
-            $topVehiclesByMileage = $this->getTopVehiclesByMileage($organizationId, 5);
+            $topVehiclesByMileage = $this->getTopVehiclesByMileage($organizationId, $vehicleIds, 5);
 
             // Anomalies détectées (kilométrage en baisse, gaps importants)
-            $anomalies = $this->detectAnomalies($organizationId);
+            $anomalies = $this->detectAnomalies($organizationId, $vehicleIds);
 
             // Répartition par méthode
             $methodDistribution = [
@@ -100,8 +108,8 @@ class MileageReadingService
             ];
 
             // Tendances
-            $trend7Days = $this->calculateTrend($organizationId, 7);
-            $trend30Days = $this->calculateTrend($organizationId, 30);
+            $trend7Days = $this->calculateTrend($organizationId, $vehicleIds, 7);
+            $trend30Days = $this->calculateTrend($organizationId, $vehicleIds, 30);
 
             return [
                 // Statistiques principales
@@ -149,7 +157,9 @@ class MileageReadingService
      */
     public function getFilteredReadings(int $organizationId, array $filters = [])
     {
-        $query = VehicleMileageReading::forOrganization($organizationId)
+        $vehicleIds = $this->getAccessibleVehicleIds($organizationId);
+
+        $query = $this->scopedReadingsQuery($organizationId, $vehicleIds)
             ->select('vehicle_mileage_readings.*')
             ->with(['vehicle', 'recordedBy'])
             ->withPreviousMileage(); // Include previous mileage for Diff calculation
@@ -227,9 +237,15 @@ class MileageReadingService
      * @param int $organizationId
      * @return int
      */
-    private function calculateTotalMileageCovered(int $organizationId): int
+    private function calculateTotalMileageCovered(int $organizationId, array $vehicleIds): int
     {
-        $vehicles = Vehicle::where('organization_id', $organizationId)->get();
+        if (empty($vehicleIds)) {
+            return 0;
+        }
+
+        $vehicles = Vehicle::where('organization_id', $organizationId)
+            ->whereIn('id', $vehicleIds)
+            ->get();
         $total = 0;
 
         foreach ($vehicles as $vehicle) {
@@ -257,9 +273,15 @@ class MileageReadingService
      * @param Carbon $endDate
      * @return float
      */
-    private function calculateAverageDailyMileage(int $organizationId, Carbon $startDate, Carbon $endDate): float
+    private function calculateAverageDailyMileage(int $organizationId, array $vehicleIds, Carbon $startDate, Carbon $endDate): float
     {
-        $vehicles = Vehicle::where('organization_id', $organizationId)->get();
+        if (empty($vehicleIds)) {
+            return 0;
+        }
+
+        $vehicles = Vehicle::where('organization_id', $organizationId)
+            ->whereIn('id', $vehicleIds)
+            ->get();
         $totalMileage = 0;
         $vehicleCount = 0;
 
@@ -296,9 +318,15 @@ class MileageReadingService
      * @param int $limit
      * @return array
      */
-    private function getTopVehiclesByMileage(int $organizationId, int $limit = 5): array
+    private function getTopVehiclesByMileage(int $organizationId, array $vehicleIds, int $limit = 5): array
     {
-        $vehicles = Vehicle::where('organization_id', $organizationId)->get();
+        if (empty($vehicleIds)) {
+            return [];
+        }
+
+        $vehicles = Vehicle::where('organization_id', $organizationId)
+            ->whereIn('id', $vehicleIds)
+            ->get();
         $vehiclesData = [];
 
         foreach ($vehicles as $vehicle) {
@@ -341,9 +369,14 @@ class MileageReadingService
      * @param int $organizationId
      * @return array
      */
-    private function detectAnomalies(int $organizationId): array
+    private function detectAnomalies(int $organizationId, array $vehicleIds): array
     {
+        if (empty($vehicleIds)) {
+            return [];
+        }
+
         $anomalies = [];
+        $inPlaceholders = implode(', ', array_fill(0, count($vehicleIds), '?'));
 
         // ============================================================
         // 1. KILOMÉTRAGE EN BAISSE - CTE PostgreSQL Enterprise
@@ -355,6 +388,7 @@ class MileageReadingService
                     LAG(mileage) OVER (PARTITION BY vehicle_id ORDER BY recorded_at) as prev_mileage
                 FROM vehicle_mileage_readings vmr
                 WHERE vmr.organization_id = ?
+                  AND vmr.vehicle_id IN ({$inPlaceholders})
             )
             SELECT * FROM readings_with_prev
             WHERE prev_mileage IS NOT NULL
@@ -363,7 +397,7 @@ class MileageReadingService
             LIMIT 50
         ";
 
-        $decreasingMileage = DB::select($decreasingMileageQuery, [$organizationId]);
+        $decreasingMileage = DB::select($decreasingMileageQuery, array_merge([$organizationId], $vehicleIds));
 
         foreach ($decreasingMileage as $reading) {
             // Charger la relation véhicule
@@ -393,6 +427,7 @@ class MileageReadingService
                     LAG(recorded_at) OVER (PARTITION BY vehicle_id ORDER BY recorded_at) as prev_recorded_at
                 FROM vehicle_mileage_readings vmr
                 WHERE vmr.organization_id = ?
+                  AND vmr.vehicle_id IN ({$inPlaceholders})
             )
             SELECT * FROM readings_with_prev
             WHERE prev_mileage IS NOT NULL
@@ -403,7 +438,7 @@ class MileageReadingService
             LIMIT 50
         ";
 
-        $suspectGaps = DB::select($suspectGapsQuery, [$organizationId]);
+        $suspectGaps = DB::select($suspectGapsQuery, array_merge([$organizationId], $vehicleIds));
 
         foreach ($suspectGaps as $reading) {
             // Charger la relation véhicule
@@ -428,6 +463,7 @@ class MileageReadingService
         // 3. VÉHICULES SANS RELEVÉ >30 JOURS
         // ============================================================
         $vehiclesWithoutRecentReading = Vehicle::where('organization_id', $organizationId)
+            ->whereIn('id', $vehicleIds)
             ->whereDoesntHave('mileageReadings', function ($query) {
                 $query->where('recorded_at', '>=', now()->subDays(30));
             })
@@ -467,17 +503,26 @@ class MileageReadingService
      * @param int $days
      * @return array
      */
-    private function calculateTrend(int $organizationId, int $days): array
+    private function calculateTrend(int $organizationId, array $vehicleIds, int $days): array
     {
+        if (empty($vehicleIds)) {
+            return [
+                'current_count' => 0,
+                'previous_count' => 0,
+                'trend' => 'stable',
+                'percentage' => 0,
+            ];
+        }
+
         $now = now();
         $previousPeriodEnd = $now->copy()->subDays($days);
         $previousPeriodStart = $previousPeriodEnd->copy()->subDays($days);
 
-        $currentPeriodCount = VehicleMileageReading::forOrganization($organizationId)
+        $currentPeriodCount = $this->scopedReadingsQuery($organizationId, $vehicleIds)
             ->where('recorded_at', '>=', $previousPeriodEnd)
             ->count();
 
-        $previousPeriodCount = VehicleMileageReading::forOrganization($organizationId)
+        $previousPeriodCount = $this->scopedReadingsQuery($organizationId, $vehicleIds)
             ->whereBetween('recorded_at', [$previousPeriodStart, $previousPeriodEnd])
             ->count();
 
@@ -575,6 +620,86 @@ class MileageReadingService
      */
     public function clearCache(int $organizationId): void
     {
-        Cache::forget("mileage_analytics_{$organizationId}");
+        $versionKey = "mileage_analytics_version_{$organizationId}";
+        if (!Cache::has($versionKey)) {
+            Cache::forever($versionKey, 1);
+        }
+        Cache::increment($versionKey);
+    }
+
+    private function buildAnalyticsCacheKey(int $organizationId, array $vehicleIds): string
+    {
+        $user = Auth::user();
+        $userId = $user?->id ?? 0;
+        $rolesHash = $user ? md5($user->getRoleNames()->sort()->implode('|')) : 'guest';
+        $accessHash = sha1(implode(',', $vehicleIds));
+        $version = (int) Cache::get("mileage_analytics_version_{$organizationId}", 1);
+
+        return sprintf(
+            'mileage_analytics:org:%d:user:%d:roles:%s:access:%s:v:%d',
+            $organizationId,
+            $userId,
+            $rolesHash,
+            $accessHash,
+            $version
+        );
+    }
+
+    private function emptyAnalyticsPayload(Carbon $now): array
+    {
+        return [
+            'total_readings' => 0,
+            'manual_count' => 0,
+            'automatic_count' => 0,
+            'vehicles_tracked' => 0,
+            'last_reading_date' => null,
+            'total_mileage_covered' => 0,
+            'avg_daily_mileage' => 0,
+            'readings_last_7_days' => 0,
+            'readings_last_30_days' => 0,
+            'top_vehicles' => [],
+            'anomalies_count' => 0,
+            'anomalies' => [],
+            'method_distribution' => [
+                'manual' => 0,
+                'automatic' => 0,
+                'manual_percentage' => 0,
+                'automatic_percentage' => 0,
+            ],
+            'trend_7_days' => [
+                'current_count' => 0,
+                'previous_count' => 0,
+                'trend' => 'stable',
+                'percentage' => 0,
+            ],
+            'trend_30_days' => [
+                'current_count' => 0,
+                'previous_count' => 0,
+                'trend' => 'stable',
+                'percentage' => 0,
+            ],
+            'generated_at' => $now,
+            'cache_expires_at' => $now->copy()->addMinutes(5),
+        ];
+    }
+
+    private function getAccessibleVehicleIds(int $organizationId): array
+    {
+        return Vehicle::query()
+            ->where('organization_id', $organizationId)
+            ->pluck('id')
+            ->map(fn ($id) => (int) $id)
+            ->all();
+    }
+
+    private function scopedReadingsQuery(int $organizationId, array $vehicleIds)
+    {
+        $query = VehicleMileageReading::forOrganization($organizationId);
+
+        if (empty($vehicleIds)) {
+            return $query->whereRaw('1 = 0');
+        }
+
+        return $query->whereIn('vehicle_id', $vehicleIds);
     }
 }

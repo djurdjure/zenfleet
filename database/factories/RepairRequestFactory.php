@@ -7,8 +7,6 @@ use App\Models\Organization;
 use App\Models\RepairRequest;
 use App\Models\User;
 use App\Models\Vehicle;
-use App\Models\VehicleCategory;
-use App\Models\VehicleDepot;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 
@@ -27,21 +25,26 @@ class RepairRequestFactory extends Factory
     public function definition(): array
     {
         $organization = Organization::factory()->create();
-        $driver = Driver::factory()->forOrganization($organization->id)->create();
-        $vehicle = Vehicle::factory()->forOrganization($organization->id)->create();
+        $driver = Driver::factory()->create([
+            'organization_id' => $organization->id,
+        ]);
+        $vehicle = Vehicle::factory()->create([
+            'organization_id' => $organization->id,
+        ]);
 
         return [
-            'uuid' => Str::uuid()->toString(),
+            'uuid' => (string) Str::uuid(),
             'organization_id' => $organization->id,
             'driver_id' => $driver->id,
+            'requested_by' => $driver->user_id,
             'vehicle_id' => $vehicle->id,
             'title' => $this->faker->randomElement([
-                'Pneu crevé',
-                'Problème de freins',
-                'Fuite d\'huile',
-                'Batterie défaillante',
-                'Phares cassés',
-                'Climatisation en panne',
+                'Flat tire on route',
+                'Brake system issue',
+                'Oil leak detected',
+                'Battery failure',
+                'Headlight malfunction',
+                'Engine warning light',
             ]),
             'description' => $this->faker->paragraph(3),
             'urgency' => $this->faker->randomElement([
@@ -56,8 +59,7 @@ class RepairRequestFactory extends Factory
             'estimated_cost' => $this->faker->optional()->randomFloat(2, 500, 50000),
             'photos' => null,
             'attachments' => null,
-            'category_id' => VehicleCategory::factory()->forOrganization($organization->id),
-            'depot_id' => VehicleDepot::factory()->forOrganization($organization->id),
+            'category_id' => null,
         ];
     }
 
@@ -66,9 +68,11 @@ class RepairRequestFactory extends Factory
      */
     public function pendingSupervisor(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn () => [
             'status' => RepairRequest::STATUS_PENDING_SUPERVISOR,
-            'supervisor_id' => User::factory()->create()->id,
+            'supervisor_id' => null,
+            'supervisor_status' => null,
+            'supervisor_approved_at' => null,
         ]);
     }
 
@@ -78,7 +82,9 @@ class RepairRequestFactory extends Factory
     public function pendingFleetManager(): static
     {
         return $this->state(function (array $attributes) {
-            $supervisor = User::factory()->create();
+            $supervisor = User::factory()->create([
+                'organization_id' => $attributes['organization_id'],
+            ]);
 
             return [
                 'status' => RepairRequest::STATUS_PENDING_FLEET_MANAGER,
@@ -96,8 +102,12 @@ class RepairRequestFactory extends Factory
     public function approved(): static
     {
         return $this->state(function (array $attributes) {
-            $supervisor = User::factory()->create();
-            $fleetManager = User::factory()->create();
+            $supervisor = User::factory()->create([
+                'organization_id' => $attributes['organization_id'],
+            ]);
+            $fleetManager = User::factory()->create([
+                'organization_id' => $attributes['organization_id'],
+            ]);
 
             return [
                 'status' => RepairRequest::STATUS_APPROVED_FINAL,
@@ -121,7 +131,9 @@ class RepairRequestFactory extends Factory
     public function rejected(): static
     {
         return $this->state(function (array $attributes) {
-            $supervisor = User::factory()->create();
+            $supervisor = User::factory()->create([
+                'organization_id' => $attributes['organization_id'],
+            ]);
 
             return [
                 'status' => RepairRequest::STATUS_REJECTED_SUPERVISOR,
@@ -141,8 +153,12 @@ class RepairRequestFactory extends Factory
     public function rejectedFinal(): static
     {
         return $this->state(function (array $attributes) {
-            $supervisor = User::factory()->create();
-            $fleetManager = User::factory()->create();
+            $supervisor = User::factory()->create([
+                'organization_id' => $attributes['organization_id'],
+            ]);
+            $fleetManager = User::factory()->create([
+                'organization_id' => $attributes['organization_id'],
+            ]);
 
             return [
                 'status' => RepairRequest::STATUS_REJECTED_FINAL,
@@ -164,7 +180,7 @@ class RepairRequestFactory extends Factory
      */
     public function critical(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn () => [
             'urgency' => RepairRequest::URGENCY_CRITICAL,
         ]);
     }
@@ -174,17 +190,17 @@ class RepairRequestFactory extends Factory
      */
     public function lowUrgency(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn () => [
             'urgency' => RepairRequest::URGENCY_LOW,
         ]);
     }
 
     /**
-     * State: With photos.
+     * State: With sample photos metadata.
      */
     public function withPhotos(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn () => [
             'photos' => [
                 [
                     'path' => 'repair-requests/photo1.jpg',
@@ -209,13 +225,18 @@ class RepairRequestFactory extends Factory
      */
     public function forOrganization(int $organizationId): static
     {
-        return $this->state(function (array $attributes) use ($organizationId) {
-            $driver = Driver::factory()->forOrganization($organizationId)->create();
-            $vehicle = Vehicle::factory()->forOrganization($organizationId)->create();
+        return $this->state(function () use ($organizationId) {
+            $driver = Driver::factory()->create([
+                'organization_id' => $organizationId,
+            ]);
+            $vehicle = Vehicle::factory()->create([
+                'organization_id' => $organizationId,
+            ]);
 
             return [
                 'organization_id' => $organizationId,
                 'driver_id' => $driver->id,
+                'requested_by' => $driver->user_id,
                 'vehicle_id' => $vehicle->id,
             ];
         });

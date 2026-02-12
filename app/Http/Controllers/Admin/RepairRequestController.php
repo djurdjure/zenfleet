@@ -47,6 +47,75 @@ class RepairRequestController extends Controller
     }
 
     /**
+     * Export repair requests as CSV with tenant and role isolation.
+     */
+    public function export(Request $request)
+    {
+        $this->authorize('export', RepairRequest::class);
+
+        $user = $request->user();
+        $query = RepairRequest::query()
+            ->with(['driver.user', 'vehicle'])
+            ->where('organization_id', $user->organization_id);
+
+        if ($user->isDriverOnly()) {
+            $query->whereHas('driver', function ($q) use ($user) {
+                $q->where('user_id', $user->id);
+            });
+        } elseif ($user->hasAnyRole(['Supervisor', 'Superviseur'])) {
+            $query->whereHas('driver', function ($q) use ($user) {
+                $q->where('supervisor_id', $user->id);
+            });
+        }
+
+        if ($request->filled('status')) {
+            $query->where('status', $request->string('status')->value());
+        }
+        if ($request->filled('urgency')) {
+            $query->where('urgency', $request->string('urgency')->value());
+        }
+
+        $filename = 'repair-requests-' . now()->format('Ymd_His') . '.csv';
+
+        return response()->streamDownload(function () use ($query) {
+            $output = fopen('php://output', 'w');
+            fputcsv($output, [
+                'ID',
+                'UUID',
+                'Date',
+                'Statut',
+                'Urgence',
+                'Chauffeur',
+                'Vehicule',
+                'Titre',
+                'Description',
+                'Cout estime',
+            ]);
+
+            $query->orderByDesc('created_at')->chunk(200, function ($rows) use ($output) {
+                foreach ($rows as $row) {
+                    fputcsv($output, [
+                        $row->id,
+                        $row->uuid,
+                        optional($row->created_at)->toDateTimeString(),
+                        $row->status,
+                        $row->urgency,
+                        $row->driver?->user?->name ?? $row->driver?->full_name ?? '',
+                        $row->vehicle?->registration_plate ?? '',
+                        $row->title,
+                        $row->description,
+                        $row->estimated_cost,
+                    ]);
+                }
+            });
+
+            fclose($output);
+        }, $filename, [
+            'Content-Type' => 'text/csv; charset=UTF-8',
+        ]);
+    }
+
+    /**
      * Display a listing of repair requests.
      *
      * Filters based on user role:
@@ -69,12 +138,12 @@ class RepairRequestController extends Controller
             ->where('organization_id', $user->organization_id);
 
         // 🔐 FILTRAGE PAR RÔLE
-        if ($user->hasRole('Chauffeur')) {
+        if ($user->isDriverOnly()) {
             // Driver: own requests only
             $query->whereHas('driver', function ($q) use ($user) {
                 $q->where('user_id', $user->id);
             });
-        } elseif ($user->hasRole('Supervisor')) {
+        } elseif ($user->hasAnyRole(['Supervisor', 'Superviseur'])) {
             // Supervisor: team requests only
             $query->whereHas('driver', function ($q) use ($user) {
                 $q->where('supervisor_id', $user->id);
@@ -230,6 +299,7 @@ class RepairRequestController extends Controller
             'fleetManager',
             'category',
             'maintenanceOperation',
+            'history.user',
         ]);
 
         // 🎯 DÉTECTION: Blade ou Inertia
@@ -269,7 +339,7 @@ class RepairRequestController extends Controller
             );
 
             return redirect()
-                ->route('repair-requests.show', $approved)
+                ->route('admin.repair-requests.show', $approved)
                 ->with('success', 'Demande approuvée avec succès. Les gestionnaires de flotte ont été notifiés.');
         } catch (\Exception $e) {
             return redirect()
@@ -295,7 +365,7 @@ class RepairRequestController extends Controller
             );
 
             return redirect()
-                ->route('repair-requests.show', $rejected)
+                ->route('admin.repair-requests.show', $rejected)
                 ->with('warning', 'Demande rejetée. Le chauffeur a été notifié.');
         } catch (\Exception $e) {
             return redirect()
@@ -321,7 +391,7 @@ class RepairRequestController extends Controller
             );
 
             return redirect()
-                ->route('repair-requests.show', $approved)
+                ->route('admin.repair-requests.show', $approved)
                 ->with('success', 'Demande approuvée définitivement. Une opération de maintenance a été créée automatiquement.');
         } catch (\Exception $e) {
             return redirect()
@@ -347,7 +417,7 @@ class RepairRequestController extends Controller
             );
 
             return redirect()
-                ->route('repair-requests.show', $rejected)
+                ->route('admin.repair-requests.show', $rejected)
                 ->with('warning', 'Demande rejetée définitivement. Le superviseur et le chauffeur ont été notifiés.');
         } catch (\Exception $e) {
             return redirect()
@@ -368,7 +438,7 @@ class RepairRequestController extends Controller
             $repairRequest->delete();
 
             return redirect()
-                ->route('repair-requests.index')
+                ->route('admin.repair-requests.index')
                 ->with('success', 'Demande de réparation supprimée avec succès.');
         } catch (\Exception $e) {
             return redirect()

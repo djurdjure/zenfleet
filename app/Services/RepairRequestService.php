@@ -8,6 +8,8 @@ use App\Models\RepairNotification;
 use App\Models\User;
 use App\Models\Driver;
 use App\Models\MaintenanceOperation;
+use App\Models\Vehicle;
+use App\Models\Scopes\UserVehicleAccessScope;
 use App\Events\RepairRequestStatusChanged;
 use App\Events\RepairRequestApproved;
 use App\Events\RepairRequestRejected;
@@ -53,6 +55,23 @@ class RepairRequestService
         return DB::transaction(function () use ($data) {
             // Get driver to extract organization_id
             $driver = Driver::with('supervisor')->findOrFail($data['driver_id']);
+            // Bypass user-vehicle visibility scope here:
+            // the service enforces tenant consistency explicitly below.
+            $vehicle = Vehicle::query()
+                ->withoutGlobalScope(UserVehicleAccessScope::class)
+                ->findOrFail($data['vehicle_id']);
+
+            if ((int) $vehicle->organization_id !== (int) $driver->organization_id) {
+                throw new \InvalidArgumentException('Le chauffeur et le véhicule doivent appartenir à la même organisation.');
+            }
+
+            $title = trim((string) ($data['title'] ?? ''));
+            if ($title === '') {
+                $title = $this->buildDefaultTitle(
+                    (string) ($data['description'] ?? ''),
+                    $vehicle->registration_plate ?? null
+                );
+            }
 
             // Upload photos if provided
             $photoPaths = [];
@@ -71,7 +90,7 @@ class RepairRequestService
                 'organization_id' => $driver->organization_id,
                 'vehicle_id' => $data['vehicle_id'],
                 'driver_id' => $data['driver_id'],
-                'title' => $data['title'],
+                'title' => $title,
                 'description' => $data['description'],
                 'urgency' => $data['urgency'] ?? RepairRequest::URGENCY_NORMAL,
                 'current_mileage' => $data['current_mileage'] ?? null,
@@ -84,7 +103,29 @@ class RepairRequestService
             ];
 
             if (Schema::hasColumn('repair_requests', 'requested_by')) {
-                $createPayload['requested_by'] = $driver->user_id ?? auth()->id();
+                $requesterId = $data['requested_by'] ?? auth()->id() ?? $driver->user_id;
+                if (!$requesterId) {
+                    throw new \RuntimeException('Impossible de déterminer l’utilisateur demandeur.');
+                }
+                $createPayload['requested_by'] = $requesterId;
+            }
+
+            if (Schema::hasColumn('repair_requests', 'category_id')) {
+                $createPayload['category_id'] = $data['category_id'] ?? null;
+            }
+
+            if (Schema::hasColumn('repair_requests', 'location_description')) {
+                $createPayload['location_description'] = $data['location_description']
+                    ?? $data['current_location']
+                    ?? null;
+            }
+
+            if (Schema::hasColumn('repair_requests', 'requested_at')) {
+                $createPayload['requested_at'] = $data['requested_at'] ?? now();
+            }
+
+            if (Schema::hasColumn('repair_requests', 'priority') && !isset($createPayload['priority'])) {
+                $createPayload['priority'] = $createPayload['urgency'];
             }
 
             $repairRequest = RepairRequest::create($createPayload);
@@ -101,16 +142,30 @@ class RepairRequestService
 
             // Notify supervisor if assigned
             if ($driver->supervisor_id) {
+                $vehicleLabel = $this->resolveVehicleLabel($repairRequest);
                 $this->notifySupervisor(
                     $repairRequest,
                     $driver->supervisor,
                     'Nouvelle demande de réparation',
-                    "Une nouvelle demande de réparation a été créée pour le véhicule {$repairRequest->vehicle->registration_plate}"
+                    "Une nouvelle demande de réparation a été créée pour le véhicule {$vehicleLabel}"
                 );
             }
 
             return $repairRequest->fresh(['driver', 'vehicle', 'supervisor', 'history']);
         });
+    }
+
+    private function buildDefaultTitle(string $description, ?string $registrationPlate): string
+    {
+        $prefix = 'Demande de réparation';
+        $suffix = $registrationPlate ? ' - ' . $registrationPlate : '';
+
+        $candidate = trim(Str::of($description)->squish()->limit(120, '')->value());
+        if ($candidate === '') {
+            return $prefix . $suffix;
+        }
+
+        return Str::limit($candidate, 255 - strlen($suffix), '') . $suffix;
     }
 
     /**
@@ -150,17 +205,18 @@ class RepairRequestService
             );
 
             // Notify fleet managers
+            $vehicleLabel = $this->resolveVehicleLabel($repairRequest);
             $this->notifyFleetManagers(
                 $repairRequest,
                 'Demande de réparation approuvée par superviseur',
-                "La demande de réparation #{$repairRequest->id} pour {$repairRequest->vehicle->registration_plate} a été approuvée par le superviseur et nécessite votre validation"
+                "La demande de réparation #{$repairRequest->id} pour {$vehicleLabel} a été approuvée par le superviseur et nécessite votre validation"
             );
 
             // Notify driver of progress
             $this->notifyDriver(
                 $repairRequest,
                 'Votre demande a été approuvée par le superviseur',
-                "Votre demande de réparation pour {$repairRequest->vehicle->registration_plate} a été approuvée par votre superviseur et est maintenant en attente de validation du gestionnaire de flotte"
+                "Votre demande de réparation pour {$vehicleLabel} a été approuvée par votre superviseur et est maintenant en attente de validation du gestionnaire de flotte"
             );
 
             // 🔔 DISPATCH EVENTS
@@ -220,10 +276,11 @@ class RepairRequestService
             );
 
             // Notify driver of rejection
+            $vehicleLabel = $this->resolveVehicleLabel($repairRequest);
             $this->notifyDriver(
                 $repairRequest,
                 'Votre demande a été rejetée',
-                "Votre demande de réparation pour {$repairRequest->vehicle->registration_plate} a été rejetée par votre superviseur. Raison: {$reason}"
+                "Votre demande de réparation pour {$vehicleLabel} a été rejetée par votre superviseur. Raison: {$reason}"
             );
 
             // 🔔 DISPATCH EVENTS
@@ -302,19 +359,21 @@ class RepairRequestService
 
             // Notify supervisor
             if ($repairRequest->supervisor_id) {
+                $vehicleLabel = $this->resolveVehicleLabel($repairRequest);
                 $this->notifySupervisor(
                     $repairRequest,
                     $repairRequest->supervisor,
                     'Demande de réparation approuvée',
-                    "La demande de réparation #{$repairRequest->id} pour {$repairRequest->vehicle->registration_plate} a été approuvée par le gestionnaire de flotte"
+                    "La demande de réparation #{$repairRequest->id} pour {$vehicleLabel} a été approuvée par le gestionnaire de flotte"
                 );
             }
 
             // Notify driver of final approval
+            $vehicleLabel = $this->resolveVehicleLabel($repairRequest);
             $this->notifyDriver(
                 $repairRequest,
                 'Votre demande a été approuvée',
-                "Votre demande de réparation pour {$repairRequest->vehicle->registration_plate} a été approuvée. La réparation peut maintenant être planifiée."
+                "Votre demande de réparation pour {$vehicleLabel} a été approuvée. La réparation peut maintenant être planifiée."
             );
 
             // 🔔 DISPATCH EVENTS
@@ -375,19 +434,21 @@ class RepairRequestService
 
             // Notify supervisor
             if ($repairRequest->supervisor_id) {
+                $vehicleLabel = $this->resolveVehicleLabel($repairRequest);
                 $this->notifySupervisor(
                     $repairRequest,
                     $repairRequest->supervisor,
                     'Demande de réparation rejetée',
-                    "La demande de réparation #{$repairRequest->id} pour {$repairRequest->vehicle->registration_plate} a été rejetée par le gestionnaire de flotte. Raison: {$reason}"
+                    "La demande de réparation #{$repairRequest->id} pour {$vehicleLabel} a été rejetée par le gestionnaire de flotte. Raison: {$reason}"
                 );
             }
 
             // Notify driver of final rejection
+            $vehicleLabel = $this->resolveVehicleLabel($repairRequest);
             $this->notifyDriver(
                 $repairRequest,
                 'Votre demande a été rejetée',
-                "Votre demande de réparation pour {$repairRequest->vehicle->registration_plate} a été rejetée par le gestionnaire de flotte. Raison: {$reason}"
+                "Votre demande de réparation pour {$vehicleLabel} a été rejetée par le gestionnaire de flotte. Raison: {$reason}"
             );
 
             // 🔔 DISPATCH EVENTS
@@ -532,7 +593,17 @@ class RepairRequestService
      */
     protected function notifyDriver(RepairRequest $repairRequest, string $title, string $message): ?RepairNotification
     {
-        if (!$repairRequest->driver->user_id) {
+        $driverUserId = $repairRequest->driver?->user_id;
+
+        if (!$driverUserId) {
+            $driverUserId = Driver::query()
+                ->withoutGlobalScopes()
+                ->whereKey($repairRequest->driver_id)
+                ->where('organization_id', $repairRequest->organization_id)
+                ->value('user_id');
+        }
+
+        if (!$driverUserId) {
             return null;
         }
 
@@ -544,11 +615,36 @@ class RepairRequestService
 
         return RepairNotification::create([
             'repair_request_id' => $repairRequest->id,
-            'user_id' => $repairRequest->driver->user_id,
+            'user_id' => $driverUserId,
             'type' => $type,
             'title' => $title,
             'message' => $message,
         ]);
+    }
+
+    /**
+     * Resolve a safe vehicle label for logs and notifications.
+     * Avoids null relations when vehicle access scopes hide the relation.
+     */
+    protected function resolveVehicleLabel(RepairRequest $repairRequest): string
+    {
+        $plate = $repairRequest->vehicle?->registration_plate;
+
+        if (!empty($plate)) {
+            return $plate;
+        }
+
+        $plate = Vehicle::query()
+            ->withoutGlobalScopes()
+            ->whereKey($repairRequest->vehicle_id)
+            ->where('organization_id', $repairRequest->organization_id)
+            ->value('registration_plate');
+
+        if (!empty($plate)) {
+            return $plate;
+        }
+
+        return 'ID #' . $repairRequest->vehicle_id;
     }
 
     /**

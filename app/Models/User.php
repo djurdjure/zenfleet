@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use Spatie\Permission\Models\Role;
 use Spatie\Permission\Traits\HasRoles;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany; 
 
@@ -19,6 +20,8 @@ class User extends Authenticatable
     use HasApiTokens, HasFactory, Notifiable, HasRoles, SoftDeletes {
         hasDirectPermission as protected spatieHasDirectPermission;
         hasPermissionTo as protected spatieHasPermissionTo;
+        assignRole as protected spatieAssignRole;
+        syncRoles as protected spatieSyncRoles;
     }
 
     /**
@@ -146,5 +149,99 @@ class User extends Authenticatable
         }
 
         return $this->spatieHasPermissionTo($permission, $guardName);
+    }
+
+    /**
+     * Tenant-first role assignment.
+     *
+     * Resolve role names to organization-scoped roles first, then fallback to global roles.
+     */
+    public function assignRole(...$roles)
+    {
+        return $this->spatieAssignRole(...$this->resolveRolesForTenant($roles));
+    }
+
+    /**
+     * Tenant-first role synchronization.
+     */
+    public function syncRoles(...$roles)
+    {
+        return $this->spatieSyncRoles(...$this->resolveRolesForTenant($roles));
+    }
+
+    /**
+     * Normalize and resolve incoming role identifiers.
+     *
+     * @param array<int, mixed> $roles
+     * @return array<int, mixed>
+     */
+    protected function resolveRolesForTenant(array $roles): array
+    {
+        $roles = collect($roles)->flatten()->map(function ($role) {
+            if ($role instanceof Role || is_int($role)) {
+                return $role;
+            }
+
+            if (!is_string($role)) {
+                return $role;
+            }
+
+            $guardName = $this->getDefaultGuardName();
+
+            if ($this->organization_id) {
+                $tenantRole = Role::query()
+                    ->where('name', $role)
+                    ->where('guard_name', $guardName)
+                    ->where('organization_id', $this->organization_id)
+                    ->first();
+
+                if ($tenantRole) {
+                    return $tenantRole;
+                }
+            }
+
+            $globalRole = Role::query()
+                ->where('name', $role)
+                ->where('guard_name', $guardName)
+                ->whereNull('organization_id')
+                ->first();
+
+            return $globalRole ?? $role;
+        });
+
+        return $roles->all();
+    }
+
+    /**
+     * Driver role helper with FR/EN aliases.
+     */
+    public function hasDriverRoleAlias(): bool
+    {
+        return $this->hasAnyRole(['Chauffeur', 'Driver']);
+    }
+
+    /**
+     * True when user has only driver aliases and no other role.
+     */
+    public function isDriverOnly(): bool
+    {
+        if (! $this->hasDriverRoleAlias()) {
+            return false;
+        }
+
+        $roleNames = $this->getRoleNames()
+            ->map(fn (string $name) => strtolower(trim($name)))
+            ->filter()
+            ->unique();
+
+        if ($roleNames->isEmpty()) {
+            return false;
+        }
+
+        $driverAliases = collect(['chauffeur', 'driver']);
+
+        return $roleNames->every(
+            fn (string $name) => $driverAliases->contains($name)
+        );
     }
 }

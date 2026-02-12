@@ -154,11 +154,12 @@ class UpdateVehicleMileage extends Component
         $user = auth()->user();
         
         // Mode fixe pour les chauffeurs avec véhicule assigné
-        if ($user->hasAnyRole(['Chauffeur', 'Driver']) && $user->driver) {
+        if ($user->isDriverOnly() && $user->driver) {
             $assignment = DB::table('assignments')
                 ->where('driver_id', $user->driver->id)
                 ->where('organization_id', $user->organization_id)
-                ->where('status', 'active')
+                ->where('status', '!=', 'cancelled')
+                ->where('start_datetime', '<=', now())
                 ->whereNull('deleted_at')
                 ->where(function ($query) {
                     $query->whereNull('end_datetime')

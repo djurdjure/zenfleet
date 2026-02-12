@@ -1,0 +1,399 @@
+/*
+|--------------------------------------------------------------------------
+| 🚀 ZenFleet Enterprise UX/UI Optimizations
+|--------------------------------------------------------------------------
+| Améliorations UX/UI enterprise-grade pour un rendu professionnel
+| Animations, transitions et micro-interactions avancées
+*/
+
+/* 🎯 Variables CSS pour cohérence enterprise */
+:root {
+    --enterprise-primary: #1e40af;
+    --enterprise-secondary: #7c3aed;
+    --enterprise-success: #059669;
+    --enterprise-warning: #d97706;
+    --enterprise-danger: #dc2626;
+    --enterprise-info: #0891b2;
+
+    --shadow-enterprise: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    --shadow-enterprise-lg: 0 35px 60px -12px rgba(0, 0, 0, 0.35);
+    --border-radius-enterprise: 1rem;
+
+    --animation-enterprise: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    --animation-bounce: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+/* 🌟 Animations Enterprise-Grade */
+@keyframes slideInFromTop {
+    from {
+        transform: translateY(-100px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideInFromBottom {
+    from {
+        transform: translateY(100px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideInFromLeft {
+    from {
+        transform: translateX(-100px);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideInFromRight {
+    from {
+        transform: translateX(100px);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes pulseGlow {
+    0%, 100% {
+        box-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
+    }
+    50% {
+        box-shadow: 0 0 40px rgba(59, 130, 246, 0.6);
+    }
+}
+
+@keyframes gradientShift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+@keyframes floatEffect {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+}
+
+/* 🎨 Classes d'animation personnalisées */
+.animate-slide-in-top {
+    animation: slideInFromTop 0.6s ease-out;
+}
+
+.animate-slide-in-bottom {
+    animation: slideInFromBottom 0.6s ease-out;
+}
+
+.animate-slide-in-left {
+    animation: slideInFromLeft 0.6s ease-out;
+}
+
+.animate-slide-in-right {
+    animation: slideInFromRight 0.6s ease-out;
+}
+
+.animate-pulse-glow {
+    animation: pulseGlow 3s ease-in-out infinite;
+}
+
+.animate-gradient-shift {
+    background-size: 200% 200%;
+    animation: gradientShift 8s ease infinite;
+}
+
+.animate-float {
+    animation: floatEffect 3s ease-in-out infinite;
+}
+
+/* 🔥 Effets de survol enterprise */
+.enterprise-hover-lift {
+    transition: var(--animation-enterprise);
+}
+
+.enterprise-hover-lift:hover {
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: var(--shadow-enterprise-lg);
+}
+
+.enterprise-hover-glow {
+    position: relative;
+    overflow: hidden;
+    transition: var(--animation-enterprise);
+}
+
+.enterprise-hover-glow::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.5s;
+}
+
+.enterprise-hover-glow:hover::before {
+    left: 100%;
+}
+
+/* 📊 Graphiques et métriques */
+.metric-card {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: var(--border-radius-enterprise);
+    transition: var(--animation-enterprise);
+    position: relative;
+    overflow: hidden;
+}
+
+.metric-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #10b981, #3b82f6, #8b5cf6, #f59e0b);
+    background-size: 200% 100%;
+    animation: gradientShift 3s linear infinite;
+}
+
+.metric-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-enterprise);
+}
+
+/* 🎯 Boutons Enterprise */
+.btn-enterprise {
+    background: linear-gradient(135deg, var(--enterprise-primary) 0%, var(--enterprise-secondary) 100%);
+    border-radius: var(--border-radius-enterprise);
+    padding: 12px 24px;
+    font-weight: 600;
+    color: white;
+    border: none;
+    cursor: pointer;
+    transition: var(--animation-enterprise);
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-enterprise::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    transition: left 0.6s;
+}
+
+.btn-enterprise:hover::before {
+    left: 100%;
+}
+
+.btn-enterprise:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-enterprise);
+}
+
+.btn-enterprise:active {
+    transform: translateY(0);
+}
+
+/* 🌈 Glass-morphism pour les cartes */
+.glass-card {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: var(--border-radius-enterprise);
+    box-shadow: var(--shadow-enterprise);
+}
+
+/* 🔄 Loading states enterprise */
+.enterprise-loading {
+    position: relative;
+    color: transparent !important;
+    min-height: 1rem;
+    pointer-events: none;
+}
+
+.enterprise-loading::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 16px;
+    height: 16px;
+    margin: -8px 0 0 -8px;
+    border: 2px solid #e5e7eb;
+    border-top-color: var(--enterprise-primary);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+/* 📱 Responsive optimizations */
+@media (max-width: 768px) {
+    .enterprise-hover-lift:hover {
+        transform: none;
+    }
+
+    .metric-card:hover {
+        transform: none;
+    }
+}
+
+/* 🎪 Micro-interactions pour les formulaires */
+.form-input-enterprise {
+    transition: var(--animation-enterprise);
+    border-radius: 0.75rem;
+    border: 2px solid #e5e7eb;
+    padding: 12px 16px;
+}
+
+.form-input-enterprise:focus {
+    border-color: var(--enterprise-primary);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    transform: scale(1.01);
+}
+
+.form-input-enterprise:focus:invalid {
+    border-color: var(--enterprise-danger);
+    box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
+}
+
+/* 🚀 Navigation améliorée */
+.nav-item-enterprise {
+    position: relative;
+    overflow: hidden;
+    border-radius: 0.75rem;
+    transition: var(--animation-enterprise);
+}
+
+.nav-item-enterprise::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+    transition: left 0.6s;
+}
+
+.nav-item-enterprise:hover::before {
+    left: 100%;
+}
+
+/* 💡 Tooltip enterprise */
+.tooltip-enterprise {
+    position: relative;
+}
+
+.tooltip-enterprise::before {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: 125%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #1f2937;
+    color: white;
+    padding: 8px 12px;
+    border-radius: 0.5rem;
+    font-size: 0.875rem;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: var(--animation-enterprise);
+    z-index: 9999;
+}
+
+.tooltip-enterprise::after {
+    content: '';
+    position: absolute;
+    bottom: 115%;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 5px solid transparent;
+    border-top-color: #1f2937;
+    opacity: 0;
+    transition: var(--animation-enterprise);
+}
+
+.tooltip-enterprise:hover::before,
+.tooltip-enterprise:hover::after {
+    opacity: 1;
+}
+
+/* 🎨 Status indicators */
+.status-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    display: inline-block;
+    margin-right: 8px;
+    animation: pulse 2s infinite;
+}
+
+.status-dot.success { background-color: var(--enterprise-success); }
+.status-dot.warning { background-color: var(--enterprise-warning); }
+.status-dot.danger { background-color: var(--enterprise-danger); }
+.status-dot.info { background-color: var(--enterprise-info); }
+
+/* 🎭 Dark mode optimizations */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --enterprise-bg: #0f172a;
+        --enterprise-surface: #1e293b;
+        --enterprise-text: #f8fafc;
+    }
+
+    .glass-card {
+        background: rgba(30, 41, 59, 0.8);
+        border-color: rgba(148, 163, 184, 0.1);
+    }
+}
+
+/* 🔥 Performance optimizations */
+.enterprise-optimized {
+    will-change: transform, opacity;
+    transform: translateZ(0);
+    backface-visibility: hidden;
+    perspective: 1000px;
+}
+
+/* 🎪 Scroll enhancements */
+.smooth-scroll {
+    scroll-behavior: smooth;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+    width: 8px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+    background: #f1f5f9;
+    border-radius: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, var(--enterprise-primary), var(--enterprise-secondary));
+    border-radius: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(135deg, var(--enterprise-secondary), var(--enterprise-primary));
+}

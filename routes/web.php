@@ -72,7 +72,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     | Les chauffeurs ont accès à leurs propres demandes de réparation
     | via le même component admin mais avec scope automatique
     */
-    Route::prefix('driver')->name('driver.')->group(function () {
+        Route::prefix('driver')->name('driver.')->group(function () {
         // Dashboard chauffeur (redirige vers /dashboard)
         Route::redirect('dashboard', '/dashboard')->name('dashboard');
 
@@ -80,11 +80,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/repair-requests', [\App\Http\Controllers\Driver\RepairRequestController::class, 'index'])
             ->name('repair-requests.index');
 
-        // Mise à jour du kilométrage - Chauffeur peut mettre à jour son véhicule
-        Route::get('/mileage/update', [\App\Http\Controllers\Admin\MileageReadingController::class, 'update'])
-            ->name('mileage.update')
-            ->middleware('can:create mileage readings');
-    });
+            // Mise à jour du kilométrage - Chauffeur peut mettre à jour son véhicule
+            Route::get('/mileage/update', [\App\Http\Controllers\Admin\MileageReadingController::class, 'update'])
+                ->name('mileage.update')
+                ->middleware('mileage.access');
+        });
 });
 
 /*
@@ -104,7 +104,7 @@ Route::middleware(['auth', 'verified', 'audit.log'])
     */
         Route::get('/dashboard', [DashboardController::class, 'index'])
             ->name('dashboard')
-            ->middleware('role:Super Admin|Admin|Gestionnaire Flotte|Supervisor');
+            ->middleware('role:Super Admin|Admin|Gestionnaire Flotte|Supervisor|Superviseur');
 
         /*
     |--------------------------------------------------------------------------
@@ -214,21 +214,20 @@ Route::middleware(['auth', 'verified', 'audit.log'])
                 // Export CSV avec filtres avancés - Enterprise
                 Route::get('/export', [\App\Http\Controllers\Admin\MileageReadingController::class, 'export'])
                     ->name('export')
-                    ->middleware('can:view mileage readings');
+                    ->middleware('can:mileage-readings.export');
 
                 // NOUVEAUX EXPORTS ENTERPRISE-GRADE
                 Route::get('/export/csv', [\App\Http\Controllers\Admin\MileageReadingController::class, 'exportCsv'])
                     ->name('export.csv')
-                    ->middleware('can:export mileage readings');
+                    ->middleware('can:mileage-readings.export');
 
                 Route::get('/export/pdf', [\App\Http\Controllers\Admin\MileageReadingController::class, 'exportPdf'])
                     ->name('export.pdf')
-                    ->middleware('can:export mileage readings');
+                    ->middleware('can:mileage-readings.export');
 
                 // Mise à jour du kilométrage (tous les rôles selon permissions)
                 Route::get('/update/{vehicle?}', [\App\Http\Controllers\Admin\MileageReadingController::class, 'update'])
-                    ->name('update')
-                    ->middleware('can:create mileage readings');
+                    ->name('update');
             });
 
             // 🚙 Véhicules avec Import/Export Avancé - Configuration Enterprise
@@ -447,8 +446,6 @@ Route::middleware(['auth', 'verified', 'audit.log'])
                 Route::post('/', [\App\Http\Controllers\Admin\RepairRequestController::class, 'store'])->name('store');
                 Route::get('/export', [\App\Http\Controllers\Admin\RepairRequestController::class, 'export'])->name('export');
                 Route::get('/{repairRequest}', [\App\Http\Controllers\Admin\RepairRequestController::class, 'show'])->name('show');
-                Route::get('/{repairRequest}/edit', [\App\Http\Controllers\Admin\RepairRequestController::class, 'edit'])->name('edit');
-                Route::put('/{repairRequest}', [\App\Http\Controllers\Admin\RepairRequestController::class, 'update'])->name('update');
                 Route::delete('/{repairRequest}', [\App\Http\Controllers\Admin\RepairRequestController::class, 'destroy'])->name('destroy');
 
                 // Workflow d'approbation à 2 niveaux
@@ -700,7 +697,7 @@ Route::middleware(['auth', 'verified', 'audit.log'])
     | - Nouveau: MaintenanceController::dashboard (variables correctes)
     |--------------------------------------------------------------------------
     */
-        Route::middleware('role:Super Admin|Admin|Gestionnaire Flotte|Supervisor')->group(function () {
+        Route::middleware('role:Super Admin|Admin|Gestionnaire Flotte|Supervisor|Superviseur')->group(function () {
 
             // ❌ LEGACY Dashboard Maintenance - DÉSACTIVÉ pour éviter conflit de routes
             /*
@@ -731,7 +728,7 @@ Route::middleware(['auth', 'verified', 'audit.log'])
     | 📋 FICHES DE REMISE - HANDOVERS ✅ SECTION CORRIGÉE
     |--------------------------------------------------------------------------
     */
-        Route::middleware('role:Super Admin|Admin|Gestionnaire Flotte|Supervisor')->group(function () {
+        Route::middleware('role:Super Admin|Admin|Gestionnaire Flotte|Supervisor|Superviseur')->group(function () {
 
             // Handovers - Temporairement désactivés en attendant le contrôleur
             // Route::prefix('handovers')->name('handovers.vehicles.')->group(function () {
@@ -754,7 +751,7 @@ Route::middleware(['auth', 'verified', 'audit.log'])
     | 📅 PLANNING ET OPTIMISATION
     |--------------------------------------------------------------------------
     */
-        Route::middleware('role:Super Admin|Admin|Gestionnaire Flotte|Supervisor')->group(function () {
+        Route::middleware('role:Super Admin|Admin|Gestionnaire Flotte|Supervisor|Superviseur')->group(function () {
 
             Route::prefix('planning')->name('planning.')->group(function () {
                 Route::get('/', [PlanningController::class, 'index'])->name('index');
