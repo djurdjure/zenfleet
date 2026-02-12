@@ -3,15 +3,16 @@
 @php
  $buttonNeutral = 'inline-flex items-center justify-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900/20 transition-colors';
  $buttonPrimary = 'inline-flex items-center justify-center gap-2 rounded-xl border border-blue-600 bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500/30 transition-colors';
+ $fieldClass = 'block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 transition-colors duration-200 hover:border-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500';
 @endphp
 
- {{-- 🎯 EN-TÊTE AVEC CONTRÔLES --}}
+ {{-- En-tête --}}
  <div class="mb-8">
  <div class="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
  <div>
 <p class="text-xs font-semibold uppercase tracking-[0.25em] text-gray-500">Security & Governance</p>
 <h1 class="mt-3 text-3xl font-semibold text-gray-900 flex items-center gap-3">
-<span class="inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-gray-700 text-white">
+<span class="inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-blue-600 text-white">
  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
  </svg>
@@ -22,7 +23,7 @@
  Orchestration unifiée des rôles, permissions et politiques de sécurité multi-tenant.
  </p>
  <div class="mt-4 flex flex-wrap gap-2 text-xs">
-<span class="rounded-full bg-gray-700 text-white px-3 py-1">RBAC Enterprise</span>
+<span class="rounded-full bg-blue-600 text-white px-3 py-1">RBAC Enterprise</span>
 <span class="rounded-full bg-gray-100 text-gray-600 px-3 py-1">Audit actif</span>
 <span class="rounded-full bg-gray-100 text-gray-600 px-3 py-1">Sync Livewire</span>
  </div>
@@ -83,17 +84,17 @@ class="{{ $buttonNeutral }}">
  </div>
  @endif
 
- {{-- 🎛️ PANNEAU DE CONTRÔLE --}}
+ {{-- Panneau de contrôle --}}
 <div class="bg-white/90 backdrop-blur rounded-2xl border border-gray-200 shadow-sm p-6 mb-8">
  <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
 
  {{-- Sélecteur de Rôle --}}
  <div class="lg:col-span-1">
  <label class="block text-sm font-medium text-gray-700 mb-2">
- 🎭 Rôle à configurer
+ Rôle à configurer
  </label>
  <select wire:model.live="selectedRoleId"
-class="block w-full rounded-xl border-gray-200 shadow-sm focus:border-gray-400 focus:ring-gray-200">
+class="{{ $fieldClass }}">
  <option value="">-- Sélectionner un rôle --</option>
  @foreach($availableRoles as $role)
  <option value="{{ $role->id }}">
@@ -103,16 +104,16 @@ class="block w-full rounded-xl border-gray-200 shadow-sm focus:border-gray-400 f
  </select>
 
  @if($selectedRole)
- <div class="mt-4 p-3 bg-blue-50 /20 rounded-md">
+ <div class="mt-4 p-3 bg-blue-50 rounded-md">
  <div class="flex items-center">
  <svg class="w-5 h-5 text-blue-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
  <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
  </svg>
  <div>
- <p class="text-sm font-semibold text-blue-900 ">
+ <p class="text-sm font-semibold text-blue-900">
  {{ count($rolePermissions) }} / {{ count($permissionsMatrix) }}
  </p>
- <p class="text-xs text-blue-700 ">
+ <p class="text-xs text-blue-700">
  permissions assignées
  </p>
  </div>
@@ -125,10 +126,10 @@ class="block w-full rounded-xl border-gray-200 shadow-sm focus:border-gray-400 f
  {{-- Contexte Organisation --}}
  <div class="lg:col-span-1">
  <label class="block text-sm font-medium text-gray-700 mb-2">
- 🧭 Contexte des rôles
+ Contexte des rôles
  </label>
  <select wire:model.live="organizationContext"
-class="block w-full rounded-xl border-gray-200 shadow-sm focus:border-gray-400 focus:ring-gray-200">
+class="{{ $fieldClass }}">
  <option value="organization">Organisation</option>
  <option value="global">Rôles globaux</option>
  <option value="all">Toutes les organisations</option>
@@ -141,10 +142,10 @@ class="block w-full rounded-xl border-gray-200 shadow-sm focus:border-gray-400 f
  @if($organizationContext === 'organization')
  <div class="lg:col-span-1">
  <label class="block text-sm font-medium text-gray-700 mb-2">
- 🏢 Organisation
+ Organisation
  </label>
  <select wire:model.live="selectedOrganizationId"
-class="block w-full rounded-xl border-gray-200 shadow-sm focus:border-gray-400 focus:ring-gray-200">
+class="{{ $fieldClass }}">
  @foreach($availableOrganizations as $org)
  <option value="{{ $org->id }}">
  {{ $org->name }}{{ $org->legal_name ? ' · ' . $org->legal_name : '' }}
@@ -158,7 +159,7 @@ class="block w-full rounded-xl border-gray-200 shadow-sm focus:border-gray-400 f
  {{-- Barre de Recherche --}}
  <div class="lg:col-span-1">
  <label class="block text-sm font-medium text-gray-700 mb-2">
- 🔍 Recherche
+ Recherche
  </label>
  <div class="relative">
  <input type="text"
@@ -166,7 +167,7 @@ class="block w-full rounded-xl border-gray-200 shadow-sm focus:border-gray-400 f
  placeholder="Rechercher une permission..."
  wire:loading.attr="aria-busy"
  wire:target="search"
- class="pl-10 pr-4 py-2.5 block w-full bg-white border border-gray-200 rounded-xl shadow-sm hover:border-gray-300 focus:ring-2 focus:ring-gray-200 focus:border-gray-400 text-sm">
+ class="pl-10 pr-4 py-2.5 block w-full rounded-lg border border-gray-300 bg-gray-50 text-sm text-gray-900 transition-colors duration-200 hover:border-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500">
  <div wire:loading.delay wire:target="search" class="absolute inset-y-0 right-0 pr-3 flex items-center">
  <x-iconify icon="lucide:loader-2" class="w-4 h-4 text-blue-500 animate-spin" />
  </div>
@@ -181,10 +182,10 @@ class="block w-full rounded-xl border-gray-200 shadow-sm focus:border-gray-400 f
  {{-- Filtre par Ressource --}}
  <div class="lg:col-span-1">
  <label class="block text-sm font-medium text-gray-700 mb-2">
- 📦 Filtrer par ressource
+ Filtrer par ressource
  </label>
  <select wire:model.live="filterByResource"
- class="block w-full rounded-xl border-gray-200 shadow-sm focus:border-gray-400 focus:ring-gray-200">
+ class="{{ $fieldClass }}">
  <option value="">Toutes les ressources</option>
  @foreach($resources as $resource)
  <option value="{{ $resource }}">{{ $this->formatResourceName($resource) }}</option>
@@ -195,10 +196,10 @@ class="block w-full rounded-xl border-gray-200 shadow-sm focus:border-gray-400 f
  {{-- Filtre par Action --}}
  <div class="lg:col-span-1">
  <label class="block text-sm font-medium text-gray-700 mb-2">
- ⚡ Filtrer par action
+ Filtrer par action
  </label>
  <select wire:model.live="filterByAction"
- class="block w-full rounded-xl border-gray-200 shadow-sm focus:border-gray-400 focus:ring-gray-200">
+ class="{{ $fieldClass }}">
  <option value="">Toutes les actions</option>
  @foreach($actions as $action)
  <option value="{{ $action }}">{{ $this->formatActionName($action) }}</option>
@@ -217,8 +218,8 @@ class="block w-full rounded-xl border-gray-200 shadow-sm focus:border-gray-400 f
  <div class="mt-4 flex items-center justify-between border-t border-gray-200 pt-4">
  <div class="flex items-center space-x-4">
  <label class="inline-flex items-center cursor-pointer">
- <input type="checkbox" wire:model.live="showOnlyAssigned" class="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-500 focus:ring-blue-500 ">
- <span class="ml-2 text-sm text-gray-700 ">
+ <input type="checkbox" wire:model.live="showOnlyAssigned" class="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+ <span class="ml-2 text-sm text-gray-700">
  Afficher uniquement les permissions assignées
  </span>
  </label>
@@ -226,7 +227,7 @@ class="block w-full rounded-xl border-gray-200 shadow-sm focus:border-gray-400 f
 
  @if($hasPendingChanges)
  <div class="flex items-center text-sm">
- <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-yellow-50 text-yellow-700 border border-yellow-200 /30 ">
+ <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-yellow-50 text-yellow-700 border border-yellow-200">
  <svg class="w-4 h-4 mr-1 animate-pulse" fill="currentColor" viewBox="0 0 20 20">
  <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
  </svg>
@@ -237,7 +238,7 @@ class="block w-full rounded-xl border-gray-200 shadow-sm focus:border-gray-400 f
  </div>
  </div>
 
- {{-- 📊 MATRICE DES PERMISSIONS --}}
+ {{-- Matrice des permissions --}}
  @if(!$selectedRole)
  <div class="bg-white rounded-lg shadow-lg p-12 text-center">
  <svg class="w-24 h-24 mx-auto text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -246,7 +247,7 @@ class="block w-full rounded-xl border-gray-200 shadow-sm focus:border-gray-400 f
  <h3 class="text-xl font-medium text-gray-900 mb-2">
  Veuillez sélectionner un rôle
  </h3>
- <p class="text-gray-600 ">
+ <p class="text-gray-600">
  Sélectionnez un rôle dans le panneau de contrôle ci-dessus pour configurer ses permissions
  </p>
  </div>
@@ -366,37 +367,38 @@ class="block w-full rounded-xl border-gray-200 shadow-sm focus:border-gray-400 f
  <h3 class="text-xl font-medium text-gray-900 mb-2">
  Aucune permission trouvée
  </h3>
- <p class="text-gray-600 ">
+ <p class="text-gray-600">
  Essayez d'ajuster vos filtres de recherche
  </p>
  </div>
  @endforelse
  </div>
 
- {{-- 💾 BARRE D'ACTIONS FLOTTANTE --}}
+ {{-- Barre d'actions flottante --}}
  @if($hasPendingChanges)
- <div class="fixed bottom-8 left-1/2 transform -translate-x-1/2 z-50">
-
- <div class="bg-gradient-to-r from-blue-600 to-blue-500 rounded-lg shadow-2xl p-6 flex items-center space-x-6">
- <div class="flex items-center text-white">
- <svg class="w-8 h-8 mr-3 animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+ <div class="fixed bottom-8 left-1/2 z-50 w-full max-w-4xl -translate-x-1/2 px-4">
+ <div class="rounded-2xl border border-blue-200 bg-white p-5 shadow-2xl">
+ <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+ <div class="flex items-center text-gray-900">
+ <svg class="w-8 h-8 mr-3 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
  </svg>
  <div>
  <p class="font-bold text-lg">{{ count($pendingChanges) }} modification(s) en attente</p>
- <p class="text-sm text-blue-100">Cliquez sur Enregistrer pour appliquer les changements</p>
+ <p class="text-sm text-gray-600">Cliquez sur Enregistrer pour appliquer les changements</p>
  </div>
  </div>
 
- <div class="flex items-center space-x-3">
+ <div class="flex items-center justify-end space-x-3">
  <button wire:click="cancel"
- class="inline-flex items-center justify-center rounded-xl border border-white/40 bg-white/20 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-white/30">
- ❌ Annuler
+ class="{{ $buttonNeutral }}">
+ Annuler
  </button>
  <button wire:click="save"
- class="inline-flex items-center justify-center rounded-xl border border-white bg-white px-6 py-2.5 text-sm font-semibold text-blue-700 shadow-lg transition-colors hover:bg-blue-50">
- ✅ Enregistrer
+ class="{{ $buttonPrimary }}">
+ Enregistrer
  </button>
+ </div>
  </div>
  </div>
  </div>
@@ -406,13 +408,13 @@ class="block w-full rounded-xl border-gray-200 shadow-sm focus:border-gray-400 f
  <div class="fixed bottom-8 right-8 z-40">
  <button wire:click="confirmApplyToAllOrganizations"
  class="{{ $buttonPrimary }} shadow-lg">
- 📌 Appliquer à toutes les organisations
+ Appliquer à toutes les organisations
  </button>
  </div>
  @endif
  @endif
 
- {{-- 🔐 MODAL CONFIRMATION APPLICATION GLOBALE --}}
+ {{-- Modal confirmation application globale --}}
  @if($showApplyAllModal && $selectedRole)
  <div class="fixed inset-0 bg-gray-900/40 backdrop-blur-sm flex items-center justify-center z-50"
  wire:click.self="$set('showApplyAllModal', false)">
@@ -449,7 +451,7 @@ class="block w-full rounded-xl border-gray-200 shadow-sm focus:border-gray-400 f
  </div>
  @endif
 
- {{-- 📊 MODAL APERÇU --}}
+ {{-- Modal aperçu --}}
  @if($showPreview && $selectedRole)
  <div class="fixed inset-0 bg-gray-900/40 backdrop-blur-sm flex items-center justify-center z-50"
  wire:click.self="$set('showPreview', false)">
@@ -474,15 +476,15 @@ class="block w-full rounded-xl border-gray-200 shadow-sm focus:border-gray-400 f
  <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
  @foreach($permissionsMatrix as $perm)
  @if(in_array($perm['id'], $rolePermissions))
- <div class="flex items-center p-3 bg-green-50 /20 rounded-lg border border-green-200 ">
+ <div class="flex items-center p-3 bg-green-50 rounded-lg border border-green-200">
  <svg class="w-5 h-5 text-green-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
  </svg>
  <div class="flex-1">
- <p class="text-xs font-semibold text-green-900 ">
+ <p class="text-xs font-semibold text-green-900">
  {{ $perm['display_name'] ?? ($perm['display_action'] . ' ' . $perm['display_resource']) }}
  </p>
- <p class="text-xs text-green-700 ">
+ <p class="text-xs text-green-700">
  {{ $perm['display_resource'] }} • {{ $perm['display_action'] }}
  </p>
  </div>
@@ -491,8 +493,8 @@ class="block w-full rounded-xl border-gray-200 shadow-sm focus:border-gray-400 f
  @endforeach
  </div>
 
- <div class="mt-6 p-4 bg-blue-50 /20 rounded-lg">
- <p class="text-sm text-blue-900 ">
+ <div class="mt-6 p-4 bg-blue-50 rounded-lg">
+ <p class="text-sm text-blue-900">
  <strong>Total:</strong> {{ count($rolePermissions) }} permission(s) assignée(s)
  </p>
  </div>
