@@ -33,6 +33,10 @@
     :root {
         color-scheme: light;
         /* 🚫 Force Light Mode */
+        --zf-primary: #0c90ee;
+        --zf-primary-hover: #0a84da;
+        --zf-primary-active: #086fb7;
+        --zf-primary-focus-ring: rgba(12, 144, 238, 0.22);
     }
 
     body {
@@ -45,6 +49,27 @@
 }
 
 @layer components {
+    .zenfleet-btn-primary {
+        background-color: var(--zf-primary);
+        border-color: var(--zf-primary);
+        color: #ffffff;
+    }
+
+    .zenfleet-btn-primary:hover {
+        background-color: var(--zf-primary-hover);
+        border-color: var(--zf-primary-hover);
+    }
+
+    .zenfleet-btn-primary:active {
+        background-color: var(--zf-primary-active);
+        border-color: var(--zf-primary-active);
+    }
+
+    .zenfleet-btn-primary:focus {
+        outline: none;
+        box-shadow: 0 0 0 3px var(--zf-primary-focus-ring);
+    }
+
     .zenfleet-card {
         background-color: white;
         border-radius: 0.75rem;

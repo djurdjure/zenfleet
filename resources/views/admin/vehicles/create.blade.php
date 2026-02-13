@@ -45,7 +45,7 @@
  - Titre compact et élégant
  - Hiérarchie visuelle optimale
  ==================================================================== --}}
-<section class="bg-gray-50 min-h-screen">
+<section class="zf-page min-h-screen">
     <div class="py-6 px-4 mx-auto max-w-7xl lg:py-12 lg:mx-0">
 
         {{-- Header COMPACT et MODERNE --}}
@@ -331,7 +331,7 @@
 
                     <x-button
                         type="submit"
-                        variant="success"
+                        variant="primary"
                         icon="check-circle">
                         Enregistrer le Véhicule
                     </x-button>

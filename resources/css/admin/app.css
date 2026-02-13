@@ -30,9 +30,18 @@ html {
     -moz-osx-font-smoothing: grayscale;
 }
 
+:root {
+    --zf-sidebar-bg: #f0f4fb;
+    --zf-page-bg: #f8fafc;
+    --zf-primary: #0c90ee;
+    --zf-primary-hover: #0a84da;
+    --zf-primary-active: #086fb7;
+    --zf-primary-focus-ring: rgba(12, 144, 238, 0.22);
+}
+
 body {
     color: rgb(17 24 39);
-    background-color: rgb(249 250 251);
+    background-color: var(--zf-page-bg);
 }
 
 /* Scrollbar personnalisé */
@@ -93,9 +102,55 @@ select {
 [multiple]:focus,
 textarea:focus,
 select:focus {
-    border-color: rgb(59 130 246);
-    --tw-ring-color: rgb(59 130 246);
+    border-color: var(--zf-primary);
+    --tw-ring-color: var(--zf-primary-focus-ring);
     outline: none;
+}
+
+.zf-page {
+    background-color: var(--zf-page-bg);
+}
+
+.zf-btn-primary {
+    background-color: var(--zf-primary);
+    color: #fff;
+    border-color: var(--zf-primary);
+}
+
+.zenfleet-btn-primary {
+    background-color: var(--zf-primary);
+    color: #fff;
+    border-color: var(--zf-primary);
+}
+
+.zf-btn-primary:hover {
+    background-color: var(--zf-primary-hover);
+    border-color: var(--zf-primary-hover);
+}
+
+.zenfleet-btn-primary:hover {
+    background-color: var(--zf-primary-hover);
+    border-color: var(--zf-primary-hover);
+}
+
+.zf-btn-primary:active {
+    background-color: var(--zf-primary-active);
+    border-color: var(--zf-primary-active);
+}
+
+.zenfleet-btn-primary:active {
+    background-color: var(--zf-primary-active);
+    border-color: var(--zf-primary-active);
+}
+
+.zf-btn-primary:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px var(--zf-primary-focus-ring);
+}
+
+.zenfleet-btn-primary:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px var(--zf-primary-focus-ring);
 }
 
 /* Transitions */
@@ -193,8 +248,8 @@ select:focus {
 /* 🎯 CRITICAL: Override SlimSelect Native CSS Variables */
 .ss-main,
 .ss-content {
-    /* Primary color - ZenFleet blue-500 for selected options */
-    --ss-primary-color: #3b82f6 !important;
+    /* Primary color - ZenFleet principal blue */
+    --ss-primary-color: var(--zf-primary) !important;
 
     /* Background colors - Match x-input gray-50 */
     --ss-bg-color: #f9fafb !important;
@@ -219,7 +274,7 @@ select:focus {
 /* Additional ZenFleet-specific variables */
 :root {
     --ss-main-height: 42px;
-    --ss-focus-color: #3b82f6;
+    --ss-focus-color: var(--zf-primary);
     --ss-error-color: #dc2626;
     --ss-hover-border-color: #9ca3af;
 }
@@ -245,8 +300,8 @@ body .ss-main:hover:not(:focus-within) {
 
 /* Focus state - Blue ring */
 body .ss-main:focus-within {
-    border-color: #3b82f6 !important;
-    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.3) !important;
+    border-color: var(--zf-primary) !important;
+    box-shadow: 0 0 0 2px var(--zf-primary-focus-ring) !important;
     background-color: #ffffff !important;
     outline: none !important;
 }

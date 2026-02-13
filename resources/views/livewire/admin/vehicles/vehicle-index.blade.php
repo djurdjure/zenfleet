@@ -1,4 +1,4 @@
-<div>
+<div class="zf-page min-h-screen">
     <div class="py-4 px-4 mx-auto max-w-7xl lg:py-6">
 
         {{-- HEADER ULTRA-COMPACT --}}
@@ -143,7 +143,7 @@
                 @if($visibility === 'archived')
                 <button wire:click="$set('visibility', 'active')"
                     title="Voir Actifs"
-                    class="inline-flex items-center justify-center h-10 w-10 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-all duration-200 shadow-sm hover:shadow-md">
+                    class="zf-btn-primary inline-flex items-center justify-center h-10 w-10 rounded-lg transition-all duration-200 shadow-sm hover:shadow-md">
                     <x-iconify icon="lucide:list" class="w-5 h-5" />
                 </button>
                 @else
@@ -212,7 +212,7 @@
                 {{-- Import --}}
                 <a href="{{ route('admin.vehicles.import.show') }}"
                     title="Importer"
-                    class="inline-flex items-center justify-center h-10 w-10 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-all duration-200 shadow-sm hover:shadow-md">
+                    class="zf-btn-primary inline-flex items-center justify-center h-10 w-10 rounded-lg transition-all duration-200 shadow-sm hover:shadow-md">
                     <x-iconify icon="lucide:upload" class="w-5 h-5" />
                 </a>
                 @endcan
@@ -221,7 +221,7 @@
                 {{-- Nouveau Véhicule --}}
                 <a href="{{ route('admin.vehicles.create') }}"
                     title="Nouveau Véhicule"
-                    class="inline-flex items-center justify-center h-10 w-10 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all duration-200 shadow-sm hover:shadow-md">
+                    class="zf-btn-primary inline-flex items-center justify-center h-10 w-10 rounded-lg transition-all duration-200 shadow-sm hover:shadow-md">
                     <x-iconify icon="lucide:plus" class="w-5 h-5" />
                 </a>
                 @endcan

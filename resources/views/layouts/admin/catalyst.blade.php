@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="h-full bg-zinc-50">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="h-full">
 
 <head>
     <meta charset="utf-8">
@@ -41,7 +41,7 @@
     <div class="min-h-full">
         {{-- Sidebar pour desktop - Style Ultra-Pro World-Class --}}
         <div class="max-lg:hidden lg:fixed lg:inset-y-0 lg:left-0 lg:z-50 lg:flex lg:w-64 lg:flex-col">
-            <div class="flex grow flex-col overflow-hidden bg-[#eef2f7] border-r border-gray-200/60 shadow-sm">
+            <div class="flex grow flex-col overflow-hidden border-r border-gray-200/60 shadow-sm [background-color:var(--zf-sidebar-bg)]">
                 {{-- En-tête avec logo Premium --}}
                 <div class="w-full flex-none px-4 py-4 h-16 flex items-center border-b border-gray-300/50">
                     <div class="flex items-center w-full">
@@ -89,7 +89,7 @@
                         x-transition:leave-end="-translate-x-full"
                         class="relative mr-16 flex w-full max-w-xs flex-1">
                         {{-- Même contenu que la sidebar desktop --}}
-                        <div class="flex grow flex-col gap-y-5 overflow-y-auto bg-zinc-50 px-6 pb-4">
+                        <div class="flex grow flex-col gap-y-5 overflow-y-auto px-6 pb-4 [background-color:var(--zf-sidebar-bg)]">
                             {{-- Logo --}}
                             <div class="flex h-16 shrink-0 items-center">
                                 <div class="flex items-center">
@@ -121,7 +121,7 @@
         </div>
 
         {{-- Contenu principal --}}
-        <div class="lg:pl-64">
+        <div class="lg:pl-64 zf-page min-h-screen">
             <div class="sticky top-0 z-40 flex h-16 shrink-0 items-center gap-x-4 border-b border-zinc-200 bg-white px-4 shadow-sm sm:gap-x-6 sm:px-6 lg:px-8">
                 <div class="h-6 w-px bg-zinc-200 lg:hidden" aria-hidden="true"></div>
 
