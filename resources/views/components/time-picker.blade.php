@@ -38,7 +38,7 @@
 >
     {{-- Label --}}
     @if($label)
-    <label for="{{ $inputId }}" class="block mb-2 text-sm font-medium text-gray-900">
+    <label for="{{ $inputId }}" class="block mb-2 text-sm font-medium text-gray-600">
         {{ $label }}
         @if($required)
             <span class="text-red-500">*</span>
@@ -62,7 +62,7 @@
             @focus="handleTimeFocus($event)"
             placeholder="{{ $placeholder }}"
             maxlength="5"
-            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 p-2.5 font-medium tracking-wider"
+            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-2 focus:ring-[#0c90ee]/20 focus:border-[#0c90ee] hover:border-gray-400 block w-full pl-10 p-2.5 font-medium tracking-wider transition-all duration-200"
             autocomplete="off"
             @if($required) required @endif
             @if($disabled) disabled @endif
@@ -75,12 +75,12 @@
 
     {{-- Messages d'erreur --}}
     @if($error)
-    <p class="mt-2 text-sm text-red-600 flex items-start">
-        <x-iconify icon="heroicons:exclamation-circle" class="w-4 h-4 mr-1 mt-0.5 flex-shrink-0" />
+    <p class="mt-2 text-sm text-red-600 flex items-start font-medium">
+        <x-iconify icon="lucide:circle-alert" class="w-4 h-4 mr-1.5 mt-0.5 flex-shrink-0" />
         <span>{{ $error }}</span>
     </p>
     @elseif($helpText)
-    <p class="mt-2 text-sm text-gray-500">
+    <p class="mt-2 text-xs text-gray-600">
         {{ $helpText }}
     </p>
     @endif

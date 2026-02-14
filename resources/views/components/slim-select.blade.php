@@ -53,7 +53,7 @@ if (!is_array($selectedValues)) {
     {{ $attributes->merge(['class' => $resolvedError ? 'slimselect-error' : '']) }}>
 
     @if($label)
-    <label for="{{ $selectId }}" class="block mb-2 text-sm font-medium text-gray-900">
+    <label for="{{ $selectId }}" class="block mb-2 text-sm font-medium text-gray-600">
         {{ $label }}
         @if($required)
         <span class="text-red-500">*</span>
@@ -96,12 +96,12 @@ if (!is_array($selectedValues)) {
     </select>
 
     @if($resolvedError)
-    <p class="mt-2 text-sm text-red-600 flex items-start">
+    <p class="mt-2 text-sm text-red-600 flex items-start font-medium">
         <x-iconify icon="lucide:circle-alert" class="w-4 h-4 mr-1.5 mt-0.5 flex-shrink-0" />
         <span>{{ $resolvedError }}</span>
     </p>
     @elseif($helpText)
-    <p class="mt-2 text-sm text-gray-500">
+    <p class="mt-2 text-xs text-gray-600">
         {{ $helpText }}
     </p>
     @endif

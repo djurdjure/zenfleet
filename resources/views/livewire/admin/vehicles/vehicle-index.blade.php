@@ -2,14 +2,15 @@
     <div class="py-4 px-4 mx-auto max-w-7xl lg:py-6">
 
         {{-- HEADER ULTRA-COMPACT --}}
-        <div class="mb-4 flex justify-between items-center">
-            <h1 class="text-2xl font-bold text-gray-900 flex items-center gap-2.5">
-                <x-iconify icon="lucide:car" class="w-6 h-6 text-blue-600" />
-                Gestion des Véhicules
-                <span class="ml-2 text-sm font-normal text-gray-500">
-                    ({{ $vehicles->total() }})
-                </span>
-            </h1>
+        <div class="mb-4 flex justify-between items-start">
+            <div>
+                <h1 class="text-xl font-bold text-gray-600 flex items-center gap-2.5">
+                    Gestion des Véhicules
+                </h1>
+                <p class="text-xs text-gray-600 mt-0.5 ml-8.5">
+                    Vue consolidée du parc • {{ $vehicles->total() }} véhicule(s)
+                </p>
+            </div>
 
             {{-- Loading Indicator (no layout shift) --}}
             <div
@@ -369,8 +370,8 @@
                                                 </div>
                                             </div>
                                             <div class="ml-3">
-                                                <div class="text-sm font-semibold text-gray-900">{{ $vehicle->registration_plate }}</div>
-                                                <div class="text-xs text-gray-500">{{ $vehicle->brand }} {{ $vehicle->model }}</div>
+                                                <div class="text-sm font-semibold text-gray-600">{{ $vehicle->registration_plate }}</div>
+                                                <div class="text-xxs text-gray-500">{{ $vehicle->brand }} {{ $vehicle->model }}</div>
                                             </div>
                                         </div>
                                     </td>

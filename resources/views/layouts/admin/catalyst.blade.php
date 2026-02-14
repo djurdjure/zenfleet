@@ -41,18 +41,18 @@
     <div class="min-h-full">
         {{-- Sidebar pour desktop - Style Ultra-Pro World-Class --}}
         <div class="max-lg:hidden lg:fixed lg:inset-y-0 lg:left-0 lg:z-50 lg:flex lg:w-64 lg:flex-col">
-            <div class="flex grow flex-col overflow-hidden border-r border-gray-200/60 shadow-sm [background-color:var(--zf-sidebar-bg)]">
+            <div class="zf-sidebar-shell flex grow flex-col overflow-hidden shadow-sm">
                 {{-- En-tête avec logo Premium --}}
-                <div class="w-full flex-none px-4 py-4 h-16 flex items-center border-b border-gray-300/50">
+                <div class="w-full flex-none px-4 py-4 h-16 flex items-center border-b border-[color:var(--zf-sidebar-border)]/70">
                     <div class="flex items-center w-full">
                         <div class="relative mr-3">
-                            <div class="w-9 h-9 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-xl flex items-center justify-center shadow-md">
+                            <div class="zf-sidebar-logo-badge w-9 h-9 rounded-xl flex items-center justify-center shadow-md">
                                 <x-iconify icon="mdi:truck-fast" class="w-5 h-5 text-white" />
                             </div>
                         </div>
                         <div class="flex-1">
-                            <span class="text-gray-800 text-lg font-bold tracking-tight">ZenFleet</span>
-                            <div class="text-xs text-gray-600 font-medium">Fleet Management</div>
+                            <span class="text-slate-800 text-lg font-bold tracking-tight">ZenFleet</span>
+                            <div class="text-xs text-slate-500 font-medium">Fleet Management</div>
                         </div>
                     </div>
                 </div>
@@ -89,12 +89,12 @@
                         x-transition:leave-end="-translate-x-full"
                         class="relative mr-16 flex w-full max-w-xs flex-1">
                         {{-- Même contenu que la sidebar desktop --}}
-                        <div class="flex grow flex-col gap-y-5 overflow-y-auto px-6 pb-4 [background-color:var(--zf-sidebar-bg)]">
+                        <div class="zf-sidebar-shell flex grow flex-col gap-y-5 overflow-y-auto px-6 pb-4">
                             {{-- Logo --}}
                             <div class="flex h-16 shrink-0 items-center">
                                 <div class="flex items-center">
-                                    <x-iconify icon="heroicons:truck" class="w-6 h-6 text-zinc-900 mr-3" />
-                                    <span class="text-zinc-900 text-xl font-bold">ZenFleet</span>
+                                    <x-iconify icon="heroicons:truck" class="w-6 h-6 text-[color:var(--zf-primary)] mr-3" />
+                                    <span class="text-slate-800 text-xl font-bold">ZenFleet</span>
                                 </div>
                             </div>
 

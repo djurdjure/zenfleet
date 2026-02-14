@@ -46,16 +46,15 @@
  - Titre compact et élégant
  - Hiérarchie visuelle optimale
  ==================================================================== --}}
-<section class="bg-gray-50 min-h-screen">
+<section class="zf-page min-h-screen">
     <div class="py-6 px-4 mx-auto max-w-7xl lg:py-12 lg:mx-0">
 
         {{-- Header COMPACT et MODERNE --}}
         <div class="mb-6">
-            <h1 class="text-2xl font-bold text-gray-900 mb-1 flex items-center gap-2.5">
-                <x-iconify icon="heroicons:user-plus" class="w-6 h-6 text-blue-600" />
+            <h1 class="text-xl font-bold text-gray-600 mb-1">
                 Ajouter un Nouveau Chauffeur
             </h1>
-            <p class="text-sm text-gray-600 ml-8.5">
+            <p class="text-xs text-gray-600">
                 Complétez les sections ci-dessous pour enregistrer un chauffeur
             </p>
         </div>
@@ -160,7 +159,7 @@
 
                     {{-- Photo --}}
                     <div class="col-span-6 mt-6">
-                        <label for="photo" class="block text-sm font-medium text-gray-700 mb-2">
+                        <label for="photo" class="block mb-2 text-sm font-medium text-gray-600">
                             Photo du chauffeur
                         </label>
                         <div class="flex items-center gap-6">
@@ -360,7 +359,7 @@
                     <div class="space-y-6">
                         {{-- Compte Utilisateur --}}
                         <div>
-                            <h4 class="text-sm font-semibold text-slate-900 mb-3 flex items-center gap-2">
+                            <h4 class="text-sm font-semibold text-slate-600 mb-3 flex items-center gap-2">
                                 <x-iconify icon="heroicons:user-circle" class="w-4 h-4 text-blue-600" />
                                 Compte Utilisateur (Optionnel)
                             </h4>
@@ -399,7 +398,7 @@
 
                         {{-- Contact d'Urgence --}}
                         <div>
-                            <h4 class="text-sm font-semibold text-slate-900 mb-3 flex items-center gap-2">
+                            <h4 class="text-sm font-semibold text-slate-600 mb-3 flex items-center gap-2">
                                 <x-iconify icon="heroicons:phone" class="w-4 h-4 text-red-600" />
                                 Contact d'Urgence
                             </h4>
@@ -437,18 +436,22 @@
                 {{-- ===========================================
  ACTIONS FOOTER
  =========================================== --}}
-                <div class="rounded-2xl border border-slate-200 bg-white p-5 flex items-center justify-between">
-                    <a href="{{ route('admin.drivers.index') }}"
-                        class="text-gray-600 hover:text-gray-900 font-medium text-sm transition-colors">
-                        Annuler
-                    </a>
+                <div class="relative pl-14">
+                    <section class="rounded-2xl border border-slate-200 bg-white shadow-sm">
+                        <div class="px-6 py-4 flex items-center justify-between gap-3">
+                            <a href="{{ route('admin.drivers.index') }}"
+                                class="inline-flex items-center justify-center h-10 px-4 rounded-lg border border-gray-300 bg-white text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#0c90ee]/20 focus:border-[#0c90ee] transition-all duration-200">
+                                Annuler
+                            </a>
 
-                    <button
-                        type="submit"
-                        class="inline-flex items-center gap-2 px-6 py-2.5 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg transition-colors shadow-sm hover:shadow-md text-sm">
-                        <x-iconify icon="heroicons:check" class="w-5 h-5" />
-                        Créer le Chauffeur
-                    </button>
+                            <x-button
+                                type="submit"
+                                variant="primary"
+                                icon="check-circle">
+                                Créer le Chauffeur
+                            </x-button>
+                        </div>
+                    </section>
                 </div>
             </form>
 

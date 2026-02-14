@@ -38,21 +38,20 @@ DESIGN PRINCIPLES:
  </div>
 @endif
 
-<section class="bg-gray-50 min-h-screen">
+<section class="zf-page min-h-screen">
  <div class="py-6 px-4 mx-auto max-w-7xl lg:py-12">
 
  {{-- ====================================================================
  HEADER - ULTRA-PRO DESIGN
  ===================================================================== --}}
  <div class="mb-6">
- <h1 class="text-2xl font-bold text-gray-900 mb-1 flex items-center gap-2.5">
- <x-iconify icon="lucide:pencil" class="w-6 h-6 text-blue-600" />
+ <h1 class="text-xl font-bold text-gray-600 mb-1">
  Modifier l'Affectation
  <span class="ml-2 text-sm font-normal text-gray-500">
  #{{ $assignment->id }}
  </span>
  </h1>
- <p class="text-sm text-gray-600 ml-8.5">
+ <p class="text-xs text-gray-600">
  Modifiez les détails de l'affectation
  </p>
  </div>
@@ -212,22 +211,20 @@ DESIGN PRINCIPLES:
  ACTIONS FOOTER
  =================================== --}}
  <div class="mt-8 pt-6 border-t border-gray-200 flex items-center justify-between">
- <div>
  <a href="{{ route('admin.assignments.index') }}"
- class="text-sm font-semibold text-gray-600 hover:text-gray-900 transition-colors">
+ class="inline-flex items-center justify-center h-10 px-4 rounded-lg border border-gray-300 bg-white text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#0c90ee]/20 focus:border-[#0c90ee] transition-all duration-200">
  Retour à la liste
  </a>
- </div>
 
  <div class="flex items-center gap-3">
  <a href="{{ route('admin.assignments.show', $assignment) }}"
- class="text-sm font-semibold text-gray-600 hover:text-gray-900 transition-colors">
+ class="inline-flex items-center justify-center h-10 px-4 rounded-lg border border-gray-300 bg-white text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#0c90ee]/20 focus:border-[#0c90ee] transition-all duration-200">
  Annuler
  </a>
 
  <x-button
  type="submit"
- variant="success"
+ variant="primary"
  icon="check-circle"
  >
  Enregistrer les Modifications

@@ -62,7 +62,7 @@ $optionKeys = array_keys($options);
     {{ $attributes->merge(['class' => 'relative']) }}>
 
     @if($label)
-    <label for="{{ $fieldId }}" class="block mb-2 text-sm font-medium text-gray-900">
+    <label for="{{ $fieldId }}" class="block mb-2 text-sm font-medium text-gray-600">
         {{ $label }}
         @if($required)
         <span class="text-red-500">*</span>

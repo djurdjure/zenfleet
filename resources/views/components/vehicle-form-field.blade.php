@@ -19,7 +19,7 @@
 <div class="relative">
  <!-- Label avec pastille d'erreur -->
  <div class="flex items-center justify-between mb-2">
- <label for="{{ $inputId }}" class="block text-sm font-semibold text-gray-700">
+ <label for="{{ $inputId }}" class="block text-sm font-medium text-gray-600">
  @if($icon)
  <i class="{{ $icon }} text-gray-400 mr-2"></i>
  @endif

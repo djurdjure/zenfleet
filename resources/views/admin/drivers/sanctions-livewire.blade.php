@@ -3,7 +3,7 @@
 @section('title', 'Sanctions des Chauffeurs')
 
 @section('content')
-<section class="bg-gray-50 min-h-screen">
+<section class="zf-page min-h-screen">
     <div class="py-4 px-4 mx-auto max-w-7xl lg:py-6">
         
         {{-- Breadcrumb --}}
@@ -19,11 +19,10 @@
 
         {{-- Header --}}
         <div class="mb-4">
-            <h1 class="text-2xl font-bold text-gray-900 flex items-center gap-2.5">
-                <x-iconify icon="heroicons:exclamation-triangle" class="w-6 h-6 text-red-600" />
+            <h1 class="text-xl font-bold text-gray-600">
                 Sanctions des Chauffeurs
             </h1>
-            <p class="text-sm text-gray-600 ml-8.5">
+            <p class="text-xs text-gray-600">
                 Gérez l'historique des sanctions de votre équipe
             </p>
         </div>

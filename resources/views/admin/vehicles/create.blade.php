@@ -50,11 +50,10 @@
 
         {{-- Header COMPACT et MODERNE --}}
         <div class="mb-6">
-            <h1 class="text-2xl font-bold text-gray-900 mb-1 flex items-center gap-2.5">
-                <x-iconify icon="heroicons:truck" class="w-6 h-6 text-blue-600" />
+            <h1 class="text-xl font-bold text-gray-600 mb-1 flex items-center gap-2.5">
                 Ajouter un Nouveau Véhicule
             </h1>
-            <p class="text-sm text-gray-600 ml-8.5">
+            <p class="text-xs text-gray-600 ml-8.5">
                 Complétez les sections ci-dessous pour enregistrer un véhicule
             </p>
         </div>
@@ -323,18 +322,22 @@
                 {{-- ===========================================
  ACTIONS FOOTER
  =========================================== --}}
-                <div class="rounded-2xl border border-slate-200 bg-white p-5 flex items-center justify-between">
-                    <a href="{{ route('admin.vehicles.index') }}"
-                        class="text-sm font-semibold text-gray-600 hover:text-gray-900 transition-colors">
-                        Annuler
-                    </a>
+                <div class="relative pl-14">
+                    <section class="rounded-2xl border border-slate-200 bg-white shadow-sm">
+                        <div class="px-6 py-4 flex items-center justify-between gap-3">
+                            <a href="{{ route('admin.vehicles.index') }}"
+                                class="inline-flex items-center justify-center h-10 px-4 rounded-lg border border-gray-300 bg-white text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#0c90ee]/20 focus:border-[#0c90ee] transition-all duration-200">
+                                Annuler
+                            </a>
 
-                    <x-button
-                        type="submit"
-                        variant="primary"
-                        icon="check-circle">
-                        Enregistrer le Véhicule
-                    </x-button>
+                            <x-button
+                                type="submit"
+                                variant="primary"
+                                icon="check-circle">
+                                Enregistrer le Véhicule
+                            </x-button>
+                        </div>
+                    </section>
                 </div>
             </form>
 

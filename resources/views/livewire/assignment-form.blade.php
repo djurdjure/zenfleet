@@ -16,8 +16,7 @@ Design surpassant Fleetio, Samsara et Verizon Connect:
 @since 2025-11-15
 ==================================================================== --}}
 
-<div x-data="assignmentFormValidation()" class="bg-gray-50 min-h-screen py-8">
-    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+<div x-data="assignmentFormValidation()">
         {{-- ===============================================
         ALERTES GLOBALES DE VALIDATION
         =============================================== --}}
@@ -140,24 +139,18 @@ Design surpassant Fleetio, Samsara et Verizon Connect:
         {{-- ===============================================
         FORMULAIRE PRINCIPAL
         =============================================== --}}
-        <form wire:submit="save" class="space-y-6">
+        <form wire:submit="save" class="space-y-8">
             {{-- ===============================================
             SECTION 1: RESSOURCES À AFFECTER (ENTERPRISE V3 - FOND BLEU)
             =============================================== --}}
-            <x-card class="bg-gradient-to-br from-gray-50 to-slate-50 border border-gray-200">
-                <div class="space-y-6">
-                    <div class="pb-4 border-b border-gray-200">
-                        <h2 class="text-lg font-semibold text-gray-900 mb-1 flex items-center gap-2">
-                            <x-iconify icon="heroicons:users" class="w-5 h-5 text-gray-600" />
-                            Ressources à Affecter
-                        </h2>
-                        <p class="text-sm text-gray-600">Sélectionnez le véhicule et le chauffeur pour cette affectation.</p>
-                    </div>
-
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <x-form-section
+                title="Ressources à Affecter"
+                icon="heroicons:users"
+                subtitle="Sélectionnez le véhicule et le chauffeur pour cette affectation.">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         {{-- Sélection Véhicule --}}
                         <div>
-                            <label for="vehicle_id" class="block text-sm font-medium text-gray-700 mb-2">
+                            <label for="vehicle_id" class="block mb-2 text-sm font-medium text-gray-600">
                                 <div class="flex items-center gap-2">
                                     <x-iconify icon="heroicons:truck" class="w-4 h-4 text-gray-500" />
                                     Véhicule
@@ -245,7 +238,7 @@ Design surpassant Fleetio, Samsara et Verizon Connect:
 
                         {{-- Sélection Chauffeur --}}
                         <div>
-                            <label for="driver_id" class="block text-sm font-medium text-gray-700 mb-2">
+                            <label for="driver_id" class="block mb-2 text-sm font-medium text-gray-600">
                                 <div class="flex items-center gap-2">
                                     <x-iconify icon="heroicons:user" class="w-4 h-4 text-gray-500" />
                                     Chauffeur
@@ -279,27 +272,20 @@ Design surpassant Fleetio, Samsara et Verizon Connect:
                             @enderror
                             <p class="mt-1.5 text-xs text-gray-500">Sélectionnez le chauffeur assigné</p>
                         </div>
-                    </div>
                 </div>
-            </x-card>
+            </x-form-section>
 
             {{-- ===============================================
             SECTION 2: PÉRIODE D'AFFECTATION (ENTERPRISE V3 - DATE/HEURE SÉPARÉES)
             =============================================== --}}
-            <x-card>
-                <div class="space-y-6">
-                    <div>
-                        <h2 class="text-lg font-semibold text-gray-900 mb-1 flex items-center gap-2">
-                            <x-iconify icon="heroicons:calendar-days" class="w-5 h-5 text-blue-600" />
-                            Période d'Affectation
-                        </h2>
-                        <p class="text-sm text-gray-600">Définissez la période de remise et de restitution du véhicule.</p>
-                    </div>
-
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <x-form-section
+                title="Période d'Affectation"
+                icon="heroicons:calendar-days"
+                subtitle="Définissez la période de remise et de restitution du véhicule.">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         {{-- DÉBUT : Date + Heure --}}
                         <div class="space-y-4">
-                            <h3 class="text-sm font-semibold text-gray-900 flex items-center gap-2">
+                            <h3 class="text-sm font-semibold text-slate-600 flex items-center gap-2">
                                 <x-iconify icon="heroicons:play" class="w-4 h-4 text-green-600" />
                                 Début d'affectation
                             </h3>
@@ -308,7 +294,7 @@ Design surpassant Fleetio, Samsara et Verizon Connect:
                             <div class="flex items-start gap-3">
                                 {{-- Date de début (largeur réduite) --}}
                                 <div class="flex-1 min-w-0">
-                                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                                    <label class="block mb-2 text-sm font-medium text-gray-600">
                                         Date de remise * 
                                         @if($isRetroactive)
                                             <span class="ml-2 text-xs font-normal text-orange-600 bg-orange-50 px-2 py-0.5 rounded-full">
@@ -342,7 +328,7 @@ Design surpassant Fleetio, Samsara et Verizon Connect:
 
                                 {{-- Heure de début (petite largeur) --}}
                                 <div class="w-32 flex-shrink-0">
-                                    <label class="block text-sm font-medium text-gray-700 mb-2">Heure *</label>
+                                    <label class="block mb-2 text-sm font-medium text-gray-600">Heure *</label>
                                     <div wire:ignore id="start-time-wrapper">
                                         <select
                                             id="start_time"
@@ -363,7 +349,7 @@ Design surpassant Fleetio, Samsara et Verizon Connect:
 
                         {{-- FIN : Date + Heure (optionnel) --}}
                         <div class="space-y-4">
-                            <h3 class="text-sm font-semibold text-gray-900 flex items-center gap-2">
+                            <h3 class="text-sm font-semibold text-slate-600 flex items-center gap-2">
                                 <x-iconify icon="heroicons:stop" class="w-4 h-4 text-red-600" />
                                 Fin d'affectation (optionnel)
                             </h3>
@@ -372,7 +358,7 @@ Design surpassant Fleetio, Samsara et Verizon Connect:
                             <div class="flex items-start gap-3">
                                 {{-- Date de fin (largeur réduite) --}}
                                 <div class="flex-1 min-w-0">
-                                    <label class="block text-sm font-medium text-gray-700 mb-2">Date de restitution</label>
+                                    <label class="block mb-2 text-sm font-medium text-gray-600">Date de restitution</label>
                                     <x-datepicker
                                         name="end_date"
                                         wire:model.live="end_date"
@@ -389,7 +375,7 @@ Design surpassant Fleetio, Samsara et Verizon Connect:
                                 <div class="w-32 flex-shrink-0">
                                     @if($end_date)
                                         <div wire:ignore id="end-time-wrapper">
-                                            <label class="block text-sm font-medium text-gray-700 mb-2">Heure</label>
+                                            <label class="block mb-2 text-sm font-medium text-gray-600">Heure</label>
                                             <select
                                                 id="end_time"
                                                 name="end_time"
@@ -440,23 +426,16 @@ Design surpassant Fleetio, Samsara et Verizon Connect:
                             <p class="mt-2 text-xs text-gray-500">Recherche automatique du prochain créneau disponible pour ces ressources</p>
                         </div>
                     @endif
-                </div>
-            </x-card>
+            </x-form-section>
 
             {{-- ===============================================
             SECTION 3: DÉTAILS DE L'AFFECTATION
             =============================================== --}}
-            <x-card>
+            <x-form-section
+                title="Détails de l'Affectation"
+                icon="heroicons:document-text"
+                subtitle="Informations complémentaires sur cette affectation.">
                 <div class="space-y-6">
-                    <div>
-                        <h2 class="text-lg font-semibold text-gray-900 mb-1 flex items-center gap-2">
-                            <x-iconify icon="heroicons:document-text" class="w-5 h-5 text-blue-600" />
-                            Détails de l'Affectation
-                        </h2>
-                        <p class="text-sm text-gray-600">Informations complémentaires sur cette affectation.</p>
-                    </div>
-
-                    <div class="space-y-6">
                         {{-- Motif --}}
                         <div>
                             <x-input
@@ -488,47 +467,48 @@ Design surpassant Fleetio, Samsara et Verizon Connect:
                         <p class="mt-1.5 text-xs text-gray-500 text-right">{{ strlen($notes ?? '') }} / 1000 caractères</p>
                     </div>
                 </div>
-            </x-card>
+            </x-form-section>
 
             {{-- ===============================================
             FOOTER: ACTIONS DU FORMULAIRE
             =============================================== --}}
-            <div class="flex items-center justify-end gap-3 pt-4">
-                <a
-                    href="{{ route('admin.assignments.index') }}"
-                    class="inline-flex items-center gap-2 px-5 py-2.5 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors shadow-sm">
-                    <x-iconify icon="heroicons:x-mark" class="w-5 h-5" />
-                    <span>Annuler</span>
-                </a>
+            <div class="relative pl-14">
+                <section class="rounded-2xl border border-slate-200 bg-white shadow-sm">
+                    <div class="px-6 py-4 flex items-center justify-between gap-3">
+                        <a
+                            href="{{ route('admin.assignments.index') }}"
+                            class="inline-flex items-center justify-center h-10 px-4 rounded-lg border border-gray-300 bg-white text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#0c90ee]/20 focus:border-[#0c90ee] transition-all duration-200">
+                            Annuler
+                        </a>
 
-                <button
-                    type="submit"
-                    wire:loading.attr="disabled"
-                    wire:target="save"
-                    class="inline-flex items-center gap-2 px-6 py-2.5 rounded-lg text-sm font-medium text-white transition-all shadow-sm disabled:opacity-50 disabled:cursor-not-allowed
-                    {{ $hasConflicts && !$forceCreate ? 'bg-red-600 hover:bg-red-700 shadow-red-500/20' : 'bg-blue-600 hover:bg-blue-700 shadow-blue-500/20' }}">
+                        <button
+                            type="submit"
+                            wire:loading.attr="disabled"
+                            wire:target="save"
+                            class="inline-flex items-center gap-2 h-10 px-6 rounded-lg text-sm font-medium text-white transition-all shadow-sm disabled:opacity-50 disabled:cursor-not-allowed {{ $hasConflicts && !$forceCreate ? 'bg-red-600 hover:bg-red-700 shadow-red-500/20' : 'zf-btn-primary' }}">
 
-                    <span wire:loading.remove wire:target="save" class="flex items-center gap-2">
-                        @if($hasConflicts && !$forceCreate)
-                            <x-iconify icon="heroicons:shield-exclamation" class="w-5 h-5" />
-                            Créer malgré les conflits
-                        @else
-                            <x-iconify icon="heroicons:check-circle" class="w-5 h-5" />
-                            {{ $isEditing ? 'Enregistrer les modifications' : 'Créer l\'affectation' }}
-                        @endif
-                    </span>
+                            <span wire:loading.remove wire:target="save" class="flex items-center gap-2">
+                                @if($hasConflicts && !$forceCreate)
+                                    <x-iconify icon="heroicons:shield-exclamation" class="w-5 h-5" />
+                                    Créer malgré les conflits
+                                @else
+                                    <x-iconify icon="heroicons:check-circle" class="w-5 h-5" />
+                                    {{ $isEditing ? 'Enregistrer les modifications' : 'Créer l\'affectation' }}
+                                @endif
+                            </span>
 
-                    <span wire:loading wire:target="save" class="flex items-center gap-2">
-                        <svg class="animate-spin w-5 h-5" fill="none" viewBox="0 0 24 24">
-                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                        </svg>
-                        <span>Sauvegarde en cours...</span>
-                    </span>
-                </button>
+                            <span wire:loading wire:target="save" class="flex items-center gap-2">
+                                <svg class="animate-spin w-5 h-5" fill="none" viewBox="0 0 24 24">
+                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                </svg>
+                                <span>Sauvegarde en cours...</span>
+                            </span>
+                        </button>
+                    </div>
+                </section>
             </div>
         </form>
-    </div>
 </div>
 
 {{-- ====================================================================

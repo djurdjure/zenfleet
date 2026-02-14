@@ -37,9 +37,18 @@ html {
     --zf-primary-hover: #0a84da;
     --zf-primary-active: #086fb7;
     --zf-primary-focus-ring: rgba(12, 144, 238, 0.22);
+    --zf-primary-soft: #e3efff;
+    --zf-primary-soft-strong: #cfe4ff;
+    --zf-primary-text: #0a5f99;
+    --zf-sidebar-text: #334155;
+    --zf-sidebar-text-muted: #475569;
+    --zf-sidebar-border: #d7e0ee;
+    --zf-sidebar-hover-bg: #ffffff;
+    --zf-sidebar-active-shadow: 0 8px 18px -10px rgba(12, 144, 238, 0.7);
 }
 
 body {
+    font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
     color: rgb(17 24 39);
     background-color: var(--zf-page-bg);
 }
@@ -109,6 +118,60 @@ select:focus {
 
 .zf-page {
     background-color: var(--zf-page-bg);
+}
+
+.zf-sidebar-shell {
+    background: linear-gradient(180deg, #f0f4fb 0%, #edf3fd 100%);
+    border-right: 1px solid var(--zf-sidebar-border);
+}
+
+.zf-sidebar-nav {
+    scrollbar-width: thin;
+}
+
+.zf-sidebar-logo-badge {
+    background: linear-gradient(135deg, var(--zf-primary), #0d74be);
+}
+
+.zf-sidebar-item {
+    color: var(--zf-sidebar-text-muted);
+}
+
+.zf-sidebar-item:hover {
+    background-color: var(--zf-sidebar-hover-bg);
+    color: var(--zf-sidebar-text);
+    box-shadow: 0 4px 12px -10px rgba(15, 23, 42, 0.35);
+}
+
+.zf-sidebar-item-active {
+    background: linear-gradient(135deg, var(--zf-primary), var(--zf-primary-hover));
+    color: #fff;
+    box-shadow: var(--zf-sidebar-active-shadow);
+}
+
+.zf-sidebar-subitem {
+    color: var(--zf-sidebar-text-muted);
+}
+
+.zf-sidebar-subitem:hover {
+    background-color: rgba(255, 255, 255, 0.82);
+    color: var(--zf-sidebar-text);
+}
+
+.zf-sidebar-subitem-active {
+    background-color: var(--zf-primary-soft);
+    color: var(--zf-primary-text);
+}
+
+.zf-sidebar-rail {
+    background-color: #cbd5e1;
+    width: 2px;
+    height: 100%;
+    border-radius: 9999px;
+}
+
+.zf-sidebar-rail-active {
+    background-color: var(--zf-primary);
 }
 
 .zf-btn-primary {
@@ -234,6 +297,11 @@ select:focus {
 .text-xxs {
     font-size: 0.65rem;
     line-height: 0.9rem;
+}
+
+.text-m {
+    font-size: 1rem;
+    line-height: 1.5rem;
 }
 
 .bg-glass {

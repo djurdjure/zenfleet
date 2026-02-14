@@ -114,7 +114,7 @@
                 <button
                     wire:click="$toggle('showArchived')"
                     class="{{ $showArchived 
-                        ? 'inline-flex items-center gap-2 p-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-all duration-200 shadow-sm hover:shadow-md' 
+                        ? 'zf-btn-primary inline-flex items-center gap-2 p-2 rounded-lg transition-all duration-200 shadow-sm hover:shadow-md' 
                         : 'inline-flex items-center gap-2 p-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-all duration-200 shadow-sm hover:shadow-md' }}"
                     title="{{ $showArchived ? 'Voir les sanctions actives' : 'Voir les archives' }}">
                     @if($showArchived)
@@ -128,7 +128,7 @@
                 @can('create', \App\Models\DriverSanction::class)
                     <button
                         onclick="openCreateSanctionModal()"
-                        class="inline-flex items-center gap-2 p-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-all duration-200 shadow-sm hover:shadow-md"
+                        class="zf-btn-primary inline-flex items-center gap-2 p-2 rounded-lg transition-all duration-200 shadow-sm hover:shadow-md"
                         title="Nouvelle Sanction">
                         <x-iconify icon="lucide:plus" class="w-5 h-5" />
                     </button>
@@ -147,7 +147,7 @@
 
                 {{-- Filtre Type --}}
                 <div class="text-xs">
-                    <label class="block text-xs font-medium text-gray-700 mb-1">Type</label>
+                    <label class="block text-xs font-medium text-gray-600 mb-1">Type</label>
                     <x-slim-select
                         wire:model.live="sanctionTypeFilter"
                         name="sanctionTypeFilter"
@@ -166,7 +166,7 @@
 
                 {{-- Filtre Gravité --}}
                 <div class="text-xs">
-                    <label class="block text-xs font-medium text-gray-700 mb-1">Gravité</label>
+                    <label class="block text-xs font-medium text-gray-600 mb-1">Gravité</label>
                     <x-slim-select
                         wire:model.live="severityFilter"
                         name="severityFilter"
@@ -566,7 +566,7 @@
                         }
                     }"
                         x-init="initSelect()">
-                        <label class="block mb-2 text-sm font-medium text-gray-900">
+                        <label class="block mb-2 text-sm font-medium text-gray-600">
                             Chauffeur <span class="text-red-500">*</span>
                         </label>
                         <select x-ref="select" class="slimselect-field w-full">
@@ -586,7 +586,7 @@
                     {{-- Type et Gravité --}}
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                            <label class="block mb-2 text-sm font-medium text-gray-900">
+                            <label class="block mb-2 text-sm font-medium text-gray-600">
                                 Type de Sanction <span class="text-red-500">*</span>
                             </label>
                             <select
@@ -611,7 +611,7 @@
                         </div>
 
                         <div>
-                            <label class="block mb-2 text-sm font-medium text-gray-900">
+                            <label class="block mb-2 text-sm font-medium text-gray-600">
                                 Gravité <span class="text-red-500">*</span>
                             </label>
                             <select
@@ -646,7 +646,7 @@
                         </div>
 
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                            <label class="block mb-2 text-sm font-medium text-gray-600">
                                 Durée (jours)
                             </label>
                             <input
@@ -662,7 +662,7 @@
 
                     {{-- Motif --}}
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                        <label class="block mb-2 text-sm font-medium text-gray-600">
                             Motif <span class="text-red-500">*</span>
                         </label>
                         <textarea
@@ -712,7 +712,7 @@
                                 }
                             }
                         }">
-                            <label class="block mb-2 text-sm font-medium text-gray-900">
+                            <label class="block mb-2 text-sm font-medium text-gray-600">
                                 Statut <span class="text-red-500">*</span>
                             </label>
                             <select x-ref="statusSelect" class="slimselect-field w-full">
@@ -724,7 +724,7 @@
                         </div>
 
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                            <label class="block mb-2 text-sm font-medium text-gray-600">
                                 Notes
                             </label>
                             <input
@@ -738,7 +738,7 @@
                     {{-- Pièce jointe --}}
                     {{-- Pièce jointe (Drag & Drop) --}}
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                        <label class="block mb-2 text-sm font-medium text-gray-600">
                             Pièce jointe
                         </label>
 
@@ -786,13 +786,13 @@
                         <button
                             type="button"
                             wire:click="closeModal"
-                            class="px-4 py-2.5 bg-white border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-gray-50 transition-colors text-sm">
+                            class="inline-flex items-center justify-center h-10 px-4 rounded-lg border border-gray-300 bg-white text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#0c90ee]/20 focus:border-[#0c90ee] transition-all duration-200">
                             Annuler
                         </button>
                         <button
                             type="submit"
                             wire:loading.attr="disabled"
-                            class="px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors shadow-sm hover:shadow-md text-sm disabled:opacity-50">
+                            class="zf-btn-primary inline-flex items-center justify-center h-10 px-4 text-white font-medium rounded-lg transition-colors shadow-sm hover:shadow-md text-sm disabled:opacity-50">
                             <span wire:loading.remove>{{ $editMode ? 'Enregistrer' : 'Créer' }}</span>
                             <span wire:loading>
                                 <x-iconify icon="heroicons:arrow-path" class="w-4 h-4 animate-spin inline" />

@@ -33,10 +33,15 @@
     :root {
         color-scheme: light;
         /* 🚫 Force Light Mode */
+        --zf-sidebar-bg: #f0f4fb;
+        --zf-page-bg: #f8fafc;
         --zf-primary: #0c90ee;
         --zf-primary-hover: #0a84da;
         --zf-primary-active: #086fb7;
         --zf-primary-focus-ring: rgba(12, 144, 238, 0.22);
+        --zf-primary-soft: #e3efff;
+        --zf-primary-soft-strong: #cfe4ff;
+        --zf-primary-text: #0a5f99;
     }
 
     body {
@@ -49,6 +54,11 @@
 }
 
 @layer components {
+    .text-m {
+        font-size: 1rem;
+        line-height: 1.5rem;
+    }
+
     .zenfleet-btn-primary {
         background-color: var(--zf-primary);
         border-color: var(--zf-primary);

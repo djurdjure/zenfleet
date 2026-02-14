@@ -1,6 +1,7 @@
 @extends('layouts.admin.catalyst')
 
 @section('content')
+<section class="zf-page min-h-screen">
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
     {{-- En-tête avec navigation et actions --}}
     <div class="md:flex md:items-center md:justify-between mb-8">
@@ -37,7 +38,7 @@
                 </ol>
             </nav>
 
-            <h2 class="text-2xl font-bold leading-7 text-gray-900 sm:text-3xl sm:truncate">
+            <h2 class="text-xl font-bold text-gray-600 sm:truncate">
                 Détail de la Sanction
             </h2>
             <div class="mt-1 flex flex-col sm:flex-row sm:flex-wrap sm:mt-0 sm:space-x-6">
@@ -345,4 +346,5 @@
         </div>
     </div>
 </div>
+</section>
 @endsection

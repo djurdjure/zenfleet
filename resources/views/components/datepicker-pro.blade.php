@@ -27,8 +27,8 @@ $value = date('d/m/Y'); // Format français par défaut
 
 // Classes conditionnelles pour erreur (fond rouge clair et bordure)
 $inputClasses = $resolvedError
-? 'datepicker-input !bg-red-50 border-2 border-red-500 text-gray-900 text-sm rounded-xl focus:ring-2 focus:ring-red-500 focus:border-red-500 block w-full pl-11 p-3 transition-all duration-200 placeholder-red-400'
-: 'datepicker-input !bg-white border border-gray-200 text-gray-900 text-sm rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 hover:border-gray-300 block w-full pl-11 p-3 transition-all duration-200';
+? 'datepicker-input bg-red-50 border border-red-500 text-gray-900 text-sm rounded-lg focus:ring-2 focus:ring-red-500/20 focus:border-red-500 block w-full pl-10 p-2.5 transition-all duration-200 placeholder-red-400'
+: 'datepicker-input bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-2 focus:ring-[#0c90ee]/20 focus:border-[#0c90ee] hover:border-gray-400 block w-full pl-10 p-2.5 transition-all duration-200';
 
 // Classes pour l'icône
 $iconClasses = $resolvedError
@@ -43,7 +43,7 @@ $containerClasses = $resolvedError
 
 <div {{ $attributes->merge(['class' => '']) }}>
     @if($label)
-    <label for="{{ $inputId }}" class="block mb-2 text-sm font-semibold {{ $resolvedError ? 'text-red-700' : 'text-gray-700' }}">
+    <label for="{{ $inputId }}" class="block mb-2 text-sm font-medium {{ $resolvedError ? 'text-red-700' : 'text-gray-600' }}">
         {{ $label }}
         @if($required)
         <span class="text-red-500 ml-0.5">*</span>
@@ -53,7 +53,7 @@ $containerClasses = $resolvedError
 
     <div class="{{ $containerClasses }}">
         {{-- Icône calendrier --}}
-        <div class="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none z-10">
+        <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none z-10">
             <x-iconify icon="lucide:calendar-days" class="w-5 h-5 {{ $iconClasses }}" />
         </div>
 
@@ -95,14 +95,14 @@ $containerClasses = $resolvedError
     {{-- Messages d'erreur ou d'aide --}}
     @if($resolvedError)
     <div class="mt-2 flex items-start animate-fadeIn">
-        <x-iconify icon="lucide:alert-circle" class="w-4 h-4 text-red-600 mr-1.5 mt-0.5 flex-shrink-0" />
+        <x-iconify icon="lucide:circle-alert" class="w-4 h-4 text-red-600 mr-1.5 mt-0.5 flex-shrink-0" />
         <div>
             <p class="text-sm text-red-600 font-medium">{{ $resolvedError }}</p>
             <p class="text-xs text-red-500 mt-0.5">Format attendu: JJ/MM/AAAA</p>
         </div>
     </div>
     @elseif($helpText)
-    <p class="mt-2 text-sm text-gray-500 flex items-start">
+    <p class="mt-2 text-xs text-gray-600 flex items-start">
         <x-iconify icon="lucide:info" class="w-4 h-4 text-gray-400 mr-1.5 mt-0.5 flex-shrink-0" />
         <span>{{ $helpText }}</span>
     </p>

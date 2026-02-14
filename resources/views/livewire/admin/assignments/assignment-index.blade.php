@@ -1,21 +1,17 @@
 @section('title', 'Gestion des Affectations')
 
-<section class="bg-gray-50 min-h-screen">
+<section class="zf-page min-h-screen">
     <div class="py-6 px-4 mx-auto max-w-7xl lg:py-12">
 
         {{-- ====================================================================
              HEADER - ULTRA-PRO DESIGN
              ===================================================================== --}}
         <div class="mb-6">
-            <h1 class="text-2xl font-bold text-gray-900 mb-1 flex items-center gap-2.5">
-                <x-iconify icon="lucide:calendar-clock" class="w-6 h-6 text-blue-600" />
+            <h1 class="text-xl font-bold text-gray-600 mb-1">
                 Affectations
-                <span class="ml-2 text-sm font-normal text-gray-500">
-                    ({{ $assignments->total() }} total)
-                </span>
             </h1>
-            <p class="text-sm text-gray-600 ml-8.5">
-                Gérez les affectations de véhicules à vos chauffeurs
+            <p class="text-xs text-gray-600">
+                Pilotage des affectations véhicule ↔ chauffeur • {{ $assignments->total() }} affectation(s)
             </p>
         </div>
 
@@ -111,7 +107,7 @@
                 @can('create', \App\Models\Assignment::class)
                 <a href="{{ route('admin.assignments.create') }}"
                     title="Nouvelle affectation"
-                    class="inline-flex items-center gap-2 p-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all duration-200 shadow-sm hover:shadow-md">
+                    class="zf-btn-primary inline-flex items-center gap-2 p-2 rounded-lg transition-all duration-200 shadow-sm hover:shadow-md">
                     <x-iconify icon="lucide:plus" class="w-5 h-5" />
                 </a>
                 @endcan
@@ -135,7 +131,7 @@
 
                     {{-- Période (Date Range) --}}
                     <div class="border border-gray-200 rounded-lg p-3 bg-gray-50">
-                        <label class="block text-sm font-semibold text-gray-700 mb-3">Période</label>
+                        <label class="block mb-2 text-sm font-medium text-gray-600">Période</label>
                         <div class="grid grid-cols-2 gap-3">
                             {{-- Date Début --}}
                             <x-datepicker
@@ -580,7 +576,7 @@
 
                                     {{-- Heure --}}
                                     <div class="col-span-1">
-                                        <label class="block text-sm font-medium text-gray-700 mb-1">
+                                        <label class="block mb-2 text-sm font-medium text-gray-600">
                                             Heure <span class="text-red-600">*</span>
                                         </label>
                                         <div wire:ignore>

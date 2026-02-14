@@ -24,8 +24,8 @@ Design surpassant Fleetio, Samsara et Verizon Connect:
 @since 2025-01-09
 ==================================================================== --}}
 
-<section class="bg-gray-50 min-h-screen" x-data="assignmentDetails()">
-    <div class="py-4 px-4 mx-auto max-w-7xl lg:py-6">
+<section class="zf-page min-h-screen" x-data="assignmentDetails()">
+    <div class="py-6 px-4 mx-auto max-w-7xl lg:py-12">
 
         {{-- ===============================================
         HEADER AVEC BREADCRUMB ET ACTIONS
@@ -35,7 +35,7 @@ Design surpassant Fleetio, Samsara et Verizon Connect:
             <nav class="flex mb-4" aria-label="Breadcrumb">
                 <ol class="inline-flex items-center space-x-1 md:space-x-3">
                     <li class="inline-flex items-center">
-                        <a href="{{ route('admin.dashboard') }}" class="inline-flex items-center text-sm font-medium text-gray-700 hover:text-blue-600">
+                        <a href="{{ route('admin.dashboard') }}" class="inline-flex items-center text-xs font-medium text-gray-600 hover:text-blue-600">
                             <x-iconify icon="lucide:home" class="w-4 h-4 mr-2" />
                             Tableau de bord
                         </a>
@@ -43,7 +43,7 @@ Design surpassant Fleetio, Samsara et Verizon Connect:
                     <li>
                         <div class="flex items-center">
                             <x-iconify icon="lucide:chevron-right" class="w-4 h-4 text-gray-400" />
-                            <a href="{{ route('admin.assignments.index') }}" class="ml-1 text-sm font-medium text-gray-700 hover:text-blue-600 md:ml-2">
+                            <a href="{{ route('admin.assignments.index') }}" class="ml-1 text-xs font-medium text-gray-600 hover:text-blue-600 md:ml-2">
                                 Affectations
                             </a>
                         </div>
@@ -51,7 +51,7 @@ Design surpassant Fleetio, Samsara et Verizon Connect:
                     <li aria-current="page">
                         <div class="flex items-center">
                             <x-iconify icon="lucide:chevron-right" class="w-4 h-4 text-gray-400" />
-                            <span class="ml-1 text-sm font-medium text-gray-500 md:ml-2">Affectation #{{ $assignment->id }}</span>
+                            <span class="ml-1 text-xs font-medium text-gray-500 md:ml-2">Affectation #{{ $assignment->id }}</span>
                         </div>
                     </li>
                 </ol>
@@ -60,11 +60,10 @@ Design surpassant Fleetio, Samsara et Verizon Connect:
             {{-- Header avec titre et actions --}}
             <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
                 <div>
-                    <h1 class="text-2xl font-bold text-gray-900 flex items-center gap-2.5">
-                        <x-iconify icon="lucide:clipboard-check" class="w-6 h-6 text-blue-600" />
+                    <h1 class="text-xl font-bold text-gray-600">
                         Affectation #{{ $assignment->id }}
                     </h1>
-                    <p class="mt-1 text-sm text-gray-500">
+                    <p class="mt-1 text-xs text-gray-600">
                         Créée le {{ $assignment->created_at->format('d/m/Y à H:i') }}
                         @if($assignment->creator)
                             par {{ $assignment->creator->name }}
@@ -73,12 +72,12 @@ Design surpassant Fleetio, Samsara et Verizon Connect:
                 </div>
 
                 {{-- Actions --}}
-                <div class="flex items-center gap-2">
+                <div class="flex flex-wrap items-center gap-2">
                     {{-- Bouton Terminer (si active) --}}
                     @if($assignment->status === 'active' && $assignment->canBeEnded())
                         <button @click="openEndAssignmentModal()"
-                                class="inline-flex items-center gap-2 px-4 py-2.5 bg-orange-600 hover:bg-orange-700 text-white font-medium rounded-lg transition-colors shadow-sm hover:shadow-md">
-                            <x-iconify icon="lucide:flag-triangle-right" class="w-5 h-5" />
+                                class="inline-flex items-center justify-center h-10 px-4 rounded-lg bg-orange-600 hover:bg-orange-700 text-white text-sm font-medium transition-all duration-200 shadow-sm hover:shadow-md">
+                            <x-iconify icon="lucide:flag-triangle-right" class="w-4 h-4 mr-2" />
                             <span>Terminer l'affectation</span>
                         </button>
                     @endif
@@ -86,23 +85,23 @@ Design surpassant Fleetio, Samsara et Verizon Connect:
                     {{-- Bouton Modifier (si éditable) --}}
                     @if($assignment->canBeEdited())
                         <a href="{{ route('admin.assignments.edit', $assignment) }}"
-                           class="inline-flex items-center gap-2 px-4 py-2.5 bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 font-medium rounded-lg transition-colors shadow-sm hover:shadow-md">
-                            <x-iconify icon="lucide:edit" class="w-5 h-5" />
+                           class="zf-btn-primary inline-flex items-center justify-center h-10 px-4 rounded-lg text-sm font-medium transition-all duration-200 shadow-sm hover:shadow-md">
+                            <x-iconify icon="lucide:edit" class="w-4 h-4 mr-2" />
                             <span>Modifier</span>
                         </a>
                     @endif
 
                     {{-- Bouton Export PDF --}}
                     <button onclick="window.print()"
-                            class="inline-flex items-center gap-2 px-4 py-2.5 bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 font-medium rounded-lg transition-colors shadow-sm hover:shadow-md">
-                        <x-iconify icon="lucide:printer" class="w-5 h-5" />
+                            class="inline-flex items-center justify-center h-10 px-4 rounded-lg border border-gray-300 bg-white text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#0c90ee]/20 focus:border-[#0c90ee] transition-all duration-200">
+                        <x-iconify icon="lucide:printer" class="w-4 h-4 mr-2" />
                         <span>Imprimer</span>
                     </button>
 
                     {{-- Bouton Retour --}}
                     <a href="{{ route('admin.assignments.index') }}"
-                       class="inline-flex items-center gap-2 px-4 py-2.5 bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 font-medium rounded-lg transition-colors shadow-sm hover:shadow-md">
-                        <x-iconify icon="lucide:arrow-left" class="w-5 h-5" />
+                       class="inline-flex items-center justify-center h-10 px-4 rounded-lg border border-gray-300 bg-white text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#0c90ee]/20 focus:border-[#0c90ee] transition-all duration-200">
+                        <x-iconify icon="lucide:arrow-left" class="w-4 h-4 mr-2" />
                         <span>Retour</span>
                     </a>
                 </div>

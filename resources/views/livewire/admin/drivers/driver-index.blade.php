@@ -77,14 +77,15 @@
         {{-- ===============================================
             HEADER ULTRA-COMPACT
         =============================================== --}}
-        <div class="mb-4 flex justify-between items-center">
-            <h1 class="text-2xl font-bold text-gray-900 flex items-center gap-2.5">
-                <x-iconify icon="lucide:users" class="w-6 h-6 text-blue-600" />
-                Gestion des Chauffeurs
-                <span class="ml-2 text-sm font-normal text-gray-500">
-                    ({{ $drivers->total() }})
-                </span>
-            </h1>
+        <div class="mb-4 flex justify-between items-start">
+            <div>
+                <h1 class="text-xl font-bold text-gray-600">
+                    Gestion des Chauffeurs
+                </h1>
+                <p class="text-xs text-gray-600 mt-0.5">
+                    Vue consolidée des chauffeurs • {{ $drivers->total() }} chauffeur(s)
+                </p>
+            </div>
 
             {{-- Loading Indicator (no layout shift) --}}
             <div
@@ -197,7 +198,7 @@
                 @if($visibility === 'archived')
                 <button wire:click="$set('visibility', 'active')"
                     title="Voir Actifs"
-                    class="inline-flex items-center gap-2 p-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-all duration-200 shadow-sm hover:shadow-md">
+                    class="zf-btn-primary inline-flex items-center gap-2 p-2 rounded-lg transition-all duration-200 shadow-sm hover:shadow-md">
                     <x-iconify icon="lucide:list" class="w-5 h-5" />
                 </button>
                 @else
@@ -241,7 +242,7 @@
                 {{-- Import --}}
                 <a href="{{ route('admin.drivers.import.show') }}"
                     title="Importer"
-                    class="inline-flex items-center gap-2 p-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-all duration-200 shadow-sm hover:shadow-md">
+                    class="zf-btn-primary inline-flex items-center gap-2 p-2 rounded-lg transition-all duration-200 shadow-sm hover:shadow-md">
                     <x-iconify icon="lucide:upload" class="w-5 h-5" />
                 </a>
                 @endcan
@@ -250,7 +251,7 @@
                 {{-- Nouveau Chauffeur --}}
                 <a href="{{ route('admin.drivers.create') }}"
                     title="Nouveau Chauffeur"
-                    class="inline-flex items-center gap-2 p-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all duration-200 shadow-sm hover:shadow-md">
+                    class="zf-btn-primary inline-flex items-center gap-2 p-2 rounded-lg transition-all duration-200 shadow-sm hover:shadow-md">
                     <x-iconify icon="lucide:plus" class="w-5 h-5" />
                 </a>
                 @endcan
@@ -260,7 +261,7 @@
                 <x-page-filters-panel columns="2">
                     {{-- Statut --}}
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1.5">Statut</label>
+                        <label class="block mb-2 text-sm font-medium text-gray-600">Statut</label>
                         <x-slim-select wire:model.live="status_id" name="status_id" placeholder="Tous les statuts">
                             <option value="" data-placeholder="true">Tous les statuts</option>
                             @foreach($driverStatuses as $status)
@@ -271,7 +272,7 @@
 
                     {{-- Catégorie Permis --}}
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1.5">Catégorie permis</label>
+                        <label class="block mb-2 text-sm font-medium text-gray-600">Catégorie permis</label>
                         <x-slim-select wire:model.live="license_category" name="license_category" placeholder="Toutes les catégories">
                             <option value="" data-placeholder="true">Toutes les catégories</option>
                             @foreach(['A1', 'A', 'B', 'BE', 'C1', 'C1E', 'C', 'CE', 'D', 'DE', 'F'] as $cat)

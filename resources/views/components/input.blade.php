@@ -22,7 +22,7 @@ $inputId = $component->getId();
 
 <div {{ $attributes->merge(['class' => '']) }}>
     @if($label)
-    <label for="{{ $inputId }}" class="block mb-2 text-sm font-medium text-gray-900">
+    <label for="{{ $inputId }}" class="block mb-2 text-sm font-medium text-gray-600">
         {{ $label }}
         @if($required)
         <span class="text-red-600">*</span>
@@ -58,7 +58,7 @@ $inputId = $component->getId();
         <span>{{ $resolvedError }}</span>
     </p>
     @elseif($helpText)
-    <p class="mt-2 text-sm text-gray-600">
+    <p class="mt-2 text-xs text-gray-600">
         {{ $helpText }}
     </p>
     @endif

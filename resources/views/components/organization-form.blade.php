@@ -125,7 +125,7 @@
  <div class="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-8">
  <!-- Organization Name -->
  <div class="space-y-3">
- <label class="block text-sm font-semibold text-gray-700">
+ <label class="block mb-2 text-sm font-medium text-gray-600">
  Nom de l'organisation <span class="text-red-500">*</span>
  </label>
  <div class="relative">
@@ -151,7 +151,7 @@
 
  <!-- Legal Name -->
  <div class="space-y-3">
- <label class="block text-sm font-semibold text-gray-700">
+ <label class="block mb-2 text-sm font-medium text-gray-600">
  Raison sociale <span class="text-red-500">*</span>
  </label>
  <input
@@ -171,7 +171,7 @@
 
  <!-- Organization Type with Tom Select -->
  <div class="space-y-3">
- <label class="block text-sm font-semibold text-gray-700">
+ <label class="block mb-2 text-sm font-medium text-gray-600">
  Type d'organisation <span class="text-red-500">*</span>
  </label>
  <div class="relative">
@@ -199,7 +199,7 @@
 
  <!-- Industry with Tom Select -->
  <div class="space-y-3">
- <label class="block text-sm font-semibold text-gray-700">
+ <label class="block mb-2 text-sm font-medium text-gray-600">
  Secteur d'activité
  </label>
  <select
@@ -248,7 +248,7 @@
 
  <!-- Description -->
  <div class="mt-8 space-y-3">
- <label class="block text-sm font-semibold text-gray-700">
+ <label class="block mb-2 text-sm font-medium text-gray-600">
  Description de l'organisation
  </label>
  <textarea
@@ -267,7 +267,7 @@
 
  <!-- Logo Upload Section -->
  <div class="mt-8 space-y-3">
- <label class="block text-sm font-semibold text-gray-700">
+ <label class="block mb-2 text-sm font-medium text-gray-600">
  Logo de l'organisation
  </label>
  <div x-data="fileUploader()"
@@ -349,7 +349,7 @@
  <div class="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-8">
  <!-- NIF (Numéro d'Identification Fiscale) -->
  <div class="space-y-3">
- <label class="block text-sm font-semibold text-gray-700">
+ <label class="block mb-2 text-sm font-medium text-gray-600">
  NIF <span class="text-red-500">*</span>
  </label>
  <input
@@ -372,7 +372,7 @@
 
  <!-- AI (Article d'Imposition) -->
  <div class="space-y-3">
- <label class="block text-sm font-semibold text-gray-700">
+ <label class="block mb-2 text-sm font-medium text-gray-600">
  AI
  </label>
  <input
@@ -392,7 +392,7 @@
 
  <!-- NIS (Numéro d'Identification Statistique) -->
  <div class="space-y-3">
- <label class="block text-sm font-semibold text-gray-700">
+ <label class="block mb-2 text-sm font-medium text-gray-600">
  NIS
  </label>
  <input
@@ -412,7 +412,7 @@
 
  <!-- Registre de Commerce -->
  <div class="space-y-3">
- <label class="block text-sm font-semibold text-gray-700">
+ <label class="block mb-2 text-sm font-medium text-gray-600">
  Registre de Commerce <span class="text-red-500">*</span>
  </label>
  <input
@@ -433,7 +433,7 @@
 
  <!-- Forme Juridique -->
  <div class="space-y-3">
- <label class="block text-sm font-semibold text-gray-700">
+ <label class="block mb-2 text-sm font-medium text-gray-600">
  Forme Juridique
  </label>
  <select
@@ -465,7 +465,7 @@
 
  <!-- Date d'Immatriculation -->
  <div class="space-y-3">
- <label class="block text-sm font-semibold text-gray-700">
+ <label class="block mb-2 text-sm font-medium text-gray-600">
  Date d'Immatriculation
  </label>
  <input
@@ -493,7 +493,7 @@
  <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
  <!-- Scan NIF -->
  <div class="space-y-3">
- <label class="block text-sm font-semibold text-gray-700">
+ <label class="block mb-2 text-sm font-medium text-gray-600">
  Scan du NIF
  </label>
  <div x-data="documentUploader('nif')"
@@ -528,7 +528,7 @@
 
  <!-- Scan AI -->
  <div class="space-y-3">
- <label class="block text-sm font-semibold text-gray-700">
+ <label class="block mb-2 text-sm font-medium text-gray-600">
  Scan de l'AI
  </label>
  <div x-data="documentUploader('ai')"
@@ -563,7 +563,7 @@
 
  <!-- Scan NIS -->
  <div class="space-y-3">
- <label class="block text-sm font-semibold text-gray-700">
+ <label class="block mb-2 text-sm font-medium text-gray-600">
  Scan du NIS
  </label>
  <div x-data="documentUploader('nis')"
@@ -618,7 +618,7 @@
  <div class="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-8">
  <!-- Email -->
  <div class="space-y-3">
- <label class="block text-sm font-semibold text-gray-700">
+ <label class="block mb-2 text-sm font-medium text-gray-600">
  Email <span class="text-red-500">*</span>
  </label>
  <input
@@ -638,7 +638,7 @@
 
  <!-- Téléphone -->
  <div class="space-y-3">
- <label class="block text-sm font-semibold text-gray-700">
+ <label class="block mb-2 text-sm font-medium text-gray-600">
  Téléphone <span class="text-red-500">*</span>
  </label>
  <input
@@ -658,7 +658,7 @@
 
  <!-- Site Web -->
  <div class="space-y-3">
- <label class="block text-sm font-semibold text-gray-700">
+ <label class="block mb-2 text-sm font-medium text-gray-600">
  Site Web
  </label>
  <input
@@ -677,7 +677,7 @@
 
  <!-- Wilaya with Tom Select -->
  <div class="space-y-3">
- <label class="block text-sm font-semibold text-gray-700">
+ <label class="block mb-2 text-sm font-medium text-gray-600">
  Wilaya <span class="text-red-500">*</span>
  </label>
  <select
@@ -770,7 +770,7 @@
  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
  <!-- Adresse -->
  <div class="space-y-3">
- <label class="block text-sm font-semibold text-gray-700">
+ <label class="block mb-2 text-sm font-medium text-gray-600">
  Adresse <span class="text-red-500">*</span>
  </label>
  <input
@@ -790,7 +790,7 @@
 
  <!-- Complément d'adresse -->
  <div class="space-y-3">
- <label class="block text-sm font-semibold text-gray-700">
+ <label class="block mb-2 text-sm font-medium text-gray-600">
  Complément d'adresse
  </label>
  <input
@@ -809,7 +809,7 @@
 
  <!-- Ville -->
  <div class="space-y-3">
- <label class="block text-sm font-semibold text-gray-700">
+ <label class="block mb-2 text-sm font-medium text-gray-600">
  Ville <span class="text-red-500">*</span>
  </label>
  <input
@@ -829,7 +829,7 @@
 
  <!-- Code postal -->
  <div class="space-y-3">
- <label class="block text-sm font-semibold text-gray-700">
+ <label class="block mb-2 text-sm font-medium text-gray-600">
  Code postal
  </label>
  <input
@@ -870,7 +870,7 @@
  <div class="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-8">
  <!-- Prénom du Responsable -->
  <div class="space-y-3">
- <label class="block text-sm font-semibold text-gray-700">
+ <label class="block mb-2 text-sm font-medium text-gray-600">
  Prénom du Gérant <span class="text-red-500">*</span>
  </label>
  <input
@@ -890,7 +890,7 @@
 
  <!-- Nom du Responsable -->
  <div class="space-y-3">
- <label class="block text-sm font-semibold text-gray-700">
+ <label class="block mb-2 text-sm font-medium text-gray-600">
  Nom du Gérant <span class="text-red-500">*</span>
  </label>
  <input
@@ -910,7 +910,7 @@
 
  <!-- NIN du Responsable -->
  <div class="space-y-3">
- <label class="block text-sm font-semibold text-gray-700">
+ <label class="block mb-2 text-sm font-medium text-gray-600">
  NIN du Gérant <span class="text-red-500">*</span>
  </label>
  <input
@@ -933,7 +933,7 @@
 
  <!-- Adresse du Responsable -->
  <div class="space-y-3">
- <label class="block text-sm font-semibold text-gray-700">
+ <label class="block mb-2 text-sm font-medium text-gray-600">
  Adresse du Gérant
  </label>
  <input
@@ -952,7 +952,7 @@
 
  <!-- Date de naissance du Responsable -->
  <div class="space-y-3">
- <label class="block text-sm font-semibold text-gray-700">
+ <label class="block mb-2 text-sm font-medium text-gray-600">
  Date de naissance du Gérant
  </label>
  <input
@@ -970,7 +970,7 @@
 
  <!-- Lieu de naissance du Responsable -->
  <div class="space-y-3">
- <label class="block text-sm font-semibold text-gray-700">
+ <label class="block mb-2 text-sm font-medium text-gray-600">
  Lieu de naissance du Gérant
  </label>
  <input
@@ -989,7 +989,7 @@
 
  <!-- Téléphone du Responsable -->
  <div class="space-y-3">
- <label class="block text-sm font-semibold text-gray-700">
+ <label class="block mb-2 text-sm font-medium text-gray-600">
  Téléphone du Gérant
  </label>
  <input
@@ -1016,7 +1016,7 @@
  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
  <!-- Scan Pièce d'Identité du Responsable -->
  <div class="space-y-3">
- <label class="block text-sm font-semibold text-gray-700">
+ <label class="block mb-2 text-sm font-medium text-gray-600">
  Scan Pièce d'Identité du Gérant
  </label>
  <div x-data="documentUploader('manager_id')"

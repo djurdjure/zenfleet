@@ -18,13 +18,13 @@
     
     // Classes conditionnelles pour erreur
     $selectClasses = $error
-        ? 'bg-red-50 border-2 border-red-500 text-gray-900 text-sm rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 block w-full p-2.5 pr-10 transition-all duration-200 animate-shake'
-        : 'bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 block w-full p-2.5 pr-10 transition-all duration-200';
+        ? 'bg-red-50 border border-red-500 text-gray-900 text-sm rounded-lg focus:ring-2 focus:ring-red-500/20 focus:border-red-500 block w-full p-2.5 pr-10 transition-all duration-200 animate-shake'
+        : 'bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-2 focus:ring-[#0c90ee]/20 focus:border-[#0c90ee] hover:border-gray-400 block w-full p-2.5 pr-10 transition-all duration-200';
     
     // Classes pour le label
     $labelClasses = $error
         ? 'block mb-2 text-sm font-medium text-red-700'
-        : 'block mb-2 text-sm font-medium text-gray-900';
+        : 'block mb-2 text-sm font-medium text-gray-600';
         
     // Classes pour l'icône dropdown
     $iconClasses = $error
@@ -103,7 +103,7 @@
             </div>
         </div>
     @elseif($helpText)
-        <p class="mt-2 text-sm text-gray-600 flex items-start">
+        <p class="mt-2 text-xs text-gray-600 flex items-start">
             <x-iconify icon="lucide:info-circle" class="w-4 h-4 text-gray-400 mr-1.5 mt-0.5 flex-shrink-0" />
             <span>{{ $helpText }}</span>
         </p>

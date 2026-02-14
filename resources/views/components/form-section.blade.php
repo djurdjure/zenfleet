@@ -9,14 +9,14 @@
 
 <div {{ $attributes->merge(['class' => 'relative']) }}>
     @if($showLine)
-        <div class="absolute left-5 top-6 bottom-6 w-px bg-slate-200/80"></div>
+        <div class="absolute left-[1.375rem] top-5 bottom-5 w-px rounded-full bg-gradient-to-b from-gray-200 via-gray-300/80 to-gray-200"></div>
     @endif
 
-    <div class="relative pl-12">
+    <div class="relative pl-14">
         @if($icon)
-            <div class="absolute left-1.5 top-6">
-                <span class="inline-flex h-9 w-9 items-center justify-center rounded-full bg-white text-blue-600 shadow-sm ring-2 ring-blue-100">
-                    <x-iconify :icon="$icon" class="w-5 h-5" />
+            <div class="absolute left-0 top-4.5">
+                <span class="inline-flex h-11 w-11 items-center justify-center rounded-full bg-gray-50 border border-gray-200 shadow-sm">
+                    <x-iconify :icon="$icon" class="w-6 h-6 text-[#0c90ee]" />
                 </span>
             </div>
         @endif
@@ -27,9 +27,9 @@
                     @if($eyebrow)
                         <p class="text-[11px] font-semibold uppercase tracking-wide text-slate-400">{{ $eyebrow }}</p>
                     @endif
-                    <h3 class="text-sm font-semibold text-slate-900">{{ $title }}</h3>
+                    <h3 class="text-m font-semibold text-slate-600">{{ $title }}</h3>
                     @if($subtitle)
-                        <p class="text-xs text-slate-500 mt-0.5">{{ $subtitle }}</p>
+                        <p class="text-xs text-slate-400 mt-0.5">{{ $subtitle }}</p>
                     @endif
                 </div>
                 {{ $actions ?? '' }}

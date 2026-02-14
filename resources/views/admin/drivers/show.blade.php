@@ -18,7 +18,7 @@
  @since 2025-01-19
  ==================================================================== --}}
 
-<section class="bg-gray-50 min-h-screen">
+<section class="zf-page min-h-screen">
     <div class="py-6 px-4 mx-auto max-w-7xl lg:py-12">
 
         {{-- ===============================================
@@ -26,7 +26,7 @@
  =============================================== --}}
         <div class="mb-6">
             {{-- Breadcrumb --}}
-            <nav class="flex items-center gap-2 text-sm text-gray-600 mb-4">
+            <nav class="flex items-center gap-2 text-xs text-gray-600 mb-4">
                 <a href="{{ route('admin.dashboard') }}" class="hover:text-blue-600 transition-colors">
                     <x-iconify icon="heroicons:home" class="w-4 h-4" />
                 </a>
@@ -35,11 +35,11 @@
                     Gestion des Chauffeurs
                 </a>
                 <x-iconify icon="heroicons:chevron-right" class="w-4 h-4 text-gray-400" />
-                <span class="font-semibold text-gray-900">{{ $driver->first_name }} {{ $driver->last_name }}</span>
+                <span class="font-medium text-gray-600">{{ $driver->first_name }} {{ $driver->last_name }}</span>
             </nav>
 
             {{-- Header avec titre et actions --}}
-            <div class="flex items-start justify-between">
+            <div class="flex flex-col xl:flex-row xl:items-start xl:justify-between gap-4">
                 <div class="flex items-center gap-4">
                     {{-- Avatar --}}
                     <div class="flex-shrink-0">
@@ -58,10 +58,10 @@
 
                     {{-- Infos principales --}}
                     <div>
-                        <h1 class="text-2xl font-bold text-gray-900 mb-1">
+                        <h1 class="text-xl font-bold text-gray-600 mb-1">
                             {{ $driver->first_name }} {{ $driver->last_name }}
                         </h1>
-                        <p class="text-sm text-gray-600">
+                        <p class="text-xs text-gray-600">
                             @if($driver->employee_number)
                             Matricule: {{ $driver->employee_number }} •
                             @endif
@@ -91,24 +91,24 @@
                 </div>
 
                 {{-- Actions --}}
-                <div class="flex items-center gap-3">
+                <div class="flex flex-wrap items-center gap-2">
                     <a href="{{ route('admin.drivers.export.profile.pdf', $driver) }}" target="_blank"
-                        class="inline-flex items-center gap-2 px-4 py-2.5 bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 font-medium rounded-lg transition-colors duration-200 text-sm shadow-sm hover:text-blue-600 hover:border-blue-300">
-                        <x-iconify icon="heroicons:document-arrow-down" class="w-5 h-5" />
-                        <span class="hidden sm:inline">Exporter PDF</span>
+                        class="inline-flex items-center justify-center h-10 px-4 rounded-lg border border-gray-300 bg-white text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#0c90ee]/20 focus:border-[#0c90ee] transition-all duration-200">
+                        <x-iconify icon="heroicons:document-arrow-down" class="w-4 h-4 mr-2" />
+                        <span>Exporter PDF</span>
                     </a>
                     @can('drivers.update')
                     <a href="{{ route('admin.drivers.edit', $driver) }}"
-                        class="inline-flex items-center gap-2 px-4 py-2.5 bg-amber-600 hover:bg-amber-700 text-white font-medium rounded-lg transition-colors duration-200 text-sm shadow-sm hover:shadow-md">
-                        <x-iconify icon="heroicons:pencil" class="w-5 h-5" />
-                        <span class="hidden sm:inline">Modifier</span>
+                        class="zf-btn-primary inline-flex items-center justify-center h-10 px-4 rounded-lg text-sm font-medium transition-all duration-200 shadow-sm hover:shadow-md">
+                        <x-iconify icon="heroicons:pencil" class="w-4 h-4 mr-2" />
+                        <span>Modifier</span>
                     </a>
                     @endcan
 
                     <a href="{{ route('admin.drivers.index') }}"
-                        class="inline-flex items-center gap-2 px-4 py-2.5 bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 font-medium rounded-lg transition-colors duration-200 text-sm shadow-sm">
-                        <x-iconify icon="heroicons:arrow-left" class="w-5 h-5" />
-                        <span class="hidden sm:inline">Retour</span>
+                        class="inline-flex items-center justify-center h-10 px-4 rounded-lg border border-gray-300 bg-white text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#0c90ee]/20 focus:border-[#0c90ee] transition-all duration-200">
+                        <x-iconify icon="heroicons:arrow-left" class="w-4 h-4 mr-2" />
+                        <span>Retour</span>
                     </a>
                 </div>
             </div>
