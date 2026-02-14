@@ -63,12 +63,16 @@
         @endif
 
         <div class="py-4 px-4 mx-auto max-w-7xl lg:py-6">
-            <div class="mb-4 flex justify-between items-center">
-                <h1 class="text-2xl font-bold text-gray-900 flex items-center gap-2.5">
-                    <x-iconify icon="lucide:warehouse" class="w-6 h-6 text-blue-600" />
-                    Gestion des Dépôts
-                    <span class="ml-2 text-sm font-normal text-gray-500">({{ $stats['total_depots'] ?? 0 }})</span>
-                </h1>
+            <div class="mb-4 flex justify-between items-start gap-4">
+                <div>
+                    <h1 class="text-xl font-bold text-gray-600">
+                        Gestion des Dépôts
+                        <span class="ml-2 text-sm font-normal text-gray-500">({{ $stats['total_depots'] ?? 0 }})</span>
+                    </h1>
+                    <p class="text-xs text-gray-600">
+                        Administration centralisée des dépôts, capacité et occupation en temps réel
+                    </p>
+                </div>
 
                 <div class="flex items-center gap-2 text-blue-600 opacity-0 transition-opacity duration-150"
                      wire:loading.delay.class="opacity-100"
@@ -209,7 +213,7 @@
                 <x-slot:filtersPanel>
                     <x-page-filters-panel columns="3">
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1.5">Statut</label>
+                            <label class="block mb-1.5 text-sm font-medium text-gray-600">Statut</label>
                             <select wire:model.live="statusFilter" class="block w-full border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-sm">
                                 <option value="all">Tous les statuts</option>
                                 <option value="active">Actifs seulement</option>
@@ -218,7 +222,7 @@
                         </div>
 
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1.5">Disponibilité</label>
+                            <label class="block mb-1.5 text-sm font-medium text-gray-600">Disponibilité</label>
                             <select wire:model.live="capacityFilter" class="block w-full border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-sm">
                                 <option value="all">Toutes capacités</option>
                                 <option value="available">Places disponibles</option>
@@ -227,7 +231,7 @@
                         </div>
 
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1.5">Tri</label>
+                            <label class="block mb-1.5 text-sm font-medium text-gray-600">Tri</label>
                             <select wire:model.live="sortBy" class="block w-full border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-sm">
                                 <option value="name">Nom (A-Z)</option>
                                 <option value="created_at">Date de création</option>
@@ -398,7 +402,7 @@
                                     </div>
 
                                     <div>
-                                        <label class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                                        <label class="block mb-1 text-sm font-medium text-gray-600">Description</label>
                                         <textarea wire:model="description" rows="3" class="form-textarea w-full rounded-lg border-gray-300 focus:border-blue-500 focus:ring-blue-500" {{ $modalMode === 'view' ? 'disabled' : '' }}></textarea>
                                     </div>
                                 </div>

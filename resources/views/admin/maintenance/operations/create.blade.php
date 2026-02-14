@@ -30,7 +30,7 @@ Design surpassant Fleetio, Samsara et Verizon Connect:
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="py-4">
                 {{-- Breadcrumb --}}
-                <nav class="flex items-center space-x-2 text-sm text-gray-500 mb-3" aria-label="Breadcrumb">
+                <nav class="flex items-center space-x-2 text-xs text-gray-500 mb-3" aria-label="Breadcrumb">
                     <a href="{{ route('admin.dashboard') }}" class="hover:text-gray-700 transition-colors">
                         <x-iconify icon="lucide:home" class="w-4 h-4" />
                     </a>
@@ -45,13 +45,10 @@ Design surpassant Fleetio, Samsara et Verizon Connect:
                 {{-- Header --}}
                 <div class="flex items-center justify-between">
                     <div>
-                        <h1 class="text-2xl font-bold text-gray-900 flex items-center gap-2.5">
-                            <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center shadow-lg">
-                                <x-iconify icon="lucide:wrench" class="w-6 h-6 text-white" />
-                            </div>
+                        <h1 class="text-xl font-bold text-gray-600">
                             Nouvelle Opération de Maintenance
                         </h1>
-                        <p class="text-sm text-gray-600 mt-1 ml-12.5">
+                        <p class="text-xs text-gray-600 mt-1">
                             Créez une nouvelle opération de maintenance avec validation temps réel
                         </p>
                     </div>

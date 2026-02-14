@@ -26,11 +26,11 @@
                 </ol>
             </nav>
 
-            <h1 class="text-2xl font-bold text-gray-900 flex items-center gap-2.5">
+            <h1 class="text-xl font-bold text-gray-600">
                 <x-iconify icon="lucide:pencil" class="w-6 h-6 text-blue-600" />
                 Modifier Opération de Maintenance
             </h1>
-            <p class="mt-1 text-sm text-gray-600">
+            <p class="mt-1 text-xs text-gray-600">
                 Mettez à jour les informations de l'opération
             </p>
         </div>
@@ -68,7 +68,7 @@
                     
                     {{-- Véhicule --}}
                     <div class="md:col-span-2">
-                        <label for="vehicle_id" class="block text-sm font-medium text-gray-700 mb-2">
+                        <label for="vehicle_id" class="block mb-2 text-sm font-medium text-gray-600">
                             <x-iconify icon="lucide:car" class="w-4 h-4 inline mr-1" />
                             Véhicule <span class="text-red-500">*</span>
                         </label>
@@ -88,7 +88,7 @@
 
                     {{-- Type de Maintenance --}}
                     <div class="md:col-span-2">
-                        <label for="maintenance_type_id" class="block text-sm font-medium text-gray-700 mb-2">
+                        <label for="maintenance_type_id" class="block mb-2 text-sm font-medium text-gray-600">
                             <x-iconify icon="lucide:tag" class="w-4 h-4 inline mr-1" />
                             Type de Maintenance <span class="text-red-500">*</span>
                         </label>
@@ -108,7 +108,7 @@
 
                     {{-- Date Planifiée --}}
                     <div>
-                        <label for="scheduled_date" class="block text-sm font-medium text-gray-700 mb-2">
+                        <label for="scheduled_date" class="block mb-2 text-sm font-medium text-gray-600">
                             <x-iconify icon="lucide:calendar" class="w-4 h-4 inline mr-1" />
                             Date Planifiée <span class="text-red-500">*</span>
                         </label>
@@ -122,7 +122,7 @@
 
                     {{-- Statut --}}
                     <div>
-                        <label for="status" class="block text-sm font-medium text-gray-700 mb-2">
+                        <label for="status" class="block mb-2 text-sm font-medium text-gray-600">
                             <x-iconify icon="lucide:info" class="w-4 h-4 inline mr-1" />
                             Statut <span class="text-red-500">*</span>
                         </label>
@@ -137,7 +137,7 @@
 
                     {{-- Fournisseur --}}
                     <div class="md:col-span-2">
-                        <label for="provider_id" class="block text-sm font-medium text-gray-700 mb-2">
+                        <label for="provider_id" class="block mb-2 text-sm font-medium text-gray-600">
                             <x-iconify icon="lucide:building" class="w-4 h-4 inline mr-1" />
                             Fournisseur (optionnel)
                         </label>
@@ -154,7 +154,7 @@
 
                     {{-- Kilométrage --}}
                     <div>
-                        <label for="mileage_at_maintenance" class="block text-sm font-medium text-gray-700 mb-2">
+                        <label for="mileage_at_maintenance" class="block mb-2 text-sm font-medium text-gray-600">
                             <x-iconify icon="lucide:gauge" class="w-4 h-4 inline mr-1" />
                             Kilométrage Prévu (km)
                         </label>
@@ -170,7 +170,7 @@
 
                     {{-- Coût Estimé --}}
                     <div>
-                        <label for="total_cost" class="block text-sm font-medium text-gray-700 mb-2">
+                        <label for="total_cost" class="block mb-2 text-sm font-medium text-gray-600">
                             <x-iconify icon="lucide:banknote" class="w-4 h-4 inline mr-1" />
                             Coût Estimé (DA)
                         </label>
@@ -186,7 +186,7 @@
 
                     {{-- Durée Estimée --}}
                     <div>
-                        <label for="duration_minutes" class="block text-sm font-medium text-gray-700 mb-2">
+                        <label for="duration_minutes" class="block mb-2 text-sm font-medium text-gray-600">
                             <x-iconify icon="lucide:clock" class="w-4 h-4 inline mr-1" />
                             Durée Estimée (minutes)
                         </label>
@@ -202,7 +202,7 @@
 
                     {{-- Description --}}
                     <div class="md:col-span-2">
-                        <label for="description" class="block text-sm font-medium text-gray-700 mb-2">
+                        <label for="description" class="block mb-2 text-sm font-medium text-gray-600">
                             <x-iconify icon="lucide:file-text" class="w-4 h-4 inline mr-1" />
                             Description
                         </label>

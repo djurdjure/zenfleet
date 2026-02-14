@@ -26,16 +26,15 @@
         {{-- ===============================================
             HEADER ULTRA-COMPACT AVEC ACTIONS
         =============================================== --}}
-        <div class="flex items-center justify-between mb-4">
+        <div class="flex items-start justify-between mb-4 gap-4">
             <div>
-                <h1 class="text-2xl font-bold text-gray-900 flex items-center gap-2.5">
-                    <x-iconify icon="lucide:wrench" class="w-6 h-6 text-blue-600" />
+                <h1 class="text-xl font-bold text-gray-600">
                     Gestion de la Maintenance
                     <span class="ml-2 text-sm font-normal text-gray-500">
                         ({{ $operations->total() }})
                     </span>
                 </h1>
-                <p class="mt-1 text-sm text-gray-600">
+                <p class="mt-1 text-xs text-gray-600">
                     Planifiez, suivez et optimisez toutes vos opérations de maintenance
                 </p>
             </div>
@@ -386,7 +385,7 @@
 
                         {{-- Filtre Statut --}}
                         <div>
-                            <label for="status" class="block text-sm font-medium text-gray-700 mb-1.5">
+                            <label for="status" class="block mb-1.5 text-sm font-medium text-gray-600">
                                 <x-iconify icon="lucide:info" class="w-4 h-4 inline" /> Statut
                             </label>
                             <select name="status" id="status" class="block w-full border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-sm">
@@ -400,7 +399,7 @@
 
                         {{-- Filtre Type de Maintenance --}}
                         <div>
-                            <label for="maintenance_type_id" class="block text-sm font-medium text-gray-700 mb-1.5">
+                            <label for="maintenance_type_id" class="block mb-1.5 text-sm font-medium text-gray-600">
                                 <x-iconify icon="lucide:tag" class="w-4 h-4 inline" /> Type de maintenance
                             </label>
                             <select name="maintenance_type_id" id="maintenance_type_id" class="block w-full border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-sm">
@@ -415,7 +414,7 @@
 
                         {{-- Filtre Véhicule --}}
                         <div>
-                            <label for="vehicle_id" class="block text-sm font-medium text-gray-700 mb-1.5">
+                            <label for="vehicle_id" class="block mb-1.5 text-sm font-medium text-gray-600">
                                 <x-iconify icon="lucide:car" class="w-4 h-4 inline" /> Véhicule
                             </label>
                             <select name="vehicle_id" id="vehicle_id" class="block w-full border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-sm">
@@ -430,7 +429,7 @@
 
                         {{-- Filtre Fournisseur --}}
                         <div>
-                            <label for="provider_id" class="block text-sm font-medium text-gray-700 mb-1.5">
+                            <label for="provider_id" class="block mb-1.5 text-sm font-medium text-gray-600">
                                 <x-iconify icon="lucide:building" class="w-4 h-4 inline" /> Fournisseur
                             </label>
                             <select name="provider_id" id="provider_id" class="block w-full border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-sm">
@@ -445,7 +444,7 @@
 
                         {{-- Filtre Date De --}}
                         <div>
-                            <label for="date_from" class="block text-sm font-medium text-gray-700 mb-1.5">
+                            <label for="date_from" class="block mb-1.5 text-sm font-medium text-gray-600">
                                 <x-iconify icon="lucide:calendar" class="w-4 h-4 inline" /> Date de début
                             </label>
                             <input type="date" name="date_from" id="date_from" value="{{ request('date_from') }}"
@@ -454,7 +453,7 @@
 
                         {{-- Filtre Date À --}}
                         <div>
-                            <label for="date_to" class="block text-sm font-medium text-gray-700 mb-1.5">
+                            <label for="date_to" class="block mb-1.5 text-sm font-medium text-gray-600">
                                 <x-iconify icon="lucide:calendar" class="w-4 h-4 inline" /> Date de fin
                             </label>
                             <input type="date" name="date_to" id="date_to" value="{{ request('date_to') }}"
@@ -463,7 +462,7 @@
 
                         {{-- Filtre Catégorie --}}
                         <div>
-                            <label for="category" class="block text-sm font-medium text-gray-700 mb-1.5">
+                            <label for="category" class="block mb-1.5 text-sm font-medium text-gray-600">
                                 <x-iconify icon="lucide:layers" class="w-4 h-4 inline" /> Catégorie
                             </label>
                             <select name="category" id="category" class="block w-full border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-sm">
@@ -477,7 +476,7 @@
 
                         {{-- Filtre En Retard --}}
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1.5">&nbsp;</label>
+                            <label class="block mb-1.5 text-sm font-medium text-gray-600">&nbsp;</label>
                             <label class="flex items-center gap-2 cursor-pointer">
                                 <input type="checkbox" name="overdue" value="1" {{ request('overdue') ? 'checked' : '' }}
                                     class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">

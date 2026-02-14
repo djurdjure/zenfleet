@@ -65,7 +65,7 @@ Design ultra-professionnel harmonisé avec assignments/create:
     {{-- ===============================================
     FORMULAIRE PRINCIPAL
     =============================================== --}}
-    <form wire:submit="save" class="space-y-6">
+    <form wire:submit="save" class="space-y-8">
 
         {{-- ===============================================
         SECTION 1: INFORMATIONS PRINCIPALES (FOND GRIS PROFESSIONNEL)
@@ -73,18 +73,18 @@ Design ultra-professionnel harmonisé avec assignments/create:
         <x-card class="bg-gradient-to-br from-gray-50 to-slate-50 border-2 border-gray-200">
             <div class="space-y-6">
                 <div class="pb-4 border-b border-gray-200">
-                    <h2 class="text-lg font-semibold text-gray-900 mb-1 flex items-center gap-2">
+                    <h2 class="text-sm font-semibold text-slate-600 mb-1 flex items-center gap-2">
                         <x-iconify icon="heroicons:wrench" class="w-5 h-5 text-gray-700" />
                         Informations Principales
                     </h2>
-                    <p class="text-sm text-gray-600">Sélectionnez le véhicule, le type et le fournisseur pour cette opération.</p>
+                    <p class="text-xs text-slate-400 mt-0.5">Sélectionnez le véhicule, le type et le fournisseur pour cette opération.</p>
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
 
                     {{-- Sélection Véhicule --}}
                     <div>
-                        <label for="vehicle_id" class="block text-sm font-medium text-gray-700 mb-2">
+                        <label for="vehicle_id" class="block mb-2 text-sm font-medium text-gray-600">
                             <div class="flex items-center gap-2">
                                 <x-iconify icon="heroicons:truck" class="w-4 h-4 text-gray-500" />
                                 Véhicule
@@ -154,7 +154,7 @@ Design ultra-professionnel harmonisé avec assignments/create:
 
                     {{-- Sélection Type de Maintenance --}}
                     <div>
-                        <label for="maintenance_type_id" class="block text-sm font-medium text-gray-700 mb-2">
+                        <label for="maintenance_type_id" class="block mb-2 text-sm font-medium text-gray-600">
                             <div class="flex items-center gap-2">
                                 <x-iconify icon="heroicons:cog" class="w-4 h-4 text-gray-500" />
                                 Type de Maintenance
@@ -201,7 +201,7 @@ Design ultra-professionnel harmonisé avec assignments/create:
 
                     {{-- Sélection Fournisseur --}}
                     <div>
-                        <label for="provider_id" class="block text-sm font-medium text-gray-700 mb-2">
+                        <label for="provider_id" class="block mb-2 text-sm font-medium text-gray-600">
                             <div class="flex items-center gap-2">
                                 <x-iconify icon="heroicons:building-storefront" class="w-4 h-4 text-gray-500" />
                                 Fournisseur
@@ -243,18 +243,18 @@ Design ultra-professionnel harmonisé avec assignments/create:
         <x-card>
             <div class="space-y-6">
                 <div>
-                    <h2 class="text-lg font-semibold text-gray-900 mb-1 flex items-center gap-2">
+                    <h2 class="text-sm font-semibold text-slate-600 mb-1 flex items-center gap-2">
                         <x-iconify icon="heroicons:calendar-days" class="w-5 h-5 text-blue-600" />
                         Dates et Planification
                     </h2>
-                    <p class="text-sm text-gray-600">Définissez les dates de planification et de réalisation de la maintenance.</p>
+                    <p class="text-xs text-slate-400 mt-0.5">Définissez les dates de planification et de réalisation de la maintenance.</p>
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
 
                     {{-- Date planifiée --}}
                     <div>
-                        <label for="scheduled_date" class="block text-sm font-medium text-gray-700 mb-2">
+                        <label for="scheduled_date" class="block mb-2 text-sm font-medium text-gray-600">
                             <div class="flex items-center gap-2">
                                 <x-iconify icon="heroicons:calendar" class="w-4 h-4 text-gray-500" />
                                 Date Planifiée
@@ -279,7 +279,7 @@ Design ultra-professionnel harmonisé avec assignments/create:
 
                     {{-- Date de completion --}}
                     <div>
-                        <label for="completed_date" class="block text-sm font-medium text-gray-700 mb-2">
+                        <label for="completed_date" class="block mb-2 text-sm font-medium text-gray-600">
                             <div class="flex items-center gap-2">
                                 <x-iconify icon="heroicons:check-circle" class="w-4 h-4 text-gray-500" />
                                 Date de Completion
@@ -304,7 +304,7 @@ Design ultra-professionnel harmonisé avec assignments/create:
 
                     {{-- Statut --}}
                     <div class="col-span-full">
-                        <label for="status" class="block text-sm font-medium text-gray-700 mb-2">
+                        <label for="status" class="block mb-2 text-sm font-medium text-gray-600">
                             <div class="flex items-center gap-2">
                                 <x-iconify icon="heroicons:signal" class="w-4 h-4 text-gray-500" />
                                 Statut
@@ -336,18 +336,18 @@ Design ultra-professionnel harmonisé avec assignments/create:
         <x-card>
             <div class="space-y-6">
                 <div>
-                    <h2 class="text-lg font-semibold text-gray-900 mb-1 flex items-center gap-2">
+                    <h2 class="text-sm font-semibold text-slate-600 mb-1 flex items-center gap-2">
                         <x-iconify icon="heroicons:cog-6-tooth" class="w-5 h-5 text-blue-600" />
                         Détails Opérationnels
                     </h2>
-                    <p class="text-sm text-gray-600">Renseignez la durée et le coût estimé de l'opération.</p>
+                    <p class="text-xs text-slate-400 mt-0.5">Renseignez la durée et le coût estimé de l'opération.</p>
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
 
                     {{-- Durée --}}
                     <div>
-                        <label for="duration_hours" class="block text-sm font-medium text-gray-700 mb-2">
+                        <label for="duration_hours" class="block mb-2 text-sm font-medium text-gray-600">
                             <div class="flex items-center gap-2">
                                 <x-iconify icon="heroicons:clock" class="w-4 h-4 text-gray-500" />
                                 Durée
@@ -378,7 +378,7 @@ Design ultra-professionnel harmonisé avec assignments/create:
 
                     {{-- Coût total --}}
                     <div>
-                        <label for="total_cost" class="block text-sm font-medium text-gray-700 mb-2">
+                        <label for="total_cost" class="block mb-2 text-sm font-medium text-gray-600">
                             <div class="flex items-center gap-2">
                                 <x-iconify icon="heroicons:currency-dollar" class="w-4 h-4 text-gray-500" />
                                 Coût Total
@@ -416,16 +416,16 @@ Design ultra-professionnel harmonisé avec assignments/create:
         <x-card>
             <div class="space-y-6">
                 <div>
-                    <h2 class="text-lg font-semibold text-gray-900 mb-1 flex items-center gap-2">
+                    <h2 class="text-sm font-semibold text-slate-600 mb-1 flex items-center gap-2">
                         <x-iconify icon="heroicons:document-text" class="w-5 h-5 text-blue-600" />
                         Description et Notes
                     </h2>
-                    <p class="text-sm text-gray-600">Ajoutez une description détaillée et des notes sur l'opération.</p>
+                    <p class="text-xs text-slate-400 mt-0.5">Ajoutez une description détaillée et des notes sur l'opération.</p>
                 </div>
 
                 {{-- Description --}}
                 <div>
-                    <label for="description" class="block text-sm font-medium text-gray-700 mb-2">
+                    <label for="description" class="block mb-2 text-sm font-medium text-gray-600">
                         Description
                         <span class="text-gray-400">(Optionnel)</span>
                     </label>
@@ -450,7 +450,7 @@ Design ultra-professionnel harmonisé avec assignments/create:
 
                 {{-- Notes --}}
                 <div>
-                    <label for="notes" class="block text-sm font-medium text-gray-700 mb-2">
+                    <label for="notes" class="block mb-2 text-sm font-medium text-gray-600">
                         Notes Additionnelles
                         <span class="text-gray-400">(Optionnel)</span>
                     </label>
@@ -478,33 +478,36 @@ Design ultra-professionnel harmonisé avec assignments/create:
         {{-- ===============================================
         BOUTONS D'ACTION
         =============================================== --}}
-        <div class="flex items-center justify-end gap-3 pt-4">
-            <a
-                href="{{ route('admin.maintenance.operations.index') }}"
-                class="inline-flex items-center gap-2 px-5 py-2.5 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors shadow-sm">
-                <x-iconify icon="heroicons:x-mark" class="w-5 h-5" />
-                <span>Annuler</span>
-            </a>
+        <div class="relative">
+            <section class="rounded-2xl border border-slate-200 bg-white shadow-sm">
+                <div class="px-6 py-4 flex items-center justify-between gap-3">
+                    <a
+                        href="{{ route('admin.maintenance.operations.index') }}"
+                        class="inline-flex items-center justify-center h-10 px-4 rounded-lg border border-gray-300 bg-white text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#0c90ee]/20 focus:border-[#0c90ee] transition-all duration-200">
+                        Annuler
+                    </a>
 
-            <button
-                type="submit"
-                wire:loading.attr="disabled"
-                wire:target="save"
-                class="inline-flex items-center gap-2 px-6 py-2.5 rounded-lg text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 transition-all shadow-sm disabled:opacity-50 disabled:cursor-not-allowed">
+                    <button
+                        type="submit"
+                        wire:loading.attr="disabled"
+                        wire:target="save"
+                        class="inline-flex items-center gap-2 h-10 px-6 rounded-lg text-sm font-medium text-white zf-btn-primary transition-all shadow-sm disabled:opacity-50 disabled:cursor-not-allowed">
 
-                <span wire:loading.remove wire:target="save" class="flex items-center gap-2">
-                    <x-iconify icon="heroicons:check-circle" class="w-5 h-5" />
-                    Créer l'opération
-                </span>
+                        <span wire:loading.remove wire:target="save" class="flex items-center gap-2">
+                            <x-iconify icon="heroicons:check-circle" class="w-5 h-5" />
+                            Créer l'opération
+                        </span>
 
-                <span wire:loading wire:target="save" class="flex items-center gap-2">
-                    <svg class="animate-spin w-5 h-5" fill="none" viewBox="0 0 24 24">
-                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                    <span>Sauvegarde en cours...</span>
-                </span>
-            </button>
+                        <span wire:loading wire:target="save" class="flex items-center gap-2">
+                            <svg class="animate-spin w-5 h-5" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                            <span>Sauvegarde en cours...</span>
+                        </span>
+                    </button>
+                </div>
+            </section>
         </div>
 
     </form>

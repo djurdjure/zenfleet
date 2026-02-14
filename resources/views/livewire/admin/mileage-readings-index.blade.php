@@ -50,11 +50,10 @@
             HEADER TITRE
         =============================================== --}}
         <div class="mb-6">
-            <h1 class="text-2xl font-bold text-gray-900 mb-1 flex items-center gap-2">
-                <x-iconify icon="lucide:gauge" class="w-7 h-7 text-blue-600" />
+            <h1 class="text-xl font-bold text-gray-600 mb-1">
                 Historique Kilométrage
             </h1>
-            <p class="text-sm text-gray-600 ml-9">
+            <p class="text-xs text-gray-600">
                 Gestion centralisée des relevés kilométriques de l'ensemble de la flotte
             </p>
         </div>

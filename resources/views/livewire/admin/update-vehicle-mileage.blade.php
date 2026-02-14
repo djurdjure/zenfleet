@@ -61,11 +61,10 @@
         <div class="mb-6">
             <div class="md:flex md:items-center md:justify-between">
                 <div class="flex-1 min-w-0">
-                    <h1 class="text-2xl font-bold text-gray-900 mb-1 flex items-center gap-2.5">
-                        <x-iconify icon="heroicons:gauge" class="w-6 h-6 text-blue-600" />
+                    <h1 class="text-xl font-bold text-gray-600 mb-1">
                         Mettre à jour le kilométrage
                     </h1>
-                    <p class="text-sm text-gray-600 ml-8.5">
+                    <p class="text-xs text-gray-600">
                         @if($mode === 'fixed' && $vehicleData)
                             Mise à jour pour <strong>{{ $vehicleData['registration_plate'] }}</strong> - {{ $vehicleData['brand'] }} {{ $vehicleData['model'] }}
                         @else
@@ -118,7 +117,7 @@
                             =============================================== --}}
                             @if($mode === 'select')
                             <div>
-                                <label for="vehicleId" class="block mb-2 text-sm font-medium text-gray-900">
+                                <label for="vehicleId" class="block mb-2 text-sm font-medium text-gray-600">
                                     <x-iconify icon="heroicons:truck" class="w-5 h-5 inline mr-1 text-blue-600" />
                                     Véhicule
                                     <span class="text-red-600">*</span>
@@ -232,7 +231,7 @@
 
                                 {{-- Date du Relevé - FLATPICKR ENTERPRISE --}}
                                 <div>
-                                    <label for="recordedDate" class="block text-sm font-medium text-gray-700 mb-2">
+                                    <label for="recordedDate" class="block mb-2 text-sm font-medium text-gray-600">
                                         <div class="flex items-center gap-2">
                                             <x-iconify icon="heroicons:calendar-days" class="w-4 h-4 text-gray-500" />
                                             Date du Relevé
@@ -255,7 +254,7 @@
 
                                 {{-- Heure du Relevé - SLIMSELECT ENTERPRISE --}}
                                 <div>
-                                    <label for="recordedTime" class="block text-sm font-medium text-gray-700 mb-2">
+                                    <label for="recordedTime" class="block mb-2 text-sm font-medium text-gray-600">
                                         <div class="flex items-center gap-2">
                                             <x-iconify icon="heroicons:clock" class="w-4 h-4 text-gray-500" />
                                             Heure du Relevé
@@ -291,7 +290,7 @@
 
                             {{-- Notes (Optionnel) --}}
                             <div>
-                                <label for="notes" class="block mb-2 text-sm font-medium text-gray-900">
+                                <label for="notes" class="block mb-2 text-sm font-medium text-gray-600">
                                     <x-iconify icon="heroicons:document-text" class="w-5 h-5 inline mr-1 text-gray-600" />
                                     Notes (optionnel)
                                 </label>
