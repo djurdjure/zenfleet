@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Driver;
+use App\Models\Assignment;
 use App\Models\User;
 use App\Repositories\Interfaces\DriverRepositoryInterface;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -191,10 +192,29 @@ class DriverService
     {
         // RÈGLE MÉTIER : On ne peut pas archiver un chauffeur avec des affectations EN COURS.
         // On autorise l'archivage si le chauffeur a seulement des affectations passées (terminées).
+        $referenceTime = now();
         $hasActiveAssignments = $driver->assignments()
+            ->where(function ($query) use ($referenceTime) {
+                $query->where(function ($activeQuery) use ($referenceTime) {
+                    $activeQuery->where('status', Assignment::STATUS_ACTIVE)
+                        ->where('start_datetime', '<=', $referenceTime)
+                        ->where(function ($dateQuery) use ($referenceTime) {
+                            $dateQuery->whereNull('end_datetime')
+                                ->orWhere('end_datetime', '>', $referenceTime);
+                        });
+                })
+                    ->orWhere(function ($legacyQuery) use ($referenceTime) {
+                        $legacyQuery->whereNull('status')
+                            ->where('start_datetime', '<=', $referenceTime)
+                            ->where(function ($dateQuery) use ($referenceTime) {
+                                $dateQuery->whereNull('end_datetime')
+                                    ->orWhere('end_datetime', '>', $referenceTime);
+                            });
+                    });
+            })
             ->where(function ($query) {
-                $query->whereNull('end_datetime')
-                    ->orWhere('end_datetime', '>', now());
+                $query->whereNull('status')
+                    ->orWhere('status', '!=', Assignment::STATUS_CANCELLED);
             })
             ->exists();
 

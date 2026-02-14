@@ -384,7 +384,11 @@
                 <x-pagination :paginator="$depots" :records-per-page="$perPage" wire:model.live="perPage" />
             </div>
 
-            <x-modal name="depot-modal" :title="$modalMode === 'create' ? 'Nouveau Dépôt' : ($modalMode === 'edit' ? 'Modifier le Dépôt' : 'Détails du Dépôt')" maxWidth="4xl">
+            <x-modal
+                name="depot-modal"
+                :title="$modalMode === 'create' ? 'Nouveau Dépôt' : ($modalMode === 'edit' ? 'Modifier le Dépôt' : 'Détails du Dépôt')"
+                maxWidth="3xl"
+                position="right">
                 <form wire:submit="save">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div class="space-y-6">
@@ -403,7 +407,11 @@
 
                                     <div>
                                         <label class="block mb-1 text-sm font-medium text-gray-600">Description</label>
-                                        <textarea wire:model="description" rows="3" class="form-textarea w-full rounded-lg border-gray-300 focus:border-blue-500 focus:ring-blue-500" {{ $modalMode === 'view' ? 'disabled' : '' }}></textarea>
+                                        <textarea
+                                            wire:model="description"
+                                            rows="3"
+                                            class="block w-full rounded-lg border border-gray-300 bg-gray-50 px-3 py-2.5 text-sm text-gray-900 transition-colors duration-200 hover:border-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                            {{ $modalMode === 'view' ? 'disabled' : '' }}></textarea>
                                     </div>
                                 </div>
                             </div>

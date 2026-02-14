@@ -4,6 +4,7 @@ namespace App\Livewire\Admin\Drivers;
 
 use App\Models\Driver;
 use App\Models\DriverStatus;
+use App\Models\Assignment;
 use App\Models\User;
 use App\Services\DriverService;
 use Livewire\Component;
@@ -416,28 +417,57 @@ class DriverIndex extends Component
             return;
         }
 
-        // 🔍 Vérification pré-archivage pour UX détaillée
-        $activeAssignment = $driver->assignments()
-            ->where(function ($query) {
-                $query->whereNull('end_datetime')
-                    ->orWhere('end_datetime', '>', now());
-            })
-            ->first();
+        try {
+            // Vérification pré-archivage : uniquement les affectations réellement actives
+            // (les affectations annulées/passées ne doivent pas bloquer l'archivage).
+            $referenceTime = now();
+            $activeAssignment = $driver->assignments()
+                ->where(function ($query) use ($referenceTime) {
+                    $query->where(function ($activeQuery) use ($referenceTime) {
+                        $activeQuery->where('status', Assignment::STATUS_ACTIVE)
+                            ->where('start_datetime', '<=', $referenceTime)
+                            ->where(function ($dateQuery) use ($referenceTime) {
+                                $dateQuery->whereNull('end_datetime')
+                                    ->orWhere('end_datetime', '>', $referenceTime);
+                            });
+                    })
+                        ->orWhere(function ($legacyQuery) use ($referenceTime) {
+                            $legacyQuery->whereNull('status')
+                                ->where('start_datetime', '<=', $referenceTime)
+                                ->where(function ($dateQuery) use ($referenceTime) {
+                                    $dateQuery->whereNull('end_datetime')
+                                        ->orWhere('end_datetime', '>', $referenceTime);
+                                });
+                        });
+                })
+                ->where(function ($query) {
+                    $query->whereNull('status')
+                        ->orWhere('status', '!=', Assignment::STATUS_CANCELLED);
+                })
+                ->first();
 
-        if ($activeAssignment) {
-            $this->dispatch('toast', [
-                'type' => 'error',
-                'message' => "Impossible d'archiver : Affectation #{$activeAssignment->id} en cours (Début : " . $activeAssignment->start_datetime->format('d/m/Y H:i') . ")"
+            if ($activeAssignment) {
+                $start = optional($activeAssignment->start_datetime)->format('d/m/Y H:i') ?? 'N/A';
+                $this->dispatch('toast', [
+                    'type' => 'error',
+                    'message' => "Impossible d'archiver : affectation #{$activeAssignment->id} en cours (début : {$start})."
+                ]);
+                $this->cancelArchive();
+                return;
+            }
+
+            if ($this->driverService->archiveDriver($driver)) {
+                $this->dispatch('toast', ['type' => 'success', 'message' => 'Chauffeur archivé avec succès']);
+            } else {
+                // Fallback si le service bloque pour une autre raison.
+                $this->dispatch('toast', ['type' => 'error', 'message' => 'Archivage refusé: vérifier les dépendances actives du chauffeur.']);
+            }
+        } catch (\Throwable $e) {
+            \Log::error('Erreur archivage chauffeur', [
+                'driver_id' => $driver->id,
+                'message' => $e->getMessage(),
             ]);
-            $this->cancelArchive();
-            return;
-        }
-
-        if ($this->driverService->archiveDriver($driver)) {
-            $this->dispatch('toast', ['type' => 'success', 'message' => 'Chauffeur archivé avec succès']);
-        } else {
-            // Fallback si le service bloque pour une autre raison
-            $this->dispatch('toast', ['type' => 'error', 'message' => 'Erreur lors de l\'archivage.']);
+            $this->dispatch('toast', ['type' => 'error', 'message' => "Erreur lors de l'archivage du chauffeur."]);
         }
         $this->cancelArchive();
     }

@@ -510,11 +510,9 @@
  =============================================== --}}
     @if($showModal)
     <div class="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
-        <div class="flex items-start justify-center min-h-screen pt-10 px-4 pb-20 text-center sm:block sm:p-0">
+        <div class="fixed inset-0 flex items-stretch justify-end">
             <div wire:click="closeModal" class="fixed inset-0 bg-gray-900/40 backdrop-blur-sm transition-opacity z-40"></div>
-            <span class="hidden sm:inline-block sm:align-middle sm:h-screen">&#8203;</span>
-
-            <div class="inline-block align-top bg-white rounded-2xl text-left shadow-xl transform transition-all sm:my-8 sm:max-w-2xl sm:w-full max-h-[90vh] overflow-y-auto relative z-50">
+            <div class="relative z-50 h-screen w-full max-w-2xl border-l border-slate-200 bg-white text-left shadow-2xl overflow-y-auto">
 
                 {{-- Header --}}
                 <div class="flex items-center justify-between px-6 pt-5 pb-4 border-b border-gray-200 sticky top-0 bg-white z-10">
@@ -591,7 +589,7 @@
                             </label>
                             <select
                                 wire:model="sanction_type"
-                                class="w-full px-4 py-2.5 bg-gray-50 border text-sm text-gray-900 rounded-lg shadow-sm transition-all @error('sanction_type') border-red-500 bg-red-50 ring-1 ring-red-500 @else border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 hover:border-gray-400 @enderror">
+                                class="block w-full rounded-lg border bg-gray-50 px-3 py-2.5 text-sm text-gray-900 transition-colors duration-200 @error('sanction_type') border-red-500 bg-red-50 focus:ring-red-500 focus:border-red-500 @else border-gray-300 hover:border-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 @enderror">
                                 <option value="">Sélectionner</option>
                                 <option value="avertissement_verbal">Avertissement Verbal</option>
                                 <option value="avertissement_ecrit">Avertissement Écrit</option>
@@ -616,7 +614,7 @@
                             </label>
                             <select
                                 wire:model="severity"
-                                class="w-full px-4 py-2.5 bg-gray-50 border text-sm text-gray-900 rounded-lg shadow-sm transition-all @error('severity') border-red-500 bg-red-50 ring-1 ring-red-500 @else border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 hover:border-gray-400 @enderror">
+                                class="block w-full rounded-lg border bg-gray-50 px-3 py-2.5 text-sm text-gray-900 transition-colors duration-200 @error('severity') border-red-500 bg-red-50 focus:ring-red-500 focus:border-red-500 @else border-gray-300 hover:border-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 @enderror">
                                 <option value="low">Faible</option>
                                 <option value="medium">Moyenne</option>
                                 <option value="high">Élevée</option>
@@ -655,7 +653,7 @@
                                 min="1"
                                 max="365"
                                 placeholder="Nombre de jours"
-                                class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm @error('duration_days') border-red-500 @enderror">
+                                class="block w-full rounded-lg border bg-gray-50 px-3 py-2.5 text-sm text-gray-900 transition-colors duration-200 @error('duration_days') border-red-500 bg-red-50 focus:ring-red-500 focus:border-red-500 @else border-gray-300 hover:border-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 @enderror">
                             @error('duration_days') <p class="mt-1.5 text-sm text-red-600 flex items-center gap-1"><x-iconify icon="heroicons:exclamation-circle" class="w-4 h-4" />{{ $message }}</p> @enderror
                         </div>
                     </div>
@@ -669,7 +667,7 @@
                             wire:model="reason"
                             rows="3"
                             placeholder="Décrivez le motif de la sanction (minimum 10 caractères)..."
-                            class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm @error('reason') border-red-500 @enderror"></textarea>
+                            class="block w-full rounded-lg border bg-gray-50 px-3 py-2.5 text-sm text-gray-900 transition-colors duration-200 @error('reason') border-red-500 bg-red-50 focus:ring-red-500 focus:border-red-500 @else border-gray-300 hover:border-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 @enderror"></textarea>
                         @error('reason') <p class="mt-1.5 text-sm text-red-600 flex items-center gap-1"><x-iconify icon="heroicons:exclamation-circle" class="w-4 h-4" />{{ $message }}</p> @enderror
                     </div>
 
@@ -731,7 +729,7 @@
                                 type="text"
                                 wire:model="notes"
                                 placeholder="Notes additionnelles"
-                                class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm">
+                                class="block w-full rounded-lg border border-gray-300 bg-gray-50 px-3 py-2.5 text-sm text-gray-900 transition-colors duration-200 hover:border-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                         </div>
                     </div>
 

@@ -3,6 +3,7 @@
 'title' => null,
 'maxWidth' => 'lg',
 'closeable' => true,
+'position' => 'center',
 ])
 
 @php
@@ -10,6 +11,7 @@ $name = $name ?? null;
 $title = $title ?? null;
 $maxWidth = $maxWidth ?? 'lg';
 $closeable = $closeable ?? true;
+$position = $position ?? 'center';
 
 $wireModel = $attributes->get('wire:model')
     ?? $attributes->get('wire:model.live')
@@ -28,6 +30,27 @@ $maxWidthClasses = match($maxWidth) {
 'full' => 'max-w-full',
 default => 'max-w-lg',
 };
+
+$isRightDrawer = $position === 'right';
+
+$containerClasses = $isRightDrawer
+    ? 'flex min-h-full items-stretch justify-end'
+    : 'flex min-h-full items-center justify-center p-4 text-center sm:p-0';
+
+$dialogClasses = $isRightDrawer
+    ? "relative h-screen w-full {$maxWidthClasses} transform overflow-hidden rounded-none border-l border-slate-200 bg-white text-left shadow-2xl transition-all z-50"
+    : "relative transform overflow-hidden rounded-xl bg-white text-left shadow-2xl transition-all w-full {$maxWidthClasses} z-50";
+
+$enterClasses = $isRightDrawer ? 'ease-out duration-300' : 'ease-out duration-300';
+$enterStartClasses = $isRightDrawer ? 'opacity-0 translate-x-8' : 'opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95';
+$enterEndClasses = $isRightDrawer ? 'opacity-100 translate-x-0' : 'opacity-100 translate-y-0 sm:scale-100';
+$leaveClasses = $isRightDrawer ? 'ease-in duration-200' : 'ease-in duration-200';
+$leaveStartClasses = $isRightDrawer ? 'opacity-100 translate-x-0' : 'opacity-100 translate-y-0 sm:scale-100';
+$leaveEndClasses = $isRightDrawer ? 'opacity-0 translate-x-8' : 'opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95';
+
+$bodyClasses = $isRightDrawer
+    ? 'px-6 py-4 h-[calc(100vh-73px)] overflow-y-auto'
+    : 'px-6 py-4 max-h-[calc(100vh-200px)] overflow-y-auto';
 @endphp
 
 {{--
@@ -80,18 +103,18 @@ default => 'max-w-lg',
 
     {{-- Modal Container - Fixed positioning avec z-index supérieur --}}
     <div class="fixed inset-0 z-50 overflow-y-auto">
-        <div class="flex min-h-full items-center justify-center p-4 text-center sm:p-0">
+        <div class="{{ $containerClasses }}">
             {{-- Modal Dialog --}}
             <div
                 x-show="show"
-                x-transition:enter="ease-out duration-300"
-                x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-                x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
-                x-transition:leave="ease-in duration-200"
-                x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
-                x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                x-transition:enter="{{ $enterClasses }}"
+                x-transition:enter-start="{{ $enterStartClasses }}"
+                x-transition:enter-end="{{ $enterEndClasses }}"
+                x-transition:leave="{{ $leaveClasses }}"
+                x-transition:leave-start="{{ $leaveStartClasses }}"
+                x-transition:leave-end="{{ $leaveEndClasses }}"
                 @click.away="@if($closeable) show = false @endif"
-                class="relative transform overflow-hidden rounded-xl bg-white text-left shadow-2xl transition-all w-full {{ $maxWidthClasses }} z-50">
+                class="{{ $dialogClasses }}">
                 {{-- Header --}}
                 @if($title || $closeable)
                 <div class="flex items-center justify-between px-6 py-4 border-b border-gray-200 bg-gray-50">
@@ -114,7 +137,7 @@ default => 'max-w-lg',
                 @endif
 
                 {{-- Body --}}
-                <div class="px-6 py-4 max-h-[calc(100vh-200px)] overflow-y-auto">
+                <div class="{{ $bodyClasses }}">
                     {{ $slot }}
                 </div>
             </div>
