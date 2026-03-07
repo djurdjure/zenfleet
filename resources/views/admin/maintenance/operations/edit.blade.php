@@ -3,14 +3,14 @@
 @section('title', 'Modifier Opération Maintenance')
 
 @section('content')
-<section class="bg-gray-50 min-h-screen">
+<section class="min-h-screen bg-[#f8fafc]">
     <div class="py-4 px-4 mx-auto max-w-4xl lg:py-6">
 
         {{-- HEADER --}}
         <div class="mb-6">
             {{-- Breadcrumb --}}
             <nav class="flex mb-4" aria-label="Breadcrumb">
-                <ol class="inline-flex items-center space-x-1 text-sm">
+                <ol class="inline-flex items-center space-x-1 text-xs text-gray-500">
                     <li class="inline-flex items-center">
                         <a href="{{ route('admin.maintenance.operations.index') }}" class="text-gray-600 hover:text-blue-600">
                             <x-iconify icon="lucide:wrench" class="w-4 h-4 mr-2 inline" />
@@ -26,10 +26,7 @@
                 </ol>
             </nav>
 
-            <h1 class="text-xl font-bold text-gray-600">
-                <x-iconify icon="lucide:pencil" class="w-6 h-6 text-blue-600" />
-                Modifier Opération de Maintenance
-            </h1>
+            <h1 class="text-xl font-bold text-gray-600">Modifier Opération de Maintenance</h1>
             <p class="mt-1 text-xs text-gray-600">
                 Mettez à jour les informations de l'opération
             </p>
@@ -59,21 +56,16 @@
 
             {{-- Card Principale --}}
             <div class="bg-white rounded-lg border border-gray-200 shadow-sm p-6">
-                <h2 class="text-lg font-semibold text-gray-900 mb-6 flex items-center gap-2">
-                    <x-iconify icon="lucide:settings" class="w-5 h-5 text-blue-600" />
-                    Informations de l'Opération
-                </h2>
+                <h2 class="text-sm font-semibold text-slate-600 mb-1">Informations de l'opération</h2>
+                <p class="text-xs text-slate-400 mt-0.5 mb-6">Mettez à jour les attributs opérationnels sans modifier le workflow métier.</p>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     
                     {{-- Véhicule --}}
                     <div class="md:col-span-2">
-                        <label for="vehicle_id" class="block mb-2 text-sm font-medium text-gray-600">
-                            <x-iconify icon="lucide:car" class="w-4 h-4 inline mr-1" />
-                            Véhicule <span class="text-red-500">*</span>
-                        </label>
+                        <label for="vehicle_id" class="block mb-2 text-sm font-medium text-gray-600">Véhicule <span class="text-red-500">*</span></label>
                         <select name="vehicle_id" id="vehicle_id" required
-                                class="block w-full border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 @error('vehicle_id') border-red-300 @enderror">
+                                class="block w-full border-gray-300 rounded-lg focus:ring-[#0c90ee]/20 focus:border-[#0c90ee] @error('vehicle_id') border-red-300 @enderror">
                             <option value="">Sélectionner un véhicule</option>
                             @foreach($vehicles as $vehicle)
                                 <option value="{{ $vehicle->id }}" {{ (old('vehicle_id', $operation->vehicle_id) == $vehicle->id) ? 'selected' : '' }}>
@@ -88,12 +80,9 @@
 
                     {{-- Type de Maintenance --}}
                     <div class="md:col-span-2">
-                        <label for="maintenance_type_id" class="block mb-2 text-sm font-medium text-gray-600">
-                            <x-iconify icon="lucide:tag" class="w-4 h-4 inline mr-1" />
-                            Type de Maintenance <span class="text-red-500">*</span>
-                        </label>
+                        <label for="maintenance_type_id" class="block mb-2 text-sm font-medium text-gray-600">Type de Maintenance <span class="text-red-500">*</span></label>
                         <select name="maintenance_type_id" id="maintenance_type_id" required
-                                class="block w-full border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 @error('maintenance_type_id') border-red-300 @enderror">
+                                class="block w-full border-gray-300 rounded-lg focus:ring-[#0c90ee]/20 focus:border-[#0c90ee] @error('maintenance_type_id') border-red-300 @enderror">
                             <option value="">Sélectionner un type</option>
                             @foreach($maintenanceTypes as $type)
                                 <option value="{{ $type->id }}" {{ (old('maintenance_type_id', $operation->maintenance_type_id) == $type->id) ? 'selected' : '' }}>
@@ -108,13 +97,10 @@
 
                     {{-- Date Planifiée --}}
                     <div>
-                        <label for="scheduled_date" class="block mb-2 text-sm font-medium text-gray-600">
-                            <x-iconify icon="lucide:calendar" class="w-4 h-4 inline mr-1" />
-                            Date Planifiée <span class="text-red-500">*</span>
-                        </label>
+                        <label for="scheduled_date" class="block mb-2 text-sm font-medium text-gray-600">Date Planifiée <span class="text-red-500">*</span></label>
                         <input type="date" name="scheduled_date" id="scheduled_date" required
                                value="{{ old('scheduled_date', $operation->scheduled_date?->format('Y-m-d')) }}"
-                               class="block w-full border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 @error('scheduled_date') border-red-300 @enderror">
+                               class="block w-full border-gray-300 rounded-lg focus:ring-[#0c90ee]/20 focus:border-[#0c90ee] @error('scheduled_date') border-red-300 @enderror">
                         @error('scheduled_date')
                             <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                         @enderror
@@ -122,12 +108,9 @@
 
                     {{-- Statut --}}
                     <div>
-                        <label for="status" class="block mb-2 text-sm font-medium text-gray-600">
-                            <x-iconify icon="lucide:info" class="w-4 h-4 inline mr-1" />
-                            Statut <span class="text-red-500">*</span>
-                        </label>
+                        <label for="status" class="block mb-2 text-sm font-medium text-gray-600">Statut <span class="text-red-500">*</span></label>
                         <select name="status" id="status" required
-                                class="block w-full border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+                                class="block w-full border-gray-300 rounded-lg focus:ring-[#0c90ee]/20 focus:border-[#0c90ee]">
                             <option value="planned" {{ old('status', $operation->status) == 'planned' ? 'selected' : '' }}>Planifiée</option>
                             <option value="in_progress" {{ old('status', $operation->status) == 'in_progress' ? 'selected' : '' }}>En cours</option>
                             <option value="completed" {{ old('status', $operation->status) == 'completed' ? 'selected' : '' }}>Terminée</option>
@@ -137,12 +120,9 @@
 
                     {{-- Fournisseur --}}
                     <div class="md:col-span-2">
-                        <label for="provider_id" class="block mb-2 text-sm font-medium text-gray-600">
-                            <x-iconify icon="lucide:building" class="w-4 h-4 inline mr-1" />
-                            Fournisseur (optionnel)
-                        </label>
+                        <label for="provider_id" class="block mb-2 text-sm font-medium text-gray-600">Fournisseur (optionnel)</label>
                         <select name="provider_id" id="provider_id"
-                                class="block w-full border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+                                class="block w-full border-gray-300 rounded-lg focus:ring-[#0c90ee]/20 focus:border-[#0c90ee]">
                             <option value="">Aucun fournisseur</option>
                             @foreach($providers as $provider)
                                 <option value="{{ $provider->id }}" {{ (old('provider_id', $operation->provider_id) == $provider->id) ? 'selected' : '' }}>
@@ -154,15 +134,12 @@
 
                     {{-- Kilométrage --}}
                     <div>
-                        <label for="mileage_at_maintenance" class="block mb-2 text-sm font-medium text-gray-600">
-                            <x-iconify icon="lucide:gauge" class="w-4 h-4 inline mr-1" />
-                            Kilométrage Prévu (km)
-                        </label>
+                        <label for="mileage_at_maintenance" class="block mb-2 text-sm font-medium text-gray-600">Kilométrage Prévu (km)</label>
                         <input type="number" name="mileage_at_maintenance" id="mileage_at_maintenance" 
                                value="{{ old('mileage_at_maintenance', $operation->mileage_at_maintenance) }}"
                                min="0" step="1"
                                placeholder="Ex: 50000"
-                               class="block w-full border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 @error('mileage_at_maintenance') border-red-300 @enderror">
+                               class="block w-full border-gray-300 rounded-lg focus:ring-[#0c90ee]/20 focus:border-[#0c90ee] @error('mileage_at_maintenance') border-red-300 @enderror">
                         @error('mileage_at_maintenance')
                             <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                         @enderror
@@ -170,15 +147,12 @@
 
                     {{-- Coût Estimé --}}
                     <div>
-                        <label for="total_cost" class="block mb-2 text-sm font-medium text-gray-600">
-                            <x-iconify icon="lucide:banknote" class="w-4 h-4 inline mr-1" />
-                            Coût Estimé (DA)
-                        </label>
+                        <label for="total_cost" class="block mb-2 text-sm font-medium text-gray-600">Coût Estimé (DA)</label>
                         <input type="number" name="total_cost" id="total_cost" 
                                value="{{ old('total_cost', $operation->total_cost) }}"
                                min="0" step="0.01"
                                placeholder="Ex: 15000.00"
-                               class="block w-full border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 @error('total_cost') border-red-300 @enderror">
+                               class="block w-full border-gray-300 rounded-lg focus:ring-[#0c90ee]/20 focus:border-[#0c90ee] @error('total_cost') border-red-300 @enderror">
                         @error('total_cost')
                             <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                         @enderror
@@ -186,15 +160,12 @@
 
                     {{-- Durée Estimée --}}
                     <div>
-                        <label for="duration_minutes" class="block mb-2 text-sm font-medium text-gray-600">
-                            <x-iconify icon="lucide:clock" class="w-4 h-4 inline mr-1" />
-                            Durée Estimée (minutes)
-                        </label>
+                        <label for="duration_minutes" class="block mb-2 text-sm font-medium text-gray-600">Durée Estimée (minutes)</label>
                         <input type="number" name="duration_minutes" id="duration_minutes" 
                                value="{{ old('duration_minutes', $operation->duration_minutes) }}"
                                min="1" max="1440"
                                placeholder="Ex: 120"
-                               class="block w-full border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 @error('duration_minutes') border-red-300 @enderror">
+                               class="block w-full border-gray-300 rounded-lg focus:ring-[#0c90ee]/20 focus:border-[#0c90ee] @error('duration_minutes') border-red-300 @enderror">
                         @error('duration_minutes')
                             <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                         @enderror
@@ -202,13 +173,10 @@
 
                     {{-- Description --}}
                     <div class="md:col-span-2">
-                        <label for="description" class="block mb-2 text-sm font-medium text-gray-600">
-                            <x-iconify icon="lucide:file-text" class="w-4 h-4 inline mr-1" />
-                            Description
-                        </label>
+                        <label for="description" class="block mb-2 text-sm font-medium text-gray-600">Description</label>
                         <textarea name="description" id="description" rows="3"
                                   placeholder="Décrivez les travaux à effectuer..."
-                                  class="block w-full border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 @error('description') border-red-300 @enderror">{{ old('description', $operation->description) }}</textarea>
+                                  class="block w-full border-gray-300 rounded-lg focus:ring-[#0c90ee]/20 focus:border-[#0c90ee] @error('description') border-red-300 @enderror">{{ old('description', $operation->description) }}</textarea>
                         @error('description')
                             <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                         @enderror
@@ -217,13 +185,10 @@
 
                     {{-- Notes --}}
                     <div class="md:col-span-2">
-                        <label for="notes" class="block text-sm font-medium text-gray-700 mb-2">
-                            <x-iconify icon="lucide:message-square" class="w-4 h-4 inline mr-1" />
-                            Notes Internes
-                        </label>
+                        <label for="notes" class="block mb-2 text-sm font-medium text-gray-600">Notes Internes</label>
                         <textarea name="notes" id="notes" rows="2"
                                   placeholder="Notes additionnelles (visibles uniquement en interne)..."
-                                  class="block w-full border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 @error('notes') border-red-300 @enderror">{{ old('notes', $operation->notes) }}</textarea>
+                                  class="block w-full border-gray-300 rounded-lg focus:ring-[#0c90ee]/20 focus:border-[#0c90ee] @error('notes') border-red-300 @enderror">{{ old('notes', $operation->notes) }}</textarea>
                         @error('notes')
                             <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                         @enderror
@@ -242,7 +207,7 @@
 
                     <div class="flex items-center gap-3">
                         <button type="submit"
-                                class="inline-flex items-center gap-2 px-6 py-2 bg-blue-600 text-white text-sm font-semibold rounded-lg hover:bg-blue-700 transition-colors duration-200 shadow-sm">
+                                class="inline-flex items-center gap-2 px-6 py-2 border border-[#0c90ee] bg-[#0c90ee] text-white text-sm font-semibold rounded-lg hover:bg-[#0a7fd1] hover:border-[#0a7fd1] transition-colors duration-200 shadow-sm">
                             <x-iconify icon="lucide:check" class="w-4 h-4" />
                             Enregistrer
                         </button>

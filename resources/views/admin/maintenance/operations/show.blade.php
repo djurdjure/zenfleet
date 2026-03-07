@@ -3,7 +3,7 @@
 @section('title', 'Détails Opération Maintenance')
 
 @section('content')
-<section class="bg-gray-50 min-h-screen">
+<section class="min-h-screen bg-[#f8fafc]">
     <div class="py-4 px-4 mx-auto max-w-7xl lg:py-6">
 
         {{-- ===============================================
@@ -31,11 +31,8 @@
             {{-- Title & Actions --}}
             <div class="flex items-center justify-between">
                 <div>
-                    <h1 class="text-2xl font-bold text-gray-900 flex items-center gap-2.5">
-                        <x-iconify icon="lucide:file-text" class="w-6 h-6 text-blue-600" />
-                        Opération de Maintenance
-                    </h1>
-                    <p class="mt-1 text-sm text-gray-600">
+                    <h1 class="text-xl font-bold text-gray-600">Opération de Maintenance</h1>
+                    <p class="mt-1 text-xs text-gray-600">
                         {{ $operation->maintenanceType->name }} - {{ $operation->vehicle->registration_plate }}
                     </p>
                 </div>
@@ -48,7 +45,7 @@
                                 @csrf
                                 @method('PATCH')
                                 <button type="submit" 
-                                        class="inline-flex items-center gap-2 px-4 py-2 bg-green-600 text-white text-sm font-semibold rounded-lg hover:bg-green-700 transition-colors duration-200">
+                                        class="inline-flex items-center gap-2 px-4 py-2 border border-green-600 bg-green-600 text-white text-sm font-semibold rounded-lg hover:bg-green-700 hover:border-green-700 transition-colors duration-200">
                                     <x-iconify icon="lucide:play" class="w-4 h-4" />
                                     Démarrer
                                 </button>
@@ -57,7 +54,7 @@
 
                         @if(in_array($operation->status, ['planned', 'in_progress']))
                             <a href="{{ route('admin.maintenance.operations.edit', $operation) }}"
-                               class="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm font-semibold rounded-lg hover:bg-blue-700 transition-colors duration-200">
+                               class="inline-flex items-center gap-2 px-4 py-2 border border-[#0c90ee] bg-[#0c90ee] text-white text-sm font-semibold rounded-lg hover:bg-[#0a7fd1] hover:border-[#0a7fd1] transition-colors duration-200">
                                 <x-iconify icon="lucide:pencil" class="w-4 h-4" />
                                 Modifier
                             </a>
@@ -65,7 +62,7 @@
                     @endcan
 
                     <a href="{{ route('admin.maintenance.operations.index') }}"
-                       class="inline-flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-50 transition-colors duration-200">
+                       class="inline-flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-50 hover:border-gray-400 transition-colors duration-200">
                         <x-iconify icon="lucide:arrow-left" class="w-4 h-4" />
                         Retour
                     </a>

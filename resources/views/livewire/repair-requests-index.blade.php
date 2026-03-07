@@ -1,17 +1,19 @@
-<div>
+<div class="min-h-screen bg-[#f8fafc]">
     <div class="py-4 px-4 mx-auto max-w-7xl lg:py-6">
-        <div class="mb-4 flex justify-between items-center">
-            <h1 class="text-2xl font-bold text-gray-900 flex items-center gap-2.5">
-                <x-iconify icon="lucide:wrench" class="w-6 h-6 text-blue-600" />
-                Demandes de Réparation
-                <span class="ml-2 text-sm font-normal text-gray-500">({{ $statistics['total'] ?? 0 }})</span>
-            </h1>
+        <div class="mb-4 flex justify-between items-start">
+            <div>
+                <h1 class="text-xl font-bold text-gray-600">
+                    Demandes de Réparation
+                    <span class="ml-2 text-sm font-normal text-gray-500">({{ $statistics['total'] ?? 0 }})</span>
+                </h1>
+                <p class="mt-1 text-xs text-gray-600">Gestion centralisée des demandes et validations multi-niveaux.</p>
+            </div>
 
             <div
-                class="flex items-center gap-2 text-blue-600 opacity-0 transition-opacity duration-150"
+                class="flex items-center gap-2 text-[#0c90ee] opacity-0 transition-opacity duration-150"
                 wire:loading.delay.class="opacity-100"
                 wire:loading.delay.class.remove="opacity-0"
-                wire:target="search,statusFilter,urgencyFilter,categoryFilter,vehicleFilter,dateFrom,dateTo,perPage">
+                wire:target="search,statusFilter,urgencyFilter,categoryFilter,vehicleFilter,driverFilter,dateFrom,dateTo,perPage">
                 <x-iconify icon="lucide:loader-2" class="w-5 h-5 animate-spin" />
                 <span class="text-sm font-medium">Chargement...</span>
             </div>
@@ -122,13 +124,14 @@
                 $urgencyFilter,
                 $categoryFilter,
                 $vehicleFilter,
+                $driverFilter,
                 $dateFrom,
                 $dateTo,
             ])->filter(fn($value) => $value !== '' && $value !== null);
             $activeCount = $activeFilters->count();
         @endphp
 
-        <x-page-search-bar x-data="{ showFilters: false }">
+        <x-page-search-bar x-data="{ showFilters: false }" data-repair-filters-root>
             <x-slot:search>
                 <div class="relative">
                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -140,9 +143,9 @@
                         placeholder="Rechercher..."
                         wire:loading.attr="aria-busy"
                         wire:target="search"
-                        class="pl-10 pr-4 py-2.5 block w-full bg-white border border-gray-300 rounded-lg shadow-sm hover:border-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm">
+                        class="pl-10 pr-4 py-2.5 block w-full bg-white border border-gray-300 rounded-lg shadow-sm hover:border-gray-400 focus:ring-2 focus:ring-[#0c90ee]/20 focus:border-[#0c90ee] text-sm">
                     <div wire:loading.delay wire:target="search" class="absolute inset-y-0 right-0 pr-3 flex items-center">
-                        <x-iconify icon="lucide:loader-2" class="w-4 h-4 text-blue-500 animate-spin" />
+                        <x-iconify icon="lucide:loader-2" class="w-4 h-4 text-[#0c90ee] animate-spin" />
                     </div>
                 </div>
             </x-slot:search>
@@ -164,14 +167,6 @@
             </x-slot:filters>
 
             <x-slot:actions>
-                @can('create', App\Models\RepairRequest::class)
-                <a href="{{ route('admin.repair-requests.create') }}"
-                    title="Nouvelle Demande"
-                    class="inline-flex items-center gap-2 p-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all duration-200 shadow-sm hover:shadow-md">
-                    <x-iconify icon="lucide:plus" class="w-5 h-5" />
-                </a>
-                @endcan
-
                 @can('export', App\Models\RepairRequest::class)
                 <div class="relative"
                     x-data="{
@@ -234,66 +229,120 @@
                             class="fixed z-[80] rounded-lg bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
                             style="display: none;">
                             <div class="py-1">
-                                <button wire:click="exportData('csv')" class="block w-full text-left px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-100">Export CSV</button>
-                                <button wire:click="exportData('excel')" class="block w-full text-left px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-100">Export Excel</button>
-                                <button wire:click="exportData('pdf')" class="block w-full text-left px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-100">Export PDF</button>
+                                <button wire:click="exportData('csv')" class="flex w-full items-center gap-2 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-100">
+                                    <x-iconify icon="lucide:file-spreadsheet" class="w-4 h-4 text-green-600" />
+                                    Export CSV
+                                </button>
+                                <button wire:click="exportData('excel')" class="flex w-full items-center gap-2 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-100">
+                                    <x-iconify icon="lucide:file-bar-chart-2" class="w-4 h-4 text-emerald-600" />
+                                    Export Excel
+                                </button>
+                                <button wire:click="exportData('pdf')" class="flex w-full items-center gap-2 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-100">
+                                    <x-iconify icon="lucide:file-text" class="w-4 h-4 text-red-600" />
+                                    Export PDF
+                                </button>
                             </div>
                         </div>
                     </template>
                 </div>
+                @endcan
+
+                @can('create', App\Models\RepairRequest::class)
+                <a href="{{ route('admin.repair-requests.create') }}"
+                    title="Nouvelle demande"
+                    class="zf-btn-primary inline-flex items-center justify-center h-10 w-10 rounded-lg transition-all duration-200 shadow-sm hover:shadow-md">
+                    <x-iconify icon="lucide:plus" class="w-5 h-5" />
+                </a>
                 @endcan
             </x-slot:actions>
 
             <x-slot:filtersPanel>
                 <x-page-filters-panel columns="4">
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1.5">Statut</label>
-                        <select wire:model.live="statusFilter" class="block w-full border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-sm">
+                        <label class="block text-xs font-semibold text-gray-700 mb-1">Statut</label>
+                        <x-slim-select wire:model.live="statusFilter" name="status_filter" placeholder="Tous les statuts">
                             <option value="">Tous les statuts</option>
                             @foreach($statuses as $value => $config)
                                 <option value="{{ $value }}">{{ $config['label'] }}</option>
                             @endforeach
-                        </select>
+                        </x-slim-select>
                     </div>
 
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1.5">Urgence</label>
-                        <select wire:model.live="urgencyFilter" class="block w-full border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-sm">
+                        <label class="block text-xs font-semibold text-gray-700 mb-1">Urgence</label>
+                        <x-slim-select wire:model.live="urgencyFilter" name="urgency_filter" placeholder="Toutes les urgences">
                             <option value="">Toutes les urgences</option>
                             @foreach($urgencyLevels as $value => $config)
                                 <option value="{{ $value }}">{{ $config['label'] }}</option>
                             @endforeach
-                        </select>
+                        </x-slim-select>
                     </div>
 
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1.5">Catégorie</label>
-                        <select wire:model.live="categoryFilter" class="block w-full border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-sm">
+                        <label class="block text-xs font-semibold text-gray-700 mb-1">Catégorie</label>
+                        <x-slim-select wire:model.live="categoryFilter" name="category_filter" placeholder="Toutes les catégories">
                             <option value="">Toutes les catégories</option>
                             @foreach($categories as $category)
                                 <option value="{{ $category->id }}">{{ $category->name }}</option>
                             @endforeach
-                        </select>
+                        </x-slim-select>
                     </div>
 
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1.5">Véhicule</label>
-                        <select wire:model.live="vehicleFilter" class="block w-full border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-sm">
+                        <label class="block text-xs font-semibold text-gray-700 mb-1">Véhicule</label>
+                        <x-slim-select wire:model.live="vehicleFilter" name="vehicle_filter" placeholder="Tous les véhicules">
                             <option value="">Tous les véhicules</option>
                             @foreach($vehicles as $vehicle)
                                 <option value="{{ $vehicle->id }}">{{ $vehicle->registration_plate }} - {{ $vehicle->brand }} {{ $vehicle->model }}</option>
                             @endforeach
-                        </select>
+                        </x-slim-select>
                     </div>
 
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1.5">Date début</label>
-                        <input type="date" wire:model.live="dateFrom" class="block w-full border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-sm">
+                        <label class="block text-xs font-semibold text-gray-700 mb-1">Chauffeur</label>
+                        <x-slim-select wire:model.live="driverFilter" name="driver_filter" placeholder="Tous les chauffeurs">
+                            <option value="">Tous les chauffeurs</option>
+                            @foreach($drivers as $driver)
+                                @php
+                                    $driverName = $driver->user?->name ?: trim(($driver->first_name ?? '').' '.($driver->last_name ?? ''));
+                                @endphp
+                                <option value="{{ $driver->id }}">
+                                    {{ $driverName !== '' ? $driverName : 'N/A' }}
+                                </option>
+                            @endforeach
+                        </x-slim-select>
                     </div>
 
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1.5">Date fin</label>
-                        <input type="date" wire:model.live="dateTo" class="block w-full border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-sm">
+                        <label class="block text-xs font-semibold text-gray-700 mb-1">Date début</label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                                <x-iconify icon="lucide:calendar" class="w-4 h-4 text-gray-400" />
+                            </div>
+                            <input
+                                type="text"
+                                wire:model.live="dateFrom"
+                                data-repair-date-from
+                                placeholder="Date début"
+                                autocomplete="off"
+                                class="block w-full bg-gray-50 border border-gray-300 rounded-lg pl-10 p-2.5 text-sm shadow-sm transition-all duration-200 hover:border-gray-400 focus:ring-2 focus:ring-[#0c90ee]/20 focus:border-[#0c90ee]">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-700 mb-1">Date fin</label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                                <x-iconify icon="lucide:calendar" class="w-4 h-4 text-gray-400" />
+                            </div>
+                            <input
+                                type="text"
+                                wire:model.live="dateTo"
+                                data-repair-date-to
+                                placeholder="Date fin"
+                                autocomplete="off"
+                                class="block w-full bg-gray-50 border border-gray-300 rounded-lg pl-10 p-2.5 text-sm shadow-sm transition-all duration-200 hover:border-gray-400 focus:ring-2 focus:ring-[#0c90ee]/20 focus:border-[#0c90ee]">
+                        </div>
                     </div>
 
                     <x-slot:reset>
@@ -476,25 +525,28 @@
                                 <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $statusColorClass }}">{{ $statusConfig['label'] }}</span>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                <div class="flex items-center justify-end space-x-2">
-                                    <a href="{{ route('admin.repair-requests.show', $request) }}" class="text-blue-600 hover:text-blue-900" title="Voir les détails">
-                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <div class="flex items-center justify-end gap-2">
+                                    <a
+                                        href="{{ route('admin.repair-requests.show', $request) }}"
+                                        class="p-2 rounded-full bg-gray-50 text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition-all duration-200 group"
+                                        title="Voir les détails">
+                                        <svg class="w-4 h-4 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
                                         </svg>
                                     </a>
 
                                     @canany(['approveLevelOne', 'approveLevelTwo'], $request)
-                                    <button wire:click="openApproveModal({{ $request->id }})" class="text-green-600 hover:text-green-900" title="Approuver">
-                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <button wire:click="openApproveModal({{ $request->id }})" class="p-2 rounded-full bg-gray-50 text-gray-400 hover:text-green-600 hover:bg-green-50 transition-all duration-200 group" title="Approuver">
+                                        <svg class="w-4 h-4 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                                         </svg>
                                     </button>
                                     @endcanany
 
                                     @canany(['rejectLevelOne', 'rejectLevelTwo'], $request)
-                                    <button wire:click="openRejectModal({{ $request->id }})" class="text-red-600 hover:text-red-900" title="Rejeter">
-                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <button wire:click="openRejectModal({{ $request->id }})" class="p-2 rounded-full bg-gray-50 text-gray-400 hover:text-red-600 hover:bg-red-50 transition-all duration-200 group" title="Rejeter">
+                                        <svg class="w-4 h-4 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                                         </svg>
                                     </button>
@@ -502,8 +554,8 @@
 
                                     @can('update', $request)
                                     @if(\Illuminate\Support\Facades\Route::has('admin.repair-requests.edit'))
-                                    <a href="{{ route('admin.repair-requests.edit', $request) }}" class="text-gray-600 hover:text-gray-900" title="Modifier">
-                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <a href="{{ route('admin.repair-requests.edit', $request) }}" class="p-2 rounded-full bg-gray-50 text-gray-400 hover:text-amber-600 hover:bg-amber-50 transition-all duration-200 group" title="Modifier">
+                                        <svg class="w-4 h-4 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
                                         </svg>
                                     </a>
@@ -598,3 +650,70 @@
         @endif
     </x-modal>
 </div>
+
+@script
+<script>
+    (() => {
+        const ROOT_SELECTOR = '[data-repair-filters-root]';
+        const DATE_SELECTORS = ['[data-repair-date-from]', '[data-repair-date-to]'];
+
+        const getRoot = () => document.querySelector(ROOT_SELECTOR) || document;
+        const q = (selector) => getRoot().querySelector(selector);
+
+        const syncLivewireInput = (el) => {
+            el.dispatchEvent(new Event('input', { bubbles: true }));
+            el.dispatchEvent(new Event('change', { bubbles: true }));
+        };
+
+        const initDatepicker = (selector) => {
+            const input = q(selector);
+            if (!input || input._repairDatepicker) return;
+
+            const boot = () => {
+                if (typeof window.Datepicker === 'undefined') {
+                    setTimeout(boot, 120);
+                    return;
+                }
+
+                const picker = new window.Datepicker(input, {
+                    autohide: true,
+                    format: 'dd/mm/yyyy',
+                    language: 'fr',
+                    todayBtn: true,
+                    clearBtn: true,
+                    todayBtnMode: 1
+                });
+
+                input._repairDatepicker = picker;
+
+                const sync = () => syncLivewireInput(input);
+                input.addEventListener('changeDate', sync);
+                input.addEventListener('clearDate', sync);
+            };
+
+            boot();
+        };
+
+        const initAll = () => {
+            DATE_SELECTORS.forEach((selector) => initDatepicker(selector));
+        };
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initAll, { once: true });
+        } else {
+            initAll();
+        }
+
+        if (!window.__repairFiltersLivewireHooked) {
+            window.__repairFiltersLivewireHooked = true;
+            document.addEventListener('livewire:initialized', () => {
+                if (window.Livewire && typeof window.Livewire.hook === 'function') {
+                    window.Livewire.hook('morph.updated', () => {
+                        requestAnimationFrame(initAll);
+                    });
+                }
+            });
+        }
+    })();
+</script>
+@endscript

@@ -187,7 +187,8 @@
                                     if (!this.$refs.trigger || !this.$refs.menu) return;
                                     const rect = this.$refs.trigger.getBoundingClientRect();
                                     const menuHeight = this.$refs.menu.offsetHeight || 260;
-                                    const menuWidth = this.$refs.menu.offsetWidth || 224;
+                                    // Fix width to a controlled value to prevent full-page expansion.
+                                    const menuWidth = 288;
                                     const padding = 12;
                                     const spaceBelow = window.innerHeight - rect.bottom;
                                     const spaceAbove = rect.top;
@@ -242,7 +243,7 @@
                                 x-transition:leave-start="transform opacity-100 scale-100"
                                 x-transition:leave-end="transform opacity-0 scale-95"
                                 :style="styles"
-                                class="rounded-md bg-white py-2 shadow-lg ring-1 ring-zinc-900/5 z-[9999]"
+                                class="w-72 max-w-[calc(100vw-1.5rem)] rounded-md bg-white py-2 shadow-lg ring-1 ring-zinc-900/5 z-[9999]"
                                 x-cloak>
 
                                 {{-- En-tête du profil --}}

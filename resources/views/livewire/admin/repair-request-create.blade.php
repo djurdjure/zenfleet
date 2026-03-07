@@ -2,21 +2,20 @@
     $attachmentsHasError = $errors->has('attachments') || $errors->has('attachments.*');
 @endphp
 
-<section class="bg-gray-50 min-h-screen">
+<section class="zf-page min-h-screen">
     <div class="py-6 px-4 mx-auto max-w-7xl lg:py-12 lg:mx-0">
         <div class="mb-6 flex items-center justify-between gap-4">
             <div>
-                <h1 class="text-2xl font-bold text-gray-900 mb-1 flex items-center gap-2.5">
-                    <x-iconify icon="heroicons:wrench-screwdriver" class="w-6 h-6 text-blue-600" />
+                <h1 class="text-xl font-bold text-gray-600 mb-1">
                     Nouvelle Demande de Réparation
                 </h1>
-                <p class="text-sm text-gray-600 ml-8.5">
+                <p class="text-xs text-gray-600">
                     Créez une demande avec un format harmonisé aux formulaires ZenFleet.
                 </p>
             </div>
 
             <a href="{{ route('admin.repair-requests.index') }}"
-               class="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors">
+               class="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#0c90ee]/20 transition-colors">
                 <x-iconify icon="heroicons:arrow-left" class="w-4 h-4" />
                 Retour à la liste
             </a>
@@ -58,13 +57,14 @@
                 eyebrow="Affectation">
                 <x-field-group :columns="2">
                     <div class="space-y-2">
-                        <x-select
+                        <x-slim-select
                             name="vehicle_id"
                             label="Véhicule"
                             required
                             :error="$errors->first('vehicle_id')"
                             :disabled="$isDriverScoped"
-                            wire:model.live="vehicle_id">
+                            wire:model.live="vehicle_id"
+                            placeholder="Sélectionner un véhicule">
                             <option value="">Sélectionner un véhicule</option>
                             @forelse($vehicles as $vehicle)
                                 <option value="{{ $vehicle['id'] }}" @selected((string) $vehicle_id === (string) $vehicle['id'])>
@@ -73,7 +73,7 @@
                             @empty
                                 <option value="" disabled>Aucun véhicule disponible</option>
                             @endforelse
-                        </x-select>
+                        </x-slim-select>
 
                         <p class="text-xs text-gray-600">
                             {{ count($vehicles) }} véhicule(s) disponible(s).
@@ -87,13 +87,14 @@
                     </div>
 
                     <div class="space-y-2">
-                        <x-select
+                        <x-slim-select
                             name="driver_id"
                             label="Chauffeur"
                             required
                             :error="$errors->first('driver_id')"
                             :disabled="$isDriverScoped"
-                            wire:model.live="driver_id">
+                            wire:model.live="driver_id"
+                            placeholder="Sélectionner un chauffeur">
                             <option value="">Sélectionner un chauffeur</option>
                             @forelse($drivers as $driver)
                                 <option value="{{ $driver['id'] }}" @selected((string) $driver_id === (string) $driver['id'])>
@@ -102,7 +103,7 @@
                             @empty
                                 <option value="" disabled>Aucun chauffeur disponible</option>
                             @endforelse
-                        </x-select>
+                        </x-slim-select>
 
                         <p class="text-xs text-gray-600">
                             {{ count($drivers) }} chauffeur(s) disponible(s).
@@ -150,33 +151,34 @@
                         wire:model.defer="description" />
 
                     <x-field-group :columns="2">
-                        <x-select
+                        <x-slim-select
                             name="category_id"
                             label="Catégorie"
                             :selected="$category_id"
                             :error="$errors->first('category_id')"
-                            wire:model.live="category_id">
+                            wire:model.live="category_id"
+                            placeholder="Sélectionner une catégorie">
                             <option value="">Sélectionner une catégorie</option>
                             @foreach($categories as $category)
                                 <option value="{{ $category['id'] }}" @selected((string) $category_id === (string) $category['id'])>
                                     {{ $category['name'] }}
                                 </option>
                             @endforeach
-                        </x-select>
+                        </x-slim-select>
 
-                        <x-select
+                        <x-slim-select
                             name="urgency"
                             label="Niveau d'urgence"
                             required
                             :selected="$urgency"
                             :error="$errors->first('urgency')"
                             wire:model.live="urgency"
-                            :options="[
-                                'low' => 'Faible',
-                                'normal' => 'Normal',
-                                'high' => 'Eleve',
-                                'critical' => 'Critique',
-                            ]" />
+                            placeholder="Sélectionner un niveau">
+                            <option value="low" @selected($urgency === 'low')>Faible</option>
+                            <option value="normal" @selected($urgency === 'normal')>Normal</option>
+                            <option value="high" @selected($urgency === 'high')>Eleve</option>
+                            <option value="critical" @selected($urgency === 'critical')>Critique</option>
+                        </x-slim-select>
                     </x-field-group>
                 </div>
             </x-form-section>
@@ -265,7 +267,7 @@
                 </a>
 
                 <button type="submit"
-                        class="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-gradient-to-r from-blue-600 to-indigo-600 text-sm font-semibold text-white shadow-sm hover:from-blue-700 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all">
+                        class="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg border border-[#0c90ee] bg-[#0c90ee] text-sm font-semibold text-white shadow-sm hover:bg-[#0a7fd1] hover:border-[#0a7fd1] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#0c90ee]/20 transition-all">
                     <x-iconify icon="heroicons:check" class="w-4 h-4" />
                     Créer la demande
                 </button>

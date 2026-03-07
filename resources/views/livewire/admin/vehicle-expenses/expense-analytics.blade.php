@@ -152,7 +152,7 @@
                     <x-select wire:model.live="vehicle_id" class="w-full">
                         <option value="">Tous les véhicules</option>
                         @foreach ($vehicles as $vehicle)
-                            <option value="{{ $vehicle->id }}">{{ $vehicle->license_plate }}</option>
+                            <option value="{{ $vehicle->id }}">{{ $vehicle->license_plate ?? $vehicle->registration_plate }}</option>
                         @endforeach
                     </x-select>
                 </div>
@@ -404,7 +404,7 @@
                     </x-card>
                 </div>
 
-                @if ($chartLabels && is_array($chartData) && !array_key_exists('datasets', $chartData))
+                @if (is_array($chartData) && !array_key_exists('datasets', $chartData))
                     <x-card>
                         <div class="p-6">
                             <h3 class="mb-4 text-lg font-semibold">TCO par véhicule</h3>
@@ -608,7 +608,7 @@
                         </x-card>
                     </div>
 
-                    @if (isset($budgetAnalysis['groups']) && count($budgetAnalysis['groups']) > 0)
+                    @if (isset($budgetAnalysis['groups']))
                         <x-card>
                             <div class="p-6">
                                 <h3 class="mb-4 text-lg font-semibold">Utilisation des budgets par groupe</h3>

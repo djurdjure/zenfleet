@@ -1,636 +1,200 @@
-{{-- resources/views/admin/maintenance/schedules/create.blade.php --}}
 @extends('layouts.admin.catalyst')
-@section('title', 'Planifier une Maintenance - ZenFleet')
 
-@push('styles')
-<style>
-    .gradient-bg {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    }
-
-    .card-hover {
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-
-    .card-hover:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-    }
-
-    .fade-in {
-        animation: fadeIn 0.6s ease-out;
-    }
-
-    @keyframes fadeIn {
-        from {
-            opacity: 0;
-            transform: translateY(20px);
-        }
-
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-
-    .slide-in {
-        animation: slideIn 0.5s ease-out;
-    }
-
-    @keyframes slideIn {
-        from {
-            opacity: 0;
-            transform: translateX(-20px);
-        }
-
-        to {
-            opacity: 1;
-            transform: translateX(0);
-        }
-    }
-
-    .form-section {
-        background: white;
-        border-radius: 12px;
-        box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
-        transition: all 0.3s ease;
-    }
-
-    .form-section:hover {
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-    }
-
-    .input-focus {
-        transition: all 0.2s ease;
-    }
-
-    .input-focus:focus {
-        border-color: #6366f1;
-        box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
-    }
-
-    .btn-primary {
-        background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
-        transition: all 0.3s ease;
-    }
-
-    .btn-primary:hover {
-        transform: translateY(-1px);
-        box-shadow: 0 10px 15px -3px rgba(99, 102, 241, 0.4);
-    }
-
-    .stepper {
-        display: flex;
-        align-items: center;
-        margin-bottom: 2rem;
-    }
-
-    .step {
-        display: flex;
-        align-items: center;
-        flex: 1;
-    }
-
-    .step-circle {
-        width: 2.5rem;
-        height: 2.5rem;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-weight: 600;
-        font-size: 0.875rem;
-        transition: all 0.3s ease;
-    }
-
-    .step.active .step-circle {
-        background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
-        color: white;
-    }
-
-    .step.completed .step-circle {
-        background: #10b981;
-        color: white;
-    }
-
-    .step.inactive .step-circle {
-        background: #f3f4f6;
-        color: #6b7280;
-    }
-
-    .step-line {
-        flex: 1;
-        height: 2px;
-        background: #e5e7eb;
-        margin: 0 1rem;
-    }
-
-    .step.completed .step-line {
-        background: #10b981;
-    }
-</style>
-@endpush
+@section('title', 'Nouvelle planification maintenance')
 
 @section('content')
-<div class="fade-in">
-    {{-- En-tête avec breadcrumb --}}
-    <div class="mb-8">
-        <nav class="flex items-center space-x-2 text-sm font-medium text-gray-600 mb-4 slide-in">
-            <a href="{{ route('admin.maintenance.dashboard') }}" class="hover:text-indigo-600 transition-colors">
-                <i class="fas fa-wrench mr-1"></i> Maintenance
-            </a>
-            <i class="fas fa-chevron-right text-gray-400 text-xs"></i>
-            <a href="{{ route('admin.maintenance.schedules.index') }}" class="hover:text-indigo-600 transition-colors">
-                Planifications
-            </a>
-            <i class="fas fa-chevron-right text-gray-400 text-xs"></i>
-            <span class="text-indigo-600 font-semibold">Nouvelle planification</span>
-        </nav>
-
-        <div class="gradient-bg rounded-xl p-6 text-white slide-in">
-            <div class="md:flex md:items-center md:justify-between">
-                <div class="flex-1 min-w-0">
-                    <h1 class="text-2xl font-bold leading-6">Planifier une Maintenance</h1>
-                    <div class="mt-2 flex flex-col sm:flex-row sm:flex-wrap sm:space-x-6">
-                        <div class="flex items-center text-indigo-100">
-                            <i class="fas fa-calendar-plus mr-2"></i>
-                            Configuration d'une nouvelle planification de maintenance
-                        </div>
-                    </div>
-                </div>
-                <div class="mt-4 md:mt-0 md:ml-4">
-                    <div class="flex items-center space-x-3 text-indigo-100">
-                        <i class="fas fa-info-circle"></i>
-                        <span class="text-sm">Assistant intelligent de planification</span>
-                    </div>
-                </div>
-            </div>
+<section class="zf-page min-h-screen">
+    <div class="py-6 px-4 mx-auto max-w-7xl lg:py-10 lg:mx-0">
+        <div class="mb-6">
+            <h1 class="text-xl font-bold text-gray-600">Nouvelle planification maintenance</h1>
+            <p class="mt-1 text-xs text-gray-600">Configurez une maintenance preventive recurrante pour un vehicule.</p>
         </div>
-    </div>
 
-    {{-- Stepper de progression --}}
-    <div class="stepper mb-8">
-        <div class="step active">
-            <div class="step-circle">1</div>
-            <div class="step-line"></div>
-        </div>
-        <div class="step inactive">
-            <div class="step-circle">2</div>
-            <div class="step-line"></div>
-        </div>
-        <div class="step inactive">
-            <div class="step-circle">3</div>
-            <div class="step-line"></div>
-        </div>
-        <div class="step inactive">
-            <div class="step-circle">4</div>
-        </div>
-    </div>
+        @if(session('error'))
+            <x-alert type="error" title="Erreur" dismissible class="mb-6">
+                {{ session('error') }}
+            </x-alert>
+        @endif
 
-    <form method="POST" action="{{ route('admin.maintenance.schedules.store') }}" class="space-y-8">
-        @csrf
+        @if ($errors->any())
+            <x-alert type="error" title="Erreurs de validation" dismissible class="mb-6">
+                Veuillez corriger les erreurs suivantes:
+                <ul class="mt-2 ml-5 list-disc text-sm">
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </x-alert>
+        @endif
 
-        {{-- Étape 1: Sélection du véhicule et type de maintenance --}}
-        <div class="form-section p-6" id="step-1">
-            <div class="flex items-center mb-6">
-                <div class="flex-shrink-0">
-                    <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center">
-                        <i class="fas fa-car text-white"></i>
-                    </div>
-                </div>
-                <div class="ml-4">
-                    <h3 class="text-lg font-semibold text-gray-900">Sélection du Véhicule et Type</h3>
-                    <p class="text-sm text-gray-600">Choisissez le véhicule et le type de maintenance à planifier</p>
-                </div>
-            </div>
+        <form method="POST" action="{{ route('admin.maintenance.schedules.store') }}" class="space-y-8">
+            @csrf
 
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                {{-- Sélection du véhicule --}}
-                <div class="space-y-2">
-                    <label for="vehicle_id" class="block text-sm font-medium text-gray-700">
-                        <i class="fas fa-car mr-2 text-blue-500"></i>Véhicule
-                        <span class="text-red-500">*</span>
-                    </label>
-                    <x-slim-select name="vehicle_id" id="vehicle_id" required>
-                        <option value="">Sélectionner un véhicule...</option>
+            <x-form-section
+                title="Contexte de planification"
+                icon="lucide:car-front"
+                subtitle="Selection du vehicule et du type de maintenance recurrante.">
+                <x-field-group :columns="2">
+                    <x-slim-select name="vehicle_id" label="Vehicule" required :error="$errors->first('vehicle_id')" placeholder="Selectionner un vehicule">
+                        <option value="" data-placeholder="true">Selectionner un vehicule</option>
                         @foreach($vehicles as $vehicle)
-                        <option value="{{ $vehicle->id }}"
-                            data-mileage="{{ $vehicle->current_mileage ?? 0 }}"
-                            data-brand="{{ $vehicle->brand }}"
-                            data-model="{{ $vehicle->model }}"
-                            {{ old('vehicle_id') == $vehicle->id ? 'selected' : '' }}>
-                            {{ $vehicle->registration_plate }} - {{ $vehicle->brand }} {{ $vehicle->model }}
-                            @if($vehicle->current_mileage)
-                            ({{ number_format($vehicle->current_mileage, 0, ',', ' ') }} km)
-                            @endif
-                        </option>
+                            <option value="{{ $vehicle->id }}" {{ old('vehicle_id') == $vehicle->id ? 'selected' : '' }}>
+                                {{ $vehicle->registration_plate }} - {{ $vehicle->brand }} {{ $vehicle->model }}
+                            </option>
                         @endforeach
                     </x-slim-select>
-                    @error('vehicle_id')
-                    <p class="text-sm text-red-600">{{ $message }}</p>
-                    @enderror
-                </div>
 
-                {{-- Sélection du type de maintenance --}}
-                <div class="space-y-2">
-                    <label for="maintenance_type_id" class="block text-sm font-medium text-gray-700">
-                        <i class="fas fa-wrench mr-2 text-green-500"></i>Type de Maintenance
-                        <span class="text-red-500">*</span>
-                    </label>
-                    <x-slim-select name="maintenance_type_id" id="maintenance_type_id" required>
-                        <option value="">Sélectionner un type...</option>
-                        @php $lastCategory = null; @endphp
+                    <x-slim-select name="maintenance_type_id" label="Type de maintenance" required :error="$errors->first('maintenance_type_id')" placeholder="Selectionner un type">
+                        <option value="" data-placeholder="true">Selectionner un type</option>
                         @foreach($maintenanceTypes as $type)
-                        @if($lastCategory !== $type->category)
-                        @if($lastCategory !== null)
-                        </optgroup>
-                        @endif
-                        <optgroup label="{{ ucfirst($type->category) }}">
-                            @php $lastCategory = $type->category; @endphp
-                            @endif
-                            <option value="{{ $type->id }}"
-                                data-interval-km="{{ $type->default_interval_km ?? 0 }}"
-                                data-interval-days="{{ $type->default_interval_days ?? 0 }}"
-                                data-duration="{{ $type->estimated_duration_minutes ?? 0 }}"
+                            <option
+                                value="{{ $type->id }}"
+                                data-interval-km="{{ (int) ($type->default_interval_km ?? 0) }}"
+                                data-interval-days="{{ (int) ($type->default_interval_days ?? 0) }}"
                                 {{ old('maintenance_type_id') == $type->id ? 'selected' : '' }}>
-                                {{ $type->name }}
+                                {{ $type->name }} ({{ ucfirst($type->category) }})
                             </option>
-                            @endforeach
-                            @if($lastCategory !== null)
-                        </optgroup>
-                        @endif
+                        @endforeach
                     </x-slim-select>
-                    @error('maintenance_type_id')
-                    <p class="text-sm text-red-600">{{ $message }}</p>
-                    @enderror
-                </div>
-            </div>
+                </x-field-group>
+            </x-form-section>
 
-            {{-- Informations sur le véhicule sélectionné --}}
-            <div id="vehicle-info" class="mt-6 hidden">
-                <div class="bg-blue-50 border-l-4 border-blue-400 p-4 rounded-r-lg">
-                    <div class="flex items-center">
-                        <div class="ml-3">
-                            <h4 class="text-sm font-medium text-blue-800">Informations Véhicule</h4>
-                            <div class="mt-2 text-sm text-blue-700" id="vehicle-details">
-                                {{-- Détails du véhicule chargés dynamiquement --}}
-                            </div>
+            <x-form-section
+                title="Regles de recurrence"
+                icon="lucide:repeat"
+                subtitle="Definissez le declenchement par kilometrage, duree ou combinaison des deux.">
+                <x-field-group :columns="3" :divided="false">
+                    <x-slim-select
+                        name="interval_type"
+                        label="Type d'intervalle"
+                        required
+                        :error="$errors->first('interval_type')"
+                        placeholder="Selectionner un mode">
+                        <option value="" data-placeholder="true">Selectionner un mode</option>
+                        <option value="mileage" {{ old('interval_type') === 'mileage' ? 'selected' : '' }}>Kilometrage</option>
+                        <option value="time" {{ old('interval_type') === 'time' ? 'selected' : '' }}>Temps</option>
+                        <option value="both" {{ old('interval_type') === 'both' ? 'selected' : '' }}>Kilometrage + Temps</option>
+                    </x-slim-select>
+
+                    <x-input
+                        type="number"
+                        name="interval_value_km"
+                        label="Intervalle kilometrique (km)"
+                        icon="chart-bar"
+                        :value="old('interval_value_km')"
+                        :error="$errors->first('interval_value_km')"
+                        min="1"
+                        placeholder="Ex: 10000"
+                        helpText="Laissez vide si non utilise." />
+
+                    <x-input
+                        type="number"
+                        name="interval_value_days"
+                        label="Intervalle temporel (jours)"
+                        icon="calendar"
+                        :value="old('interval_value_days')"
+                        :error="$errors->first('interval_value_days')"
+                        min="1"
+                        placeholder="Ex: 180"
+                        helpText="Laissez vide si non utilise." />
+                </x-field-group>
+            </x-form-section>
+
+            <x-form-section
+                title="Point de depart"
+                icon="lucide:calendar-clock"
+                subtitle="Base de calcul de la prochaine operation generee par la planification.">
+                <x-field-group :columns="2">
+                    <x-datepicker
+                        name="last_maintenance_date"
+                        label="Date de derniere maintenance"
+                        :value="old('last_maintenance_date')"
+                        :error="$errors->first('last_maintenance_date')"
+                        placeholder="JJ/MM/AAAA"
+                        helpText="Optionnel, utile pour initialiser les prochaines echeances." />
+
+                    <x-input
+                        type="number"
+                        name="last_maintenance_mileage"
+                        label="Kilometrage de derniere maintenance"
+                        icon="chart-bar"
+                        :value="old('last_maintenance_mileage')"
+                        :error="$errors->first('last_maintenance_mileage')"
+                        min="0"
+                        placeholder="Ex: 56000"
+                        helpText="Optionnel, en kilometres." />
+                </x-field-group>
+            </x-form-section>
+
+            <x-form-section
+                title="Activation"
+                icon="lucide:shield-check"
+                subtitle="Controlez l'etat de la planification a la creation.">
+                <div class="grid grid-cols-1 gap-4">
+                    <label class="inline-flex items-start gap-3 rounded-lg border border-gray-200 bg-gray-50 px-4 py-3">
+                        <input
+                            type="checkbox"
+                            name="is_active"
+                            value="1"
+                            class="mt-1 rounded border-gray-300 text-[#0c90ee] focus:ring-[#0c90ee]/20"
+                            {{ old('is_active', '1') ? 'checked' : '' }}>
+                        <span>
+                            <span class="block text-sm font-medium text-gray-700">Activer immediatement</span>
+                            <span class="block text-xs text-gray-500 mt-0.5">La planification pourra generer des operations des son prochain cycle.</span>
+                        </span>
+                    </label>
+                </div>
+            </x-form-section>
+
+            <div class="relative pl-14">
+                <div class="rounded-2xl border border-slate-200 bg-white shadow-sm">
+                    <div class="px-6 py-4">
+                        <div class="flex flex-wrap items-center justify-end gap-3">
+                            <a
+                                href="{{ route('admin.maintenance.schedules.index') }}"
+                                class="inline-flex items-center justify-center rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-semibold text-gray-600 shadow-sm transition hover:bg-gray-50 hover:text-gray-700">
+                                Annuler
+                            </a>
+                            <button
+                                type="submit"
+                                class="inline-flex items-center justify-center rounded-lg border border-[#0c90ee] bg-[#0c90ee] px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:border-[#0a7fd1] hover:bg-[#0a7fd1]">
+                                Creer la planification
+                            </button>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
-
-        {{-- Étape 2: Configuration des intervalles --}}
-        <div class="form-section p-6" id="step-2">
-            <div class="flex items-center mb-6">
-                <div class="flex-shrink-0">
-                    <div class="w-10 h-10 bg-gradient-to-br from-green-500 to-emerald-600 rounded-full flex items-center justify-center">
-                        <i class="fas fa-clock text-white"></i>
-                    </div>
-                </div>
-                <div class="ml-4">
-                    <h3 class="text-lg font-semibold text-gray-900">Configuration des Intervalles</h3>
-                    <p class="text-sm text-gray-600">Définissez les intervalles de maintenance et les alertes</p>
-                </div>
-            </div>
-
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                {{-- Intervalles de temps --}}
-                <div class="space-y-4">
-                    <h4 class="font-medium text-gray-900 flex items-center">
-                        <i class="fas fa-calendar mr-2 text-blue-500"></i>Intervalles Temporels
-                    </h4>
-
-                    <div class="space-y-2">
-                        <label for="interval_days" class="block text-sm font-medium text-gray-700">
-                            Intervalle en jours
-                        </label>
-                        <input type="number" name="interval_days" id="interval_days" min="1"
-                            class="input-focus block w-full rounded-lg border-gray-300 shadow-sm"
-                            placeholder="Ex: 90 jours">
-                        @error('interval_days')
-                        <p class="text-sm text-red-600">{{ $message }}</p>
-                        @enderror
-                    </div>
-
-                    <div class="space-y-2">
-                        <label for="alert_days_before" class="block text-sm font-medium text-gray-700">
-                            Alerte avant (jours)
-                        </label>
-                        <input type="number" name="alert_days_before" id="alert_days_before" min="1"
-                            class="input-focus block w-full rounded-lg border-gray-300 shadow-sm"
-                            placeholder="Ex: 7 jours avant">
-                        @error('alert_days_before')
-                        <p class="text-sm text-red-600">{{ $message }}</p>
-                        @enderror
-                    </div>
-                </div>
-
-                {{-- Intervalles kilométriques --}}
-                <div class="space-y-4">
-                    <h4 class="font-medium text-gray-900 flex items-center">
-                        <i class="fas fa-tachometer-alt mr-2 text-green-500"></i>Intervalles Kilométriques
-                    </h4>
-
-                    <div class="space-y-2">
-                        <label for="interval_km" class="block text-sm font-medium text-gray-700">
-                            Intervalle en kilomètres
-                        </label>
-                        <input type="number" name="interval_km" id="interval_km" min="1"
-                            class="input-focus block w-full rounded-lg border-gray-300 shadow-sm"
-                            placeholder="Ex: 10000 km">
-                        @error('interval_km')
-                        <p class="text-sm text-red-600">{{ $message }}</p>
-                        @enderror
-                    </div>
-
-                    <div class="space-y-2">
-                        <label for="alert_km_before" class="block text-sm font-medium text-gray-700">
-                            Alerte avant (km)
-                        </label>
-                        <input type="number" name="alert_km_before" id="alert_km_before" min="1"
-                            class="input-focus block w-full rounded-lg border-gray-300 shadow-sm"
-                            placeholder="Ex: 500 km avant">
-                        @error('alert_km_before')
-                        <p class="text-sm text-red-600">{{ $message }}</p>
-                        @enderror
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        {{-- Étape 3: Prochaines échéances --}}
-        <div class="form-section p-6" id="step-3">
-            <div class="flex items-center mb-6">
-                <div class="flex-shrink-0">
-                    <div class="w-10 h-10 bg-gradient-to-br from-purple-500 to-pink-600 rounded-full flex items-center justify-center">
-                        <i class="fas fa-calendar-check text-white"></i>
-                    </div>
-                </div>
-                <div class="ml-4">
-                    <h3 class="text-lg font-semibold text-gray-900">Prochaines Échéances</h3>
-                    <p class="text-sm text-gray-600">Définissez les prochaines dates et kilométrages de maintenance</p>
-                </div>
-            </div>
-
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                {{-- Prochaine échéance date --}}
-                <div class="space-y-2">
-                    <label for="next_due_date" class="block text-sm font-medium text-gray-700">
-                        <i class="fas fa-calendar mr-2 text-blue-500"></i>Prochaine échéance (date)
-                    </label>
-                    <input type="date" name="next_due_date" id="next_due_date"
-                        class="input-focus block w-full rounded-lg border-gray-300 shadow-sm">
-                    @error('next_due_date')
-                    <p class="text-sm text-red-600">{{ $message }}</p>
-                    @enderror
-                </div>
-
-                {{-- Prochaine échéance kilométrage --}}
-                <div class="space-y-2">
-                    <label for="next_due_mileage" class="block text-sm font-medium text-gray-700">
-                        <i class="fas fa-tachometer-alt mr-2 text-green-500"></i>Prochaine échéance (km)
-                    </label>
-                    <input type="number" name="next_due_mileage" id="next_due_mileage" min="0"
-                        class="input-focus block w-full rounded-lg border-gray-300 shadow-sm"
-                        placeholder="Ex: 25000 km">
-                    @error('next_due_mileage')
-                    <p class="text-sm text-red-600">{{ $message }}</p>
-                    @enderror
-                </div>
-            </div>
-
-            {{-- Calculatrice automatique --}}
-            <div class="mt-6 bg-gray-50 rounded-lg p-4">
-                <h4 class="font-medium text-gray-900 mb-3 flex items-center">
-                    <i class="fas fa-calculator mr-2 text-indigo-500"></i>Calcul Automatique des Échéances
-                </h4>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
-                    <div class="bg-white p-3 rounded-lg">
-                        <div class="text-gray-600">Kilométrage actuel</div>
-                        <div id="current-mileage" class="font-semibold text-lg text-gray-900">-</div>
-                    </div>
-                    <div class="bg-white p-3 rounded-lg">
-                        <div class="text-gray-600">Prochaine maintenance (date)</div>
-                        <div id="calculated-date" class="font-semibold text-lg text-blue-600">-</div>
-                    </div>
-                    <div class="bg-white p-3 rounded-lg">
-                        <div class="text-gray-600">Prochaine maintenance (km)</div>
-                        <div id="calculated-mileage" class="font-semibold text-lg text-green-600">-</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        {{-- Étape 4: Options avancées --}}
-        <div class="form-section p-6" id="step-4">
-            <div class="flex items-center mb-6">
-                <div class="flex-shrink-0">
-                    <div class="w-10 h-10 bg-gradient-to-br from-orange-500 to-red-600 rounded-full flex items-center justify-center">
-                        <i class="fas fa-cogs text-white"></i>
-                    </div>
-                </div>
-                <div class="ml-4">
-                    <h3 class="text-lg font-semibold text-gray-900">Options Avancées</h3>
-                    <p class="text-sm text-gray-600">Configuration des options et paramètres supplémentaires</p>
-                </div>
-            </div>
-
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                {{-- Statut et activation --}}
-                <div class="space-y-4">
-                    <h4 class="font-medium text-gray-900">Statut et Activation</h4>
-
-                    <div class="flex items-center">
-                        <input type="checkbox" name="is_active" id="is_active" value="1" checked
-                            class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded">
-                        <label for="is_active" class="ml-2 block text-sm text-gray-900">
-                            Activer cette planification immédiatement
-                        </label>
-                    </div>
-
-                    <div class="flex items-center">
-                        <input type="checkbox" name="auto_create_operations" id="auto_create_operations" value="1"
-                            class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded">
-                        <label for="auto_create_operations" class="ml-2 block text-sm text-gray-900">
-                            Créer automatiquement les opérations de maintenance
-                        </label>
-                    </div>
-                </div>
-
-                {{-- Notes et commentaires --}}
-                <div class="space-y-2">
-                    <label for="notes" class="block text-sm font-medium text-gray-700">
-                        <i class="fas fa-sticky-note mr-2 text-yellow-500"></i>Notes et Commentaires
-                    </label>
-                    <textarea name="notes" id="notes" rows="4"
-                        class="input-focus block w-full rounded-lg border-gray-300 shadow-sm"
-                        placeholder="Ajoutez des notes spécifiques pour cette planification..."></textarea>
-                    @error('notes')
-                    <p class="text-sm text-red-600">{{ $message }}</p>
-                    @enderror
-                </div>
-            </div>
-        </div>
-
-        {{-- Résumé de la planification --}}
-        <div class="form-section p-6 bg-gradient-to-r from-blue-50 to-indigo-50 border-2 border-indigo-200">
-            <h3 class="text-lg font-semibold text-indigo-900 mb-4 flex items-center">
-                <i class="fas fa-clipboard-check mr-2"></i>Résumé de la Planification
-            </h3>
-            <div id="planning-summary" class="text-sm text-indigo-800">
-                <p>Veuillez remplir les informations ci-dessus pour voir le résumé.</p>
-            </div>
-        </div>
-
-        {{-- Boutons d'action --}}
-        <div class="flex items-center justify-between pt-6 border-t border-gray-200">
-            <a href="{{ route('admin.maintenance.schedules.index') }}"
-                class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-lg text-gray-700 bg-white hover:bg-gray-50 transition-colors">
-                <i class="fas fa-times mr-2"></i>
-                Annuler
-            </a>
-
-            <div class="flex items-center space-x-3">
-                <button type="button" id="save-draft"
-                    class="inline-flex items-center px-4 py-2 border border-indigo-300 shadow-sm text-sm font-medium rounded-lg text-indigo-700 bg-indigo-50 hover:bg-indigo-100 transition-colors">
-                    <i class="fas fa-save mr-2"></i>
-                    Sauvegarder le brouillon
-                </button>
-
-                <button type="submit"
-                    class="btn-primary inline-flex items-center px-6 py-2 border border-transparent text-sm font-medium rounded-lg text-white shadow-sm">
-                    <i class="fas fa-calendar-plus mr-2"></i>
-                    Créer la Planification
-                </button>
-            </div>
-        </div>
-    </form>
-</div>
+        </form>
+    </div>
+</section>
 @endsection
 
 @push('scripts')
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Event listeners for selects (using standard 'change' event which works with SlimSelect)
-        const vehicleSelect = document.getElementById('vehicle_id');
-        const typeSelect = document.getElementById('maintenance_type_id');
+    document.addEventListener('DOMContentLoaded', () => {
+        const typeSelect = document.querySelector('select[name="maintenance_type_id"]');
+        const intervalKmInput = document.querySelector('input[name="interval_value_km"]');
+        const intervalDaysInput = document.querySelector('input[name="interval_value_days"]');
 
-        // Gestion des changements
-        vehicleSelect.addEventListener('change', function() {
-            const value = this.value;
-            if (value) {
-                // Charger les informations du véhicule
-                fetch(`/admin/vehicles/${value}/details`)
-                    .then(response => response.json())
-                    .then(data => {
-                        document.getElementById('vehicle-info').classList.remove('hidden');
-                        document.getElementById('vehicle-details').innerHTML = `
-                        <div class="grid grid-cols-2 gap-4">
-                            <div><strong>Marque:</strong> ${data.brand}</div>
-                            <div><strong>Modèle:</strong> ${data.model}</div>
-                            <div><strong>Immatriculation:</strong> ${data.license_plate}</div>
-                            <div><strong>Kilométrage:</strong> ${data.mileage} km</div>
-                        </div>
-                    `;
-                        calculateDueDates();
-                        updateSummary();
-                    });
-            } else {
-                document.getElementById('vehicle-info').classList.add('hidden');
-                updateSummary();
-            }
-        });
+        if (!typeSelect || !intervalKmInput || !intervalDaysInput) return;
 
-        typeSelect.addEventListener('change', updateSummary);
+        const shouldFill = (input) => input.value === '' || input.value === null;
 
-        // Gestion des étapes
-        const steps = document.querySelectorAll('.step');
-        let currentStep = 0;
+        typeSelect.addEventListener('change', () => {
+            const option = typeSelect.options[typeSelect.selectedIndex];
+            if (!option) return;
 
-        function updateStepVisual(stepIndex, status) {
-            const step = steps[stepIndex];
-            step.className = `step ${status}`;
-        }
+            const intervalKm = option.dataset.intervalKm;
+            const intervalDays = option.dataset.intervalDays;
 
-        // Calcul automatique des échéances
-        function calculateDueDates() {
-            const intervalDays = parseInt(document.getElementById('interval_days').value) || 0;
-            const intervalKm = parseInt(document.getElementById('interval_km').value) || 0;
-            const currentMileage = 15000; // À récupérer dynamiquement
-
-            if (intervalDays > 0) {
-                const nextDate = new Date();
-                nextDate.setDate(nextDate.getDate() + intervalDays);
-                document.getElementById('calculated-date').textContent = nextDate.toLocaleDateString('fr-FR');
-                document.getElementById('next_due_date').value = nextDate.toISOString().split('T')[0];
+            if (intervalKm && parseInt(intervalKm, 10) > 0 && shouldFill(intervalKmInput)) {
+                intervalKmInput.value = intervalKm;
             }
 
-            if (intervalKm > 0) {
-                const nextMileage = currentMileage + intervalKm;
-                document.getElementById('calculated-mileage').textContent = nextMileage.toLocaleString() + ' km';
-                document.getElementById('next_due_mileage').value = nextMileage;
+            if (intervalDays && parseInt(intervalDays, 10) > 0 && shouldFill(intervalDaysInput)) {
+                intervalDaysInput.value = intervalDays;
             }
-
-            document.getElementById('current-mileage').textContent = currentMileage.toLocaleString() + ' km';
-        }
-
-        // Écouteurs d'événements
-        document.getElementById('interval_days').addEventListener('input', calculateDueDates);
-        document.getElementById('interval_km').addEventListener('input', calculateDueDates);
-
-
-        // Mise à jour du résumé
-        function updateSummary() {
-            const vehicleText = vehicleSelect.selectedIndex !== -1 && vehicleSelect.options[vehicleSelect.selectedIndex] ? vehicleSelect.options[vehicleSelect.selectedIndex].text : 'Non sélectionné';
-            const typeText = typeSelect.selectedIndex !== -1 && typeSelect.options[typeSelect.selectedIndex] ? typeSelect.options[typeSelect.selectedIndex].text : 'Non sélectionné';
-            const intervalDays = document.getElementById('interval_days').value || 'Non défini';
-            const intervalKm = document.getElementById('interval_km').value || 'Non défini';
-
-            document.getElementById('planning-summary').innerHTML = `
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                    <strong>Véhicule:</strong> ${vehicleText}<br>
-                    <strong>Type de maintenance:</strong> ${typeText}
-                </div>
-                <div>
-                    <strong>Intervalle temporel:</strong> ${intervalDays} jours<br>
-                    <strong>Intervalle kilométrique:</strong> ${intervalKm} km
-                </div>
-            </div>
-        `;
-        }
-
-        // Écouteurs pour la mise à jour du résumé
-        [vehicleSelect, typeSelect].forEach(select => {
-            select.addEventListener('change', updateSummary);
         });
-
-        ['interval_days', 'interval_km', 'next_due_date', 'next_due_mileage'].forEach(id => {
-            document.getElementById(id).addEventListener('input', updateSummary);
-        });
-
-        // Animation d'entrée des sections
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.style.opacity = '1';
-                    entry.target.style.transform = 'translateY(0)';
-                }
-            });
-        });
-
-        document.querySelectorAll('.form-section').forEach(section => {
-            section.style.opacity = '0';
-            section.style.transform = 'translateY(20px)';
-            section.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
-            observer.observe(section);
-        });
-
-        // Initialisation
-        calculateDueDates();
-        updateSummary();
     });
 </script>
 @endpush

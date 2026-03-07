@@ -20,13 +20,13 @@
  @since 2025-10-23
  ==================================================================== --}}
 
-<section class="bg-gray-50 min-h-screen">
+<section class="min-h-screen bg-[#f8fafc]">
     <div class="py-4 px-4 mx-auto max-w-7xl lg:py-6">
 
         {{-- ===============================================
             HEADER ULTRA-COMPACT AVEC ACTIONS
         =============================================== --}}
-        <div class="flex items-start justify-between mb-4 gap-4">
+        <div class="mb-4">
             <div>
                 <h1 class="text-xl font-bold text-gray-600">
                     Gestion de la Maintenance
@@ -37,43 +37,6 @@
                 <p class="mt-1 text-xs text-gray-600">
                     Planifiez, suivez et optimisez toutes vos opérations de maintenance
                 </p>
-            </div>
-
-            <div class="flex items-center gap-3">
-                {{-- Sélecteur de vue --}}
-                <div class="flex bg-white rounded-lg border border-gray-200 p-1" x-data="{ view: 'list' }">
-                    <button
-                        @click="view = 'list'"
-                        :class="view === 'list' ? 'bg-blue-50 text-blue-600' : 'text-gray-600 hover:bg-gray-50'"
-                        class="px-3 py-1.5 rounded-md text-sm font-medium transition-all duration-200 flex items-center gap-1.5"
-                        title="Vue Liste">
-                        <x-iconify icon="lucide:list" class="w-4 h-4" />
-                        Liste
-                    </button>
-                    <button
-                        @click="view = 'kanban'; window.location.href='{{ route('admin.maintenance.operations.kanban') }}'"
-                        :class="view === 'kanban' ? 'bg-blue-50 text-blue-600' : 'text-gray-600 hover:bg-gray-50'"
-                        class="px-3 py-1.5 rounded-md text-sm font-medium transition-all duration-200 flex items-center gap-1.5"
-                        title="Vue Kanban">
-                        <x-iconify icon="lucide:columns-3" class="w-4 h-4" />
-                        Kanban
-                    </button>
-                    <button
-                        @click="view = 'calendar'; window.location.href='{{ route('admin.maintenance.operations.calendar') }}'"
-                        :class="view === 'calendar' ? 'bg-blue-50 text-blue-600' : 'text-gray-600 hover:bg-gray-50'"
-                        class="px-3 py-1.5 rounded-md text-sm font-medium transition-all duration-200 flex items-center gap-1.5"
-                        title="Vue Calendrier">
-                        <x-iconify icon="lucide:calendar" class="w-4 h-4" />
-                        Calendrier
-                    </button>
-                </div>
-
-                {{-- Bouton Nouvelle Maintenance --}}
-                <a href="{{ route('admin.maintenance.operations.create') }}"
-                    class="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm font-semibold rounded-lg hover:bg-blue-700 transition-all duration-200 shadow-sm hover:shadow-md">
-                    <x-iconify icon="lucide:plus" class="w-4 h-4" />
-                    Nouvelle Maintenance
-                </a>
             </div>
         </div>
 
@@ -312,7 +275,20 @@
         {{-- ===============================================
             BARRE DE RECHERCHE ET ACTIONS (Enterprise-Grade)
         =============================================== --}}
-        <div class="mb-6" x-data="{ showFilters: false }">
+        @php
+            $activeFilterCount = collect([
+                request('status'),
+                request('maintenance_type_id'),
+                request('provider_id'),
+                request('vehicle_id'),
+                request('category'),
+                request('date_from'),
+                request('date_to'),
+                request('overdue') ? '1' : null,
+            ])->filter(fn ($value) => filled($value))->count();
+        @endphp
+
+        <div class="mb-6" x-data="{ showFilters: {{ $activeFilterCount > 0 ? 'true' : 'false' }} }">
             {{-- Ligne principale: Recherche + Filtres + Boutons Actions --}}
             <div class="flex flex-col lg:flex-row items-start lg:items-center gap-3">
                 {{-- Recherche rapide --}}
@@ -328,22 +304,48 @@
                                 id="quickSearch"
                                 value="{{ request('search') }}"
                                 placeholder="Rechercher par véhicule, type de maintenance, fournisseur..."
-                                class="pl-10 pr-4 py-2.5 block w-full border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm shadow-sm"
+                                class="block w-full rounded-lg border border-gray-300 bg-white p-2.5 pl-10 pr-4 text-sm text-gray-900 shadow-sm transition-colors duration-200 hover:border-gray-400 focus:ring-2 focus:ring-[#0c90ee]/20 focus:border-[#0c90ee]"
                                 onchange="document.getElementById('searchForm').submit()">
                         </div>
                     </form>
+                </div>
+
+                {{-- Barre de style d'affichage --}}
+                <div class="inline-flex items-center rounded-lg border border-gray-300 bg-white p-1 shadow-sm">
+                    <a
+                        href="{{ route('admin.maintenance.operations.index', request()->except(['page'])) }}"
+                        class="inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm font-medium transition-all duration-200 {{ request()->routeIs('admin.maintenance.operations.index') ? 'bg-[#e3efff] text-[#0c90ee]' : 'text-gray-600 hover:bg-gray-50' }}"
+                        title="Vue Liste">
+                        <x-iconify icon="lucide:list" class="w-4 h-4" />
+                        Liste
+                    </a>
+                    <a
+                        href="{{ route('admin.maintenance.operations.kanban', request()->except(['page'])) }}"
+                        class="inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm font-medium transition-all duration-200 {{ request()->routeIs('admin.maintenance.operations.kanban') ? 'bg-[#e3efff] text-[#0c90ee]' : 'text-gray-600 hover:bg-gray-50' }}"
+                        title="Vue Kanban">
+                        <x-iconify icon="lucide:columns-3" class="w-4 h-4" />
+                        Kanban
+                    </a>
+                    <a
+                        href="{{ route('admin.maintenance.operations.calendar', request()->except(['page'])) }}"
+                        class="inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm font-medium transition-all duration-200 {{ request()->routeIs('admin.maintenance.operations.calendar') ? 'bg-[#e3efff] text-[#0c90ee]' : 'text-gray-600 hover:bg-gray-50' }}"
+                        title="Vue Calendrier">
+                        <x-iconify icon="lucide:calendar" class="w-4 h-4" />
+                        Calendrier
+                    </a>
                 </div>
 
                 {{-- Bouton Filtres Avancés --}}
                 <button
                     @click="showFilters = !showFilters"
                     type="button"
-                    class="inline-flex items-center gap-2 px-4 py-2.5 bg-white border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-all duration-200 shadow-sm">
+                    class="inline-flex items-center gap-2 p-2 bg-white border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-all duration-200 shadow-sm hover:shadow-md"
+                    title="Filtres">
                     <x-iconify icon="lucide:filter" class="w-4 h-4" />
-                    Filtres avancés
-                    @if(request()->hasAny(['status', 'maintenance_type_id', 'provider_id', 'category', 'date_from', 'date_to']))
-                    <span class="bg-blue-50 text-blue-700 border border-blue-200 text-xs font-semibold px-2 py-0.5 rounded-full">
-                        Actifs
+                    <x-iconify icon="heroicons:chevron-down" class="w-4 h-4 text-gray-400 transition-transform duration-200" x-bind:class="showFilters ? 'rotate-180' : ''" />
+                    @if($activeFilterCount > 0)
+                    <span class="ml-1 inline-flex items-center rounded-full border border-blue-200 bg-blue-50 px-2 py-0.5 text-xs font-semibold text-blue-700">
+                        {{ $activeFilterCount }}
                     </span>
                     @endif
                 </button>
@@ -352,15 +354,25 @@
                 <div class="flex items-center gap-2">
                     {{-- Export --}}
                     <a href="{{ route('admin.maintenance.operations.export', request()->all()) }}"
-                        class="inline-flex items-center gap-2 px-4 py-2.5 bg-white border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-all duration-200 shadow-sm">
+                        class="inline-flex items-center gap-2 p-2 bg-white border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-all duration-200 shadow-sm hover:shadow-md"
+                        title="Exporter">
                         <x-iconify icon="lucide:download" class="w-4 h-4" />
-                        Export
+                    </a>
+
+                    {{-- Ajouter --}}
+                    <a
+                        href="{{ route('admin.maintenance.operations.create') }}"
+                        class="inline-flex items-center gap-2 p-2 border border-[#0c90ee] bg-[#0c90ee] text-white rounded-lg hover:bg-[#0a7fd1] hover:border-[#0a7fd1] transition-all duration-200 shadow-sm hover:shadow-md"
+                        title="Nouvelle maintenance">
+                        <x-iconify icon="lucide:plus" class="w-5 h-5" />
                     </a>
 
                     {{-- Refresh --}}
                     <button
+                        type="button"
                         onclick="window.location.reload()"
-                        class="inline-flex items-center gap-2 px-4 py-2.5 bg-white border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-all duration-200 shadow-sm">
+                        class="inline-flex items-center gap-2 p-2 bg-white border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-all duration-200 shadow-sm hover:shadow-md"
+                        title="Rafraîchir">
                         <x-iconify icon="lucide:refresh-cw" class="w-4 h-4" />
                     </button>
                 </div>
@@ -377,7 +389,7 @@
                 x-transition:leave="transition ease-in duration-200"
                 x-transition:leave-start="opacity-100 transform scale-100"
                 x-transition:leave-end="opacity-0 transform scale-95"
-                class="mt-4 bg-white rounded-lg border border-gray-200 p-5 shadow-sm"
+                class="mt-4 rounded-xl border border-gray-200 bg-white p-5 shadow-sm"
                 style="display: none;">
 
                 <form action="{{ route('admin.maintenance.operations.index') }}" method="GET" id="filterForm">
@@ -385,10 +397,10 @@
 
                         {{-- Filtre Statut --}}
                         <div>
-                            <label for="status" class="block mb-1.5 text-sm font-medium text-gray-600">
+                            <label for="status" class="block mb-2 text-sm font-medium text-gray-600">
                                 <x-iconify icon="lucide:info" class="w-4 h-4 inline" /> Statut
                             </label>
-                            <select name="status" id="status" class="block w-full border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-sm">
+                            <select name="status" id="status" class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 transition-colors duration-200 hover:border-gray-400 focus:ring-2 focus:ring-[#0c90ee]/20 focus:border-[#0c90ee]">
                                 <option value="">Tous les statuts</option>
                                 <option value="planned" {{ request('status') == 'planned' ? 'selected' : '' }}>Planifiée</option>
                                 <option value="in_progress" {{ request('status') == 'in_progress' ? 'selected' : '' }}>En cours</option>
@@ -399,10 +411,10 @@
 
                         {{-- Filtre Type de Maintenance --}}
                         <div>
-                            <label for="maintenance_type_id" class="block mb-1.5 text-sm font-medium text-gray-600">
+                            <label for="maintenance_type_id" class="block mb-2 text-sm font-medium text-gray-600">
                                 <x-iconify icon="lucide:tag" class="w-4 h-4 inline" /> Type de maintenance
                             </label>
-                            <select name="maintenance_type_id" id="maintenance_type_id" class="block w-full border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-sm">
+                            <select name="maintenance_type_id" id="maintenance_type_id" class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 transition-colors duration-200 hover:border-gray-400 focus:ring-2 focus:ring-[#0c90ee]/20 focus:border-[#0c90ee]">
                                 <option value="">Tous les types</option>
                                 @foreach($maintenanceTypes as $type)
                                 <option value="{{ $type->id }}" {{ request('maintenance_type_id') == $type->id ? 'selected' : '' }}>
@@ -414,10 +426,10 @@
 
                         {{-- Filtre Véhicule --}}
                         <div>
-                            <label for="vehicle_id" class="block mb-1.5 text-sm font-medium text-gray-600">
+                            <label for="filter_vehicle_id" class="block mb-2 text-sm font-medium text-gray-600">
                                 <x-iconify icon="lucide:car" class="w-4 h-4 inline" /> Véhicule
                             </label>
-                            <select name="vehicle_id" id="vehicle_id" class="block w-full border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-sm">
+                            <select name="vehicle_id" id="filter_vehicle_id" class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 transition-colors duration-200 hover:border-gray-400 focus:ring-2 focus:ring-[#0c90ee]/20 focus:border-[#0c90ee]">
                                 <option value="">Tous les véhicules</option>
                                 @foreach($vehicles as $vehicle)
                                 <option value="{{ $vehicle->id }}" {{ request('vehicle_id') == $vehicle->id ? 'selected' : '' }}>
@@ -429,10 +441,10 @@
 
                         {{-- Filtre Fournisseur --}}
                         <div>
-                            <label for="provider_id" class="block mb-1.5 text-sm font-medium text-gray-600">
+                            <label for="provider_id" class="block mb-2 text-sm font-medium text-gray-600">
                                 <x-iconify icon="lucide:building" class="w-4 h-4 inline" /> Fournisseur
                             </label>
-                            <select name="provider_id" id="provider_id" class="block w-full border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-sm">
+                            <select name="provider_id" id="provider_id" class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 transition-colors duration-200 hover:border-gray-400 focus:ring-2 focus:ring-[#0c90ee]/20 focus:border-[#0c90ee]">
                                 <option value="">Tous les fournisseurs</option>
                                 @foreach($providers as $provider)
                                 <option value="{{ $provider->id }}" {{ request('provider_id') == $provider->id ? 'selected' : '' }}>
@@ -444,28 +456,32 @@
 
                         {{-- Filtre Date De --}}
                         <div>
-                            <label for="date_from" class="block mb-1.5 text-sm font-medium text-gray-600">
+                            <label class="block mb-2 text-sm font-medium text-gray-600">
                                 <x-iconify icon="lucide:calendar" class="w-4 h-4 inline" /> Date de début
                             </label>
-                            <input type="date" name="date_from" id="date_from" value="{{ request('date_from') }}"
-                                class="block w-full border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-sm">
+                            <x-datepicker
+                                name="date_from"
+                                :value="request('date_from')"
+                                placeholder="jj/mm/aaaa" />
                         </div>
 
                         {{-- Filtre Date À --}}
                         <div>
-                            <label for="date_to" class="block mb-1.5 text-sm font-medium text-gray-600">
+                            <label class="block mb-2 text-sm font-medium text-gray-600">
                                 <x-iconify icon="lucide:calendar" class="w-4 h-4 inline" /> Date de fin
                             </label>
-                            <input type="date" name="date_to" id="date_to" value="{{ request('date_to') }}"
-                                class="block w-full border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-sm">
+                            <x-datepicker
+                                name="date_to"
+                                :value="request('date_to')"
+                                placeholder="jj/mm/aaaa" />
                         </div>
 
                         {{-- Filtre Catégorie --}}
                         <div>
-                            <label for="category" class="block mb-1.5 text-sm font-medium text-gray-600">
+                            <label for="category" class="block mb-2 text-sm font-medium text-gray-600">
                                 <x-iconify icon="lucide:layers" class="w-4 h-4 inline" /> Catégorie
                             </label>
-                            <select name="category" id="category" class="block w-full border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-sm">
+                            <select name="category" id="category" class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 transition-colors duration-200 hover:border-gray-400 focus:ring-2 focus:ring-[#0c90ee]/20 focus:border-[#0c90ee]">
                                 <option value="">Toutes catégories</option>
                                 <option value="preventive" {{ request('category') == 'preventive' ? 'selected' : '' }}>Préventive</option>
                                 <option value="corrective" {{ request('category') == 'corrective' ? 'selected' : '' }}>Corrective</option>
@@ -476,10 +492,10 @@
 
                         {{-- Filtre En Retard --}}
                         <div>
-                            <label class="block mb-1.5 text-sm font-medium text-gray-600">&nbsp;</label>
+                            <label class="block mb-2 text-sm font-medium text-gray-600">&nbsp;</label>
                             <label class="flex items-center gap-2 cursor-pointer">
                                 <input type="checkbox" name="overdue" value="1" {{ request('overdue') ? 'checked' : '' }}
-                                    class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                                    class="rounded border-gray-300 text-[#0c90ee] focus:ring-[#0c90ee]/20">
                                 <span class="text-sm text-gray-700">
                                     <x-iconify icon="lucide:alert-circle" class="w-4 h-4 inline text-red-500" />
                                     Seulement en retard
@@ -493,12 +509,13 @@
                         <button
                             type="button"
                             onclick="document.getElementById('filterForm').reset(); window.location.href='{{ route('admin.maintenance.operations.index') }}'"
-                            class="text-sm text-gray-600 hover:text-gray-900 font-medium">
-                            <x-iconify icon="lucide:x" class="w-4 h-4 inline" /> Réinitialiser
+                            class="inline-flex items-center justify-center h-10 px-4 rounded-lg border border-gray-300 bg-white text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#0c90ee]/20 focus:border-[#0c90ee] transition-all duration-200">
+                            <x-iconify icon="lucide:x" class="w-4 h-4 mr-2" />
+                            Réinitialiser
                         </button>
                         <button
                             type="submit"
-                            class="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm font-semibold rounded-lg hover:bg-blue-700 transition-all duration-200">
+                            class="inline-flex items-center justify-center h-10 gap-2 px-5 rounded-lg border border-[#0c90ee] bg-[#0c90ee] text-sm font-semibold text-white hover:bg-[#0a7fd1] hover:border-[#0a7fd1] focus:outline-none focus:ring-2 focus:ring-[#0c90ee]/20 transition-all duration-200">
                             <x-iconify icon="lucide:filter" class="w-4 h-4" />
                             Appliquer les filtres
                         </button>
@@ -524,7 +541,7 @@
                         <label class="text-xs text-gray-600">Trier par:</label>
                         <select
                             onchange="window.location.href='{{ route('admin.maintenance.operations.index') }}?' + new URLSearchParams(Object.fromEntries(new URLSearchParams(window.location.search).entries())).toString() + '&sort=' + this.value.split(':')[0] + '&direction=' + this.value.split(':')[1]"
-                            class="text-xs border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                            class="text-xs border-gray-300 rounded-md focus:ring-[#0c90ee]/20 focus:border-[#0c90ee]">
                             <option value="scheduled_date:desc" {{ request('sort') == 'scheduled_date' && request('direction') == 'desc' ? 'selected' : '' }}>Date (récent)</option>
                             <option value="scheduled_date:asc" {{ request('sort') == 'scheduled_date' && request('direction') == 'asc' ? 'selected' : '' }}>Date (ancien)</option>
                             <option value="total_cost:desc" {{ request('sort') == 'total_cost' && request('direction') == 'desc' ? 'selected' : '' }}>Coût (élevé)</option>
@@ -541,9 +558,7 @@
                     <thead class="bg-gray-50">
                         <tr>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                V
-
-                                échicule
+                                Véhicule
                             </th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                 Type de maintenance
@@ -688,7 +703,7 @@
                                     <h3 class="text-sm font-medium text-gray-900 mb-1">Aucune opération trouvée</h3>
                                     <p class="text-sm text-gray-500 mb-4">Commencez par créer une nouvelle opération de maintenance.</p>
                                     <a href="{{ route('admin.maintenance.operations.create') }}"
-                                        class="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm font-semibold rounded-lg hover:bg-blue-700">
+                                        class="inline-flex items-center gap-2 px-4 py-2 border border-[#0c90ee] bg-[#0c90ee] text-white text-sm font-semibold rounded-lg hover:bg-[#0a7fd1] hover:border-[#0a7fd1]">
                                         <x-iconify icon="lucide:plus" class="w-4 h-4" />
                                         Nouvelle Maintenance
                                     </a>
@@ -712,12 +727,49 @@
 {{-- Script Alpine.js pour interactions --}}
 @push('scripts')
 <script>
-    // Auto-submit form on filter change
-    document.querySelectorAll('#filterForm select, #filterForm input[type="date"]').forEach(element => {
-        element.addEventListener('change', function() {
-            document.getElementById('filterForm').submit();
+    (function initMaintenanceFilters() {
+        const filterForm = document.getElementById('filterForm');
+        if (!filterForm) {
+            return;
+        }
+
+        // Auto-submit for standard filters.
+        filterForm.querySelectorAll('select:not(#filter_vehicle_id), input[type="checkbox"]').forEach((element) => {
+            element.addEventListener('change', () => {
+                filterForm.submit();
+            });
         });
-    });
+
+        // Flowbite datepicker change event.
+        filterForm.querySelectorAll('.datepicker-input').forEach((element) => {
+            element.addEventListener('changeDate', () => {
+                filterForm.submit();
+            });
+        });
+
+        // Vehicle filter with SlimSelect search support.
+        const vehicleSelect = document.getElementById('filter_vehicle_id');
+        if (vehicleSelect && typeof window.SlimSelect !== 'undefined' && vehicleSelect.dataset.slimInitialized !== '1') {
+            vehicleSelect.dataset.slimInitialized = '1';
+
+            new window.SlimSelect({
+                select: vehicleSelect,
+                settings: {
+                    showSearch: true,
+                    searchPlaceholder: 'Rechercher un véhicule...',
+                    searchText: 'Aucun véhicule trouvé',
+                    searchingText: 'Recherche...',
+                    placeholderText: 'Tous les véhicules',
+                    allowDeselect: true
+                },
+                events: {
+                    afterChange: () => {
+                        filterForm.submit();
+                    }
+                }
+            });
+        }
+    })();
 </script>
 @endpush
 

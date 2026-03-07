@@ -3,19 +3,20 @@
         Single Root Element enforced for Livewire 3
         Design System: Matches admin/drivers/driver-index.blade.php
     --}}
-    <div class="py-4 px-4 mx-auto max-w-7xl lg:py-6">
+    <div class="py-6 px-4 mx-auto max-w-7xl lg:py-10">
 
         {{-- ===============================================
             HEADER
         =============================================== --}}
-        <div class="mb-4 flex justify-between items-center">
-            <h1 class="text-2xl font-bold text-gray-900 flex items-center gap-2.5">
-                <x-iconify icon="lucide:file-text" class="w-6 h-6 text-blue-600" />
-                Gestion des Documents
-                <span class="ml-2 text-sm font-normal text-gray-500">
-                    ({{ $documents->total() }})
-                </span>
-            </h1>
+        <div class="mb-6 flex flex-col gap-2 lg:flex-row lg:items-center lg:justify-between">
+            <div>
+                <h1 class="text-xl font-bold text-gray-600">
+                    Gestion des Documents
+                </h1>
+                <p class="text-xs text-gray-600">
+                    Référentiel documentaire centralisé • {{ $documents->total() }} document(s)
+                </p>
+            </div>
 
             <div wire:loading class="flex items-center gap-2 text-blue-600">
                 <x-iconify icon="lucide:loader-2" class="w-5 h-5 animate-spin" />
@@ -88,7 +89,7 @@
                     <input wire:model.live.debounce.500ms="search" type="text"
                         wire:loading.attr="aria-busy"
                         wire:target="search"
-                        class="pl-10 pr-4 py-2.5 block w-full bg-white border border-gray-300 rounded-lg shadow-sm hover:border-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+                        class="pl-10 pr-4 py-2.5 block w-full bg-white border border-gray-300 rounded-lg shadow-sm hover:border-gray-400 focus:ring-2 focus:ring-[#0c90ee]/20 focus:border-[#0c90ee] text-sm"
                         placeholder="Rechercher (nom, description)...">
                     <div wire:loading.delay wire:target="search" class="absolute inset-y-0 right-0 pr-3 flex items-center">
                         <x-iconify icon="lucide:loader-2" class="w-4 h-4 text-blue-500 animate-spin" />
@@ -98,7 +99,7 @@
 
             <x-slot:filters>
                 <button @click="showFilters = !showFilters" type="button"
-                    class="inline-flex items-center gap-2 p-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-all duration-200 shadow-sm hover:shadow-md">
+                    class="inline-flex items-center gap-2 h-10 px-3 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-all duration-200 shadow-sm hover:shadow-md">
                     <x-iconify icon="lucide:filter" class="w-5 h-5 text-gray-500" />
                     <x-iconify icon="heroicons:chevron-down" class="w-4 h-4 text-gray-400 transition-transform duration-200" x-bind:class="showFilters ? 'rotate-180' : ''" />
                 </button>
@@ -107,9 +108,9 @@
             <x-slot:actions>
                 @can('documents.create')
                     <button wire:click="openUploadModal"
-                        class="inline-flex items-center gap-2 p-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all duration-200 shadow-sm hover:shadow-md">
+                        class="inline-flex items-center gap-2 h-10 px-4 bg-[#0c90ee] text-white rounded-lg hover:bg-[#0b82d6] transition-all duration-200 shadow-sm hover:shadow-md">
                         <x-iconify icon="lucide:upload-cloud" class="w-5 h-5" />
-                        <span class="hidden sm:inline">Uploader</span>
+                        <span class="hidden sm:inline font-medium">Uploader</span>
                     </button>
                 @endcan
             </x-slot:actions>
@@ -117,8 +118,8 @@
             <x-slot:filtersPanel>
                 <x-page-filters-panel columns="2">
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1.5">Catégorie</label>
-                        <select wire:model.live="categoryFilter" class="block w-full border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                        <label class="block mb-2 text-sm font-medium text-gray-600">Catégorie</label>
+                        <select wire:model.live="categoryFilter" class="block w-full bg-gray-50 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[#0c90ee]/20 focus:border-[#0c90ee]">
                             <option value="">Toutes les catégories</option>
                             @foreach($categories as $category)
                             <option value="{{ $category->id }}">{{ $category->name }}</option>
@@ -126,8 +127,8 @@
                         </select>
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1.5">Statut</label>
-                        <select wire:model.live="statusFilter" class="block w-full border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                        <label class="block mb-2 text-sm font-medium text-gray-600">Statut</label>
+                        <select wire:model.live="statusFilter" class="block w-full bg-gray-50 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[#0c90ee]/20 focus:border-[#0c90ee]">
                             <option value="">Tous les statuts</option>
                             <option value="draft">Brouillon</option>
                             <option value="validated">Validé</option>
@@ -267,154 +268,183 @@
     =============================================== --}}
     @if($showUploadModal)
     <div class="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
-        <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-            <div class="fixed inset-0 bg-gray-900/40 backdrop-blur-sm transition-opacity z-40" wire:click="closeUploadModal"></div>
+        <div class="fixed inset-0 flex items-stretch justify-end">
+            <div wire:click="closeUploadModal" class="fixed inset-0 bg-gray-900/40 backdrop-blur-sm transition-opacity z-40"></div>
 
-            <span class="hidden sm:inline-block sm:align-middle sm:h-screen">&#8203;</span>
-
-            <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-2xl sm:w-full relative z-50">
-
-                {{-- Validated Header Logic --}}
-                <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4 border-b border-gray-100">
-                    <div class="flex items-center justify-between">
-                        <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-title">
-                            Nouveau Document
-                        </h3>
-                        <button wire:click="closeUploadModal" class="bg-white rounded-md text-gray-400 hover:text-gray-500 focus:outline-none">
-                            <x-iconify icon="lucide:x" class="w-5 h-5" />
-                        </button>
-                    </div>
+            <div class="relative z-50 h-screen w-full max-w-2xl border-l border-slate-200 bg-white text-left shadow-2xl overflow-y-auto">
+                <div class="flex items-center justify-between px-6 pt-5 pb-4 border-b border-gray-200 sticky top-0 bg-white z-10">
+                    <h3 class="text-lg font-semibold text-gray-900 flex items-center gap-2" id="modal-title">
+                        <x-iconify icon="heroicons:document-arrow-up" class="w-5 h-5 text-[#0c90ee]" />
+                        Nouveau Document
+                    </h3>
+                    <button wire:click="closeUploadModal" class="text-gray-400 hover:text-gray-500 transition-colors p-2 hover:bg-gray-100 rounded-lg">
+                        <x-iconify icon="heroicons:x-mark" class="w-5 h-5" />
+                    </button>
                 </div>
 
-                {{-- Modal Body --}}
-                <div class="px-4 pt-5 pb-4 sm:p-6">
+                <form wire:submit.prevent="upload" class="space-y-6 px-6 py-4">
                     @if (session()->has('error'))
-                    <div class="mb-4 bg-red-50 border-l-4 border-red-500 p-4 rounded-r-lg">
-                        <div class="flex">
-                            <div class="flex-shrink-0"><x-iconify icon="lucide:alert-circle" class="h-5 w-5 text-red-500" /></div>
-                            <div class="ml-3">
-                                <p class="text-sm text-red-700">{{ session('error') }}</p>
-                            </div>
+                        <div class="rounded-lg border border-red-200 bg-red-50 px-4 py-3">
+                            <p class="text-sm text-red-700 flex items-center gap-2">
+                                <x-iconify icon="heroicons:exclamation-circle" class="w-4 h-4" />
+                                {{ session('error') }}
+                            </p>
                         </div>
-                    </div>
                     @endif
 
-                    <form wire:submit.prevent="upload" class="space-y-4">
-
-                        {{-- File Input --}}
-                        <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 flex justify-center items-center hover:border-blue-400 transition-colors bg-gray-50">
-                            <div class="text-center">
-                                <x-iconify icon="lucide:cloud-upload" class="mx-auto h-12 w-12 text-gray-400" />
-                                <div class="mt-2 text-sm text-gray-600">
-                                    <label for="file-upload" class="relative cursor-pointer bg-white rounded-md font-medium text-blue-600 hover:text-blue-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-blue-500 px-2 py-1">
-                                        <span>Choisir un fichier</span>
-                                        <input id="file-upload" wire:model="newFile" type="file" class="sr-only">
-                                    </label>
-                                    <p class="pl-1 inline">ou glisser-déposer</p>
-                                </div>
-                                <p class="text-xs text-gray-500 mt-1">PDF, IMG jusqu'à 10MB</p>
+                    <div>
+                        <label class="block mb-2 text-sm font-medium text-gray-600">
+                            Fichier
+                            <span class="text-red-500">*</span>
+                        </label>
+                        <div class="relative border-2 border-dashed rounded-xl p-6 text-center transition-all border-gray-300 hover:border-[#0c90ee] bg-gray-50">
+                            <input id="file-upload" wire:model="newFile" type="file" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10">
+                            <div class="pointer-events-none">
+                                <x-iconify icon="heroicons:cloud-arrow-up" class="mx-auto h-9 w-9 text-gray-400" />
+                                <p class="mt-2 text-sm text-gray-600">
+                                    <span class="font-medium text-[#0c90ee]">Cliquez pour téléverser</span> ou glissez-déposez
+                                </p>
+                                <p class="text-xs text-gray-500 mt-1">PDF, DOC, DOCX, JPG, PNG (max 10MB)</p>
 
                                 @if($newFile)
-                                <div class="mt-2 text-sm text-green-600 font-medium flex items-center justify-center gap-1">
-                                    <x-iconify icon="lucide:check" class="w-4 h-4" />
-                                    {{ $newFile->getClientOriginalName() }}
-                                </div>
+                                    <p class="mt-3 inline-flex items-center gap-2 rounded-full bg-green-50 border border-green-200 px-3 py-1 text-sm font-medium text-green-700">
+                                        <x-iconify icon="heroicons:check-circle" class="w-4 h-4" />
+                                        {{ $newFile->getClientOriginalName() }}
+                                    </p>
                                 @endif
 
-                                <div wire:loading wire:target="newFile" class="mt-2 text-sm text-blue-600 flex items-center justify-center gap-1">
-                                    <x-iconify icon="lucide:loader-2" class="w-4 h-4 animate-spin" />
-                                    Upload en cours...
+                                <div wire:loading wire:target="newFile" class="mt-2 text-sm text-[#0c90ee] flex items-center justify-center gap-2">
+                                    <x-iconify icon="heroicons:arrow-path" class="w-4 h-4 animate-spin" />
+                                    Téléversement en cours...
                                 </div>
                             </div>
                         </div>
-                        @error('newFile') <span class="text-xs text-red-500">{{ $message }}</span> @enderror
+                        @error('newFile')
+                            <p class="mt-2 text-sm text-red-600 flex items-center gap-1.5">
+                                <x-iconify icon="heroicons:exclamation-circle" class="w-4 h-4" />
+                                {{ $message }}
+                            </p>
+                        @enderror
+                    </div>
 
-                        {{-- Category --}}
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700">Catégorie</label>
-                            <select wire:model.live="uploadCategoryId" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md">
-                                <option value="">Choisir...</option>
-                                @foreach($categories as $cat)
+                    <div>
+                        <label class="block mb-2 text-sm font-medium text-gray-600">
+                            Catégorie
+                            <span class="text-red-500">*</span>
+                        </label>
+                        <select wire:model.live="uploadCategoryId" class="block w-full rounded-lg border bg-gray-50 px-3 py-2.5 text-sm text-gray-900 transition-colors duration-200 @error('uploadCategoryId') border-red-500 bg-red-50 focus:ring-red-500 focus:border-red-500 @else border-gray-300 hover:border-gray-400 focus:ring-2 focus:ring-[#0c90ee]/20 focus:border-[#0c90ee] @enderror">
+                            <option value="">Sélectionner une catégorie</option>
+                            @foreach($categories as $cat)
                                 <option value="{{ $cat->id }}">{{ $cat->name }}</option>
-                                @endforeach
-                            </select>
-                            @error('uploadCategoryId') <span class="text-xs text-red-500">{{ $message }}</span> @enderror
-                        </div>
+                            @endforeach
+                        </select>
+                        @error('uploadCategoryId')
+                            <p class="mt-2 text-sm text-red-600 flex items-center gap-1.5">
+                                <x-iconify icon="heroicons:exclamation-circle" class="w-4 h-4" />
+                                {{ $message }}
+                            </p>
+                        @enderror
+                    </div>
 
-                        {{-- Dynamic Fields --}}
-                        @if($this->selectedUploadCategory && $this->selectedUploadCategory->meta_schema)
-                        <div class="bg-gray-50 p-3 rounded-lg border border-gray-200">
-                            <h4 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">
-                                Détails : {{ $this->selectedUploadCategory->name }}
+                    @if($this->selectedUploadCategory && $this->selectedUploadCategory->meta_schema)
+                        <div class="rounded-xl border border-gray-200 bg-gray-50 p-4">
+                            <h4 class="text-sm font-semibold text-slate-600 mb-3">
+                                Détails: {{ $this->selectedUploadCategory->name }}
                             </h4>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 @foreach($this->selectedUploadCategory->meta_schema as $field)
-                                @php
-                                $key = $field['key'] ?? null;
-                                $label = $field['label'] ?? $key;
-                                $type = $field['type'] ?? 'string';
-                                @endphp
-                                @if($key)
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700">{{ $label }}</label>
-                                    @if($type === 'boolean')
-                                    <input type="checkbox" wire:model="uploadMetadata.{{ $key }}" class="mt-1 h-4 w-4 text-blue-600 border-gray-300 rounded">
-                                    @elseif($type === 'number')
-                                    <input type="number" wire:model="uploadMetadata.{{ $key }}" class="mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
-                                    @elseif($type === 'date')
-                                    <input type="date" wire:model="uploadMetadata.{{ $key }}" class="mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
-                                    @else
-                                    <input type="text" wire:model="uploadMetadata.{{ $key }}" class="mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                                    @php
+                                        $key = $field['key'] ?? null;
+                                        $label = $field['label'] ?? $key;
+                                        $type = $field['type'] ?? 'string';
+                                    @endphp
+                                    @if($key)
+                                        <div>
+                                            <label class="block mb-2 text-sm font-medium text-gray-600">{{ $label }}</label>
+                                            @if($type === 'boolean')
+                                                <label class="inline-flex items-center gap-2 text-sm text-gray-600">
+                                                    <input type="checkbox" wire:model="uploadMetadata.{{ $key }}" class="h-4 w-4 rounded border-gray-300 text-[#0c90ee] focus:ring-[#0c90ee]/30">
+                                                    Oui
+                                                </label>
+                                            @elseif($type === 'number')
+                                                <input type="number" wire:model="uploadMetadata.{{ $key }}" class="block w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm text-gray-900 hover:border-gray-400 focus:ring-2 focus:ring-[#0c90ee]/20 focus:border-[#0c90ee]">
+                                            @elseif($type === 'date')
+                                                <input type="date" wire:model="uploadMetadata.{{ $key }}" class="block w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm text-gray-900 hover:border-gray-400 focus:ring-2 focus:ring-[#0c90ee]/20 focus:border-[#0c90ee]">
+                                            @else
+                                                <input type="text" wire:model="uploadMetadata.{{ $key }}" class="block w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm text-gray-900 hover:border-gray-400 focus:ring-2 focus:ring-[#0c90ee]/20 focus:border-[#0c90ee]">
+                                            @endif
+                                            @error("uploadMetadata.{$key}")
+                                                <p class="mt-2 text-sm text-red-600 flex items-center gap-1.5">
+                                                    <x-iconify icon="heroicons:exclamation-circle" class="w-4 h-4" />
+                                                    {{ $message }}
+                                                </p>
+                                            @enderror
+                                        </div>
                                     @endif
-                                    @error("uploadMetadata.{$key}") <span class="text-xs text-red-500">{{ $message }}</span> @enderror
-                                </div>
-                                @endif
                                 @endforeach
                             </div>
                         </div>
-                        @endif
+                    @endif
 
-                        {{-- Standard Dates --}}
-                        <div class="grid grid-cols-2 gap-4">
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700">Date d'émission</label>
-                                <input type="date" wire:model="uploadIssueDate" class="mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
-                                @error('uploadIssueDate') <span class="text-xs text-red-500">{{ $message }}</span> @enderror
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700">Date d'expiration</label>
-                                <input type="date" wire:model="uploadExpiryDate" class="mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
-                                @error('uploadExpiryDate') <span class="text-xs text-red-500">{{ $message }}</span> @enderror
-                            </div>
-                        </div>
-
-                        {{-- Description --}}
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                            <label class="block text-sm font-medium text-gray-700">Description</label>
-                            <textarea wire:model="uploadDescription" rows="2" class="mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"></textarea>
-                            @error('uploadDescription') <span class="text-xs text-red-500">{{ $message }}</span> @enderror
+                            <x-datepicker
+                                name="upload_issue_date"
+                                label="Date d'émission"
+                                :value="$uploadIssueDate"
+                                placeholder="JJ/MM/AAAA"
+                                :error="$errors->first('uploadIssueDate')"
+                                x-on:input="$wire.set('uploadIssueDate', $event.detail)" />
                         </div>
+                        <div>
+                            <x-datepicker
+                                name="upload_expiry_date"
+                                label="Date d'expiration"
+                                :value="$uploadExpiryDate"
+                                :minDate="$uploadIssueDate"
+                                placeholder="JJ/MM/AAAA"
+                                :error="$errors->first('uploadExpiryDate')"
+                                x-on:input="$wire.set('uploadExpiryDate', $event.detail)" />
+                        </div>
+                    </div>
 
-                        {{-- Status & Submit --}}
-                        <div class="flex items-center justify-between pt-2">
-                            <div class="flex items-center">
-                                <input type="checkbox" wire:model="uploadStatus" value="validated" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
-                                <label class="ml-2 block text-sm text-gray-900">
-                                    Marquer comme validé
-                                </label>
-                            </div>
-                            <div class="flex gap-2">
-                                <button type="button" wire:click="closeUploadModal" class="inline-flex justify-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none">
-                                    Annuler
-                                </button>
-                                <button type="submit" wire:loading.attr="disabled" class="inline-flex justify-center px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md shadow-sm hover:bg-blue-700 focus:outline-none">
-                                    <span wire:loading.remove wire:target="upload">Uploader</span>
-                                    <span wire:loading wire:target="upload">Traitement...</span>
-                                </button>
-                            </div>
-                        </div>
-                    </form>
-                </div>
+                    <div>
+                        <label class="block mb-2 text-sm font-medium text-gray-600">Description</label>
+                        <textarea wire:model="uploadDescription" rows="3" class="block w-full rounded-lg border border-gray-300 bg-gray-50 px-3 py-2.5 text-sm text-gray-900 hover:border-gray-400 focus:ring-2 focus:ring-[#0c90ee]/20 focus:border-[#0c90ee]" placeholder="Contexte du document..."></textarea>
+                        @error('uploadDescription')
+                            <p class="mt-2 text-sm text-red-600 flex items-center gap-1.5">
+                                <x-iconify icon="heroicons:exclamation-circle" class="w-4 h-4" />
+                                {{ $message }}
+                            </p>
+                        @enderror
+                    </div>
+
+                    <div class="flex items-center">
+                        <input id="upload-status-validated" type="checkbox" wire:model="uploadStatus" value="validated" class="h-4 w-4 rounded border-gray-300 text-[#0c90ee] focus:ring-[#0c90ee]/30">
+                        <label for="upload-status-validated" class="ml-2 block text-sm text-gray-600">
+                            Marquer comme validé
+                        </label>
+                    </div>
+
+                    <div class="flex items-center justify-end gap-3 pt-4 pb-4 px-6 border-t border-gray-200 bg-gray-50 sticky bottom-0 -mx-6">
+                        <button
+                            type="button"
+                            wire:click="closeUploadModal"
+                            class="inline-flex items-center justify-center h-10 px-4 rounded-lg border border-gray-300 bg-white text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#0c90ee]/20 focus:border-[#0c90ee] transition-all duration-200">
+                            Annuler
+                        </button>
+                        <button
+                            type="submit"
+                            wire:loading.attr="disabled"
+                            class="zf-btn-primary inline-flex items-center justify-center h-10 px-4 text-white font-medium rounded-lg transition-colors shadow-sm hover:shadow-md text-sm disabled:opacity-50">
+                            <span wire:loading.remove wire:target="upload">Uploader</span>
+                            <span wire:loading wire:target="upload">
+                                <x-iconify icon="heroicons:arrow-path" class="w-4 h-4 animate-spin inline" />
+                                Traitement...
+                            </span>
+                        </button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>

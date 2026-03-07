@@ -3,7 +3,7 @@
 @section('title', 'Planifications Maintenance')
 
 @section('content')
-<section class="bg-gray-50 min-h-screen">
+<section class="zf-page min-h-screen">
     <div class="py-4 px-4 mx-auto max-w-7xl lg:py-6">
 
         {{-- HEADER --}}
@@ -29,18 +29,17 @@
             {{-- Title & Actions --}}
             <div class="flex items-center justify-between">
                 <div>
-                    <h1 class="text-2xl font-bold text-gray-900 flex items-center gap-2.5">
-                        <x-iconify icon="lucide:repeat" class="w-6 h-6 text-blue-600" />
+                    <h1 class="text-xl font-bold text-gray-600">
                         Planifications de Maintenance
                     </h1>
-                    <p class="mt-1 text-sm text-gray-600">
+                    <p class="mt-1 text-xs text-gray-600">
                         Gérez les maintenances préventives récurrentes
                     </p>
                 </div>
 
                 <div class="flex items-center gap-3">
                     <a href="{{ route('admin.maintenance.schedules.create') }}"
-                       class="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm font-semibold rounded-lg hover:bg-blue-700 transition-colors duration-200 shadow-sm">
+                       class="inline-flex items-center gap-2 px-4 py-2 border border-[#0c90ee] bg-[#0c90ee] text-white text-sm font-semibold rounded-lg hover:bg-[#0a7fd1] hover:border-[#0a7fd1] transition-all duration-200 shadow-sm hover:shadow-md">
                         <x-iconify icon="lucide:plus" class="w-4 h-4" />
                         Nouvelle Planification
                     </a>
@@ -156,7 +155,7 @@
                                             <x-iconify icon="lucide:car" class="w-5 h-5 text-blue-600" />
                                         </div>
                                         <div>
-                                            <div class="text-sm font-semibold text-gray-900">
+                                            <div class="text-sm font-semibold text-gray-600">
                                                 {{ $schedule->vehicle->registration_plate }}
                                             </div>
                                             <div class="text-xs text-gray-500">
@@ -200,20 +199,23 @@
                                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                     <div class="flex items-center gap-2">
                                         <a href="{{ route('admin.maintenance.schedules.show', $schedule) }}"
-                                           class="text-blue-600 hover:text-blue-900">
-                                            <x-iconify icon="lucide:eye" class="w-5 h-5" />
+                                           class="p-2 rounded-full bg-gray-50 text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition-all duration-200 group"
+                                           title="Voir détails">
+                                            <x-iconify icon="lucide:eye" class="w-4 h-4 group-hover:scale-110 transition-transform" />
                                         </a>
                                         <a href="{{ route('admin.maintenance.schedules.edit', $schedule) }}"
-                                           class="text-gray-600 hover:text-gray-900">
-                                            <x-iconify icon="lucide:pencil" class="w-5 h-5" />
+                                           class="p-2 rounded-full bg-gray-50 text-gray-400 hover:text-amber-600 hover:bg-amber-50 transition-all duration-200 group"
+                                           title="Modifier">
+                                            <x-iconify icon="lucide:pencil" class="w-4 h-4 group-hover:scale-110 transition-transform" />
                                         </a>
                                         <form action="{{ route('admin.maintenance.schedules.toggle', $schedule) }}" 
                                               method="POST" class="inline">
                                             @csrf
                                             @method('PATCH')
                                             <button type="submit" 
-                                                    class="text-{{ $schedule->is_active ? 'red' : 'green' }}-600 hover:text-{{ $schedule->is_active ? 'red' : 'green' }}-900">
-                                                <x-iconify icon="lucide:{{ $schedule->is_active ? 'pause' : 'play' }}-circle" class="w-5 h-5" />
+                                                    class="p-2 rounded-full bg-gray-50 text-gray-400 transition-all duration-200 group {{ $schedule->is_active ? 'hover:text-orange-600 hover:bg-orange-50' : 'hover:text-green-600 hover:bg-green-50' }}"
+                                                    title="{{ $schedule->is_active ? 'Desactiver' : 'Activer' }}">
+                                                <x-iconify icon="lucide:{{ $schedule->is_active ? 'pause' : 'play' }}-circle" class="w-4 h-4 group-hover:scale-110 transition-transform" />
                                             </button>
                                         </form>
                                     </div>

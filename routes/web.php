@@ -560,8 +560,8 @@ Route::middleware(['auth', 'verified', 'audit.log'])
     */
 
         // 🚨 SYSTÈME D'ALERTES ENTERPRISE
-        Route::prefix('alerts')->name('alerts.')->group(function () {
-            Route::get('/', [\App\Http\Controllers\Admin\AlertController::class, 'index'])->name('index');
+        Route::prefix('alerts')->name('alerts.')->middleware('can:alerts.view')->group(function () {
+            Route::view('/', 'admin.alerts.index-livewire')->name('index');
             Route::get('/api', [\App\Http\Controllers\Admin\AlertController::class, 'getAlertsApi'])->name('api');
             Route::post('/mark-as-read', [\App\Http\Controllers\Admin\AlertController::class, 'markAsRead'])->name('mark-as-read');
             Route::get('/export', [\App\Http\Controllers\Admin\AlertController::class, 'export'])->name('export');

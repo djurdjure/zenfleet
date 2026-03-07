@@ -182,13 +182,18 @@ class VehicleExpenseController extends Controller
         Gate::authorize('expenses.analytics.view');
 
         $organizationId = auth()->user()->organization_id;
+        $currentYear = (int) now()->year;
+        $year = (int) request()->integer('year', $currentYear);
+        if ($year < 2000 || $year > ($currentYear + 1)) {
+            $year = $currentYear;
+        }
         
         // Récupérer les statistiques avancées
         $stats = $this->analyticsService->getDashboardStats($organizationId);
         // Temporairement désactivé - méthode calculateGrowthRate manquante
         // $trends = $this->analyticsService->getTrends($organizationId, date('Y'));
         // $predictions = $this->analyticsService->getPredictions($organizationId);
-        $tco = $this->analyticsService->calculateTCO($organizationId);
+        $tco = $this->analyticsService->calculateTCO($organizationId, $year);
         // $efficiency = $this->analyticsService->getEfficiencyMetrics($organizationId);
         
         // Valeurs temporaires
@@ -202,6 +207,7 @@ class VehicleExpenseController extends Controller
             'predictions' => $predictions,
             'tco' => $tco,
             'efficiency' => $efficiency,
+            'year' => $year,
         ]);
     }
 

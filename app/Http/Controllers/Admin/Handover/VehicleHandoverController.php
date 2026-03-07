@@ -22,12 +22,6 @@ use App\Services\PdfGenerationService;
 class VehicleHandoverController extends Controller
 {
     /**
-     * Affiche la vue de création d’une fiche de remise pour une affectation donnée.
-     *
-     * @param Assignment $assignment
-     * @return View
-     */
-    /**
      * Affiche la liste des fiches de remise.
      * Redirige vers la liste des affectations pour le moment.
      *
@@ -40,6 +34,12 @@ class VehicleHandoverController extends Controller
 
     /**
      * Affiche la vue de création d’une fiche de remise pour une affectation donnée.
+     *
+     * @param Assignment $assignment
+     * @param HandoverChecklistService $checklistService
+     * @return View|RedirectResponse
+     */
+    public function create(Assignment $assignment, HandoverChecklistService $checklistService): View|RedirectResponse
     {
         $this->authorize('handovers.create');
 

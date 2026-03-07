@@ -52,7 +52,7 @@
 {{-- ====================================================================
  🎨 SECTION PRINCIPALE - FOND GRIS CLAIR MODERNE
  ==================================================================== --}}
-<section class="bg-gray-50 min-h-screen">
+<section class="zf-page min-h-screen">
     <div class="py-6 px-4 mx-auto max-w-7xl lg:py-12">
 
         {{-- ===============================================
@@ -61,10 +61,10 @@
         <div class="mb-6">
             <div class="md:flex md:items-center md:justify-between">
                 <div class="flex-1 min-w-0">
-                    <h1 class="text-xl font-bold text-gray-600 mb-1">
+                    <h1 class="text-xl font-bold text-gray-600 mb-1 flex items-center gap-2.5">
                         Mettre à jour le kilométrage
                     </h1>
-                    <p class="text-xs text-gray-600">
+                    <p class="text-xs text-gray-600 ml-8.5">
                         @if($mode === 'fixed' && $vehicleData)
                             Mise à jour pour <strong>{{ $vehicleData['registration_plate'] }}</strong> - {{ $vehicleData['brand'] }} {{ $vehicleData['model'] }}
                         @else
@@ -74,7 +74,7 @@
                 </div>
                 <div class="mt-4 flex gap-2 md:mt-0 md:ml-4">
                     <a href="{{ route('admin.mileage-readings.index') }}" 
-                       class="inline-flex items-center gap-2 px-4 py-2 bg-white hover:bg-gray-50 border border-gray-300 text-gray-700 font-medium rounded-lg shadow-sm transition-colors duration-200">
+                       class="inline-flex items-center justify-center h-10 gap-2 px-4 rounded-lg border border-gray-300 bg-white text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#0c90ee]/20 focus:border-[#0c90ee] transition-all duration-200 shadow-sm">
                         <x-iconify icon="heroicons:arrow-left" class="w-5 h-5" />
                         <span class="hidden sm:inline">Retour</span>
                     </a>
@@ -108,17 +108,18 @@
             <div class="lg:col-span-2 space-y-6">
                 
                 {{-- CARD FORMULAIRE --}}
-                <form wire:submit.prevent="save" x-data="mileageFormValidation()">
-                    <x-card padding="p-6">
-                        <div class="space-y-6">
+                <form wire:submit.prevent="save" x-data="mileageFormValidation()" class="space-y-8">
 
-                            {{-- ===============================================
-                                SÉLECTION VÉHICULE (MODE SELECT)
-                            =============================================== --}}
-                            @if($mode === 'select')
+                    {{-- ===============================================
+                        SÉLECTION VÉHICULE (MODE SELECT)
+                    =============================================== --}}
+                    @if($mode === 'select')
+                    <x-form-section
+                        title="Sélection du véhicule"
+                        icon="heroicons:truck"
+                        subtitle="Choisissez le véhicule concerné par le relevé">
                             <div>
                                 <label for="vehicleId" class="block mb-2 text-sm font-medium text-gray-600">
-                                    <x-iconify icon="heroicons:truck" class="w-5 h-5 inline mr-1 text-blue-600" />
                                     Véhicule
                                     <span class="text-red-600">*</span>
                                 </label>
@@ -164,12 +165,17 @@
                                 </p>
                                 @endif
                             </div>
-                            @endif
+                    </x-form-section>
+                    @endif
 
-                            {{-- ===============================================
-                                CARTE INFO VÉHICULE (QUAND SÉLECTIONNÉ)
-                            =============================================== --}}
-                            @if($vehicleData)
+                    {{-- ===============================================
+                        CARTE INFO VÉHICULE + FORMULAIRE RELEVÉ
+                    =============================================== --}}
+                    @if($vehicleData)
+                    <x-form-section
+                        title="Données du relevé kilométrique"
+                        icon="heroicons:gauge"
+                        subtitle="Saisissez le kilométrage, la date et l'heure du relevé">
                             <div class="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg border-2 border-blue-200 p-5">
                                 <div class="flex items-start gap-4">
                                     <div class="w-12 h-12 bg-blue-600 border border-blue-700 rounded-full flex items-center justify-center flex-shrink-0">
@@ -299,7 +305,7 @@
                                     id="notes"
                                     rows="3"
                                     maxlength="500"
-                                    class="block w-full border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-sm"
+                                    class="block w-full rounded-lg border border-gray-300 bg-gray-50 px-3 py-2.5 text-sm text-gray-900 transition-colors duration-200 hover:border-gray-400 focus:ring-2 focus:ring-[#0c90ee]/20 focus:border-[#0c90ee]"
                                     placeholder="Ex: Relevé effectué après le plein d'essence. Véhicule en bon état."></textarea>
                                 <p class="mt-1 text-xs text-gray-500">
                                     <span x-text="$wire.notes.length || 0"></span>/500 caractères
@@ -308,37 +314,37 @@
                                     <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                                 @enderror
                             </div>
+                    </x-form-section>
 
-                            {{-- ===============================================
-                                BOUTONS D'ACTION
-                            =============================================== --}}
-                            <div class="pt-4 border-t border-gray-200">
-                                <div class="flex items-center justify-between gap-3 rounded-xl border border-slate-200 bg-white px-4 py-3 shadow-sm">
-                                    <a
-                                        href="{{ route('admin.mileage-readings.index') }}"
-                                        class="inline-flex items-center justify-center h-10 px-4 rounded-lg border border-gray-300 bg-white text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#0c90ee]/20 focus:border-[#0c90ee] transition-all duration-200">
-                                        Annuler
-                                    </a>
+                    {{-- ===============================================
+                        BOUTONS D'ACTION
+                    =============================================== --}}
+                    <div class="relative pl-14">
+                        <section class="rounded-2xl border border-slate-200 bg-white shadow-sm">
+                            <div class="px-6 py-4 flex items-center justify-between gap-3">
+                                <a
+                                    href="{{ route('admin.mileage-readings.index') }}"
+                                    class="inline-flex items-center justify-center h-10 px-4 rounded-lg border border-gray-300 bg-white text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#0c90ee]/20 focus:border-[#0c90ee] transition-all duration-200">
+                                    Annuler
+                                </a>
 
-                                    <button
-                                        type="submit"
-                                        wire:loading.attr="disabled"
-                                        @if(!$vehicleData || !$newMileage || !$recordedDate || !$recordedTime) disabled @endif
-                                        class="zf-btn-primary inline-flex items-center justify-center h-10 gap-2 px-6 rounded-lg text-sm font-medium text-white transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed">
-                                        <x-iconify icon="heroicons:check" class="w-5 h-5" wire:loading.remove />
-                                        <svg wire:loading class="h-5 w-5 animate-spin text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                        </svg>
-                                        <span wire:loading.remove>Enregistrer le relevé</span>
-                                        <span wire:loading>Enregistrement...</span>
-                                    </button>
-                                </div>
+                                <button
+                                    type="submit"
+                                    wire:loading.attr="disabled"
+                                    @if(!$vehicleData || !$newMileage || !$recordedDate || !$recordedTime) disabled @endif
+                                    class="inline-flex items-center justify-center h-10 gap-2 px-6 rounded-lg border border-[#0c90ee] bg-[#0c90ee] text-sm font-medium text-white transition-all duration-200 hover:bg-[#0a7fd1] hover:border-[#0a7fd1] focus:outline-none focus:ring-2 focus:ring-[#0c90ee]/20 disabled:opacity-50 disabled:cursor-not-allowed">
+                                    <x-iconify icon="heroicons:check" class="w-5 h-5" wire:loading.remove />
+                                    <svg wire:loading class="h-5 w-5 animate-spin text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                    </svg>
+                                    <span wire:loading.remove>Enregistrer le relevé</span>
+                                    <span wire:loading>Enregistrement...</span>
+                                </button>
                             </div>
-                            @endif
-
-                        </div>
-                    </x-card>
+                        </section>
+                    </div>
+                    @endif
                 </form>
 
             </div>
@@ -354,7 +360,7 @@
                 @if($vehicleData && isset($recentReadings) && count($recentReadings) > 0)
                 <x-card padding="p-0">
                     <div class="p-4 border-b border-gray-200">
-                        <h3 class="text-sm font-semibold text-gray-900 flex items-center gap-2">
+                        <h3 class="text-m font-semibold text-slate-600 flex items-center gap-2">
                             <x-iconify icon="heroicons:clock" class="w-5 h-5 text-blue-600" />
                             Historique Récent
                         </h3>
@@ -387,8 +393,8 @@
                         @endforeach
                     </div>
                     <div class="p-3 bg-gray-50 border-t border-gray-200">
-                        <a href="{{ route('admin.vehicles.mileage-history', $vehicleData['id']) }}" 
-                           class="text-xs font-medium text-blue-600 hover:text-blue-700 flex items-center gap-1">
+                        <a href="{{ route('admin.vehicles.mileage-history', $vehicleData['id']) }}"
+                           class="inline-flex items-center justify-center h-9 gap-1.5 px-3 rounded-lg border border-[#0c90ee]/30 bg-blue-50 text-xs font-medium text-[#0c90ee] hover:bg-blue-100 hover:border-[#0c90ee]/45 focus:outline-none focus:ring-2 focus:ring-[#0c90ee]/20 transition-all duration-200">
                             Voir l'historique complet
                             <x-iconify icon="heroicons:arrow-right" class="w-4 h-4" />
                         </a>
@@ -402,7 +408,7 @@
                 @if($vehicleData && $stats)
                 <x-card padding="p-0">
                     <div class="p-4 border-b border-gray-200">
-                        <h3 class="text-sm font-semibold text-gray-900 flex items-center gap-2">
+                        <h3 class="text-m font-semibold text-slate-600 flex items-center gap-2">
                             <x-iconify icon="heroicons:chart-bar" class="w-5 h-5 text-purple-600" />
                             Statistiques
                         </h3>

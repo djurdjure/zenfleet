@@ -1,16 +1,16 @@
-<div>
-    <div class="py-4 px-4 mx-auto max-w-7xl lg:py-6">
-        <div class="mb-4 flex justify-between items-center">
-            <h1 class="text-2xl font-bold text-gray-900 flex items-center gap-2.5">
-                <x-iconify icon="lucide:building-2" class="w-6 h-6 text-blue-600" />
-                Gestion des Fournisseurs
-                <span class="ml-2 text-sm font-normal text-gray-500">
-                    ({{ $suppliers->total() }})
-                </span>
-            </h1>
+<div class="zf-page min-h-screen">
+    <div class="py-6 px-4 mx-auto max-w-7xl lg:py-10">
+        <div class="mb-5 flex items-start justify-between">
+            <div>
+                <h1 class="text-xl font-bold text-gray-600">Gestion des Fournisseurs</h1>
+                <p class="text-xs text-gray-600">
+                    Vue consolidée des partenaires fournisseurs
+                    <span class="ml-2 text-gray-500">• {{ $suppliers->total() }} fournisseur(s)</span>
+                </p>
+            </div>
 
             <div
-                class="flex items-center gap-2 text-blue-600 opacity-0 transition-opacity duration-150"
+                class="flex items-center gap-2 text-[#0c90ee] opacity-0 transition-opacity duration-150"
                 wire:loading.delay.class="opacity-100"
                 wire:loading.delay.class.remove="opacity-0"
                 wire:target="search,supplier_type,category_id,wilaya,is_active,is_preferred,is_certified,min_rating,sort_by,sort_direction,perPage">
@@ -56,14 +56,14 @@
                 </div>
             </div>
 
-            <div class="bg-purple-50 rounded-lg border border-purple-200 p-6 hover:shadow-lg transition-shadow duration-300">
+            <div class="bg-sky-50 rounded-lg border border-sky-200 p-6 hover:shadow-lg transition-shadow duration-300">
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-sm font-medium text-gray-600">Certifiés</p>
-                        <p class="text-2xl font-bold text-purple-600 mt-1">{{ $analytics['certified'] ?? 0 }}</p>
+                        <p class="text-2xl font-bold text-sky-600 mt-1">{{ $analytics['certified'] ?? 0 }}</p>
                     </div>
-                    <div class="w-12 h-12 bg-purple-100 border border-purple-300 rounded-full flex items-center justify-center">
-                        <x-iconify icon="lucide:badge-check" class="w-6 h-6 text-purple-600" />
+                    <div class="w-12 h-12 bg-sky-100 border border-sky-300 rounded-full flex items-center justify-center">
+                        <x-iconify icon="lucide:badge-check" class="w-6 h-6 text-sky-600" />
                     </div>
                 </div>
             </div>
@@ -105,7 +105,7 @@
                         placeholder="Rechercher par nom, contact, téléphone, email..."
                         wire:loading.attr="aria-busy"
                         wire:target="search"
-                        class="pl-10 pr-4 py-2.5 block w-full bg-white border border-gray-300 rounded-lg shadow-sm hover:border-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm">
+                        class="pl-10 pr-4 py-2.5 block w-full bg-white border border-gray-300 rounded-lg shadow-sm hover:border-gray-400 focus:ring-2 focus:ring-[#0c90ee]/20 focus:border-[#0c90ee] text-sm text-gray-700">
                     <div wire:loading.delay wire:target="search" class="absolute inset-y-0 right-0 pr-3 flex items-center">
                         <x-iconify icon="lucide:loader-2" class="w-4 h-4 text-blue-500 animate-spin" />
                     </div>
@@ -117,7 +117,7 @@
                     @click="showFilters = !showFilters"
                     type="button"
                     title="Filtres"
-                    class="inline-flex items-center gap-2 p-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-all duration-200 shadow-sm hover:shadow-md">
+                    class="inline-flex items-center gap-2 h-10 px-3 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-all duration-200 shadow-sm hover:shadow-md">
                     <x-iconify icon="lucide:filter" class="w-5 h-5 text-gray-500" />
                     <x-iconify icon="heroicons:chevron-down" class="w-4 h-4 text-gray-400 transition-transform duration-200" x-bind:class="showFilters ? 'rotate-180' : ''" />
                     @if($activeCount > 0)
@@ -131,95 +131,102 @@
             <x-slot:actions>
                 <a href="{{ route('admin.suppliers.export', $exportParams) }}"
                     title="Exporter"
-                    class="inline-flex items-center gap-2 p-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-all duration-200 shadow-sm hover:shadow-md">
+                    class="inline-flex items-center justify-center h-10 w-10 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-all duration-200 shadow-sm hover:shadow-md">
                     <x-iconify icon="lucide:download" class="w-5 h-5 text-gray-500" />
                 </a>
                 @can('suppliers.create')
                 <a href="{{ route('admin.suppliers.create') }}"
                     title="Nouveau Fournisseur"
-                    class="inline-flex items-center gap-2 p-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all duration-200 shadow-sm hover:shadow-md">
+                    class="inline-flex items-center justify-center h-10 w-10 bg-[#0c90ee] text-white rounded-lg hover:bg-[#0b82d6] transition-all duration-200 shadow-sm hover:shadow-md focus:outline-none focus:ring-2 focus:ring-[#0c90ee]/25">
                     <x-iconify icon="lucide:plus" class="w-5 h-5" />
                 </a>
                 @endcan
             </x-slot:actions>
 
             <x-slot:filtersPanel>
-                <x-page-filters-panel columns="4">
+                <x-page-filters-panel columns="4" class="bg-white/95 border border-gray-200 p-4 rounded-xl shadow-sm">
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1.5">Type</label>
-                        <select wire:model.live="supplier_type" class="block w-full border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-sm">
-                            <option value="">Tous les types</option>
+                        <label class="block text-xs font-semibold text-gray-700 mb-1">Type</label>
+                        <x-slim-select wire:model.live="supplier_type" name="supplier_type" placeholder="Tous les types">
+                            <option value="" data-placeholder="true">Tous les types</option>
                             @foreach($types as $key => $label)
                                 <option value="{{ $key }}">{{ $label }}</option>
                             @endforeach
-                        </select>
+                        </x-slim-select>
                     </div>
 
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1.5">Catégorie</label>
-                        <select wire:model.live="category_id" class="block w-full border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-sm">
-                            <option value="">Toutes les catégories</option>
+                        <label class="block text-xs font-semibold text-gray-700 mb-1">Catégorie</label>
+                        <x-slim-select wire:model.live="category_id" name="category_id" placeholder="Toutes les catégories">
+                            <option value="" data-placeholder="true">Toutes les catégories</option>
                             @foreach($categories as $category)
                                 <option value="{{ $category->id }}">{{ $category->name }}</option>
                             @endforeach
-                        </select>
+                        </x-slim-select>
                     </div>
 
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1.5">Wilaya</label>
-                        <select wire:model.live="wilaya" class="block w-full border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-sm">
-                            <option value="">Toutes les wilayas</option>
+                        <label class="block text-xs font-semibold text-gray-700 mb-1">Wilaya</label>
+                        <x-slim-select wire:model.live="wilaya" name="wilaya" placeholder="Toutes les wilayas">
+                            <option value="" data-placeholder="true">Toutes les wilayas</option>
                             @foreach($wilayas as $key => $label)
                                 <option value="{{ $key }}">{{ $label }}</option>
                             @endforeach
-                        </select>
+                        </x-slim-select>
                     </div>
 
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1.5">Statut</label>
-                        <select wire:model.live="is_active" class="block w-full border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-sm">
-                            <option value="">Tous</option>
+                        <label class="block text-xs font-semibold text-gray-700 mb-1">Statut</label>
+                        <x-slim-select wire:model.live="is_active" name="is_active" placeholder="Tous">
+                            <option value="" data-placeholder="true">Tous</option>
                             <option value="1">Actifs</option>
                             <option value="0">Inactifs</option>
-                        </select>
+                        </x-slim-select>
                     </div>
 
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1.5">Préféré</label>
-                        <select wire:model.live="is_preferred" class="block w-full border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-sm">
-                            <option value="">Tous</option>
+                        <label class="block text-xs font-semibold text-gray-700 mb-1">Préféré</label>
+                        <x-slim-select wire:model.live="is_preferred" name="is_preferred" placeholder="Tous">
+                            <option value="" data-placeholder="true">Tous</option>
                             <option value="1">Oui</option>
                             <option value="0">Non</option>
-                        </select>
+                        </x-slim-select>
                     </div>
 
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1.5">Certifié</label>
-                        <select wire:model.live="is_certified" class="block w-full border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-sm">
-                            <option value="">Tous</option>
+                        <label class="block text-xs font-semibold text-gray-700 mb-1">Certifié</label>
+                        <x-slim-select wire:model.live="is_certified" name="is_certified" placeholder="Tous">
+                            <option value="" data-placeholder="true">Tous</option>
                             <option value="1">Oui</option>
                             <option value="0">Non</option>
-                        </select>
+                        </x-slim-select>
                     </div>
 
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1.5">Note minimale</label>
-                        <input wire:model.live="min_rating" type="number" min="0" max="5" step="0.1" class="block w-full border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-sm" placeholder="0-5">
+                        <label class="block text-xs font-semibold text-gray-700 mb-1">Note minimale</label>
+                        <input
+                            wire:model.live="min_rating"
+                            type="number"
+                            min="0"
+                            max="5"
+                            step="0.1"
+                            placeholder="0-5"
+                            class="block w-full bg-gray-50 border border-gray-300 rounded-lg px-3 py-2.5 text-sm text-gray-700 shadow-sm transition-all duration-200 hover:border-gray-400 focus:ring-2 focus:ring-[#0c90ee]/20 focus:border-[#0c90ee]">
                     </div>
 
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1.5">Tri</label>
+                        <label class="block text-xs font-semibold text-gray-700 mb-1">Tri</label>
                         <div class="grid grid-cols-2 gap-2">
-                            <select wire:model.live="sort_by" class="block w-full border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-sm">
+                            <x-slim-select wire:model.live="sort_by" name="sort_by" placeholder="Nom">
                                 <option value="company_name">Nom</option>
                                 <option value="rating">Rating</option>
                                 <option value="quality_score">Qualité</option>
                                 <option value="reliability_score">Fiabilité</option>
-                            </select>
-                            <select wire:model.live="sort_direction" class="block w-full border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-sm">
+                            </x-slim-select>
+                            <x-slim-select wire:model.live="sort_direction" name="sort_direction" placeholder="Asc">
                                 <option value="asc">Asc</option>
                                 <option value="desc">Desc</option>
-                            </select>
+                            </x-slim-select>
                         </div>
                     </div>
 
@@ -319,14 +326,14 @@
                                 <div class="flex items-center justify-end gap-2">
                                     @can('suppliers.view')
                                     <a href="{{ route('admin.suppliers.show', $supplier) }}"
-                                        class="p-2 rounded-full bg-gray-50 text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition-all duration-200 group"
+                                        class="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-gray-200 bg-white text-gray-500 hover:border-[#0c90ee]/30 hover:bg-[#0c90ee]/5 hover:text-[#0c90ee] transition-all duration-200 group"
                                         title="Voir">
                                         <x-iconify icon="lucide:eye" class="w-4 h-4 group-hover:scale-110 transition-transform" />
                                     </a>
                                     @endcan
                                     @can('suppliers.update')
                                     <a href="{{ route('admin.suppliers.edit', $supplier) }}"
-                                        class="p-2 rounded-full bg-gray-50 text-gray-400 hover:text-amber-600 hover:bg-amber-50 transition-all duration-200 group"
+                                        class="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-gray-200 bg-white text-gray-500 hover:border-amber-300 hover:bg-amber-50 hover:text-amber-600 transition-all duration-200 group"
                                         title="Modifier">
                                         <x-iconify icon="lucide:edit-3" class="w-4 h-4 group-hover:scale-110 transition-transform" />
                                     </a>
@@ -339,7 +346,7 @@
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit"
-                                            class="p-2 rounded-full bg-gray-50 text-gray-400 hover:text-red-600 hover:bg-red-50 transition-all duration-200 group"
+                                            class="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-gray-200 bg-white text-gray-500 hover:border-red-300 hover:bg-red-50 hover:text-red-600 transition-all duration-200 group"
                                             title="Archiver">
                                             <x-iconify icon="lucide:archive" class="w-4 h-4 group-hover:scale-110 transition-transform" />
                                         </button>

@@ -7,17 +7,17 @@
             <div class="flex items-center gap-2">
                 <button 
                     wire:click="previousMonth"
-                    class="p-2 hover:bg-gray-100 rounded-lg transition-colors duration-200">
+                    class="inline-flex items-center justify-center p-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 hover:border-gray-400 transition-colors duration-200">
                     <x-iconify icon="lucide:chevron-left" class="w-5 h-5 text-gray-600" />
                 </button>
                 
-                <h2 class="text-lg font-semibold text-gray-900 min-w-[200px] text-center">
+                <h2 class="text-lg font-semibold text-slate-600 min-w-[200px] text-center">
                     {{ $startDate->translatedFormat('F Y') }}
                 </h2>
                 
                 <button 
                     wire:click="nextMonth"
-                    class="p-2 hover:bg-gray-100 rounded-lg transition-colors duration-200">
+                    class="inline-flex items-center justify-center p-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 hover:border-gray-400 transition-colors duration-200">
                     <x-iconify icon="lucide:chevron-right" class="w-5 h-5 text-gray-600" />
                 </button>
             </div>
@@ -26,12 +26,12 @@
             <div class="flex items-center gap-2">
                 <button 
                     wire:click="today"
-                    class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors duration-200">
+                    class="px-4 py-2 text-sm font-medium text-gray-600 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 hover:text-[#0c90ee] hover:border-[#0c90ee]/30 transition-colors duration-200">
                     Aujourd'hui
                 </button>
                 
                 <a href="{{ route('admin.maintenance.operations.create') }}"
-                   class="px-4 py-2 text-sm font-semibold text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors duration-200 flex items-center gap-2">
+                   class="px-4 py-2 text-sm font-semibold text-white border border-[#0c90ee] bg-[#0c90ee] rounded-lg hover:bg-[#0a7fd1] hover:border-[#0a7fd1] transition-colors duration-200 flex items-center gap-2">
                     <x-iconify icon="lucide:plus" class="w-4 h-4" />
                     Nouvelle Maintenance
                 </a>
@@ -73,7 +73,7 @@
                     {{-- Day Number --}}
                     <div class="text-right mb-1">
                         <span class="inline-flex items-center justify-center w-7 h-7 text-sm font-medium rounded-full
-                            {{ $isToday ? 'bg-blue-600 text-white' : ($isCurrentMonth ? 'text-gray-900' : 'text-gray-400') }}">
+                            {{ $isToday ? 'bg-[#0c90ee] text-white' : ($isCurrentMonth ? 'text-gray-900' : 'text-gray-400') }}">
                             {{ $currentDate->day }}
                         </span>
                     </div>
@@ -83,7 +83,7 @@
                         @foreach($dayEvents->take(3) as $event)
                             <button 
                                 @click="selectedEvent = {{ json_encode($event) }}; showEventModal = true"
-                                class="w-full text-left px-2 py-1 rounded text-xs font-medium truncate transition-colors duration-200 hover:opacity-80"
+                                class="w-full text-left px-2 py-1 rounded-md border border-black/5 text-xs font-medium truncate transition-colors duration-200 hover:opacity-80"
                                 style="background-color: {{ $event['backgroundColor'] }}; color: {{ $event['textColor'] }};">
                                 <div class="flex items-center gap-1">
                                     <x-iconify icon="lucide:wrench" class="w-3 h-3 flex-shrink-0" />
@@ -223,7 +223,7 @@
                     </button>
                     <a 
                         :href="'/admin/maintenance/operations/' + selectedEvent?.id"
-                        class="px-4 py-2 text-sm font-semibold text-white bg-blue-600 rounded-lg hover:bg-blue-700">
+                        class="px-4 py-2 text-sm font-semibold text-white border border-[#0c90ee] bg-[#0c90ee] rounded-lg hover:bg-[#0a7fd1] hover:border-[#0a7fd1]">
                         Voir Détails
                     </a>
                 </div>
@@ -233,7 +233,7 @@
 
     {{-- Loading Indicator --}}
     <div wire:loading class="fixed top-4 right-4 bg-white rounded-lg shadow-lg px-4 py-2 flex items-center gap-2 border border-gray-200">
-        <x-iconify icon="lucide:loader" class="w-4 h-4 text-blue-600 animate-spin" />
+        <x-iconify icon="lucide:loader" class="w-4 h-4 text-[#0c90ee] animate-spin" />
         <span class="text-sm text-gray-700">Chargement...</span>
     </div>
 </div>

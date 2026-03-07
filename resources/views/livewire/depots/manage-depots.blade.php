@@ -8,57 +8,54 @@
                 });
             }
          }" class="space-y-8 animate-fade-in-up">
-        @if (session()->has('success'))
+        @if(session()->has('success'))
         <div x-data="{ show: true }"
-            x-show="show"
-            x-init="setTimeout(() => show = false, 5000)"
-            x-transition:enter="transform ease-out duration-300 transition"
-            x-transition:enter-start="translate-y-2 opacity-0 sm:translate-y-0 sm:translate-x-2"
-            x-transition:enter-end="translate-y-0 opacity-100 sm:translate-x-0"
-            x-transition:leave="transition ease-in duration-100"
-            x-transition:leave-start="opacity-100"
-            x-transition:leave-end="opacity-0"
-            class="fixed top-4 right-4 z-50 max-w-sm w-full bg-white shadow-lg rounded-lg pointer-events-auto ring-1 ring-black ring-opacity-5 overflow-hidden">
-            <div class="p-4">
-                <div class="flex items-start">
-                    <div class="flex-shrink-0">
-                        <x-iconify icon="lucide:check-circle" class="h-6 w-6 text-green-400" />
-                    </div>
-                    <div class="ml-3 w-0 flex-1 pt-0.5">
-                        <p class="text-sm font-medium text-gray-900">Succès</p>
-                        <p class="mt-1 text-sm text-gray-500">{{ session('success') }}</p>
-                    </div>
-                    <div class="ml-4 flex-shrink-0 flex">
-                        <button @click="show = false" class="bg-white rounded-md inline-flex text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                            <span class="sr-only">Fermer</span>
-                            <x-iconify icon="lucide:x" class="h-5 w-5" />
-                        </button>
-                    </div>
-                </div>
-            </div>
+             x-show="show"
+             x-init="setTimeout(() => show = false, 5000)"
+             x-transition:enter="transition ease-out duration-300"
+             x-transition:enter-start="opacity-0 transform scale-90"
+             x-transition:enter-end="opacity-100 transform scale-100"
+             x-transition:leave="transition ease-in duration-300"
+             x-transition:leave-start="opacity-100 transform scale-100"
+             x-transition:leave-end="opacity-0 transform scale-90"
+             class="fixed top-4 right-4 z-50 max-w-md">
+            <x-alert type="success" title="Succès" dismissible>
+                {{ session('success') }}
+            </x-alert>
         </div>
         @endif
 
-        @if (session()->has('error'))
+        @if(session()->has('warning'))
         <div x-data="{ show: true }"
-            x-show="show"
-            class="fixed top-4 right-4 z-50 max-w-sm w-full bg-white shadow-lg rounded-lg pointer-events-auto ring-1 ring-red-500 ring-opacity-50 overflow-hidden border-l-4 border-red-500">
-            <div class="p-4">
-                <div class="flex items-start">
-                    <div class="flex-shrink-0">
-                        <x-iconify icon="lucide:alert-circle" class="h-6 w-6 text-red-500" />
-                    </div>
-                    <div class="ml-3 w-0 flex-1 pt-0.5">
-                        <p class="text-sm font-medium text-red-900">Erreur</p>
-                        <p class="mt-1 text-sm text-red-600">{{ session('error') }}</p>
-                    </div>
-                    <div class="ml-4 flex-shrink-0 flex">
-                        <button @click="show = false" class="text-red-400 hover:text-red-500">
-                            <x-iconify icon="lucide:x" class="h-5 w-5" />
-                        </button>
-                    </div>
-                </div>
-            </div>
+             x-show="show"
+             x-init="setTimeout(() => show = false, 5500)"
+             x-transition:enter="transition ease-out duration-300"
+             x-transition:enter-start="opacity-0 transform scale-90"
+             x-transition:enter-end="opacity-100 transform scale-100"
+             x-transition:leave="transition ease-in duration-300"
+             x-transition:leave-start="opacity-100 transform scale-100"
+             x-transition:leave-end="opacity-0 transform scale-90"
+             class="fixed top-4 right-4 z-50 max-w-md">
+            <x-alert type="warning" title="Attention" dismissible>
+                {{ session('warning') }}
+            </x-alert>
+        </div>
+        @endif
+
+        @if(session()->has('error'))
+        <div x-data="{ show: true }"
+             x-show="show"
+             x-init="setTimeout(() => show = false, 6500)"
+             x-transition:enter="transition ease-out duration-300"
+             x-transition:enter-start="opacity-0 transform scale-90"
+             x-transition:enter-end="opacity-100 transform scale-100"
+             x-transition:leave="transition ease-in duration-300"
+             x-transition:leave-start="opacity-100 transform scale-100"
+             x-transition:leave-end="opacity-0 transform scale-90"
+             class="fixed top-4 right-4 z-50 max-w-md">
+            <x-alert type="error" title="Erreur" dismissible>
+                {{ session('error') }}
+            </x-alert>
         </div>
         @endif
 
@@ -389,105 +386,116 @@
                 :title="$modalMode === 'create' ? 'Nouveau Dépôt' : ($modalMode === 'edit' ? 'Modifier le Dépôt' : 'Détails du Dépôt')"
                 maxWidth="3xl"
                 position="right">
-                <form wire:submit="save">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div class="space-y-6">
-                            <div class="bg-gray-50 p-4 rounded-lg border border-gray-100">
-                                <h4 class="text-sm font-bold text-gray-900 uppercase mb-4 flex items-center">
-                                    <x-iconify icon="lucide:info" class="w-4 h-4 mr-2 text-blue-500" /> Informations Générales
-                                </h4>
+                <form wire:submit="save" class="space-y-6">
+                    <x-form-section
+                        title="Informations générales"
+                        icon="heroicons:building-office"
+                        subtitle="Identité, capacité et description du dépôt"
+                        :showLine="false">
+                        <div class="space-y-4">
+                            <x-input wire:model="name" name="name" label="Nom du Dépôt" placeholder="ex: Dépôt Central Alger" :disabled="$modalMode === 'view'" required />
 
-                                <div class="space-y-4">
-                                    <x-input wire:model="name" name="name" label="Nom du Dépôt" placeholder="ex: Dépôt Central Alger" :disabled="$modalMode === 'view'" required />
-
-                                    <div class="grid grid-cols-2 gap-4">
-                                        <x-input wire:model="code" name="code" label="Code" placeholder="Auto" helpText="Laisser vide pour auto-générer" :disabled="$modalMode === 'view'" />
-                                        <x-input wire:model="capacity" name="capacity" type="number" label="Capacité" placeholder="ex: 100" :disabled="$modalMode === 'view'" />
-                                    </div>
-
-                                    <div>
-                                        <label class="block mb-1 text-sm font-medium text-gray-600">Description</label>
-                                        <textarea
-                                            wire:model="description"
-                                            rows="3"
-                                            class="block w-full rounded-lg border border-gray-300 bg-gray-50 px-3 py-2.5 text-sm text-gray-900 transition-colors duration-200 hover:border-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                                            {{ $modalMode === 'view' ? 'disabled' : '' }}></textarea>
-                                    </div>
-                                </div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <x-input wire:model="code" name="code" label="Code" placeholder="Auto" helpText="Laisser vide pour auto-générer" :disabled="$modalMode === 'view'" />
+                                <x-input wire:model="capacity" name="capacity" type="number" label="Capacité" placeholder="ex: 100" :disabled="$modalMode === 'view'" />
                             </div>
 
-                            <div class="bg-gray-50 p-4 rounded-lg border border-gray-100">
-                                <h4 class="text-sm font-bold text-gray-900 uppercase mb-4 flex items-center">
-                                    <x-iconify icon="lucide:settings" class="w-4 h-4 mr-2 text-gray-500" /> Configuration
-                                </h4>
-
-                                <div class="flex items-center">
-                                    <input type="checkbox" wire:model="is_active" id="is_active" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded" {{ $modalMode === 'view' ? 'disabled' : '' }}>
-                                    <label for="is_active" class="ml-2 block text-sm text-gray-900">
-                                        Dépôt Actif (visible dans les sélecteurs)
-                                    </label>
-                                </div>
+                            <div>
+                                <label class="block mb-2 text-sm font-medium text-gray-600">Description</label>
+                                <textarea
+                                    wire:model="description"
+                                    rows="3"
+                                    class="block w-full rounded-lg border border-gray-300 bg-gray-50 px-3 py-2.5 text-sm text-gray-900 transition-colors duration-200 hover:border-gray-400 focus:ring-2 focus:ring-[#0c90ee]/20 focus:border-[#0c90ee]"
+                                    {{ $modalMode === 'view' ? 'disabled' : '' }}></textarea>
                             </div>
                         </div>
+                    </x-form-section>
 
-                        <div class="space-y-6">
-                            <div class="bg-gray-50 p-4 rounded-lg border border-gray-100">
-                                <h4 class="text-sm font-bold text-gray-900 uppercase mb-4 flex items-center">
-                                    <x-iconify icon="lucide:map-pin" class="w-4 h-4 mr-2 text-green-500" /> Localisation
-                                </h4>
+                    <x-form-section
+                        title="Localisation"
+                        icon="heroicons:map-pin"
+                        subtitle="Adresse et coordonnées géographiques"
+                        :showLine="false">
+                        <div class="space-y-4">
+                            <x-input wire:model="address" name="address" label="Adresse" placeholder="ex: Zone Industrielle" :disabled="$modalMode === 'view'" />
 
-                                <div class="space-y-4">
-                                    <x-input wire:model="address" name="address" label="Adresse" placeholder="ex: Zone Industrielle" :disabled="$modalMode === 'view'" />
-
-                                    <div class="grid grid-cols-2 gap-4">
-                                        <x-input wire:model="city" name="city" label="Ville" placeholder="ex: Rouiba" :disabled="$modalMode === 'view'" />
-                                        <x-input wire:model="wilaya" name="wilaya" label="Wilaya" placeholder="ex: Alger" :disabled="$modalMode === 'view'" />
-                                    </div>
-
-                                    <div class="grid grid-cols-2 gap-4">
-                                        <x-input wire:model="latitude" name="latitude" label="Latitude" placeholder="0.0000" :disabled="$modalMode === 'view'" />
-                                        <x-input wire:model="longitude" name="longitude" label="Longitude" placeholder="0.0000" :disabled="$modalMode === 'view'" />
-                                    </div>
-                                </div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <x-input wire:model="city" name="city" label="Ville" placeholder="ex: Rouiba" :disabled="$modalMode === 'view'" />
+                                <x-input wire:model="wilaya" name="wilaya" label="Wilaya" placeholder="ex: Alger" :disabled="$modalMode === 'view'" />
                             </div>
 
-                            <div class="bg-gray-50 p-4 rounded-lg border border-gray-100">
-                                <h4 class="text-sm font-bold text-gray-900 uppercase mb-4 flex items-center">
-                                    <x-iconify icon="lucide:phone" class="w-4 h-4 mr-2 text-purple-500" /> Contact & Responsable
-                                </h4>
-
-                                <div class="space-y-4">
-                                    <x-input wire:model="manager_name" name="manager_name" label="Responsable du site" placeholder="Nom complet" :disabled="$modalMode === 'view'" />
-
-                                    <div class="grid grid-cols-2 gap-4">
-                                        <x-input wire:model="phone" name="phone" label="Tél. Dépôt" placeholder="+213..." :disabled="$modalMode === 'view'" />
-                                        <x-input wire:model="manager_phone" name="manager_phone" label="Tél. Responsable" placeholder="+213..." :disabled="$modalMode === 'view'" />
-                                    </div>
-
-                                    <x-input wire:model="email" name="email" type="email" label="Email" placeholder="contact@depot.com" :disabled="$modalMode === 'view'" />
-                                </div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <x-input wire:model="latitude" name="latitude" label="Latitude" placeholder="0.0000" :disabled="$modalMode === 'view'" />
+                                <x-input wire:model="longitude" name="longitude" label="Longitude" placeholder="0.0000" :disabled="$modalMode === 'view'" />
                             </div>
                         </div>
-                    </div>
+                    </x-form-section>
+
+                    <x-form-section
+                        title="Contact & Responsable"
+                        icon="heroicons:phone"
+                        subtitle="Canaux de contact opérationnels"
+                        :showLine="false">
+                        <div class="space-y-4">
+                            <x-input wire:model="manager_name" name="manager_name" label="Responsable du site" placeholder="Nom complet" :disabled="$modalMode === 'view'" />
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <x-input wire:model="phone" name="phone" label="Tél. Dépôt" placeholder="+213..." :disabled="$modalMode === 'view'" />
+                                <x-input wire:model="manager_phone" name="manager_phone" label="Tél. Responsable" placeholder="+213..." :disabled="$modalMode === 'view'" />
+                            </div>
+
+                            <x-input wire:model="email" name="email" type="email" label="Email" placeholder="contact@depot.com" :disabled="$modalMode === 'view'" />
+                        </div>
+                    </x-form-section>
+
+                    <x-form-section
+                        title="Configuration"
+                        icon="heroicons:cog-6-tooth"
+                        subtitle="Activation du dépôt dans les sélecteurs"
+                        :showLine="false">
+                        <div class="flex items-center">
+                            <input type="checkbox" wire:model="is_active" id="is_active" class="h-4 w-4 rounded border-gray-300 text-[#0c90ee] focus:ring-[#0c90ee]/30" {{ $modalMode === 'view' ? 'disabled' : '' }}>
+                            <label for="is_active" class="ml-2 block text-sm text-gray-700">
+                                Dépôt Actif (visible dans les sélecteurs)
+                            </label>
+                        </div>
+                    </x-form-section>
 
                     @if($modalMode !== 'view')
-                    <div class="mt-8 pt-6 border-t border-gray-200 flex justify-end gap-3">
-                        <x-button type="button" variant="secondary" @click="$dispatch('close-modal', 'depot-modal')">
-                            Annuler
-                        </x-button>
-                        <x-button type="submit" variant="primary" wire:loading.attr="disabled">
-                            <span wire:loading.remove>{{ $modalMode === 'create' ? 'Créer le Dépôt' : 'Enregistrer les modifications' }}</span>
-                            <span wire:loading class="flex items-center">
-                                <x-iconify icon="lucide:loader-2" class="animate-spin w-4 h-4 mr-2" />
-                                Traitement...
-                            </span>
-                        </x-button>
+                    <div class="relative pl-14">
+                        <section class="rounded-2xl border border-slate-200 bg-white shadow-sm">
+                            <div class="px-6 py-4 flex items-center justify-end gap-3">
+                                <button
+                                    type="button"
+                                    @click="$dispatch('close-modal', 'depot-modal')"
+                                    class="inline-flex items-center justify-center h-10 px-4 rounded-lg border border-gray-300 bg-white text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#0c90ee]/20 focus:border-[#0c90ee] transition-all duration-200">
+                                    Annuler
+                                </button>
+                                <button
+                                    type="submit"
+                                    wire:loading.attr="disabled"
+                                    class="inline-flex items-center justify-center h-10 gap-2 px-5 rounded-lg border border-[#0c90ee] bg-[#0c90ee] text-sm font-medium text-white transition-all duration-200 hover:bg-[#0a7fd1] hover:border-[#0a7fd1] focus:outline-none focus:ring-2 focus:ring-[#0c90ee]/20 disabled:opacity-50 disabled:cursor-not-allowed">
+                                    <span wire:loading.remove>{{ $modalMode === 'create' ? 'Créer le Dépôt' : 'Enregistrer les modifications' }}</span>
+                                    <span wire:loading class="inline-flex items-center">
+                                        <x-iconify icon="lucide:loader-2" class="animate-spin w-4 h-4 mr-2" />
+                                        Traitement...
+                                    </span>
+                                </button>
+                            </div>
+                        </section>
                     </div>
                     @else
-                    <div class="mt-8 pt-6 border-t border-gray-200 flex justify-end">
-                        <x-button type="button" variant="secondary" @click="$dispatch('close-modal', 'depot-modal')">
-                            Fermer
-                        </x-button>
+                    <div class="relative pl-14">
+                        <section class="rounded-2xl border border-slate-200 bg-white shadow-sm">
+                            <div class="px-6 py-4 flex items-center justify-end">
+                                <button
+                                    type="button"
+                                    @click="$dispatch('close-modal', 'depot-modal')"
+                                    class="inline-flex items-center justify-center h-10 px-4 rounded-lg border border-gray-300 bg-white text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#0c90ee]/20 focus:border-[#0c90ee] transition-all duration-200">
+                                    Fermer
+                                </button>
+                            </div>
+                        </section>
                     </div>
                     @endif
                 </form>

@@ -1,14 +1,16 @@
-<div>
-    <div class="py-4 px-4 mx-auto max-w-7xl lg:py-6">
-        <div class="mb-4 flex justify-between items-center">
-            <h1 class="text-2xl font-bold text-gray-900 flex items-center gap-2.5">
-                <x-iconify icon="lucide:credit-card" class="w-6 h-6 text-blue-600" />
-                Gestion des Dépenses Véhicules
-                <span class="ml-2 text-sm font-normal text-gray-500">({{ $expenses->total() }})</span>
-            </h1>
+<div class="zf-page min-h-screen">
+    <div class="py-6 px-4 mx-auto max-w-7xl lg:py-10">
+        <div class="mb-5 flex items-start justify-between">
+            <div>
+                <h1 class="text-xl font-bold text-gray-600">Gestion des Dépenses Véhicules</h1>
+                <p class="text-xs text-gray-600">
+                    Pilotage des dépenses, validations et paiements
+                    <span class="ml-2 text-gray-500">• {{ $expenses->total() }} dépense(s)</span>
+                </p>
+            </div>
 
             <div
-                class="flex items-center gap-2 text-blue-600 opacity-0 transition-opacity duration-150"
+                class="flex items-center gap-2 text-[#0c90ee] opacity-0 transition-opacity duration-150"
                 wire:loading.delay.class="opacity-100"
                 wire:loading.delay.class.remove="opacity-0"
                 wire:target="search,vehicle_id,supplier_id,expense_group_id,category,payment_status,approval_status,dateFrom,dateTo,perPage,filter">
@@ -95,9 +97,9 @@
                         placeholder="Rechercher par référence, description, véhicule..."
                         wire:loading.attr="aria-busy"
                         wire:target="search"
-                        class="pl-10 pr-4 py-2.5 block w-full bg-white border border-gray-300 rounded-lg shadow-sm hover:border-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm">
+                        class="pl-10 pr-4 h-10 block w-full bg-white border border-gray-300 rounded-lg shadow-sm hover:border-gray-400 focus:ring-2 focus:ring-[#0c90ee]/20 focus:border-[#0c90ee] text-sm text-gray-700">
                     <div wire:loading.delay wire:target="search" class="absolute inset-y-0 right-0 pr-3 flex items-center">
-                        <x-iconify icon="lucide:loader-2" class="w-4 h-4 text-blue-500 animate-spin" />
+                        <x-iconify icon="lucide:loader-2" class="w-4 h-4 text-[#0c90ee] animate-spin" />
                     </div>
                 </div>
             </x-slot:search>
@@ -107,7 +109,7 @@
                     @click="showFilters = !showFilters"
                     type="button"
                     title="Filtres"
-                    class="inline-flex items-center gap-2 p-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-all duration-200 shadow-sm hover:shadow-md">
+                    class="inline-flex items-center gap-2 h-10 px-3 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-all duration-200 shadow-sm hover:shadow-md">
                     <x-iconify icon="lucide:filter" class="w-5 h-5 text-gray-500" />
                     <x-iconify icon="heroicons:chevron-down" class="w-4 h-4 text-gray-400 transition-transform duration-200" x-bind:class="showFilters ? 'rotate-180' : ''" />
                     @if($activeCount > 0)
@@ -122,91 +124,101 @@
                 @can('expenses.create')
                     <a href="{{ route('admin.vehicle-expenses.create') }}"
                         title="Nouvelle dépense"
-                        class="inline-flex items-center gap-2 p-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all duration-200 shadow-sm hover:shadow-md">
-                        <x-iconify icon="solar:add-circle-bold" class="w-5 h-5" />
+                        class="zf-btn-primary inline-flex items-center justify-center h-10 w-10 rounded-lg transition-all duration-200 shadow-sm hover:shadow-md">
+                        <x-iconify icon="lucide:plus" class="w-5 h-5" />
                     </a>
                 @endcan
                 @canany(['expenses.analytics.view', 'expenses.dashboard.view'])
                     <a href="{{ route('admin.vehicle-expenses.dashboard') }}"
                         title="Analytics"
-                        class="inline-flex items-center gap-2 p-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-all duration-200 shadow-sm hover:shadow-md">
-                        <x-iconify icon="solar:chart-2-bold" class="w-5 h-5" />
+                        class="inline-flex items-center justify-center h-10 w-10 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-all duration-200 shadow-sm hover:shadow-md">
+                        <x-iconify icon="lucide:chart-column" class="w-5 h-5" />
                     </a>
                 @endcanany
             </x-slot:actions>
 
             <x-slot:filtersPanel>
-                <x-page-filters-panel columns="4">
+                <x-page-filters-panel columns="4" class="bg-white/95 border border-gray-200 p-4 rounded-xl shadow-sm">
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1.5">Véhicule</label>
-                        <select wire:model.live="vehicle_id" class="block w-full border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-sm">
-                            <option value="">Tous les véhicules</option>
+                        <label class="block text-xs font-semibold text-gray-700 mb-1">Véhicule</label>
+                        <x-slim-select wire:model.live="vehicle_id" name="vehicle_id" placeholder="Tous les véhicules">
+                            <option value="" data-placeholder="true">Tous les véhicules</option>
                             @foreach($vehicles as $vehicle)
                                 <option value="{{ $vehicle->id }}">{{ $vehicle->registration_plate }} - {{ $vehicle->brand }} {{ $vehicle->model }}</option>
                             @endforeach
-                        </select>
+                        </x-slim-select>
                     </div>
 
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1.5">Catégorie</label>
-                        <select wire:model.live="category" class="block w-full border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-sm">
-                            <option value="">Toutes les catégories</option>
+                        <label class="block text-xs font-semibold text-gray-700 mb-1">Catégorie</label>
+                        <x-slim-select wire:model.live="category" name="category" placeholder="Toutes les catégories">
+                            <option value="" data-placeholder="true">Toutes les catégories</option>
                             @foreach($categories as $key => $label)
                                 <option value="{{ $key }}">{{ $label }}</option>
                             @endforeach
-                        </select>
+                        </x-slim-select>
                     </div>
 
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1.5">Statut d'approbation</label>
-                        <select wire:model.live="approval_status" class="block w-full border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-sm">
-                            <option value="">Tous les statuts</option>
+                        <label class="block text-xs font-semibold text-gray-700 mb-1">Statut d'approbation</label>
+                        <x-slim-select wire:model.live="approval_status" name="approval_status" placeholder="Tous les statuts">
+                            <option value="" data-placeholder="true">Tous les statuts</option>
                             <option value="draft">Brouillon</option>
                             <option value="pending_level1">En attente niveau 1</option>
                             <option value="pending_level2">En attente niveau 2</option>
                             <option value="approved">Approuvé</option>
                             <option value="rejected">Rejeté</option>
-                        </select>
+                        </x-slim-select>
                     </div>
 
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1.5">Statut de paiement</label>
-                        <select wire:model.live="payment_status" class="block w-full border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-sm">
-                            <option value="">Tous</option>
+                        <label class="block text-xs font-semibold text-gray-700 mb-1">Statut de paiement</label>
+                        <x-slim-select wire:model.live="payment_status" name="payment_status" placeholder="Tous">
+                            <option value="" data-placeholder="true">Tous</option>
                             <option value="pending">En attente</option>
                             <option value="paid">Payé</option>
                             <option value="rejected">Rejeté</option>
-                        </select>
+                        </x-slim-select>
                     </div>
 
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1.5">Fournisseur</label>
-                        <select wire:model.live="supplier_id" class="block w-full border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-sm">
-                            <option value="">Tous les fournisseurs</option>
+                        <label class="block text-xs font-semibold text-gray-700 mb-1">Fournisseur</label>
+                        <x-slim-select wire:model.live="supplier_id" name="supplier_id" placeholder="Tous les fournisseurs">
+                            <option value="" data-placeholder="true">Tous les fournisseurs</option>
                             @foreach($suppliers as $supplier)
-                                <option value="{{ $supplier->id }}">{{ $supplier->name }}</option>
+                                <option value="{{ $supplier->id }}">{{ $supplier->company_name ?? $supplier->name }}</option>
                             @endforeach
-                        </select>
+                        </x-slim-select>
                     </div>
 
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1.5">Groupe</label>
-                        <select wire:model.live="expense_group_id" class="block w-full border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-sm">
-                            <option value="">Tous les groupes</option>
+                        <label class="block text-xs font-semibold text-gray-700 mb-1">Groupe</label>
+                        <x-slim-select wire:model.live="expense_group_id" name="expense_group_id" placeholder="Tous les groupes">
+                            <option value="" data-placeholder="true">Tous les groupes</option>
                             @foreach($expenseGroups as $group)
                                 <option value="{{ $group->id }}">{{ $group->name }}</option>
                             @endforeach
-                        </select>
+                        </x-slim-select>
                     </div>
 
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1.5">Date de début</label>
-                        <input type="date" wire:model.live="dateFrom" class="block w-full border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-sm">
-                    </div>
-
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1.5">Date de fin</label>
-                        <input type="date" wire:model.live="dateTo" class="block w-full border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-sm">
+                    <div class="md:col-span-2">
+                        <label class="block text-xs font-semibold text-gray-700 mb-1">Période de dépense</label>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-[11px] text-gray-500 mb-1">Du</label>
+                                <x-datepicker
+                                    wire:model.live="dateFrom"
+                                    name="expenses_date_from"
+                                    placeholder="JJ/MM/AAAA" />
+                            </div>
+                            <div>
+                                <label class="block text-[11px] text-gray-500 mb-1">Au</label>
+                                <x-datepicker
+                                    wire:model.live="dateTo"
+                                    name="expenses_date_to"
+                                    placeholder="JJ/MM/AAAA" />
+                            </div>
+                        </div>
                     </div>
 
                     <x-slot:reset>
@@ -286,14 +298,23 @@
                              @keydown.escape.window="close()"
                              @scroll.window="open && updatePosition()"
                              @resize.window="open && updatePosition()">
-                            <button @click="toggle()" x-ref="trigger" class="inline-flex items-center gap-1 px-3 py-1.5 bg-gray-600 text-white text-sm font-medium rounded hover:bg-gray-700">
+                            <button @click="toggle()" x-ref="trigger" class="inline-flex items-center gap-1 px-3 py-1.5 bg-white border border-gray-300 text-gray-600 text-sm font-medium rounded-md hover:bg-gray-50 transition-colors">
                                 <x-iconify icon="solar:export-bold" class="w-4 h-4" /> Export
                             </button>
                             <template x-teleport="body">
                                 <div x-show="open" x-ref="menu" @click.outside="close()" x-transition :style="styles" class="rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 z-[9999]" x-cloak>
-                                    <button wire:click="exportSelected('csv')" @click="close()" class="block w-full text-left px-4 py-2 text-sm hover:bg-gray-100">CSV</button>
-                                    <button wire:click="exportSelected('excel')" @click="close()" class="block w-full text-left px-4 py-2 text-sm hover:bg-gray-100">Excel</button>
-                                    <button wire:click="exportSelected('pdf')" @click="close()" class="block w-full text-left px-4 py-2 text-sm hover:bg-gray-100">PDF</button>
+                                    <button wire:click="exportSelected('csv')" @click="close()" class="flex w-full items-center gap-2 text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                        <x-iconify icon="solar:document-text-bold" class="w-4 h-4 text-gray-500" />
+                                        CSV
+                                    </button>
+                                    <button wire:click="exportSelected('excel')" @click="close()" class="flex w-full items-center gap-2 text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                        <x-iconify icon="solar:document-bold" class="w-4 h-4 text-gray-500" />
+                                        Excel
+                                    </button>
+                                    <button wire:click="exportSelected('pdf')" @click="close()" class="flex w-full items-center gap-2 text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                        <x-iconify icon="solar:file-text-bold" class="w-4 h-4 text-gray-500" />
+                                        PDF
+                                    </button>
                                 </div>
                             </template>
                         </div>
@@ -307,7 +328,7 @@
                     <thead class="bg-gray-50">
                         <tr>
                             <th class="px-4 py-3 text-left">
-                                <input type="checkbox" wire:model.live="selectAll" class="rounded">
+                                <input type="checkbox" wire:model.live="selectAll" class="rounded border-gray-300 text-[#0c90ee] focus:ring-[#0c90ee]/20">
                             </th>
                             <th class="px-4 py-3 text-left">
                                 <button wire:click="sortBy('invoice_number')" class="flex items-center gap-1 font-medium text-xs uppercase tracking-wider text-gray-700">
@@ -345,7 +366,7 @@
                         @forelse($expenses as $expense)
                         <tr class="hover:bg-gray-50 transition-colors">
                             <td class="px-4 py-3">
-                                <input type="checkbox" wire:model.live="selectedExpenses" value="{{ $expense->id }}" class="rounded">
+                                <input type="checkbox" wire:model.live="selectedExpenses" value="{{ $expense->id }}" class="rounded border-gray-300 text-[#0c90ee] focus:ring-[#0c90ee]/20">
                             </td>
                             <td class="px-4 py-3 whitespace-nowrap">
                                 <span class="font-medium text-gray-900">{{ $expense->expense_number ?? $expense->invoice_number ?? '—' }}</span>
@@ -367,7 +388,7 @@
                             <td class="px-4 py-3">
                                 <p class="text-sm text-gray-900 truncate max-w-xs">{{ $expense->description }}</p>
                             </td>
-                            <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-600">{{ $expense->supplier?->name ?? '-' }}</td>
+                            <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-600">{{ $expense->supplier?->company_name ?? $expense->supplier?->name ?? '-' }}</td>
                             <td class="px-4 py-3 whitespace-nowrap text-right">
                                 <span class="font-semibold text-gray-900">{{ number_format($expense->total_ttc, 2) }} DZD</span>
                             </td>
@@ -389,27 +410,27 @@
                                 @endswitch
                             </td>
                             <td class="px-4 py-3 whitespace-nowrap">
-                                <div class="flex items-center gap-1">
+                                <div class="flex items-center gap-1.5">
                                     @can('view', $expense)
-                                        <a href="{{ route('admin.vehicle-expenses.show', $expense) }}" class="p-1.5 text-gray-600 hover:bg-gray-100 rounded-lg transition" title="Voir">
-                                            <x-iconify icon="solar:eye-bold" class="w-4 h-4" />
+                                        <a href="{{ route('admin.vehicle-expenses.show', $expense) }}" class="p-2 rounded-full bg-gray-50 text-gray-400 hover:text-[#0c90ee] hover:bg-blue-50 transition-all duration-200 group" title="Voir">
+                                            <x-iconify icon="lucide:eye" class="w-3.5 h-3.5 group-hover:scale-110 transition-transform" />
                                         </a>
                                     @endcan
                                     @can('update', $expense)
-                                        <a href="{{ route('admin.vehicle-expenses.edit', $expense) }}" class="p-1.5 text-blue-600 hover:bg-blue-100 rounded-lg transition" title="Éditer">
-                                            <x-iconify icon="solar:pen-bold" class="w-4 h-4" />
+                                        <a href="{{ route('admin.vehicle-expenses.edit', $expense) }}" class="p-2 rounded-full bg-gray-50 text-gray-400 hover:text-amber-600 hover:bg-amber-50 transition-all duration-200 group" title="Éditer">
+                                            <x-iconify icon="lucide:edit-3" class="w-3.5 h-3.5 group-hover:scale-110 transition-transform" />
                                         </a>
                                     @endcan
                                     @if(in_array($expense->approval_status, ['pending_level1', 'pending_level2']))
                                         @can('approve', $expense)
-                                            <button wire:click="approveExpense({{ $expense->id }})" class="p-1.5 text-green-600 hover:bg-green-100 rounded-lg transition" title="Approuver">
-                                                <x-iconify icon="solar:check-circle-bold" class="w-4 h-4" />
+                                            <button wire:click="approveExpense({{ $expense->id }})" class="p-2 rounded-full bg-gray-50 text-gray-400 hover:text-green-600 hover:bg-green-50 transition-all duration-200 group" title="Approuver">
+                                                <x-iconify icon="lucide:check-circle-2" class="w-3.5 h-3.5 group-hover:scale-110 transition-transform" />
                                             </button>
                                         @endcan
                                     @endif
                                     @can('delete', $expense)
-                                        <button wire:click="confirmDelete({{ $expense->id }})" class="p-1.5 text-red-600 hover:bg-red-100 rounded-lg transition" title="Supprimer">
-                                            <x-iconify icon="solar:trash-bin-2-bold" class="w-4 h-4" />
+                                        <button wire:click="confirmDelete({{ $expense->id }})" class="p-2 rounded-full bg-gray-50 text-gray-400 hover:text-red-600 hover:bg-red-50 transition-all duration-200 group" title="Supprimer">
+                                            <x-iconify icon="lucide:trash-2" class="w-3.5 h-3.5 group-hover:scale-110 transition-transform" />
                                         </button>
                                     @endcan
                                 </div>

@@ -1,78 +1,114 @@
 <?php
 
-namespace App\Http\Controllers\Admin;
+namespace App\Services;
 
-use App\Http\Controllers\Controller;
-use App\Models\MaintenanceAlert;
-use App\Models\RepairRequest;
-use App\Models\VehicleExpense;
 use App\Models\ExpenseBudget;
+use App\Models\RepairRequest;
 use App\Models\Vehicle;
-use App\Models\User;
-use App\Services\AlertCenterService;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
-use Carbon\Carbon;
 
-class AlertController extends Controller
+class AlertCenterService
 {
-    public function __construct()
+    private const CACHE_TTL_SECONDS = 30;
+
+    public function getDashboardData(int $organizationId, bool $forceRefresh = false): array
     {
-        $this->middleware(['auth', 'verified']);
+        $cacheKey = $this->dashboardCacheKey($organizationId);
+
+        if ($forceRefresh) {
+            Cache::forget($cacheKey);
+        }
+
+        return Cache::remember(
+            $cacheKey,
+            now()->addSeconds(self::CACHE_TTL_SECONDS),
+            fn () => $this->buildDashboardData($organizationId)
+        );
     }
 
-    /**
-     * Affichage du dashboard des alertes enterprise
-     */
-    public function index(Request $request)
+    public function getPendingAlertsCount(int $organizationId, bool $forceRefresh = false): int
     {
-        $user = Auth::user();
-        $organizationId = $user->organization_id;
+        $countKey = $this->pendingCountCacheKey($organizationId);
 
-        // Récupération des alertes par catégorie
+        if ($forceRefresh) {
+            Cache::forget($countKey);
+            Cache::forget($this->dashboardCacheKey($organizationId));
+        }
+
+        return Cache::remember(
+            $countKey,
+            now()->addSeconds(self::CACHE_TTL_SECONDS),
+            function () use ($organizationId) {
+                $data = $this->getDashboardData($organizationId);
+
+                return (int) (
+                    $data['criticalAlerts']->count()
+                    + $data['maintenanceAlerts']->count()
+                    + $data['budgetAlerts']->count()
+                    + $data['repairAlerts']->count()
+                );
+            }
+        );
+    }
+
+    public function clearOrganizationCache(int $organizationId): void
+    {
+        Cache::forget($this->dashboardCacheKey($organizationId));
+        Cache::forget($this->pendingCountCacheKey($organizationId));
+    }
+
+    private function dashboardCacheKey(int $organizationId): string
+    {
+        return "alerts:dashboard:org:{$organizationId}";
+    }
+
+    private function pendingCountCacheKey(int $organizationId): string
+    {
+        return "alerts:pending-count:org:{$organizationId}";
+    }
+
+    private function buildDashboardData(int $organizationId): array
+    {
         $alerts = $this->getSystemAlerts($organizationId);
         $criticalAlerts = $this->getCriticalAlerts($organizationId);
         $maintenanceAlerts = $this->getMaintenanceAlerts($organizationId);
         $budgetAlerts = $this->getBudgetAlerts($organizationId);
         $repairAlerts = $this->getRepairAlerts($organizationId);
 
-        // Statistiques des alertes
         $stats = [
             'total_alerts' => $alerts->count(),
             'critical_count' => $criticalAlerts->count(),
             'maintenance_count' => $maintenanceAlerts->count(),
             'budget_overruns' => $budgetAlerts->where('type', 'budget_overrun')->count(),
             'pending_repairs' => $repairAlerts->where('status', 'en_attente')->count(),
-            'overdue_maintenance' => $maintenanceAlerts->where('priority', 'urgent')->count()
+            'overdue_maintenance' => $maintenanceAlerts->where('priority', 'urgent')->count(),
         ];
 
-        // Alertes récentes (7 derniers jours)
-        $recentAlerts = collect([
-            ...$maintenanceAlerts->take(5),
-            ...$budgetAlerts->take(5),
-            ...$repairAlerts->take(5)
-        ])->sortByDesc('created_at')->take(10);
+        $recentAlerts = collect()
+            ->concat($maintenanceAlerts->take(5))
+            ->concat($budgetAlerts->take(5))
+            ->concat($repairAlerts->take(5))
+            ->sortByDesc('created_at')
+            ->take(10)
+            ->values();
 
-        return view('admin.alerts.index', compact(
-            'alerts',
-            'criticalAlerts',
-            'maintenanceAlerts',
-            'budgetAlerts',
-            'repairAlerts',
-            'stats',
-            'recentAlerts'
-        ));
+        return [
+            'alerts' => $alerts,
+            'criticalAlerts' => $criticalAlerts,
+            'maintenanceAlerts' => $maintenanceAlerts,
+            'budgetAlerts' => $budgetAlerts,
+            'repairAlerts' => $repairAlerts,
+            'stats' => $stats,
+            'recentAlerts' => $recentAlerts,
+        ];
     }
 
-    /**
-     * Alertes système globales
-     */
-    private function getSystemAlerts($organizationId)
+    private function getSystemAlerts(int $organizationId): Collection
     {
         $alerts = collect();
 
-        // Alertes de maintenance en retard
         $overdueMaintenanceCount = DB::table('maintenance_schedules')
             ->where('organization_id', $organizationId)
             ->where('next_due_date', '<', now())
@@ -80,7 +116,7 @@ class AlertController extends Controller
             ->count();
 
         if ($overdueMaintenanceCount > 0) {
-            $alerts->push((object)[
+            $alerts->push((object) [
                 'id' => 'overdue_maintenance',
                 'type' => 'maintenance',
                 'priority' => 'urgent',
@@ -89,15 +125,13 @@ class AlertController extends Controller
                 'count' => $overdueMaintenanceCount,
                 'icon' => 'alert-triangle',
                 'color' => 'red',
-                'created_at' => now()
+                'created_at' => now(),
             ]);
         }
 
-        // Alertes de budget dépassé - ENTERPRISE: Vérification existence table
         try {
             if (DB::getSchemaBuilder()->hasTable('expense_budgets')) {
-                $budgetQuery = ExpenseBudget::query()
-                    ->where('organization_id', $organizationId);
+                $budgetQuery = ExpenseBudget::query()->where('organization_id', $organizationId);
 
                 if (DB::getSchemaBuilder()->hasColumn('expense_budgets', 'is_active')) {
                     $budgetQuery->where('is_active', true);
@@ -105,12 +139,10 @@ class AlertController extends Controller
                     $budgetQuery->where('status', 'active');
                 }
 
-                $budgetOverruns = $budgetQuery
-                    ->whereRaw('spent_amount > budgeted_amount')
-                    ->count();
+                $budgetOverruns = $budgetQuery->whereRaw('spent_amount > budgeted_amount')->count();
 
                 if ($budgetOverruns > 0) {
-                    $alerts->push((object)[
+                    $alerts->push((object) [
                         'id' => 'budget_overrun',
                         'type' => 'budget',
                         'priority' => 'high',
@@ -119,15 +151,14 @@ class AlertController extends Controller
                         'count' => $budgetOverruns,
                         'icon' => 'wallet',
                         'color' => 'red',
-                        'created_at' => now()
+                        'created_at' => now(),
                     ]);
                 }
             }
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             \Log::warning('Budget alerts unavailable', ['error' => $e->getMessage()]);
         }
 
-        // Alertes de paiements en retard - ENTERPRISE: Vérification existence table
         try {
             if (DB::getSchemaBuilder()->hasTable('vehicle_expenses')) {
                 $overduePayments = DB::table('vehicle_expenses')
@@ -138,7 +169,7 @@ class AlertController extends Controller
                     ->count();
 
                 if ($overduePayments > 0) {
-                    $alerts->push((object)[
+                    $alerts->push((object) [
                         'id' => 'overdue_payments',
                         'type' => 'payment',
                         'priority' => 'high',
@@ -147,26 +178,22 @@ class AlertController extends Controller
                         'count' => $overduePayments,
                         'icon' => 'credit-card',
                         'color' => 'orange',
-                        'created_at' => now()
+                        'created_at' => now(),
                     ]);
                 }
             }
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             \Log::warning('Payment alerts unavailable', ['error' => $e->getMessage()]);
         }
 
-        return $alerts->sortByDesc('priority');
+        return $alerts->sortByDesc('priority')->values();
     }
 
-    /**
-     * Alertes critiques nécessitant une action immédiate - ENTERPRISE: Colonnes optionnelles
-     */
-    private function getCriticalAlerts($organizationId)
+    private function getCriticalAlerts(int $organizationId): Collection
     {
         $criticalAlerts = collect();
 
         try {
-            // Véhicules avec assurance expirée - seulement si la colonne existe
             if (DB::getSchemaBuilder()->hasColumn('vehicles', 'insurance_expiry_date')) {
                 $expiredInsurance = Vehicle::where('organization_id', $organizationId)
                     ->where('insurance_expiry_date', '<', now())
@@ -174,23 +201,22 @@ class AlertController extends Controller
                     ->count();
 
                 if ($expiredInsurance > 0) {
-                    $criticalAlerts->push((object)[
+                    $criticalAlerts->push((object) [
                         'id' => 'expired_insurance',
                         'type' => 'vehicle',
                         'priority' => 'critical',
                         'title' => 'Assurances expirées',
                         'message' => "{$expiredInsurance} véhicule(s) avec assurance expirée",
                         'action_required' => true,
-                        'created_at' => now()
+                        'created_at' => now(),
                     ]);
                 }
             }
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             \Log::warning('Insurance alerts unavailable', ['error' => $e->getMessage()]);
         }
 
         try {
-            // Véhicules avec contrôle technique expiré - seulement si la colonne existe
             if (DB::getSchemaBuilder()->hasColumn('vehicles', 'technical_inspection_date')) {
                 $expiredInspection = Vehicle::where('organization_id', $organizationId)
                     ->where('technical_inspection_date', '<', now())
@@ -198,28 +224,25 @@ class AlertController extends Controller
                     ->count();
 
                 if ($expiredInspection > 0) {
-                    $criticalAlerts->push((object)[
+                    $criticalAlerts->push((object) [
                         'id' => 'expired_inspection',
                         'type' => 'vehicle',
                         'priority' => 'critical',
                         'title' => 'Contrôles techniques expirés',
                         'message' => "{$expiredInspection} véhicule(s) avec contrôle technique expiré",
                         'action_required' => true,
-                        'created_at' => now()
+                        'created_at' => now(),
                     ]);
                 }
             }
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             \Log::warning('Technical inspection alerts unavailable', ['error' => $e->getMessage()]);
         }
 
-        return $criticalAlerts;
+        return $criticalAlerts->values();
     }
 
-    /**
-     * Alertes de maintenance
-     */
-    private function getMaintenanceAlerts($organizationId)
+    private function getMaintenanceAlerts(int $organizationId): Collection
     {
         return DB::table('maintenance_schedules')
             ->join('vehicles', 'maintenance_schedules.vehicle_id', '=', 'vehicles.id')
@@ -247,7 +270,7 @@ class AlertController extends Controller
                     ELSE 'medium'
                 END as priority"),
                 DB::raw("'maintenance' as type"),
-                'maintenance_schedules.created_at'
+                'maintenance_schedules.created_at',
             ])
             ->orderByRaw("CASE
                 WHEN next_due_date < NOW() THEN 1
@@ -259,18 +282,14 @@ class AlertController extends Controller
             ->get();
     }
 
-    /**
-     * Alertes budgétaires - ENTERPRISE: Avec gestion d'absence de table
-     */
-    private function getBudgetAlerts($organizationId)
+    private function getBudgetAlerts(int $organizationId): Collection
     {
         try {
             if (!DB::getSchemaBuilder()->hasTable('expense_budgets')) {
-                return collect([]);
+                return collect();
             }
 
-            $budgetQuery = ExpenseBudget::query()
-                ->where('organization_id', $organizationId);
+            $budgetQuery = ExpenseBudget::query()->where('organization_id', $organizationId);
 
             if (DB::getSchemaBuilder()->hasColumn('expense_budgets', 'is_active')) {
                 $budgetQuery->where('is_active', true);
@@ -301,7 +320,7 @@ class AlertController extends Controller
                         ? 'vehicle'
                         : ($budget->isCategoryScope() ? 'category' : 'global');
 
-                    return (object)[
+                    return (object) [
                         'id' => $budget->id,
                         'scope_type' => $scopeType,
                         'scope_description' => $budget->scope_description,
@@ -321,21 +340,19 @@ class AlertController extends Controller
                         : ($alert->priority === 'high' ? 2 : 3);
                 })
                 ->values();
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             \Log::warning('Error fetching budget alerts', ['error' => $e->getMessage()]);
-            return collect([]);
+
+            return collect();
         }
     }
 
-    /**
-     * Alertes de réparation - ENTERPRISE: PostgreSQL compatible
-     */
-    private function getRepairAlerts($organizationId)
+    private function getRepairAlerts(int $organizationId): Collection
     {
         return RepairRequest::with(['vehicle', 'driver'])
             ->where('organization_id', $organizationId)
             ->whereIn('status', ['pending', 'supervisor_review', 'fleet_manager_review'])
-            ->where('created_at', '>=', now()->subDays(30)) // Derniers 30 jours
+            ->where('created_at', '>=', now()->subDays(30))
             ->orderByRaw("CASE urgency
                 WHEN 'urgent' THEN 1
                 WHEN 'high' THEN 2
@@ -344,8 +361,8 @@ class AlertController extends Controller
                 ELSE 5 END")
             ->orderBy('created_at', 'desc')
             ->get()
-            ->map(function($repair) {
-                return (object)[
+            ->map(function ($repair) {
+                return (object) [
                     'id' => $repair->id,
                     'type' => 'repair',
                     'priority' => $repair->urgency ?? 'medium',
@@ -355,66 +372,9 @@ class AlertController extends Controller
                     'status' => $repair->status,
                     'requested_by' => $repair->driver?->name ?? 'N/A',
                     'created_at' => $repair->created_at,
-                    'days_pending' => $repair->created_at->diffInDays(now())
+                    'days_pending' => $repair->created_at->diffInDays(now()),
                 ];
-            });
-    }
-
-    /**
-     * Marquer une alerte comme lue
-     */
-    public function markAsRead(Request $request)
-    {
-        $alertId = $request->input('alert_id');
-        $alertType = $request->input('alert_type');
-
-        // Logique pour marquer comme lue selon le type
-        switch ($alertType) {
-            case 'maintenance':
-                // Marquer l'alerte de maintenance comme acknowledgeée
-                DB::table('maintenance_schedules')
-                    ->where('id', $alertId)
-                    ->update(['acknowledged_at' => now(), 'acknowledged_by' => Auth::id()]);
-                break;
-
-            case 'repair':
-                // Ajouter un commentaire système sur la demande de réparation
-                RepairRequest::where('id', $alertId)
-                    ->update(['last_viewed_at' => now(), 'last_viewed_by' => Auth::id()]);
-                break;
-        }
-
-        return response()->json(['success' => true]);
-    }
-
-    /**
-     * Obtenir les alertes pour l'API (notifications temps réel)
-     */
-    public function getAlertsApi(Request $request)
-    {
-        $user = Auth::user();
-        $organizationId = (int) $user->organization_id;
-        $dashboard = app(AlertCenterService::class)->getDashboardData($organizationId);
-
-        $alerts = [
-            'system' => $dashboard['alerts'],
-            'critical' => $dashboard['criticalAlerts'],
-            'maintenance' => $dashboard['maintenanceAlerts']->take(5)->values(),
-            'budget' => $dashboard['budgetAlerts']->take(5)->values(),
-            'repair' => $dashboard['repairAlerts']->take(5)->values(),
-        ];
-
-        return response()->json($alerts);
-    }
-
-    /**
-     * Export des alertes en Excel
-     */
-    public function export(Request $request)
-    {
-        // Implémentation de l'export Excel
-        // À compléter selon les besoins
-
-        return response()->json(['message' => 'Export en développement']);
+            })
+            ->values();
     }
 }

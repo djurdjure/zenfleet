@@ -90,6 +90,10 @@ class RepairRequestsIndex extends Component
         'statusFilter' => ['except' => ''],
         'urgencyFilter' => ['except' => ''],
         'categoryFilter' => ['except' => ''],
+        'vehicleFilter' => ['except' => ''],
+        'driverFilter' => ['except' => ''],
+        'dateFrom' => ['except' => ''],
+        'dateTo' => ['except' => ''],
         'perPage' => ['except' => 20],
         'sortField' => ['except' => 'created_at'],
         'sortDirection' => ['except' => 'desc'],
@@ -178,6 +182,26 @@ class RepairRequestsIndex extends Component
     }
 
     public function updatingCategoryFilter(): void
+    {
+        $this->resetPage();
+    }
+
+    public function updatingVehicleFilter(): void
+    {
+        $this->resetPage();
+    }
+
+    public function updatingDriverFilter(): void
+    {
+        $this->resetPage();
+    }
+
+    public function updatingDateFrom(): void
+    {
+        $this->resetPage();
+    }
+
+    public function updatingDateTo(): void
     {
         $this->resetPage();
     }
@@ -418,11 +442,17 @@ class RepairRequestsIndex extends Component
 
         // 📅 FILTRE PAR DATES
         if (!empty($this->dateFrom)) {
-            $query->whereDate('created_at', '>=', $this->dateFrom);
+            $fromDate = $this->normalizeFilterDate($this->dateFrom);
+            if ($fromDate) {
+                $query->whereDate('created_at', '>=', $fromDate);
+            }
         }
 
         if (!empty($this->dateTo)) {
-            $query->whereDate('created_at', '<=', $this->dateTo);
+            $toDate = $this->normalizeFilterDate($this->dateTo);
+            if ($toDate) {
+                $query->whereDate('created_at', '<=', $toDate);
+            }
         }
 
         // 📊 TRI
@@ -500,6 +530,31 @@ class RepairRequestsIndex extends Component
     }
 
     /**
+     * Normalise une date de filtre saisie via datepicker en instance Carbon.
+     */
+    private function normalizeFilterDate(?string $value): ?Carbon
+    {
+        $raw = trim((string) $value);
+        if ($raw === '') {
+            return null;
+        }
+
+        foreach (['d/m/Y', 'Y-m-d'] as $format) {
+            try {
+                return Carbon::createFromFormat($format, $raw)->startOfDay();
+            } catch (\Throwable $e) {
+                // Continue fallback formats
+            }
+        }
+
+        try {
+            return Carbon::parse($raw)->startOfDay();
+        } catch (\Throwable $e) {
+            return null;
+        }
+    }
+
+    /**
      * 📁 CATÉGORIES DE RÉPARATION
      */
     public function getCategoriesProperty()
@@ -549,6 +604,53 @@ class RepairRequestsIndex extends Component
         }
 
         return $query->orderBy('registration_plate')->get();
+    }
+
+    /**
+     * 👤 CHAUFFEURS DISPONIBLES
+     *
+     * Retourne une liste de chauffeurs filtrée selon les permissions de l'utilisateur.
+     */
+    public function getDriversProperty()
+    {
+        $user = auth()->user();
+
+        $query = Driver::query()
+            ->with('user:id,name')
+            ->where('organization_id', $user->organization_id)
+            ->whereNull('deleted_at');
+
+        if ($user->can('repair-requests.view.all')) {
+            return $query->orderBy('first_name')->orderBy('last_name')->get();
+        }
+
+        if ($this->isSupervisorRole($user)) {
+            return $query
+                ->where('supervisor_id', $user->id)
+                ->orderBy('first_name')
+                ->orderBy('last_name')
+                ->get();
+        }
+
+        if ($this->isFleetManagerRole($user) && $user->depot_id) {
+            return $query
+                ->whereHas('assignments.vehicle', function ($vehicleQuery) use ($user) {
+                    $vehicleQuery->where('depot_id', $user->depot_id);
+                })
+                ->orderBy('first_name')
+                ->orderBy('last_name')
+                ->get();
+        }
+
+        if ($user->can('repair-requests.view.own') || $this->isDriverRole($user)) {
+            return $query
+                ->where('user_id', $user->id)
+                ->orderBy('first_name')
+                ->orderBy('last_name')
+                ->get();
+        }
+
+        return collect();
     }
 
     /**
@@ -863,6 +965,7 @@ class RepairRequestsIndex extends Component
             'urgencyLevels' => $this->urgencyLevels,
             'categories' => $this->categories,
             'vehicles' => $this->vehicles,
+            'drivers' => $this->drivers,
             'decisionRequest' => $this->decisionRequest,
             'statistics' => $this->statistics,
         ]);

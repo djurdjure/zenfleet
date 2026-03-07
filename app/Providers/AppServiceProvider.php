@@ -11,6 +11,8 @@ use App\Models\VehicleDepot;
 use App\Observers\VehicleDepotObserver;
 use App\Models\Organization;
 use App\Observers\OrganizationObserver;
+use App\Services\AlertCenterService;
+use Illuminate\Support\Facades\View;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -37,5 +39,25 @@ class AppServiceProvider extends ServiceProvider
 
         // ✅ Provision roles on organization creation (enterprise guardrail)
         Organization::observe(OrganizationObserver::class);
+
+        // Sidebar counter (short cache) for actionable alerts.
+        View::composer('layouts.admin.partials.sidebar-nav', function ($view) {
+            $pendingAlertsCount = 0;
+            $user = auth()->user();
+
+            if ($user && $user->can('alerts.view')) {
+                try {
+                    $pendingAlertsCount = app(AlertCenterService::class)
+                        ->getPendingAlertsCount((int) $user->organization_id);
+                } catch (\Throwable $e) {
+                    \Log::warning('Unable to load sidebar alerts counter', [
+                        'user_id' => $user->id,
+                        'error' => $e->getMessage(),
+                    ]);
+                }
+            }
+
+            $view->with('sidebarPendingAlertsCount', $pendingAlertsCount);
+        });
     }
 }

@@ -22,7 +22,7 @@ Design surpassant Fleetio, Samsara et Verizon Connect:
 @author ZenFleet Architecture Team - Expert Système Senior
 ==================================================================== --}}
 
-<section class="bg-gray-50 min-h-screen">
+<section class="min-h-screen bg-[#f8fafc]">
     {{-- ===============================================
     HEADER AVEC BREADCRUMB
     =============================================== --}}
@@ -55,7 +55,7 @@ Design surpassant Fleetio, Samsara et Verizon Connect:
 
                     {{-- Bouton retour --}}
                     <a href="{{ route('admin.maintenance.operations.index') }}"
-                       class="inline-flex items-center gap-2 px-4 py-2.5 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 hover:shadow-md transition-all duration-200 text-sm font-medium">
+                       class="inline-flex items-center gap-2 px-4 py-2.5 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 hover:text-[#0c90ee] hover:border-[#0c90ee]/40 hover:shadow-md transition-all duration-200 text-sm font-medium text-gray-600">
                         <x-iconify icon="lucide:arrow-left" class="w-4 h-4 text-gray-500" />
                         <span>Retour à la liste</span>
                     </a>

@@ -28,18 +28,17 @@
 @endpush
 
 @section('content')
-<section class="bg-gray-50 min-h-screen">
-    <div class="py-4 px-4 mx-auto max-w-7xl lg:py-6" x-data="alertsManager()" x-init="init()">
-        <div class="mb-4 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3">
+<section class="zf-page min-h-screen">
+    <div class="py-6 px-4 mx-auto max-w-7xl lg:py-10" x-data="alertsManager()" x-init="init()">
+        <div class="mb-6 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3">
             <div>
-                <h1 class="text-2xl font-bold text-gray-900 flex items-center gap-2.5">
-                    <x-iconify icon="heroicons:exclamation-triangle" class="w-6 h-6 text-red-600" />
+                <h1 class="text-xl font-bold text-gray-600 flex items-center gap-2.5">
                     Centre d'Alertes
-                    <span class="ml-2 text-sm font-normal text-gray-500">({{ $stats['total_alerts'] }})</span>
                 </h1>
-                <p class="text-sm text-gray-600 ml-8.5">
+                <p class="text-xs text-gray-600">
                     Surveillance proactive de la flotte
-                    <span class="ml-2 text-xs text-gray-500">Dernière mise à jour: <span x-text="lastUpdate"></span></span>
+                    <span class="ml-2">• {{ $stats['total_alerts'] }} alerte(s)</span>
+                    <span class="ml-2 text-gray-500">Dernière mise à jour: <span x-text="lastUpdate"></span></span>
                 </p>
             </div>
             <div class="flex items-center gap-2">
@@ -131,9 +130,9 @@
             <div class="flex flex-col lg:flex-row items-start lg:items-center gap-3">
                 <div class="flex flex-col sm:flex-row items-start sm:items-center gap-3">
                     <div class="flex items-center gap-2">
-                        <label for="filter-type" class="text-sm font-medium text-gray-700">Type:</label>
+                        <label for="filter-type" class="text-sm font-medium text-gray-600">Type:</label>
                         <select id="filter-type" x-model="filters.type" @change="applyFilters()"
-                            class="rounded-lg border-gray-300 text-sm focus:ring-blue-500 focus:border-blue-500">
+                            class="bg-gray-50 border border-gray-300 rounded-lg text-sm px-3 py-2 focus:ring-2 focus:ring-[#0c90ee]/20 focus:border-[#0c90ee]">
                             <option value="">Tous</option>
                             <option value="critical">Critiques</option>
                             <option value="maintenance">Maintenance</option>
@@ -142,9 +141,9 @@
                         </select>
                     </div>
                     <div class="flex items-center gap-2">
-                        <label for="filter-priority" class="text-sm font-medium text-gray-700">Priorité:</label>
+                        <label for="filter-priority" class="text-sm font-medium text-gray-600">Priorité:</label>
                         <select id="filter-priority" x-model="filters.priority" @change="applyFilters()"
-                            class="rounded-lg border-gray-300 text-sm focus:ring-blue-500 focus:border-blue-500">
+                            class="bg-gray-50 border border-gray-300 rounded-lg text-sm px-3 py-2 focus:ring-2 focus:ring-[#0c90ee]/20 focus:border-[#0c90ee]">
                             <option value="">Toutes</option>
                             <option value="urgent">Urgente</option>
                             <option value="high">Haute</option>
@@ -155,12 +154,12 @@
                 </div>
                 <div class="flex items-center gap-2 ml-auto">
                     <button @click="refreshAlerts()"
-                        class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-lg shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors">
-                        <x-iconify icon="heroicons:arrow-path" class="h-4 w-4 mr-2" ::class="refreshing ? 'animate-spin' : ''" />
+                        class="inline-flex items-center h-10 px-4 border border-gray-300 rounded-lg text-sm font-medium text-gray-600 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#0c90ee]/20 focus:border-[#0c90ee] transition-colors">
+                        <x-iconify icon="heroicons:arrow-path" class="h-4 w-4 mr-2" x-bind:class="refreshing ? 'animate-spin' : ''" />
                         Actualiser
                     </button>
                     <button onclick="exportAlerts()"
-                        class="inline-flex items-center px-4 py-2 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors">
+                        class="inline-flex items-center h-10 px-4 border border-transparent rounded-lg text-sm font-medium text-white bg-[#0c90ee] hover:bg-[#0b82d6] focus:outline-none focus:ring-2 focus:ring-[#0c90ee]/20 transition-colors">
                         <x-iconify icon="heroicons:arrow-down-tray" class="h-4 w-4 mr-2" />
                         Exporter
                     </button>

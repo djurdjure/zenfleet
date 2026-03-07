@@ -318,6 +318,11 @@
                                 class="flex items-center w-full h-11 px-3.5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 {{ request()->routeIs('admin.alerts.*') ? 'zf-sidebar-item-active' : 'zf-sidebar-item' }}">
                                 <x-iconify icon="mdi:bell-ring" class="w-5 h-5 mr-3 {{ request()->routeIs('admin.alerts.*') ? 'text-white' : 'text-gray-600' }}" />
                                 <span class="flex-1">Alertes</span>
+                                @if(($sidebarPendingAlertsCount ?? 0) > 0)
+                                    <span class="inline-flex items-center justify-center min-w-[22px] h-[22px] px-1.5 rounded-full text-[11px] font-bold {{ request()->routeIs('admin.alerts.*') ? 'bg-white text-[#0c90ee]' : 'bg-red-500 text-white' }}">
+                                        {{ ($sidebarPendingAlertsCount ?? 0) > 99 ? '99+' : ($sidebarPendingAlertsCount ?? 0) }}
+                                    </span>
+                                @endif
                             </a>
                         </li>
                         @endcan

@@ -8,6 +8,68 @@ use App\Models\Vehicle;
 class HandoverChecklistService
 {
     /**
+     * Fallback template used when no checklist template exists in DB.
+     *
+     * This keeps handover creation operational in dev/staging and prevents
+     * UX dead-ends when templates were not seeded yet.
+     */
+    private const FALLBACK_TEMPLATE = [
+        'Papiers du véhicule' => [
+            'type' => 'binary',
+            'items' => [
+                'Carte Grise',
+                'Assurance',
+                'Vignette',
+                'Contrôle technique',
+                'Permis de circuler',
+                'Carte Carburant',
+            ],
+        ],
+        'Accessoires Intérieur' => [
+            'type' => 'binary',
+            'items' => [
+                'Triangle',
+                'Cric',
+                'Manivelle/Clé',
+                'Gilet',
+                'Tapis',
+                'Extincteur',
+                'Trousse de secours',
+                'Rétroviseur intérieur',
+                'Pare-soleil',
+                'Autoradio',
+                'Propreté',
+            ],
+        ],
+        'Pneumatiques' => [
+            'type' => 'condition',
+            'items' => [
+                'Roue AV Gauche',
+                'Roue AV Droite',
+                'Roue AR Gauche',
+                'Roue AR Droite',
+                'Roue de Secours',
+                'Enjoliveurs',
+            ],
+        ],
+        'État Extérieur' => [
+            'type' => 'condition',
+            'items' => [
+                'Vitres',
+                'Pare-brise',
+                'Rétroviseur Gauche',
+                'Rétroviseur Droit',
+                'Verrouillage',
+                'Poignées',
+                'Feux avant',
+                'Feux arrières',
+                'Essuie-glaces',
+                'Carrosserie Générale',
+            ],
+        ],
+    ];
+
+    /**
      * Get the most appropriate template for a vehicle.
      * 
      * Priority:
@@ -46,22 +108,13 @@ class HandoverChecklistService
     public function getTemplateStructure(Vehicle $vehicle): array
     {
         $template = $this->getTemplateForVehicle($vehicle);
+        $templateJson = $template?->template_json;
 
-        if (!$template) {
-            return [];
+        if (!is_array($templateJson) || empty($templateJson)) {
+            $templateJson = self::FALLBACK_TEMPLATE;
         }
 
-        $structure = [];
-
-        foreach ($template->template_json as $category => $config) {
-            $structure[$category] = [
-                'type' => $config['type'] ?? 'condition',
-                'items' => $config['items'] ?? [],
-                'statuses' => $this->getValidStatusesForCategory($config['type'] ?? 'condition'),
-            ];
-        }
-
-        return $structure;
+        return $this->buildStructureFromTemplateJson($templateJson);
     }
 
     /**
@@ -100,16 +153,12 @@ class HandoverChecklistService
     public function validateChecklistData(Vehicle $vehicle, array $checklistData): array
     {
         $template = $this->getTemplateForVehicle($vehicle);
-
-        if (!$template) {
-            return [
-                'valid' => false,
-                'errors' => ['No template found for this vehicle'],
-            ];
-        }
-
         $errors = [];
-        $templateJson = $template->template_json;
+        $templateJson = $template?->template_json;
+
+        if (!is_array($templateJson) || empty($templateJson)) {
+            $templateJson = self::FALLBACK_TEMPLATE;
+        }
 
         foreach ($checklistData as $category => $items) {
             // Check if category exists in template
@@ -133,5 +182,24 @@ class HandoverChecklistService
             'valid' => empty($errors),
             'errors' => $errors,
         ];
+    }
+
+    /**
+     * Build view-ready structure from template json.
+     */
+    private function buildStructureFromTemplateJson(array $templateJson): array
+    {
+        $structure = [];
+
+        foreach ($templateJson as $category => $config) {
+            $categoryType = $config['type'] ?? 'condition';
+            $structure[$category] = [
+                'type' => $categoryType,
+                'items' => $config['items'] ?? [],
+                'statuses' => $this->getValidStatusesForCategory($categoryType),
+            ];
+        }
+
+        return $structure;
     }
 }

@@ -37,16 +37,15 @@
 </div>
 @endif
 
-<section class="bg-gray-50 min-h-screen">
+<section class="zf-page min-h-screen">
     <div class="py-6 px-4 mx-auto max-w-7xl lg:py-12 lg:mx-0">
 
         {{-- Header COMPACT et MODERNE --}}
         <div class="mb-6">
-            <h1 class="text-2xl font-bold text-gray-900 mb-1 flex items-center gap-2.5">
-                <x-iconify icon="heroicons:building-office" class="w-6 h-6 text-blue-600" />
+            <h1 class="text-xl font-bold text-gray-600 mb-1">
                 Nouveau Fournisseur
             </h1>
-            <p class="text-sm text-gray-600 ml-8.5">
+            <p class="text-xs text-gray-600">
                 Remplissez les informations pour enregistrer un nouveau fournisseur
             </p>
         </div>
@@ -335,7 +334,7 @@
                                 name="is_active"
                                 value="1"
                                 {{ old('is_active', true) ? 'checked' : '' }}
-                                class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500">
+                                class="w-4 h-4 text-[#0c90ee] bg-gray-100 border-gray-300 rounded focus:ring-[#0c90ee]/30 focus:ring-2">
                             Actif
                         </label>
 
@@ -344,7 +343,7 @@
                                 name="is_preferred"
                                 value="1"
                                 {{ old('is_preferred') ? 'checked' : '' }}
-                                class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500">
+                                class="w-4 h-4 text-[#0c90ee] bg-gray-100 border-gray-300 rounded focus:ring-[#0c90ee]/30 focus:ring-2">
                             Préféré
                         </label>
 
@@ -353,7 +352,7 @@
                                 name="is_certified"
                                 value="1"
                                 {{ old('is_certified') ? 'checked' : '' }}
-                                class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500">
+                                class="w-4 h-4 text-[#0c90ee] bg-gray-100 border-gray-300 rounded focus:ring-[#0c90ee]/30 focus:ring-2">
                             Certifié
                         </label>
                     </div>
@@ -368,22 +367,23 @@
                     </div>
                 </x-form-section>
 
-                <div class="flex items-center justify-between pt-6 border-t border-gray-200">
-                    <x-button
-                        href="{{ route('admin.suppliers.index') }}"
-                        variant="secondary"
-                        icon="arrow-left"
-                        iconPosition="left">
-                        Annuler
-                    </x-button>
+                <div class="relative pl-14">
+                    <section class="rounded-2xl border border-slate-200 bg-white shadow-sm">
+                        <div class="flex items-center justify-between gap-3 px-6 py-4">
+                            <a href="{{ route('admin.suppliers.index') }}"
+                                class="inline-flex items-center justify-center h-10 px-4 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#0c90ee]/20 focus:border-[#0c90ee] transition-all">
+                                <x-iconify icon="heroicons:arrow-left" class="w-4 h-4 mr-2" />
+                                Annuler
+                            </a>
 
-                    <x-button
-                        type="submit"
-                        variant="primary"
-                        icon="check"
-                        iconPosition="left">
-                        Créer le Fournisseur
-                    </x-button>
+                            <button
+                                type="submit"
+                                class="inline-flex items-center justify-center h-10 px-4 text-sm font-medium text-white bg-[#0c90ee] border border-transparent rounded-lg hover:bg-[#0b82d6] focus:outline-none focus:ring-2 focus:ring-[#0c90ee]/25 transition-all">
+                                <x-iconify icon="heroicons:check" class="w-4 h-4 mr-2" />
+                                Créer le Fournisseur
+                            </button>
+                        </div>
+                    </section>
                 </div>
             </form>
         </div>

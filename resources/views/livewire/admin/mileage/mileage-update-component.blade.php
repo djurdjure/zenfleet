@@ -23,7 +23,7 @@
     @author Expert Fullstack Senior (20+ ans)
     ==================================================================== --}}
 
-<section class="bg-gray-50 min-h-screen">
+<section class="min-h-screen bg-[#f8fafc]">
     <div class="py-6 px-4 mx-auto max-w-7xl lg:py-12">
         
         {{-- ====================================================================
@@ -32,21 +32,19 @@
         <div class="mb-6">
             <div class="flex items-center justify-between">
                 <div>
-                    <h1 class="text-2xl font-bold text-gray-900 mb-1 flex items-center gap-2.5">
-                        <x-iconify icon="heroicons:chart-bar" class="w-6 h-6 text-blue-600" />
-                        Mise à Jour du Kilométrage
+                    <h1 class="text-xl font-bold text-gray-600">
+                        Mise a jour du kilometrage
                     </h1>
-                    <p class="text-sm text-gray-600 ml-8.5">
+                    <p class="text-xs text-gray-600">
                         Enregistrez le nouveau kilométrage d'un véhicule de manière simple et rapide
                     </p>
                 </div>
-                <x-button 
-                    href="{{ route('admin.mileage-readings.index') }}" 
-                    variant="secondary" 
-                    icon="list-bullet"
-                    size="sm">
+                <a
+                    href="{{ route('admin.mileage-readings.index') }}"
+                    class="inline-flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-600 shadow-sm transition-all duration-200 hover:bg-gray-50 hover:text-[#0c90ee] focus:outline-none focus:ring-2 focus:ring-[#0c90ee]/20 focus:border-[#0c90ee]">
+                    <x-iconify icon="heroicons:list-bullet" class="h-4 w-4" />
                     Voir l'historique
-                </x-button>
+                </a>
             </div>
         </div>
 
@@ -72,113 +70,102 @@
             
             {{-- COLONNE PRINCIPALE - FORMULAIRE --}}
             <div class="lg:col-span-2">
-                <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-                    
-                    {{-- En-tête de la carte - STYLE ZENFLEET --}}
-                    <div class="px-6 py-4 bg-gray-50 border-b border-gray-200">
-                        <h2 class="text-lg font-semibold text-gray-900 flex items-center gap-2">
-                            <x-iconify icon="heroicons:pencil-square" class="w-5 h-5 text-blue-600" />
-                            Enregistrer un Relevé Kilométrique
-                        </h2>
-                    </div>
-
-                    {{-- Corps du formulaire --}}
-                    <form wire:submit.prevent="save" class="p-6 space-y-6">
-                        
-                        {{-- 1. SÉLECTION DU VÉHICULE - SLIMSELECT ENTERPRISE --}}
-                        <div>
-                            <label for="vehicle_id" class="block text-sm font-medium text-gray-700 mb-2">
-                                <div class="flex items-center gap-2">
-                                    <x-iconify icon="heroicons:truck" class="w-4 h-4 text-gray-500" />
-                                    Véhicule
-                                    <span class="text-red-500">*</span>
+                <form wire:submit.prevent="save" class="space-y-5">
+                    <x-form-section
+                        title="Vehicule"
+                        icon="heroicons:truck"
+                        subtitle="Selectionnez le vehicule et confirmez son contexte actuel">
+                        <div class="space-y-4">
+                            <div>
+                                <label for="vehicle_id" class="block mb-2 text-sm font-medium text-gray-600">
+                                    Véhicule <span class="text-red-500">*</span>
+                                </label>
+                                <div wire:ignore id="vehicle-select-wrapper">
+                                    <select
+                                        id="vehicle_id"
+                                        name="vehicle_id"
+                                        class="slimselect-vehicle w-full"
+                                        required>
+                                        <option data-placeholder="true" value=""></option>
+                                        @foreach($availableVehicles as $vehicle)
+                                            <option
+                                                value="{{ $vehicle->id }}"
+                                                data-mileage="{{ $vehicle->current_mileage ?? 0 }}"
+                                                data-registration="{{ $vehicle->registration_plate }}"
+                                                data-brand="{{ $vehicle->brand }}"
+                                                data-model="{{ $vehicle->model }}"
+                                                @selected($vehicle_id == $vehicle->id)>
+                                                {{ $vehicle->registration_plate }} - {{ $vehicle->brand }} {{ $vehicle->model }} ({{ number_format($vehicle->current_mileage ?? 0, 0, ',', ' ') }} km)
+                                            </option>
+                                        @endforeach
+                                    </select>
                                 </div>
-                            </label>
-                            {{-- wire:ignore car SlimSelect gère le DOM, pas de wire:model pour éviter conflit --}}
-                            <div wire:ignore id="vehicle-select-wrapper">
-                                <select
-                                    id="vehicle_id"
-                                    name="vehicle_id"
-                                    class="slimselect-vehicle w-full"
-                                    required>
-                                    {{-- Option placeholder avec data-placeholder pour SlimSelect --}}
-                                    <option data-placeholder="true" value=""></option>
-                                    @foreach($availableVehicles as $vehicle)
-                                        <option
-                                            value="{{ $vehicle->id }}"
-                                            data-mileage="{{ $vehicle->current_mileage ?? 0 }}"
-                                            data-registration="{{ $vehicle->registration_plate }}"
-                                            data-brand="{{ $vehicle->brand }}"
-                                            data-model="{{ $vehicle->model }}"
-                                            @selected($vehicle_id == $vehicle->id)>
-                                            {{ $vehicle->registration_plate }} - {{ $vehicle->brand }} {{ $vehicle->model }} ({{ number_format($vehicle->current_mileage ?? 0, 0, ',', ' ') }} km)
-                                        </option>
-                                    @endforeach
-                                </select>
+                                @error('vehicle_id')
+                                    <p class="mt-2 text-sm text-red-600 flex items-center gap-1">
+                                        <x-iconify icon="heroicons:exclamation-circle" class="w-4 h-4" />
+                                        {{ $message }}
+                                    </p>
+                                @enderror
                             </div>
-                            @error('vehicle_id')
-                                <p class="mt-2 text-sm text-red-600 flex items-center gap-1">
-                                    <x-iconify icon="heroicons:exclamation-circle" class="w-4 h-4" />
-                                    {{ $message }}
-                                </p>
-                            @enderror
-                        </div>
 
-                        {{-- INFORMATIONS DU VÉHICULE SÉLECTIONNÉ --}}
-                        @if($vehicleData)
-                            <div class="p-4 bg-blue-50 border border-blue-200 rounded-lg">
-                                <div class="flex items-start gap-3">
-                                    <div class="flex-shrink-0">
-                                        <x-iconify icon="heroicons:truck" class="w-6 h-6 text-blue-600" />
-                                    </div>
-                                    <div class="flex-1 space-y-2">
-                                        <div class="flex items-center gap-2">
-                                            <span class="text-lg font-bold text-blue-900">
-                                                {{ $vehicleData['registration_plate'] }}
-                                            </span>
-                                            <span class="text-sm text-blue-700">
-                                                {{ $vehicleData['brand'] }} {{ $vehicleData['model'] }}
-                                            </span>
+                            @if($vehicleData)
+                                <div class="rounded-xl border border-blue-200 bg-blue-50 p-4">
+                                    <div class="flex items-start gap-3">
+                                        <div class="flex-shrink-0">
+                                            <x-iconify icon="heroicons:truck" class="w-6 h-6 text-blue-600" />
                                         </div>
-                                        
-                                        <div class="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
-                                            @if($vehicleData['category_name'])
-                                                <div>
-                                                    <span class="text-blue-600 font-medium">Catégorie:</span>
-                                                    <span class="text-blue-900">{{ $vehicleData['category_name'] }}</span>
-                                                </div>
-                                            @endif
-                                            @if($vehicleData['fuel_type'])
-                                                <div>
-                                                    <span class="text-blue-600 font-medium">Carburant:</span>
-                                                    <span class="text-blue-900">{{ $vehicleData['fuel_type'] }}</span>
-                                                </div>
-                                            @endif
-                                            @if($vehicleData['depot_name'])
-                                                <div class="col-span-2">
-                                                    <span class="text-blue-600 font-medium">Dépôt:</span>
-                                                    <span class="text-blue-900">{{ $vehicleData['depot_name'] }}</span>
-                                                </div>
-                                            @endif
-                                        </div>
-                                        
-                                        <div class="pt-2 border-t border-blue-200">
+                                        <div class="flex-1 space-y-2">
                                             <div class="flex items-center gap-2">
-                                                <x-iconify icon="heroicons:chart-bar" class="w-5 h-5 text-blue-600" />
-                                                <span class="text-sm text-blue-700 font-medium">Kilométrage actuel:</span>
                                                 <span class="text-lg font-bold text-blue-900">
-                                                    {{ number_format($vehicleData['current_mileage'], 0, ',', ' ') }} km
+                                                    {{ $vehicleData['registration_plate'] }}
                                                 </span>
+                                                <span class="text-sm text-blue-700">
+                                                    {{ $vehicleData['brand'] }} {{ $vehicleData['model'] }}
+                                                </span>
+                                            </div>
+
+                                            <div class="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
+                                                @if($vehicleData['category_name'])
+                                                    <div>
+                                                        <span class="text-blue-600 font-medium">Catégorie:</span>
+                                                        <span class="text-blue-900">{{ $vehicleData['category_name'] }}</span>
+                                                    </div>
+                                                @endif
+                                                @if($vehicleData['fuel_type'])
+                                                    <div>
+                                                        <span class="text-blue-600 font-medium">Carburant:</span>
+                                                        <span class="text-blue-900">{{ $vehicleData['fuel_type'] }}</span>
+                                                    </div>
+                                                @endif
+                                                @if($vehicleData['depot_name'])
+                                                    <div class="col-span-2">
+                                                        <span class="text-blue-600 font-medium">Dépôt:</span>
+                                                        <span class="text-blue-900">{{ $vehicleData['depot_name'] }}</span>
+                                                    </div>
+                                                @endif
+                                            </div>
+
+                                            <div class="pt-2 border-t border-blue-200">
+                                                <div class="flex items-center gap-2">
+                                                    <x-iconify icon="heroicons:chart-bar" class="w-5 h-5 text-blue-600" />
+                                                    <span class="text-sm text-blue-700 font-medium">Kilométrage actuel:</span>
+                                                    <span class="text-lg font-bold text-blue-900">
+                                                        {{ number_format($vehicleData['current_mileage'], 0, ',', ' ') }} km
+                                                    </span>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                        @endif
+                            @endif
+                        </div>
+                    </x-form-section>
 
-                        {{-- 2. DATE ET HEURE DE LA LECTURE --}}
+                    <x-form-section
+                        title="Horodatage"
+                        icon="heroicons:clock"
+                        subtitle="Date et heure du releve">
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            {{-- Date - FLATPICKR ENTERPRISE (déjà correct) --}}
                             <div>
                                 <x-datepicker
                                     name="date"
@@ -193,14 +180,9 @@
                                     required
                                 />
                             </div>
-                            {{-- Heure - Champ natif prérempli et modifiable --}}
                             <div>
-                                <label for="time" class="block text-sm font-medium text-gray-700 mb-2">
-                                    <div class="flex items-center gap-2">
-                                        <x-iconify icon="heroicons:clock" class="w-4 h-4 text-gray-500" />
-                                        Heure de la lecture
-                                        <span class="text-red-500">*</span>
-                                    </div>
+                                <label for="time" class="block mb-2 text-sm font-medium text-gray-600">
+                                    Heure de la lecture <span class="text-red-500">*</span>
                                 </label>
                                 <input
                                     type="time"
@@ -209,7 +191,7 @@
                                     wire:model.live="time"
                                     step="60"
                                     required
-                                    class="block w-full px-3 py-2.5 bg-white border rounded-lg shadow-sm text-sm text-gray-900 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 {{ $errors->has('time') ? 'border-red-500 bg-red-50' : 'border-gray-300' }}"
+                                    class="block w-full rounded-lg border bg-white px-3 py-2.5 text-sm text-gray-900 shadow-sm transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-[#0c90ee]/20 focus:border-[#0c90ee] {{ $errors->has('time') ? 'border-red-500 bg-red-50' : 'border-gray-300' }}"
                                 />
                                 @error('time')
                                     <p class="mt-2 text-sm text-red-600 flex items-center gap-1">
@@ -217,83 +199,88 @@
                                         {{ $message }}
                                     </p>
                                 @enderror
-                                <p class="mt-1.5 text-xs text-gray-500">Préchargée à l'heure actuelle, modifiable.</p>
+                                <p class="mt-1.5 text-xs text-gray-600">Préchargée à l'heure actuelle, modifiable.</p>
                             </div>
                         </div>
+                    </x-form-section>
 
-                        {{-- 3. NOUVEAU KILOMÉTRAGE --}}
-                        <div>
-                            <x-input
-                                type="number"
-                                name="mileage"
-                                wire:model.live="mileage"
-                                label="Nouveau kilométrage (km)"
-                                placeholder="Ex: 125000"
-                                :error="$errors->first('mileage')"
-                                icon="chart-bar"
-                                required
-                                min="0"
-                                step="1"
-                            />
-                            
-                            {{-- Message de validation en temps réel --}}
-                            @if($validationMessage && $vehicleData)
-                                <div class="mt-2 p-3 rounded-lg {{ 
-                                    $validationType === 'success' ? 'bg-green-50 border border-green-200' : 
-                                    ($validationType === 'warning' ? 'bg-yellow-50 border border-yellow-200' : 
-                                    'bg-red-50 border border-red-200')
-                                }}">
-                                    <p class="text-sm font-medium {{ 
-                                        $validationType === 'success' ? 'text-green-800' : 
-                                        ($validationType === 'warning' ? 'text-yellow-800' : 
-                                        'text-red-800')
+                    <x-form-section
+                        title="Releve kilometrique"
+                        icon="heroicons:chart-bar"
+                        subtitle="Saisissez la nouvelle lecture avec controle en temps reel">
+                        <div class="space-y-4">
+                            <div>
+                                <x-input
+                                    type="number"
+                                    name="mileage"
+                                    wire:model.live="mileage"
+                                    label="Nouveau kilométrage (km)"
+                                    placeholder="Ex: 125000"
+                                    :error="$errors->first('mileage')"
+                                    icon="chart-bar"
+                                    required
+                                    min="0"
+                                    step="1"
+                                />
+
+                                @if($validationMessage && $vehicleData)
+                                    <div class="mt-2 rounded-lg p-3 {{
+                                        $validationType === 'success' ? 'bg-green-50 border border-green-200' :
+                                        ($validationType === 'warning' ? 'bg-yellow-50 border border-yellow-200' :
+                                        'bg-red-50 border border-red-200')
                                     }}">
-                                        {{ $validationMessage }}
-                                    </p>
-                                </div>
-                            @endif
+                                        <p class="text-sm font-medium {{
+                                            $validationType === 'success' ? 'text-green-800' :
+                                            ($validationType === 'warning' ? 'text-yellow-800' :
+                                            'text-red-800')
+                                        }}">
+                                            {{ $validationMessage }}
+                                        </p>
+                                    </div>
+                                @endif
+                            </div>
+
+                            <div>
+                                <x-textarea
+                                    name="notes"
+                                    wire:model="notes"
+                                    label="Notes (optionnel)"
+                                    placeholder="Commentaires ou observations particulières..."
+                                    :error="$errors->first('notes')"
+                                    rows="3"
+                                />
+                                <p class="mt-1 text-xs text-gray-600">Maximum 500 caractères</p>
+                            </div>
                         </div>
+                    </x-form-section>
 
-                        {{-- 4. NOTES OPTIONNELLES --}}
-                        <div>
-                            <x-textarea
-                                name="notes"
-                                wire:model="notes"
-                                label="Notes (optionnel)"
-                                placeholder="Commentaires ou observations particulières..."
-                                :error="$errors->first('notes')"
-                                rows="3"
-                            />
-                            <p class="mt-1 text-xs text-gray-500">
-                                Maximum 500 caractères
-                            </p>
-                        </div>
+                    <div class="relative pl-14">
+                        <section class="rounded-2xl border border-slate-200 bg-white shadow-sm">
+                            <div class="px-6 py-4 flex items-center justify-between gap-3">
+                                <button
+                                    type="button"
+                                    wire:click="resetForm"
+                                    class="inline-flex items-center justify-center h-10 gap-2 px-4 rounded-lg border border-gray-300 bg-white text-sm font-medium text-gray-600 transition-all duration-200 hover:bg-gray-50 hover:text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#0c90ee]/20 focus:border-[#0c90ee]">
+                                    <x-iconify icon="heroicons:arrow-path" class="w-4 h-4" />
+                                    Réinitialiser
+                                </button>
 
-                        {{-- BOUTONS D'ACTION - STYLE ZENFLEET --}}
-                        <div class="flex items-center justify-between pt-4 border-t border-gray-200">
-                            <x-button
-                                type="button"
-                                wire:click="resetForm"
-                                variant="secondary"
-                                icon="arrow-path"
-                                size="md">
-                                Réinitialiser
-                            </x-button>
-
-                            <x-button
-                                type="submit"
-                                wire:loading.attr="disabled"
-                                wire:target="save"
-                                variant="primary"
-                                icon="check"
-                                size="md">
-                                <span wire:loading.remove wire:target="save">Enregistrer la Lecture</span>
-                                <span wire:loading wire:target="save">Enregistrement...</span>
-                            </x-button>
-                        </div>
-
-                    </form>
-                </div>
+                                <button
+                                    type="submit"
+                                    wire:loading.attr="disabled"
+                                    wire:target="save"
+                                    class="inline-flex items-center justify-center h-10 gap-2 px-5 rounded-lg border border-[#0c90ee] bg-[#0c90ee] text-sm font-medium text-white transition-all duration-200 hover:bg-[#0a7fd1] hover:border-[#0a7fd1] focus:outline-none focus:ring-2 focus:ring-[#0c90ee]/20 disabled:opacity-50 disabled:cursor-not-allowed">
+                                    <x-iconify icon="heroicons:check" class="w-4 h-4" wire:loading.remove wire:target="save" />
+                                    <span wire:loading.remove wire:target="save">Enregistrer la lecture</span>
+                                    <span wire:loading wire:target="save" class="inline-flex items-center">
+                                        <x-iconify icon="lucide:loader-2" class="w-4 h-4 animate-spin mr-2" />
+                                        Enregistrement...
+                                    </span>
+                                </button>
+                            </div>
+                        </section>
+                    </div>
+                </form>
             </div>
 
             {{-- COLONNE LATÉRALE - INFORMATIONS --}}

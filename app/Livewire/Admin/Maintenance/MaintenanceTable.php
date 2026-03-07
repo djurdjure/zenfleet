@@ -10,6 +10,7 @@ use App\Models\MaintenanceType;
 use App\Models\Supplier;
 use App\Models\Vehicle;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Carbon\Carbon;
 
 /**
  * 📊 COMPOSANT TABLE MAINTENANCE ENTERPRISE
@@ -157,6 +158,9 @@ class MaintenanceTable extends Component
     {
         $this->authorize('viewAny', MaintenanceOperation::class);
 
+        $normalizedDateFrom = $this->normalizeDateFilter($this->dateFrom);
+        $normalizedDateTo = $this->normalizeDateFilter($this->dateTo);
+
         $filters = [
             'search' => $this->search,
             'status' => $this->status,
@@ -164,8 +168,8 @@ class MaintenanceTable extends Component
             'provider_id' => $this->providerId,
             'vehicle_id' => $this->vehicleId,
             'category' => $this->category,
-            'date_from' => $this->dateFrom,
-            'date_to' => $this->dateTo,
+            'date_from' => $normalizedDateFrom,
+            'date_to' => $normalizedDateTo,
             'overdue' => $this->overdue,
             'sort' => $this->sortField,
             'direction' => $this->sortDirection,
@@ -207,5 +211,31 @@ class MaintenanceTable extends Component
             'vehicles' => $vehicles,
             'providers' => $providers,
         ])->extends('layouts.admin.catalyst')->section('content');
+    }
+
+    /**
+     * Normalize date filters to Y-m-d for SQL comparisons.
+     */
+    private function normalizeDateFilter(?string $value): string
+    {
+        $value = trim((string) $value);
+        if ($value === '') {
+            return '';
+        }
+
+        try {
+            if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $value)) {
+                return Carbon::createFromFormat('Y-m-d', $value)->format('Y-m-d');
+            }
+
+            if (preg_match('/^\d{1,2}\/\d{1,2}\/\d{4}$/', $value)) {
+                return Carbon::createFromFormat('d/m/Y', $value)->format('Y-m-d');
+            }
+
+            $date = Carbon::parse($value);
+            return $date->format('Y-m-d');
+        } catch (\Throwable $e) {
+            return '';
+        }
     }
 }

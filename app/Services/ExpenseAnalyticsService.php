@@ -161,14 +161,22 @@ class ExpenseAnalyticsService
     }
 
     /**
-     * Calculer le TCO (Total Cost of Ownership) par véhicule
-     * 
+     * Calculer le TCO (Total Cost of Ownership) par véhicule.
+     * L'annee est optionnelle pour préserver la compatibilite avec
+     * les anciens appels (1 seul argument).
+     *
      * @param int $organizationId
-     * @param int $year
+     * @param int|null $year
      * @return array
      */
-    public function calculateTCO(int $organizationId, int $year): array
+    public function calculateTCO(int $organizationId, ?int $year = null): array
     {
+        $currentYear = (int) now()->year;
+        $year = $year ?? $currentYear;
+        if ($year < 2000 || $year > ($currentYear + 1)) {
+            $year = $currentYear;
+        }
+
         $vehicles = Vehicle::where('organization_id', $organizationId)
             ->with(['expenses' => function ($query) use ($year) {
                 $query->whereYear('expense_date', $year);

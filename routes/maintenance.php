@@ -5,6 +5,7 @@ use App\Http\Controllers\Admin\Maintenance\MaintenanceOperationController;
 use App\Http\Controllers\Admin\Maintenance\MaintenanceScheduleController;
 use App\Http\Controllers\Admin\MaintenanceAlertController;
 use App\Http\Controllers\Admin\MaintenanceReportController;
+use App\Livewire\Admin\Maintenance\MaintenanceTable;
 
 /*
 |--------------------------------------------------------------------------
@@ -43,8 +44,8 @@ Route::prefix('admin/maintenance')->name('admin.maintenance.')->middleware(['aut
         | ROUTES STATIQUES - Doivent être définies EN PREMIER
         |----------------------------------------------------------------------
         */
-        // Vue liste principale
-        Route::get('/', [MaintenanceOperationController::class, 'index'])->name('index');
+        // Vue liste principale (Livewire, filtres sans refresh complet)
+        Route::get('/', MaintenanceTable::class)->name('index');
         
         // Vues alternatives (statiques)
         Route::get('/kanban', [MaintenanceOperationController::class, 'kanban'])->name('kanban');

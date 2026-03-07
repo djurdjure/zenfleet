@@ -45,6 +45,7 @@ import flatpickr from 'flatpickr';
 import { French } from 'flatpickr/dist/l10n/fr.js';
 // ✅ FLOWBITE DATEPICKER
 import Datepicker from 'flowbite-datepicker/Datepicker';
+import DateRangePicker from 'flowbite-datepicker/DateRangePicker';
 import fr from './locales/fr.js';
 import { setupZenFleetChartsLifecycle } from '../charts/zenfleet-charts';
 
@@ -58,6 +59,7 @@ const initializeAdminGlobals = () => {
     // ✅ FLOWBITE SETUP
     Object.assign(Datepicker.locales, { fr });
     window.Datepicker = Datepicker;
+    window.DateRangePicker = DateRangePicker;
     console.log('📅 Flowbite Datepicker configured globally:', !!window.Datepicker);
 };
 

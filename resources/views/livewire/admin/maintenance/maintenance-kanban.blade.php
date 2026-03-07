@@ -1,7 +1,7 @@
 <div class="grid grid-cols-1 md:grid-cols-3 gap-6" x-data="kanbanBoard()" x-init="init()">
     
     @foreach($kanbanData as $statusKey => $column)
-        <div class="bg-gray-50 rounded-lg p-4 border border-gray-200">
+        <div class="bg-white rounded-lg p-4 border border-gray-200 shadow-sm">
             
             {{-- Column Header --}}
             <div class="flex items-center justify-between mb-4">
@@ -10,8 +10,8 @@
                         $statusKey === 'planned' ? 'bg-blue-500' : 
                         ($statusKey === 'in_progress' ? 'bg-orange-500' : 'bg-green-500') 
                     }}"></div>
-                    <h3 class="text-sm font-semibold text-gray-900">{{ $column['label'] }}</h3>
-                    <span class="px-2 py-0.5 text-xs font-medium bg-white rounded-full border border-gray-200">
+                    <h3 class="text-sm font-semibold text-slate-600">{{ $column['label'] }}</h3>
+                    <span class="px-2 py-0.5 text-xs font-medium bg-[#f8fafc] rounded-full border border-gray-200 text-gray-600">
                         {{ $column['count'] }}
                     </span>
                 </div>
@@ -23,9 +23,9 @@
                 data-status="{{ $statusKey }}"
                 x-ref="column_{{ $statusKey }}">
                 
-                @foreach($column['operations'] as $operation)
+                @forelse($column['operations'] as $operation)
                     <div 
-                        class="bg-white rounded-lg p-4 border border-gray-200 shadow-sm hover:shadow-md transition-shadow duration-200 cursor-move"
+                        class="rounded-lg bg-white p-4 border border-gray-200 shadow-sm hover:shadow-md transition-shadow duration-200 cursor-move"
                         data-operation-id="{{ $operation->id }}"
                         draggable="true"
                         @dragstart="dragStart($event)"
@@ -85,18 +85,22 @@
                         {{-- Actions --}}
                         <div class="flex items-center justify-end gap-2 mt-3 pt-3 border-t border-gray-100">
                             <a href="{{ route('admin.maintenance.operations.show', $operation) }}" 
-                               class="text-blue-600 hover:text-blue-900" 
+                               class="p-2 rounded-full bg-gray-50 text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition-all duration-200 group" 
                                title="Voir détails">
-                                <x-iconify icon="lucide:eye" class="w-4 h-4" />
+                                <x-iconify icon="lucide:eye" class="w-4 h-4 group-hover:scale-110 transition-transform" />
                             </a>
                             <a href="{{ route('admin.maintenance.operations.edit', $operation) }}" 
-                               class="text-gray-600 hover:text-gray-900" 
+                               class="p-2 rounded-full bg-gray-50 text-gray-400 hover:text-amber-600 hover:bg-amber-50 transition-all duration-200 group" 
                                title="Modifier">
-                                <x-iconify icon="lucide:pencil" class="w-4 h-4" />
+                                <x-iconify icon="lucide:pencil" class="w-4 h-4 group-hover:scale-110 transition-transform" />
                             </a>
                         </div>
                     </div>
-                @endforeach
+                @empty
+                    <div class="rounded-lg border border-dashed border-gray-300 bg-gray-50 p-4 text-center">
+                        <p class="text-xs text-gray-500">Aucune opération dans cette colonne.</p>
+                    </div>
+                @endforelse
 
                 {{-- Drop Zone Indicator --}}
                 <div 
